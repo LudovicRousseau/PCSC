@@ -148,13 +148,11 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	} else
 	{
-	DebugLogA("POUET");
 		/* use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
 			rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
 		else
 			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
-	DebugLogA("POUET");
 	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -563,7 +561,6 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 #endif
 
-	DebugLogA("POUET");
 	if (rContext->dwVersion != IFD_HVERSION_2_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
@@ -614,7 +611,6 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD, LPDWORD);
 #endif
 
-	DebugLogA("POUET");
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
