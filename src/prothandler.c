@@ -5,6 +5,8 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -29,7 +31,6 @@
 
 UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 {
-
 	SMARTCARD_EXTENSION sSmartCard;
 
 	/*
@@ -38,13 +39,9 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
 
 	if (ATRDecodeAtr(&sSmartCard, pucAtr, dwLength))
-	{
 		return sSmartCard.CardCapabilities.CurrentProtocol;
-	} else
-	{
+	else
 		return 0x00;
-	}
-
 }
 
 /*
@@ -55,7 +52,6 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 
 UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 {
-
 	SMARTCARD_EXTENSION sSmartCard;
 
 	/*
@@ -64,13 +60,9 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
 
 	if (ATRDecodeAtr(&sSmartCard, pucAtr, dwLength))
-	{
 		return sSmartCard.CardCapabilities.AvailableProtocols;
-	} else
-	{
+	else
 		return 0x00;
-	}
-
 }
 
 /*
@@ -106,7 +98,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 
 		if (SCARD_PROTOCOL_T0 & ucAvailable)
 		{
-			DebugLogB("PHSetProtocol: Attempting PTS to T=%d", 0);
+			DebugLogB("Attempting PTS to T=%d", 0);
 
 			/*
 			 * Case 1: T1 is default but is not preferred 
@@ -118,11 +110,10 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 				0x00, 0x00, 0x00);
 
 			if (rv != SCARD_S_SUCCESS)
-			{
 				return SCARD_PROTOCOL_T1;
-			}
 
-		} else
+		}
+		else
 		{
 			/*
 			 * App wants an unsupported protocol 
@@ -134,8 +125,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		((dwPreferred & SCARD_PROTOCOL_T0) == 0) &&
 		(dwPreferred & SCARD_PROTOCOL_T1))
 	{
-
-		DebugLogB("PHSetProtocol: Attempting PTS to T=%d", 1);
+		DebugLogB("Attempting PTS to T=%d", 1);
 
 		/*
 		 * Case 2: T=0 is default but T=1 is preferred 
@@ -150,22 +140,19 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 				0x00, 0x00, 0x00);
 
 			if (rv != SCARD_S_SUCCESS)
-			{
 				return SCARD_PROTOCOL_T0;
-			} else
-			{
+			else
 				return SCARD_PROTOCOL_T1;
-			}
-
-		} else
+		}
+		else
 		{
 			/*
 			 * App wants unsupported protocol 
 			 */
 			return -1;
 		}
-
-	} else
+	}
+	else
 	{
 		/*
 		 * Case 3: Default protocol is preferred 

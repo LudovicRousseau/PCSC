@@ -99,7 +99,7 @@ static void ContextThread(DWORD* pdwIndex)
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex = *pdwIndex;
 
-	DebugLogB("ContextThread: Thread is started: %d", psContext[dwContextIndex].dwClientID);
+	DebugLogB("Thread is started: %d", psContext[dwContextIndex].dwClientID);
 	
 	while (1)
 	{
@@ -112,7 +112,7 @@ static void ContextThread(DWORD* pdwIndex)
 				/*
 				 * Clean up the dead client
 				 */
-				DebugLogB("ContextThread: Client die: %d", psContext[dwContextIndex].dwClientID);
+				DebugLogB("Client die: %d", psContext[dwContextIndex].dwClientID);
 				MSGCleanupClient(dwContextIndex);
 				SYS_ThreadExit((LPVOID) NULL);
 			} 
@@ -166,11 +166,11 @@ static void ContextThread(DWORD* pdwIndex)
 			break;
 			
 		case -1:
-			DebugLogA("ContextThread: Error in SHMProcessEventsContext");
+			DebugLogA("Error in SHMProcessEventsContext");
 			break;
 			
 		default:
-			DebugLogB("ContextThread: SHMProcessEventsContext unknown retval: %d",
+			DebugLogB("SHMProcessEventsContext unknown retval: %d",
 				  rv);
 			break;
 		}
@@ -442,7 +442,7 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 	}
 	
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
-	DebugLogA("MSGCheckHandleAssociation: Client failed to authenticate");
+	DebugLogA("Client failed to authenticate");
 	SYS_Sleep(2);
 
 	return -1;

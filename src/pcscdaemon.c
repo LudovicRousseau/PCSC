@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999
+ * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -87,7 +87,7 @@ void SVCServiceRunLoop()
 
 	if (rsp == -1)
 	{
-		DebugLogA("SVCServiceRunLoop: Error initializing pcscd.");
+		DebugLogA("Error initializing pcscd.");
 		exit(-1);
 	}
 
@@ -98,7 +98,7 @@ void SVCServiceRunLoop()
 
 	if (rv == -1)
 	{
-		DebugLogA("SVCServiceRunLoop: Error initializing pcscd.");
+		DebugLogA("Error initializing pcscd.");
 		exit(-1);
 	}
 
@@ -134,12 +134,12 @@ void SVCServiceRunLoop()
 		{
 
 		case 0:
-			DebugLogB("SVCServiceRunLoop: A new context thread creation is requested: %d", dwClientID);
+			DebugLogB("A new context thread creation is requested: %d", dwClientID);
 			rv = CreateContextThread(&dwClientID);
 
  			if (rv != SCARD_S_SUCCESS)
 			{
-				DebugLogA("SVCServiceRunLoop: Problem during the context thread creation");
+				DebugLogA("Problem during the context thread creation");
 				AraKiri = TRUE;
 			}
 
@@ -154,11 +154,11 @@ void SVCServiceRunLoop()
 			break;
 
 		case -1:
-			DebugLogA("SVCServiceRunLoop: Error in SHMProcessEventsServer");
+			DebugLogA("Error in SHMProcessEventsServer");
 			break;
 
 		default:
-			DebugLogB("SVCServiceRunLoop: SHMProcessEventsServer unknown retval: %d",
+			DebugLogB("SHMProcessEventsServer unknown retval: %d",
 				rsp);
 			break;
 		}
@@ -177,7 +177,6 @@ void SVCServiceRunLoop()
 
 int main(int argc, char **argv)
 {
-
 	int rv;
 	char setToForeground;
 	char *newReaderConfig;
@@ -229,7 +228,7 @@ int main(int argc, char **argv)
 #endif
 		switch (opt) {
 			case 'c':
-				DebugLogB("main: using new config file: %s", optarg);
+				DebugLogB("using new config file: %s", optarg);
 				newReaderConfig = optarg;
 				break;
 
@@ -318,7 +317,7 @@ int main(int argc, char **argv)
 
 			if (kill(pid, 0) == 0)
 			{
-				DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
+				DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
 				DebugLogB("Another pcscd (pid: %d) seems to be running.", pid);
 				return EXIT_FAILURE;
 			}
@@ -328,7 +327,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
+			DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
 			DebugLogA("Maybe another pcscd is running?");
 			DebugLogA("I can't read process pid from " USE_RUN_PID);
 			DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
@@ -336,7 +335,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 #else
-		DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
+		DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
 		DebugLogA("Maybe another pcscd is running?");
 		DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 		DebugLogA("if pcscd is not running to clear this message.");
@@ -350,7 +349,7 @@ int main(int argc, char **argv)
 	if (!setToForeground)
 	{
 		if (SYS_Daemon(0, 0))
-			DebugLogB("main: SYS_Daemon() failed: %s", strerror(errno));
+			DebugLogB("SYS_Daemon() failed: %s", strerror(errno));
 	}
 
 	/*
@@ -386,7 +385,7 @@ int main(int argc, char **argv)
 		rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
 		if (rv != 0)
 		{
-			DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s",
+			DebugLogB("cannot create " PCSCLITE_IPC_DIR ": %s",
 				strerror(errno));
 			return EXIT_FAILURE;
 		}
@@ -394,7 +393,7 @@ int main(int argc, char **argv)
 
 	/* cleanly remove /var/run/pcsc.* files when exiting */
 	if (atexit(at_exit))
-		DebugLogB("main: atexit() failed: %s", strerror(errno));
+		DebugLogB("atexit() failed: %s", strerror(errno));
 
 	/*
 	 * Allocate memory for reader structures 
@@ -409,7 +408,7 @@ int main(int argc, char **argv)
 		rv = DBUpdateReaders(newReaderConfig);
 		if (rv != 0)
 		{
-			DebugLogC("main: invalid file %s: %s", newReaderConfig,
+			DebugLogC("invalid file %s: %s", newReaderConfig,
 				strerror(errno));
 			at_exit();
 		}
@@ -421,7 +420,7 @@ int main(int argc, char **argv)
 #if 0
 		if (rv == 1)
 		{
-			DebugLogA("main: warning: no " PCSCLITE_READER_CONFIG " found");
+			DebugLogA("warning: no " PCSCLITE_READER_CONFIG " found");
 			/*
 			 * Token error in file 
 			 */
@@ -439,7 +438,7 @@ int main(int argc, char **argv)
 	g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
 	g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
 
-	DebugLogA("main: pcsc-lite daemon ready.");
+	DebugLogA("pcsc-lite daemon ready.");
 
 	/*
 	 * post initialistion 
@@ -456,13 +455,13 @@ int main(int argc, char **argv)
 
 	SVCServiceRunLoop();
 
-	DebugLogA("main: SVCServiceRunLoop returned");
+	DebugLogA("SVCServiceRunLoop returned");
 	return EXIT_FAILURE;
 }
 
 void at_exit(void)
 {
-	DebugLogA("at_exit: cleaning " PCSCLITE_IPC_DIR);
+	DebugLogA("cleaning " PCSCLITE_IPC_DIR);
 
 	clean_temp_files();
 
@@ -475,18 +474,18 @@ void clean_temp_files(void)
 
 	rv = SYS_Unlink(PCSCLITE_PUBSHM_FILE);
 	if (rv != 0)
-		DebugLogB("main: Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",
+		DebugLogB("Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",
 			strerror(errno));
 
 	rv = SYS_Unlink(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
-		DebugLogB("main: Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
+		DebugLogB("Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
 #ifdef USE_RUN_PID
 	rv = SYS_Unlink(USE_RUN_PID);
 	if (rv != 0)
-		DebugLogB("main: Cannot unlink " USE_RUN_PID ": %s",
+		DebugLogB("Cannot unlink " USE_RUN_PID ": %s",
 			strerror(errno));
 #endif
 }

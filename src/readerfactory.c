@@ -98,7 +98,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
 					(dwPort == (sReadersContexts[i])->dwPort))
 				{
-					DebugLogA("RFAddReader: Duplicate reader found.");
+					DebugLogA("Duplicate reader found.");
 					return SCARD_E_DUPLICATE_READER;
 				}
 			}
@@ -221,7 +221,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		/*
 		 * Clean up so it is not using needed space 
 		 */
-		DebugLogB("RFAddReader: %s init failed.", lpcReader);
+		DebugLogB("%s init failed.", lpcReader);
 
 		(sReadersContexts[dwContext])->dwVersion = 0;
 		(sReadersContexts[dwContext])->dwPort = 0;
@@ -390,7 +390,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			/*
 			 * Clean up so it is not using needed space 
 			 */
-			DebugLogB("RFAddReader: %s init failed.", lpcReader);
+			DebugLogB("%s init failed.", lpcReader);
 
 			(sReadersContexts[dwContextB])->dwVersion = 0;
 			(sReadersContexts[dwContextB])->dwPort = 0;
@@ -862,7 +862,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 
 	if (rContext->vHandle != 0)
 	{
-		DebugLogA("RFLoadReader: Warning library pointer not NULL");
+		DebugLogA("Warning library pointer not NULL");
 		/*
 		 * Another reader exists with this library loaded 
 		 */
@@ -913,7 +913,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		 */
 		rContext->psFunctions.pvfCreateChannel = 0;
 
-		DebugLogA("RFBindFunctions: IFDHandler functions missing");
+		DebugLogA("IFDHandler functions missing");
 
 		exit(1);
 	} else if (rv1 == SCARD_S_SUCCESS)
@@ -948,8 +948,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-
-		DebugLogA("RFBindFunctions: Loading IFD Handler 1.0");
+		DebugLogA("Loading IFD Handler 1.0");
 
 		rv = DYN_GetAddress(rContext->vHandle,
 			&rContext->psFunctions.pvfCloseChannel, "IO_Close_Channel");
@@ -957,7 +956,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfCloseChannel = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -968,7 +967,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfGetCapabilities = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -979,7 +978,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfSetCapabilities = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -999,7 +998,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfPowerICC = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1036,7 +1035,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfTransmitICC = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1046,7 +1045,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfICCPresent = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1067,9 +1066,9 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	} else if ((rContext->dwVersion == IFD_HVERSION_2_0) || (rContext->dwVersion == IFD_HVERSION_3_0))
 	{
 		if (rContext->dwVersion == IFD_HVERSION_2_0)
-			DebugLogA("RFBindFunctions: Loading IFD Handler 2.0");
+			DebugLogA("Loading IFD Handler 2.0");
 		else
-			DebugLogA("RFBindFunctions: Loading IFD Handler 3.0");
+			DebugLogA("Loading IFD Handler 3.0");
 
 		rv = DYN_GetAddress(rContext->vHandle,
 			&rContext->psFunctions.pvfCloseChannel, "IFDHCloseChannel");
@@ -1077,7 +1076,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfCloseChannel = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1088,7 +1087,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfGetCapabilities = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1099,7 +1098,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfSetCapabilities = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1121,7 +1120,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfPowerICC = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1131,7 +1130,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfTransmitICC = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1141,7 +1140,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfControl = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1151,7 +1150,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			rContext->psFunctions.pvfICCPresent = 0;
-			DebugLogA("RFBindFunctions: IFDHandler functions missing");
+			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -1160,7 +1159,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Who knows what could have happenned for it to get here. 
 		 */
-		DebugLogA("RFBindFunctions: IFD Handler not 1.0/2.0/3.0");
+		DebugLogA("IFD Handler not 1.0/2.0/3.0");
 		exit(1);
 	}
 
@@ -1198,7 +1197,7 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 
 	if (*rContext->dwFeeds == 1)
 	{
-		DebugLogA("RFUnloadReader: Unloading reader driver.");
+		DebugLogA("Unloading reader driver.");
 		DYN_CloseLibrary(&rContext->vHandle);
 	}
 
@@ -1310,8 +1309,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	/*
 	 * Spawn the event handler thread 
 	 */
-	DebugLogB("RFInitializeReader: Attempting startup of %s.",
-		rContext->lpcReader);
+	DebugLogB("Attempting startup of %s.", rContext->lpcReader);
 
   /******************************************/
 	/*
@@ -1345,7 +1343,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 	if (rv != IFD_SUCCESS)
 	{
-		DebugLogC("RFInitializeReader: Open Port %X Failed (%s)",
+		DebugLogC("Open Port %X Failed (%s)",
 			rContext->dwPort, rContext->lpcDevice);
 		RFUnBindFunctions(rContext);
 		RFUnloadReader(rContext);
@@ -1357,7 +1355,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 LONG RFUnInitializeReader(PREADER_CONTEXT rContext)
 {
-	DebugLogB("RFUninitializeReader: Attempting shutdown of %s.",
+	DebugLogB("Attempting shutdown of %s.",
 		rContext->lpcReader);
 
 	/*
@@ -1578,7 +1576,7 @@ void RFCleanupReaders(int shouldExit)
 	LONG rv;
 	char lpcStripReader[MAX_READERNAME];
 
-	DebugLogA("RFCleanupReaders: entering cleaning function");
+	DebugLogA("entering cleaning function");
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (sReadersContexts[i]->vHandle != 0)
@@ -1654,7 +1652,7 @@ void RFAwakeAllReaders()
 
 			if (rv != IFD_SUCCESS)
 			{
-				DebugLogC("RFInitializeReader: Open Port %X Failed (%s)",
+				DebugLogC("Open Port %X Failed (%s)",
 					  (sReadersContexts[i])->dwPort, (sReadersContexts[i])->lpcDevice);
 			}
 

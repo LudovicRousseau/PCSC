@@ -39,38 +39,23 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	bundlePath = CFStringCreateWithCString(NULL, pcLibrary,
 		kCFStringEncodingMacRoman);
 	if (bundlePath == NULL)
-	{
 		return SCARD_E_NO_MEMORY;
-
-	} else
-	{
-	}
 
 	bundleURL = CFURLCreateWithFileSystemPath(NULL, bundlePath,
 		kCFURLPOSIXPathStyle, TRUE);
 	CFRelease(bundlePath);
 	if (bundleURL == NULL)
-	{
 		return SCARD_E_NO_MEMORY;
-	} else
-	{
-	}
 
 	bundle = CFBundleCreate(NULL, bundleURL);
 	CFRelease(bundleURL);
 	if (bundle == NULL)
-	{
 		return SCARD_F_UNKNOWN_ERROR;
-	} else
-	{
-	}
 
 	if (!CFBundleLoadExecutable(bundle))
 	{
 		CFRelease(bundle);
 		return SCARD_F_UNKNOWN_ERROR;
-	} else
-	{
 	}
 
 	*pvLHandle = (void *) bundle;
@@ -87,10 +72,9 @@ int DYN_CloseLibrary(void **pvLHandle)
 	{
 		CFBundleUnloadExecutable(bundle);
 		CFRelease(bundle);
-	} else
-	{
-		DebugLogA("DYN_CloseLibrary: Cannot unload library.");
 	}
+	else
+		DebugLogA("Cannot unload library.");
 
 	*pvLHandle = 0;
 	return SCARD_S_SUCCESS;

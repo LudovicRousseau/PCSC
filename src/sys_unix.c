@@ -259,17 +259,17 @@ int SYS_Daemon(int nochdir, int noclose)
 
 	if (!noclose) {
 		if (SYS_CloseFile(0))
-			DebugLogB("main: SYS_CloseFile(0) failed: %s", strerror(errno));
+			DebugLogB("SYS_CloseFile(0) failed: %s", strerror(errno));
 
 		if (SYS_CloseFile(1))
-			DebugLogB("main: SYS_CloseFile(1) failed: %s", strerror(errno));
+			DebugLogB("SYS_CloseFile(1) failed: %s", strerror(errno));
 
 		if (SYS_CloseFile(2))
-			DebugLogB("main: SYS_CloseFile(2) failed: %s", strerror(errno));
+			DebugLogB("SYS_CloseFile(2) failed: %s", strerror(errno));
 	}
 	if (!nochdir) {
 		if (SYS_Chdir("/"))
-			DebugLogB("main: SYS_Chdir() failed: %s", strerror(errno));
+			DebugLogB("SYS_Chdir() failed: %s", strerror(errno));
 	}
 	return 0;
 #endif

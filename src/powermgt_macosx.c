@@ -57,14 +57,14 @@ void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * m
           IOAllowPowerChange(root_port,(long)messageArgument);
           break;
     case kIOMessageSystemWillSleep:
-          DebugLogA("PMPowerEventCallback: system going into sleep");
+          DebugLogA("system going into sleep");
           SYS_MutexLock(&usbNotifierMutex);
           RFSuspendAllReaders();
           IOAllowPowerChange(root_port,(long)messageArgument);
-          DebugLogA("PMPowerEventCallback: system allowed to sleep");
+          DebugLogA("system allowed to sleep");
           break;
     case kIOMessageSystemHasPoweredOn: 
-        DebugLogA("PMPowerEventCallback: system coming out of sleep");
+        DebugLogA("system coming out of sleep");
         HPSearchHotPluggables();
         RFAwakeAllReaders();
         SYS_MutexUnLock(&usbNotifierMutex);

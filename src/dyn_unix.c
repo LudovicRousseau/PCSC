@@ -5,6 +5,8 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -28,7 +30,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 
 	if (*pvLHandle == NULL)
 	{
-		DebugLogB("DYN_LoadLibrary: dlerror() reports %s", dlerror());
+		DebugLogC("%s: %s", pcLibrary, dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -44,7 +46,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 
 	if (ret)
 	{
-		DebugLogB("DYN_CloseLibrary: dlerror() reports %s", dlerror());
+		DebugLogB("%s", dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -73,7 +75,7 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 
 	if (*pvFHandle == NULL)
 	{
-		DebugLogB("DYN_GetAddress: dlerror() reports %s", dlerror());
+		DebugLogC("%s: %s", pcFunction, dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
 	} else
 		rv = SCARD_S_SUCCESS;

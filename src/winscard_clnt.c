@@ -7,6 +7,7 @@
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -1198,7 +1199,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 */
 
 	/*
-	 * DebugLogA("SCardGetStatusChange: Event Loop Start"_);
+	 * DebugLogA("Event Loop Start"_);
 	 */
 
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_BLOCKING;
@@ -1512,7 +1513,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	while (1);
 
 	/*
-	 * DebugLogA("SCardGetStatusChange: Event Loop End");
+	 * DebugLogA("Event Loop End");
 	 */
 
 	if (psContextMap[dwContextIndex].contextBlockStatus ==
@@ -2216,7 +2217,7 @@ LONG SCardCheckDaemonAvailability()
 
 	if (rv != 0)
 	{
-		DebugLogA("SCardCheckDaemonAvailability: PCSC Not Running");
+		DebugLogA("PCSC Not Running");
 		return SCARD_E_NO_SERVICE;
 	}
 

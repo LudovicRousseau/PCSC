@@ -5,6 +5,8 @@
  *
  * Copyright (C) 2000
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -39,7 +41,6 @@
 
 int atrToString(MSCPUChar8 Atr, MSCULong32 Length, char *outAtr)
 {
-
 	MSCULong32 i;
 	MSCULong32 j;
 
@@ -76,7 +77,6 @@ int atrToString(MSCPUChar8 Atr, MSCULong32 Length, char *outAtr)
 
 int stringToBytes(char *inStr, MSCPUChar8 Buffer, MSCPULong32 Length)
 {
-
 	int i;
 	int j;
 	int inLen;
@@ -337,7 +337,6 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 {
-
 	MSCLong32 rv;
 
 	pConnection->libPointers.pvfWriteFramework = 0;
@@ -407,7 +406,6 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 
 MSCLong32 TPUnloadToken(MSCLPTokenConnection pConnection)
 {
-
 	MSCLong32 rv;
 
 	if (pConnection->tokenLibHandle == 0)
@@ -428,7 +426,6 @@ MSCLong32 TPUnloadToken(MSCLPTokenConnection pConnection)
 
 MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 {
-
 	MSCLong32 rv;
 
 	if (pConnection->tokenLibHandle == 0)
@@ -443,7 +440,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfWriteFramework = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		/*
 		 * No big deal - this feature is just not supported 
 		 */
@@ -455,7 +452,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfIdentifyToken = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -466,7 +463,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfInitializePlugin = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -477,7 +474,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfFinalizePlugin = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -487,7 +484,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetStatus = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -498,7 +495,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetCapabilities = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -509,7 +506,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExtendedFeature = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		/*
 		 * No big deal - there are no extended features 
 		 */
@@ -521,7 +518,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGenerateKeys = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -531,7 +528,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfImportKey = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -541,7 +538,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExportKey = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -551,7 +548,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfComputeCrypt = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -562,7 +559,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExtAuthenticate = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -572,7 +569,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListKeys = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -582,7 +579,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfCreatePIN = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -592,7 +589,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfVerifyPIN = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -602,7 +599,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfChangePIN = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -612,7 +609,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfUnblockPIN = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -622,7 +619,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListPINs = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -632,7 +629,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfCreateObject = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -642,7 +639,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfDeleteObject = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -652,7 +649,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfWriteObject = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -662,7 +659,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfReadObject = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -672,7 +669,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListObjects = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -682,7 +679,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfLogoutAll = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -692,7 +689,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetChallenge = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
+		DebugLogA("Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -701,7 +698,6 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 
 MSCLong32 TPUnbindFunctions(MSCLPTokenConnection pConnection)
 {
-
 	pConnection->libPointers.pvfWriteFramework = 0;
 	pConnection->libPointers.pvfInitializePlugin = 0;
 	pConnection->libPointers.pvfFinalizePlugin = 0;

@@ -6,6 +6,8 @@
  *
  * Copyright (C) 2000
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -36,7 +38,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT);
 
 LONG EHInitializeEventStructures()
 {
-
 	int fd, i, pageSize;
 
 	fd = 0;
@@ -48,7 +49,7 @@ LONG EHInitializeEventStructures()
 	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, 00644);
 	if (fd < 0)
 	{
-		DebugLogC("Error: Cannot create public shared file %s: %s",
+		DebugLogC("Cannot create public shared file %s: %s",
 			PCSCLITE_PUBSHM_FILE, strerror(errno));
 		exit(1);
 	}
@@ -73,7 +74,7 @@ LONG EHInitializeEventStructures()
 			SYS_MemoryMap(sizeof(READER_STATES), fd, (i * pageSize));
 		if (readerStates[i] == 0)
 		{
-			DebugLogC("Error: Cannot memory map public shared file %s: %s",
+			DebugLogC("Cannot memory map public shared file %s: %s",
 				PCSCLITE_PUBSHM_FILE, strerror(errno));
 			exit(1);
 		}
@@ -96,7 +97,6 @@ LONG EHInitializeEventStructures()
 
 LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
-
 	LONG rv;
 	int i;
 
@@ -107,7 +107,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	i = rContext->dwPublicID;
 	if ((readerStates[i])->readerName[0] == 0)
 	{
-		DebugLogA("EHDestroyEventHandler: Thread already stomped.");
+		DebugLogA("Thread already stomped.");
 		return SCARD_S_SUCCESS;
 	}
 
@@ -116,7 +116,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	 */
 	rContext->dwLockId = 0xFFFF;
 
-	DebugLogA("EHDestroyEventHandler: Stomping thread.");
+	DebugLogA("Stomping thread.");
 
 	do
 	{
@@ -143,14 +143,13 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	/* Zero the thread */
 	rContext->pthThread = 0;
 
-	DebugLogA("EHDestroyEventHandler: Thread stomped.");
+	DebugLogA("Thread stomped.");
 
 	return SCARD_S_SUCCESS;
 }
 
 LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 {
-
 	LONG rv;
 	LPCSTR lpcReader;
 	DWORD dwStatus, dwProtocol;
@@ -172,8 +171,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogB("EHSpawnEventHandler: Initial Check Failed on %s",
-			lpcReader);
+		DebugLogB("Initial Check Failed on %s", lpcReader);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -311,8 +309,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			DebugLogB("EHSpawnEventHandler: Error communicating to: %s",
-				lpcReader);
+			DebugLogB("Error communicating to: %s", lpcReader);
 
 			/*
 			 * Set error status on this reader while errors occur 
@@ -370,8 +367,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				/*
 				 * Change the status structure 
 				 */
-				DebugLogB("EHSpawnEventHandler: Card Removed From %s",
-					lpcReader);
+				DebugLogB("Card Removed From %s", lpcReader);
 				/*
 				 * Notify the card has been removed 
 				 */
@@ -459,21 +455,20 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				SYS_MMapSynchronize((void *) readerStates[i], pageSize);
 
-				DebugLogB("EHSpawnEventHandler: Card inserted into %s",
-					lpcReader);
+				DebugLogB("Card inserted into %s", lpcReader);
 
 				if (rv == IFD_SUCCESS)
 				{
 					if (rContext->dwAtrLen > 0)
 					{
-						DebugXxd("EHSpawnEventHandler: Card ATR: ",
+						DebugXxd("Card ATR: ",
 							rContext->ucAtr, rContext->dwAtrLen);
 					}
 					else
-						DebugLogA("EHSpawnEventHandler: Card ATR: (NULL)");
+						DebugLogA("Card ATR: (NULL)");
 				}
 				else
-					DebugLogA("EHSpawnEventHandler: Error powering up card.");
+					DebugLogA("Error powering up card.");
 			}
 		}
 
