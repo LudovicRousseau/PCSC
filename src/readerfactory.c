@@ -21,16 +21,15 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/ifdhandler.h"
+#include "PCSC/debuglog.h"
 #include "thread_generic.h"
 #include "readerfactory.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
 #include "eventhandler.h"
-#include "ifdhandler.h"
 #include "ifdwrapper.h"
-#include "debuglog.h"
 #include "hotplug.h"
 
 #ifndef TRUE

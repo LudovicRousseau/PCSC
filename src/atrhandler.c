@@ -15,10 +15,9 @@
 #include <syslog.h>
 #include <string.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "atrhandler.h"
-#include "debuglog.h"
 
 /*
  * Uncomment the following for ATR debugging 

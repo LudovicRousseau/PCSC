@@ -25,14 +25,13 @@
 #include <getopt.h>
 #endif
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"
 #include "thread_generic.h"
 #include "hotplug.h"
-#include "debuglog.h"
 #include "readerfactory.h"
 #include "configfile.h"
 #include "powermgt_generic.h"

@@ -28,8 +28,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
-#include <wintypes.h>
-#include <winscard.h>
+
+#include <PCSC/wintypes.h>
+#include <PCSC/winscard.h>
 
 #ifndef TRUE
 #define TRUE 1

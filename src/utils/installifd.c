@@ -16,8 +16,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <wintypes.h>
-#include <winscard.h>
+
+#include "PCSC/wintypes.h"
+#include "PCSC/winscard.h"
 
 #ifndef PCSCLITE_READER_CONFIG
 #define PCSCLITE_READER_CONFIG "/etc/reader.conf"

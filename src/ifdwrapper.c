@@ -12,15 +12,14 @@
  */
 
 #include "config.h"
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/ifdhandler.h"
+#include "PCSC/debuglog.h"
 #include "readerfactory.h"
-#include "ifdhandler.h"
 #include "ifdwrapper.h"
 #include "atrhandler.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
-#include "debuglog.h"
 
 #undef PCSCLITE_STATIC_DRIVER
 

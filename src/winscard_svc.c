@@ -17,12 +17,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
-#include "winscard.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
+#include "PCSC/debuglog.h"
 #include "winscard_msg.h"
 #include "winscard_svc.h"
-#include "debuglog.h"
 #include "sys_generic.h"
 #include "thread_generic.h"
 

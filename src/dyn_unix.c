@@ -18,10 +18,9 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "dyn_generic.h"
-#include "debuglog.h"
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {

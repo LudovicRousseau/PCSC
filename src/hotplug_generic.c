@@ -10,8 +10,7 @@
  */
 
 #include "config.h"
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
 
 /*
  * Check for platforms that have their own specific support.

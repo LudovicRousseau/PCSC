@@ -20,10 +20,10 @@
 #include <dirent.h>
 #endif
 
-#include "debuglog.h"
+#include "PCSC/debuglog.h"
+#include "PCSC/parser.h"
 #include "dyn_generic.h"
 #include "tokenfactory.h"
-#include "parser.h"
 
 #ifndef WIN32
 #ifndef MSC_SVC_DROPDIR

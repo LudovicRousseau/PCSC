@@ -12,7 +12,7 @@
  */
 
 #include "config.h"
-#include "wintypes.h"
+#include "PCSC/pcsclite.h"
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -22,12 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pcsclite.h"
+#include "PCSC/debuglog.h"
+#include "PCSC/parser.h"
 #include "readerfactory.h"
 #include "winscard_msg.h"
-#include "debuglog.h"
 #include "sys_generic.h"
-#include "parser.h"
 #include "hotplug.h"
 
 #undef DEBUG_HOTPLUG

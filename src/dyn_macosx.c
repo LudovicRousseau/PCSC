@@ -11,10 +11,9 @@
 
 #include "config.h"
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "dyn_generic.h"
-#include "debuglog.h"
 
 #ifdef __APPLE__
 #include <CoreFoundation/CFBundle.h>

@@ -17,8 +17,8 @@
 #include <string.h>
 #include <errno.h>
 
-#include "debuglog.h"
-#include "parser.h"
+#include "PCSC/debuglog.h"
+#include "PCSC/parser.h"
 
 void tpevalToken(char *pcToken, int tokType);
 

@@ -21,10 +21,9 @@
 #include <sys/un.h>
 #include <errno.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
-#include "winscard.h"
-#include "debuglog.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
+#include "PCSC/debuglog.h"
 #include "thread_generic.h"
 
 #include "readerfactory.h"

@@ -20,16 +20,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/ifdhandler.h"
+#include "PCSC/debuglog.h"
 #include "thread_generic.h"
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
-#include "ifdhandler.h"
 #include "ifdwrapper.h"
-#include "debuglog.h"
 #include "prothandler.h"
 
 static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];

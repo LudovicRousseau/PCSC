@@ -16,15 +16,14 @@
 #include <sys/time.h>
 #include <string.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
-#include "winscard.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
+#include "PCSC/ifdhandler.h"
+#include "PCSC/debuglog.h"
 #include "readerfactory.h"
 #include "prothandler.h"
-#include "ifdhandler.h"
 #include "ifdwrapper.h"
 #include "atrhandler.h"
-#include "debuglog.h"
 #include "configfile.h"
 #include "sys_generic.h"
 

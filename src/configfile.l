@@ -39,14 +39,13 @@ void tok_error(char *pcToken_error);
 
 #include <stdio.h>
 #include <string.h>
-#include <wintypes.h>
 #include <errno.h>
 
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "config.h"
-#include "pcsclite.h"
 #include "sys_generic.h"
 #include "readerfactory.h"
-#include "debuglog.h"
 
 int evaluatetoken(char *pcToken)
 {

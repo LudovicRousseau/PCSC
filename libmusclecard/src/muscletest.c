@@ -13,12 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* use the local pcsclite.h instead of the (old) one already installed */
-#include "pcsclite.h"
-
-#include <winscard.h>
-#include <mscdefines.h>
-#include <musclecard.h>
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
+#include "PCSC/mscdefines.h"
+#include "PCSC/musclecard.h"
 
 #define MY_OBJECT_ID    "c1"
 #define MY_OBJECT_SIZE  50

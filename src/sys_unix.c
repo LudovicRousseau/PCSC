@@ -26,7 +26,7 @@
 #include <time.h>
 
 #include "sys_generic.h"
-#include "debuglog.h"
+#include "PCSC/debuglog.h"
 
 int SYS_Initialize()
 {

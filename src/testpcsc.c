@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "pcsclite.h"
-#include "winscard.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
 
 int main(int argc, char **argv)
 {

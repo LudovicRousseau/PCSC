@@ -24,8 +24,9 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "pcsclite.h"
-#include <winscard.h>
+
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
 
 /*
  * The following defines personalize this for different tokens 

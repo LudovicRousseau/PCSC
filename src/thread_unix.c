@@ -12,7 +12,7 @@
  */
 
 #include "config.h"
-#include "wintypes.h"
+#include "PCSC/wintypes.h"
 #include "thread_generic.h"
 
 #ifndef TRUE

@@ -25,13 +25,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
+#include "PCSC/parser.h"
 #include "readerfactory.h"
 #include "winscard_msg.h"
-#include "debuglog.h"
 #include "sys_generic.h"
-#include "parser.h"
 #include "hotplug.h"
 
 #define PCSCLITE_USB_PATH		"/proc/bus/usb"

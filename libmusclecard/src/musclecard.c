@@ -18,12 +18,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "musclecard.h"
+#include "PCSC/musclecard.h"
+#include "PCSC/debuglog.h"
 #include "tokenfactory.h"
-#include "debuglog.h"
 
 #ifdef USE_THREAD_SAFETY
-#include "wintypes.h"
+#include "PCSC/wintypes.h"
 #include "thread_generic.h"
 #include "sys_generic.h"
 #endif

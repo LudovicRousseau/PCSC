@@ -34,9 +34,8 @@
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include <IOKit/IOMessage.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
-#include "debuglog.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
 #include "readerfactory.h"
 #include "thread_generic.h"
 #include "hotplug.h"

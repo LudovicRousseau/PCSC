@@ -28,12 +28,11 @@
 #include <sys/filio.h>
 #endif
 
-#include "wintypes.h"
-#include "pcsclite.h"
-#include "winscard.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/winscard.h"
+#include "PCSC/debuglog.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
-#include "debuglog.h"
 
 static int commonSocket = 0;
 

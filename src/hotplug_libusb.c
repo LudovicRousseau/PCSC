@@ -26,13 +26,12 @@
 #include <errno.h>
 #include <usb.h>
 
-#include "wintypes.h"
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
+#include "PCSC/debuglog.h"
+#include "PCSC/parser.h"
 #include "readerfactory.h"
 #include "winscard_msg.h"
-#include "debuglog.h"
 #include "sys_generic.h"
-#include "parser.h"
 #include "hotplug.h"
 
 #undef DEBUG_HOTPLUG
