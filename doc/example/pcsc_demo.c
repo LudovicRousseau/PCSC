@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2003
+ * Copyright (C) 2003-2004
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,10 +64,11 @@ int main(int argc, char *argv[])
 	DWORD dwActiveProtocol, dwReaderLen, dwState, dwProt, dwAtrLen;
 	BYTE pbAtr[MAX_ATR_SIZE] = "";
 	BYTE pbReader[MAX_READERNAME] = "";
+	int reader_nb;
 	int i;
 
 	printf("PC/SC sample code\n");
-	printf("V 1.0 2003, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
+	printf("V 1.1 2003-2004, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
 
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 	if (rv != SCARD_S_SUCCESS)
@@ -118,11 +119,43 @@ int main(int argc, char *argv[])
 		goto end;
 	}
 
+	if (argc > 1)
+	{
+		reader_nb = atoi(argv[1]);
+		if (reader_nb < 0 || reader_nb >= nbReaders)
+		{
+			printf("Wrong reader index: %d\n", reader_nb);
+			goto end;
+		}
+	}
+	else
+		reader_nb = 0;
+
 	/* connect to a card */
-	rv = SCardConnect(hContext, readers[0], SCARD_SHARE_SHARED,
-		SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+	dwActiveProtocol = -1;
+	rv = SCardConnect(hContext, readers[reader_nb], SCARD_SHARE_EXCLUSIVE,
+		SCARD_PROTOCOL_ANY, &hCard, &dwActiveProtocol);
 	printf(" Protocol: %ld\n", dwActiveProtocol);
 	PCSC_ERROR(rv, "SCardConnect")
+
+	/* get card status */
+	dwAtrLen = sizeof(pbAtr);
+	dwReaderLen = sizeof(pbReader);
+	rv = SCardStatus(hCard, /*NULL*/ pbReader, &dwReaderLen, &dwState, &dwProt,
+		pbAtr, &dwAtrLen);
+	printf(" Reader: %s (length %ld bytes)\n", pbReader, dwReaderLen);
+	printf(" State: 0x%lX\n", dwState);
+	printf(" Prot: %ld\n", dwProt);
+	printf(" ATR (length %ld bytes):", dwAtrLen);
+	for (i=0; i<dwAtrLen; i++)
+		printf(" %02X", pbAtr[i]);
+	printf("\n");
+	PCSC_ERROR(rv, "SCardStatus")
+
+	/* card reconnect */
+	rv = SCardReconnect(hCard, SCARD_SHARE_EXCLUSIVE,
+		SCARD_PROTOCOL_ANY, SCARD_UNPOWER_CARD, &dwActiveProtocol);
+	PCSC_ERROR(rv, "SCardReconnect")
 
 	/* get card status */
 	dwAtrLen = sizeof(pbAtr);
