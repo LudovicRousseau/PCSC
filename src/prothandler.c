@@ -21,6 +21,7 @@
 #include "prothandler.h"
 #include "atrhandler.h"
 #include "ifdwrapper.h"
+#include "eventhandler.h"
 
 /*
  * Function: PHGetDefaultProtocol Purpose : To get the default protocol
@@ -76,7 +77,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 	DWORD dwPreferred, UCHAR ucAvailable)
 {
 	LONG rv;
-	DWORD protocol = rContext->dwProtocol;
+	DWORD protocol = rContext->readerState->cardProtocol;
 
 	if (dwPreferred == 0)
 	{
@@ -86,7 +87,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		return -1;
 	}
 
-	if ((rContext->dwProtocol == SCARD_PROTOCOL_T1) &&
+	if ((protocol == SCARD_PROTOCOL_T1) &&
 		((dwPreferred & SCARD_PROTOCOL_T1) == 0) &&
 		(dwPreferred & SCARD_PROTOCOL_T0))
 	{
@@ -116,7 +117,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			return -1;
 		}
 
-	} else if ((rContext->dwProtocol == SCARD_PROTOCOL_T0) &&
+	} else if ((protocol == SCARD_PROTOCOL_T0) &&
 		((dwPreferred & SCARD_PROTOCOL_T0) == 0) &&
 		(dwPreferred & SCARD_PROTOCOL_T1))
 	{

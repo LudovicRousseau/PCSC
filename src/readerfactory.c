@@ -51,6 +51,7 @@ LONG RFAllocateReaderSpace(void)
 	{
 		sReadersContexts[i] = (PREADER_CONTEXT) malloc(sizeof(READER_CONTEXT));
 		(sReadersContexts[i])->vHandle = NULL;
+		(sReadersContexts[i])->readerState = NULL;
 	}
 
 	/*
@@ -139,16 +140,15 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	(sReadersContexts[dwContext])->dwVersion = 0;
 	(sReadersContexts[dwContext])->dwPort = dwPort;
 	(sReadersContexts[dwContext])->mMutex = 0;
-	(sReadersContexts[dwContext])->dwStatus = 0;
 	(sReadersContexts[dwContext])->dwBlockStatus = 0;
 	(sReadersContexts[dwContext])->dwContexts = 0;
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->dwLockId = 0;
 	(sReadersContexts[dwContext])->vHandle = 0;
-	(sReadersContexts[dwContext])->dwPublicID = 0;
 	(sReadersContexts[dwContext])->pdwFeeds = 0;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << (sizeof(DWORD) / 2) * 8;
+	(sReadersContexts[dwContext])->readerState = NULL;
 
 	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 		(sReadersContexts[dwContext])->psHandles[i].hCard = 0;
@@ -229,7 +229,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		(sReadersContexts[dwContext])->dwVersion = 0;
 		(sReadersContexts[dwContext])->dwPort = 0;
 		(sReadersContexts[dwContext])->vHandle = 0;
-		(sReadersContexts[dwContext])->dwPublicID = 0;
+		(sReadersContexts[dwContext])->readerState = NULL;
 		(sReadersContexts[dwContext])->dwIdentity = 0;
 
 		/*
@@ -352,11 +352,10 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		/* Added by Dave for multiple slots */
 		*(sReadersContexts[dwContextB])->pdwFeeds += 1;
 
-		(sReadersContexts[dwContextB])->dwStatus = 0;
 		(sReadersContexts[dwContextB])->dwBlockStatus = 0;
 		(sReadersContexts[dwContextB])->dwContexts = 0;
 		(sReadersContexts[dwContextB])->dwLockId = 0;
-		(sReadersContexts[dwContextB])->dwPublicID = 0;
+		(sReadersContexts[dwContextB])->readerState = NULL;
 		(sReadersContexts[dwContextB])->dwIdentity =
 			(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
 
@@ -400,7 +399,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			(sReadersContexts[dwContextB])->dwVersion = 0;
 			(sReadersContexts[dwContextB])->dwPort = 0;
 			(sReadersContexts[dwContextB])->vHandle = 0;
-			(sReadersContexts[dwContextB])->dwPublicID = 0;
+			(sReadersContexts[dwContextB])->readerState = NULL;
 			(sReadersContexts[dwContextB])->dwIdentity = 0;
 
 			/*
@@ -498,14 +497,13 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 		sContext->dwVersion = 0;
 		sContext->dwPort = 0;
 		sContext->mMutex = 0;
-		sContext->dwStatus = 0;
 		sContext->dwBlockStatus = 0;
 		sContext->dwContexts = 0;
 		sContext->dwSlot = 0;
 		sContext->dwLockId = 0;
 		sContext->vHandle = 0;
 		sContext->dwIdentity = 0;
-		sContext->dwPublicID = 0;
+		sContext->readerState = NULL;
 
 		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 			sContext->psHandles[i].hCard = 0;
@@ -1503,7 +1501,8 @@ LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 
 LONG RFCheckReaderStatus(PREADER_CONTEXT rContext)
 {
-	if (rContext->dwStatus & SCARD_UNKNOWN)
+	if ((rContext->readerState == NULL)
+		|| (rContext->readerState->readerState & SCARD_UNKNOWN))
 		return SCARD_E_READER_UNAVAILABLE;
 	else
 		return SCARD_S_SUCCESS;

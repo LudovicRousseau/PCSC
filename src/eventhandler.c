@@ -96,15 +96,7 @@ LONG EHInitializeEventStructures(void)
 
 LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
-	LONG rv;
-	int i;
-
-	i = 0;
-	rv = 0;
-
-
-	i = rContext->dwPublicID;
-	if ((readerStates[i])->readerName[0] == 0)
+	if (rContext->readerState && rContext->readerState->readerName[0] == '\0')
 	{
 		DebugLogA("Thread already stomped.");
 		return SCARD_S_SUCCESS;
@@ -130,14 +122,16 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	 * used again 
 	 */
 
-	memset((readerStates[i])->readerName, 0, MAX_READERNAME);
-	memset((readerStates[i])->cardAtr, 0, MAX_ATR_SIZE);
-	(readerStates[i])->readerID = 0;
-	(readerStates[i])->readerState = 0;
-	(readerStates[i])->lockState = 0;
-	(readerStates[i])->readerSharing = 0;
-	(readerStates[i])->cardAtrLength = 0;
-	(readerStates[i])->cardProtocol = 0;
+	memset(rContext->readerState->readerName, 0,
+		sizeof(rContext->readerState->readerName));
+	memset(rContext->readerState->cardAtr, 0,
+		sizeof(rContext->readerState->cardAtr));
+	rContext->readerState->readerID = 0;
+	rContext->readerState->readerState = 0;
+	rContext->readerState->lockState = 0;
+	rContext->readerState->readerSharing = 0;
+	rContext->readerState->cardAtrLength = 0;
+	rContext->readerState->cardProtocol = 0;
 
 	/* Zero the thread */
 	rContext->pthThread = 0;
@@ -150,27 +144,15 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 {
 	LONG rv;
-	LPCTSTR lpcReader;
-	DWORD dwStatus, dwProtocol;
+	DWORD dwStatus = 0;
 	int i;
+	UCHAR ucAtr[MAX_ATR_SIZE];
+	DWORD dwAtrLen = 0;
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	lpcReader = 0;
-	dwStatus = 0;
-	dwProtocol = 0;
-	i = 0;
-
-	lpcReader = rContext->lpcReader;
-
-	rv = IFDStatusICC(rContext, &dwStatus,
-		&dwProtocol, rContext->ucAtr, &rContext->dwAtrLen);
-
+	rv = IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogB("Initial Check Failed on %s", lpcReader);
+		DebugLogB("Initial Check Failed on %s", rContext->lpcReader);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -189,18 +171,14 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	/*
 	 * Set all the attributes to this reader 
 	 */
-	strcpy((readerStates[i])->readerName, rContext->lpcReader);
-	memcpy((readerStates[i])->cardAtr, rContext->ucAtr,
-		rContext->dwAtrLen);
-	(readerStates[i])->readerID = i + 100;
-	(readerStates[i])->readerState = rContext->dwStatus;
-	(readerStates[i])->readerSharing = rContext->dwContexts;
-	(readerStates[i])->cardAtrLength = rContext->dwAtrLen;
-	(readerStates[i])->cardProtocol = rContext->dwProtocol;
-	/*
-	 * So the thread can access this array indice 
-	 */
-	rContext->dwPublicID = i;
+	rContext->readerState = readerStates[i];
+	strcpy(rContext->readerState->readerName, rContext->lpcReader);
+	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
+	rContext->readerState->readerID = i + 100;
+	rContext->readerState->readerState = dwStatus;
+	rContext->readerState->readerSharing = rContext->dwContexts;
+	rContext->readerState->cardAtrLength = dwAtrLen;
+	rContext->readerState->cardProtocol = 0;
 
 	rv = SYS_ThreadCreate(&rContext->pthThread, NULL,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
@@ -214,97 +192,97 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
 	LONG rv;
 	LPCTSTR lpcReader;
-	DWORD dwStatus, dwProtocol, dwReaderSharing;
-	DWORD dwErrorCount, dwCurrentState;
-	int i, pageSize;
+	DWORD dwStatus, dwReaderSharing;
+	DWORD dwCurrentState;
+	int pageSize;
 
 	/*
 	 * Zero out everything 
 	 */
-	rv = 0;
-	lpcReader = 0;
 	dwStatus = 0;
-	dwProtocol = 0;
 	dwReaderSharing = 0;
 	dwCurrentState = 0;
-	dwErrorCount = 0;
-	i = 0;
-	pageSize = 0;
 
 	lpcReader = rContext->lpcReader;
-	i = rContext->dwPublicID;
 
 	pageSize = SYS_GetPageSize();
 
-	rv = IFDStatusICC(rContext, &dwStatus,
-		&dwProtocol, rContext->ucAtr, &rContext->dwAtrLen);
-
+	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
+			&rContext->readerState->cardAtrLength);
 	if (dwStatus & SCARD_PRESENT)
 	{
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
-			rContext->ucAtr, &rContext->dwAtrLen);
+			rContext->readerState->cardAtr,
+			&rContext->readerState->cardAtrLength);
 
 		if (rv == IFD_SUCCESS)
 		{
-			rContext->dwProtocol = PHGetDefaultProtocol(rContext->ucAtr,
-				rContext->dwAtrLen);
-			rContext->dwStatus |= SCARD_PRESENT;
-			rContext->dwStatus &= ~SCARD_ABSENT;
-			rContext->dwStatus |= SCARD_POWERED;
-			rContext->dwStatus |= SCARD_NEGOTIABLE;
-			rContext->dwStatus &= ~SCARD_SPECIFIC;
-			rContext->dwStatus &= ~SCARD_SWALLOWED;
-			rContext->dwStatus &= ~SCARD_UNKNOWN;
+			rContext->readerState->cardProtocol =
+				PHGetDefaultProtocol(rContext->readerState->cardAtr,
+				rContext->readerState->cardAtrLength);
+
+			dwStatus |= SCARD_PRESENT;
+			dwStatus &= ~SCARD_ABSENT;
+			dwStatus |= SCARD_POWERED;
+			dwStatus |= SCARD_NEGOTIABLE;
+			dwStatus &= ~SCARD_SPECIFIC;
+			dwStatus &= ~SCARD_SWALLOWED;
+			dwStatus &= ~SCARD_UNKNOWN;
+
+			if (rContext->readerState->cardAtrLength > 0)
+			{
+				DebugXxd("Card ATR: ",
+					rContext->readerState->cardAtr,
+					rContext->readerState->cardAtrLength);
+			}
+			else
+				DebugLogA("Card ATR: (NULL)");
 		}
 		else
 		{
-			rContext->dwStatus |= SCARD_PRESENT;
-			rContext->dwStatus &= ~SCARD_ABSENT;
-			rContext->dwStatus |= SCARD_SWALLOWED;
-			rContext->dwStatus &= ~SCARD_POWERED;
-			rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-			rContext->dwStatus &= ~SCARD_SPECIFIC;
-			rContext->dwStatus &= ~SCARD_UNKNOWN;
-			rContext->dwProtocol = 0;
-			rContext->dwAtrLen = 0;
+			dwStatus |= SCARD_PRESENT;
+			dwStatus &= ~SCARD_ABSENT;
+			dwStatus |= SCARD_SWALLOWED;
+			dwStatus &= ~SCARD_POWERED;
+			dwStatus &= ~SCARD_NEGOTIABLE;
+			dwStatus &= ~SCARD_SPECIFIC;
+			dwStatus &= ~SCARD_UNKNOWN;
+			DebugLogA("Error powering up card.");
 		}
 
 		dwCurrentState = SCARD_PRESENT;
-
 	}
 	else
 	{
+		dwStatus |= SCARD_ABSENT;
+		dwStatus &= ~SCARD_PRESENT;
+		dwStatus &= ~SCARD_POWERED;
+		dwStatus &= ~SCARD_NEGOTIABLE;
+		dwStatus &= ~SCARD_SPECIFIC;
+		dwStatus &= ~SCARD_SWALLOWED;
+		dwStatus &= ~SCARD_UNKNOWN;
+		rContext->readerState->cardAtrLength = 0;
+		rContext->readerState->cardProtocol = 0;
+
 		dwCurrentState = SCARD_ABSENT;
-		rContext->dwStatus |= SCARD_ABSENT;
-		rContext->dwStatus &= ~SCARD_PRESENT;
-		rContext->dwStatus &= ~SCARD_POWERED;
-		rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-		rContext->dwStatus &= ~SCARD_SPECIFIC;
-		rContext->dwStatus &= ~SCARD_SWALLOWED;
-		rContext->dwStatus &= ~SCARD_UNKNOWN;
-		rContext->dwAtrLen = 0;
-		rContext->dwProtocol = 0;
 	}
 
 	/*
 	 * Set all the public attributes to this reader 
 	 */
-	(readerStates[i])->readerState = rContext->dwStatus;
-	(readerStates[i])->cardAtrLength = rContext->dwAtrLen;
-	(readerStates[i])->cardProtocol = rContext->dwProtocol;
-	(readerStates[i])->readerSharing = dwReaderSharing =
+	rContext->readerState->readerState = dwStatus;
+	rContext->readerState->readerSharing = dwReaderSharing =
 		rContext->dwContexts;
-	memcpy((readerStates[i])->cardAtr, rContext->ucAtr,
-		rContext->dwAtrLen);
 
-	SYS_MMapSynchronize((void *) readerStates[i], pageSize);
+	SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 
 	while (1)
 	{
 		dwStatus = 0;
 
 		rv = IFDStatusICC(rContext, &dwStatus,
-			&dwProtocol, rContext->ucAtr, &rContext->dwAtrLen);
+			rContext->readerState->cardAtr,
+			&rContext->readerState->cardAtrLength);
 
 		if (rv != SCARD_S_SUCCESS)
 		{
@@ -314,28 +292,19 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			 * Set error status on this reader while errors occur 
 			 */
 
-			rContext->dwStatus &= ~SCARD_ABSENT;
-			rContext->dwStatus &= ~SCARD_PRESENT;
-			rContext->dwStatus &= ~SCARD_POWERED;
-			rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-			rContext->dwStatus &= ~SCARD_SPECIFIC;
-			rContext->dwStatus &= ~SCARD_SWALLOWED;
-			rContext->dwStatus |= SCARD_UNKNOWN;
-			rContext->dwAtrLen = 0;
-			rContext->dwProtocol = 0;
+			rContext->readerState->readerState &= ~SCARD_ABSENT;
+			rContext->readerState->readerState &= ~SCARD_PRESENT;
+			rContext->readerState->readerState &= ~SCARD_POWERED;
+			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
+			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
+			rContext->readerState->readerState |= SCARD_UNKNOWN;
+			rContext->readerState->cardAtrLength = 0;
+			rContext->readerState->cardProtocol = 0;
 
 			dwCurrentState = SCARD_UNKNOWN;
 
-			/*
-			 * Set all the public attributes to this reader 
-			 */
-			(readerStates[i])->readerState = rContext->dwStatus;
-			(readerStates[i])->cardAtrLength = rContext->dwAtrLen;
-			(readerStates[i])->cardProtocol = rContext->dwProtocol;
-			memcpy((readerStates[i])->cardAtr, rContext->ucAtr,
-				rContext->dwAtrLen);
-
-			SYS_MMapSynchronize((void *) readerStates[i], pageSize);
+			SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 
 			/*
 			 * This code causes race conditions on G4's with USB
@@ -372,27 +341,18 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				 */
 				RFSetReaderEventState(rContext, SCARD_REMOVED);
 
-				rContext->dwAtrLen = 0;
-				rContext->dwProtocol = 0;
-				rContext->dwStatus |= SCARD_ABSENT;
-				rContext->dwStatus &= ~SCARD_UNKNOWN;
-				rContext->dwStatus &= ~SCARD_PRESENT;
-				rContext->dwStatus &= ~SCARD_POWERED;
-				rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-				rContext->dwStatus &= ~SCARD_SWALLOWED;
-				rContext->dwStatus &= ~SCARD_SPECIFIC;
+				rContext->readerState->cardAtrLength = 0;
+				rContext->readerState->cardProtocol = 0;
+				rContext->readerState->readerState |= SCARD_ABSENT;
+				rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+				rContext->readerState->readerState &= ~SCARD_PRESENT;
+				rContext->readerState->readerState &= ~SCARD_POWERED;
+				rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
+				rContext->readerState->readerState &= ~SCARD_SWALLOWED;
+				rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 				dwCurrentState = SCARD_ABSENT;
 
-				/*
-				 * Set all the public attributes to this reader 
-				 */
-				(readerStates[i])->readerState = rContext->dwStatus;
-				(readerStates[i])->cardAtrLength = rContext->dwAtrLen;
-				(readerStates[i])->cardProtocol = rContext->dwProtocol;
-				memcpy((readerStates[i])->cardAtr, rContext->ucAtr,
-					rContext->dwAtrLen);
-
-				SYS_MMapSynchronize((void *) readerStates[i], pageSize);
+				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 			}
 
 		}
@@ -406,20 +366,21 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				 */
 				SYS_USleep(PCSCLITE_STATUS_WAIT);
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
-					rContext->ucAtr, &rContext->dwAtrLen);
+					rContext->readerState->cardAtr,
+					&rContext->readerState->cardAtrLength);
 
 				if (rv == IFD_SUCCESS)
 				{
-					rContext->dwProtocol =
-						PHGetDefaultProtocol(rContext->ucAtr,
-						rContext->dwAtrLen);
-					rContext->dwStatus |= SCARD_PRESENT;
-					rContext->dwStatus &= ~SCARD_ABSENT;
-					rContext->dwStatus |= SCARD_POWERED;
-					rContext->dwStatus |= SCARD_NEGOTIABLE;
-					rContext->dwStatus &= ~SCARD_SPECIFIC;
-					rContext->dwStatus &= ~SCARD_UNKNOWN;
-					rContext->dwStatus &= ~SCARD_SWALLOWED;
+					rContext->readerState->cardProtocol =
+						PHGetDefaultProtocol(rContext->readerState->cardAtr,
+						rContext->readerState->cardAtrLength);
+					rContext->readerState->readerState |= SCARD_PRESENT;
+					rContext->readerState->readerState &= ~SCARD_ABSENT;
+					rContext->readerState->readerState |= SCARD_POWERED;
+					rContext->readerState->readerState |= SCARD_NEGOTIABLE;
+					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+					rContext->readerState->readerState &= ~SCARD_SWALLOWED;
 
 					/*
 					 * Notify the card has been reset 
@@ -430,38 +391,30 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				}
 				else
 				{
-					rContext->dwStatus |= SCARD_PRESENT;
-					rContext->dwStatus &= ~SCARD_ABSENT;
-					rContext->dwStatus |= SCARD_SWALLOWED;
-					rContext->dwStatus &= ~SCARD_POWERED;
-					rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-					rContext->dwStatus &= ~SCARD_SPECIFIC;
-					rContext->dwStatus &= ~SCARD_UNKNOWN;
-					rContext->dwAtrLen = 0;
-					rContext->dwProtocol = 0;
+					rContext->readerState->readerState |= SCARD_PRESENT;
+					rContext->readerState->readerState &= ~SCARD_ABSENT;
+					rContext->readerState->readerState |= SCARD_SWALLOWED;
+					rContext->readerState->readerState &= ~SCARD_POWERED;
+					rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
+					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+					rContext->readerState->cardAtrLength = 0;
+					rContext->readerState->cardProtocol = 0;
 				}
 
 				dwCurrentState = SCARD_PRESENT;
 
-				/*
-				 * Set all the public attributes to this reader 
-				 */
-				(readerStates[i])->readerState = rContext->dwStatus;
-				(readerStates[i])->cardAtrLength = rContext->dwAtrLen;
-				(readerStates[i])->cardProtocol = rContext->dwProtocol;
-				memcpy((readerStates[i])->cardAtr, rContext->ucAtr,
-					rContext->dwAtrLen);
-
-				SYS_MMapSynchronize((void *) readerStates[i], pageSize);
+				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 
 				DebugLogB("Card inserted into %s", lpcReader);
 
 				if (rv == IFD_SUCCESS)
 				{
-					if (rContext->dwAtrLen > 0)
+					if (rContext->readerState->cardAtrLength > 0)
 					{
 						DebugXxd("Card ATR: ",
-							rContext->ucAtr, rContext->dwAtrLen);
+							rContext->readerState->cardAtr,
+							rContext->readerState->cardAtrLength);
 					}
 					else
 						DebugLogA("Card ATR: (NULL)");
@@ -488,8 +441,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		if (dwReaderSharing != rContext->dwContexts)
 		{
 			dwReaderSharing = rContext->dwContexts;
-			(readerStates[i])->readerSharing = dwReaderSharing;
-			SYS_MMapSynchronize((void *) readerStates[i], pageSize);
+			rContext->readerState->readerSharing = dwReaderSharing;
+			SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 		}
 
 		SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
@@ -498,5 +451,5 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 void EHSetSharingEvent(PREADER_CONTEXT rContext, DWORD dwValue)
 {
-	(readerStates[rContext->dwPublicID])->lockState = dwValue;
+	rContext->readerState->lockState = dwValue;
 }
