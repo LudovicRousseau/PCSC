@@ -911,20 +911,24 @@ rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
 #include <winscard.h>
 
 LONG SCardControl(SCARDHANDLE hCard,
+    DWORD dwControlCode,
     LPCBYTE pbSendBuffer,
     DWORD cbSendLength,
     LPBYTE pbRecvBuffer,
-    LPDWORD pcbRecvLength);
+    DWORD pcbRecvLength,
+    LPDWORD lpBytesReturned);
 \end{verbatim}
 
 \parameters
 
 \begin{tabular}{lll}
 \texttt{hCard} &		IN &	Connection made from \texttt{SCardConnect}\\
+\texttt{dwControlCode} & IN & Control code for the operation \\
 \texttt{pbSendBuffer} &		IN &	Command to send to the reader\\
 \texttt{cbSendLength} &		IN &	Length of the command\\
 \texttt{pbRecvBuffer} &		OUT &	Response from the reader\\
-\texttt{pcbRecvLength} &	INOUT &	Length of the response\\
+\texttt{pcbRecvLength} &	IN &	Length of the response buffer\\
+\texttt{lpBytesReturned} & OUT & Length of the response\\
 \end{tabular}
 
 \desc
@@ -933,6 +937,10 @@ This function sends a command directly to the IFD Handler to be
 processed by the reader.  This is useful for creating client side reader
 drivers for functions like PIN pads, biometrics, or other extensions to
 the normal smartcard reader that are not normally handled by PC/SC.
+
+Note: the API of this function changed. In pcsc-lite 1.2.0 and before
+the API was not Windows{\textregistered} PC/SC compatible. This has been
+corrected.
 
 \example
 
@@ -948,8 +956,8 @@ rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
          SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
 pcbRecvLength = sizeof(pbRecvBuffer);
-rv = SCardControl(hCard, pbSendBuffer, sizeof(pbSendBuffer),
-         pbRecvBuffer, &pcbRecvLength);
+rv = SCardControl(hCard, 0x42000001, pbSendBuffer, sizeof(pbSendBuffer),
+         pbRecvBuffer, sizeof(pbRecvBuffer), &pcbRecvLength);
 \end{verbatim}
 
 \returns
@@ -1282,6 +1290,162 @@ rv = SCardSetTimeout(hContext, 50);   /* 50 second timeout */
 \begin{tabular}{ll}
 \texttt{SCARD\_S\_SUCCESS}			& Successful\\
 \texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hContext} handle\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardGetAttrib}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardGetAttrib(SCARDHANDLE hCard,
+    DWORD dwAttrId,
+    LPBYTE pbAttr,
+    LPDWORD pcbAttrLen);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN &	Connection made from \texttt{SCardConnect}\\
+\texttt{dwAttrId} & IN & Identifier for the attribute to get \\
+\texttt{pbAttr} & OUT &	Pointer to a buffer that receives the attribute \\
+\texttt{pcbAttrLen} & IN/OUT & Length of the \texttt{pbAttr} buffer in bytes \\
+\end{tabular}
+
+\desc
+
+This function get an attribute from the IFD Handler. The list of
+possible attributes is available in the file \texttt{pcsclite.h}.
+
+\begin{itemize}
+\item \texttt{SCARD\_ATTR\_ASYNC\_PROTOCOL\_TYPES}
+\item \texttt{SCARD\_ATTR\_ATR\_STRING}
+\item \texttt{SCARD\_ATTR\_CHANNEL\_ID}
+\item \texttt{SCARD\_ATTR\_CHARACTERISTICS}
+\item \texttt{SCARD\_ATTR\_CURRENT\_BWT}
+\item \texttt{SCARD\_ATTR\_CURRENT\_CLK}
+\item \texttt{SCARD\_ATTR\_CURRENT\_CWT}
+\item \texttt{SCARD\_ATTR\_CURRENT\_D}
+\item \texttt{SCARD\_ATTR\_CURRENT\_EBC\_ENCODING}
+\item \texttt{SCARD\_ATTR\_CURRENT\_F}
+\item \texttt{SCARD\_ATTR\_CURRENT\_IFSC}
+\item \texttt{SCARD\_ATTR\_CURRENT\_IFSD}
+\item \texttt{SCARD\_ATTR\_CURRENT\_IO\_STATE}
+\item \texttt{SCARD\_ATTR\_CURRENT\_N}
+\item \texttt{SCARD\_ATTR\_CURRENT\_PROTOCOL\_TYPE}
+\item \texttt{SCARD\_ATTR\_CURRENT\_W}
+\item \texttt{SCARD\_ATTR\_DEFAULT\_CLK}
+\item \texttt{SCARD\_ATTR\_DEFAULT\_DATA\_RATE}
+\item \texttt{SCARD\_ATTR\_DEVICE\_FRIENDLY\_NAME\_A}
+\item \texttt{SCARD\_ATTR\_DEVICE\_FRIENDLY\_NAME\_W}
+\item \texttt{SCARD\_ATTR\_DEVICE\_IN\_USE}
+\item \texttt{SCARD\_ATTR\_DEVICE\_SYSTEM\_NAME\_A}
+\item \texttt{SCARD\_ATTR\_DEVICE\_SYSTEM\_NAME\_W}
+\item \texttt{SCARD\_ATTR\_DEVICE\_UNIT}
+\item \texttt{SCARD\_ATTR\_ESC\_AUTHREQUEST}
+\item \texttt{SCARD\_ATTR\_ESC\_CANCEL}
+\item \texttt{SCARD\_ATTR\_ESC\_RESET}
+\item \texttt{SCARD\_ATTR\_EXTENDED\_BWT}
+\item \texttt{SCARD\_ATTR\_ICC\_INTERFACE\_STATUS}
+\item \texttt{SCARD\_ATTR\_ICC\_PRESENCE}
+\item \texttt{SCARD\_ATTR\_ICC\_TYPE\_PER\_ATR}
+\item \texttt{SCARD\_ATTR\_MAX\_CLK}
+\item \texttt{SCARD\_ATTR\_MAX\_DATA\_RATE}
+\item \texttt{SCARD\_ATTR\_MAX\_IFSD}
+\item \texttt{SCARD\_ATTR\_MAXINPUT}
+\item \texttt{SCARD\_ATTR\_POWER\_MGMT\_SUPPORT}
+\item \texttt{SCARD\_ATTR\_SUPRESS\_T1\_IFS\_REQUEST}
+\item \texttt{SCARD\_ATTR\_SYNC\_PROTOCOL\_TYPES}
+\item \texttt{SCARD\_ATTR\_USER\_AUTH\_INPUT\_DEVICE}
+\item \texttt{SCARD\_ATTR\_USER\_TO\_CARD\_AUTH\_DEVICE}
+\item \texttt{SCARD\_ATTR\_VENDOR\_IFD\_SERIAL\_NO}
+\item \texttt{SCARD\_ATTR\_VENDOR\_IFD\_TYPE}
+\item \texttt{SCARD\_ATTR\_VENDOR\_IFD\_VERSION}
+\item \texttt{SCARD\_ATTR\_VENDOR\_NAME}
+\end{itemize}
+
+Not all the \texttt{dwAttrId} values listed above may be implemented in
+the IFD Handler you are using. And some \texttt{dwAttrId} values not
+listed here may be implemented.
+
+\example
+
+\begin{verbatim}
+LONG rv;
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+unsigned char pbAtr[MAX_ATR_SIZE];
+DWORD dwAtrLen;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_NOT\_TRANSACTED}		& Data exchange not successful\\
+\texttt{SCARD\_E\_INSUFFICIENT\_BUFFER} & Reader buffer not large enough \\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardSetAttrib}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardSetAttrib(SCARDHANDLE hCard,
+    DWORD dwAttrId,
+    LPCBYTE pbAttr,
+    DWORD cbAttrLen);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN &	Connection made from \texttt{SCardConnect}\\
+\texttt{dwAttrId} & IN & Identifier for the attribute to get \\
+\texttt{pbAttr} & IN &	Pointer to a buffer that receives the attribute \\
+\texttt{pcbAttrLen} & IN & Length of the \texttt{pbAttr} buffer in bytes \\
+\end{tabular}
+
+\desc
+
+This function set an attribute of the IFD Handler. The list of
+attributes you can set is dependent on the IFD Handler you are using.
+
+\example
+
+\begin{verbatim}
+LONG rv;
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+unsigned char pbAtr[MAX_ATR_SIZE];
+DWORD dwAtrLen;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+rv = SCardSetAttrib(hCard, 0x42000001, "\x12\x34\x56", 3);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_NOT\_TRANSACTED}		& Data exchange not successful\\
 \end{tabular}
 
 
