@@ -133,9 +133,6 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb
 		use_libusb=false
 		case ${enableval} in
 			"" | "yes" | "YES")
-				if test x$use_libusb = xtrue; then
-					LIBS="${LIBS} -lusb"
-				fi
 				;;
 			"no" | "NO")
 				use_libusb=false
@@ -147,12 +144,14 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb
 				if test x$use_libusb = xtrue; then
 					CPPFLAGS="$CPPFLAGS -I${libusb_prefix}/include"
 					LDFLAGS="$LDFLAGS -L${libusb_prefix}/lib"
-					LIBS="${LIBS} -lusb"
 				fi
 				;;
 		esac
 	]
 )
+if test x$use_libusb = xtrue; then
+	LIBS="${LIBS} -lusb"
+fi
 
 AC_MSG_RESULT([enable libusb support         : $use_libusb])
 
