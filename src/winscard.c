@@ -363,6 +363,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				&rContext->readerState->cardAtrLength);
 		}
 
+		/* the protocol is unset after a power on */
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
+
 		/*
 		 * Notify the card has been reset
 		 * Not doing this could result in deadlock
@@ -416,7 +419,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
 					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-					rContext->readerState->cardProtocol = 0;
 					rContext->readerState->cardAtrLength = 0;
 				}
 
@@ -815,6 +817,9 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 				&rContext->readerState->cardAtrLength);
 		}
 
+		/* the protocol is unset after a power on */
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
+
 		/*
 		 * Notify the card has been reset
 		 */
@@ -845,7 +850,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
 			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-			rContext->readerState->cardProtocol = 0;
 			rContext->readerState->cardAtrLength = 0;
 		}
 
