@@ -28,7 +28,7 @@
 #ifndef WIN32
 #define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
 #else
-#define MSC_SVC_DROPDIR                     "c:\\pcsc\\"
+#define MSC_SVC_DROPDIR                     "C:\\Program Files\\Muscle\\Services\\"
 #endif
 
 #define MSC_MANUMSC_KEY_NAME                "spVendorName"

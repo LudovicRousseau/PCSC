@@ -89,7 +89,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install
-PostBuild_Cmds=copy  Debug\musclecard.dll  c:\winnt\system32\	copy  Debug\musclecard.dll ..\..\win32bin	copy  Debug\musclecard.lib ..\..\win32bin
+PostBuild_Cmds=copy  Debug\musclecard.dll  c:\winnt\system32\	copy  Debug\musclecard.dll ..\..\win32bin	copy  Debug\musclecard.lib ..\..\win32bin	copy Debug\musclecard.lib "c:\Program Files\Muscle\Libraries\"	copy Debug\musclecard.dll "c:\Program Files\Muscle\Runtime\"
 # End Special Build Tool
 
 !ENDIF 

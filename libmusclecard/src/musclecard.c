@@ -335,9 +335,15 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	}
 	mscUnLockThread();
 
+#ifdef WIN32
 	rv = SCardConnect(pConnection->hContext, tokenStruct->slotName,
-		sharingMode, SCARD_PROTOCOL_T0, // | SCARD_PROTOCOL_T1,
+		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&pConnection->hCard, &dwActiveProtocol);
+#else
+	rv = SCardConnect(pConnection->hContext, tokenStruct->slotName,
+		sharingMode, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
+		&pConnection->hCard, &dwActiveProtocol);
+#endif
 
 #ifdef MSC_DEBUG
 	DebugLogC("SCardConnect returns %s\n", pcsc_stringify_error(rv));
