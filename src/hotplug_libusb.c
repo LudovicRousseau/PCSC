@@ -95,8 +95,8 @@ LONG HPReadBundleValues(void)
 
 	if (hpDir == NULL)
 	{
-		DebugLogA("Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
-		DebugLogA("Disabling USB support for pcscd.");
+		Log1(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log1(PCSC_LOG_ERROR, "Disabling USB support for pcscd.");
 		return -1;
 	}
 
@@ -104,7 +104,7 @@ LONG HPReadBundleValues(void)
 	driverTracker = calloc(DRIVER_TRACKER_SIZE_STEP, sizeof(*driverTracker));
 	if (NULL == driverTracker)
 	{
-		DebugLogA("Not enough memory");
+		Log1(PCSC_LOG_CRITICAL, "Not enough memory");
 		return -1;
 	}
 	driverSize = DRIVER_TRACKER_SIZE_STEP;
@@ -161,7 +161,7 @@ LONG HPReadBundleValues(void)
 				}
 
 #ifdef DEBUG_HOTPLUG
-					DebugLogB("Found driver for: %s",
+					Log2(PCSC_LOG_INFO, "Found driver for: %s",
 						driverTracker[listCount].readerName);
 #endif
 
@@ -173,14 +173,14 @@ LONG HPReadBundleValues(void)
 					/* increase the array size */
 					driverSize += DRIVER_TRACKER_SIZE_STEP;
 #ifdef DEBUG_HOTPLUG
-					DebugLogB("Increase driverTracker to %d entries",
-						driverSize);
+					Log2(PCSC_LOG_INFO,
+						"Increase driverTracker to %d entries", driverSize);
 #endif
 					driverTracker = realloc(driverTracker,
 						driverSize * sizeof(*driverTracker));
 					if (NULL == driverTracker)
 					{
-						DebugLogA("Not enough memory");
+						Log1(PCSC_LOG_CRITICAL, "Not enough memory");
 						return -1;
 					}
 				}
@@ -193,12 +193,12 @@ LONG HPReadBundleValues(void)
 
 	if (driverSize == 0)
 	{
-		DebugLogA("No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
-		DebugLogA("Disabling USB support for pcscd");
+		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
 	}
 #ifdef DEBUG_HOTPLUG
 	else
-		DebugLogB("Found drivers for %d readers", listCount);
+		Log2(PCSC_LOG_INFO, "Found drivers for %d readers", listCount);
 #endif
 
 	return 0;
@@ -241,7 +241,7 @@ void HPEstablishUSBNotifications(void)
 							bus->dirname, dev->filename);
 						bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
 #ifdef DEBUG_HOTPLUG
-						DebugLogB("Found matching USB device: %s", bus_device);
+						Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s", bus_device);
 #endif
 						newreader = TRUE;
 
@@ -255,7 +255,7 @@ void HPEstablishUSBNotifications(void)
 								readerTracker[j].status = READER_PRESENT;
 								newreader = FALSE;
 #ifdef DEBUG_HOTPLUG
-								DebugLogB("Refresh USB device: %s", bus_device);
+								Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s", bus_device);
 #endif
 								break;
 							}
@@ -298,20 +298,20 @@ void HPEstablishUSBNotifications(void)
 				{
 					/* The device is present */
 #ifdef DEBUG_HOTPLUG
-					DebugLogB("BSD: EBUSY on %s", filename);
+					Log2(PCSC_LOG_DEBUG, "BSD: EBUSY on %s", filename);
 #endif
 					readerTracker[i].status = READER_PRESENT;
 				}
 #ifdef DEBUG_HOTPLUG
 				else
-					DebugLogC("BSD: %s error: %s", filename,
+					Log3(PCSC_LOG_DEBUG, "BSD: %s error: %s", filename,
 						strerror(errno));
 #endif
 			}
 			else
 			{
 #ifdef DEBUG_HOTPLUG
-				DebugLogB("BSD: %s still present", filename);
+				Log2(PCSC_LOG_DEBUG, "BSD: %s still present", filename);
 #endif
 				readerTracker[i].status = READER_PRESENT;
 				close(fd);
@@ -327,7 +327,7 @@ void HPEstablishUSBNotifications(void)
 		{
 			int retval;
 
-			DebugLogA("Hotplug stopped");
+			Log1(PCSC_LOG_INFO, "Hotplug stopped");
 			pthread_exit(&retval);
 		}
 
@@ -368,7 +368,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 
 	SYS_MutexLock(&usbNotifierMutex);
 
-	DebugLogB("Adding USB device: %s", bus_device);
+	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
 	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb:%s",
 		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
@@ -383,7 +383,8 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 
 	if (i==PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		DebugLogB("Not enough reader entries. Already found %d readers", i);
+		Log2(PCSC_LOG_ERROR,
+			"Not enough reader entries. Already found %d readers", i);
 		return 0;
 	}
 
@@ -407,7 +408,8 @@ LONG HPRemoveHotPluggable(int index)
 {
 	SYS_MutexLock(&usbNotifierMutex);
 
-	DebugLogC("Removing USB device[%d]: %s", index, readerTracker[index].bus_device);
+	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", index,
+		readerTracker[index].bus_device);
 
 	RFRemoveReader(readerTracker[index].driver->readerName,
 		PCSCLITE_HP_BASE_PORT + index);

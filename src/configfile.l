@@ -93,9 +93,9 @@ int evaluatetoken(char *pcToken)
 				if ((NULL == strchr(pcDevicename, ':'))
 					&& (SYS_Stat(pcDevicename, &fStatBuf) != 0))
 				{
-					DebugLogC("Error with device %s: %s",
+					Log3(PCSC_LOG_CRITICAL, "Error with device %s: %s",
 						pcDevicename, strerror(errno));
-					DebugLogA("You should use 'DEVICENAME /dev/null' if your driver does not use this field");
+					Log1(PCSC_LOG_CRITICAL, "You should use 'DEVICENAME /dev/null' if your driver does not use this field");
 					badError = 1;
 				}
 			}
@@ -114,16 +114,16 @@ int evaluatetoken(char *pcToken)
 				pcLibpath = strdup(pcCurrent);
 				if (SYS_Stat(pcLibpath, &fStatBuf) != 0)
 				{
-					DebugLogC("Error with library %s: %s",
+					Log3(PCSC_LOG_CRITICAL, "Error with library %s: %s",
 						pcLibpath, strerror(errno));
 					badError = 1;
 				}
 
 				if (strstr(pcLibpath, ".bundle") != NULL)
 				{
-					DebugLogA("WARNING *************************************");
-					DebugLogB("WARNING: USB drivers SHOULD NOT be declared in reader.conf: %s", pcLibpath);
-					DebugLogA("WARNING *************************************");
+					Log1(PCSC_LOG_ERROR, "WARNING *************************************");
+					Log2(PCSC_LOG_ERROR, "WARNING: USB drivers SHOULD NOT be declared in reader.conf: %s", pcLibpath);
+					Log1(PCSC_LOG_ERROR, "WARNING *************************************");
 				}
 			}
 			else
@@ -174,7 +174,8 @@ int evaluatetoken(char *pcToken)
 
 void tok_error(char *token_error)
 {
-	DebugLogB("tok_error: invalid value in reader.conf: %s", token_error);
+	Log2(PCSC_LOG_ERROR, "tok_error: invalid value in reader.conf: %s",
+		token_error);
 	badError = 1;
 }
 

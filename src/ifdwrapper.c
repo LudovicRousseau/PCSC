@@ -477,7 +477,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			dwCardStatus |= SCARD_ABSENT;
 		else
 		{
-			DebugLogB("Card not transacted: %ld", rv);
+			Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
 			return SCARD_E_NOT_TRANSACTED;
 		}
 
@@ -592,7 +592,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 		return SCARD_S_SUCCESS;
 	else
 	{
-		DebugLogB("Card not transacted: %ld", rv);
+		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
@@ -647,7 +647,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 		return SCARD_S_SUCCESS;
 	else
 	{
-		DebugLogB("Card not transacted: %ld", rv);
+		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
@@ -728,7 +728,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 		return SCARD_S_SUCCESS;
 	else
 	{
-		DebugLogB("Card not transacted: %ld", rv);
+		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }

@@ -113,8 +113,8 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 
 	if (!file)
 	{
-		DebugLogC("Could not open bundle file %s: %s", fileName,
-			strerror(errno));
+		Log3(PCSC_LOG_CRITICAL, "Could not open bundle file %s: %s",
+			fileName, strerror(errno));
 		return 1;
 	}
 
@@ -130,7 +130,7 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		if (tokenIndice == 0)
 		{
 			/* Not defined at all */
-			DebugLogC("Value/Key not defined for: %s in %s",
+			Log3(PCSC_LOG_CRITICAL, "Value/Key not defined for: %s in %s",
 				tokenKey, fileName);
 		}
 		ret = -1;

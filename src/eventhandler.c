@@ -49,7 +49,7 @@ LONG EHInitializeEventStructures(void)
 	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, 00644);
 	if (fd < 0)
 	{
-		DebugLogC("Cannot create public shared file %s: %s",
+		Log3(PCSC_LOG_CRITICAL, "Cannot create public shared file %s: %s",
 			PCSCLITE_PUBSHM_FILE, strerror(errno));
 		exit(1);
 	}
@@ -74,7 +74,7 @@ LONG EHInitializeEventStructures(void)
 			SYS_MemoryMap(sizeof(READER_STATE), fd, (i * pageSize));
 		if (readerStates[i] == 0)
 		{
-			DebugLogC("Cannot memory map public shared file %s: %s",
+			Log3(PCSC_LOG_CRITICAL, "Cannot memory map public shared file %s: %s",
 				PCSCLITE_PUBSHM_FILE, strerror(errno));
 			exit(1);
 		}
@@ -99,13 +99,13 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
 	if (NULL == rContext->readerState)
 	{
-		DebugLogA("Thread never started (reader init failed?)");
+		Log1(PCSC_LOG_ERROR, "Thread never started (reader init failed?)");
 		return SCARD_S_SUCCESS;
 	}
 
 	if ('\0' == rContext->readerState->readerName[0])
 	{
-		DebugLogA("Thread already stomped.");
+		Log1(PCSC_LOG_INFO, "Thread already stomped.");
 		return SCARD_S_SUCCESS;
 	}
 
@@ -114,7 +114,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	 */
 	rContext->dwLockId = 0xFFFF;
 
-	DebugLogA("Stomping thread.");
+	Log1(PCSC_LOG_INFO, "Stomping thread.");
 
 	do
 	{
@@ -143,7 +143,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	/* Zero the thread */
 	rContext->pthThread = 0;
 
-	DebugLogA("Thread stomped.");
+	Log1(PCSC_LOG_INFO, "Thread stomped.");
 
 	return SCARD_S_SUCCESS;
 }
@@ -159,7 +159,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	rv = IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogB("Initial Check Failed on %s", rContext->lpcReader);
+		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s", rContext->lpcReader);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -238,12 +238,12 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			if (rContext->readerState->cardAtrLength > 0)
 			{
-				DebugXxd("Card ATR: ",
+				LogXxd(PCSC_LOG_INFO, "Card ATR: ",
 					rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
 			}
 			else
-				DebugLogA("Card ATR: (NULL)");
+				Log1(PCSC_LOG_INFO, "Card ATR: (NULL)");
 		}
 		else
 		{
@@ -254,7 +254,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			dwStatus &= ~SCARD_NEGOTIABLE;
 			dwStatus &= ~SCARD_SPECIFIC;
 			dwStatus &= ~SCARD_UNKNOWN;
-			DebugLogA("Error powering up card.");
+			Log1(PCSC_LOG_ERROR, "Error powering up card.");
 		}
 
 		dwCurrentState = SCARD_PRESENT;
@@ -293,7 +293,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			DebugLogB("Error communicating to: %s", lpcReader);
+			Log2(PCSC_LOG_ERROR, "Error communicating to: %s", lpcReader);
 
 			/*
 			 * Set error status on this reader while errors occur 
@@ -342,7 +342,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				/*
 				 * Change the status structure 
 				 */
-				DebugLogB("Card Removed From %s", lpcReader);
+				Log2(PCSC_LOG_INFO, "Card Removed From %s", lpcReader);
 				/*
 				 * Notify the card has been removed 
 				 */
@@ -410,21 +410,21 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 
-				DebugLogB("Card inserted into %s", lpcReader);
+				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
 
 				if (rv == IFD_SUCCESS)
 				{
 					if (rContext->readerState->cardAtrLength > 0)
 					{
-						DebugXxd("Card ATR: ",
+						LogXxd(PCSC_LOG_INFO, "Card ATR: ",
 							rContext->readerState->cardAtr,
 							rContext->readerState->cardAtrLength);
 					}
 					else
-						DebugLogA("Card ATR: (NULL)");
+						Log1(PCSC_LOG_INFO, "Card ATR: (NULL)");
 				}
 				else
-					DebugLogA("Error powering up card.");
+					Log1(PCSC_LOG_ERROR,"Error powering up card.");
 			}
 		}
 

@@ -145,7 +145,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		mapAddr = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDONLY, 0);
 		if (mapAddr < 0)
 		{
-			DebugLogB("ERROR: Cannot open public shared file: %s",
+			Log2(PCSC_LOG_CRITICAL, "Cannot open public shared file: %s",
 				PCSCLITE_PUBSHM_FILE);
 			return SCARD_E_NO_SERVICE;
 		}
@@ -162,7 +162,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 				mapAddr, (i * pageSize));
 			if (readerStates[i] == NULL)
 			{
-				DebugLogA("ERROR: Cannot public memory map");
+				Log1(PCSC_LOG_CRITICAL, "Cannot public memory map");
 				SYS_CloseFile(mapAddr);	/* Close the memory map file */
 				return SCARD_F_INTERNAL_ERROR;
 			}
@@ -238,11 +238,11 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		if (-1 == SHMMessageReceive(&msgStruct, dwClientID,
 			PCSCLITE_CLIENT_ATTEMPTS))
 		{
-			DebugLogA("Your pcscd is too old and does not support CMD_VERSION");
+			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");
 			return SCARD_F_COMM_ERROR;
 		}
 
-		DebugLogC("Server is protocol version %d:%d",
+		Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
 			veStr->major, veStr->minor);
 
 		isExecuted = 1;
@@ -1132,9 +1132,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 * Now is where we start our event checking loop
 	 */
 
-	/*
-	 * DebugLogA("Event Loop Start"_);
-	 */
+	Log1(PCSC_LOG_DEBUG, "Event Loop Start");
 
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_BLOCKING;
 
@@ -1452,9 +1450,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 	while (1);
 
-	/*
-	 * DebugLogA("Event Loop End");
-	 */
+	Log1(PCSC_LOG_DEBUG, "Event Loop End");
 
 	if (psContextMap[dwContextIndex].contextBlockStatus ==
 			BLOCK_STATUS_RESUME)
@@ -2135,7 +2131,7 @@ static LONG SCardCheckDaemonAvailability(void)
 
 	if (rv != 0)
 	{
-		DebugLogA("PCSC Not Running");
+		Log1(PCSC_LOG_ERROR, "PCSC Not Running");
 		return SCARD_E_NO_SERVICE;
 	}
 

@@ -99,7 +99,8 @@ static void ContextThread(DWORD* pdwIndex)
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex = *pdwIndex;
 
-	DebugLogB("Thread is started: %d", psContext[dwContextIndex].dwClientID);
+	Log2(PCSC_LOG_DEBUG, "Thread is started: %d",
+		psContext[dwContextIndex].dwClientID);
 	
 	while (1)
 	{
@@ -111,7 +112,8 @@ static void ContextThread(DWORD* pdwIndex)
 				/*
 				 * Clean up the dead client
 				 */
-				DebugLogB("Client die: %d", psContext[dwContextIndex].dwClientID);
+				Log2(PCSC_LOG_DEBUG, "Client die: %d",
+					psContext[dwContextIndex].dwClientID);
 				MSGCleanupClient(dwContextIndex);
 				SYS_ThreadExit((LPVOID) NULL);
 			} 
@@ -138,7 +140,8 @@ static void ContextThread(DWORD* pdwIndex)
 					psContext[dwContextIndex].protocol_major = veStr->major;
 					psContext[dwContextIndex].protocol_minor = veStr->minor;
 
-					DebugLogC("Client is protocol version %d:%d",
+					Log3(PCSC_LOG_DEBUG,
+						"Client is protocol version %d:%d",
 						veStr->major, veStr->minor);
 
 					/* set the server protocol version */
@@ -165,12 +168,12 @@ static void ContextThread(DWORD* pdwIndex)
 			break;
 			
 		case -1:
-			DebugLogA("Error in SHMProcessEventsContext");
+			Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsContext");
 			break;
 			
 		default:
-			DebugLogB("SHMProcessEventsContext unknown retval: %d",
-				  rv);
+			Log2(PCSC_LOG_ERROR,
+				"SHMProcessEventsContext unknown retval: %d", rv);
 			break;
 		}
 	}
@@ -440,7 +443,7 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 	}
 	
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
-	DebugLogA("Client failed to authenticate");
+	Log1(PCSC_LOG_ERROR, "Client failed to authenticate");
 	SYS_Sleep(2);
 
 	return -1;

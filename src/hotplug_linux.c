@@ -102,8 +102,9 @@ LONG HPReadBundleValues(void)
 
 	if (hpDir == NULL)
 	{
-		DebugLogA("Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
-		DebugLogA("Disabling USB support for pcscd.");
+		Log1(PCSC_LOG_INFO,
+			"Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd.");
 		return -1;
 	}
 
@@ -168,8 +169,9 @@ LONG HPReadBundleValues(void)
 
 	if (bundleSize == 0)
 	{
-		DebugLogA("No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
-		DebugLogA("Disabling USB support for pcscd");
+		Log1(PCSC_LOG_INFO,
+			"No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
 	}
 
 	closedir(hpDir);
@@ -207,7 +209,8 @@ void HPEstablishUSBNotifications(void)
 			dir = opendir(PCSCLITE_USB_PATH);
 			if (dir == NULL)
 			{
-				DebugLogA("Cannot open USB path directory: " PCSCLITE_USB_PATH);
+				Log1(PCSC_LOG_ERROR,
+					"Cannot open USB path directory: " PCSCLITE_USB_PATH);
 				return;
 			}
 
@@ -232,8 +235,8 @@ void HPEstablishUSBNotifications(void)
 
 				if (dirB == NULL)
 				{
-					DebugLogB("USB path seems to have disappeared %s",
-						dirpath);
+					Log2(PCSC_LOG_ERROR,
+						"USB path seems to have disappeared %s", dirpath);
 					closedir(dir);
 					return;
 				}
@@ -307,7 +310,8 @@ void HPEstablishUSBNotifications(void)
 				}
 
 				if (j == PCSCLITE_MAX_READERS_CONTEXTS)
-					DebugLogA("Too many identical readers plugged in");
+					Log1(PCSC_LOG_ERROR,
+						"Too many identical readers plugged in");
 				else
 				{
 					HPAddHotPluggable(i, j+1);
@@ -349,7 +353,7 @@ void HPEstablishUSBNotifications(void)
 		{
 			int retval;
 
-			DebugLogA("Hotplug stopped");
+			Log1(PCSC_LOG_INFO, "Hotplug stopped");
 			pthread_exit(&retval);
 		}
 

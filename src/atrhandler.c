@@ -40,7 +40,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 
 #ifdef ATR_DEBUG
 	if (dwLength > 0)
-		DebugXxd("ATR: ", pucAtr, dwLength);
+		LogXxd(PCSC_LOG_DEBUG, "ATR: ", pucAtr, dwLength);
 #endif
 
 	if (dwLength < 2)
@@ -135,7 +135,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			}
 
 #ifdef ATR_DEBUG
-			DebugLogB("T=%d Protocol Found", T);
+			Log2(PCSC_LOG_DEBUG, "T=%d Protocol Found", T);
 #endif
 			if (0 == T)
 			{
@@ -177,7 +177,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			{
 				T = TAi & 0x0F;
 #ifdef ATR_DEBUG
-				DebugLogB("Specific mode: T=%d", T);
+				Log2(PCSC_LOG_DEBUG, "Specific mode: T=%d", T);
 #endif
 				switch (T)
 				{
@@ -239,7 +239,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	psExtension->ATR.Length = p;	/* modified from p-1 */
 
 #ifdef ATR_DEBUG
-	DebugLogC("CurrentProtocol: %d, AvailableProtocols: %d",
+	Log3(PCSC_LOG_DEBUG, "CurrentProtocol: %d, AvailableProtocols: %d",
 		psExtension->CardCapabilities.CurrentProtocol,
 		psExtension->CardCapabilities.AvailableProtocols);
 #endif

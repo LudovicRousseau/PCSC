@@ -102,7 +102,8 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 {
 	int i;
 #ifdef DEBUG_HOTPLUG
-	DebugLogB("Entering HPDriversGetFromDirectory: %s", driverBundlePath);
+	Log2(PCSC_LOG_DEBUG, "Entering HPDriversGetFromDirectory: %s",
+		driverBundlePath);
 #endif
 
 	int readersNumber = 0;
@@ -119,14 +120,14 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	CFRelease(driverBundlePathString);
 	if (!pluginUrl)
 	{
-		DebugLogA("error getting plugin directory URL");
+		Log1(PCSC_LOG_ERROR, "error getting plugin directory URL");
 		return NULL;
 	}
 	bundleArray = CFBundleCreateBundlesFromDirectory(kCFAllocatorDefault,
 		pluginUrl, NULL);
 	if (!bundleArray)
 	{
-		DebugLogA("error getting plugin directory bundles");
+		Log1(PCSC_LOG_ERROR, "error getting plugin directory bundles");
 		return NULL;
 	}
 	CFRelease(pluginUrl);
@@ -145,7 +146,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 		if (!blobValue)
 		{
-			DebugLogA("error getting vendor ID from bundle");
+			Log1(PCSC_LOG_ERROR, "error getting vendor ID from bundle");
 			return NULL;
 		}
 
@@ -160,7 +161,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			readersNumber++;
 	}
 #ifdef DEBUG_HOTPLUG
-	DebugLogB("Total of %d readers supported", readersNumber);
+	Log2(PCSC_LOG_DEBUG, "Total of %d readers supported", readersNumber);
 #endif
 
 	/* The last entry is an end marker (m_vendorId = 0)
@@ -171,7 +172,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	bundleVector = (HPDriver *) calloc(readersNumber, sizeof(HPDriver));
 	if (!bundleVector)
 	{
-		DebugLogA("memory allocation failure");
+		Log1(PCSC_LOG_ERROR, "memory allocation failure");
 		return NULL;
 	}
 
@@ -193,7 +194,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 		if (!blobValue)
 		{
-			DebugLogA("error getting vendor ID from bundle");
+			Log1(PCSC_LOG_ERROR, "error getting vendor ID from bundle");
 			return bundleVector;
 		}
 
@@ -205,14 +206,14 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			char *libPath = driverBundle->m_libPath;
 
 #ifdef DEBUG_HOTPLUG
-			DebugLogB("Driver with aliases: %s", libPath);
+			Log2(PCSC_LOG_DEBUG, "Driver with aliases: %s", libPath);
 #endif
 			/* get list of ProductID */
 			productArray = CFDictionaryGetValue(dict,
 				 CFSTR(PCSCLITE_HP_PRODKEY_NAME));
 			if (!productArray)
 			{
-				DebugLogA("error getting product ID from bundle");
+				Log1(PCSC_LOG_ERROR, "error getting product ID from bundle");
 				return bundleVector;
 			}
 
@@ -221,7 +222,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				 CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
 			if (!friendlyNameArray)
 			{
-				DebugLogA("error getting product ID from bundle");
+				Log1(PCSC_LOG_ERROR, "error getting product ID from bundle");
 				return bundleVector;
 			}
 
@@ -229,14 +230,16 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 			if (reader_nb != CFArrayGetCount(productArray))
 			{
-				DebugLogC("Malformed Info.plist: %d vendors and %d products",
+				Log3(PCSC_LOG_ERROR,
+					"Malformed Info.plist: %d vendors and %d products",
 					reader_nb, CFArrayGetCount(productArray));
 				return bundleVector;
 			}
 
 			if (reader_nb != CFArrayGetCount(friendlyNameArray))
 			{
-				DebugLogC("Malformed Info.plist: %d vendors and %d friendlynames",
+				Log3(PCSC_LOG_ERROR,
+					"Malformed Info.plist: %d vendors and %d friendlynames",
 					reader_nb, CFArrayGetCount(friendlyNameArray));
 				return bundleVector;
 			}
@@ -262,10 +265,13 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 					driverBundle->m_libPath = strdup(libPath);
 
 #ifdef DEBUG_HOTPLUG
-				DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
-				DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
-				DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);
-				DebugLogB("Driver: %s", driverBundle->m_libPath);
+				Log2(PCSC_LOG_DEBUG, "VendorID: 0x%04X",
+					driverBundle->m_vendorId);
+				Log2(PCSC_LOG_DEBUG, "ProductID: 0x%04X",
+					driverBundle->m_productId);
+				Log2(PCSC_LOG_DEBUG, "Friendly name: %s",
+					driverBundle->m_friendlyName);
+				Log2(PCSC_LOG_DEBUG, "Driver: %s", driverBundle->m_libPath);
 #endif
 
 				/* go to next bundle in the vector */
@@ -277,7 +283,8 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			CFStringRef strValue = blobValue;
 
 #ifdef DEBUG_HOTPLUG
-			DebugLogC("Driver without alias: %s", driverBundle, driverBundle->m_libPath);
+			Log3(PCSC_LOG_DEBUG, "Driver without alias: %s",
+				driverBundle, driverBundle->m_libPath);
 #endif
 
 			driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
@@ -287,7 +294,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				CFSTR(PCSCLITE_HP_PRODKEY_NAME));
 			if (!strValue)
 			{
-				DebugLogA("error getting product ID from bundle");
+				Log1(PCSC_LOG_ERROR, "error getting product ID from bundle");
 				return bundleVector;
 			}
 			driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
@@ -297,7 +304,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
 			if (!strValue)
 			{
-				DebugLogA("error getting product friendly name from bundle");
+				Log1(PCSC_LOG_ERROR, "error getting product friendly name from bundle");
 				driverBundle->m_friendlyName = strdup("unnamed device");
 			}
 			else
@@ -308,10 +315,10 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				driverBundle->m_friendlyName = strdup(cstr);
 			}
 #ifdef DEBUG_HOTPLUG
-			DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
-			DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
-			DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);
-			DebugLogB("Driver: %s", driverBundle->m_libPath);
+			Log2(PCSC_LOG_DEBUG, "VendorID: 0x%04X", driverBundle->m_vendorId);
+			Log2(PCSC_LOG_DEBUG, "ProductID: 0x%04X", driverBundle->m_productId);
+			Log2(PCSC_LOG_DEBUG, "Friendly name: %s", driverBundle->m_friendlyName);
+			Log2(PCSC_LOG_DEBUG, "Driver: %s", driverBundle->m_libPath);
 #endif
 
 			/* go to next bundle in the vector */
@@ -381,7 +388,7 @@ HPDeviceListInsert(HPDeviceList list, HPDriver * bundle, UInt32 address)
 
 	if (!newReader)
 	{
-		DebugLogA("memory allocation failure");
+		Log1(PCSC_LOG_ERROR, "memory allocation failure");
 		return list;
 	}
 
@@ -425,7 +432,8 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 
 	if (0 == usbMatch)
 	{
-		DebugLogA("error getting USB match from IOServiceMatching()");
+		Log1(PCSC_LOG_ERROR,
+			"error getting USB match from IOServiceMatching()");
 		return 1;
 	}
 
@@ -435,8 +443,8 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 
 	if (kret != 0)
 	{
-		DebugLogA
-			("error getting iterator from IOServiceGetMatchingServices()");
+		Log1(PCSC_LOG_ERROR,
+			"error getting iterator from IOServiceGetMatchingServices()");
 		return 1;
 	}
 
@@ -450,8 +458,8 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 		kret = IORegistryEntryGetName(usbDevice, namebuf);
 		if (kret != 0)
 		{
-			DebugLogA
-				("error getting device name from IORegistryEntryGetName()");
+			Log1(PCSC_LOG_ERROR,
+				"error getting device name from IORegistryEntryGetName()");
 			return 1;
 		}
 
@@ -463,8 +471,7 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 			kIOCFPlugInInterfaceID, &iodev, &score);
 		if (kret != 0)
 		{
-			DebugLogA
-				("error getting plugin interface from IOCreatePlugInInterfaceForService()");
+			Log1(PCSC_LOG_ERROR, "error getting plugin interface from IOCreatePlugInInterfaceForService()");
 			return 1;
 		}
 		IOObjectRelease(usbDevice);
@@ -477,7 +484,8 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 		(*iodev)->Release(iodev);
 		if (hres)
 		{
-			DebugLogA("error querying interface in QueryInterface()");
+			Log1(PCSC_LOG_ERROR,
+				"error querying interface in QueryInterface()");
 			return 1;
 		}
 
@@ -518,7 +526,8 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 
 	if (pccMatch == NULL)
 	{
-		DebugLogA("error getting PCCard match from IOServiceMatching()");
+		Log1(PCSC_LOG_ERROR,
+			"error getting PCCard match from IOServiceMatching()");
 		return 1;
 	}
 
@@ -528,7 +537,8 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		&pccIter);
 	if (kret != 0)
 	{
-		DebugLogA("error getting iterator from IOServiceGetMatchingServices()");
+		Log1(PCSC_LOG_ERROR,
+			"error getting iterator from IOServiceGetMatchingServices()");
 		return 1;
 	}
 
@@ -542,7 +552,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		kret = IORegistryEntryGetName(pccDevice, namebuf);
 		if (kret != 0)
 		{
-			DebugLogA("error getting plugin interface from IOCreatePlugInInterfaceForService()");
+			Log1(PCSC_LOG_ERROR, "error getting plugin interface from IOCreatePlugInInterfaceForService()");
 			return 1;
 		}
 		UInt32 vendorId = 0;
@@ -554,7 +564,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 
 		if (!valueRef)
 		{
-			DebugLogA("error getting vendor");
+			Log1(PCSC_LOG_ERROR, "error getting vendor");
 		}
 		else
 		{
@@ -566,7 +576,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 			kCFAllocatorDefault, NULL);
 		if (!valueRef)
 		{
-			DebugLogA("error getting device");
+			Log1(PCSC_LOG_ERROR, "error getting device");
 		}
 		else
 		{
@@ -578,7 +588,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 			kCFAllocatorDefault, NULL);
 		if (!valueRef)
 		{
-			DebugLogA("error getting PC Card socket");
+			Log1(PCSC_LOG_ERROR, "error getting PC Card socket");
 		}
 		else
 		{
@@ -618,7 +628,7 @@ static void HPEstablishUSBNotification(void)
 	matchingDictionary = IOServiceMatching("IOUSBDevice");
 	if (!matchingDictionary)
 	{
-		DebugLogB("IOServiceMatching() failed", 0);
+		Log1(PCSC_LOG_ERROR, "IOServiceMatching() failed");
 	}
 	matchingDictionary =
 		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
@@ -628,8 +638,8 @@ static void HPEstablishUSBNotification(void)
 		matchingDictionary, HPDeviceAppeared, NULL, &deviceAddedIterator);
 	if (kret)
 	{
-		DebugLogB("IOServiceAddMatchingNotification()-1 failed with code %d",
-			kret);
+		Log2(PCSC_LOG_ERROR,
+			"IOServiceAddMatchingNotification()-1 failed with code %d", kret);
 	}
 	HPDeviceAppeared(NULL, deviceAddedIterator);
 
@@ -639,8 +649,8 @@ static void HPEstablishUSBNotification(void)
 		HPDeviceDisappeared, NULL, &deviceRemovedIterator);
 	if (kret)
 	{
-		DebugLogB("IOServiceAddMatchingNotification()-2 failed with code %d",
-			kret);
+		Log2(PCSC_LOG_ERROR,
+			"IOServiceAddMatchingNotification()-2 failed with code %d", kret);
 	}
 	HPDeviceDisappeared(NULL, deviceRemovedIterator);
 }
@@ -661,7 +671,7 @@ static void HPEstablishPCCardNotification(void)
 	matchingDictionary = IOServiceMatching("IOPCCard16Device");
 	if (!matchingDictionary)
 	{
-		DebugLogB("IOServiceMatching() failed", 0);
+		Log1(PCSC_LOG_ERROR, "IOServiceMatching() failed");
 	}
 	matchingDictionary =
 		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
@@ -671,8 +681,8 @@ static void HPEstablishPCCardNotification(void)
 		matchingDictionary, HPDeviceAppeared, NULL, &deviceAddedIterator);
 	if (kret)
 	{
-		DebugLogB("IOServiceAddMatchingNotification()-1 failed with code %d",
-			kret);
+		Log2(PCSC_LOG_ERROR,
+			"IOServiceAddMatchingNotification()-1 failed with code %d", kret);
 	}
 	HPDeviceAppeared(NULL, deviceAddedIterator);
 
@@ -682,8 +692,8 @@ static void HPEstablishPCCardNotification(void)
 		HPDeviceDisappeared, NULL, &deviceRemovedIterator);
 	if (kret)
 	{
-		DebugLogB("IOServiceAddMatchingNotification()-2 failed with code %d",
-			kret);
+		Log2(PCSC_LOG_ERROR,
+			"IOServiceAddMatchingNotification()-2 failed with code %d", kret);
 	}
 	HPDeviceDisappeared(NULL, deviceRemovedIterator);
 }

@@ -74,7 +74,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 		CFRelease(bundle);
 	}
 	else
-		DebugLogA("Cannot unload library.");
+		Log1(PCSC_LOG_ERROR, "Cannot unload library.");
 
 	*pvLHandle = 0;
 	return SCARD_S_SUCCESS;

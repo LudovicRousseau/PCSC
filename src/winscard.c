@@ -66,7 +66,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 
 	*phContext = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
 
-	DebugLogB("Establishing Context: %d", *phContext);
+	Log2(PCSC_LOG_DEBUG, "Establishing Context: %d", *phContext);
 
 	return SCARD_S_SUCCESS;
 }
@@ -77,7 +77,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 * Nothing to do here RPC layer will handle this
 	 */
 
-	DebugLogB("Releasing Context: %d", hContext);
+	Log2(PCSC_LOG_DEBUG, "Releasing Context: %d", hContext);
 
 	return SCARD_S_SUCCESS;
 }
@@ -119,13 +119,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
 
-	DebugLogC("Attempting Connect to %s %d", szReader, dwPreferredProtocols);
+	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s %d", szReader,
+		dwPreferredProtocols);
 
 	rv = RFReaderInfo((LPTSTR) szReader, &rContext);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogB("Reader %s Not Found", szReader);
+		Log2(PCSC_LOG_ERROR, "Reader %s Not Found", szReader);
 		return rv;
 	}
 
@@ -147,7 +148,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	 */
 	if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
 	{
-		DebugLogA("Error Reader Exclusive");
+		Log1(PCSC_LOG_ERROR, "Error Reader Exclusive");
 		return SCARD_E_SHARING_VIOLATION;
 	}
 
@@ -163,7 +164,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	{
 		if (!(dwStatus & SCARD_PRESENT))
 		{
-			DebugLogA("Card Not Inserted");
+			Log1(PCSC_LOG_ERROR, "Card Not Inserted");
 			return SCARD_E_NO_SMARTCARD;
 		}
 	}
@@ -223,9 +224,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 
 	if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
 		&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
-		DebugLogB("Active Protocol: unknown %d", *pdwActiveProtocol);
+		Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+			*pdwActiveProtocol);
 	else
-		DebugLogB("Active Protocol: T=%d",
+		Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
 			(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
 
 	/*
@@ -233,7 +235,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	 */
 	*phCard = RFCreateReaderHandle(rContext);
 
-	DebugLogB("hCard Identity: %x", *phCard);
+	Log2(PCSC_LOG_DEBUG, "hCard Identity: %x", *phCard);
 
 	/*******************************************
 	 *
@@ -300,7 +302,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
 
-	DebugLogA("Attempting reconnect to token.");
+	Log1(PCSC_LOG_DEBUG, "Attempting reconnect to token.");
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -392,17 +394,17 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				break;
 
 			case SCARD_W_REMOVED_CARD:
-				DebugLogA("card removed");
+				Log1(PCSC_LOG_ERROR, "card removed");
 				return SCARD_W_REMOVED_CARD;
 
 			/* invalid EventStatus */
 			case SCARD_E_INVALID_VALUE:
-				DebugLogA("invalid EventStatus");
+				Log1(PCSC_LOG_ERROR, "invalid EventStatus");
 				return SCARD_F_INTERNAL_ERROR;
 
 			/* invalid hCard, but hCard was widely used some lines above :( */
 			case SCARD_E_INVALID_HANDLE:
-				DebugLogA("invalid handle");
+				Log1(PCSC_LOG_ERROR, "invalid handle");
 				return SCARD_F_INTERNAL_ERROR;
 
 			case SCARD_S_SUCCESS:
@@ -438,8 +440,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 				if (rContext->readerState->cardAtrLength > 0)
 				{
-					DebugLogA("Reset complete.");
-					DebugXxd("Card ATR: ", rContext->readerState->cardAtr,
+					Log1(PCSC_LOG_DEBUG, "Reset complete.");
+					LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
+						rContext->readerState->cardAtr,
 						rContext->readerState->cardAtrLength);
 				}
 				else
@@ -447,7 +450,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					DWORD dwStatus, dwAtrLen;
 					UCHAR ucAtr[MAX_ATR_SIZE];
 
-					DebugLogA("Error resetting card.");
+					Log1(PCSC_LOG_ERROR, "Error resetting card.");
 					IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
 					if (dwStatus & SCARD_PRESENT)
 						return SCARD_W_UNRESPONSIVE_CARD;
@@ -457,7 +460,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				break;
 
 			default:
-				DebugLogB("invalid retcode from RFCheckReaderEventState (%X)", rv);
+				Log2(PCSC_LOG_ERROR,
+					"invalid retcode from RFCheckReaderEventState (%X)", rv);
 				return SCARD_F_INTERNAL_ERROR;
 				break;
 		}
@@ -613,7 +617,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	RFUnlockSharing(hCard);
 
-	DebugLogB("Active Contexts: %d", rContext->dwContexts);
+	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->dwContexts);
 
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
@@ -672,9 +676,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 
 		if (rContext->readerState->cardAtrLength > 0)
-			DebugLogA("Reset complete.");
+			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 		else
-			DebugLogA("Error resetting card.");
+			Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
@@ -699,16 +703,16 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		{
 			if (receiveLength == 2 && receiveBuffer[0] == 0x90)
 			{
-				DebugLogA("Card ejected successfully.");
+				Log1(PCSC_LOG_DEBUG, "Card ejected successfully.");
 				/*
 				 * Successful
 				 */
 			}
 			else
-				DebugLogA("Error ejecting card.");
+				Log1(PCSC_LOG_ERROR, "Error ejecting card.");
 		}
 		else
-			DebugLogA("Error ejecting card.");
+			Log1(PCSC_LOG_ERROR, "Error ejecting card.");
 
 	}
 	else if (dwDisposition == SCARD_LEAVE_CARD)
@@ -784,7 +788,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	rv = RFLockSharing(hCard);
 
-	DebugLogB("Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
 
 	return rv;
 }
@@ -881,9 +885,9 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 
 		if (rContext->readerState->cardAtrLength > 0)
-			DebugLogA("Reset complete.");
+			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 		else
-			DebugLogA("Error resetting card.");
+			Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
@@ -908,16 +912,16 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		{
 			if (receiveLength == 2 && receiveBuffer[0] == 0x90)
 			{
-				DebugLogA("Card ejected successfully.");
+				Log1(PCSC_LOG_DEBUG, "Card ejected successfully.");
 				/*
 				 * Successful
 				 */
 			}
 			else
-				DebugLogA("Error ejecting card.");
+				Log1(PCSC_LOG_ERROR, "Error ejecting card.");
 		}
 		else
-			DebugLogA("Error ejecting card.");
+			Log1(PCSC_LOG_ERROR, "Error ejecting card.");
 
 	}
 	else if (dwDisposition == SCARD_LEAVE_CARD)
@@ -932,7 +936,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	RFUnlockSharing(hCard);
 
-	DebugLogB("Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
 
 	return rv;
 }
@@ -968,7 +972,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	rv = RFUnlockSharing(hCard);
 
-	DebugLogB("Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
 
 	return rv;
 }
@@ -1367,7 +1371,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	sSendPci.Length = pioSendPci->cbPciLength;
 
 	/* the protocol number is decoded a few lines above */
-	DebugLogB("Send Protocol: T=%d", sSendPci.Protocol);
+	Log2(PCSC_LOG_DEBUG, "Send Protocol: T=%d", sSendPci.Protocol);
 
 	tempRxLength = dwRxLength;
 
@@ -1394,7 +1398,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (rv != SCARD_S_SUCCESS)
 	{
 		*pcbRecvLength = 0;
-		DebugLogB("Card not transacted: %ld", rv);
+		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 

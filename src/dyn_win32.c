@@ -26,7 +26,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	if (*pvLHandle == NULL)
 	{
 #if 0
-		DebugLogB("DYN_LoadLibrary: dlerror() reports %s", dlerror());
+		Log2(PCSC_LOG_ERROR, "DYN_LoadLibrary: dlerror() reports %s", dlerror());
 #endif
 		return SCARD_F_UNKNOWN_ERROR;
 	}
@@ -46,7 +46,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 	if (ret == 0)
 	{
 #if 0
-		DebugLogB("DYN_CloseLibrary: dlerror() reports %s", dlerror());
+		Log2(PCSC_LOG_ERROR, "DYN_CloseLibrary: dlerror() reports %s", dlerror());
 #endif
 		return SCARD_F_UNKNOWN_ERROR;
 	}
@@ -73,7 +73,7 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	if (*pvFHandle == NULL)
 	{
 #if 0
-		DebugLogB("DYN_GetAddress: dlerror() reports %s", dlerror());
+		Log2(PCSC_LOG_ERROR, "DYN_GetAddress: dlerror() reports %s", dlerror());
 #endif
 		rv = SCARD_F_UNKNOWN_ERROR;
 	}

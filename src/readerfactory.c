@@ -92,7 +92,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
 					(dwPort == (sReadersContexts[i])->dwPort))
 				{
-					DebugLogA("Duplicate reader found.");
+					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
 					return SCARD_E_DUPLICATE_READER;
 				}
 			}
@@ -169,7 +169,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
-			DebugLogA("Driver is thread safe");
+			Log1(PCSC_LOG_INFO, "Driver is thread safe");
 			(sReadersContexts[dwContext])->mMutex = 0;
 			(sReadersContexts[dwContext])->pdwMutex = 0;
 		}
@@ -216,7 +216,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		/*
 		 * Clean up so it is not using needed space 
 		 */
-		DebugLogB("%s init failed.", lpcReader);
+		Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
 
 		(sReadersContexts[dwContext])->dwVersion = 0;
 		(sReadersContexts[dwContext])->dwPort = 0;
@@ -393,7 +393,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			/*
 			 * Clean up so it is not using needed space 
 			 */
-			DebugLogB("%s init failed.", lpcReader);
+			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
 
 			(sReadersContexts[dwContextB])->dwVersion = 0;
 			(sReadersContexts[dwContextB])->dwPort = 0;
@@ -464,7 +464,8 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 		 */
 		if ((NULL == sContext->pdwMutex) || (NULL == sContext->pdwFeeds))
 		{
-			DebugLogA("Trying to remove an already removed driver");
+			Log1(PCSC_LOG_ERROR,
+				"Trying to remove an already removed driver");
 			return SCARD_E_INVALID_VALUE;
 		}
 
@@ -552,8 +553,8 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPTSTR readerName,
 						(tagValue[0] > 1))
 					{
 						supportedChannels = tagValue[0];
-						DebugLogB("Support %d simultaneous readers",
-							tagValue[0]);
+						Log2(PCSC_LOG_INFO,
+							"Support %d simultaneous readers", tagValue[0]);
 					}
 					else
 						supportedChannels = -1;
@@ -776,7 +777,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 {
 	if (rContext->vHandle != 0)
 	{
-		DebugLogA("Warning library pointer not NULL");
+		Log1(PCSC_LOG_ERROR, "Warning library pointer not NULL");
 		/*
 		 * Another reader exists with this library loaded 
 		 */
@@ -817,7 +818,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Neither version of the IFD Handler was found - exit 
 		 */
-		DebugLogA("IFDHandler functions missing");
+		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 
 		exit(1);
 	} else if (rv1 == SCARD_S_SUCCESS)
@@ -847,7 +848,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		DebugLogA("Loading IFD Handler 1.0");
+		Log1(PCSC_LOG_INFO, "Loading IFD Handler 1.0");
 
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
@@ -860,7 +861,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESSv1(field, function) \
 	GET_ADDRESS_OPTIONALv1(field, function, \
-		DebugLogA("IFDHandler functions missing: " #function ); \
+		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #function ); \
 		exit(1); )
 
 		DYN_GetAddress(rContext->vHandle,
@@ -872,7 +873,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			"IO_Close_Channel"))
 		{
 			rContext->psFunctions.psFunctions_v1.pvfCloseChannel = NULL;
-			DebugLogA("IFDHandler functions missing");
+			Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 			exit(1);
 		}
 
@@ -901,10 +902,10 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESSv2(s) \
 	GET_ADDRESS_OPTIONALv2(s, \
-		DebugLogA("IFDHandler functions missing: " #s ); \
+		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #s ); \
 		exit(1); )
 
-		DebugLogA("Loading IFD Handler 2.0");
+		Log1(PCSC_LOG_INFO, "Loading IFD Handler 2.0");
 
 		GET_ADDRESSv2(CloseChannel)
 		GET_ADDRESSv2(GetCapabilities)
@@ -933,10 +934,10 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESSv3(s) \
 	GET_ADDRESS_OPTIONALv3(s, \
-		DebugLogA("IFDHandler functions missing: " #s ); \
+		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #s ); \
 		exit(1); )
 
-		DebugLogA("Loading IFD Handler 3.0");
+		Log1(PCSC_LOG_INFO, "Loading IFD Handler 3.0");
 
 		GET_ADDRESSv2(CloseChannel)
 		GET_ADDRESSv2(GetCapabilities)
@@ -953,7 +954,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Who knows what could have happenned for it to get here. 
 		 */
-		DebugLogA("IFD Handler not 1.0/2.0 or 3.0");
+		Log1(PCSC_LOG_CRITICAL, "IFD Handler not 1.0/2.0 or 3.0");
 		exit(1);
 	}
 
@@ -979,7 +980,7 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 
 	if (*rContext->pdwFeeds == 1)
 	{
-		DebugLogA("Unloading reader driver.");
+		Log1(PCSC_LOG_INFO, "Unloading reader driver.");
 		DYN_CloseLibrary(&rContext->vHandle);
 	}
 
@@ -1062,7 +1063,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	/*
 	 * Spawn the event handler thread 
 	 */
-	DebugLogB("Attempting startup of %s.", rContext->lpcReader);
+	Log2(PCSC_LOG_INFO, "Attempting startup of %s.", rContext->lpcReader);
 
   /******************************************/
 	/*
@@ -1096,7 +1097,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 	if (rv != IFD_SUCCESS)
 	{
-		DebugLogC("Open Port %X Failed (%s)",
+		Log3(PCSC_LOG_CRITICAL, "Open Port %X Failed (%s)",
 			rContext->dwPort, rContext->lpcDevice);
 		RFUnBindFunctions(rContext);
 		RFUnloadReader(rContext);
@@ -1108,7 +1109,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 LONG RFUnInitializeReader(PREADER_CONTEXT rContext)
 {
-	DebugLogB("Attempting shutdown of %s.",
+	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
 		rContext->lpcReader);
 
 	/*
@@ -1317,7 +1318,7 @@ void RFCleanupReaders(int shouldExit)
 {
 	int i;
 
-	DebugLogA("entering cleaning function");
+	Log1(PCSC_LOG_INFO, "entering cleaning function");
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (sReadersContexts[i]->vHandle != 0)
@@ -1325,7 +1326,8 @@ void RFCleanupReaders(int shouldExit)
 			LONG rv;
 			char lpcStripReader[MAX_READERNAME];
 
-			DebugLogB("Stopping reader: %s", sReadersContexts[i]->lpcReader);
+			Log2(PCSC_LOG_INFO, "Stopping reader: %s",
+				sReadersContexts[i]->lpcReader);
 
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 				sizeof(lpcStripReader));
@@ -1337,7 +1339,7 @@ void RFCleanupReaders(int shouldExit)
 			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->dwPort);
 
 			if (rv != SCARD_S_SUCCESS)
-				DebugLogB("RFRemoveReader error: %s",
+				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: %s",
 					pcsc_stringify_error(rv));
 		}
 	}
@@ -1397,7 +1399,7 @@ void RFAwakeAllReaders(void)
 
 			if (rv != IFD_SUCCESS)
 			{
-				DebugLogC("Open Port %X Failed (%s)",
+				Log3(PCSC_LOG_ERROR, "Open Port %X Failed (%s)",
 					(sReadersContexts[i])->dwPort, (sReadersContexts[i])->lpcDevice);
 			}
 

@@ -48,7 +48,7 @@ int SHMClientSetupSession(PDWORD pdwClientID)
 
 	if ((*pdwClientID = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB("Error: create on client socket: %s",
+		Log2(PCSC_LOG_CRITICAL, "Error: create on client socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -60,7 +60,7 @@ int SHMClientSetupSession(PDWORD pdwClientID)
 	if (connect(*pdwClientID, (struct sockaddr *) &svc_addr,
 			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) < 0)
 	{
-		DebugLogB("Error: connect to client socket: %s",
+		Log2(PCSC_LOG_CRITICAL, "Error: connect to client socket: %s",
 			strerror(errno));
 		SYS_CloseFile(*pdwClientID);
 		return -1;
@@ -69,7 +69,7 @@ int SHMClientSetupSession(PDWORD pdwClientID)
 	one = 1;
 	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
-		DebugLogB("Error: cannot set socket nonblocking: %s",
+		Log2(PCSC_LOG_CRITICAL, "Error: cannot set socket nonblocking: %s",
 			strerror(errno));
 		SYS_CloseFile(*pdwClientID);
 		return -1;
@@ -93,7 +93,8 @@ int SHMInitializeCommonSegment(void)
 	 */
 	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB("Unable to create common socket: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Unable to create common socket: %s",
+			strerror(errno));
 		return -1;
 	}
 
@@ -105,14 +106,16 @@ int SHMInitializeCommonSegment(void)
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
 			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
 	{
-		DebugLogB("Unable to bind common socket: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Unable to bind common socket: %s",
+			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
 
 	if (listen(commonSocket, 1) < 0)
 	{
-		DebugLogB("Unable to listen common socket: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Unable to listen common socket: %s",
+			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
@@ -137,7 +140,8 @@ int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 	if ((new_sock = accept(commonSocket, (struct sockaddr *) &clnt_addr,
 				&clnt_len)) < 0)
 	{
-		DebugLogB("ER: Accept on common socket: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Accept on common socket: %s",
+			strerror(errno));
 		return -1;
 	}
 
@@ -146,7 +150,8 @@ int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 	one = 1;
 	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
-		DebugLogB("Error: cannot set socket nonblocking: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Error: cannot set socket nonblocking: %s",
+			strerror(errno));
 		SYS_CloseFile(*pdwClientID);
 		*pdwClientID = -1;
 		return -1;
@@ -176,7 +181,8 @@ int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 
 	if (selret < 0)
 	{
-		DebugLogB("Select returns with failure: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
+			strerror(errno));
 		return -1;
 	}
 
@@ -188,14 +194,16 @@ int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	 */
 	if (FD_ISSET(commonSocket, &read_fd))
 	{
-		DebugLogA("Common channel packet arrival");
+		Log1(PCSC_LOG_DEBUG, "Common channel packet arrival");
 		if (SHMProcessCommonChannelRequest(pdwClientID) == -1)
 		{
-			DebugLogB("error in SHMProcessCommonChannelRequest: %d", *pdwClientID);
+			Log2(PCSC_LOG_ERROR,
+				"error in SHMProcessCommonChannelRequest: %d", *pdwClientID);
 			return -1;
 		} else
 		{
-			DebugLogB("SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
+			Log2(PCSC_LOG_DEBUG,
+				"SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
 			return 0;
 		}
 	}
@@ -220,7 +228,8 @@ int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int
 
 	if (selret < 0)
 	{
-		DebugLogB("Select returns with failure: %s", strerror(errno));
+		Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
+			strerror(errno));
 		return -1;
 	}
 
@@ -238,7 +247,8 @@ int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int
 		
 		if (rv == -1)
 		{	/* The client has died */
-			DebugLogB("Client has disappeared: %d", *pdwClientID);
+			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d",
+				*pdwClientID);
 			msgStruct->mtype = CMD_CLIENT_DIED;
 			msgStruct->command = 0;
 			SYS_CloseFile(*pdwClientID);
@@ -249,7 +259,8 @@ int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int
 		/*
 		 * Set the identifier handle 
 		 */
-		DebugLogB("correctly processed client: %d", *pdwClientID);
+		Log2(PCSC_LOG_DEBUG, "correctly processed client: %d",
+			*pdwClientID);
 		return 1;
 	}
 	
@@ -358,7 +369,8 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB("Select returns with failure: %s", strerror(errno));
+				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
+					strerror(errno));
 				retval = -1;
 				break;
 			}
@@ -469,7 +481,8 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB("Select returns with failure: %s", strerror(errno));
+				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
+					strerror(errno));
 				retval = -1;
 				break;
 			}
