@@ -1550,61 +1550,170 @@ MSC_RV MSCDeleteObject(MSCLPTokenConnection pConnection,
 	return rv;
 }
 
-MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection, MSCString objectID,
-	MSCULong32 offset, MSCPUChar8 pInputData, MSCUChar8 dataSize)
+MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
+		      MSCString objectID, MSCULong32 offSet,
+		      MSCPUChar8 pInputData, MSCULong32 dataSize,
+		      LPRWEventCallback rwCallback, MSCPVoid32 addParams)
 {
-	MSCLong32 rv;
+	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
+	MSCULong32 objectSize;
+	int totalSteps, stepInterval;
+	MSC_RV(*callBackFunction) (void *, int);
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCWriteObject) (MSCLPTokenConnection, MSCString,
 		MSCULong32, MSCPUChar8, MSCUChar8);
+	int i;
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
 	if (localHContext == 0)
 		return MSC_INTERNAL_ERROR;
 
-	vFunction = pConnection->libPointers.pvfWriteObject;
+	vFunction        = pConnection->libPointers.pvfWriteObject;
+	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
+	objectSize       = dataSize;
 
-	if (vFunction != 0)
+	if (vFunction == 0)
 	{
-		libMSCWriteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
-				MSCULong32, MSCPUChar8, MSCUChar8)) vFunction;
-		rv = (*libMSCWriteObject) (pConnection, objectID, offset,
-			pInputData, dataSize);
+	        return MSC_UNSUPPORTED_FEATURE;
+        }
 
-	} else
+	libMSCWriteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
+					  MSCULong32, MSCPUChar8, MSCUChar8)) 
+	  vFunction;
+
+	/*
+	 * Figure out the number of steps total and present this in a percent
+	 * step basis 
+	 */
+
+	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
+	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
+
+	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
 	{
-		return MSC_UNSUPPORTED_FEATURE;
+	  rv = (*libMSCWriteObject) (pConnection, objectID, 
+				     i * MSC_SIZEOF_KEYPACKET + offSet,
+				     &pInputData[i * MSC_SIZEOF_KEYPACKET], 
+				     MSC_SIZEOF_KEYPACKET);				     
+		if (rv != MSC_SUCCESS)
+		{
+			return rv;
+		}
+
+		if (rwCallback)
+		{
+			if ((*callBackFunction) (addParams,
+			      stepInterval * i) == MSC_CANCELLED)
+			{
+				return MSC_CANCELLED;
+			}
+		}
+	}
+
+	if (objectSize % MSC_SIZEOF_KEYPACKET)
+	{
+
+	  rv = (*libMSCWriteObject) (pConnection, objectID, 
+				     i * MSC_SIZEOF_KEYPACKET + offSet,
+				     &pInputData[i * MSC_SIZEOF_KEYPACKET], 
+				     objectSize % MSC_SIZEOF_KEYPACKET);
+
+		if (rv != MSC_SUCCESS)
+		{
+			return rv;
+		}
+	}
+
+	if (rwCallback)
+	{
+		(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
 	}
 
 	return rv;
 }
 
-MSC_RV MSCReadObject(MSCLPTokenConnection pConnection, MSCString objectID,
-	MSCULong32 offset, MSCPUChar8 pOutputData, MSCUChar8 dataSize)
+MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
+		     MSCString objectID, MSCULong32 offSet,
+		     MSCPUChar8 pOutputData, MSCULong32 dataSize,
+		     LPRWEventCallback rwCallback, 
+		     MSCPVoid32 addParams)
 {
-	MSCLong32 rv;
+
+        MSC_RV rv = MSC_UNSPECIFIED_ERROR;
+	MSCULong32 objectSize;
+	int totalSteps, stepInterval;
+	MSC_RV(*callBackFunction) (void *, int);
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCReadObject) (MSCLPTokenConnection, MSCString,
 		MSCULong32, MSCPUChar8, MSCUChar8);
+	int i;
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
 	if (localHContext == 0)
 		return MSC_INTERNAL_ERROR;
 
-	vFunction = pConnection->libPointers.pvfReadObject;
+	vFunction        = pConnection->libPointers.pvfReadObject;
+	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
+	objectSize       = dataSize;
 
-	if (vFunction != 0)
-	{
-		libMSCReadObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
-				MSCULong32, MSCPUChar8, MSCUChar8)) vFunction;
-		rv = (*libMSCReadObject) (pConnection, objectID, offset,
-			pOutputData, dataSize);
-
-	} else
+	if (vFunction == 0)
 	{
 		return MSC_UNSUPPORTED_FEATURE;
+	}
+
+	libMSCReadObject = (MSCLong32(*)(MSCLPTokenConnection, 
+					 MSCString, MSCULong32, 
+					 MSCPUChar8, MSCUChar8)) 
+	  vFunction;
+
+	/*
+	 * Figure out the number of steps total and present this in a percent
+	 * step basis 
+	 */
+
+	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
+	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
+
+	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
+	{
+	        rv = (*libMSCReadObject) (pConnection, objectID, 
+				    i * MSC_SIZEOF_KEYPACKET + offSet,
+				    &pOutputData[i * MSC_SIZEOF_KEYPACKET], 
+				    MSC_SIZEOF_KEYPACKET);
+
+		if (rv != MSC_SUCCESS)
+		{
+			return rv;
+		}
+
+		if (rwCallback)
+		{
+			if ((*callBackFunction) (addParams,
+					stepInterval * i) == MSC_CANCELLED)
+			{
+				return MSC_CANCELLED;
+			}
+		}
+	}
+
+	if (objectSize % MSC_SIZEOF_KEYPACKET)
+	{
+	        rv = (*libMSCReadObject) (pConnection, objectID, 
+				    i * MSC_SIZEOF_KEYPACKET + offSet,
+				    &pOutputData[i * MSC_SIZEOF_KEYPACKET], 
+				    objectSize % MSC_SIZEOF_KEYPACKET);
+
+		if (rv != MSC_SUCCESS)
+		{
+			return rv;
+		}
+	}
+
+	if (rwCallback)
+	{
+		(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
 	}
 
 	return rv;
@@ -1699,7 +1808,7 @@ MSC_RV MSCGetChallenge(MSCLPTokenConnection pConnection, MSCPUChar8 pSeed,
 }
 
 MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
-	MSCUChar8 keyNumber, MSCLPKeyInfo pKeyInfo)
+			   MSCUChar8 keyNumber, MSCLPKeyInfo pKeyInfo)
 {
 
 	MSC_RV rv;
@@ -1733,9 +1842,12 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 		pKeyInfo->keyPolicy.cipherDirection =
 			keyInfo.keyPolicy.cipherDirection;
 
-		pKeyInfo->keyACL.readPermission = keyInfo.keyACL.readPermission;
-		pKeyInfo->keyACL.writePermission = keyInfo.keyACL.writePermission;
-		pKeyInfo->keyACL.usePermission = keyInfo.keyACL.usePermission;
+		pKeyInfo->keyACL.readPermission = 
+		  keyInfo.keyACL.readPermission;
+		pKeyInfo->keyACL.writePermission = 
+		  keyInfo.keyACL.writePermission;
+		pKeyInfo->keyACL.usePermission = 
+		  keyInfo.keyACL.usePermission;
 
 		return MSC_SUCCESS;
 	}
@@ -1842,261 +1954,11 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 * pOutputData, MSCPULong32 dataSize)
+			     MSCString objectID, MSCPUChar8 * pOutputData,
+			     MSCPULong32 dataSize, 
+			     LPRWEventCallback rwCallback, 
+			     MSCPVoid32 addParams)
 {
-
-	MSC_RV rv;
-	MSCObjectInfo objInfo;
-
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
-
-	if (pOutputData == 0)
-	{
-		return MSC_INVALID_PARAMETER;
-	}
-
-	rv = MSCGetObjectAttributes(pConnection, objectID, &objInfo);
-
-	if (rv != MSC_SUCCESS)
-	{
-		*dataSize = 0;
-		*pOutputData = 0;
-		return rv;
-	}
-
-	*pOutputData =
-		(MSCPUChar8) malloc(sizeof(MSCUChar8) * objInfo.objectSize);
-	*dataSize = objInfo.objectSize;
-
-	return MSCReadLargeObject(pConnection, objectID, *pOutputData,
-		objInfo.objectSize);
-
-}
-
-MSC_RV MSCReadLargeObject(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 pOutputData, MSCULong32 dataSize)
-{
-
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int i;
-
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
-
-	objectSize = dataSize;
-
-	/*
-	 * Read the key from the default object 
-	 */
-	for (i = 0; i < objectSize / MSC_SINGLE_READ_PACKET; i++)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SINGLE_READ_PACKET,
-			&pOutputData[i * MSC_SINGLE_READ_PACKET],
-			MSC_SINGLE_READ_PACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	if (objectSize % MSC_SINGLE_READ_PACKET)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SINGLE_READ_PACKET,
-			&pOutputData[i * MSC_SINGLE_READ_PACKET],
-			objectSize % MSC_SINGLE_READ_PACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	return rv;
-}
-
-MSC_RV MSCWriteLargeObject(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 pInputData, MSCULong32 dataSize)
-{
-
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int i;
-
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
-
-	objectSize = dataSize;
-
-	for (i = 0; i < objectSize / MSC_SINGLE_READ_PACKET; i++)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SINGLE_READ_PACKET,
-			&pInputData[i * MSC_SINGLE_READ_PACKET],
-			MSC_SINGLE_READ_PACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	if (objectSize % MSC_SINGLE_READ_PACKET)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SINGLE_READ_PACKET,
-			&pInputData[i * MSC_SINGLE_READ_PACKET],
-			objectSize % MSC_SINGLE_READ_PACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	return rv;
-}
-
-MSC_RV MSCWriteLargeObjectCB(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 pInputData,
-	MSCULong32 dataSize,
-	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
-{
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int totalSteps, stepInterval;
-	MSC_RV(*callBackFunction) (void *, int);
-	int i;
-
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
-
-	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize = dataSize;
-
-	/*
-	 * Figure out the number of steps total and present this in a percent
-	 * step basis 
-	 */
-
-	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
-	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
-
-	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET,
-			&pInputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-
-		if ((*callBackFunction) (addParams,
-				stepInterval * i) == MSC_CANCELLED)
-		{
-			return MSC_CANCELLED;
-		}
-
-	}
-
-	if (objectSize % MSC_SIZEOF_KEYPACKET)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET,
-			&pInputData[i * MSC_SIZEOF_KEYPACKET],
-			objectSize % MSC_SIZEOF_KEYPACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
-
-	return rv;
-}
-
-MSC_RV MSCReadLargeObjectCB(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 pOutputData,
-	MSCULong32 dataSize,
-	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
-{
-
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int totalSteps, stepInterval;
-	MSC_RV(*callBackFunction) (void *, int);
-	int i;
-
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
-
-	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize = dataSize;
-
-	/*
-	 * Figure out the number of steps total and present this in a percent
-	 * step basis 
-	 */
-
-	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
-	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
-
-	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET,
-			&pOutputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-
-		if ((*callBackFunction) (addParams,
-				stepInterval * i) == MSC_CANCELLED)
-		{
-			return MSC_CANCELLED;
-		}
-	}
-
-	if (objectSize % MSC_SIZEOF_KEYPACKET)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET,
-			&pOutputData[i * MSC_SIZEOF_KEYPACKET],
-			objectSize % MSC_SIZEOF_KEYPACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
-
-	return rv;
-}
-
-MSC_RV MSCReadAllocateObjectCB(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCPUChar8 * pOutputData,
-	MSCPULong32 dataSize,
-	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
-{
-
 	MSC_RV rv;
 	MSCObjectInfo objInfo;
 	MSCULong32 objectSize;
@@ -2124,136 +1986,11 @@ MSC_RV MSCReadAllocateObjectCB(MSCLPTokenConnection pConnection,
 	*dataSize = objectSize;
 	*pOutputData = (MSCPUChar8) malloc(sizeof(MSCUChar8) * objectSize);
 
-	return MSCReadLargeObjectCB(pConnection, objectID, *pOutputData,
-		objectSize, rwCallback, addParams);
+	return MSCReadObject(pConnection, objectID, 0, *pOutputData,
+			     objectSize, rwCallback, addParams);
 
 }
 
-MSC_RV MSCWriteLargeObjectOffCB(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCULong32 offSet,
-	MSCPUChar8 pInputData, MSCULong32 dataSize,
-	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
-{
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int totalSteps, stepInterval;
-	MSC_RV(*callBackFunction) (void *, int);
-	int i;
-
-	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize = dataSize;
-
-	/*
-	 * Figure out the number of steps total and present this in a percent
-	 * step basis 
-	 */
-
-	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
-	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
-
-	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET + offSet,
-			&pInputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-
-		if (rwCallback)
-		{
-			if ((*callBackFunction) (addParams,
-					stepInterval * i) == MSC_CANCELLED)
-			{
-				return MSC_CANCELLED;
-			}
-		}
-	}
-
-	if (objectSize % MSC_SIZEOF_KEYPACKET)
-	{
-		rv = MSCWriteObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET + offSet,
-			&pInputData[i * MSC_SIZEOF_KEYPACKET],
-			objectSize % MSC_SIZEOF_KEYPACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	if (rwCallback)
-	{
-		(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
-	}
-	return rv;
-}
-
-MSC_RV MSCReadLargeObjectOffCB(MSCLPTokenConnection pConnection,
-	MSCString objectID, MSCULong32 offSet,
-	MSCPUChar8 pOutputData, MSCULong32 dataSize,
-	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
-{
-
-	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
-	MSCULong32 objectSize;
-	int totalSteps, stepInterval;
-	MSC_RV(*callBackFunction) (void *, int);
-	int i;
-
-	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize = dataSize;
-
-	/*
-	 * Figure out the number of steps total and present this in a percent
-	 * step basis 
-	 */
-
-	totalSteps = objectSize / MSC_SIZEOF_KEYPACKET + 1;
-	stepInterval = MSC_PERCENT_STEPSIZE / totalSteps;
-
-	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET + offSet,
-			&pOutputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-
-		if (rwCallback)
-		{
-			if ((*callBackFunction) (addParams,
-					stepInterval * i) == MSC_CANCELLED)
-			{
-				return MSC_CANCELLED;
-			}
-		}
-	}
-
-	if (objectSize % MSC_SIZEOF_KEYPACKET)
-	{
-		rv = MSCReadObject(pConnection, objectID,
-			i * MSC_SIZEOF_KEYPACKET + offSet,
-			&pOutputData[i * MSC_SIZEOF_KEYPACKET],
-			objectSize % MSC_SIZEOF_KEYPACKET);
-
-		if (rv != MSC_SUCCESS)
-		{
-			return rv;
-		}
-	}
-
-	if (rwCallback)
-	{
-		(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
-	}
-
-	return rv;
-}
 
 MSC_RV pcscToMSC(MSCLong32 pcscCode)
 {

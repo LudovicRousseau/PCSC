@@ -860,12 +860,19 @@ extern "C"
 		MSCString objectID, MSCUChar8 zeroFlag);
 
 	MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCULong32 offset, MSCPUChar8 pInputData, MSCUChar8 dataSize);
+		MSCString objectID, MSCULong32 offset, 
+		MSCPUChar8 pInputData, MSCULong32 dataSize,
+		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
 	MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCULong32 offset, MSCPUChar8 pOutputData, MSCUChar8 dataSize);
+		MSCString objectID, MSCULong32 offset, 
+                MSCPUChar8 pOutputData, MSCULong32 dataSize,
+		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
+
+	MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
+		MSCString objectID, MSCPUChar8 *pOutputData, 
+                MSCPULong32 dataSize,
+                LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
 	MSC_RV MSCListObjects(MSCLPTokenConnection pConnection,
 		MSCUChar8 seqOption, MSCLPObjectInfo pObjectInfo);
@@ -894,48 +901,6 @@ extern "C"
 
 	MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 		MSCString objectID, MSCLPObjectInfo pObjectInfo);
-
-	MSC_RV MSCWriteLargeObject(MSCLPTokenConnection pConnection,
-		MSCString objectID, MSCPUChar8 pInputData, MSCULong32 dataSize);
-
-	MSC_RV MSCWriteLargeObjectCB(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCPUChar8 pInputData,
-		MSCULong32 dataSize,
-		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
-
-	MSC_RV MSCReadLargeObject(MSCLPTokenConnection pConnection,
-		MSCString objectID, MSCPUChar8 pOutputData, MSCULong32 dataSize);
-
-	MSC_RV MSCReadLargeObjectCB(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCPUChar8 pOutputData,
-		MSCULong32 dataSize,
-		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
-
-	MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCPUChar8 * pOutputData, MSCPULong32 dataSize);
-
-	MSC_RV MSCReadAllocateObjectCB(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCPUChar8 * pOutputData,
-		MSCPULong32 dataSize,
-		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
-
-	MSC_RV MSCWriteLargeObjectOffCB(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCULong32 offSet,
-		MSCPUChar8 pInputData,
-		MSCULong32 dataSize,
-		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
-
-	MSC_RV MSCReadLargeObjectOffCB(MSCLPTokenConnection pConnection,
-		MSCString objectID,
-		MSCULong32 offSet,
-		MSCPUChar8 pOutputData,
-		MSCULong32 dataSize,
-		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
 	char *msc_error(MSC_RV errorCode);
 
