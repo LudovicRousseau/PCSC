@@ -526,7 +526,7 @@ void print_usage (char const * const progname)
 #ifdef HAVE_GETOPT_LONG
 	printf("  -a, --apdu		log APDU commands and results\n");
 	printf("  -c, --config		path to reader.conf\n");
-	printf("  -f, --foreground	run in foreground (no daemon)\n");
+	printf("  -f, --foreground	run in foreground (no daemon) (imply --debug stderr)\n");
 	printf("  -d, --debug output	display debug messages. Output may be:\n"); 
 	printf("			\"stdout\" (imply -f), \"stderr\" (imply -f),\n");
 	printf("			or \"syslog\"\n");
