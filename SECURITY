@@ -1,6 +1,6 @@
 SECURITY
 
-This file will discuss security related issues with pcsc-lite and how to
+This file discusses security related issues with pcsc-lite and how to
 handle them.
 
 Sometimes it is dangerous to run daemons under a root account.  If there is

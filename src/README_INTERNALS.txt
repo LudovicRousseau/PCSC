@@ -4,7 +4,7 @@ Some internal docs
 This file is not complete and may even not be exact. I (Ludovic
 Rousseau) am not the author of pcsc-lite so I may have missed points.
 
-The documentation correspond to post pcsc-lite-1.2.0 compiled for
+The documentation corresponds to post pcsc-lite-1.2.0 compiled for
 GNU/Linux.  Information may be wrong for other pcsc-lite versions.
 
 

@@ -863,8 +863,8 @@ typedef struct {
 Value of \texttt{pioSendPci} & Meaning \\
 \hline
 \hline
-\texttt{SCARD\_PCI\_T0} & Pre defined T=0 PCI structure\\
-\texttt{SCARD\_PCI\_T1} & Pre defined T=1 PCI structure\\
+\texttt{SCARD\_PCI\_T0} & Pre-defined T=0 PCI structure\\
+\texttt{SCARD\_PCI\_T1} & Pre-defined T=1 PCI structure\\
 \hline
 \end{tabular}
 
@@ -1185,7 +1185,7 @@ rgReaderStates[0].szReader = strdup("Reader X");
 rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
 cReaders = 1;
-rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates,  cReaders);
+rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, cReaders);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
 \end{verbatim}

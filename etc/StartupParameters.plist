@@ -5,7 +5,7 @@
   OrderPreference = "None";
   Messages =
   {
-    start = "Starting Smart card Services";
-    stop  = "Stopping Smart card Services";
+    start = "Starting Smart Card Services";
+    stop  = "Stopping Smart Card Services";
   };
 }

@@ -1,6 +1,6 @@
 DRIVERS
 
-To install USB drivers download the driver from http://www.linuxnet.com/
+To install USB drivers, download the driver from http://www.linuxnet.com/
 and copy it to a temporary location.  After you have unarchived the files
 copy the directory to /usr/local/pcsc/drivers/.  If the directory
 /usr/local/pcsc/drivers/ does not exist create it before copying the driver
@@ -19,11 +19,11 @@ You must restart pcscd to use the new driver.
 
 All OS's:
 
-For non USB users you must edit the /etc/reader.conf file.
+For non-USB users, you must edit the /etc/reader.conf file.
 You can do this easily by running the installifd program in the utils/
 directory of pcsc-lite.  Some newer drivers require you to specify 1 as the
 port and then make a symlink from /dev/pcsc/1 to /dev/ttyS* so you can
-ennumerate your ports on any Unix without changing the driver.
+enumerate your ports on any Unix without changing the driver.
 
 Refer to the driver README for more information.
 

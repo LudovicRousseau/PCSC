@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# pcscd        Starts the pcscd Daemon
+# pcscd        Starts the pcscd daemon
 #
 #
 # chkconfig: 2345 12 88

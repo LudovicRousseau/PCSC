@@ -32,7 +32,7 @@ Displays information about the pcscd command line
 \fB\-v\fR, \fB\-\-version\fR
 Displays the program version number
 .SH DESCRIPTION
-pcscd is the daemon program for pcsc-lite and MuscleCard framework. It is 
+pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is 
 a resource manager that coordinates communications with smart card readers 
 and smart cards and cryptographic tokens that are connected to the system.
 
@@ -99,7 +99,7 @@ Example:
 
  # Configuration file for pcsc-lite
  
- FRIENDLYNAME "My Smart card Reader"
+ FRIENDLYNAME "My Smart Card Reader"
  DEVICENAME   GEN_SMART_RDR
  LIBPATH      @usbdropdir@/my_reader.so
  CHANNELID    0x0103F8

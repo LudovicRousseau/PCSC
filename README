@@ -23,7 +23,7 @@ communicating to smart cards and readers. PCSC Lite can be compiled
 directly to a desired reader driver or can be used to dynamically
 allocate/deallocate reader drivers at runtime (default).
 
-PCSC Lite uses the same winscard api as used under Windows(R).  
+PCSC Lite uses the same winscard API as used under Windows(R).  
 
 For security aware persons please read the SECURITY file on possible
 vulnerabilites to pcsclite, how you can fix some, and how some will

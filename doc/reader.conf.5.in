@@ -31,7 +31,7 @@ that prints the names of all the connected and detected readers.
 The "DEVICENAME" field was not used for old drivers (using the IFD
 handler version 2.0 or previous). It is now (IFD handler version 3.0) used
 to identify the physical port on which the reader is connected. This
-is the device name of this port. It is dependant of the OS kernel. The
+is the device name of this port. It is dependent of the OS kernel. The
 first serial port device is called
 .I /dev/ttyS0
 under Linux and
@@ -39,12 +39,12 @@ under Linux and
 under FreeBSD.
 
 The "LIBPATH" field is the filename of the driver code. The driver is
-a dynamically loaded piece of code (generaly a 
+a dynamically loaded piece of code (generally a 
 .I drivername.so*
 file).
 
 The "CHANNELID" is no more used for recent drivers (IFD handler 3.0) and
-has been superseeded by "DEVICENAME". If you have an old driver this
+has been superseded by "DEVICENAME". If you have an old driver this
 field is used to indicate the port to use. You should read your driver
 documentation to know what information is needed here. It should be the
 serial port number for a serial reader.
@@ -60,7 +60,7 @@ In order to set up your
 .I @confdir@/reader.conf
 file correctly you may want to have debug messages from
 .BR pcscd .
-I recommand you to start
+I recommend you to start
 .B pscsd
 in the foreground using:
  # pcscd --foreground

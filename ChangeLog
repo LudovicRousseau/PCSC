@@ -1,12 +1,12 @@
 pcsc-lite-1.2.9-beta2: Ludovic Rousseau
 11 May 2004
 - change libmusclecard current version to 1 so that old libmusclecard0 and new
-  libmusclecard1 can cohabitate on the same system and will not break existing
+  libmusclecard1 can cohabit on the same system and will not break existing
   programs during upgrades.
 
   This is because libmusclecard is provided in the same distrib/package as
-  libpcsclite. If we want two libpcsclite to cohabitate we must also ensure
-  that the two libmusclecard can also cohabitate.
+  libpcsclite. If we want two libpcsclite to cohabit we must also ensure
+  that the two libmusclecard can also cohabit.
 - src/pcscdaemon.c: print pcsc-lite version number during startup
 - src/winscard.c: in SCardReconnect(), SCardDisconnect() and
   SCardEndTransaction() SCARD_UNPOWER_CARD is "Power down the card and reset
@@ -124,7 +124,7 @@ pcsc-lite-1.2.0-rc2: Ludovic Rousseau
 - removed a very _stupid_ bug that linked libpcsclite with libusb. Any
   application linked with libpcsclite was also linked with libusb.
 - generate a new library libmusclecard and remove MuscleCard code from
-  libpcsclite. An application using MuscleCard function need to explicitely
+  libpcsclite. An application using MuscleCard functions needs to explicitly
   link with libmusclecard.
 - src/winscard_clnt.c: add a new function SCardUnload() to free allocated
   resources. It is mandatory only if you use dlopen/dlclose to often
