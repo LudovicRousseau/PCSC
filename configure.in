@@ -305,7 +305,7 @@ AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
 
 dnl --enable-extendedapdu
 AC_ARG_ENABLE(extendedapdu,
-	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 128KB)]),
+	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 32KB)]),
 	[ case "${enableval}" in
 		yes) extendedapdu=true ;;
 		no) extendedapdu=false ;;
