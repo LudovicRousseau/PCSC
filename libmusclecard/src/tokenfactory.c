@@ -330,10 +330,6 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 	pConnection->libPointers.pvfComputeCrypt = 0;
 	pConnection->libPointers.pvfExtAuthenticate = 0;
 	pConnection->libPointers.pvfListKeys = 0;
-	pConnection->libPointers.pvfImportCertificate = 0;
-	pConnection->libPointers.pvfExportCertificate = 0;
-	pConnection->libPointers.pvfDeleteCertificate = 0;
-	pConnection->libPointers.pvfListCertificates = 0;
 	pConnection->libPointers.pvfCreatePIN = 0;
 	pConnection->libPointers.pvfVerifyPIN = 0;
 	pConnection->libPointers.pvfChangePIN = 0;
@@ -559,50 +555,6 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	}
 
 	rv = DYN_GetAddress(pConnection->tokenLibHandle,
-		&pConnection->libPointers.pvfImportCertificate,
-		"PL_MSCImportCertificate");
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		pConnection->libPointers.pvfImportCertificate = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
-		return SCARD_F_INTERNAL_ERROR;
-	}
-
-	rv = DYN_GetAddress(pConnection->tokenLibHandle,
-		&pConnection->libPointers.pvfExportCertificate,
-		"PL_MSCExportCertificate");
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		pConnection->libPointers.pvfExportCertificate = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
-		return SCARD_F_INTERNAL_ERROR;
-	}
-
-	rv = DYN_GetAddress(pConnection->tokenLibHandle,
-		&pConnection->libPointers.pvfDeleteCertificate,
-		"PL_MSCDeleteCertificate");
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		pConnection->libPointers.pvfDeleteCertificate = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
-		return SCARD_F_INTERNAL_ERROR;
-	}
-
-	rv = DYN_GetAddress(pConnection->tokenLibHandle,
-		&pConnection->libPointers.pvfListCertificates,
-		"PL_MSCListCertificates");
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		pConnection->libPointers.pvfListCertificates = 0;
-		DebugLogA("TPBindFunctions: Missing functions");
-		return SCARD_F_INTERNAL_ERROR;
-	}
-
-	rv = DYN_GetAddress(pConnection->tokenLibHandle,
 		&pConnection->libPointers.pvfCreatePIN, "PL_MSCCreatePIN");
 
 	if (rv != SCARD_S_SUCCESS)
@@ -740,10 +692,6 @@ MSCLong32 TPUnbindFunctions(MSCLPTokenConnection pConnection)
 	pConnection->libPointers.pvfComputeCrypt = 0;
 	pConnection->libPointers.pvfExtAuthenticate = 0;
 	pConnection->libPointers.pvfListKeys = 0;
-	pConnection->libPointers.pvfImportCertificate = 0;
-	pConnection->libPointers.pvfExportCertificate = 0;
-	pConnection->libPointers.pvfDeleteCertificate = 0;
-	pConnection->libPointers.pvfListCertificates = 0;
 	pConnection->libPointers.pvfCreatePIN = 0;
 	pConnection->libPointers.pvfVerifyPIN = 0;
 	pConnection->libPointers.pvfChangePIN = 0;
