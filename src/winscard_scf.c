@@ -6,6 +6,8 @@
  * Copyright (C) 2002
  *  David Corcoran <corcoran@linuxnet.com>
  *  Najam Siddiqui
+ * Copyright (C) 2005
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -124,7 +126,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 {
 	LONG rv = 0;
 
-
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
 
@@ -134,24 +135,18 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		return rv;
 
 	if (NULL == phContext)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
 	else
-	{
 		*phContext = 0;
-	}
 
 	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
 		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
 	{
-
 		*phContext = 0;
 		return SCARD_E_INVALID_VALUE;
 	}
 	rv = getNewContext(phContext);
 	return rv;
-
 }
 
 LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
@@ -164,14 +159,11 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 		pvReserved2, phContext);
 	SCardUnlockThread();
 
-
 	return rv;
-
 }
 
 static LONG SCardReleaseContextTH(SCARDCONTEXT hContext)
 {
-
 	LONG rv;
 	/* Zero out everything */
 
@@ -236,7 +228,6 @@ static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 	if (1 >= dwReadersLen)
 		return SCARD_E_READER_UNAVAILABLE;
 
-
 	if (mszReaders == 0)
 	{
 		*pcchReaders = dwReadersLen;
@@ -274,7 +265,6 @@ static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 	LPTSTR mszReaders, LPDWORD pcchReaders)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -301,37 +291,26 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
 
 	/* Check for NULL parameters */
 	if (phCard == 0 || pdwActiveProtocol == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
 	else
-	{
 		*phCard = 0;
-	}
 
 	/* Make sure this context has been opened */
 	if (SCardGetContextIndice(hContext) == -1)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	if (szReader == 0)
-	{
 		return SCARD_E_UNKNOWN_READER;
-	}
 
 	/* Check for uninitialized strings */
 	if (strlen(szReader) > MAX_READERNAME)
-	{
 		return SCARD_E_INVALID_VALUE;
-	}
 
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
 	{
-
 		return SCARD_E_INVALID_VALUE;
 	}
 
@@ -348,9 +327,7 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
 	rv = getNewHandle(hContext, szReader, phCard, dwShareMode);
 
 	if (SCARD_S_SUCCESS != rv)
-	{
 		return rv;
-	}
 
 	*pdwActiveProtocol = SCARD_PROTOCOL_T0;
 	return SCARD_S_SUCCESS;
@@ -367,12 +344,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader, DWORD dwShareMode,
 		dwPreferredProtocols, phCard, pdwActiveProtocol);
 	SCardUnlockThread();
 	return rv;
-
 }
 
 static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	long rv;
 	LONG retIndice = 0;
 
@@ -392,9 +367,7 @@ static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*CHECK HANDLE VALIDITY */
 	retIndice = SCardGetHandleIndice(hCard);
 	if ((retIndice == -1) || (NULL == psChannelMap[retIndice].SCF_hCard))
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	/* TODO Take Care of the Disposition...  */
 	/* Resetting the card for SCARD_RESET_CARD | 
@@ -417,14 +390,12 @@ static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = SCardRemoveHandle(hCard);
 
 	return rv;
-
 }
 
 static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	DWORD dwPreferredProtocols, DWORD dwInitialization,
 	LPDWORD pdwActiveProtocol)
 {
-
 	SCARDCONTEXT hContext;
 	LPTSTR ReaderName;
 	SCARDHANDLE tempHandle;
@@ -434,9 +405,8 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
 	if (pdwActiveProtocol == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
+
 	if (dwInitialization != SCARD_LEAVE_CARD &&
 		dwInitialization != SCARD_RESET_CARD &&
 		dwInitialization != SCARD_UNPOWER_CARD &&
@@ -448,9 +418,7 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	retIndice = SCardGetHandleIndice(hCard);
 
 	if (-1 == retIndice)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	hContext = psChannelMap[retIndice].hContext;
 	ReaderName = psReaderMap[psChannelMap[retIndice].ReaderIndice].ReaderName;
@@ -461,15 +429,11 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	rv = SCardConnectTH(hContext, ReaderName, dwShareMode,
 		dwPreferredProtocols, &tempHandle, pdwActiveProtocol);
 	if (SCARD_S_SUCCESS != rv)
-	{
 		return rv;
-	}
 
 	retIndice = SCardGetHandleIndice(tempHandle);
 	if (-1 == retIndice)
-	{
 		return SCARD_E_NO_MEMORY;
-	}
 
 	/*set PCSC hCard to old Handle */
 	SCardEventLock();
@@ -477,7 +441,6 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	SCardEventUnlock();
 
 	return SCARD_S_SUCCESS;
-
 }
 
 LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
@@ -491,25 +454,21 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		dwInitialization, pdwActiveProtocol);
 	SCardUnlockThread();
 	return rv;
-
 }
 
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	long rv;
 
 	SCardLockThread();
 	rv = SCardDisconnectTH(hCard, dwDisposition);
 	SCardUnlockThread();
 	return rv;
-
 }
 
 
 LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
-
 	LONG rv;
 
 	SCF_Card_t SCF_hCard;
@@ -539,12 +498,10 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	rv = ConvertStatus(status);
 
 	return rv;
-
 }
 
 static LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	LONG rv;
 	LONG retIndice = 0;
 	SCF_Card_t SCF_hCard;
@@ -564,9 +521,7 @@ static LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 	retIndice = SCardGetHandleIndice(hCard);
 	if (retIndice == -1)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	rv = getCardForHandle(hCard, &SCF_hCard);
 	if (rv != SCARD_S_SUCCESS)
@@ -593,7 +548,6 @@ static LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -613,7 +567,6 @@ static LONG SCardCancelTransactionTH(SCARDHANDLE hCard)
 
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -621,6 +574,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	SCardUnlockThread();
 	return rv;
 }
+
 static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
@@ -644,7 +598,6 @@ static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	{
 		return SCARD_E_INVALID_PARAMETER;
 	}
-
 
 	retIndice = SCardGetHandleIndice(hCard);
 
@@ -737,7 +690,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	DWORD dwBreakFlag;
 	int i, j;
 
-
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
 
@@ -754,22 +706,18 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	dwBreakFlag = 0;
 
 	if (rgReaderStates == 0 && cReaders > 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
+
 	if (cReaders < 0)
-	{
 		return SCARD_E_INVALID_VALUE;
-	}
+
 	/* change by najam */
 	SCardLockThread();
 	retIndice = SCardGetContextIndice(hContext);
 	/* change by najam */
 	SCardUnlockThread();
 	if (retIndice == -1)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	/* Application is waiting for a reader -
 	   return the first available reader 
@@ -1009,9 +957,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/* Counter and resetter */
 		j = j + 1;
 		if (j == cReaders)
-		{
 			j = 0;
-		}
 
 		if (dwTimeout != INFINITE && dwTimeout != 0)
 		{
@@ -1029,15 +975,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/* Declare all the break conditions */
 		/* TODO think about this */
 		if (psContextMap[retIndice].contextBlockStatus == BLOCK_STATUS_RESUME)
-		{
 			break;
-		}
 
 		/* Break if UNAWARE is set and all readers have been checked */
 		if ((dwBreakFlag == 1) && (j == 0))
-		{
 			break;
-		}
 
 		/*
 		 * Solve the problem of never exiting the loop when a smartcard is
@@ -1045,9 +987,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		 * (patch proposed by Serge Koganovitsch)
 		 */
 		if ((dwTimeout == 0) && (j == 0))
-		{
 			break;
-		}
 
 	}
 	while (1);					/* end of do */
@@ -1064,7 +1004,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 LONG SCardControl(SCARDHANDLE hCard, LPCBYTE pbSendBuffer, DWORD cbSendLength,
 	LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
 {
-
 	/* TODO */
 	return SCARD_S_SUCCESS;
 }
@@ -1073,7 +1012,6 @@ static LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPCBYTE pbSendBuffer, DWORD cbSendLength,
 	LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
 {
-
 	BYTE Buffer[MAX_BUFFER_SIZE];
 	LONG rv = 0;
 	SCF_Card_t SCF_hCard;
@@ -1090,9 +1028,7 @@ static LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	rv = getCardForHandle(hCard, &SCF_hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	if ((cbSendLength > MAX_BUFFER_SIZE) || (*pcbRecvLength < 2))
 		return SCARD_E_INSUFFICIENT_BUFFER;
@@ -1119,7 +1055,6 @@ static LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	{
 		psTransmitMap[retIndice].isResponseCached = 0;
 	}
-
 
 	status = SCF_Card_exchangeAPDU(SCF_hCard,
 		(const uint8_t *) pbSendBuffer, (size_t) cbSendLength,
@@ -1161,14 +1096,12 @@ static LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	rv = ConvertStatus(status);
 	return rv;
-
 }
 
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPCBYTE pbSendBuffer, DWORD cbSendLength,
 	LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -1177,7 +1110,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	SCardUnlockThread();
 
 	return rv;
-
 }
 
 
@@ -1214,7 +1146,6 @@ static LONG SCardListReaderGroupsTH(SCARDCONTEXT hContext, LPTSTR mszGroups,
 LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
 	LPDWORD pcchGroups)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -1226,29 +1157,23 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
 
 static LONG SCardCancelTH(SCARDCONTEXT hContext)
 {
-
 	LONG hContextIndice;
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
 
-
 	hContextIndice = SCardGetContextIndice(hContext);
 
 	if (hContextIndice == -1)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	/* Set the block status for this Context so blocking calls will complete */
 	psContextMap[hContextIndice].contextBlockStatus = BLOCK_STATUS_RESUME;
-
 
 	return SCARD_S_SUCCESS;
 }
 
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
-
 	long rv;
 
 	SCardLockThread();
@@ -1267,9 +1192,7 @@ static LONG SCardGetHandleIndice(SCARDHANDLE hCard)
 	if (hCard == 0)
 		return -1;
 	if (psChannelMap[LastIndex].PCSC_hCard == hCard)
-	{
 		return LastIndex;
-	}
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
@@ -1298,9 +1221,6 @@ static LONG SCardGetReaderIndice(LPCTSTR ReaderName)
 
 	return -1;
 }
-
-
-
 
 static LONG SCardAddHandle(SCARDHANDLE PCSC_hCard, SCARDCONTEXT hContext,
 	SCF_Session_t hSession, SCF_Terminal_t hTerminal,
@@ -1365,7 +1285,6 @@ static LONG PCSC_SCF_getATR(SCF_Card_t hCard, LPBYTE pcbAtr,
 	SCF_Card_freeInfo(hCard, pAtr);
 	return SCARD_S_SUCCESS;
 }
-
 
 static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 {
@@ -1442,7 +1361,6 @@ static LONG getNewHandle(SCARDCONTEXT hContext, LPCTSTR szReader,
 	SCF_Terminal_t hTerminal;
 	SCF_Card_t SCF_hCard;
 
-
 	ReaderIndice = SCardGetReaderIndice(szReader);
 	if (-1 == ReaderIndice)
 		return SCARD_E_UNKNOWN_READER;
@@ -1515,11 +1433,8 @@ static LONG getNewHandle(SCARDCONTEXT hContext, LPCTSTR szReader,
   the blocking variable contextBlockStatus to an hContext
 */
 
-
-
 static LONG getNewContext(SCARDCONTEXT * phContext)
 {
-
 	LONG rv;
 	SCF_Session_t hSession = NULL;
 	SCF_Status_t status;
@@ -1541,17 +1456,12 @@ static LONG getNewContext(SCARDCONTEXT * phContext)
 		SCF_Session_close(hSession);
 	}
 
-
 	return rv;
 }
 
-
 static LONG SCardAddContext(SCARDCONTEXT hContext, SCF_Session_t hSession)
 {
-
 	int i;
-	i = 0;
-
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
@@ -1569,10 +1479,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, SCF_Session_t hSession)
 
 static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 {
-
 	int i;
-	i = 0;
-
 
 	/* Find this context and return it's spot in the array */
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
@@ -1588,7 +1495,6 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 
 static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 {
-
 	LONG retIndice;
 	int i = 0;
 	retIndice = 0;
@@ -1616,21 +1522,18 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 	}
 
 	return SCARD_S_SUCCESS;
-
 }
 
 static SCF_Session_t getSessionForContext(SCARDCONTEXT hContext)
 {
-
 	LONG retIndice;
 	retIndice = 0;
 
 	retIndice = SCardGetContextIndice(hContext);
 
 	if (retIndice == -1)
-	{
 		return NULL;
-	}
+
 	return (psContextMap[retIndice].hSession);
 }
 
@@ -1639,12 +1542,12 @@ static SCF_Session_t getSessionForContext(SCARDCONTEXT hContext)
     must wait to use this function
 */
 
-LONG SCardLockThread()
+LONG SCardLockThread(void)
 {
 	return SYS_MutexLock(&clientMutex);
 }
 
-LONG SCardEventLock()
+LONG SCardEventLock(void)
 {
 	return SYS_MutexLock(&EventMutex);
 }
@@ -1653,12 +1556,12 @@ LONG SCardEventLock()
     may use the client library 
 */
 
-LONG SCardUnlockThread()
+LONG SCardUnlockThread(void)
 {
 	return SYS_MutexUnLock(&clientMutex);
 }
 
-LONG SCardEventUnlock()
+LONG SCardEventUnlock(void)
 {
 	return SYS_MutexUnLock(&EventMutex);
 }
@@ -1777,14 +1680,12 @@ static LONG isOCFServerRunning(void)
 	return SCARD_S_SUCCESS;
 }
 
-
-static LONG PCSC_SCF_Initialize()
+static LONG PCSC_SCF_Initialize(void)
 {
 	SCF_Status_t status;
 	char **tList = NULL;
 	static int first_time = 1;
-	int i = 0;
-
+	int i;
 
 	if (!first_time)
 		return SCARD_S_SUCCESS;
@@ -1845,7 +1746,6 @@ static LONG PCSC_SCF_Initialize()
 	SCF_Session_freeInfo(g_hSession, tList);
 	first_time = 0;
 	return SCARD_S_SUCCESS;
-
 }
 
 static LONG ConvertStatus(SCF_Status_t status)
@@ -1883,7 +1783,6 @@ static LONG ConvertStatus(SCF_Status_t status)
 		return SCARD_S_SUCCESS;
 	}
 	return SCARD_F_UNKNOWN_ERROR;
-
 }
 
 /*
@@ -1891,13 +1790,12 @@ static LONG ConvertStatus(SCF_Status_t status)
  */
 LONG SCardCheckReaderAvailability(LPTSTR readerName, LONG errorCode)
 {
-
+#if 0
 	LONG retIndice;
 	int i;
 
 	retIndice = 0;
 	i = 0;
-#if 0
 	if (errorCode != SCARD_S_SUCCESS)
 	{
 		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
@@ -1917,7 +1815,6 @@ LONG SCardCheckReaderAvailability(LPTSTR readerName, LONG errorCode)
 	}
 #endif
 	return 0;
-
 }
 
 /*
@@ -1940,17 +1837,13 @@ void SCardUnload(void)
 /*
  * Note that this function is not used
  */
-LONG SCardCheckDaemonAvailability()
+LONG SCardCheckDaemonAvailability(void)
 {
-
 	LONG rv = 1;				/* assume it exists */
 
 	if (rv == 0)
-	{
 		return SCARD_E_NO_SERVICE;
-	}
 	else
-	{
 		return SCARD_S_SUCCESS;
-	}
 }
+
