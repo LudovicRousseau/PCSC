@@ -153,11 +153,12 @@ int main(int argc, char **argv)
 	printf("Currently logged identities : %04X\n", statusInf.loggedID);
 
 	printf("Please enter the PIN value: ");
-	fgets(defaultPIN, sizeof(defaultPIN), stdin);
+	fgets((char *)defaultPIN, sizeof(defaultPIN), stdin);
 	if (defaultPIN[0] == '\n')
-		strcpy(defaultPIN, "Muscle00\n");
+		strcpy((char *)defaultPIN, "Muscle00\n");
 
-	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN, strlen(defaultPIN) - 1);
+	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN,
+		strlen((char *)defaultPIN) - 1);
 	printf("Verify default PIN          : %s\n", msc_error(rv));
 
 	rv = MSCGetStatus(&pConnection, &statusInf);
@@ -180,7 +181,7 @@ int main(int argc, char **argv)
 	if (rv == MSC_SUCCESS)
 	{
 		printf("Object data                 : %s\n", readData);
-		if (strcmp(readData, myData) == 0)
+		if (strcmp((char *)readData, (char*)myData) == 0)
 			printf("Data comparison             : Successful\n");
 		else
 			printf("Data comparison             : Data mismatch\n");

@@ -21,8 +21,9 @@
  */
 
 #include "config.h"
-#ifdef __APPLE__
 #include <ctype.h>
+
+#ifdef __APPLE__
 #include <stdlib.h>
 #include <stdio.h>
 

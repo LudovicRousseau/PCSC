@@ -155,9 +155,10 @@ int main(int argc, char *argv[])
 			break;
 		dwSendLength = x;
 
-		line_ptr = strchr(line_ptr, ' ') +1;
-		if (line_ptr == (char *)(NULL+1))
+		line_ptr = strchr(line_ptr, ' ');
+		if (line_ptr == NULL)
 			break;
+		line_ptr++;
 
 		for (i = 0; i < dwSendLength; i++)
 		{
@@ -170,10 +171,12 @@ int main(int argc, char *argv[])
 			}
 			s[i] = x;
 
-			line_ptr = strchr(line_ptr, ' ') +1;
+			line_ptr = strchr(line_ptr, ' ');
 
-			if (line_ptr == (char *)(NULL+1))
+			if (line_ptr == NULL)
 				break;
+
+			line_ptr++;
 		}
 
 		printf("Processing Command %03d of length %03lX: %s", cnum,

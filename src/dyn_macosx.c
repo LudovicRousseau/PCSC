@@ -10,15 +10,16 @@
  */
 
 #include "config.h"
-#ifdef __APPLE__
-#include <CoreFoundation/CFBundle.h>
-#include <CoreFoundation/CFString.h>
-#include <CoreFoundation/CFURL.h>
 
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "dyn_generic.h"
 #include "debuglog.h"
+
+#ifdef __APPLE__
+#include <CoreFoundation/CFBundle.h>
+#include <CoreFoundation/CFString.h>
+#include <CoreFoundation/CFURL.h>
 
 /*
  * / Load a module (if needed) 

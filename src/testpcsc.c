@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 	}
 
 	printf("Testing SCardSetAttrib           : ");
-	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, "", 1);
+	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
 	printf("%s\n", pcsc_stringify_error(rv));
 
 	printf("Testing SCardStatus              : ");

@@ -46,7 +46,7 @@ int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
 }
 
 int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, LPVOID pthAttr,
-	LPVOID pvFunction, LPVOID pvArg)
+	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 
 	int retval;

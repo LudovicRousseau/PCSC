@@ -78,7 +78,8 @@ LONG CreateContextThread(PDWORD pdwClientID)
 	dwNextContextIndex = i;
 
 	if (SYS_ThreadCreate(&psContext[i].pthThread, NULL,
-		(LPVOID) ContextThread, (LPVOID) &dwNextContextIndex) != 1)
+		(PCSCLITE_THREAD_FUNCTION()) ContextThread,
+		(LPVOID) &dwNextContextIndex) != 1)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0; 

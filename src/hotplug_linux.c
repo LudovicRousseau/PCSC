@@ -14,8 +14,9 @@
  */
 
 #include "config.h"
-#if defined(__linux__) && !defined(HAVE_LIBUSB)
 #include <string.h>
+
+#if defined(__linux__) && !defined(HAVE_LIBUSB)
 #include <sys/types.h>
 #include <stdio.h>
 #include <dirent.h>

@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999-2002
+ * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -45,7 +45,7 @@ typedef enum {
 	DEBUGLOG_NO_DEBUG = 0,
 	DEBUGLOG_SYSLOG_DEBUG,
 	DEBUGLOG_STDERR_DEBUG,
-	DEBUGLOG_STDOUT_DEBUG,
+	DEBUGLOG_STDOUT_DEBUG
 } DebugLogType;
 
 #define DEBUG_CATEGORY_NOTHING  0
@@ -75,7 +75,7 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int size);
 void DebugLogSuppress(const int);
 void DebugLogSetLogType(const int);
 int DebugLogSetCategory(const int);
-void DebugLogCategory(const int, const char *, const int);
+void DebugLogCategory(const int, const unsigned char *, const int);
 
 char *pcsc_stringify_error(long);
 

@@ -128,7 +128,7 @@ int SHMInitializeCommonSegment(void)
 
 int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 {
-	int clnt_len;
+	socklen_t clnt_len;
 	int new_sock;
 	struct sockaddr_un clnt_addr;
 	int one;

@@ -12,6 +12,8 @@
  */
 
 #include "config.h"
+#include "wintypes.h"
+
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOCFPlugIn.h>
@@ -20,7 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "wintypes.h"
 #include "pcsclite.h"
 #include "readerfactory.h"
 #include "winscard_msg.h"

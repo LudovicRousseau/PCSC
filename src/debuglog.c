@@ -168,7 +168,8 @@ int DebugLogSetCategory(const int dbginfo)
 	return debug_category;
 }
 
-void DebugLogCategory(const int category, const char *buffer, const int len)
+void DebugLogCategory(const int category, const unsigned char *buffer,
+	const int len)
 {
 	if ((category & DEBUG_CATEGORY_APDU)
 		&& (debug_category & DEBUG_CATEGORY_APDU))

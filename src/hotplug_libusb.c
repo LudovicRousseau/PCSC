@@ -327,7 +327,7 @@ LONG HPSearchHotPluggables(void)
 	HPReadBundleValues();
 
 	SYS_ThreadCreate(&usbNotifyThread, NULL,
-		(LPVOID) HPEstablishUSBNotifications, 0);
+		(PCSCLITE_THREAD_FUNCTION()) HPEstablishUSBNotifications, 0);
 
 	return 0;
 }
