@@ -67,7 +67,7 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 	return rv;
 }
 
-LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
+LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevice)
 {
 	DWORD dwContext, dwContextB, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
@@ -144,6 +144,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		lpcLibrary, dwPort, 0);
 
 	strcpy((sReadersContexts[dwContext])->lpcLibrary, lpcLibrary);
+	strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
 	(sReadersContexts[dwContext])->dwVersion = 0;
 	(sReadersContexts[dwContext])->dwPort = dwPort;
 	(sReadersContexts[dwContext])->mMutex = 0;
@@ -345,6 +346,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				lpcLibrary, dwPort, j);
 
 			strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
+			strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
 			(sReadersContexts[dwContextB])->dwVersion =
 			  (sReadersContexts[dwContext])->dwVersion;
 			(sReadersContexts[dwContextB])->dwPort =
@@ -520,6 +522,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 			sContext->dwFeeds = 0;
 		}
 
+		sContext->lpcDevice[0] = 0;
 		sContext->dwVersion = 0;
 		sContext->dwPort = 0;
 		sContext->mMutex = 0;
@@ -1425,8 +1428,8 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 	if (rv != IFD_SUCCESS)
 	{
-		DebugLogB("RFInitializeReader: Open Port %X Failed",
-			rContext->dwPort);
+		DebugLogC("RFInitializeReader: Open Port %X Failed (%s)",
+			rContext->dwPort, rContext->lpcDevice);
 		RFUnBindFunctions(rContext);
 		RFUnloadReader(rContext);
 		return SCARD_E_INVALID_TARGET;
