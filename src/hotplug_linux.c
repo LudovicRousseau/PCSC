@@ -42,7 +42,7 @@ $Id$
 #define PCSCLITE_HP_MAX_SIMUL_READERS           04
 #define PCSCLITE_HP_MAX_DRIVERS					20
 
-extern int LCFBundleFindValueWithKey(char *, char *, char *);
+extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
 struct usb_device_descriptor
@@ -131,30 +131,30 @@ LONG HPReadBundleValues()
 			sprintf(fullPath, "%s%s%s", PCSCLITE_HP_DROPDIR,
 				currFP->d_name, "/Contents/Info.plist");
 
-			rv = LCFBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
-				keyValue);
+			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+				keyValue, 0);
 			if (rv == 0)
 			{
 				bundleTracker[listCount].manuID = strtol(keyValue, 0, 16);
 			}
 
-			rv = LCFBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
-				keyValue);
+			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
+				keyValue, 0);
 			if (rv == 0)
 			{
 				bundleTracker[listCount].productID =
 					strtol(keyValue, 0, 16);
 			}
 
-			rv = LCFBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
-				keyValue);
+			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
+				keyValue, 0);
 			if (rv == 0)
 			{
 				bundleTracker[listCount].readerName = strdup(keyValue);
 			}
 
-			rv = LCFBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
-				keyValue);
+			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
+				keyValue, 0);
 			if (rv == 0)
 			{
 				sprintf(fullLibPath, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
