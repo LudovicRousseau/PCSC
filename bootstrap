@@ -2,17 +2,36 @@
 
 # $Id$
 
+# I use
+# - autoconf (GNU Autoconf) 2.57
+# - automake (GNU automake) 1.6.3
+# - ltmain.sh (GNU libtool) 1.4.3 (1.922.2.111 2002/10/23 02:54:36)
+
+ac_aux_dir=build
+
+set -e
 set -x
 
+# some cleanup
 if [ -e Makefile ]
 then
   make distclean
 fi
+rm -f $ac_aux_dir/aclocal.m4 aclocal.m4
 rm -f config.h.in
-aclocal -I build --output=build/aclocal.m4
+rm -rf autom4te.cache
+
+aclocal-1.6 -I $ac_aux_dir --output=$ac_aux_dir/aclocal.m4
+
 libtoolize --copy --force
 # cp -f ~/cvs/config/config.guess ~/cvs/config/config.sub build/
-autoheader
-automake --add-missing --copy --verbose
-autoconf --localdir=build --verbose
+
+autoheader --include=$ac_aux_dir
+
+# needed otherwise automake-1.6 says
+# no proper implementation of AM_INIT_AUTOMAKE was found,
+ln -s $ac_aux_dir/aclocal.m4
+
+autoconf --include=$ac_aux_dir #--warnings=all #--verbose
+automake-1.6 --add-missing --copy #--verbose
 
