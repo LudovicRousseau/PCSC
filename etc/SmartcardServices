@@ -6,6 +6,34 @@
 
 . /etc/rc.common
 
+StartService ()
+{
+    if ! pid=$(GetPID pcscd); then
 	ConsoleMessage "Starting Smartcard Services"
-	/usr/local/bin/pcscd
+	/usr/sbin/pcscd
+    fi
+}
+
+
+StopService ()
+{
+    if pid=$(GetPID pcscd); then
+        ConsoleMessage "Stopping Smartcard Services"
+        kill -TERM "${pid}"
+    fi
+}
+
+RestartService ()
+{
+    if pid=$(GetPID pcscd); then
+        ConsoleMessage "Restarting Smartcard Services"
+        kill -TERM "${pid}"
+    fi
+    # Leave pcscd the time to die
+    sleep 3
+    StartService
+}
+
+RunService "$1"
+
 
