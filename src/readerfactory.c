@@ -308,7 +308,6 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			rv = RFSetReaderName(sContexts[dwContextB], lpcReader,
 				lpcLibrary, dwPort, j);
 
-			printf("Init %s\n", (sContexts[dwContextB])->lpcReader);
 			strcpy((sContexts[dwContextB])->lpcLibrary, lpcLibrary);
 			(sContexts[dwContextB])->dwVersion =
 			  (sContexts[dwContext])->dwVersion;
