@@ -33,6 +33,6 @@ LATEX2HTML = latex2html
 
 # create a HTML document
 %.html: %.tex
-	rm -r $*
+	rm -rf $*
 	$(LATEX2HTML) -split +2 $*
 
