@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	FILE *fd;
 
 	printf("Please enter a friendly name for your reader (%d char max)\n",
-		sizeof(lpcReader));
+		(int)sizeof(lpcReader));
 	printf("-----> ");
 
 	fgets(lpcReader, sizeof(lpcReader), stdin);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
   retrylib:
 
 	printf("Please enter the full path of the readers driver (%d char max)\n",
-		sizeof(lpcLibrary));
+		(int)sizeof(lpcLibrary));
 	printf("Example: %s/librdr_generic.so\n", PCSCLITE_HP_DROPDIR);
 	printf("-----> ");
 
