@@ -17,18 +17,19 @@
 #define __winscard_svc_h__
 
 #ifdef __cplusplus
-extern "C" {
-#endif      
-  
-  LONG MSGFunctionDemarshall( psharedSegmentMsg );
-  LONG MSGAddContext( SCARDCONTEXT, DWORD );
-  LONG MSGRemoveContext( SCARDCONTEXT, DWORD );
-  LONG MSGAddHandle( SCARDCONTEXT, DWORD, SCARDHANDLE );
-  LONG MSGRemoveHandle( SCARDCONTEXT, DWORD, SCARDHANDLE );
-  LONG MSGCleanupClient( psharedSegmentMsg );
+extern "C"
+{
+#endif
+
+	LONG MSGFunctionDemarshall(psharedSegmentMsg);
+	LONG MSGAddContext(SCARDCONTEXT, DWORD);
+	LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
+	LONG MSGAddHandle(SCARDCONTEXT, DWORD, SCARDHANDLE);
+	LONG MSGRemoveHandle(SCARDCONTEXT, DWORD, SCARDHANDLE);
+	LONG MSGCleanupClient(psharedSegmentMsg);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif

@@ -17,7 +17,7 @@
 
 #include "config.h"
 
-LONG HPSearchHotPluggables() {
+LONG HPSearchHotPluggables()
+{
 	return 0;
 }
-

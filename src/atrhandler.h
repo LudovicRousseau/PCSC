@@ -9,72 +9,89 @@
             Purpose: This keeps track of smartcard protocols,
                      timing issues, and atr handling.
  
-********************************************************************/ 
+********************************************************************/
 
 #ifndef __atrhandler_h__
 #define __atrhandler_h__
 
 #ifdef __cplusplus
-extern "C" {
-#endif 
+extern "C"
+{
+#endif
 
 #define SCARD_CONVENTION_DIRECT  0x0001
 #define SCARD_CONVENTION_INVERSE 0x0002
 
-typedef struct _SMARTCARD_EXTENSION {
+	typedef struct _SMARTCARD_EXTENSION
+	{
 
-  struct _ATR {
-    DWORD Length;
-    UCHAR Value[MAX_ATR_SIZE];
-    DWORD HistoryLength;
-    UCHAR HistoryValue[MAX_ATR_SIZE];
-  } ATR;
+		struct _ATR
+		{
+			DWORD Length;
+			UCHAR Value[MAX_ATR_SIZE];
+			DWORD HistoryLength;
+			UCHAR HistoryValue[MAX_ATR_SIZE];
+		}
+		ATR;
 
-  DWORD ReadTimeout;
+		DWORD ReadTimeout;
 
-  struct _CardCapabilities {
-    UCHAR  AvailableProtocols;
-    UCHAR  CurrentProtocol;
-    UCHAR  Convention; 
-    USHORT ETU;
+		struct _CardCapabilities
+		{
+			UCHAR AvailableProtocols;
+			UCHAR CurrentProtocol;
+			UCHAR Convention;
+			USHORT ETU;
 
-    struct _PtsData {
-      UCHAR F1;
-      UCHAR D1;
-      UCHAR I1;
-      UCHAR P1;
-      UCHAR N1;
-    } PtsData;
+			struct _PtsData
+			{
+				UCHAR F1;
+				UCHAR D1;
+				UCHAR I1;
+				UCHAR P1;
+				UCHAR N1;
+			}
+			PtsData;
 
-    struct _T1 {
-      USHORT BGT;
-      USHORT BWT;
-      USHORT CWT;
-      USHORT CGT;
-      USHORT WT;
-    } T1;
-    
-    struct _T0 {
-      USHORT BGT;
-      USHORT BWT;
-      USHORT CWT;
-      USHORT CGT;
-      USHORT WT;
-    } T0;
-    
-  } CardCapabilities;
+			struct _T1
+			{
+				USHORT BGT;
+				USHORT BWT;
+				USHORT CWT;
+				USHORT CGT;
+				USHORT WT;
+			}
+			T1;
 
-  /*  PREADER_CONNECTION psReaderConnection; */
+			struct _T0
+			{
+				USHORT BGT;
+				USHORT BWT;
+				USHORT CWT;
+				USHORT CGT;
+				USHORT WT;
+			}
+			T0;
 
-} SMARTCARD_EXTENSION, *PSMARTCARD_EXTENSION;
+		}
+		CardCapabilities;
 
-/* Decodes the ATR and fills the structure */
+		/*
+		 * PREADER_CONNECTION psReaderConnection; 
+		 */
 
-short ATRDecodeAtr( PSMARTCARD_EXTENSION psExtension, 
-		    PUCHAR pucAtr, DWORD dwLength );
+	}
+	SMARTCARD_EXTENSION, *PSMARTCARD_EXTENSION;
+
+	/*
+	 * Decodes the ATR and fills the structure 
+	 */
+
+	short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
+		PUCHAR pucAtr, DWORD dwLength);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __smclib_h__ */
+#endif							/* __smclib_h__ */

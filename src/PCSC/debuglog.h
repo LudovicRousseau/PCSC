@@ -14,8 +14,8 @@
 
 /*
  * DebugLogA("text");
- * 	send "text" to syslog if USE_SYSLOG is defined
- * 	print to stderr "text" if USE_SYSLOG is NOT defined
+ *  send "text" to syslog if USE_SYSLOG is defined
+ *  print to stderr "text" if USE_SYSLOG is NOT defined
  *
  * DebugLogB("text: %d", 1234)
  *  send "text: 1234" to syslog if USE_SYSLOG is defined
@@ -32,8 +32,9 @@
 #define __debuglog_h__
 
 #ifdef __cplusplus
-extern "C" {
-#endif     
+extern "C"
+{
+#endif
 
 #define DEBUGLOG_LOG_ENTRIES    1
 #define DEBUGLOG_IGNORE_ENTRIES 2
@@ -55,17 +56,17 @@ extern "C" {
 #define DebugXxd(msg, buffer, size)
 #endif
 
-void debug_msg(char *fmt, ...);
-void debug_xxd(const char *msg, const unsigned char *buffer, const int size);
+	void debug_msg(char *fmt, ...);
+	void debug_xxd(const char *msg, const unsigned char *buffer,
+		const int size);
 
-void DebugLogSuppress( long );
-void DebugLogSetLogType( long );
+	void DebugLogSuppress(long);
+	void DebugLogSetLogType(long);
 
-char* pcsc_stringify_error ( long );
+	char *pcsc_stringify_error(long);
 
 #ifdef __cplusplus
 }
-#endif     
+#endif
 
-#endif /* __debuglog_h__ */
-
+#endif							/* __debuglog_h__ */

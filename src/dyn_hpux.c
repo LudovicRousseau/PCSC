@@ -21,60 +21,76 @@
 #include "dyn_generic.h"
 #include "debuglog.h"
 
-int DYN_LoadLibrary( void** pvLHandle, char* pcLibrary ) {
+int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+{
 
-  shl_t myHandle;
+	shl_t myHandle;
 
-  *pvLHandle = 0;
-  myHandle = shl_load( pcLibrary, BIND_IMMEDIATE|BIND_VERBOSE|BIND_NOSTART,
-                       0L);
+	*pvLHandle = 0;
+	myHandle =
+		shl_load(pcLibrary, BIND_IMMEDIATE | BIND_VERBOSE | BIND_NOSTART,
+		0L);
 
-  if ( myHandle == 0 ) {
-    DebugLogB("DYN_GetAddress: strerror() reports %s", strerror(errno));
-    return SCARD_F_UNKNOWN_ERROR;
-  }
+	if (myHandle == 0)
+	{
+		DebugLogB("DYN_GetAddress: strerror() reports %s",
+			strerror(errno));
+		return SCARD_F_UNKNOWN_ERROR;
+	}
 
-  *pvLHandle = (void *)myHandle;
-  return SCARD_S_SUCCESS;
+	*pvLHandle = (void *) myHandle;
+	return SCARD_S_SUCCESS;
 }
 
-int DYN_CloseLibrary( void** pvLHandle ) {
+int DYN_CloseLibrary(void **pvLHandle)
+{
 
-  int rv;
-  /* Zero out everything */
-  rv=0;
+	int rv;
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
 
-  rv = shl_unload( (shl_t)*pvLHandle );
-  *pvLHandle = 0;
+	rv = shl_unload((shl_t) * pvLHandle);
+	*pvLHandle = 0;
 
-  if ( rv == -1 ) {
-    DebugLogB("DYN_GetAddress: strerror() reports %s", strerror(errno));
-    return SCARD_F_UNKNOWN_ERROR;
-  }
+	if (rv == -1)
+	{
+		DebugLogB("DYN_GetAddress: strerror() reports %s",
+			strerror(errno));
+		return SCARD_F_UNKNOWN_ERROR;
+	}
 
-  return SCARD_S_SUCCESS;
+	return SCARD_S_SUCCESS;
 }
 
-int DYN_GetAddress( void* pvLHandle, void** pvFHandle, char* pcFunction ) {
+int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
+{
 
-  int rv;
-  char *pcFunctionName;
-  
-  /* Zero out everything */
-  rv=0; pcFunctionName=0;
+	int rv;
+	char *pcFunctionName;
 
-  pcFunctionName = pcFunction;
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	pcFunctionName = 0;
 
-  *pvFHandle = 0;
-  rv = shl_findsym((shl_t *)&pvLHandle, pcFunction, TYPE_PROCEDURE, pvFHandle);
+	pcFunctionName = pcFunction;
 
-  if ( rv == -1 ) {
-    DebugLogB("DYN_GetAddress: strerror() reports %s", strerror(errno));
-    rv = SCARD_F_UNKNOWN_ERROR;
-  } else {
-    rv = SCARD_S_SUCCESS;
-  }
+	*pvFHandle = 0;
+	rv = shl_findsym((shl_t *) & pvLHandle, pcFunction, TYPE_PROCEDURE,
+		pvFHandle);
 
-  return rv;
+	if (rv == -1)
+	{
+		DebugLogB("DYN_GetAddress: strerror() reports %s",
+			strerror(errno));
+		rv = SCARD_F_UNKNOWN_ERROR;
+	} else
+	{
+		rv = SCARD_S_SUCCESS;
+	}
+
+	return rv;
 }
-

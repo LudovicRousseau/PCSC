@@ -16,12 +16,13 @@
 #define __dyn_generic_h__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-  int  DYN_LoadLibrary( void**, char* );
-  int  DYN_CloseLibrary( void** );
-  int  DYN_GetAddress( void*, void**, char* );
+	int DYN_LoadLibrary(void **, char *);
+	int DYN_CloseLibrary(void **);
+	int DYN_GetAddress(void *, void **, char *);
 
 #ifdef __cplusplus
 }

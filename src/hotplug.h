@@ -16,14 +16,14 @@
 #define __hotplug_h__
 
 #ifdef __cplusplus
-extern "C" {
-#endif  
-  
-  LONG HPSearchHotPluggables();
+extern "C"
+{
+#endif
+
+	LONG HPSearchHotPluggables();
 
 #ifdef __cplusplus
 }
-#endif 
-
 #endif
 
+#endif

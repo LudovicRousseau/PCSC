@@ -15,18 +15,19 @@
 #include "mscdefines.h"
 
 #ifdef __cplusplus
-extern "C" {
-#endif     
+extern "C"
+{
+#endif
 
-  MSCLong32 TPLoadToken( MSCLPTokenConnection );
-  MSCLong32 TPUnloadToken( MSCLPTokenConnection );
-  MSCLong32 TPBindFunctions( MSCLPTokenConnection );
-  MSCLong32 TPUnbindFunctions( MSCLPTokenConnection );  
-  MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
-                                  MSCLPTokenInfo tokenInfo );
+	MSCLong32 TPLoadToken(MSCLPTokenConnection);
+	MSCLong32 TPUnloadToken(MSCLPTokenConnection);
+	MSCLong32 TPBindFunctions(MSCLPTokenConnection);
+	MSCLong32 TPUnbindFunctions(MSCLPTokenConnection);
+	MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
+		MSCLPTokenInfo tokenInfo);
 
 #ifdef __cplusplus
 }
-#endif     
+#endif
 
-#endif /* __cardfactory_h__ */
+#endif							/* __cardfactory_h__ */

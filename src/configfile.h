@@ -14,14 +14,14 @@
 #define __configfile_h__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int DBUpdateReaders ( char *readerconf );
+	int DBUpdateReaders(char *readerconf);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif /* __configfile_h__ */
+#endif							/* __configfile_h__ */
