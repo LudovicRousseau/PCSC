@@ -52,30 +52,36 @@ typedef enum {
 #define DEBUG_CATEGORY_APDU     1 
 #define DEBUG_CATEGORY_SW       2 
 
+enum {
+	PCSC_LOG_DEBUG = 0,
+	PCSC_LOG_INFO,
+	PCSC_LOG_ERROR,
+	PCSC_LOG_CRITICAL
+};
+
 /* You can't do #ifndef __FUNCTION__ */
 #if !defined(__GNUC__) && !defined(__IBMC__)
 #define __FUNCTION__ ""
 #endif
 
-#ifndef NO_PCSC_DEBUG
-#define DebugLogA(fmt) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
-#define DebugLogB(fmt, data) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data)
-#define DebugLogC(fmt, data1, data2) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
-#define DebugXxd(msg, buffer, size) debug_xxd(msg, buffer, size)
-#else
-#define DebugLogA(fmt)
-#define DebugLogB(fmt, data)
-#define DebugLogC(fmt, data1, data2)
-#define DebugXxd(msg, buffer, size)
-#endif
+#define Log1(priority, fmt) log_msg(priority, "i%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
+#define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data)
+#define Log3(priority, fmt, data1, data2) log_msg(priority, "%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
+#define LogXxd(priority, msg, buffer, size) log_xxd(priority, msg, buffer, size)
 
-void debug_msg(const char *fmt, ...);
-void debug_xxd(const char *msg, const unsigned char *buffer, const int size);
+#define DebugLogA(a) Log1(PCSC_LOG_INFO, a)
+#define DebugLogB(a, b) Log2(PCSC_LOG_INFO, a, b)
+#define DebugLogC(a, b,c) Log3(PCSC_LOG_INFO, a, b, c)
+
+void log_msg(int priority, const char *fmt, ...);
+void log_xxd(int priority, const char *msg, const unsigned char *buffer,
+	const int size);
 
 void DebugLogSuppress(const int);
 void DebugLogSetLogType(const int);
 int DebugLogSetCategory(const int);
 void DebugLogCategory(const int, const unsigned char *, const int);
+void DebugLogSetLevel(const int level);
 
 char *pcsc_stringify_error(long);
 
