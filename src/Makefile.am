@@ -121,7 +121,7 @@ pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c \
 	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h \
 	winscard_svc.h
 pcscd_LDADD   = libpcsclite-core.la $(PCSCD_INCLUDE_LIBS)
-pcscd_LDFLAGS = $(PCSC_MYLDFLAGS)
+pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -Wl,--export-dynamic
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
