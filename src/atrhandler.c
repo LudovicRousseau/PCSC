@@ -83,8 +83,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	p = 2;
 
 #ifdef ATR_DEBUG
-	debug_msg("%s:%d:%s Conv: %02X, Y1: %02X, K: %02X",
-		__FILE__, __LINE__, __FUNCTION__,
+	Log4(PCSC_LOG_DEBUG, "Conv: %02X, Y1: %02X, K: %02X",
 		psExtension->CardCapabilities.Convention, Y1i, K);
 #endif
 
@@ -101,8 +100,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
 #ifdef ATR_DEBUG
-		debug_msg("%s:%d:%s TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
-			__FILE__, __LINE__, __FUNCTION__,
+		Log9(PCSC_LOG_DEBUG,
+			"TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
 			i, TAi, i, TBi, i, TCi, i, TDi);
 #endif
 
