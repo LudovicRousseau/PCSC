@@ -28,13 +28,13 @@ extern "C"
 		LPVOID pvfCloseChannel;
 		LPVOID pvfGetCapabilities;
 		LPVOID pvfSetCapabilities;
-		LPVOID pvfSetProtocol;
+		LPVOID pvfSetProtocolParameters;
 		LPVOID pvfPowerICC;
 		LPVOID pvfSwallowICC;		/* Deprecated in 2.0 */
 		LPVOID pvfEjectICC;		/* Deprecated in 2.0 */
 		LPVOID pvfConfiscateICC;	/* Deprecated in 2.0 */
-		LPVOID pvfTransmitICC;
-		LPVOID pvfICCPresent;
+		LPVOID pvfTransmitToICC;
+		LPVOID pvfICCPresence;
 		LPVOID pvfICCAbsent;		/* Deprecated in 2.0 */
 		LPVOID pvfControl;		/* MUSCLE IFD 2.0 Compliance */
 	};
