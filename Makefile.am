@@ -40,6 +40,7 @@ libtool: $(LIBTOOL_DEPS)
 
 ChangeLog.cvs:
 	rcs2log | perl -e 'while (<>) { s/corcoran /David Corcoran /; \
+	s/corcoran-guest /David Corcoran /; \
 	s/oznet /Chris Osgood /; s/cprados /Carlos Prados /; \
 	s/mikeg /Michael Gile /; s/rousseau /Ludovic Rousseau /; \
 	s/giraud /Jean-Luc Giraud /; \
