@@ -138,6 +138,9 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	(readerStates[i])->cardAtrLength = 0;
 	(readerStates[i])->cardProtocol = 0;
 
+        /* Zero the thread */
+        rContext->pthThread = 0;
+
 	DebugLogA("EHDestroyEventHandler: Thread stomped.");
 
 	return SCARD_S_SUCCESS;

@@ -158,6 +158,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	(sContexts[dwContext])->dwStatus = 0;
 	(sContexts[dwContext])->dwBlockStatus = 0;
 	(sContexts[dwContext])->dwContexts = 0;
+        (sContexts[dwContext])->pthThread = 0;
 	(sContexts[dwContext])->dwLockId = 0;
 	(sContexts[dwContext])->vHandle = 0;
 	(sContexts[dwContext])->dwPublicID = 0;
@@ -1664,7 +1665,9 @@ void RFAwakeAllReaders()
 
 	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
 	{
-		if ((sContexts[i])->vHandle != 0)
+                /* If the library is loaded and the event handler is not running */
+	        if ( ((sContexts[i])->vHandle   != 0) &&
+                     ((sContexts[i])->pthThread == 0) )
 		{
                 
                         for (j=0; j < i; j++)
