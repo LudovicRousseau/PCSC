@@ -262,7 +262,7 @@ char* pcsc_stringify_error(long pcscError)
 		strlcpy(strError, "Transaction failed.", sizeof(strError));
 		break;
 	case SCARD_E_READER_UNAVAILABLE:
-		strlcpy(strError, "Reader/s is unavailable.", sizeof(strError));
+		strlcpy(strError, "Reader is unavailable.", sizeof(strError));
 		break;
 	case SCARD_W_UNSUPPORTED_CARD:
 		strlcpy(strError, "Card is not supported.", sizeof(strError));
