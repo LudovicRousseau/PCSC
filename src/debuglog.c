@@ -171,7 +171,8 @@ void DebugLogSetLevel(const int level)
 
 		default:
 			log_level = PCSC_LOG_INFO;
-			Log1(PCSC_LOG_CRITICAL, "unknown level, using level=notice");
+			Log2(PCSC_LOG_CRITICAL, "unknown level (%d), using level=notice",
+				level);
 	}
 }
 
