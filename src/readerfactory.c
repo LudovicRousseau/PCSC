@@ -320,7 +320,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			/*
 			 * No more spots left return 
 			 */
-			rv = RFRemoveReader(tmpReader, dwPort);
+			rv = RFRemoveReader(lpcReader, dwPort);
 			return SCARD_E_NO_MEMORY;
 		}
 
