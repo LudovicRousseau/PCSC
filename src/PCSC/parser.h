@@ -1,5 +1,5 @@
-#define TOKEN_MAX_KEY_SIZE   256
-#define TOKEN_MAX_VALUE_SIZE 256
+#define TOKEN_MAX_KEY_SIZE   200
+#define TOKEN_MAX_VALUE_SIZE 200
 
 #define TOKEN_TYPE_KEY         1
 #define TOKEN_TYPE_STRING      2
