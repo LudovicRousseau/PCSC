@@ -5,11 +5,9 @@
 #
 # David Corcoran <corcoran@linuxnet.com>
 
-
-FRIENDLYNAME     "Generic Reader"
-DEVICENAME       /dev/ttySx_not_configured
-LIBPATH          @usbdropdir@/libgen_ifd.so
-CHANNELID        0x0103F8
-
+#FRIENDLYNAME     "Generic Reader"
+#DEVICENAME       /dev/ttySx_not_configured
+#LIBPATH          @usbdropdir@/libgen_ifd.so
+#CHANNELID        0x0103F8
 
 # End of file
