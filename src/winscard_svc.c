@@ -297,7 +297,8 @@ LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 
 	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
 	{
-		if (psChannelMap[i].dwClientID == dwClientID)
+		if (psChannelMap[i].hContext == hContext &&
+			psChannelMap[i].dwClientID == dwClientID)
 		{
 			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
 			{
