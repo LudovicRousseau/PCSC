@@ -1879,6 +1879,12 @@ char *msc_error(MSC_RV errorCode)
 		case MSC_INVALID_PARAMETER:
 			strncpy(message, "Invalid parameter", sizeof(message));
 			break;
+		case MSC_INCORRECT_P1:
+			strncpy(message, "Incorrect P1 parameter", sizeof(message));
+			break;
+		case MSC_INCORRECT_P2:
+			strncpy(message, "Incorrect P2 parameter", sizeof(message));
+			break;
 		case MSC_SEQUENCE_END:
 			strncpy(message, "End of sequence", sizeof(message));
 			break;
