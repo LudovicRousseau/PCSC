@@ -9,7 +9,7 @@ then
 fi
 
 autoreconf --force --localdir=build --verbose
-./configure --prefix=/usr/local/
+#./configure --prefix=/usr/local/
 
 #./configure --prefix=/usr/local/ --enable-usb --enable-debug --enable-threadsafe --enable-runpid=/var/run/pcscd.pid --enable-usbdropdir=/usr/lib/pcsc/
 
