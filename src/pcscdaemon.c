@@ -136,9 +136,18 @@ void SVCServiceRunLoop()
 				SYS_MutexLock(&usbNotifierMutex);
 				MSGCleanupClient(&msgStruct);
 				SYS_MutexUnLock(&usbNotifierMutex);
+
+#if HAVE_SNPRINTF
 				snprintf(errMessage, sizeof(errMessage), "%s%d%s",
 					"SVCServiceRun: Client ", msgStruct.request_id,
 					" has disappeared.");
+#else
+				sprintf(errMessage, "%s%d%s", "SVCServiceRun: Client ", 
+                                        msgStruct.request_id, " has disappeared.");
+
+#endif
+
+
 				DebugLogB("%s", errMessage);
 			} else
 			{

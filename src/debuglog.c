@@ -52,7 +52,11 @@ void debug_msg(const char *fmt, ...)
 #ifndef WIN32
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
 #else
+#if HAVE_VSNPRINTF
+	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+#else
 	vsprintf(DebugBuffer, fmt, argptr);
+#endif
 #endif
 	va_end(argptr);
 

@@ -90,6 +90,17 @@ PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
+else
+if PCSC_ARCH_AIX
+PCSC_MYLDFLAGS      =
+PCSC_INCLUDE_LIBS   = -ll -lbsd
+PCSCD_INCLUDE_LIBS  = -ll -lpthread
+PCSC_THREAD_SOURCE  = thread_unix.c
+PCSC_DYNLOAD_SOURCE = dyn_unix.c
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c
+PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
+endif
 endif
 endif
 endif

@@ -27,6 +27,7 @@ case "${build_os}" in
  *solaris*)	arch=solaris ;;
  *hpux*)        arch=hpux ;;
  *osf*)         arch=tru64 ;;
+ *aix*)         arch=aix ;;
  *) AC_MSG_ERROR([Operating system ${build_os} not supported]) ;;
 esac
 
@@ -36,6 +37,7 @@ AM_CONDITIONAL(PCSC_ARCH_OSX, test x$arch = xdarwin)
 AM_CONDITIONAL(PCSC_ARCH_SOLARIS, test x$arch = xsolaris)
 AM_CONDITIONAL(PCSC_ARCH_HPUX, test x$arch = xhpux)
 AM_CONDITIONAL(PCSC_ARCH_TRU64, test x$arch = xtru64)  
+AM_CONDITIONAL(PCSC_ARCH_AIX, test x$arch = xaix)  
 
 if test x$arch = xlinux ; then
   AC_DEFINE(PCSC_TARGET_LINUX, 1, [Linux])
@@ -67,6 +69,13 @@ if test x$arch = xtru64 ; then
   AC_DEFINE(MSC_TARGET_TRU64, 1, [TRU64])
 fi
 
+if test x$arch = xaix ; then
+  AC_DEFINE(PCSC_TARGET_AIX, 1, [AIX])
+  AC_DEFINE(MSC_TARGET_AIX, 1, [AIX])
+fi
+
+
+
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
@@ -86,6 +95,7 @@ ACX_PTHREAD(
 
 AC_CHECK_FUNCS(daemon)
 AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(snprintf vsnprintf)
 
 AC_CHECK_HEADERS(getopt.h)
 

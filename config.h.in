@@ -9,6 +9,12 @@
 /* Define if you have the getopt_long function.  */
 #undef HAVE_GETOPT_LONG
 
+/* Define if you have the snprintf function.  */
+#undef HAVE_SNPRINTF
+
+/* Define if you have the vsnprintf function.  */
+#undef HAVE_VSNPRINTF
+
 /* Define if you have the <getopt.h> header file.  */
 #undef HAVE_GETOPT_H
 
@@ -53,6 +59,12 @@
 
 /* TRU64 */
 #undef MSC_TARGET_TRU64
+
+/* AIX */
+#undef PCSC_TARGET_AIX
+
+/* AIX */
+#undef MSC_TARGET_AIX
 
 /* Define to the necessary symbol if this constant
                            uses a non-standard name on your system. */

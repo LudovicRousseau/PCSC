@@ -129,8 +129,14 @@ int main(int argc, char **argv)
 	}
 	while (userChoice != 0);
 
+#if HAVE_SNPRINTF
 	snprintf(chosenInfoPlist, sizeof(chosenInfoPlist),
 		"%s%s/Contents/Info.plist", BUNDLE_DIR, currBundle->d_name);
+#else
+        sprintf(chosenInfoPlist, "%s%s/Contents/Info.plist", BUNDLE_DIR, 
+                currBundle->d_name);
+#endif
+
 	closedir(bundleDir);
 	printf("\n");
 
@@ -163,8 +169,13 @@ int main(int argc, char **argv)
 	}
 	printf("\n");
 
+#if HAVE_SNPRINTF
 	snprintf(atrInsertion, sizeof(atrInsertion),
 		"        <string>%s</string>\n", spAtrValue);
+#else 
+        sprintf(atrInsertion, "        <string>%s</string>\n", 
+                spAtrValue);
+#endif
 
 	fp = fopen(chosenInfoPlist, "r+");
 	if (fp == 0)
