@@ -25,6 +25,8 @@
 #include "tokenfactory.h"
 #include "strlcpycat.h"
 
+#define USE_THREAD_SAFETY
+
 #ifdef USE_THREAD_SAFETY
 #include <wintypes.h>
 #include <thread_generic.h>
@@ -579,6 +581,16 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 	{
 		rv = TPUnloadToken(pConnection);
 		pConnection->tokenLibHandle = 0;
+	}
+
+	/*
+	 * Release Context
+	 */
+	if (pConnection->hContext != 0)
+	{
+		rv = SCardReleaseContext(pConnection->hContext);
+		if (pcscToMSC(rv) != MSC_SUCCESS)
+			return pcscToMSC(rv);
 	}
 
 	pConnection->tokenLibHandle = 0;
