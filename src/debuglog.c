@@ -113,13 +113,13 @@ void DebugLogSetLogType(const int dbgtype)
 		case DEBUGLOG_NO_DEBUG:
 		case DEBUGLOG_SYSLOG_DEBUG:
 		case DEBUGLOG_STDERR_DEBUG:
+			debug_msg_type = dbgtype;
 			break;
 		default:
 			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stderr",
 				dbgtype);
-			dbgtype = DEBUGLOG_STDERR_DEBUG;
+			debug_msg_type = DEBUGLOG_STDERR_DEBUG;
 	}
-	debug_msg_type = dbgtype;
 }
 
 void DebugLogSetLevel(const int level)
