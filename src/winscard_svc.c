@@ -29,7 +29,6 @@ struct _psContext
 	SCARDCONTEXT hContext;
 	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 	DWORD dwClientID;
-	//	DWORD dwHandleID;
 	PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 	sharedSegmentMsg msgStruct;
 };
@@ -401,7 +400,7 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 	}
 	
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
-	DebugLogA("MSGCheckHandleAssociation: Client failed to authenticate\n");
+	DebugLogA("MSGCheckHandleAssociation: Client failed to authenticate");
 	SYS_Sleep(2);
 
 	return -1;
