@@ -93,9 +93,6 @@ extern "C"
 		char lpcDevice[MAX_DEVICENAME];	/* Device Name */
 		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
-		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
-						   capabilities */
-		PROT_OPTIONS psProtOptions;	/* Structure of protocol options */
 		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];	
                                          /* Structure of connected handles */
 		FCT_MAP psFunctions;	/* Structure of function pointers */
@@ -114,6 +111,13 @@ extern "C"
 		DWORD dwPublicID;		/* Public id of public state struct */
 		PDWORD pdwFeeds;		/* Number of shared client to lib */
 		PDWORD pdwMutex;		/* Number of client to mutex */
+
+		/* these structures are unused */
+#if 0
+		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
+						   capabilities */
+		PROT_OPTIONS psProtOptions;	/* Structure of protocol options */
+#endif
 	};
 
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
