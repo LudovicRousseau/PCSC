@@ -122,7 +122,6 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 		 * Wait 0.05 seconds for the child to respond 
 		 */
 		SYS_USleep(50000);
-                printf("Waiting\n");
 	}
 	while (rContext->dwLockId == 0xFFFF);
 

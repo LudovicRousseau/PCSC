@@ -360,9 +360,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	/*
 	 * Try to destroy the thread 
 	 */
-         printf("I'm destroying\n");
 	rv = EHDestroyEventHandler(sContext);
-        printf("I'm just destroyed\n");
 
 	rv = RFUnInitializeReader(sContext);
 	if (rv != SCARD_S_SUCCESS)
