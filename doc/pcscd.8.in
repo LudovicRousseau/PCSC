@@ -13,18 +13,18 @@ log APDUs and SW using the debug method (see \fB\-d\fR)
 .TP
 \fB\-c\fR, \fB\-\-config\fR \fIfile\fR
 Specifies the file \fIfile\fR as an alternate location for
-\fIreader.conf\fR
+\fI@confdir@/reader.conf\fR
 .TP
 \fB\-d\fR, \fB\-\-debug\fR \fIOUTPUT\fR
 display debug messages.
 
 \fIOUTPUT\fR may be:
- \fBstdout\fR (imply \fB\-f\fR),
- \fBstderr\fR (imply \fB\-f\fR),
+ \fBstdout\fR (imply \-\-foreground),
+ \fBstderr\fR (imply \-\-foreground),
  or \fBsyslog\fR
 .TP
 \fB\-f\fR, \fB\-\-foreground\fR
-Runs pcscd in the foreground (no daemon)
+Runs pcscd in the foreground (imply \-\-debug stdout)
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Displays information about the pcscd command line
@@ -72,7 +72,7 @@ file.  The file has the following format:
  FRIENDLYNAME <Descriptive name>
  DEVICENAME   <Short name>
  LIBPATH      <Location of the driver library>
- CHANNELID    <Hexadecimal channel identificator>
+ CHANNELID    <Channel identifier>
 
 .IP FRIENDLYNAME 
 is a user friendly name of the reader that is served by this driver.
@@ -115,17 +115,17 @@ pcsc-lite uses plug-ins to handle different types of smart cards. There is
 a plug-in for each smart card type. Plug-ins are installed in the 
 .I @muscledropdir@
 directory.  Plug-ins for cards/tokens are available from the MUSCLE
-web site \fIhttp://www.musclecard.com\fR.
+web site \fIhttp://www.musclecard.com/\fR.
 .SH FILES
 .I @confdir@/reader.conf
 : Reader configuration file
-.br
+
 .I /etc/init.d/pcscd
 : pcscd startup script
-.br
+
 .I @runpid@
 : process id of the running pcscd
-.br
+
 .I @usbdropdir@
 : directory containing bundles for USB
 drivers
@@ -135,5 +135,5 @@ None known.
 .BR bundleTool (8),
 .BR formaticc (1)
 .SH AUTHORS
-David Corcoran <corcoran@linuxnet.com> and Ludovic Rousseau
+David Corcoran <corcoran@musclecard.com> and Ludovic Rousseau
 <ludovic.rousseau@free.fr>
