@@ -1183,6 +1183,12 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		return SCARD_E_INVALID_PARAMETER;
 
 	/*
+	 * Must at least send a 4 bytes APDU
+	 */
+	if (cbSendLength < 4)
+		return SCARD_E_INVALID_PARAMETER;
+
+	/*
 	 * Must at least have 2 status words even for SCardControl 
 	 */
 	if (dwRxLength < 2)
