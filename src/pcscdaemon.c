@@ -319,7 +319,7 @@ int main(int argc, char **argv)
 		{
 			DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
 			DebugLogA("Maybe another pcscd is running?");
-			DebugLogA("Can't read process pid from" USE_RUN_PID);
+			DebugLogA("Can't read process pid from " USE_RUN_PID);
 			DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
 			DebugLogA("to clear this message.");
 			return 1;
