@@ -95,29 +95,28 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		((dwPreferred & SCARD_PROTOCOL_T1) == 0) &&
 		(dwPreferred & SCARD_PROTOCOL_T0))
 	{
-
 		if (SCARD_PROTOCOL_T0 & ucAvailable)
 		{
-			DebugLogB("Attempting PTS to T=%d", 0);
+			DebugLogA("Attempting PTS to T=0");
 
 			/*
 			 * Case 1: T1 is default but is not preferred 
-			 */
-			/*
-			 * Soln : Change to T=0 protocol.  
+			 *
+			 * Action: Change to T=0 protocol.  
 			 */
 			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T0, 0x00,
 				0x00, 0x00, 0x00);
 
 			if (rv != SCARD_S_SUCCESS)
 				return SCARD_PROTOCOL_T1;
-
 		}
 		else
 		{
 			/*
 			 * App wants an unsupported protocol 
 			 */
+			DebugLogA("Protocol T=0 requested but unsupported by the card");
+
 			return -1;
 		}
 
@@ -125,17 +124,15 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		((dwPreferred & SCARD_PROTOCOL_T0) == 0) &&
 		(dwPreferred & SCARD_PROTOCOL_T1))
 	{
-		DebugLogB("Attempting PTS to T=%d", 1);
-
-		/*
-		 * Case 2: T=0 is default but T=1 is preferred 
-		 */
-		/*
-		 * Soln : Change to T=1 only if supported 
-		 */
-
 		if (ucAvailable & SCARD_PROTOCOL_T1)
 		{
+			DebugLogA("Attempting PTS to T=1");
+
+			/*
+			 * Case 2: T=0 is default but T=1 is preferred 
+			 *
+			 * Action: Change to T=1 only if supported 
+			 */
 			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T1, 0x00,
 				0x00, 0x00, 0x00);
 
@@ -149,6 +146,8 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			/*
 			 * App wants unsupported protocol 
 			 */
+			DebugLogA("Protocol T=1 requested but unsupported by the card");
+
 			return -1;
 		}
 	}
@@ -156,12 +155,12 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 	{
 		/*
 		 * Case 3: Default protocol is preferred 
-		 */
-		/*
-		 * Soln : No need to change protocols 
+		 *
+		 * Action: No need to change protocols 
 		 */
 		return rContext->dwProtocol;
 	}
 
 	return rContext->dwProtocol;
 }
+
