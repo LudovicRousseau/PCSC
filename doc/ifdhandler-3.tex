@@ -241,6 +241,54 @@ Example:
 
 \end{itemize}
 
+Complete sample file:
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundlePackageType</key>
+    <string>BNDL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleVersion</key>
+    <string>0.0.1d1</string>
+    <key>ifdCapabilities</key>
+    <string>0x00000000</string>
+    <key>ifdProtocolSupport</key>
+    <string>0x00000001</string>
+    <key>ifdVersionNumber</key>
+    <string>0x00000001</string>
+
+    <key>CFBundleExecutable</key>
+    <string>libfoobar.so.x.y</string>
+
+    <key>ifdManufacturerString</key>
+    <string>Foo bar inc.</string>
+
+    <key>ifdProductString</key>
+    <string>Driver for Foobar reader, version x.y</string>
+
+    <key>ifdVendorID</key>
+    <string>0x1234</string>
+
+    <key>ifdProductID</key>
+    <string>0x5678</string>
+
+    <key>ifdFriendlyName</key>
+    <string>Foobar USB reader</string>
+</dict>
+</plist>
+\end{verbatim}
+
+As indicated in the XML file the DTD is available at
+\url{http://www.apple.com/DTDs/PropertyList-1.0.dtd}.
+
 
 %---------%---------%---------%---------%---------%---------
 \subsection{Serial readers}
