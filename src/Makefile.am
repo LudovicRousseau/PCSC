@@ -28,10 +28,6 @@ else
 PCSC_CLIENT_SRC  = winscard_clnt.c
 endif
 
-if PCSC_THR_SAFE
-PCSC_CLIENT_THR = $(PCSC_THREAD_SRC)
-endif
-
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
 	configfile.l \
@@ -55,7 +51,7 @@ libpcsclite_la_SOURCES = \
 	winscard_msg.c \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
-	$(PCSC_CLIENT_THR)
+	$(PCSC_THREAD_SRC)
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@
 

@@ -80,11 +80,10 @@ AC_ARG_ENABLE(threadsafe,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-threadsafe]) ;;
  esac], [threadsafe=true])
 
-if test x${threadsafe} = xtrue ; then
-  LIBS="$PTHREAD_LIBS $LIBS"
-  CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-  CC="$PTHREAD_CC"
-fi
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
 
@@ -300,7 +299,6 @@ else
 fi
 
 AC_MSG_RESULT([enable threadsafe client      : $threadsafe])
-AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
 
 dnl --enable-extendedapdu
 AC_ARG_ENABLE(extendedapdu,
@@ -321,7 +319,6 @@ fi
 
 dnl warning about pthread
 if test x${threadsafe} = xtrue ; then
-  AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])
   AC_DEFINE(USE_THREAD_SAFETY, 1, [enable client side thread safety.])
 fi
 
