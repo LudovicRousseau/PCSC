@@ -115,6 +115,13 @@ int evaluatetoken(char *pcToken)
 						pcLibpath, strerror(errno));
 					badError = 1;
 				}
+
+				if (strstr(pcLibpath, ".bundle") != NULL)
+				{
+					DebugLogA("WARNING *************************************");
+					DebugLogB("WARNING: USB drivers SHOULD NOT be declared in reader.conf: %s", pcLibpath);
+					DebugLogA("WARNING *************************************");
+				}
 			}
 			else
 			{
