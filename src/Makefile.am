@@ -80,7 +80,7 @@ muscletest_SOURCES = muscletest.c
 muscletest_LDADD = libmusclecard.la
 
 include_HEADERS = \
-	debuglog.h pcsclite.h winscard.h wintypes.h \
+	debuglog.h pcsclite.h.in winscard.h wintypes.h \
 	$(MC_HDR)
 noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \

@@ -297,6 +297,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
  * you must define PCSCLITE_ENHANCED_MESSAGING in the framework(library),
  * the daemon, and your application
  */
+@extended_apdu@
 #ifndef PCSCLITE_ENHANCED_MESSAGING
 #define PCSCLITE_MAX_MESSAGE_SIZE	2048	/* Transport msg len */
 #define MAX_BUFFER_SIZE			264	/* Maximum Tx/Rx Buffer */

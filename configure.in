@@ -303,6 +303,23 @@ fi
 AC_MSG_RESULT([enable threadsafe client      : $threadsafe])
 AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
 
+dnl --enable-extendedapdu
+AC_ARG_ENABLE(extendedapdu,
+	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 128KB)]),
+	[ case "${enableval}" in
+		yes) extendedapdu=true ;;
+		no) extendedapdu=false ;;
+		*) AC_MSG_ERROR([bad value ${enableval} for --enable-extendedapdu]) ;;
+	esac], [extendedapdu=false])
+
+AC_MSG_RESULT([enable extended APDU          : $extendedapdu])
+
+if test x${extendedapdu} = xtrue ; then
+  extended_apdu="#define PCSCLITE_ENHANCED_MESSAGING"
+else
+  extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
+fi
+
 dnl warning about pthread
 if test x${threadsafe} = xtrue ; then
   AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])
@@ -316,6 +333,7 @@ AC_SUBST(muscledropdir)
 AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
+AC_SUBST(extended_apdu)
 
 dnl Write Makefiles
 AC_OUTPUT([
@@ -331,6 +349,7 @@ etc/reader.conf
 src/Makefile
 src/libmusclecard.pc
 src/libpcsclite.pc
+src/pcsclite.h
 src/utils/Makefile
 win32/Makefile
 ])
