@@ -14,7 +14,7 @@ None
 .SH USAGE
 bundleTool lists the currently installed bundles and asks you to 
 select one.  You select the plugin bundle that services your 
-smartcard. bundleTool will then ask you to insert the new card.  The 
+smart card. bundleTool will then ask you to insert the new card.  The 
 application exits and pcsc is now configured to use your card.
 
 Example:

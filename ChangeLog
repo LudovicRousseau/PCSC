@@ -105,8 +105,8 @@ pcsc-lite-1.2.0-rc2: Ludovic Rousseau
 4 September, 2003
 - removed a very _stupid_ bug that linked libpcsclite with libusb. Any
   application linked with libpcsclite was also linked with libusb.
-- generate a new library libmusclecard and remove musclecard code from
-  libpcsclite. An application using musclecard function need to explicitely
+- generate a new library libmusclecard and remove MuscleCard code from
+  libpcsclite. An application using MuscleCard function need to explicitely
   link with libmusclecard.
 - src/winscard_clnt.c: add a new function SCardUnload() to free allocated
   resources. It is mandatory only if you use dlopen/dlclose to often

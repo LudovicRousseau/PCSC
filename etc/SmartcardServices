@@ -9,7 +9,7 @@
 StartService ()
 {
     if ! pid=$(GetPID pcscd); then
-	ConsoleMessage "Starting Smartcard Services"
+	ConsoleMessage "Starting Smart card Services"
 	rm -rf /tmp/pcsc
 	/usr/sbin/pcscd
     fi
@@ -19,7 +19,7 @@ StartService ()
 StopService ()
 {
     if pid=$(GetPID pcscd); then
-        ConsoleMessage "Stopping Smartcard Services"
+        ConsoleMessage "Stopping Smart card Services"
         kill -TERM "${pid}"
     fi
 }
@@ -27,7 +27,7 @@ StopService ()
 RestartService ()
 {
     if pid=$(GetPID pcscd); then
-        ConsoleMessage "Restarting Smartcard Services"
+        ConsoleMessage "Restarting Smart card Services"
         kill -TERM "${pid}"
     fi
     # Leave pcscd the time to die

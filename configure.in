@@ -200,7 +200,7 @@ AC_MSG_RESULT([enable debug messages         : $debug])
 
 if test x${debug} = xtrue ; then
   AC_DEFINE(PCSC_DEBUG, 1, [enable full PCSC debug messaging.])
-  AC_DEFINE(MSC_DEBUG, 1, [enable full musclecard debug messaging.])
+  AC_DEFINE(MSC_DEBUG, 1, [enable full MuscleCard debug messaging.])
 fi
 
 dnl --enable-debugatr
@@ -238,14 +238,14 @@ AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
 
 dnl --disable-musclecard
 AC_ARG_ENABLE(musclecard,
-  AC_HELP_STRING([--disable-musclecard],[musclecard framework disabled]),
+  AC_HELP_STRING([--disable-musclecard],[MuscleCard framework disabled]),
 [case "${enableval}" in
   yes)	musclecard=true ;;
   no)	musclecard=false ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --disable-musclecard]) ;;
  esac], [musclecard=true])
 
-AC_MSG_RESULT([enable musclecard             : $musclecard])
+AC_MSG_RESULT([enable MuscleCard             : $musclecard])
 
 AM_CONDITIONAL(HAVE_MUSCLECARD, test x$musclecard = xtrue)
 

@@ -237,7 +237,7 @@ char* pcsc_stringify_error(long pcscError)
 		strncpy(strError, "Sharing violation.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NO_SMARTCARD:
-		strncpy(strError, "No smartcard inserted.", sizeof(strError)-1);
+		strncpy(strError, "No smart card inserted.", sizeof(strError)-1);
 		break;
 	case SCARD_E_UNKNOWN_CARD:
 		strncpy(strError, "Unknown card.", sizeof(strError)-1);

@@ -88,14 +88,8 @@ extern "C"
 	/*******************************************************/
 	/*
 	 * These returns are beyond the protocol specification 
-	 */
-	/*
 	 * and only exist here to provide return codes for the 
-	 */
-	/*
 	 * additional functions provided by the MuscleCard API 
-	 */
-	/*
 	 * beyond the protocol specification.  
 	 */
 	/*******************************************************/
@@ -642,14 +636,9 @@ extern "C"
 	/*******************************************************************/
 	/*
 	 * Connection oriented functions 
-	 */
-	/*
+	 *
 	 * These functions do not coorespond to internal library funcions 
-	 */
-	/*
 	 * but serve to connect to tokens.  You can still use the internal 
-	 */
-	/*
 	 * PC/SC calls to do this.  These provide an abstract means.  
 	 */
 	/*******************************************************************/
@@ -758,7 +747,7 @@ extern "C"
 
 	/*****************************************************************/
 	/*
-	 * Core Musclecard functions 
+	 * Core MuscleCard functions 
 	 */
 	/*
 	 * These functions coorespond directly to internal library 
@@ -896,7 +885,7 @@ extern "C"
 
 	/*****************************************************************/
 	/*
-	 * Extended Musclecard functions 
+	 * Extended MuscleCard functions 
 	 */
 	/*
 	 * These functions do not coorespond to internal library funcions 

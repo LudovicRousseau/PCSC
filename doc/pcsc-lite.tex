@@ -1,5 +1,5 @@
 %
-% MUSCLE SmartCard Development ( http://www.linuxnet.com )
+% MUSCLE Smart Card Development ( http://www.linuxnet.com )
 %
 % Copyright (C) 2004
 %  David Corcoran <corcoran@linuxnet.com>
@@ -85,11 +85,11 @@ Document history: \\
 \section{Introduction/Overview}
 
 This document contains the reference API calls for communicating to the
-MUSCLE PC/SC Smartcard Resource Manager. PC/SC is a standard proposed by
+MUSCLE PC/SC Smart Card Resource Manager. PC/SC is a standard proposed by
 the PC/SC workgroup \cite{pcsc_workgroup} which is a conglomerate of
-representative from major smartcard manufacturers and other companies.
-This specification tries to abstract the smartcard layer into a high
-level API so that smartcards and their readers can be accessed in a
+representative from major smart card manufacturers and other companies.
+This specification tries to abstract the smart card layer into a high
+level API so that smart cards and their readers can be accessed in a
 homogeneous fashion.
 
 This toolkit was written in ANSI C that can be used with most compilers
@@ -845,7 +845,7 @@ LONG SCardTransmit(SCARDHANDLE hCard,
 
 \desc
 
-This function sends an APDU  to the smartcard contained in the reader
+This function sends an APDU  to the smart card contained in the reader
 connected to by \texttt{SCardConnect()}.  The card responds from the
 APDU and stores this response in \texttt{pbRecvBuffer} and it's length
 in \texttt{SpcbRecvLength}.  \texttt{SSendPci} and \texttt{SRecvPci} are
@@ -936,7 +936,7 @@ LONG SCardControl(SCARDHANDLE hCard,
 This function sends a command directly to the IFD Handler to be
 processed by the reader.  This is useful for creating client side reader
 drivers for functions like PIN pads, biometrics, or other extensions to
-the normal smartcard reader that are not normally handled by PC/SC.
+the normal smart card reader that are not normally handled by PC/SC.
 
 Note: the API of this function changed. In pcsc-lite 1.2.0 and before
 the API was not Windows{\textregistered} PC/SC compatible. This has been

@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 	rgReaderStates[0].szReader = &mszReaders[iList[iReader]];
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
-	printf("Please insert a smartcard\n");
+	printf("Please insert a smart card\n");
 	SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,

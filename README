@@ -19,7 +19,7 @@ Tested Platforms:
 
 Welcome to PCSC Lite.  The purpose of PCSC Lite is to
 provide a Windows(R) SCard interface in a very small form factor for
-communicating to smartcards and readers. PCSC Lite can be compiled
+communicating to smart cards and readers. PCSC Lite can be compiled
 directly to a desired reader driver or can be used to dynamically
 allocate/deallocate reader drivers at runtime (default).
 
@@ -69,7 +69,7 @@ You must be root to do make install in the default locations.
 
 Be sure to edit the /etc/reader.conf file to fit your needs and make sure
 your IFD Handler driver is located in the path specified as LIBRARYPATH
-in reader.conf.  If you are using a reader with multiple smartcard slots
+in reader.conf.  If you are using a reader with multiple smart card slots
 all you have to do is define a different FRIENDLYNAME in the reader.conf
 for each reader.  Both will have the same information otherwise.  
 

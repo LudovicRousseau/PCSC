@@ -313,7 +313,7 @@ MSCString pcsc_stringify_error(MSCLong32 Error)
 		strcpy(strError, "Sharing violation.");
 		break;
 	case SCARD_E_NO_SMARTCARD:
-		strcpy(strError, "No smartcard inserted.");
+		strcpy(strError, "No smart card inserted.");
 		break;
 	case SCARD_E_UNKNOWN_CARD:
 		strcpy(strError, "Unknown card.");
