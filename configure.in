@@ -298,8 +298,14 @@ CFLAGS="$CFLAGS -Wall -fno-common"
 
 dnl Setup dist stuff
 AC_SUBST(ac_aux_dir)
+AC_SUBST(muscledropdir)
+AC_SUBST(usbdropdir)
+AC_SUBST(confdir)
+AC_SUBST(runpid)
 
 dnl Write Makefiles.
-AC_CONFIG_FILES(Makefile src/Makefile src/utils/Makefile etc/Makefile doc/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile src/utils/Makefile etc/Makefile
+				doc/Makefile doc/bundleTool.8 doc/pcscd.8
+				etc/reader.conf src/libpcsclite.pc)
 AC_OUTPUT
 

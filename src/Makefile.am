@@ -1,6 +1,9 @@
 ## Process this file with automake to create Makefile.in.
 # $Id$
 
+pcdir= @libdir@/pkgconfig
+pc_DATA = libpcsclite.pc
+
 SUBDIRS = . utils
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la

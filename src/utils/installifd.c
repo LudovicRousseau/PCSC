@@ -16,6 +16,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "config.h"
+
 int main(int argc, char **argv)
 {
 
@@ -45,7 +47,7 @@ int main(int argc, char **argv)
 
 	printf
 		("Please enter the full path of the readers driver (75 char max)\n");
-	printf("Example: /usr/local/pcsc/drivers/librdr_generic.so\n");
+	printf("Example: %s/librdr_generic.so\n", PCSCLITE_HP_DROPDIR);
 	printf("-----> ");
 
 	gets(lpcLibrary);
