@@ -14,18 +14,18 @@ $Id$
 ********************************************************************/
 
 /*
+ * log message is sent to syslog, stdout or stderr depending on --debug
+ * command line argument
+ *
  * DebugLogA("text");
- *  send "text" to syslog if USE_SYSLOG is defined
- *  print to stderr "text" if USE_SYSLOG is NOT defined
+ *  log "text"
  *
  * DebugLogB("text: %d", 1234)
- *  send "text: 1234" to syslog if USE_SYSLOG is defined
- *  print to stderr "text: 1234" is USE_SYSLOG is NOT defined
+ *  log "text: 1234"
  * the format string can be anything printf() can understand
  *
  * DebugXxd(msg, buffer, size)
- *  send to syslog (if USE_SYSLOG is defined) or print to stderr
- *  "msg" + a hex dump of size bytes of buffer[]
+ *  log "msg" + a hex dump of size bytes of buffer[]
  *
  */
 
