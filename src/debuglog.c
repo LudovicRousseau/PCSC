@@ -1,14 +1,15 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : debuglog.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles debugging. 
+	Title  : debuglog.c
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 7/27/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This handles debugging. 
 	            
+$Id$
 
 ********************************************************************/
 
@@ -81,11 +82,24 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 		c += strlen(c);
 	}
 
-#ifdef USE_SYSLOG
-	syslog(LOG_INFO, "%s", DebugBuffer);
-#else
-	fprintf(stderr, "%s\n", DebugBuffer);
-#endif
+	if (debug_msg_type == DEBUGLOG_NO_DEBUG)
+	{
+		/*
+		 * Do nothing, it hasn't been set 
+		 */
+
+	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG)
+	{
+		syslog(LOG_INFO, "%s", DebugBuffer);
+
+	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG)
+	{
+		fprintf(stderr, "%s\n", DebugBuffer);
+
+	} else if (debug_msg_type & DEBUGLOG_STDOUT_DEBUG)
+	{
+		fprintf(stdout, "%s\n", DebugBuffer);
+	}
 }	/* debug_xxd */
 
 void DebugLogSuppress(LONG lSType)
