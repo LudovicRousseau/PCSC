@@ -2,4 +2,4 @@
 
 sysconf_DATA = reader.conf
 
-EXTRA_DIST = StartupParameters.plist SmartcardServices pcscd.init
+EXTRA_DIST = StartupParameters.plist SmartcardServices
