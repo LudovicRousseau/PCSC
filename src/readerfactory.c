@@ -180,6 +180,17 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		  (sContexts[parentNode])->vHandle;
 		(sContexts[dwContext])->mMutex = 
 		  (sContexts[parentNode])->mMutex;
+		
+		/*
+		 * Call on the driver to see if it is thread safe 
+		 */
+		rv = IFDGetCapabilities((sContexts[parentNode]),
+		       TAG_IFD_THREAD_SAFE, &dwGetSize, ucGetData);
+
+		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucGetData[0] == 1)
+		{
+			(sContexts[dwContext])->mMutex = 0;
+		}
 	}
 
 	if ((sContexts[dwContext])->dwFeeds == 0)
