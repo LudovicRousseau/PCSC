@@ -495,7 +495,6 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	i = 0;
 	rv = -1;
 	supportedChannels = 0;
-	valueLength = sizeof(tagValue);
 	tagValue = 0;
 
 	/*
@@ -521,6 +520,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 						/*
 						 * Ask the driver if it supports multiple channels 
 						 */
+						valueLength = sizeof(tagValue);
 						ret = IFDGetCapabilities((sContexts[i]),
 							TAG_IFD_SIMULTANEOUS_ACCESS,
 							&valueLength, &tagValue);
