@@ -20,10 +20,10 @@ application exits and pcsc is now configured to use your card.
 Example:
 
  [root@linux]# bundleTool
- Select the approprate token driver:
- -----------------------------------
+ Select the appropriate token driver:
+ ------------------------------------
    1.     mscMuscleCard.bundle
- -----------------------------------
+ ------------------------------------
  Enter the number: 1
  
  Insert your token in: My Friendly Reader 0 0

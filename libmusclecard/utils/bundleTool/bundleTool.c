@@ -105,8 +105,8 @@ int main(int argc, char **argv)
 	}
 #endif
 
-	printf("Select the approprate token driver:\n");
-	printf("-----------------------------------\n");
+	printf("Select the appropriate token driver:\n");
+	printf("------------------------------------\n");
 
 	i = 1;
 	totalBundles = 0;
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 	} while (FindNextFile(hFind, &findData) != 0);
 #endif
 
-	printf("-----------------------------------\n");
+	printf("------------------------------------\n");
 
 	if (totalBundles == 0)
 	{
