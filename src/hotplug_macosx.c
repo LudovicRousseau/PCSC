@@ -82,9 +82,9 @@ void RawDeviceAdded(void *refCon, io_iterator_t iterator)
 
 		if (refCon == NULL)
 		{	/* Dont do this on (void *)1 */  
-                        //SYS_MutexLock(&usbNotifierMutex); 
+                        SYS_MutexLock(&usbNotifierMutex); 
                 	HPSetupHotPlugDevice();
-                        //SYS_MutexUnLock(&usbNotifierMutex); 
+                        SYS_MutexUnLock(&usbNotifierMutex); 
 		}
 
 		kr = IOObjectRelease(obj);
@@ -102,9 +102,9 @@ void RawDeviceRemoved(void *refCon, io_iterator_t iterator)
 
 		if (refCon == NULL)
 		{ 
-                        //SYS_MutexLock(&usbNotifierMutex); 
+                        SYS_MutexLock(&usbNotifierMutex); 
                         HPSetupHotPlugDevice();
-                        //SYS_MutexUnLock(&usbNotifierMutex); 
+                        SYS_MutexUnLock(&usbNotifierMutex); 
 		}
 
 		kr = IOObjectRelease(obj);
@@ -113,12 +113,21 @@ void RawDeviceRemoved(void *refCon, io_iterator_t iterator)
 
 void HPEstablishUSBNotifications()
 {
+        mach_port_t 		tmpMasterPort;
+	const char 		*cStringValue;
+	CFStringRef 		propertyString;
+	kern_return_t 		kr;
+	CFRunLoopSourceRef 	runLoopSource;
+	int 			i;
 
-	const char *cStringValue;
-	CFStringRef propertyString;
-	kern_return_t kr;
-	CFRunLoopSourceRef runLoopSource;
-	int i;
+        // first create a master_port for my task
+        kr = IOMasterPort(MACH_PORT_NULL, &tmpMasterPort);
+        if (kr || !tmpMasterPort)
+        {
+            printf("ERR: Couldn't create a master IOKit Port(%08x)\n", kr);
+            return;
+        }
+
 
 	for (i = 0; i < bundleArraySize; i++)
 	{
@@ -126,7 +135,7 @@ void HPEstablishUSBNotifications()
 		bundleInfoDict = CFBundleGetInfoDictionary(currBundle);
 
 		propertyString = CFDictionaryGetValue(bundleInfoDict,
-			CFSTR("ifdVendorID"));
+                                                        CFSTR("ifdVendorID"));
 		if (propertyString == 0)
 		{
 			DebugLogA
@@ -135,11 +144,11 @@ void HPEstablishUSBNotifications()
 		}
 
 		cStringValue = CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding());
+                                                        CFStringGetSystemEncoding());
 		hpManu_id = strtoul(cStringValue, 0, 16);
 
 		propertyString = CFDictionaryGetValue(bundleInfoDict,
-			CFSTR("ifdProductID"));
+                                                        CFSTR("ifdProductID"));
 		if (propertyString == 0)
 		{
 			DebugLogA
@@ -148,13 +157,13 @@ void HPEstablishUSBNotifications()
 		}
 
 		cStringValue = CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding());
+                                                        CFStringGetSystemEncoding());
 		hpProd_id = strtoul(cStringValue, 0, 16);
 
 		// Set up the matching criteria for the devices we're interested
 		// in
-		bundleTracker[i].matchingDict =
-			IOServiceMatching(kIOUSBDeviceClassName);
+		bundleTracker[i].matchingDict = IOServiceMatching(kIOUSBDeviceClassName);
+                
 		if (!bundleTracker[i].matchingDict)
 		{
 			DebugLogA
@@ -163,17 +172,20 @@ void HPEstablishUSBNotifications()
 		}
 		// Add our vendor and product IDs to the matching criteria
 		CFDictionarySetValue(bundleTracker[i].matchingDict,
-			CFSTR(kUSBVendorName),
-			CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type,
-				&hpManu_id));
+                                        CFSTR(kUSBVendorName),
+                                        CFNumberCreate(kCFAllocatorDefault, 
+                                        kCFNumberSInt32Type,
+                                        &hpManu_id));
 		CFDictionarySetValue(bundleTracker[i].matchingDict,
-			CFSTR(kUSBProductName), CFNumberCreate(kCFAllocatorDefault,
-				kCFNumberSInt32Type, &hpProd_id));
+                                        CFSTR(kUSBProductName), 
+                                        CFNumberCreate(kCFAllocatorDefault,
+                                        kCFNumberSInt32Type, 
+                                        &hpProd_id));
 
 		// Create a notification port and add its run loop event source to 
 		// our run loop
 		// This is how async notifications get set up.
-		gNotifyPort = IONotificationPortCreate(masterPort);
+		gNotifyPort = IONotificationPortCreate(tmpMasterPort);
 		runLoopSource = IONotificationPortGetRunLoopSource(gNotifyPort);
 
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource,
@@ -184,22 +196,20 @@ void HPEstablishUSBNotifications()
 		// IOServiceAddMatchingNotification, each of which consumes one
 		// reference.
 		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].
-			matchingDict);
+			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
 		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].
-			matchingDict);
+			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
 		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].
-			matchingDict);
+			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
 
 		// Now set up two notifications, one to be called when a raw
 		// device is first matched by I/O Kit, and the other to be
 		// called when the device is terminated.
 		kr = IOServiceAddMatchingNotification(gNotifyPort,
-			kIOFirstMatchNotification,
-			bundleTracker[i].matchingDict,
-			RawDeviceAdded, NULL, &gRawAddedIter);
+                                                        kIOFirstMatchNotification,
+                                                        bundleTracker[i].matchingDict,
+                                                        RawDeviceAdded, NULL, 
+                                                        &gRawAddedIter);
 
 		/*
 		 * The void * 1 allows me to distinguish this initialization
@@ -209,12 +219,17 @@ void HPEstablishUSBNotifications()
 		RawDeviceAdded((void *) 1, gRawAddedIter);
 
 		kr = IOServiceAddMatchingNotification(gNotifyPort,
-			kIOTerminatedNotification,
-			bundleTracker[i].matchingDict,
-			RawDeviceRemoved, NULL, &gRawRemovedIter);
+                                                        kIOTerminatedNotification,
+                                                        bundleTracker[i].matchingDict,
+                                                        RawDeviceRemoved, NULL, 
+                                                        &gRawRemovedIter);
 
 		RawDeviceRemoved((void *) 1, gRawRemovedIter);
 	}
+        
+        // Now done with the master_port
+        mach_port_deallocate(mach_task_self(), tmpMasterPort);
+        tmpMasterPort = 0;
 
 	CFRunLoopRun();
 
@@ -236,40 +251,54 @@ LONG HPSearchHotPluggables()
 		}
 	}
 
-	iorv = IOMasterPort(bootstrap_port, &masterPort);
+	iorv = IOMasterPort(MACH_PORT_NULL, &masterPort);
 	if (iorv != 0)
+        {
+                printf("ERR: Couldn't create a master IOKit Port(%08x)\n", iorv);
 		return -1;
+        }
 
 	pluginDirString = CFStringCreateWithCString(NULL, PCSCLITE_HP_DROPDIR,
-		kCFStringEncodingMacRoman);
+                                                    kCFStringEncodingMacRoman);
 
-	if (pluginDirString == NULL)
+	if (pluginDirString == NULL) 
+        {
+                printf("ERR: Couldn't create pluginDirString\n");
 		return -1;
+        }
 
 	pluginDirURL = CFURLCreateWithFileSystemPath(NULL, pluginDirString,
-		kCFURLPOSIXPathStyle, TRUE);
+                                                    kCFURLPOSIXPathStyle, TRUE);
 	CFRelease(pluginDirString);
 
 	if (pluginDirURL == NULL)
+        {
+                printf("ERR: Couldn't create pluginDirURL\n");
 		return -1;
+        }
+
 
 	bundleArray = CFBundleCreateBundlesFromDirectory(NULL, pluginDirURL,
-		NULL);
+                                                         NULL);
 
 	if (bundleArray == NULL)
-		return SCARD_E_NO_MEMORY;
+        {
+                printf("ERR: Couldn't create bundleArray\n");
+		return -1;
+        }
+
 
 	bundleArraySize = CFArrayGetCount(bundleArray);
 
 	/*
 	 * Look for initial USB devices 
 	 */
-        //SYS_MutexLock(&usbNotifierMutex); 
+        SYS_MutexLock(&usbNotifierMutex); 
         HPSetupHotPlugDevice();
-        //SYS_MutexUnLock(&usbNotifierMutex); 
+        SYS_MutexUnLock(&usbNotifierMutex); 
 
 	rv = SYS_ThreadCreate(&usbNotifyThread, NULL,
-		(LPVOID) HPEstablishUSBNotifications, 0);
+                                (LPVOID) HPEstablishUSBNotifications, 0);
 
 	return rv;
 }
@@ -326,7 +355,7 @@ LONG HPSetupHotPlugDevice()
 		}
 
 		propertyString = CFDictionaryGetValue(bundleInfoDict,
-			CFSTR("ifdVendorID"));
+                                                        CFSTR("ifdVendorID"));
 		if (propertyString == 0)
 		{
 			if (USBMatch)
@@ -335,11 +364,11 @@ LONG HPSetupHotPlugDevice()
 		}
 
 		cStringValue = CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding());
+                                                        CFStringGetSystemEncoding());
 		hpManu_id = strtoul(cStringValue, 0, 16);
 
 		propertyString = CFDictionaryGetValue(bundleInfoDict,
-			CFSTR("ifdProductID"));
+                                                        CFSTR("ifdProductID"));
 		if (propertyString == 0)
 		{
 			if (USBMatch)
@@ -348,7 +377,7 @@ LONG HPSetupHotPlugDevice()
 		}
 
 		cStringValue = CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding());
+                                                        CFStringGetSystemEncoding());
 		hpProd_id = strtoul(cStringValue, 0, 16);
 
 		IOIteratorReset(iter);
@@ -364,8 +393,9 @@ LONG HPSetupHotPlugDevice()
 			UInt16 product;
 
 			kr = IOCreatePlugInInterfaceForService(USBDevice,
-				kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID,
-				&iodev, &score);
+                                                                kIOUSBDeviceUserClientTypeID, 
+                                                                kIOCFPlugInInterfaceID,
+                                                                &iodev, &score);
 			if (kr || !iodev)
 			{
 				DebugLogB
@@ -373,8 +403,8 @@ LONG HPSetupHotPlugDevice()
 					kr);
 				SYS_Sleep(1);
 				kr = IOCreatePlugInInterfaceForService(USBDevice,
-					kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID,
-					&iodev, &score);
+                                                                        kIOUSBDeviceUserClientTypeID, 											kIOCFPlugInInterfaceID,
+                                                                        &iodev, &score);
 				if (kr || !iodev)
 				{
 					DebugLogB
@@ -393,10 +423,10 @@ LONG HPSetupHotPlugDevice()
 			 */
 			res =
 				(*iodev)->QueryInterface(iodev,
-				CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
-				(LPVOID) & dev);
-			IODestroyPlugInInterface(iodev);
-
+                                                            CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
+                                                            (LPVOID) &dev);
+			//IODestroyPlugInInterface(iodev);
+                        (*iodev)->Release(iodev);
 			if (res || !dev)
 			{
 				DebugLogB
@@ -438,9 +468,7 @@ LONG HPSetupHotPlugDevice()
 				 * Here we will add the reader, since it is not in the
 				 * address list 
 				 */
-                                SYS_MutexLock(&usbNotifierMutex); 
 				HPAddHotPluggable(i, addrHolder[k]);
-                                SYS_MutexUnLock(&usbNotifierMutex); 
 			} else
                         {
 				DebugLogA("HPSearchHotPluggables: Warning - reader already in list.");
@@ -470,9 +498,7 @@ LONG HPSetupHotPlugDevice()
 					 * Here we will remove the reader, since it is not in
 					 * the device address list 
 					 */
-                                        SYS_MutexLock(&usbNotifierMutex);  
                                         HPRemoveHotPluggable(i, bundleTracker[i].addrList[x]);
-                                        SYS_MutexUnLock(&usbNotifierMutex); 
                                 }
 			}
 		}
@@ -577,41 +603,4 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 
 	return rv;
 }	/* End of function */
-
-LONG HPRemoveAllHotPluggables() {
-
-        LONG rv;
-        int i, j;
-        const char *cStringValue;
-        CFStringRef propertyString;
-        
-	for (i = 0; i < bundleArraySize; i++)
-	{
-        
-            currBundle = (CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
-            bundleInfoDict = CFBundleGetInfoDictionary(currBundle);
-            propertyString = CFDictionaryGetValue(bundleInfoDict, CFSTR("ifdFriendlyName"));
-
-            if (propertyString == 0)
-            {
-		return -1;
-            }
-
-            cStringValue = strdup(CFStringGetCStringPtr(propertyString,
-                                CFStringGetSystemEncoding()));
-
-            for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
-            {
-		if (bundleTracker[i].addrList[j] != 0)
-		{ 
-	           rv = RFRemoveReader((LPSTR) cStringValue, 0x200000 + j);
-                   bundleTracker[i].addrList[j] = 0;
-		}
-            }
-            
-        }
-
-        free((LPSTR)cStringValue);
-        return 0;
-}
 
