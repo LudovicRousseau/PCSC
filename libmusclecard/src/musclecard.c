@@ -894,6 +894,8 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 			continue;
 		} else if (ret == MSC_TOKEN_REMOVED)
 		{
+		        pConnection->tokenInfo.tokenType = 
+			  MSC_TOKEN_TYPE_REMOVED;
 			return ret;
 		}
 	}
@@ -928,6 +930,8 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 			continue;
 		} else if (ret == MSC_TOKEN_REMOVED)
 		{
+		        pConnection->tokenInfo.tokenType = 
+			  MSC_TOKEN_TYPE_REMOVED;
 			return ret;
 		}
 	}
@@ -2136,6 +2140,21 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 
 MSCUChar8 MSCIsTokenReset(MSCLPTokenConnection pConnection)
 {
+        MSCULong32 rv;
+	char slotName[MAX_READERNAME];
+	MSCULong32 slotNameSize, slotState, slotProtocol;
+	MSCUChar8 tokenId[MAX_ATR_SIZE];
+	MSCULong32 tokenIdLength;
+
+	rv = SCardStatus(pConnection->hCard, slotName,
+			 &slotNameSize, &slotState, &slotProtocol, 
+			 tokenId, &tokenIdLength);
+
+	if (rv == SCARD_W_RESET_CARD)
+	{
+	        return 1;
+	} 
+
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_RESET)
 	{
 		return 1;
@@ -2153,6 +2172,29 @@ MSCUChar8 MSCClearReset(MSCLPTokenConnection pConnection)
 
 MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection)
 {
+        MSCULong32 rv;
+	char slotName[MAX_READERNAME];
+	MSCULong32 slotNameSize, slotState, slotProtocol;
+	MSCUChar8 tokenId[MAX_ATR_SIZE];
+	MSCULong32 tokenIdLength;
+
+
+	rv = SCardStatus(pConnection->hCard, slotName,
+			 &slotNameSize, &slotState, &slotProtocol, 
+			 tokenId, &tokenIdLength);
+
+	if (rv == SCARD_W_REMOVED_CARD)
+	{
+	        return 1;
+	} else if (rv == SCARD_W_INSERTED_CARD)
+	{
+	        return 1;
+	} else if (slotState & SCARD_ABSENT)
+	{
+	        return 1;
+	}
+
+
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_REMOVED)
 	{
 		return 1;
@@ -2164,13 +2206,14 @@ MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection)
 
 MSCUChar8 MSCIsTokenChanged(MSCLPTokenConnection pConnection)
 {
-	if ((pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_REMOVED) ||
-		(pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_RESET))
+	if (MSCIsTokenMoved(pConnection))
 	{
 		return 1;
-	} else
+	} else if (MSCIsTokenReset(pConnection)) 
 	{
-		return 0;
+		return 1;
+	} else {
+	        return 0;
 	}
 }
 
