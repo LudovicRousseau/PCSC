@@ -59,7 +59,7 @@ void mscUnLockThread()
 /**************** MSC Connection Functions **************************/
 
 MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
-	MSCPULong32 arrayLength)
+		     MSCPULong32 arrayLength)
 {
 
 	MSCLong32 rv;
@@ -126,8 +126,9 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 		rgReaderStates.szReader = &readerList[i];
 		rgReaderStates.dwCurrentState = SCARD_STATE_UNAWARE;
 
-		rv = SCardGetStatusChange(localHContext, INFINITE, &rgReaderStates,
-			1);
+		rv = SCardGetStatusChange(localHContext, INFINITE, 
+					  &rgReaderStates,
+					  1);
 
 		if (pcscToMSC(rv) != MSC_SUCCESS)
 		{
@@ -239,9 +240,10 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 }
 
 MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
-	MSCULong32 sharingMode,
-	MSCPUChar8 applicationName,
-	MSCULong32 nameSize, MSCLPTokenConnection pConnection)
+			      MSCULong32 sharingMode,
+			      MSCPUChar8 applicationName,
+			      MSCULong32 nameSize, 
+			      MSCLPTokenConnection pConnection)
 {
 	MSCLong32 rv;
 	MSCULong32 tokenSize;
@@ -501,7 +503,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 }
 
 MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
-	MSCULong32 endAction)
+			    MSCULong32 endAction)
 {
 
 	MSCLong32 rv = SCARD_S_SUCCESS;
@@ -568,7 +570,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
-	MSCULong32 arraySize, MSCULong32 timeoutValue)
+			    MSCULong32 arraySize, MSCULong32 timeoutValue)
 {
 
 	MSCLong32 rv, rt;
@@ -1035,9 +1037,11 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCGenerateKeys = (MSCLong32(*)(MSCLPTokenConnection,
-				MSCUChar8, MSCUChar8, MSCLPGenKeyParams)) vFunction;
+						   MSCUChar8, MSCUChar8, 
+						   MSCLPGenKeyParams)) 
+		  vFunction;
 		rv = (*libMSCGenerateKeys) (pConnection, prvKeyNum, pubKeyNum,
-			pParams);
+					    pParams);
 
 	} else
 	{
@@ -1106,8 +1110,11 @@ MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	if (vFunction != 0)
 	{
-		libMSCExportKey = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
-				MSCPUChar8, MSCPULong32, MSCPVoid32, MSCUChar8)) vFunction;
+		libMSCExportKey = (MSCLong32(*)(MSCLPTokenConnection, 
+						MSCUChar8, MSCPUChar8, 
+						MSCPULong32, MSCPVoid32, 
+						MSCUChar8)) vFunction;
+
 		rv = (*libMSCExportKey) (pConnection, keyNum, pKeyBlob,
 			keyBlobSize, pAddParams, addParamsSize);
 
@@ -1120,14 +1127,15 @@ MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 }
 
 MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
-	MSCLPCryptInit cryptInit, MSCPUChar8 pInputData,
-	MSCULong32 inputDataSize, MSCPUChar8 pOutputData,
-	MSCPULong32 outputDataSize)
+		       MSCLPCryptInit cryptInit, MSCPUChar8 pInputData,
+		       MSCULong32 inputDataSize, MSCPUChar8 pOutputData,
+		       MSCPULong32 outputDataSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCComputeCrypt) (MSCLPTokenConnection, MSCLPCryptInit,
-		MSCPUChar8, MSCULong32, MSCPUChar8, MSCPULong32);
+					MSCPUChar8, MSCULong32, MSCPUChar8, 
+					MSCPULong32);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1139,10 +1147,12 @@ MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCComputeCrypt =
-			(MSCLong32(*)(MSCLPTokenConnection, MSCLPCryptInit, MSCPUChar8,
-				MSCULong32, MSCPUChar8, MSCPULong32)) vFunction;
+			(MSCLong32(*)(MSCLPTokenConnection, MSCLPCryptInit, 
+				      MSCPUChar8, MSCULong32, MSCPUChar8, 
+				      MSCPULong32)) vFunction;
 		rv = (*libMSCComputeCrypt) (pConnection, cryptInit, pInputData,
-			inputDataSize, pOutputData, outputDataSize);
+					    inputDataSize, pOutputData, 
+					    outputDataSize);
 
 	} else
 	{
@@ -1153,13 +1163,15 @@ MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
-	MSCUChar8 keyNum, MSCUChar8 cipherMode, MSCUChar8 cipherDirection,
-	MSCPUChar8 pData, MSCULong32 dataSize)
+			  MSCUChar8 keyNum, MSCUChar8 cipherMode, 
+			  MSCUChar8 cipherDirection,
+			  MSCPUChar8 pData, MSCULong32 dataSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCExtAuthenticate) (MSCLPTokenConnection, MSCUChar8,
-		MSCUChar8, MSCUChar8, MSCPUChar8, MSCULong32);
+					   MSCUChar8, MSCUChar8, MSCPUChar8, 
+					   MSCULong32);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1171,8 +1183,9 @@ MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCExtAuthenticate =
-			(MSCLong32(*)(MSCLPTokenConnection, MSCUChar8, MSCUChar8,
-				MSCUChar8, MSCPUChar8, MSCULong32)) vFunction;
+			(MSCLong32(*)(MSCLPTokenConnection, MSCUChar8, 
+				      MSCUChar8, MSCUChar8, MSCPUChar8, 
+				      MSCULong32)) vFunction;
 		rv = (*libMSCExtAuthenticate) (pConnection, keyNum, cipherMode,
 			cipherDirection, pData, dataSize);
 	} else
@@ -1184,7 +1197,7 @@ MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
-	MSCLPKeyInfo pKeyInfo)
+		   MSCLPKeyInfo pKeyInfo)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
@@ -1201,7 +1214,7 @@ MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
 	if (vFunction != 0)
 	{
 		libMSCListKeys = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
-				MSCLPKeyInfo)) vFunction;
+					       MSCLPKeyInfo)) vFunction;
 		rv = (*libMSCListKeys) (pConnection, seqOption, pKeyInfo);
 
 	} else
@@ -1213,14 +1226,16 @@ MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
 }
 
 MSC_RV MSCImportCertificate(MSCLPTokenConnection pConnection,
-	MSCULong32 certNumber, MSCLPCertInfo certInfo,
-	MSCPUChar8 certBlob, MSCULong32 certBlobSize,
-	MSCPVoid32 pAddParams, MSCULong32 addParamsSize)
+			    MSCULong32 certNumber, MSCLPCertInfo certInfo,
+			    MSCPUChar8 certBlob, MSCULong32 certBlobSize,
+			    MSCPVoid32 pAddParams, MSCULong32 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCImportCertificate) (MSCLPTokenConnection, MSCULong32,
-		MSCLPCertInfo, MSCPUChar8, MSCULong32, MSCPVoid32, MSCULong32);
+					     MSCLPCertInfo, MSCPUChar8, 
+					     MSCULong32, MSCPVoid32, 
+					     MSCULong32);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1235,8 +1250,10 @@ MSC_RV MSCImportCertificate(MSCLPTokenConnection pConnection,
 			(MSCLPTokenConnection, MSCULong32,
 				MSCLPCertInfo, MSCPUChar8,
 				MSCULong32, MSCPVoid32, MSCULong32)) vFunction;
-		rv = (*libMSCImportCertificate) (pConnection, certNumber, certInfo,
-			certBlob, certBlobSize, pAddParams, addParamsSize);
+		rv = (*libMSCImportCertificate) (pConnection, certNumber, 
+						 certInfo, certBlob, 
+						 certBlobSize, pAddParams, 
+						 addParamsSize);
 
 	} else
 	{
