@@ -318,7 +318,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
 		strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
-		strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
+		strcpy((sReadersContexts[dwContextB])->lpcDevice, lpcDevice);
 		(sReadersContexts[dwContextB])->dwVersion =
 		  (sReadersContexts[dwContext])->dwVersion;
 		(sReadersContexts[dwContextB])->dwPort =
