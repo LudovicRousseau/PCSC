@@ -61,6 +61,9 @@
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
+/* directory containing USB drivers */
+#undef PCSCLITE_HP_DROPDIR
+
 /* enable full PCSC debug messaging. */
 #undef PCSC_DEBUG
 
@@ -69,6 +72,9 @@
 
 /* display ATR parsing debug messages. */
 #undef ATR_DEBUG
+
+/* directory containing MuscleCard bundles */
+#undef MSC_SVC_DROPDIR
 
 /* directory containing reader.conf (default /etc) */
 #undef USE_READER_CONF
