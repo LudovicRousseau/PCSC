@@ -88,7 +88,8 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
-	unsigned char *c, *debug_buf_end;
+	char *c;
+        char *debug_buf_end;
 
 	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
 		return;
@@ -171,11 +172,11 @@ void DebugLogCategory(const int category, const char *buffer, const int len)
 {
 	if ((category & DEBUG_CATEGORY_APDU)
 		&& (debug_category & DEBUG_CATEGORY_APDU))
-		debug_xxd("APDU: ", buffer, len);
+		debug_xxd("APDU: ", (const unsigned char *)buffer, len);
 
 	if ((category & DEBUG_CATEGORY_SW)
 		&& (debug_category & DEBUG_CATEGORY_APDU))
-		debug_xxd("SW: ", buffer, len);
+		debug_xxd("SW: ", (const unsigned char *)buffer, len);
 }
 
 char* pcsc_stringify_error(long pcscError)
