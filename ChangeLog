@@ -1,4 +1,4 @@
-pcsc-lite-1.2.0-rc2: Ludovic Rousseau
+pcsc-lite-1.2.0-rc3: Ludovic Rousseau
 15 october, 2003
 - src/winscard_msg.c: perform a round-robbin among clients to avoid starvation
   under heavy load. Patch from Bettina Martelli.
