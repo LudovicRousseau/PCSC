@@ -163,7 +163,14 @@ void SVCServiceRunLoop()
 		}
 
 		if (AraKiri)
+		{
+			/* stop the hotpug thread and waits its exit */
+			HPStopHotPluggables();
+			SYS_Sleep(1);
+
+			/* now stop all the drivers */
 			RFCleanupReaders(1);
+		}
 	}
 }
 
