@@ -801,8 +801,8 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	}
 	mscUnLockThread();
 
-	if (SYS_ThreadCreate(&callbackThread, NULL, _MSCEventThread,
-			(void *) evlist) == 0)
+	if (SYS_ThreadCreate(&callbackThread, THREAD_ATTR_DEFAULT,
+			_MSCEventThread, (void *) evlist) == 0)
 		return MSC_INTERNAL_ERROR;
 
 	return MSC_SUCCESS;
