@@ -1954,7 +1954,6 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 
 	LONG  retIndice;
 	UCHAR isLastContext;
-	int i;
 
 	retIndice = 0; isLastContext = 1;
 	retIndice = SCardGetContextIndice(hContext);
