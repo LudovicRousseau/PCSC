@@ -3,6 +3,24 @@
 
 #include "stdafx.h"
 #include "PCSC.h"
+#include <stdio.h>
+#include <assert.h>
+
+class Global {
+    public:
+        Global();
+};
+
+// PCSC_MCARD_mutex is defined in musclecard.c
+extern "C" CRITICAL_SECTION PCSC_MCARD_mutex;
+
+Global::Global()
+{
+    InitializeCriticalSection(&PCSC_MCARD_mutex);
+}
+
+static Global global;
+
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -19,7 +37,6 @@ BOOL APIENTRY DllMain( HANDLE hModule,
     }
     return TRUE;
 }
-
 
 // This is an example of an exported variable
 //PCSC_API int nPCSC=0;

@@ -37,7 +37,13 @@ $Id$
 #endif
 
 #ifdef USE_THREAD_SAFETY
-static PCSCLITE_MUTEX mcardMutex = PTHREAD_MUTEX_INITIALIZER;
+
+#ifndef WIN32
+static PCSCLITE_MUTEX PCSC_MCARD_mutex = PTHREAD_MUTEX_INITIALIZER;
+#else
+/* This is initialized once in PCSC.cpp */
+PCSCLITE_MUTEX PCSC_MCARD_mutex;
+#endif
 static PCSCLITE_THREAD_T callbackThread;
 #endif
 
@@ -57,14 +63,14 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection);
 void mscLockThread()
 {
 #ifdef USE_THREAD_SAFETY
-	SYS_MutexLock(&mcardMutex);
+	SYS_MutexLock(&PCSC_MCARD_mutex);
 #endif
 }
 
 void mscUnLockThread()
 {
 #ifdef USE_THREAD_SAFETY
-	SYS_MutexUnLock(&mcardMutex);
+	SYS_MutexUnLock(&PCSC_MCARD_mutex);
 #endif
 }
 
@@ -893,8 +899,10 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 		rv = SCardBeginTransaction(pConnection->hCard);
 		ret = pcscToMSC(rv);
 
+/* Changes made by Jamie Nicolson
 		if (ret == MSC_SUCCESS)
 			break;
+*/
 		if (ret == MSC_TOKEN_RESET)
 		{
 		        pConnection->tokenInfo.tokenType |= 
@@ -902,13 +910,27 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
+
+/*  Changes by Jamie Nicolson
 			continue;
+*/
+
 		} else if (ret == MSC_TOKEN_REMOVED)
 		{
 		        pConnection->tokenInfo.tokenType = 
 			  MSC_TOKEN_TYPE_REMOVED;
-			return ret;
+
+/* Changes by Jamie Nicolson
+				return ret;
+         }
+*/
+		    break;
+		} else {
+			break;
 		}
+/* End of additions by Jamie */
+
+
 	}
 
 	return ret;
@@ -929,8 +951,11 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 		rv = SCardEndTransaction(pConnection->hCard, endAction);
 		ret = pcscToMSC(rv);
 
+/* Changes by Jamie Nicolson
 		if (ret == MSC_SUCCESS)
 			break;
+*/
+
 		if (ret == MSC_TOKEN_RESET)
 		{
 		        pConnection->tokenInfo.tokenType |= 
@@ -938,13 +963,23 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
+/* Changes by Jamie Nicolson
 			continue;
+*/
 		} else if (ret == MSC_TOKEN_REMOVED)
 		{
 		        pConnection->tokenInfo.tokenType = 
 			  MSC_TOKEN_TYPE_REMOVED;
+/* Changes by Jamie Nicolson
 			return ret;
 		}
+*/
+			break;
+		} else {
+			break;
+		}
+/* End of Jamie's changes */
+
 	}
 
 	return ret;
@@ -2183,34 +2218,23 @@ MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection)
 {
         MSCULong32 rv;
 	char slotName[MAX_READERNAME];
-	MSCULong32 slotNameSize, slotState, slotProtocol;
+	MSCULong32 slotNameSize=MAX_READERNAME, slotState, slotProtocol;
 	MSCUChar8 tokenId[MAX_ATR_SIZE];
-	MSCULong32 tokenIdLength;
-
-	slotNameSize = sizeof(slotName);
-	tokenIdLength = sizeof(tokenId);
-
-	rv = SCardStatus(pConnection->hCard, slotName,
-			 &slotNameSize, &slotState, &slotProtocol, 
-			 tokenId, &tokenIdLength);
-
-	if (rv == SCARD_W_REMOVED_CARD)
-	        return 1;
-	else
-	{
-		if (rv == SCARD_W_INSERTED_CARD)
-	        return 1;
-		else
-		{
-			if (slotState & SCARD_ABSENT)
-				return 1;
-		}
-	}
+	MSCULong32 tokenIdLength=MAX_ATR_SIZE;
 
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_REMOVED)
 		return 1;
-	else
-		return 0;
+
+	rv = SCardStatus(pConnection->hCard, slotName,
+		&slotNameSize, &slotState, &slotProtocol,
+		tokenId, &tokenIdLength);
+
+	if (rv != SCARD_S_SUCCESS || (slotState & SCARD_ABSENT) ) {
+		return 1;
+	}
+
+
+	return 0;
 }
 
 MSCUChar8 MSCIsTokenChanged(MSCLPTokenConnection pConnection)

@@ -27,10 +27,20 @@ extern "C"
 #endif
 
 #ifndef __APPLE__
-#include <mscdefines.h>
+#include "mscdefines.h"
 #else
 #include <PCSC/mscdefines.h>
 #endif
+
+/*
+ * PCSC_API is defined for Windows but is a no-op on other
+ * platforms.
+ */
+
+#ifndef PCSC_API
+#define PCSC_API
+#endif
+
 
 	/****************
      * Return codes *
@@ -649,9 +659,7 @@ extern "C"
 	/*
 	 * Lists all known tokens on the system 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	 MSC_RV MSCListTokens(MSCULong32 listScope,	/* defines the scope to
 												 * return */
 		MSCLPTokenInfo tokenArray,	/* token struct array */
@@ -661,9 +669,7 @@ extern "C"
 	/*
 	 * Establishes a connection to the specified token 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,	/* The
 																 * struct
 																 * of
@@ -677,9 +683,7 @@ extern "C"
 	/*
 	 * Releases a connection to the specified token 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,	/* Connection 
 																	 * handle 
 																	 */
@@ -689,9 +693,7 @@ extern "C"
 	/*
 	 * Blocks for an event to occur on a token 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,	/* Array of
 															 * token
 															 * structs */
@@ -702,18 +704,14 @@ extern "C"
 	/*
 	 * Cancels a pending MSCWaitForTokenEvent 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCCancelEventWait(void	/* No parameters */
 		);
 
 	/*
 	 * Registers a callback function for event change 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,	/* Array
 																 * of
 																 * token
@@ -727,17 +725,13 @@ extern "C"
 	/*
 	 * Cancels all callback registrations 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCCallbackCancelEvent();
 
 	/*
 	 * Locks a transaction to the token 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection	/* Connection 
 																 * handle */
 		);
@@ -745,9 +739,7 @@ extern "C"
 	/*
 	 * Releases a locked transaction to the token 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,	/* Connection 
 																 * handle */
 		MSCULong32 endAction	/* Action to perform on token */
@@ -762,9 +754,7 @@ extern "C"
 	/*
 	 * Pre-personalization function 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCWriteFramework(MSCLPTokenConnection pConnection,
 		MSCLPInitTokenParams pInitParams);
 
@@ -780,36 +770,26 @@ extern "C"
 	 */
 	/*****************************************************************/
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGetStatus(MSCLPTokenConnection pConnection,
 		MSCLPStatusInfo pStatusInfo);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGetCapabilities(MSCLPTokenConnection pConnection,
 		MSCULong32 Tag, MSCPUChar8 Value, MSCPULong32 Length);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCExtendedFeature(MSCLPTokenConnection pConnection,
 		MSCULong32 extFeature,
 		MSCPUChar8 outData,
 		MSCULong32 outLength, MSCPUChar8 inData, MSCPULong32 inLength);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 		MSCUChar8 prvKeyNum,
 		MSCUChar8 pubKeyNum, MSCLPGenKeyParams pParams);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCImportKey(MSCLPTokenConnection pConnection,
 		MSCUChar8 keyNum,
 		MSCLPKeyACL pKeyACL,
@@ -818,27 +798,21 @@ extern "C"
 		MSCLPKeyPolicy keyPolicy,
 		MSCPVoid32 pAddParams, MSCUChar8 addParamsSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCExportKey(MSCLPTokenConnection pConnection,
 		MSCUChar8 keyNum,
 		MSCPUChar8 pKeyBlob,
 		MSCPULong32 keyBlobSize,
 		MSCPVoid32 pAddParams, MSCUChar8 addParamsSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
 		MSCLPCryptInit cryptInit,
 		MSCPUChar8 pInputData,
 		MSCULong32 inputDataSize,
 		MSCPUChar8 pOutputData, MSCPULong32 outputDataSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
 				  MSCUChar8 keyNum,
 				  MSCUChar8 cipherMode,
@@ -846,16 +820,12 @@ extern "C"
 				  MSCPUChar8 pData, 
 				  MSCULong32 dataSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCListKeys(MSCLPTokenConnection pConnection,
 			   MSCUChar8 seqOption, 
 			   MSCLPKeyInfo pKeyInfo);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCCreatePIN(MSCLPTokenConnection pConnection,
 			    MSCUChar8 pinNum,
 			    MSCUChar8 pinAttempts,
@@ -864,87 +834,63 @@ extern "C"
 			    MSCPUChar8 pUnblockCode, 
 			    MSCUChar8 unblockCodeSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCVerifyPIN(MSCLPTokenConnection pConnection,
 			    MSCUChar8 pinNum, 
 			    MSCPUChar8 pPinCode, 
 			    MSCULong32 pinCodeSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCChangePIN(MSCLPTokenConnection pConnection,
 		MSCUChar8 pinNum,
 		MSCPUChar8 pOldPinCode,
 		MSCUChar8 oldPinCodeSize,
 		MSCPUChar8 pNewPinCode, MSCUChar8 newPinCodeSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCUnblockPIN(MSCLPTokenConnection pConnection,
 		MSCUChar8 pinNum,
 		MSCPUChar8 pUnblockCode, MSCULong32 unblockCodeSize);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCListPINs(MSCLPTokenConnection pConnection,
 		MSCPUShort16 pPinBitMask);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCCreateObject(MSCLPTokenConnection pConnection,
 		MSCString objectID,
 		MSCULong32 objectSize, MSCLPObjectACL pObjectACL);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCDeleteObject(MSCLPTokenConnection pConnection,
 		MSCString objectID, MSCUChar8 zeroFlag);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
 		MSCString objectID, MSCULong32 offset, 
 		MSCPUChar8 pInputData, MSCULong32 dataSize,
 		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
 		MSCString objectID, MSCULong32 offset, 
                 MSCPUChar8 pOutputData, MSCULong32 dataSize,
 		LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 		MSCString objectID, MSCPUChar8 *pOutputData, 
                 MSCPULong32 dataSize,
                 LPRWEventCallback rwCallback, MSCPVoid32 addParams);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCListObjects(MSCLPTokenConnection pConnection,
 		MSCUChar8 seqOption, MSCLPObjectInfo pObjectInfo);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCLogoutAll(MSCLPTokenConnection pConnection);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGetChallenge(MSCLPTokenConnection pConnection,
 		MSCPUChar8 pSeed,
 		MSCUShort16 seedSize,
@@ -962,63 +908,47 @@ extern "C"
 	 */
 	/*****************************************************************/
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 				   MSCUChar8 keyNumber, 
 				   MSCLPKeyInfo pKeyInfo);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 				      MSCString objectID, 
 				      MSCLPObjectInfo pObjectInfo);
 
-#ifdef WIN32
 	PCSC_API
-#endif
 	char *msc_error(MSC_RV errorCode);
 
 	/*
 	 * Was the token reset ? 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSCUChar8 MSCIsTokenReset(MSCLPTokenConnection pConnection);
 
 	/*
 	 * Clear the Reset state 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSCUChar8 MSCClearReset(MSCLPTokenConnection pConnection);
 
 	/*
 	 * Was the token moved (removed, removed/inserted) ? 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection);
 
 	/*
 	 * Did any state change with the token ? 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSCUChar8 MSCIsTokenChanged(MSCLPTokenConnection pConnection);
 
 	/*
 	 * Is the token recognized ? 
 	 */
-#ifdef WIN32
 	PCSC_API
-#endif
 	MSCUChar8 MSCIsTokenKnown(MSCLPTokenConnection pConnection);
 
 #ifdef __cplusplus

@@ -17,7 +17,11 @@ $Id$
 #define __pcsclite_h__
 
 #ifndef __APPLE__
+#ifdef WIN32
+#include <windows.h>
+#else
 #include <wintypes.h>
+#endif
 #endif
 
 #ifdef __cplusplus

@@ -20,7 +20,10 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <stdint.h> /* May break IA64 test-noansi-r */
+
+#ifndef WIN32
+#include <stdint.h>  /* May break IA64 test-noansi-r */
+#endif
 
 /* end standard C headers. */
 
@@ -496,7 +499,11 @@ void tperrorCheck (char *pcToken_error);
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
+
+#ifndef WIN32
 #include <unistd.h>
+#endif
+
 #endif
 
 #ifndef YY_EXTRA_TYPE
@@ -1733,7 +1740,13 @@ void tpfree (void * ptr )
 #include <stdio.h>
 #include <string.h>
 #include "debuglog.h"
+
+#ifndef WIN32
 #include "config.h"
+#else
+#include "win32_config.h"
+#endif
+
 
 int tpwrap()
 {

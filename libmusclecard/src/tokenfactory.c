@@ -46,8 +46,8 @@ extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 int atrToString(MSCPUChar8 Atr, MSCULong32 Length, char *outAtr)
 {
 
-	int i;
-	int j;
+	MSCULong32 i;
+	MSCULong32 j;
 
 	j = 0;
 

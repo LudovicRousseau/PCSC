@@ -40,10 +40,13 @@ extern "C"
 #define DEBUGLOG_LOG_ENTRIES    1
 #define DEBUGLOG_IGNORE_ENTRIES 2
 
-#define DEBUGLOG_NO_DEBUG       0
-#define DEBUGLOG_SYSLOG_DEBUG   1
-#define DEBUGLOG_STDERR_DEBUG   2
-#define DEBUGLOG_STDOUT_DEBUG   4
+	typedef enum {
+	DEBUGLOG_NO_DEBUG = 0,
+	DEBUGLOG_SYSLOG_DEBUG,
+	DEBUGLOG_STDERR_DEBUG,
+	DEBUGLOG_STDOUT_DEBUG,
+	DEBUGLOG_FILE_DEBUG,
+	} DebugLogType;
 
 #define DEBUG_CATEGORY_NOTHING  0
 #define DEBUG_CATEGORY_APDU     1 
@@ -70,7 +73,7 @@ extern "C"
 	int DebugLogSetCategory(const int);
 	void DebugLogCategory(const int, const char *, const int);
 
-	char *pcsc_stringify_error(const long);
+	char *pcsc_stringify_error(long);
 
 #ifdef __cplusplus
 }

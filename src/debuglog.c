@@ -21,15 +21,21 @@ $Id$
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #ifndef WIN32
 #include "config.h"
+#include "wintypes.h"
 #else
 #include "../win32/win32_config.h"
 #endif
 
-#include "wintypes.h"
+#ifdef WIN32
+#include "../win32/win32_pcsclite.h"
+#else
 #include "pcsclite.h"
+#endif
+
 #include "debuglog.h"
 
 // Max string size when dumping a 256 bytes longs APDU
@@ -40,6 +46,7 @@ static char DebugBuffer[DEBUG_BUF_SIZE];
 static int lSuppress = DEBUGLOG_LOG_ENTRIES;
 static int debug_msg_type = DEBUGLOG_NO_DEBUG;
 static int debug_category = DEBUG_CATEGORY_NOTHING;
+static FILE *debug_file = NULL;
 
 void debug_msg(const char *fmt, ...)
 {
@@ -60,27 +67,42 @@ void debug_msg(const char *fmt, ...)
 #endif
 	va_end(argptr);
 
-	if (debug_msg_type == DEBUGLOG_NO_DEBUG)
-	{
+	switch(debug_msg_type) {
+		case DEBUGLOG_NO_DEBUG:
 		/*
 		 * Do nothing, it hasn't been set 
 		 */
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG)
-	{
+		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
 		syslog(LOG_INFO, "%s", DebugBuffer);
 #else
 		fprintf(stderr, "%s\n", DebugBuffer);
 #endif
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG)
-	{
+		case DEBUGLOG_STDERR_DEBUG:
 		fprintf(stderr, "%s\n", DebugBuffer);
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_STDOUT_DEBUG)
-	{
+		case DEBUGLOG_STDOUT_DEBUG:
 		fprintf(stdout, "%s\n", DebugBuffer);
+		break;
+
+		case DEBUGLOG_FILE_DEBUG:
+			if (debug_file) {
+				fprintf(debug_file, "%s\n", DebugBuffer);
+			} else {
+				/* File not setup, do nothing. But assert to catch this in debug
+				 * builds */
+				assert(0);
+			}
+			break;
+
+		default:
+			/* Unknown type. Do nothing. */
+			assert(0);
 	}
 }	/* debug_msg */
 
@@ -103,27 +125,42 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 		c += strlen(c);
 	}
 
-	if (debug_msg_type == DEBUGLOG_NO_DEBUG)
-	{
+	switch( debug_msg_type ) {
+		case DEBUGLOG_NO_DEBUG:
 		/*
 		 * Do nothing, it hasn't been set 
 		 */
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG)
-	{
+		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
 		syslog(LOG_INFO, "%s", DebugBuffer);
 #else
 		fprintf(stderr, "%s\n", DebugBuffer);
 #endif
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG)
-	{
+		case DEBUGLOG_STDERR_DEBUG:
 		fprintf(stderr, "%s\n", DebugBuffer);
+		break;
 
-	} else if (debug_msg_type & DEBUGLOG_STDOUT_DEBUG)
-	{
+		case DEBUGLOG_STDOUT_DEBUG:
 		fprintf(stdout, "%s\n", DebugBuffer);
+		break;
+
+		case DEBUGLOG_FILE_DEBUG:
+			if (debug_file) {
+				fprintf(debug_file, "%s\n", DebugBuffer);
+			} else {
+				/* File not setup, do nothing.  But assert to catch this in debug
+				 * builds. */
+				assert(0);
+			}
+			break;
+
+		default:
+			/* Unknown type - do nothing */
+			assert(0);
 	}
 }	/* debug_xxd */
 
@@ -171,11 +208,11 @@ void DebugLogCategory(const int category, const char *buffer, const int len)
 		debug_xxd("SW: ", buffer, len);
 }
 
-LPSTR pcsc_stringify_error(const LONG Error)
+char* pcsc_stringify_error(long pcscError)
 {
 	static char strError[75];
 
-	switch (Error)
+	switch (pcscError)
 	{
 	case SCARD_S_SUCCESS:
 		strncpy(strError, "Command successful.", sizeof(strError)-1);
@@ -294,3 +331,39 @@ LPSTR pcsc_stringify_error(const LONG Error)
 	return strError;
 }
 
+#ifdef WIN32
+static DWORD getPID() {
+	return GetCurrentProcessId();
+}
+
+#else
+static pid_t getPID() {
+	return getpid();
+}
+#endif
+
+void DebugLogSetupLogFile(const char* filename_base) {
+  char *filename = NULL;
+  int bufsize;
+
+  bufsize = strlen(filename_base) + 22;
+  filename = (char *)malloc(bufsize);
+  if (filename == NULL) {
+	  goto finish;
+  }
+
+  if ( debug_file != NULL ) {
+	  fclose(debug_file);
+	  debug_file = NULL;
+  }
+
+  sprintf(filename, "%s.%20d", filename_base, getPID());
+  debug_file = fopen(filename, "a");
+
+  /* In debug mode, catch the case where we couldn't open the file */
+  assert(debug_file);
+
+finish:
+  free(filename);
+
+}
