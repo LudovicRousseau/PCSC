@@ -142,7 +142,7 @@ dnl --enable-usbdropdir
 AC_ARG_ENABLE(usbdropdir,
 [  --enable-usbdropdir=DIR directory containing USB drivers                                                (default /usr/local/pcsc/drivers/)],
 [usbdropdir="${enableval}"], [usbdropdir=false])
-if test x${usbdropdir} == xfalse ; then
+if test x${usbdropdir} = xfalse ; then
 	usbdropdir="/usr/local/pcsc/drivers/"
 fi
 AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
@@ -223,7 +223,7 @@ dnl --enable-muscledropdir
 AC_ARG_ENABLE(muscledropdir,
 [  --enable-muscledropdir=DIR directory containing MuscleCard bundles                                      (default /usr/local/pcsc/services/)],
 [muscledropdir="${enableval}"], [muscledropdir=false])
-if test x${muscledropdir} == xfalse ; then
+if test x${muscledropdir} = xfalse ; then
 	muscledropdir="/usr/local/pcsc/services/"
 fi
 AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
