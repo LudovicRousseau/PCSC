@@ -36,10 +36,6 @@
 #define FALSE 0
 #endif
 
-#ifndef PCSCLITE_MAX_READERS_CONTEXTS
-#define PCSCLITE_MAX_READERS_CONTEXTS	16
-#endif
-
 /* PCSC error message pretty print */
 #define PCSC_ERROR(rv, text) \
 if (rv != SCARD_S_SUCCESS) \
@@ -58,7 +54,7 @@ int main(int argc, char *argv[])
 	SCARDCONTEXT hContext;
 	DWORD dwReaders;
 	LPSTR mszReaders;
-	char *ptr, *readers[PCSCLITE_MAX_READERS_CONTEXTS];
+	char *ptr, **readers;
 	int nbReaders;
 	SCARDHANDLE hCard;
 	DWORD dwActiveProtocol, dwReaderLen, dwState, dwProt, dwAtrLen;
@@ -100,15 +96,12 @@ int main(int argc, char *argv[])
 	if (rv != SCARD_S_SUCCESS)
 		printf("SCardListReader: %lX\n", rv);
 
-	/* Extract readers from the null separated string and get thetotal
-	 * number of readers
-	 */
+	/* Extract readers from the null separated string and get the total
+	 * number of readers */
 	nbReaders = 0;
 	ptr = mszReaders;
 	while ((*ptr != '\0') && (nbReaders < PCSCLITE_MAX_READERS_CONTEXTS))
 	{
-		printf("%d: %s\n", nbReaders, ptr);
-		readers[nbReaders] = ptr;
 		ptr += strlen(ptr)+1;
 		nbReaders++;
 	}
@@ -117,6 +110,25 @@ int main(int argc, char *argv[])
 	{
 		printf("No reader found\n");
 		goto end;
+	}
+
+	/* allocate the readers table */
+	readers = calloc(nbReaders, sizeof(char *));
+	if (NULL == readers)
+	{
+		printf("Not enough memory for readers[]\n");
+		goto end;
+	}
+
+	/* fill the readers table */
+	nbReaders = 0;
+	ptr = mszReaders;
+	while (*ptr != '\0')
+	{
+		printf("%d: %s\n", nbReaders, ptr);
+		readers[nbReaders] = ptr;
+		ptr += strlen(ptr)+1;
+		nbReaders++;
 	}
 
 	if (argc > 1)
