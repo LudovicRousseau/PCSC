@@ -3,9 +3,9 @@
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
 	Title  : hotplug_linux.c
 	Package: pcsc lite
-	Author : David Corcoran 
-	Date   : 02/28/01, updated 11 Aug 2002
-	License: Copyright (C) 2001 David Corcoran, Ludovic Rousseau
+	Author : David Corcoran, Ludovic Rousseau
+	Date   : 02/28/01, last update 4/6/2003
+	License: Copyright (C) 2001,2003 David Corcoran, Ludovic Rousseau
 			<corcoran@linuxnet.com>
 	Purpose: This provides a search API for hot pluggble devices.
 	Credits: The USB code was based partly on Johannes Erdfelt
@@ -72,7 +72,7 @@ static PCSCLITE_THREAD_T usbNotifyThread;
 static int bundleSize = 0;
 
 /*
- * A list to keep track of 20 simultaneous readers 
+ * A list to keep track of 20 simultaneous readers
  */
 
 static struct _bundleTracker
@@ -80,9 +80,9 @@ static struct _bundleTracker
 	long  manuID;
 	long  productID;
 
-	struct _deviceNumber {   
-	  int  id;
-	  char status;
+	struct _deviceNumber {
+		int  id;
+		char status;
 	} deviceNumber[PCSCLITE_HP_MAX_SIMUL_READERS];
 
 	char *bundleName;
@@ -125,7 +125,7 @@ LONG HPReadBundleValues()
 
 			/*
 			 * The bundle exists - let's form a full path name and get the
-			 * vendor and product ID's for this particular bundle 
+			 * vendor and product ID's for this particular bundle
 			 */
 
 			sprintf(fullPath, "%s%s%s", PCSCLITE_HP_DROPDIR,
@@ -191,7 +191,7 @@ void HPEstablishUSBNotifications()
 	int fd, ret;
 	struct usb_device_descriptor usbDescriptor;
 
-	usbDeviceStatus = 0; 
+	usbDeviceStatus = 0;
 	suspectDeviceNumber = 0;
 
 	while (1)
@@ -200,11 +200,11 @@ void HPEstablishUSBNotifications()
 		{
 			usbDeviceStatus     = 0;
 			suspectDeviceNumber = 0;
-			
+
 			for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
 			{
-			        bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
-			}			 
+				bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
+			}
 
 			dir = NULL;
 			dir = opendir(PCSCLITE_USB_PATH);
@@ -219,7 +219,7 @@ void HPEstablishUSBNotifications()
 			{
 
 				/*
-				 * Skip anything starting with a . 
+				 * Skip anything starting with a
 				 */
 				if (entry->d_name[0] == '.')
 					continue;
@@ -244,12 +244,12 @@ void HPEstablishUSBNotifications()
 				while ((entryB = readdir(dirB)) != NULL)
 				{
 					/*
-					 * Skip anything starting with a . 
+					 * Skip anything starting with a
 					 */
 					if (entryB->d_name[0] == '.')
 						continue;
 
-					/* Get the device number so we can distinguish 
+					/* Get the device number so we can distinguish
 					   multiple readers */
 					sprintf(filename, "%s/%s", dirpath, entryB->d_name);
 					sscanf(entryB->d_name, "%d", &deviceNumber);
@@ -267,29 +267,29 @@ void HPEstablishUSBNotifications()
 						continue;
 
 					/*
-					 * Device is found and we don't know about it 
+					 * Device is found and we don't know about it
 					 */
-					  
+
 					if (usbDescriptor.idVendor == bundleTracker[i].manuID &&
-					    usbDescriptor.idProduct == bundleTracker[i].productID &&
-					    usbDescriptor.idVendor !=0 &&
+						usbDescriptor.idProduct == bundleTracker[i].productID &&
+						usbDescriptor.idVendor !=0 &&
 						usbDescriptor.idProduct != 0)
 					{
-					  for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
-					    {
-					      if (bundleTracker[i].deviceNumber[j].id == deviceNumber &&
-						  bundleTracker[i].deviceNumber[j].id != 0)
-					      {
-					              bundleTracker[i].deviceNumber[j].status = 1; /* i'm here */
-					              break;
-					      }
-					    }
-						 
-					    if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
-					    {
-					            usbDeviceStatus = 1;
-						    suspectDeviceNumber = deviceNumber;
-					    } 
+						for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+						{
+							if (bundleTracker[i].deviceNumber[j].id == deviceNumber &&
+								bundleTracker[i].deviceNumber[j].id != 0)
+							{
+								bundleTracker[i].deviceNumber[j].status = 1; /* i'm here */
+								break;
+							}
+						}
+
+						if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
+						{
+							usbDeviceStatus = 1;
+							suspectDeviceNumber = deviceNumber;
+						}
 					}
 
 				} /* End of while */
@@ -301,46 +301,50 @@ void HPEstablishUSBNotifications()
 
 			if (usbDeviceStatus == 1)
 			{
-			        SYS_MutexLock(&usbNotifierMutex);
+				SYS_MutexLock(&usbNotifierMutex);
 
-				for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++) 
+				for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
 				{
-				        if (bundleTracker[i].deviceNumber[j].id == 0)
-				                break;
+					if (bundleTracker[i].deviceNumber[j].id == 0)
+						break;
 				}
-	
+
 				if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
 				{
-                                        DebugLogA("Too many identical readers plugged in");
-				} else 
-                                {
-				        HPAddHotPluggable(i, j+1);
-				        bundleTracker[i].deviceNumber[j].id = suspectDeviceNumber;
+					DebugLogA("Too many identical readers plugged in");
+				}
+				else
+				{
+					HPAddHotPluggable(i, j+1);
+					bundleTracker[i].deviceNumber[j].id = suspectDeviceNumber;
 				}
 
 				SYS_MutexUnLock(&usbNotifierMutex);
 
-			} else if (usbDeviceStatus == 0)
-			{
-
-			        for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
-			        {
-			                if (bundleTracker[i].deviceNumber[j].id != 0 &&
-					    bundleTracker[i].deviceNumber[j].status == 0) 
-					{
-					        SYS_MutexLock(&usbNotifierMutex);
-					        HPRemoveHotPluggable(i, j+1);
-					        bundleTracker[i].deviceNumber[j].id = 0;
-						SYS_MutexUnLock(&usbNotifierMutex);
-
-					}
-			        }
-			} else
-			{
-				/*
-				 * Do nothing - no USB devices found 
-				 */
 			}
+			else
+				if (usbDeviceStatus == 0)
+				{
+
+					for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+					{
+						if (bundleTracker[i].deviceNumber[j].id != 0 &&
+							bundleTracker[i].deviceNumber[j].status == 0)
+						{
+							SYS_MutexLock(&usbNotifierMutex);
+							HPRemoveHotPluggable(i, j+1);
+							bundleTracker[i].deviceNumber[j].id = 0;
+							SYS_MutexUnLock(&usbNotifierMutex);
+
+						}
+					}
+				}
+				else
+				{
+					/*
+					 * Do nothing - no USB devices found
+					 */
+				}
 
 			if (dir)
 				closedir(dir);
@@ -361,12 +365,9 @@ LONG HPSearchHotPluggables()
 	{
 		bundleTracker[i].productID  = 0;
 		bundleTracker[i].manuID     = 0;
-		
-		for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
-		{
-		        bundleTracker[i].deviceNumber[j].id = 0;
-		}
 
+		for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+			 bundleTracker[i].deviceNumber[j].id = 0;
 	}
 
 	HPReadBundleValues();
@@ -379,7 +380,6 @@ LONG HPSearchHotPluggables()
 
 LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 {
-
 	RFAddReader(bundleTracker[i].readerName, 0x200000 + usbAddr,
 		bundleTracker[i].libraryPath);
 
@@ -388,7 +388,6 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 
 LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 {
-
 	RFRemoveReader(bundleTracker[i].readerName, 0x200000 + usbAddr);
 
 	return 1;
