@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 
 	printf("Testing SCardGetStatusChange \n");
 	printf("Please insert a working reader   : ");
+	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, 0, 0);
 
 	printf("%s\n", pcsc_stringify_error(rv));
