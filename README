@@ -122,7 +122,7 @@ source distribution of the ifd-gempc driver
 (http://ludovic.rousseau.free.fr/softwares/ifd-GemPC/ifd-GemPC.html)
 
 SOLARIS:
-Solaris PC/SC applications must link with -lsocket and -lposix4 since
+Solaris PC/SC applications must link with -lsocket since
 the libraries are not statically linked.
 
 QUESTIONS: 
