@@ -46,7 +46,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 	ucValue[0] = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -55,7 +55,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	 */
 	vFunction = rContext->psFunctions.pvfSetProtocol;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -138,8 +138,8 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
-	vFunction1 = 0;
+	vFunction = NULL;
+	vFunction1 = NULL;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
@@ -148,7 +148,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	vFunction = rContext->psFunctions.pvfCreateChannel;
 	vFunction1 = rContext->psFunctions.pvfCreateChannelByName;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -229,7 +229,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
@@ -237,7 +237,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	 */
 	vFunction = rContext->psFunctions.pvfCloseChannel;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -293,7 +293,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
@@ -301,7 +301,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	 */
 	vFunction = rContext->psFunctions.pvfSetCapabilities;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -355,7 +355,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
@@ -363,7 +363,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	 */
 	vFunction = rContext->psFunctions.pvfGetCapabilities;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -426,7 +426,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 	dwStatus = 0;
 	dwProtocol = 0;
 	ucValue[0] = 0;
@@ -444,7 +444,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 */
 	vFunction = rContext->psFunctions.pvfPowerICC;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -525,8 +525,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	 */
 	rv = 0;
 	rv1 = 0;
-	vFunctionA = 0;
-	vFunctionB = 0;
+	vFunctionA = NULL;
+	vFunctionB = NULL;
 	dwTag = 0;
 	dwCardStatus = 0;
 	ucValue[0] = 0;
@@ -538,10 +538,10 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	vFunctionA = rContext->psFunctions.pvfICCPresent;
 	vFunctionB = rContext->psFunctions.pvfGetCapabilities;
 
-	if (vFunctionA == 0)
+	if (vFunctionA == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
-	if ((vFunctionB == 0) && (rContext->dwVersion == IFD_HVERSION_1_0))
+	if ((vFunctionB == NULL) && (rContext->dwVersion == IFD_HVERSION_1_0))
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -683,7 +683,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 	ucValue[0] = 0;
 
 	if (rContext->dwVersion != IFD_HVERSION_1_0)
@@ -695,7 +695,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	 */
 	vFunction = rContext->psFunctions.pvfControl;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	IFDH_control_v2 = (RESPONSECODE(*)(DWORD, PUCHAR, DWORD,
@@ -751,7 +751,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 	ucValue[0] = 0;
 
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
@@ -822,7 +822,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = 0;
+	vFunction = NULL;
 	ucValue[0] = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -831,7 +831,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	 */
 	vFunction = rContext->psFunctions.pvfTransmitICC;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)

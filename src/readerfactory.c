@@ -853,7 +853,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Neither version of the IFD Handler was found - exit 
 		 */
-		rContext->psFunctions.pvfCreateChannel = 0;
+		rContext->psFunctions.pvfCreateChannel = NULL;
 
 		DebugLogA("IFDHandler functions missing");
 
@@ -897,7 +897,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfCloseChannel = 0;
+			rContext->psFunctions.pvfCloseChannel = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -908,7 +908,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfGetCapabilities = 0;
+			rContext->psFunctions.pvfGetCapabilities = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -919,7 +919,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfSetCapabilities = 0;
+			rContext->psFunctions.pvfSetCapabilities = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -929,7 +929,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			"IFD_Set_Protocol_Parameters");
 
 		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfSetProtocol = 0;
+			rContext->psFunctions.pvfSetProtocol = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -939,7 +939,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfPowerICC = 0;
+			rContext->psFunctions.pvfPowerICC = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -948,7 +948,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			&rContext->psFunctions.pvfSwallowICC, "IFD_Swallow_ICC");
 
 		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfSwallowICC = 0;
+			rContext->psFunctions.pvfSwallowICC = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -957,7 +957,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			&rContext->psFunctions.pvfEjectICC, "IFD_Eject_ICC");
 
 		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfEjectICC = 0;
+			rContext->psFunctions.pvfEjectICC = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -966,7 +966,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			&rContext->psFunctions.pvfConfiscateICC, "IFD_Confiscate_ICC");
 
 		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfConfiscateICC = 0;
+			rContext->psFunctions.pvfConfiscateICC = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -976,7 +976,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfTransmitICC = 0;
+			rContext->psFunctions.pvfTransmitICC = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -986,7 +986,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfICCPresent = 0;
+			rContext->psFunctions.pvfICCPresent = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -996,7 +996,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfICCAbsent = 0;
+			rContext->psFunctions.pvfICCAbsent = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -1017,7 +1017,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfCloseChannel = 0;
+			rContext->psFunctions.pvfCloseChannel = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1028,7 +1028,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfGetCapabilities = 0;
+			rContext->psFunctions.pvfGetCapabilities = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1039,7 +1039,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfSetCapabilities = 0;
+			rContext->psFunctions.pvfSetCapabilities = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1050,7 +1050,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfSetProtocol = 0;
+			rContext->psFunctions.pvfSetProtocol = NULL;
 			/*
 			 * Not a completely required function 
 			 */
@@ -1061,7 +1061,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfPowerICC = 0;
+			rContext->psFunctions.pvfPowerICC = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1071,7 +1071,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfTransmitICC = 0;
+			rContext->psFunctions.pvfTransmitICC = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1081,7 +1081,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfControl = 0;
+			rContext->psFunctions.pvfControl = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1091,7 +1091,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			rContext->psFunctions.pvfICCPresent = 0;
+			rContext->psFunctions.pvfICCPresent = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -1114,19 +1114,19 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 	 * Zero out everything 
 	 */
 
-	rContext->psFunctions.pvfCreateChannel = 0;
-	rContext->psFunctions.pvfCreateChannelByName = 0;
-	rContext->psFunctions.pvfCloseChannel = 0;
-	rContext->psFunctions.pvfGetCapabilities = 0;
-	rContext->psFunctions.pvfSetCapabilities = 0;
-	rContext->psFunctions.pvfSetProtocol = 0;
-	rContext->psFunctions.pvfPowerICC = 0;
-	rContext->psFunctions.pvfSwallowICC = 0;
-	rContext->psFunctions.pvfEjectICC = 0;
-	rContext->psFunctions.pvfConfiscateICC = 0;
-	rContext->psFunctions.pvfTransmitICC = 0;
-	rContext->psFunctions.pvfICCPresent = 0;
-	rContext->psFunctions.pvfICCAbsent = 0;
+	rContext->psFunctions.pvfCreateChannel = NULL;
+	rContext->psFunctions.pvfCreateChannelByName = NULL;
+	rContext->psFunctions.pvfCloseChannel = NULL;
+	rContext->psFunctions.pvfGetCapabilities = NULL;
+	rContext->psFunctions.pvfSetCapabilities = NULL;
+	rContext->psFunctions.pvfSetProtocol = NULL;
+	rContext->psFunctions.pvfPowerICC = NULL;
+	rContext->psFunctions.pvfSwallowICC = NULL;
+	rContext->psFunctions.pvfEjectICC = NULL;
+	rContext->psFunctions.pvfConfiscateICC = NULL;
+	rContext->psFunctions.pvfTransmitICC = NULL;
+	rContext->psFunctions.pvfICCPresent = NULL;
+	rContext->psFunctions.pvfICCAbsent = NULL;
 
 	return SCARD_S_SUCCESS;
 }
