@@ -209,6 +209,9 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			memcpy(pucAtr, rContext->ucAtr, rContext->dwAtrLen);
 			dwAtrLength = rContext->dwAtrLen;
+			if (rContext->dwAtrLen > 0)
+				DebugXxd("EHSpawnEventHandler: Card ATR: ",
+					rContext->ucAtr, rContext->dwAtrLen);
 
 			rContext->dwProtocol =
 				PHGetDefaultProtocol(pucAtr, dwAtrLength);
@@ -315,7 +318,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	UCHAR pucAtr[MAX_ATR_SIZE], ucAvailable;
 	DWORD dwAtrLength, dwAction = 0;
 
-        DebugLogA("SCardReconnect: Attempting reconnect to token.");
+	DebugLogA("SCardReconnect: Attempting reconnect to token.");
+
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	rContext = 0;
+	ucAvailable = 0;
+	dwAtrLength = 0;
+	memset(pucAtr, 0x00, MAX_ATR_SIZE);
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -392,6 +404,13 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		dwInitialization == SCARD_UNPOWER_CARD)
 	{
 		/*
+		 * Currently pcsc-lite keeps the card powered constantly 
+		 */
+		rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
+			&rContext->dwAtrLen);
+
+		/*
+		 * Notify the card has been reset 
 		 * Not doing this could result in deadlock 
 		 */
 		rv = RFCheckReaderEventState(rContext, hCard);
@@ -416,9 +435,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				return SCARD_F_INTERNAL_ERROR;
 
 			case SCARD_S_SUCCESS:
-				rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
-					&rContext->dwAtrLen);
-
 				/*
 				 * Notify the card has been reset 
 				 */
@@ -451,7 +467,11 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				}
 
 				if (rContext->dwAtrLen > 0)
+				{
 					DebugLogA("SCardReconnect: Reset complete.");
+					DebugXxd("SCardReconnect: Card ATR: ",
+						rContext->ucAtr, rContext->dwAtrLen);
+				}
 				else
 					DebugLogA("SCardReconnect: Error resetting card.");
 				break;
