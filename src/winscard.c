@@ -1104,6 +1104,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		return rv;
 	}
 
+	if (strlen(rContext->lpcReader) > MAX_BUFFER_SIZE
+			|| rContext->dwAtrLen > MAX_ATR_SIZE || rContext->dwAtrLen < 0)
+		return SCARD_F_INTERNAL_ERROR;
+
 	/*
 	 * This is a client side function however the server maintains the
 	 * list of events between applications so it must be passed through to 
