@@ -25,6 +25,7 @@ extern "C"
 		unsigned int user_id;
 		unsigned int group_id;
 		unsigned int command;
+		unsigned int dummy;	/* was request_id in pcsc-lite <= 1.2.0 */
 		time_t date;
 		unsigned char key[PCSCLITE_MSG_KEY_LEN];
 		unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
