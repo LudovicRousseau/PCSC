@@ -14,7 +14,6 @@ $Id$
 ********************************************************************/
 
 #include <string.h>
-//#include <dlfcn.h>
 
 #include "../win32/win32_config.h"
 #include "windows.h"

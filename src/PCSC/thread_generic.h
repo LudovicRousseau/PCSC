@@ -49,12 +49,6 @@ extern "C"
         int SYS_ThreadJoin(PCSCLITE_THREAD_T *, LPVOID*);
 	int SYS_ThreadExit(LPVOID);
 
-
-        PCSC_API int MSC_MutexInit(PCSCLITE_MUTEX_T);
-	PCSC_API int MSC_MutexDestroy(PCSCLITE_MUTEX_T);
-	PCSC_API int MSC_MutexLock(PCSCLITE_MUTEX_T);
-        PCSC_API int MSC_MutexUnLock(PCSCLITE_MUTEX_T);
-
 #ifdef __cplusplus
 }
 #endif

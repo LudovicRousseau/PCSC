@@ -33,7 +33,7 @@ $Id$
 int SYS_Initialize()
 {
 	/*
-	 * Nothing special for OS X and Linux 
+	 * Nothing special
 	 */
 	return 0;
 }
@@ -50,13 +50,29 @@ int SYS_GetPID()
 
 int SYS_Sleep(int iTimeVal)
 {
+#ifdef HAVE_NANOSLEEP
+	struct timespec mrqtp;
+	mrqtp.tv_sec = iTimeVal;
+	mrqtp.tv_nsec = 0;
+
+	return nanosleep(&mrqtp, NULL);
+#else
 	return sleep(iTimeVal);
+#endif
 }
 
 int SYS_USleep(int iTimeVal)
 {
+#ifdef HAVE_NANOSLEEP
+	struct timespec mrqtp;
+	mrqtp.tv_sec = 0;
+	mrqtp.tv_nsec = iTimeVal * 1000;
+
+	return nanosleep(&mrqtp, NULL);
+#else
 	usleep(iTimeVal);
 	return iTimeVal;
+#endif
 }
 
 int SYS_OpenFile(char *pcFile, int flags, int mode)
@@ -116,17 +132,50 @@ int SYS_ChangePermissions(char *pcFile, int mode)
 
 int SYS_LockFile(int iHandle)
 {
+#ifdef HAVE_FLOCK
 	return flock(iHandle, LOCK_EX | LOCK_NB);
+#else
+	struct flock lock_s;
+
+	lock_s.l_type = F_WRLCK;
+	lock_s.l_whence = 0;
+	lock_s.l_start = 0L;
+	lock_s.l_len = 0L;
+
+	return fcntl(iHandle, F_SETLK, &lock_s);
+#endif
 }
 
 int SYS_LockAndBlock(int iHandle)
 {
+#ifdef HAVE_FLOCK
 	return flock(iHandle, LOCK_EX);
+#else
+	struct flock lock_s;
+
+	lock_s.l_type = F_RDLCK;
+	lock_s.l_whence = 0;
+	lock_s.l_start = 0L;
+	lock_s.l_len = 0L;
+
+	return fcntl(iHandle, F_SETLKW, &lock_s);
+#endif
 }
 
 int SYS_UnlockFile(int iHandle)
 {
+#ifdef HAVE_FLOCK
 	return flock(iHandle, LOCK_UN);
+#else
+	struct flock lock_s;
+
+	lock_s.l_type = F_UNLCK;
+	lock_s.l_whence = 0;
+	lock_s.l_start = 0L;
+	lock_s.l_len = 0L;
+
+	return fcntl(iHandle, F_SETLK, &lock_s);
+#endif
 }
 
 int SYS_SeekFile(int iHandle, int iSeekLength)
@@ -182,7 +231,12 @@ void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 
 int SYS_MMapSynchronize(void *begin, int length)
 {
-	return msync(begin, length, MS_SYNC | MS_INVALIDATE);
+	int flags = 0;
+
+#ifdef MS_INVALIDATE
+	flags |= MS_INVALIDATE;
+#endif
+	return msync(begin, length, MS_SYNC | flags);
 }
 
 int SYS_Fork()
@@ -190,12 +244,37 @@ int SYS_Fork()
 	return fork();
 }
 
-#ifdef HAVE_DAEMON
 int SYS_Daemon(int nochdir, int noclose)
 {
+#ifdef HAVE_DAEMON
 	return daemon(nochdir, noclose);
-}
+#else
+	switch (SYS_Fork())
+	{
+	case -1:
+		return (-1);
+	case 0:
+		break;
+	default:
+		return (0);
+	}
+
+	if (!noclose) {
+		if (SYS_CloseFile(0))
+			DebugLogB("main: SYS_CloseFile(0) failed: %s", strerror(errno));
+
+		if (SYS_CloseFile(1))
+			DebugLogB("main: SYS_CloseFile(1) failed: %s", strerror(errno));
+
+		if (SYS_CloseFile(2))
+			DebugLogB("main: SYS_CloseFile(2) failed: %s", strerror(errno));
+	}
+	if (!nochdir) {
+		if (SYS_Chdir("/"))
+			DebugLogB("main: SYS_Chdir() failed: %s", strerror(errno));
+	}
 #endif
+}
 
 int SYS_Wait(int iPid, int iWait)
 {
@@ -261,4 +340,3 @@ int SYS_Unlink(char *pcFile)
 {
 	return unlink(pcFile);
 }
-

@@ -38,7 +38,7 @@ PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
 PCSCD_INCLUDE_LIBS  = -lfl -pthread
 PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
-PCSC_DYNLOAD_SOURCE = dyn_bsd.c dyn_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
 PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 if PCSC_USE_LIBUSB
@@ -52,7 +52,7 @@ if PCSC_ARCH_OSX
 PCSC_MYLDFLAGS      = -framework CoreFoundation
 PCSC_INCLUDE_LIBS   = -ll -lIOKit
 PCSCD_INCLUDE_LIBS  = -ll -lIOKit
-PCSC_THREAD_SOURCE  = thread_macosx.c thread_generic.h
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
 PCSC_DYNLOAD_SOURCE = dyn_macosx.c dyn_generic.h
 PCSC_HOTPLUG_SOURCE = hotplug_macosx.c hotplug.h powermgt_macosx.c \
 					  powermgt_generic.h
@@ -78,7 +78,7 @@ PCSCD_INCLUDE_LIBS  = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
 PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
-PCSC_SYSTEM_SOURCE  = sys_solaris.c sys_generic.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 endif
 
 if PCSC_ARCH_HPUX
@@ -88,7 +88,7 @@ PCSCD_INCLUDE_LIBS  = -ll -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
 PCSC_DYNLOAD_SOURCE = dyn_hpux.c dyn_generic.h
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
-PCSC_SYSTEM_SOURCE  = sys_hpux.c sys_generic.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 

@@ -5,8 +5,7 @@
 	Package: pcsc lite
 	Author : David Corcoran
 	Date   : 8/12/99
-	License: Copyright (C) 1999 David Corcoran
-			<corcoran@linuxnet.com>
+	License: Copyright (C) 1999 David Corcoran <corcoran@linuxnet.com>
 	Purpose: This abstracts dynamic library loading functions and timing. 
 
 $Id$
@@ -15,6 +14,7 @@ $Id$
 
 #include <string.h>
 #include <dlfcn.h>
+#include <stdlib.h>
 
 #include "config.h"
 #include "wintypes.h"
@@ -24,7 +24,7 @@ $Id$
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
-	*pvLHandle = 0;
+	*pvLHandle = NULL;
 	*pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
 
 	if (*pvLHandle == NULL)
@@ -41,7 +41,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 	int ret;
 
 	ret = dlclose(*pvLHandle);
-	*pvLHandle = 0;
+	*pvLHandle = NULL;
 
 	if (ret)
 	{
@@ -54,28 +54,38 @@ int DYN_CloseLibrary(void **pvLHandle)
 
 int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 {
-	int rv;
+	int rv, iSize;
 	char *pcFunctionName;
 
 	/*
 	 * Zero out everything 
 	 */
 	rv = 0;
-	pcFunctionName = 0;
+	pcFunctionName = NULL;
+	iSize = 0;
 
-	pcFunctionName = pcFunction;
+	iSize = strlen(pcFunction) + 2;	/* 1-NULL, 2-_ */
+	pcFunctionName = (char *) malloc(iSize * sizeof(char));
+	pcFunctionName[0] = '_';
+	strcpy(&pcFunctionName[1], pcFunction);
 
-	*pvFHandle = 0;
+	*pvFHandle = NULL;
 	*pvFHandle = dlsym(pvLHandle, pcFunctionName);
+
+	/*
+	 * also try without a leading '_' (needed for FreeBSD) 
+	 */
+	if (*pvFHandle == NULL)
+		*pvFHandle = dlsym(pvLHandle, pcFunction);
 
 	if (*pvFHandle == NULL)
 	{
 		DebugLogB("DYN_GetAddress: dlerror() reports %s", dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
-	}
-	else
+	} else
 		rv = SCARD_S_SUCCESS;
+
+	free(pcFunctionName);
 
 	return rv;
 }
-

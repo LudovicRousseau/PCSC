@@ -77,9 +77,7 @@ extern "C"
 
 	int SYS_Fork();
 
-#ifdef HAVE_DAEMON
 	int SYS_Daemon(int, int);
-#endif
 
 	int SYS_Wait(int, int);
 

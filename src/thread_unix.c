@@ -116,17 +116,6 @@ int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
 int SYS_ThreadExit(LPVOID pvRetVal)
 {
 
-	int retval;
-
 	pthread_exit(pvRetVal);
-
-	retval = *(int *)pvRetVal;
-
-	if (retval == 0)
-	{
-		return 1;
-	} else
-	{
-		return 0;
-	}
+	return 1;
 }

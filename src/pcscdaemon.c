@@ -358,32 +358,8 @@ int main(int argc, char **argv)
 
 	if (setToForeground == 0)
 	{
-#ifndef HAVE_DAEMON
-		switch (SYS_Fork())
-		{
-		case -1:
-			return (-1);
-		case 0:
-			break;
-		default:
-			return (0);
-		}
-
-		if (SYS_CloseFile(0))
-			DebugLogB("main: SYS_CloseFile(0) failed: %s", strerror(errno));
-
-		if (SYS_CloseFile(1))
-			DebugLogB("main: SYS_CloseFile(1) failed: %s", strerror(errno));
-
-		if (SYS_CloseFile(2))
-			DebugLogB("main: SYS_CloseFile(2) failed: %s", strerror(errno));
-
-		if (SYS_Chdir("/"))
-			DebugLogB("main: SYS_Chdir() failed: %s", strerror(errno));
-#else
 		if (SYS_Daemon(0, 0))
 			DebugLogB("main: SYS_Daemon() failed: %s", strerror(errno));
-#endif
 	}
 
 	/*
