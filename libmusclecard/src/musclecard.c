@@ -308,7 +308,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	if (localHContext == 0)
 	{
 		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &localHContext);
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 		DebugLogB("SCardEstablishContext returns %s",
 			pcsc_stringify_error(rv));
 #endif
@@ -336,7 +336,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		&pConnection->hCard, &dwActiveProtocol);
 #endif
 
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 	DebugLogB("SCardConnect returns %s", pcsc_stringify_error(rv));
 #endif
 
@@ -369,7 +369,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	rv = SCardStatus(pConnection->hCard, slotName,
 		&slotNameSize, &slotState, &slotProtocol, tokenId, &tokenIdLength);
 
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 	DebugLogB("SCardStatus returns %s", pcsc_stringify_error(rv));
 #endif
 
@@ -411,7 +411,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	 */
 	rv = TPLoadToken(pConnection);
 
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 	DebugLogB("TPLoadToken returns %s", pcsc_stringify_error(rv));
 #endif
 
@@ -483,7 +483,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 			rv = (*libPL_MSCIdentifyToken) (pConnection);
 		}
 
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 		DebugLogB("MSCIdentifyToken returns %s", msc_error(rv));
 #endif
 

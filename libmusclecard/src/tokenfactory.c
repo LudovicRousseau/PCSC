@@ -187,7 +187,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 			atrIndex = 0;
 
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 			DebugLogB("ATR comparison: FILE: %s", fullPath);
 			DebugLogB("ATR comparison: Target Match: %s", atrString);
 #endif
@@ -201,7 +201,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					break;	/* No aliases found, break out of search
 							 * aliases loop */
 				}
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 				DebugLogB("ATR comparison: Source: %s", keyValue);
 #endif
 
@@ -213,7 +213,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					atrIndex += 1;
 					continue;
 				}
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 				DebugLogB("Match found at ATR alias %d", atrIndex);
 #endif
 
@@ -236,7 +236,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 						return -1;
 					}
 				}
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 				DebugLogB("Product name: %s", keyValue);
 #endif
 				strcpy(tokenInfo->tokenName, keyValue);
@@ -295,7 +295,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 				if (rv == 0)
 				{
-#ifdef MSC_DEBUG
+#ifndef NO_MSC_DEBUG
 					DebugLogB("Default AID name: %s", keyValue);
 #endif
 					rv = stringToBytes(keyValue, tokenInfo->tokenApp,
