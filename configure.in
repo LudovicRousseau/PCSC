@@ -180,7 +180,7 @@ AC_ARG_ENABLE(usb,
 [ case "${enableval}" in
   yes)
    case "${build_os}" in
-    linux-gnu)	usb=true ;;
+    *linux*)	usb=true ;;
     *) AC_MSG_WARN([USB hotplug support only available on Linux])
 		usb=false
      ;;
@@ -190,7 +190,7 @@ AC_ARG_ENABLE(usb,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-usb]) ;;
  esac], 
 [ case "${build_os}" in
-    linux-gnu)	usb=true ;;
+    *linux*)	usb=true ;;
     *) usb=false
      ;;
    esac
