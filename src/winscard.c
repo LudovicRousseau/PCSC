@@ -685,8 +685,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 		else
 		{
-			rContext->dwStatus |= SCARD_PRESENT;
-			rContext->dwStatus &= ~SCARD_ABSENT;
+			if (rContext->dwStatus & SCARD_ABSENT)
+				rContext->dwStatus &= ~SCARD_PRESENT;
+			else
+				rContext->dwStatus |= SCARD_PRESENT;
+			/* SCARD_ABSENT flag is already set */
 			rContext->dwStatus |= SCARD_SWALLOWED;
 			rContext->dwStatus &= ~SCARD_POWERED;
 			rContext->dwStatus &= ~SCARD_NEGOTIABLE;
@@ -908,8 +911,11 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 		else
 		{
-			rContext->dwStatus |= SCARD_PRESENT;
-			rContext->dwStatus &= ~SCARD_ABSENT;
+			if (rContext->dwStatus & SCARD_ABSENT)
+				rContext->dwStatus &= ~SCARD_PRESENT;
+			else
+				rContext->dwStatus |= SCARD_PRESENT;
+			/* SCARD_ABSENT flag is already set */
 			rContext->dwStatus |= SCARD_SWALLOWED;
 			rContext->dwStatus &= ~SCARD_POWERED;
 			rContext->dwStatus &= ~SCARD_NEGOTIABLE;
