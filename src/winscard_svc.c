@@ -149,6 +149,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 		stStr->rv = SCardStatus(stStr->hCard, stStr->mszReaderNames,
 			&stStr->pcchReaderLen, &stStr->pdwState,
 			&stStr->pdwProtocol, stStr->pbAtr, &stStr->pcbAtrLen);
+		break;
 
 	case SCARD_TRANSMIT:
 		trStr = ((transmit_struct *) msgStruct->data);
