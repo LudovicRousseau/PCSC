@@ -30,8 +30,11 @@ autoheader --include=$ac_aux_dir
 
 # needed otherwise automake says
 # no proper implementation of AM_INIT_AUTOMAKE was found,
-ln -s $ac_aux_dir/aclocal.m4
+ln $ac_aux_dir/aclocal.m4
 
 autoconf --include=$ac_aux_dir #--warnings=all #--verbose
 automake --add-missing --copy #--verbose
+
+# remove now useless file
+rm $ac_aux_dir/aclocal.m4
 
