@@ -42,8 +42,10 @@ extern "C"
 	int SYS_ThreadCreate(PCSCLITE_THREAD_T *, LPVOID, LPVOID, LPVOID);
 	int SYS_ThreadCancel(PCSCLITE_THREAD_T *);
 	int SYS_ThreadDetach(PCSCLITE_THREAD_T);
-        int SYS_ThreadJoin(PCSCLITE_THREAD_T *, LPVOID*);
+	int SYS_ThreadJoin(PCSCLITE_THREAD_T *, LPVOID*);
 	int SYS_ThreadExit(LPVOID);
+	PCSCLITE_THREAD_T SYS_ThreadSelf();
+	int SYS_ThreadEqual(PCSCLITE_THREAD_T *, PCSCLITE_THREAD_T *);
 
 #ifdef __cplusplus
 }

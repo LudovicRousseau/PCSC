@@ -112,3 +112,22 @@ int SYS_ThreadExit(LPVOID pvRetVal)
 	pthread_exit(pvRetVal);
 	return 1;
 }
+
+PCSCLITE_THREAD_T SYS_ThreadSelf()
+{
+	return pthread_self();
+}
+
+int SYS_ThreadEqual(PCSCLITE_THREAD_T *pthThread1, PCSCLITE_THREAD_T *pthThread2)
+{
+	int retval;
+	retval = pthread_equal(*pthThread1, *pthThread2);
+
+	if (retval == 0)
+	{
+		return 0;
+	} else
+	{
+		return 1;
+	}
+}
