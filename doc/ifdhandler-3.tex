@@ -47,7 +47,7 @@
 \title{MUSCLE PC/SC IFD Driver API}
 \author{David Corcoran \& Ludovic Rousseau\\
 \url{corcoran@musclecard.com}, \url{ludovic.rousseau@free.fr}}
-\date{May 10, 2004}
+\date{June 11, 2004}
 
 \begin{document}
 
@@ -73,7 +73,7 @@ Document history: \\
 \hline
 3.0.1 & August 9, 2004 & latest PDF only version \\
 \hline
-3.1.0 & May 7, 2004 & reformat using \LaTeX{} and correct bugs \\
+3.1.0 & June 11, 2004 & reformat using \LaTeX{} and correct bugs \\
 \hline
 \end{tabular}
 
@@ -314,7 +314,7 @@ above web site.
 \synopsis
 
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHCreateChannel(DWORD Lun,
     DWORD Channel);
@@ -389,7 +389,7 @@ bus for the particular reader by manufacturer and product id.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHCreateChannelByName(DWORD Lun,
     LPSTR deviceName);
@@ -464,7 +464,7 @@ readers connected at the same time.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHCloseChannel(DWORD Lun);
 \end{verbatim}
@@ -495,7 +495,7 @@ powered down.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHGetCapabilities(DWORD Lun,
     DWORD Tag,
@@ -562,7 +562,7 @@ limited.  The ones above are used by the PC/SC lite resource manager.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHSetCapabilities(DWORD Lun,
     DWORD Tag,
@@ -609,7 +609,7 @@ This function is also called when the application uses the PC/SC
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHSetProtocolParameters(DWORD Lun,
     DWORD Protocol,
@@ -670,7 +670,7 @@ See ISO 7816/EMV documentation.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHPowerICC(DWORD Lun,
     DWORD Action,
@@ -747,7 +747,7 @@ Reset errors should return zero for the \texttt{AtrLength} and return
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHTransmitToICC(DWORD Lun,
     SCARD_IO_HEADER SendPci,
@@ -847,7 +847,7 @@ command for received buffers containing \texttt{61 XX}.
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHControl(DWORD Lun,
     DWORD dwControlCode,
@@ -916,7 +916,7 @@ in \texttt{RxLength} and it must set the length of the received data in
 
 \synopsis
 \begin{verbatim}
-#include <ifdhandler.h>
+#include <PCSC/ifdhandler.h>
 
 RESPONSECODE IFDHICCPresence(DWORD Lun);
 \end{verbatim}
@@ -942,6 +942,115 @@ and receive a command each time this function is called.
 \texttt{IFD\_ICC\_NOT\_PRESENT} & ICC is not present\\
 \texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred
 \end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{API provided by pcsc-lite}
+
+pcsc-lite also provides some API to ease the development of the driver.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{LTPBundleFindValueWithKey}
+
+\synopsis
+\begin{verbatim}
+#include <PCSC/parser.h>
+
+int LTPBundleFindValueWithKey(char *fileName,
+    char *tokenKey,
+    char *tokenValue,
+    int tokenIndice);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{fileName} & IN & configuration file name \\
+\texttt{tokenKey} & IN & searched token string \\
+\texttt{tokenValue} & OUT & found token value \\
+\texttt{tokenIndice} & IN & indice of the desired token in an array \\
+\end{tabular}
+
+\desc
+
+This function is used to parse the \texttt{Info.plist} configuration
+file. The \texttt{tokenIndice} field is used to get the n-th element of
+an array.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{-1} & Error\\
+\texttt{0} & No error \\
+\texttt{1} & Configuration file not found \\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{debug\_msg}
+
+\synopsis
+\begin{verbatim}
+#include <PCSC/debuglog.h>
+
+void debug_msg(const char *fmt,
+    ...);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{fmt} & IN & format string as in \texttt{printf()} \\
+\texttt{...} & IN & optionnal parameters as in \texttt{printf()} \\
+\end{tabular}
+
+\desc
+
+This function is used by the driver to send debug information. The
+advantage of using the same debug function as pcsc-lite is that you also
+benefit from the debug redirection provided by pcsc-lite. For example
+you can use \texttt{pcscd --foreground} to start \texttt{pcscd} and keep
+it in the forground with the debug sent to stderr. You will then get
+\texttt{pcscd} and the driver' debug messages in the same place.
+
+\example
+\begin{verbatim}
+#define DebugLogB(fmt, data) debug_msg("%s:%d:%s " fmt, \
+    __FILE__, __LINE__, __FUNCTION__, data)
+
+DebugLogB("received bytes: %d", r);
+\end{verbatim}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{debug\_xxd}
+
+\synopsis
+\begin{verbatim}
+#include <PCSC/debuglog.h>
+
+void debug_xxd(const char *msg,
+    const unsigned char *buffer,
+    const int size);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{msg} & IN & text string \\
+\texttt{buffer} & IN & buffer you want to dump in hex \\
+\texttt{size} & IN & size of the buffer \\
+\end{tabular}
+
+\desc
+
+Same idea as \texttt{debug\_msg()} put print the hex dump of a buffer.
+
+\example
+\begin{verbatim}
+debug_xxd("received frame: ", buff, buff_size);
+\end{verbatim}
 
 
 %---------%---------%---------%---------%---------%---------%---------
