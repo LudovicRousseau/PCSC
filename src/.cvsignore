@@ -1,0 +1,13 @@
+configfile.c
+.deps
+*.la
+libmusclecard.pc
+libpcsclite.pc
+.libs
+*.lo
+Makefile
+Makefile.in
+muscletest
+pcscd
+testpcsc
+tokenparser.c
