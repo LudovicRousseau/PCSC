@@ -410,6 +410,21 @@ int main(int argc, char **argv)
 	}
 #endif
 
+	/*
+	 * If PCSCLITE_IPC_DIR does not exist then create it
+	 */
+	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
+	if (rv < 0)
+	{
+		rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
+		if (rv != 0)
+		{
+			DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s",
+				strerror(errno));
+			return 1;
+		}
+	}
+
 	/* cleanly remove /var/run/pcsc.* files when exiting */
 	if (atexit(at_exit))
 		DebugLogB("main: atexit() failed: %s", strerror(errno));
