@@ -418,7 +418,7 @@ int main(int argc, char **argv)
 
 		if (rv == 1)
 		{
-			DebugLogA("main: warning: no reader.conf found");
+			DebugLogA("main: warning: no " PCSCLITE_READER_CONFIG " found");
 			/*
 			 * Token error in file 
 			 */
