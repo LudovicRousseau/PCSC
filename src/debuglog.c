@@ -173,121 +173,120 @@ void DebugLogCategory(const int category, const char *buffer, const int len)
 
 LPSTR pcsc_stringify_error(const LONG Error)
 {
-
 	static char strError[75];
 
 	switch (Error)
 	{
 	case SCARD_S_SUCCESS:
-		strcpy(strError, "Command successful.");
+		strncpy(strError, "Command successful.", sizeof(strError)-1);
 		break;
 	case SCARD_E_CANCELLED:
-		strcpy(strError, "Command cancelled.");
+		strncpy(strError, "Command cancelled.", sizeof(strError)-1);
 		break;
 	case SCARD_E_CANT_DISPOSE:
-		strcpy(strError, "Cannot dispose handle.");
+		strncpy(strError, "Cannot dispose handle.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INSUFFICIENT_BUFFER:
-		strcpy(strError, "Insufficient buffer.");
+		strncpy(strError, "Insufficient buffer.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INVALID_ATR:
-		strcpy(strError, "Invalid ATR.");
+		strncpy(strError, "Invalid ATR.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INVALID_HANDLE:
-		strcpy(strError, "Invalid handle.");
+		strncpy(strError, "Invalid handle.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INVALID_PARAMETER:
-		strcpy(strError, "Invalid parameter given.");
+		strncpy(strError, "Invalid parameter given.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INVALID_TARGET:
-		strcpy(strError, "Invalid target given.");
+		strncpy(strError, "Invalid target given.", sizeof(strError)-1);
 		break;
 	case SCARD_E_INVALID_VALUE:
-		strcpy(strError, "Invalid value given.");
+		strncpy(strError, "Invalid value given.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NO_MEMORY:
-		strcpy(strError, "Not enough memory.");
+		strncpy(strError, "Not enough memory.", sizeof(strError)-1);
 		break;
 	case SCARD_F_COMM_ERROR:
-		strcpy(strError, "RPC transport error.");
+		strncpy(strError, "RPC transport error.", sizeof(strError)-1);
 		break;
 	case SCARD_F_INTERNAL_ERROR:
-		strcpy(strError, "Unknown internal error.");
+		strncpy(strError, "Unknown internal error.", sizeof(strError)-1);
 		break;
 	case SCARD_F_UNKNOWN_ERROR:
-		strcpy(strError, "Unknown internal error.");
+		strncpy(strError, "Unknown internal error.", sizeof(strError)-1);
 		break;
 	case SCARD_F_WAITED_TOO_LONG:
-		strcpy(strError, "Waited too long.");
+		strncpy(strError, "Waited too long.", sizeof(strError)-1);
 		break;
 	case SCARD_E_UNKNOWN_READER:
-		strcpy(strError, "Unknown reader specified.");
+		strncpy(strError, "Unknown reader specified.", sizeof(strError)-1);
 		break;
 	case SCARD_E_TIMEOUT:
-		strcpy(strError, "Command timeout.");
+		strncpy(strError, "Command timeout.", sizeof(strError)-1);
 		break;
 	case SCARD_E_SHARING_VIOLATION:
-		strcpy(strError, "Sharing violation.");
+		strncpy(strError, "Sharing violation.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NO_SMARTCARD:
-		strcpy(strError, "No smartcard inserted.");
+		strncpy(strError, "No smartcard inserted.", sizeof(strError)-1);
 		break;
 	case SCARD_E_UNKNOWN_CARD:
-		strcpy(strError, "Unknown card.");
+		strncpy(strError, "Unknown card.", sizeof(strError)-1);
 		break;
 	case SCARD_E_PROTO_MISMATCH:
-		strcpy(strError, "Card protocol mismatch.");
+		strncpy(strError, "Card protocol mismatch.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NOT_READY:
-		strcpy(strError, "Subsystem not ready.");
+		strncpy(strError, "Subsystem not ready.", sizeof(strError)-1);
 		break;
 	case SCARD_E_SYSTEM_CANCELLED:
-		strcpy(strError, "System cancelled.");
+		strncpy(strError, "System cancelled.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NOT_TRANSACTED:
-		strcpy(strError, "Transaction failed.");
+		strncpy(strError, "Transaction failed.", sizeof(strError)-1);
 		break;
 	case SCARD_E_READER_UNAVAILABLE:
-		strcpy(strError, "Reader/s is unavailable.");
+		strncpy(strError, "Reader/s is unavailable.", sizeof(strError)-1);
 		break;
 	case SCARD_W_UNSUPPORTED_CARD:
-		strcpy(strError, "Card is not supported.");
+		strncpy(strError, "Card is not supported.", sizeof(strError)-1);
 		break;
 	case SCARD_W_UNRESPONSIVE_CARD:
-		strcpy(strError, "Card is unresponsive.");
+		strncpy(strError, "Card is unresponsive.", sizeof(strError)-1);
 		break;
 	case SCARD_W_UNPOWERED_CARD:
-		strcpy(strError, "Card is unpowered.");
+		strncpy(strError, "Card is unpowered.", sizeof(strError)-1);
 		break;
 	case SCARD_W_RESET_CARD:
-		strcpy(strError, "Card was reset.");
+		strncpy(strError, "Card was reset.", sizeof(strError)-1);
 		break;
 	case SCARD_W_REMOVED_CARD:
-		strcpy(strError, "Card was removed.");
+		strncpy(strError, "Card was removed.", sizeof(strError)-1);
 		break;
 	case SCARD_W_INSERTED_CARD:
-		strcpy(strError, "Card was inserted.");
+		strncpy(strError, "Card was inserted.", sizeof(strError)-1);
 		break;
 	case SCARD_E_UNSUPPORTED_FEATURE:
-		strcpy(strError, "Feature not supported.");
+		strncpy(strError, "Feature not supported.", sizeof(strError)-1);
 		break;
 	case SCARD_E_PCI_TOO_SMALL:
-		strcpy(strError, "PCI struct too small.");
+		strncpy(strError, "PCI struct too small.", sizeof(strError)-1);
 		break;
 	case SCARD_E_READER_UNSUPPORTED:
-		strcpy(strError, "Reader is unsupported.");
+		strncpy(strError, "Reader is unsupported.", sizeof(strError)-1);
 		break;
 	case SCARD_E_DUPLICATE_READER:
-		strcpy(strError, "Reader already exists.");
+		strncpy(strError, "Reader already exists.", sizeof(strError)-1);
 		break;
 	case SCARD_E_CARD_UNSUPPORTED:
-		strcpy(strError, "Card is unsupported.");
+		strncpy(strError, "Card is unsupported.", sizeof(strError)-1);
 		break;
 	case SCARD_E_NO_SERVICE:
-		strcpy(strError, "Service not available.");
+		strncpy(strError, "Service not available.", sizeof(strError)-1);
 		break;
 	case SCARD_E_SERVICE_STOPPED:
-		strcpy(strError, "Service was stopped.");
+		strncpy(strError, "Service was stopped.", sizeof(strError)-1);
 		break;
 
 	};
