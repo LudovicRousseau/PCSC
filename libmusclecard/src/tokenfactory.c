@@ -191,8 +191,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 			atrIndex = 0;
 
 #ifdef MSC_DEBUG
-			DebugLogC("ATR comparison: FILE: %s\n", fullPath);
-			DebugLogC("ATR comparison: Target Match: %s\n", atrString);
+			DebugLogB("ATR comparison: FILE: %s\n", fullPath);
+			DebugLogB("ATR comparison: Target Match: %s\n", atrString);
 #endif
 
 			while (1)
@@ -205,7 +205,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 							 * aliases loop */
 				}
 #ifdef MSC_DEBUG
-				DebugLogC("ATR comparison: Source: %s\n", keyValue);
+				DebugLogB("ATR comparison: Source: %s\n", keyValue);
 #endif
 
 				if (strcmp(keyValue, atrString) != 0)
@@ -240,7 +240,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					}
 				}
 #ifdef MSC_DEBUG
-				DebugLogC("Product name: %s\n", keyValue);
+				DebugLogB("Product name: %s\n", keyValue);
 #endif
 				strcpy(tokenInfo->tokenName, keyValue);
 
@@ -333,7 +333,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 				if (rv == 0)
 				{
 #ifdef MSC_DEBUG
-					DebugLogC("Default AID name: %s\n", keyValue);
+					DebugLogB("Default AID name: %s\n", keyValue);
 #endif
 					rv = stringToBytes(keyValue, tokenInfo->tokenApp,
 						&tokenInfo->tokenAppLen);
@@ -429,11 +429,11 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		DebugLogA("Error: Could not load service library\n");
-		DebugLogC("->> %s\n", pConnection->tokenInfo.svProvider);
+		DebugLogB("->> %s\n", pConnection->tokenInfo.svProvider);
 		return SCARD_E_INVALID_TARGET;
 	} else
 	{
-		DebugLogC("Loading service library %s\n",
+		DebugLogB("Loading service library %s\n",
 			pConnection->tokenInfo.svProvider);
 	}
 
