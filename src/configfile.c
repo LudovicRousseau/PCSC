@@ -382,7 +382,7 @@ char *yytext;
 
 ******************************************************************/
 #line 14 "configfile.l"
-void evaluatetoken( char *pcToken );
+int evaluatetoken( char *pcToken );
 
 static int iLinenumber      = 1;
 static char *pcPrevious     = 0;
@@ -391,10 +391,11 @@ static char *pcFriendlyname = 0;
 static char *pcDevicename   = 0;
 static char *pcLibpath      = 0;
 static char *pcChannelid    = 0;
+static int   badError       = 0;
 
-void error ( char *pcToken_error );
+void tok_error ( char *pcToken_error );
 
-#line 398 "lex.yy.c"
+#line 399 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -545,10 +546,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 28 "configfile.l"
+#line 29 "configfile.l"
 
 
-#line 552 "lex.yy.c"
+#line 553 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -633,40 +634,40 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 30 "configfile.l"
+#line 31 "configfile.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 31 "configfile.l"
+#line 32 "configfile.l"
 { iLinenumber++; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 32 "configfile.l"
+#line 33 "configfile.l"
 { evaluatetoken( yytext); } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 33 "configfile.l"
+#line 34 "configfile.l"
 {}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 34 "configfile.l"
+#line 35 "configfile.l"
 { evaluatetoken( yytext ); } 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 35 "configfile.l"
-{ error( yytext ); }
+#line 36 "configfile.l"
+{ tok_error( yytext ); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 36 "configfile.l"
+#line 37 "configfile.l"
 ECHO;
 	YY_BREAK
-#line 670 "lex.yy.c"
+#line 671 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1552,7 +1553,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 36 "configfile.l"
+#line 37 "configfile.l"
 
 
 #include <stdio.h>
@@ -1564,7 +1565,7 @@ int main()
 #include "readerfactory.h"
 #include "debuglog.h"
 
-void evaluatetoken( char *pcToken ) {
+int evaluatetoken( char *pcToken ) {
 
   DWORD dwChannelId = 0;
   int p             = 0;
@@ -1584,28 +1585,28 @@ void evaluatetoken( char *pcToken ) {
          }
          pcFriendlyname[p++] = 0;
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "DEVICENAME" ) == 0 ) {
        if ( pcDevicename == 0 ) {
          pcDevicename = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "LIBPATH" ) == 0 ) {
        if ( pcLibpath == 0 ) {
          pcLibpath = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "CHANNELID" ) == 0 ) {
        if ( pcChannelid == 0 ) {
          pcChannelid = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else {
-       error( pcPrevious ); SYS_Exit(1);
+       tok_error( pcPrevious ); return 1;
     }
 
     free( pcPrevious ); pcPrevious = 0;
@@ -1622,33 +1623,40 @@ void evaluatetoken( char *pcToken ) {
        pcFriendlyname = 0;     pcDevicename = 0;
        pcLibpath      = 0;     pcChannelid  = 0;
   }
+
+  return 0;
 }
 
-void error ( char *token_error ) {
-  DebugLogC("pcsc-manager::Invalid ID (%s)", token_error );
+void tok_error ( char *token_error ) {
+  debug_msg("%s:%d tok_error: invalid value in reader.conf", 
+             __FILE__, __LINE__);
+  badError = 1;
 }
 
 int DBUpdateReaders ( char *readerconf ) {
 
-  FILE *file;
-  file = 0;	
+  FILE *configFile;
+  configFile = 0;	
 
-  file = fopen( readerconf, "r");
+  configFile = fopen( readerconf, "r");
 
-  if (!file) {
-    DebugLogB("Warning couldn't open config file %s", readerconf);
+  if (configFile == 0) {
     return 1;
   }
 
-  yyin = file;
+  yyin = configFile;
 
   do {
     yylex();
   }
-  while (!feof(file));
+  while (!feof(configFile));
 
-  fclose(file);
+  fclose(configFile);
 
-  return 0;
+  if (badError = 1) {
+    return -1;
+  } else {
+    return 0;
+  }
 } /* End of configfile.c */
 

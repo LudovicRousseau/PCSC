@@ -11,7 +11,7 @@
 ******************************************************************/
 
 %{
-void evaluatetoken( char *pcToken );
+int evaluatetoken( char *pcToken );
 
 static int iLinenumber      = 1;
 static char *pcPrevious     = 0;
@@ -20,8 +20,9 @@ static char *pcFriendlyname = 0;
 static char *pcDevicename   = 0;
 static char *pcLibpath      = 0;
 static char *pcChannelid    = 0;
+static int   badError       = 0;
 
-void error ( char *pcToken_error );
+void tok_error ( char *pcToken_error );
 
 %}
 
@@ -32,7 +33,7 @@ void error ( char *pcToken_error );
 (\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { evaluatetoken( yytext); } 
 [ \t]                     {}
 ([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@])+       { evaluatetoken( yytext ); } 
-.                                         { error( yytext ); }
+.                                         { tok_error( yytext ); }
 %%
 
 #include <stdio.h>
@@ -44,7 +45,7 @@ void error ( char *pcToken_error );
 #include "readerfactory.h"
 #include "debuglog.h"
 
-void evaluatetoken( char *pcToken ) {
+int evaluatetoken( char *pcToken ) {
 
   DWORD dwChannelId = 0;
   int p             = 0;
@@ -64,28 +65,28 @@ void evaluatetoken( char *pcToken ) {
          }
          pcFriendlyname[p++] = 0;
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "DEVICENAME" ) == 0 ) {
        if ( pcDevicename == 0 ) {
          pcDevicename = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "LIBPATH" ) == 0 ) {
        if ( pcLibpath == 0 ) {
          pcLibpath = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "CHANNELID" ) == 0 ) {
        if ( pcChannelid == 0 ) {
          pcChannelid = strdup( pcCurrent );
        } else {
-         error( pcPrevious ); SYS_Exit(1);
+         tok_error( pcPrevious ); return 1;
        }
     } else {
-       error( pcPrevious ); SYS_Exit(1);
+       tok_error( pcPrevious ); return 1;
     }
 
     free( pcPrevious ); pcPrevious = 0;
@@ -102,33 +103,40 @@ void evaluatetoken( char *pcToken ) {
        pcFriendlyname = 0;     pcDevicename = 0;
        pcLibpath      = 0;     pcChannelid  = 0;
   }
+
+  return 0;
 }
 
-void error ( char *token_error ) {
-  DebugLogC("pcsc-manager::Invalid ID (%s)", token_error );
+void tok_error ( char *token_error ) {
+  debug_msg("%s:%d tok_error: invalid value in reader.conf", 
+             __FILE__, __LINE__);
+  badError = 1;
 }
 
 int DBUpdateReaders ( char *readerconf ) {
 
-  FILE *file;
-  file = 0;	
+  FILE *configFile;
+  configFile = 0;	
 
-  file = fopen( readerconf, "r");
+  configFile = fopen( readerconf, "r");
 
-  if (!file) {
-    DebugLogB("Warning couldn't open config file %s", readerconf);
+  if (configFile == 0) {
     return 1;
   }
 
-  yyin = file;
+  yyin = configFile;
 
   do {
     yylex();
   }
-  while (!feof(file));
+  while (!feof(configFile));
 
-  fclose(file);
+  fclose(configFile);
 
-  return 0;
+  if (badError = 1) {
+    return -1;
+  } else {
+    return 0;
+  }
 } /* End of configfile.c */
 

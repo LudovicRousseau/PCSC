@@ -33,12 +33,6 @@
 #include "readerfactory.h"
 #include "configfile.h"
 
-#ifdef USE_DAEMON
-#ifndef USE_SYSLOG
-#error You must use '--enable-syslog' when also using '--enable-daemon' or you will not get any message
-#endif
-#endif
-
 static char AraKiri = 0;
 static char Init = 1;
 
@@ -184,8 +178,8 @@ int main(int argc, char **argv) {
 	DebugLogA("main: pcscd set to foreground\n" );
 	setToForeground = 1;
       } else if (strncmp(argv[i], "-c", PCSCLITE_MAX_COMSIZE) == 0) {
-	DebugLogB("main: using new config file: %s", argv[2]);
-	newReaderConfig = argv[i+1];
+	DebugLogB("main: using new config file: %s", argv[i+1]);
+	newReaderConfig = argv[i+1]; i+=1;
       } else {
 	printf("pcsc-lite: invalid arguments, try -help \n");
 	return 1;
@@ -199,8 +193,10 @@ int main(int argc, char **argv) {
   rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
 
   if (rv == 0) {
-    DebugLogA("main: directory " PCSCLITE_IPC_DIR " already exists."
-	      " Maybe another pcscd is running?");
+    DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
+    DebugLogA("Maybe another pcscd is running?");
+    DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
+    DebugLogA("to clear this message");
     return 1;
   }
   
@@ -251,24 +247,38 @@ int main(int argc, char **argv) {
   /* Create the /tmp/pcsc directory and chmod it */
   rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU );
   if ( rv != 0 ) {
-    DebugLogB("main: Cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
+    DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
 	return 1;
   }
 
   rv = SYS_Chmod(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU );
   if ( rv != 0 ) {
-    DebugLogB("main: Cannot chmod " PCSCLITE_IPC_DIR ": %s", strerror(errno));
+    DebugLogB("main: cannot chmod " PCSCLITE_IPC_DIR ": %s", strerror(errno));
 	return 1;
   }
 
+  atexit(at_exit);
   /* Allocate memory for reader structures     */
   RFAllocateReaderSpace( PCSCLITE_MAX_CONTEXTS );
 
   /* Grab the information from the reader.conf */    
   if ( newReaderConfig ) {
-    DBUpdateReaders ( newReaderConfig );
+    rv = DBUpdateReaders ( newReaderConfig );
+    if (rv != 0) {
+      DebugLogB("main: invalid file %s\n", newReaderConfig);
+      at_exit();
+      return 1;
+    }
   } else {
-    DBUpdateReaders ( PCSCLITE_READER_CONFIG );
+    rv = DBUpdateReaders ( PCSCLITE_READER_CONFIG );
+    
+    if (rv == 1) {
+      DebugLogA("main: warning: no reader.conf found\n");
+    /* Token error in file */
+    } else if (rv == -1) {
+      at_exit();
+      return 1;
+    }      
   }
 
   /* Set the default globals                   */
@@ -281,9 +291,9 @@ int main(int argc, char **argv) {
   /* post initialistion */
   Init = 0;
 
-  /* cleanly remove /tmp/pcsc when exiting */
   /* signal_trap() does just set a global variable used by the main loop */
-  atexit(at_exit);
+  /* cleanly remove /tmp/pcsc when exiting */
+
   signal(SIGQUIT, signal_trap);
   signal(SIGTERM, signal_trap);
   signal(SIGINT, signal_trap);

@@ -7,8 +7,6 @@ sbin_PROGRAMS = pcscd
 include_HEADERS = pcsclite.h winscard.h wintypes.h mscdefines.h musclecard.h
 check_PROGRAMS = testpcsc
 TESTS = testpcsc
-man_MANS = pcscd.8
-
 
 if PCSC_ARCH_LINUX
 if PCSC_LINUX_USB
