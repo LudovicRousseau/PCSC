@@ -1866,14 +1866,11 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 				/*
 				 * Build the multi-string
 				 */
-				strcpy(&mszReaders[lastChrPtr],
-					(readerStates[i])->readerName);
-				lastChrPtr += strlen((readerStates[i])->readerName);
-				mszReaders[lastChrPtr] = 0;	/* Add the null */
-				lastChrPtr += 1;
+				strcpy(&mszReaders[lastChrPtr], (readerStates[i])->readerName);
+				lastChrPtr += strlen((readerStates[i])->readerName)+1;
 			}
 		}
-		mszReaders[lastChrPtr] = 0;	/* Add the last null */
+		mszReaders[lastChrPtr] = '\0';	/* Add the last null */
 	}
 
 	*pcchReaders = dwReadersLen;
