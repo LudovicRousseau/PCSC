@@ -35,12 +35,19 @@ static int lSuppress = DEBUGLOG_LOG_ENTRIES;
 static int debug_msg_type = DEBUGLOG_NO_DEBUG;
 static int debug_category = DEBUG_CATEGORY_NOTHING;
 
-void debug_msg(const char *fmt, ...)
+/* default level is a bit verbose to be backward compatible */
+static int log_level = PCSC_LOG_INFO;
+
+void log_msg(int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
 	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
+		return;
+
+	/* log priority lower than threshold? */
+	if (priority < log_level)
 		return;
 
 	va_start(argptr, fmt);
@@ -82,9 +89,9 @@ void debug_msg(const char *fmt, ...)
 			/* Unknown type. Do nothing. */
 			assert(0);
 	}
-}	/* debug_msg */
+} /* log_msg */
 
-void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
+void log_xxd(int priority, const char *msg, const unsigned char *buffer, const int len)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
@@ -92,6 +99,10 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
         char *debug_buf_end;
 
 	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
+		return;
+
+	/* log priority lower than threshold? */
+	if (priority <= log_level)
 		return;
 
 	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
@@ -132,7 +143,7 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 			/* Unknown type - do nothing */
 			assert(0);
 	}
-}	/* debug_xxd */
+} /* log_xxd */
 
 void DebugLogSuppress(const int lSType)
 {
@@ -142,6 +153,33 @@ void DebugLogSuppress(const int lSType)
 void DebugLogSetLogType(const int dbgtype)
 {
 	debug_msg_type = dbgtype;
+}
+
+void DebugLogSetLevel(const int level)
+{
+	log_level = level;
+	switch (level)
+	{
+		case PCSC_LOG_CRITICAL:
+			Log1(PCSC_LOG_CRITICAL, "debug level=critical");
+			break;
+
+		case PCSC_LOG_ERROR:
+			Log1(PCSC_LOG_CRITICAL, "debug level=error");
+			break;
+
+		case PCSC_LOG_INFO:
+			Log1(PCSC_LOG_CRITICAL, "debug level=notice");
+			break;
+
+		case PCSC_LOG_DEBUG:
+			Log1(PCSC_LOG_CRITICAL, "debug level=debug");
+			break;
+
+		default:
+			log_level = PCSC_LOG_INFO;
+			Log1(PCSC_LOG_CRITICAL, "unknown level, using level=notice");
+	}
 }
 
 int DebugLogSetCategory(const int dbginfo)
@@ -163,7 +201,7 @@ int DebugLogSetCategory(const int dbginfo)
 	if (debug_category & DEBUG_CATEGORY_APDU)
 		strlcat(text, " APDU", sizeof(text));
 
-	DebugLogB("Debug options:%s", text);
+	Log2(PCSC_LOG_INFO, "Debug options:%s", text);
 
 	return debug_category;
 }
@@ -173,11 +211,11 @@ void DebugLogCategory(const int category, const unsigned char *buffer,
 {
 	if ((category & DEBUG_CATEGORY_APDU)
 		&& (debug_category & DEBUG_CATEGORY_APDU))
-		debug_xxd("APDU: ", (const unsigned char *)buffer, len);
+		log_xxd(PCSC_LOG_INFO, "APDU: ", (const unsigned char *)buffer, len);
 
 	if ((category & DEBUG_CATEGORY_SW)
 		&& (debug_category & DEBUG_CATEGORY_APDU))
-		debug_xxd("SW: ", (const unsigned char *)buffer, len);
+		log_xxd(PCSC_LOG_INFO, "SW: ", (const unsigned char *)buffer, len);
 }
 
 char* pcsc_stringify_error(long pcscError)
@@ -307,4 +345,61 @@ char* pcsc_stringify_error(long pcscError)
 
 	return strError;
 }
+
+/*
+ * old function supported for backward object code compatibility
+ */
+void debug_msg(const char *fmt, ...)
+{
+	char DebugBuffer[DEBUG_BUF_SIZE];
+	va_list argptr;
+
+	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
+		return;
+
+	va_start(argptr, fmt);
+#ifndef WIN32
+	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+#else
+#if HAVE_VSNPRINTF
+	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+#else
+	vsprintf(DebugBuffer, fmt, argptr);
+#endif
+#endif
+	va_end(argptr);
+
+	switch(debug_msg_type) {
+		case DEBUGLOG_NO_DEBUG:
+		/*
+		 * Do nothing, it hasn't been set 
+		 */
+		break;
+
+		case DEBUGLOG_SYSLOG_DEBUG:
+#ifndef WIN32
+			syslog(LOG_INFO, "%s", DebugBuffer);
+#else
+			fprintf(stderr, "%s\n", DebugBuffer);
+#endif
+			break;
+
+		case DEBUGLOG_STDERR_DEBUG:
+			fprintf(stderr, "%s\n", DebugBuffer);
+			break;
+
+		case DEBUGLOG_STDOUT_DEBUG:
+			fprintf(stdout, "%s\n", DebugBuffer);
+			break;
+
+		default:
+			/* Unknown type. Do nothing. */
+			assert(0);
+	}
+} /* debug_msg */
+
+void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
+{
+	log_xxd(PCSC_LOG_ERROR, msg, buffer, len);
+} /* debug_xxd */
 
