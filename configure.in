@@ -130,7 +130,6 @@ AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
 dnl --enable-libusb=DIR
 AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb],
 	[
-		use_libusb=false
 		case ${enableval} in
 			"" | "yes" | "YES")
 				;;
@@ -138,6 +137,7 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb
 				use_libusb=false
 				;;
 			*)
+				use_libusb=false
 				libusb_prefix=${enableval}
 				AC_CHECK_LIB(usb, usb_init, [ use_libusb=true ], [ use_libusb=false ], "-L${libusb_prefix}/lib")
 				AC_CHECK_HEADERS(${libusb_prefix}/include/usb.h, [ use_libusb=true ], [ use_libusb=false ])
