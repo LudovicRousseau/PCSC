@@ -99,7 +99,7 @@ TESTS = testpcsc
 @PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_FALSE@@PCSC_ARCH_OSX_FALSE@@PCSC_ARCH_SOLARIS_FALSE@@PCSC_ARCH_HPUX_FALSE@@PCSC_ARCH_TRU64_TRUE@PCSC_INCLUDE_LIBS = -ll
 @PCSC_ARCH_LINUX_TRUE@@PCSC_LINUX_USB_TRUE@PCSCD_INCLUDE_LIBS = -lfl -ldl -lpthread
 @PCSC_ARCH_LINUX_TRUE@@PCSC_LINUX_USB_FALSE@PCSCD_INCLUDE_LIBS = -lfl -ldl -lpthread
-@PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_TRUE@PCSCD_INCLUDE_LIBS = -lfl -lpthread
+@PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_TRUE@PCSCD_INCLUDE_LIBS = -lfl #-lpthread
 @PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_FALSE@@PCSC_ARCH_OSX_TRUE@PCSCD_INCLUDE_LIBS = -ll -lIOKit
 @PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_FALSE@@PCSC_ARCH_OSX_FALSE@@PCSC_ARCH_SOLARIS_TRUE@PCSCD_INCLUDE_LIBS = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
 @PCSC_ARCH_LINUX_FALSE@@PCSC_ARCH_BSD_FALSE@@PCSC_ARCH_OSX_FALSE@@PCSC_ARCH_SOLARIS_FALSE@@PCSC_ARCH_HPUX_TRUE@PCSCD_INCLUDE_LIBS = -ll -lpthread
@@ -152,7 +152,7 @@ libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c 	thread_generic.h readerfactory.h 	atrhandler.h configfile.h dyn_generic.h eventhandler.h hotplug.h 	ifdhandler.h ifdwrapper.h powermgt_generic.h prothandler.h 	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h 	winscard_svc.h
 
 pcscd_LDADD = libpcsclite-core.la $(PCSCD_INCLUDE_LIBS)
-pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -Wl,--export-dynamic
+pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic #-Wl,--export-dynamic
 
 CFLAGS = @CFLAGS@ -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
 
@@ -6209,6 +6209,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
+DEP_FILES =  .deps/atrhandler.P .deps/configfile.P .deps/debuglog.P \
+.deps/driverparser.P .deps/dyn_bsd.P .deps/dyn_hpux.P \
+.deps/dyn_macosx.P .deps/dyn_unix.P .deps/eventhandler.P \
+.deps/hotplug_generic.P .deps/hotplug_linux.P .deps/hotplug_macosx.P \
+.deps/ifdwrapper.P .deps/musclecard.P .deps/muscletest.P \
+.deps/pcscdaemon.P .deps/powermgt_macosx.P .deps/prothandler.P \
+.deps/readerfactory.P .deps/sys_hpux.P .deps/sys_solaris.P \
+.deps/sys_unix.P .deps/testpcsc.P .deps/thread_macosx.P \
+.deps/thread_unix.P .deps/tokenfactory.P .deps/tokenparser.P \
+.deps/winscard.P .deps/winscard_clnt.P .deps/winscard_msg.P \
+.deps/winscard_svc.P
 SOURCES = $(libpcsclite_la_SOURCES) $(libpcsclite_core_la_SOURCES) $(EXTRA_libpcsclite_core_la_SOURCES) $(testpcsc_SOURCES) $(pcscd_SOURCES)
 OBJECTS = $(libpcsclite_la_OBJECTS) $(libpcsclite_core_la_OBJECTS) $(testpcsc_OBJECTS) $(pcscd_OBJECTS)
 
@@ -6216,9 +6227,9 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .l .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -6257,9 +6268,6 @@ distclean-noinstLTLIBRARIES:
 
 maintainer-clean-noinstLTLIBRARIES:
 
-.c.o:
-	$(COMPILE) -c $<
-
 .s.o:
 	$(COMPILE) -c $<
 
@@ -6275,9 +6283,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 maintainer-clean-compile:
-
-.c.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
 
 .s.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
@@ -6454,6 +6459,11 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = src
 
 distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -6475,6 +6485,37 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
 check-TESTS: $(TESTS)
 	@failed=0; all=0; \
 	srcdir=$(srcdir); export srcdir; \
@@ -6546,20 +6587,21 @@ mostlyclean-am:  mostlyclean-libLTLIBRARIES \
 		mostlyclean-noinstLTLIBRARIES mostlyclean-compile \
 		mostlyclean-libtool mostlyclean-checkPROGRAMS \
 		mostlyclean-sbinPROGRAMS mostlyclean-tags \
-		mostlyclean-generic
+		mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
 clean-am:  clean-libLTLIBRARIES clean-noinstLTLIBRARIES clean-compile \
 		clean-libtool clean-checkPROGRAMS clean-sbinPROGRAMS \
-		clean-tags clean-generic mostlyclean-am
+		clean-tags clean-depend clean-generic mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-libLTLIBRARIES distclean-noinstLTLIBRARIES \
 		distclean-compile distclean-libtool \
 		distclean-checkPROGRAMS distclean-sbinPROGRAMS \
-		distclean-tags distclean-generic clean-am
+		distclean-tags distclean-depend distclean-generic \
+		clean-am
 	-rm -f libtool
 
 distclean: distclean-recursive
@@ -6569,7 +6611,8 @@ maintainer-clean-am:  maintainer-clean-libLTLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
 		maintainer-clean-checkPROGRAMS \
 		maintainer-clean-sbinPROGRAMS maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -6593,12 +6636,14 @@ uninstalldirs-recursive all-recursive check-recursive \
 installcheck-recursive info-recursive dvi-recursive \
 mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
-distclean-tags clean-tags maintainer-clean-tags distdir check-TESTS \
-info-am info dvi-am dvi check check-am installcheck-am installcheck \
-install-exec-am install-exec install-data-am install-data install-am \
-install uninstall-am uninstall all-redirect all-am all installdirs-am \
-installdirs mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+distclean-tags clean-tags maintainer-clean-tags distdir \
+mostlyclean-depend distclean-depend clean-depend \
+maintainer-clean-depend check-TESTS info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
 
 
 # Hack to be able to use flex -P to enable linking of multiple lexer

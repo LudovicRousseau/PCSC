@@ -6287,7 +6287,7 @@ else
   usbdropdir=false
 fi
 
-if test x${usbdropdir} == xfalse ; then
+if test x${usbdropdir} = xfalse ; then
 	usbdropdir="/usr/local/pcsc/drivers/"
 fi
 echo "$ac_t""enable USB drop directory     : $usbdropdir" 1>&6
@@ -6433,7 +6433,7 @@ else
   muscledropdir=false
 fi
 
-if test x${muscledropdir} == xfalse ; then
+if test x${muscledropdir} = xfalse ; then
 	muscledropdir="/usr/local/pcsc/services/"
 fi
 echo "$ac_t""enable MuscleCard bundles dir : $muscledropdir" 1>&6
