@@ -4,7 +4,11 @@ SUBDIRS = . utils
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 sbin_PROGRAMS = pcscd
-include_HEADERS = pcsclite.h winscard.h wintypes.h mscdefines.h musclecard.h
+include_HEADERS = atrhandler.h configfile.h debuglog.h dyn_generic.h \
+	eventhandler.h hotplug.h ifdhandler.h ifdwrapper.h mscdefines.h \
+	musclecard.h pcsclite.h prothandler.h readerfactory.h \
+	sys_generic.h thread_generic.h tokenfactory.h winscard.h \
+	winscard_msg.h winscard_svc.h wintypes.h
 check_PROGRAMS = testpcsc
 TESTS = testpcsc
 
@@ -108,7 +112,7 @@ testpcsc_LDADD = libpcsclite.la
 EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
 	hotplug_generic.c hotplug_linux.c hotplug_macosx.c \
 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
-	sys_solaris.c sys_hpux.c powermgt_macosx.c
+	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
