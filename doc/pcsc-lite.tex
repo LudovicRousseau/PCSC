@@ -46,7 +46,7 @@
 \title{MUSCLE PC/SC Lite API \\ Toolkit API Reference Documentation}
 \author{David Corcoran \& Ludovic Rousseau\\
 \url{corcoran@linuxnet.com}, \url{ludovic.rousseau@free.fr}}
-\date{May 19, 2004}
+\date{May 26, 2004}
 
 
 \begin{document}
@@ -73,7 +73,8 @@ Document history: \\
 \hline
 0.8.7 & March 8, 2001 & latest PDF only version \\
 \hline
-0.9.0 & May 19, 2004 & reformat using \LaTeX{} and correct bugs \\
+0.9.0 & May 26, 2004 & reformat using \LaTeX{}, correct bugs and add
+parts 4 and 5 \\
 \hline
 \end{tabular}
 
@@ -953,6 +954,9 @@ Note: the API of this function changed. In pcsc-lite 1.2.0 and before
 the API was not Windows{\textregistered} PC/SC compatible. This has been
 corrected.
 
+see \S~\ref{Some SCardControl commands} for a list of supported commands
+by some drivers.
+
 \example
 
 \begin{verbatim}
@@ -1486,7 +1490,8 @@ LONG rv;
 
 rv = SCardEstablishContext(SCARD\_SCOPE\_SYSTEM, NULL, NULL, &hContext);
 if (rv != SCARD_S_SUCCESS)
-    printf("SCardReleaseContext: %s (0x%lX)\n", pcsc_stringify_error(rv), rv);
+    printf("SCardReleaseContext: %s (0x%lX)\n",
+        pcsc_stringify_error(rv), rv);
 \end{verbatim}
 
 
@@ -1516,6 +1521,153 @@ If different threads share a same context, the calls to different
 functions of the pcsc-lite API are stored in a queue and the executions
 serialised for this context because there is a mutex shared for all the
 (critical) operations of this context.
+
+Note: The SCF (Smart Card Framework) used by Solaris has not been
+updated. So if you compile pcsc-lite using \texttt{./configure
+--enable-scf} you will still have a global lock mechanism.
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Some SCardControl commands}
+\label{Some SCardControl commands}
+
+The commands described here may not be implemented by all the drivers.
+They are implemented by the CCID driver available at
+\url{http://pcsclite.alioth.debian.org/ccid.html} and maybe some other.
+
+The tag names used by these functions are
+\texttt{IOCTL\_SMARTCARD\_VENDOR\_*}. They are vendor (driver) specific.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFD\_EXCHANGE}
+
+This command is used to send a proprietary command to a reader.
+
+The CCID specification~\cite{ccid_spec} describes a
+\texttt{PC\_to\_RDR\_Escape} command to send proprietary commands to the
+reader.
+
+\example
+
+\begin{verbatim}
+#include <wintypes.h>
+#include <winscard.h>
+
+#define SCARD_CTL_CODE(code) (0x42000000 + (code))
+#define IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE SCARD_CTL_CODE(1)
+
+SCARDHANDLE hCard;
+unsigned char bSendBuffer[MAX_BUFFER_SIZE];
+unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
+DWORD length;
+
+/* get firmware */
+bSendBuffer[0] = 0x02;
+rv = SCardControl(hCard, IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
+    bSendBuffer, 1, bRecvBuffer, sizeof(bRecvBuffer), &length);
+
+printf(" Firmware: ");
+for (i=0; i<length; i++)
+	printf("%02X ", bRecvBuffer[i]);
+printf("\n");
+\end{verbatim}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{VERIFY\_PIN}
+
+This command is used to perform a secure PIN verification using a smart
+card reader equipped with a keyboard or keypad.
+
+The CCID specification~\cite{ccid_spec} describes a
+\texttt{PC\_to\_RDR\_Secure} command to perform such a PIN verification.
+
+The \texttt{bSendBuffer} to pass to \texttt{SCardControl()} contains:
+\begin{itemize}
+\item the VERIFY APDU
+
+That is the APDU sent to the card with the PIN code values replaced by
+the actually entered PIN code. See the CCID
+specification~\cite{ccid_spec} for a more precise descruption.
+
+\item the CCID \texttt{abPINDataStructure}
+
+This is the CCID structure used to parameter the PIN verification
+command.
+
+You can omit to send the 3 bytes of the \texttt{bTeoPrologue} field.
+This field is only significant with a T=1 card.
+
+\end{itemize}
+
+\example
+
+\begin{verbatim}
+#include <wintypes.h>
+#include <winscard.h>
+
+#define SCARD_CTL_CODE(code) (0x42000000 + (code))
+#define IOCTL_SMARTCARD_VENDOR_VERIFY_PIN SCARD_CTL_CODE(2)
+
+LONG rv;
+SCARDHANDLE hCard;
+char attribute[1];
+DWORD attribute_length;
+
+/* does the reader support PIN verification? */
+attribute_length = sizeof(attribute);
+rv = SCardGetAttrib(hCard, IOCTL_SMARTCARD_VENDOR_VERIFY_PIN, attribute,
+    &attribute_length);
+if (TRUE == attribute[0])
+{
+    int i, offset;
+    unsigned char bSendBuffer[MAX_BUFFER_SIZE];
+    unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
+    DWORD length;
+
+    /* verify PIN */
+    offset = 0;
+    /* APDU: 00 20 00 00 08 30 30 30 30 00 00 00 00 */
+    bSendBuffer[offset++] = 0x00;   /* CLA */
+    bSendBuffer[offset++] = 0x20;   /* INS: VERIFY */
+    bSendBuffer[offset++] = 0x00;   /* P1 */
+    bSendBuffer[offset++] = 0x00;   /* P2 */
+    bSendBuffer[offset++] = 0x08;   /* Lc: 8 data bytes */
+    bSendBuffer[offset++] = 0x30;   /* '0' */
+    bSendBuffer[offset++] = 0x30;   /* '0' */
+    bSendBuffer[offset++] = 0x30;   /* '0' */
+    bSendBuffer[offset++] = 0x30;   /* '0' */
+    bSendBuffer[offset++] = 0x00;   /* '\0' */
+    bSendBuffer[offset++] = 0x00;   /* '\0' */
+    bSendBuffer[offset++] = 0x00;   /* '\0' */
+    bSendBuffer[offset++] = 0x00;   /* '\0' */
+    
+    /* CCID PIN verification data structure */
+    bSendBuffer[offset++] = 0x00;   /* bTimeOut */
+    bSendBuffer[offset++] = 0x82;   /* bmFormatString */
+    bSendBuffer[offset++] = 0x04;   /* bmPINBlockString (PIN length) */
+    bSendBuffer[offset++] = 0x00;   /* bmPINLengthFormat */
+    bSendBuffer[offset++] = 0x04;   /* wPINMaxExtraDigit: min */
+    bSendBuffer[offset++] = 0x04;   /* wPINMaxExtraDigit: max */
+    bSendBuffer[offset++] = 0x02;   /* bEntryValidationCondition */
+    bSendBuffer[offset++] = 0x00;   /* bNumberMessage */
+    bSendBuffer[offset++] = 0x04;   /* wLangId: english */
+    bSendBuffer[offset++] = 0x09;   /* " */
+    bSendBuffer[offset++] = 0x00;   /* bMsgIndex */
+    bSendBuffer[offset++] = 0x00;   /* bTeoPrologue */
+    bSendBuffer[offset++] = 0x00;   /* " */
+    bSendBuffer[offset++] = 0x00;   /* " */
+    
+    rv = SCardControl(hCard, IOCTL_SMARTCARD_VENDOR_VERIFY_PIN,
+        bSendBuffer, offset, bRecvBuffer, sizeof(bRecvBuffer), &length);
+    
+    printf(" card response:");
+    for (i=0; i<length; i++)
+        printf(" %02X", bRecvBuffer[i]);
+    printf("\n");
+}
+\end{verbatim}
 
 
 %---------%---------%---------%---------%---------%---------
