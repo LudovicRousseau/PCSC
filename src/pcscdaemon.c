@@ -420,11 +420,6 @@ void at_exit(void)
 
 	DebugLogA("at_exit: cleaning " PCSCLITE_IPC_DIR);
 
-	rv = SYS_Unlink(PCSCLITE_SHM_FILE);
-	if (rv != 0)
-		DebugLogB("main: Cannot unlink " PCSCLITE_SHM_FILE ": %s",
-			strerror(errno));
-
 	rv = SYS_Unlink(PCSCLITE_PUBSHM_FILE);
 	if (rv != 0)
 		DebugLogB("main: Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",

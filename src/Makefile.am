@@ -4,11 +4,7 @@ SUBDIRS = . utils
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 sbin_PROGRAMS = pcscd
-include_HEADERS = atrhandler.h configfile.h debuglog.h dyn_generic.h \
-	eventhandler.h hotplug.h ifdhandler.h ifdwrapper.h mscdefines.h \
-	musclecard.h pcsclite.h prothandler.h readerfactory.h \
-	sys_generic.h thread_generic.h tokenfactory.h winscard.h \
-	winscard_msg.h winscard_svc.h wintypes.h
+include_HEADERS = mscdefines.h musclecard.h pcsclite.h winscard.h wintypes.h debuglog.h
 check_PROGRAMS = testpcsc
 TESTS = testpcsc
 

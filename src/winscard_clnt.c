@@ -2092,31 +2092,17 @@ LONG SCardCheckDaemonAvailability()
 {
 
 	LONG rv;
-	int fd;
+	struct stat statBuffer;
 
-	fd = SYS_OpenFile(PCSCLITE_SHM_FILE, O_RDWR, 0);
-	if (fd < 0)
+	rv = SYS_Stat(PCSCLITE_IPC_DIR, &statBuffer);
+
+	if (rv != 0)
 	{
-		DebugLogA("Error: Cannot open shared file " PCSCLITE_SHM_FILE);
+		debug_msg("SCardCheckDaemonAvailability: PCSC Not Running\n");
 		return SCARD_E_NO_SERVICE;
 	}
 
-	/*
-	 * Attempt a passive lock on the shared memory file 
-	 */
-	rv = SYS_LockFile(fd);
-
-	SYS_CloseFile(fd);
-
-	/*
-	 * If the lock succeeds then the daemon is not there, otherwise if an 
-	 * error is returned then it is 
-	 */
-
-	if (rv == 0)
-		return SCARD_E_NO_SERVICE;
-	else
-		return SCARD_S_SUCCESS;
+	return SCARD_S_SUCCESS;
 }
 
 /*

@@ -33,6 +33,8 @@ static struct _psChannelMap
 }
 psChannelMap[PCSCLITE_MAX_CHANNELS];
 
+LONG MSGCheckHandleAssociation(DWORD, SCARDHANDLE);
+
 /*
  * A list of local functions used to keep track of clients and their
  * connections 
@@ -97,6 +99,9 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_RECONNECT:
 		rcStr = ((reconnect_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, rcStr->hCard);
+		if (rv != 0) return rv;
+
 		rcStr->rv = SCardReconnect(rcStr->hCard, rcStr->dwShareMode,
 			rcStr->dwPreferredProtocols,
 			rcStr->dwInitialization, &rcStr->pdwActiveProtocol);
@@ -104,6 +109,8 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_DISCONNECT:
 		diStr = ((disconnect_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, diStr->hCard);
+		if (rv != 0) return rv;
 		diStr->rv = SCardDisconnect(diStr->hCard, diStr->dwDisposition);
 
 		if (diStr->rv == SCARD_S_SUCCESS)
@@ -114,28 +121,38 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_BEGIN_TRANSACTION:
 		beStr = ((begin_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, beStr->hCard);
+		if (rv != 0) return rv;
 		beStr->rv = SCardBeginTransaction(beStr->hCard);
 		break;
 
 	case SCARD_END_TRANSACTION:
 		enStr = ((end_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, enStr->hCard);
+		if (rv != 0) return rv;
 		enStr->rv =
 			SCardEndTransaction(enStr->hCard, enStr->dwDisposition);
 		break;
 
 	case SCARD_CANCEL_TRANSACTION:
 		caStr = ((cancel_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, caStr->hCard);
+		if (rv != 0) return rv;
 		caStr->rv = SCardCancelTransaction(caStr->hCard);
 		break;
 
 	case SCARD_STATUS:
 		stStr = ((status_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, stStr->hCard);
+		if (rv != 0) return rv;
 		stStr->rv = SCardStatus(stStr->hCard, stStr->mszReaderNames,
 			&stStr->pcchReaderLen, &stStr->pdwState,
 			&stStr->pdwProtocol, stStr->pbAtr, &stStr->pcbAtrLen);
 
 	case SCARD_TRANSMIT:
 		trStr = ((transmit_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(msgStruct->request_id, trStr->hCard);
+		if (rv != 0) return rv;
 		trStr->rv = SCardTransmit(trStr->hCard, &trStr->pioSendPci,
 			trStr->pbSendBuffer, trStr->cbSendLength,
 			&trStr->pioRecvPci, trStr->pbRecvBuffer,
@@ -293,6 +310,33 @@ LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 	}
 
 	return SCARD_E_INVALID_VALUE;
+}
+
+
+LONG MSGCheckHandleAssociation(DWORD dwClientID, SCARDHANDLE hCard)
+{
+
+	int i, j;
+
+	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	{
+		if (psChannelMap[i].dwClientID == dwClientID)
+		{
+			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			{
+				if (psChannelMap[i].hCard[j] == hCard)
+				{
+				  return 0;
+				}
+			}
+		}
+	}
+
+	/* Must be a rogue client, debug log and sleep a couple of seconds */
+	DebugLogA("MSGCheckHandleAssociation: Client failed to authenticate\n");
+	SYS_Sleep(2);
+
+	return -1;
 }
 
 LONG MSGCleanupClient(psharedSegmentMsg msgStruct)

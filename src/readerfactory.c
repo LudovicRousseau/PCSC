@@ -44,55 +44,13 @@ static DWORD *dwNumContexts = 0;
 LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 {
 
-	int psize;					/* Page Size */
-	int fd;						/* File descriptor */
-	int i, j;					/* Counter */
-	int rv;						/* Return tester */
+	int i;   					/* Counter */
+	LONG rv;       					/* Return tester */
 
 	/*
 	 * Zero out everything 
 	 */
 	i = 0;
-	j = 0;
-	fd = 0;
-	psize = 0;
-
-	/*
-	 * Here we must map the sContexts over to a memory map so when the
-	 * server is threaded or forked we can continue to keep track of the
-	 * reader's state. 
-	 */
-
-	/*
-	 * First open and lock the file to test for other running daemons 
-	 */
-
-	fd = SYS_OpenFile(PCSCLITE_SHM_FILE, O_RDWR | O_CREAT | O_NONBLOCK,
-		0666);
-	if (fd < 0)
-	{
-		DebugLogA("Error: Cannot open shared file " PCSCLITE_SHM_FILE);
-		exit(1);
-	}
-
-	/*
-	 * Attempt a passive lock on the shared memory file 
-	 */
-	rv = SYS_LockFile(fd);
-
-	if (rv != 0)
-	{
-		DebugLogA("Error: pcscd already running");
-		exit(1);
-	}
-
-	rv = SYS_Chmod(PCSCLITE_SHM_FILE, S_IRWXO | S_IRWXG | S_IRWXU);
-
-	if (rv != 0)
-	{
-		DebugLogA("Error: cannot chmod shared file " PCSCLITE_SHM_FILE);
-		exit(1);
-	}
 
 	/*
 	 * Allocate global dwNumContexts 

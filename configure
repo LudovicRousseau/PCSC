@@ -34,7 +34,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-debugatr       enable ATR debug messages from pcscd."
 ac_help="$ac_help
-  --disable-musclecard         musclecard framework disabled."
+  --disable-musclecard    musclecard framework disabled."
 ac_help="$ac_help
   --enable-confdir=DIR    directory containing reader.conf (default /etc)"
 ac_help="$ac_help
@@ -811,7 +811,7 @@ fi
 
 PACKAGE=pcsc-lite
 
-VERSION=1.0.2.beta5
+VERSION=1.0.2.cvs
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }

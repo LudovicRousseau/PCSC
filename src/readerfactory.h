@@ -95,7 +95,7 @@ extern "C"
 		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
 		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
-										 * capabilities */
+						   capabilities */
 		PROT_OPTIONS psProtOptions;	/* Structure of protocol options */
 		RDR_CLIHANDLES psHandles[16];	/* Structure of connected handles */
 		FCT_MAP psFunctions;	/* Structure of function pointers */

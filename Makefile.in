@@ -10,6 +10,8 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+# $Id$
+
 
 SHELL = @SHELL@
 
@@ -77,7 +79,8 @@ SUBDIRS = src etc doc
 AUX_DIST = $(ac_aux_dir)/acinclude.m4 	$(ac_aux_dir)/aclocal.m4 	$(ac_aux_dir)/acx_pthread.m4 	$(ac_aux_dir)/config.guess 	$(ac_aux_dir)/config.sub 	$(ac_aux_dir)/install-sh 	$(ac_aux_dir)/ltconfig 	$(ac_aux_dir)/ltmain.sh 	$(ac_aux_dir)/missing 	$(ac_aux_dir)/mkinstalldirs 	$(ac_aux_dir)/ylwrap
 
 
-EXTRA_DIST = DRIVERS SECURITY reconf bootstrap $(ac_aux_dir) HELP
+EXTRA_DIST = DRIVERS SECURITY reconf bootstrap $(ac_aux_dir) HELP 	ChangeLog.cvs
+
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 configure config-h.in 	stamp-h.in $(AUX_DIST)
 
 
@@ -364,6 +367,11 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
+
+ChangeLog.cvs:
+	rcs2log > $@
+
+.PHONY: ChangeLog.cvs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -159,9 +159,7 @@ extern "C"
 #define PCSCLITE_CONFIG_DIR		USE_READER_CONF
 #endif
 #define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
-#define PCSCLITE_CARD_CONFIG		PCSCLITE_CONFIG_DIR "/card.conf"
 #define PCSCLITE_IPC_DIR		"/tmp/pcsc"
-#define PCSCLITE_SHM_FILE               PCSCLITE_IPC_DIR "/.pcsctmp"
 #define PCSCLITE_PUBSHM_FILE            PCSCLITE_IPC_DIR "/.pcscpub"
 #define PCSCLITE_CSOCK_NAME             PCSCLITE_IPC_DIR "/.pcscomm"
 

@@ -76,7 +76,7 @@ SUBDIRS = . utils
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 sbin_PROGRAMS = pcscd
-include_HEADERS = pcsclite.h winscard.h wintypes.h mscdefines.h musclecard.h
+include_HEADERS = mscdefines.h musclecard.h pcsclite.h winscard.h wintypes.h debuglog.h
 check_PROGRAMS = testpcsc
 TESTS = testpcsc
 @PCSC_ARCH_LINUX_TRUE@@PCSC_LINUX_USB_TRUE@PCSC_MYLDFLAGS = 
@@ -144,7 +144,7 @@ pcscd_LDFLAGS = $(PCSC_MYLDFLAGS)
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
-EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c 	hotplug_generic.c hotplug_linux.c hotplug_macosx.c 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c 	sys_solaris.c sys_hpux.c powermgt_macosx.c
+EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c 	hotplug_generic.c hotplug_linux.c hotplug_macosx.c 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c 	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c
 
 
 EXTRA_DIST = README_INTERNALS.txt
@@ -6183,12 +6183,13 @@ DEP_FILES =  .deps/atrhandler.P .deps/configfile.P .deps/debuglog.P \
 .deps/driverparser.P .deps/dyn_bsd.P .deps/dyn_hpux.P \
 .deps/dyn_macosx.P .deps/dyn_unix.P .deps/eventhandler.P \
 .deps/hotplug_generic.P .deps/hotplug_linux.P .deps/hotplug_macosx.P \
-.deps/ifdwrapper.P .deps/musclecard.P .deps/pcscdaemon.P \
-.deps/powermgt_macosx.P .deps/prothandler.P .deps/readerfactory.P \
-.deps/sys_hpux.P .deps/sys_solaris.P .deps/sys_unix.P .deps/testpcsc.P \
-.deps/thread_macosx.P .deps/thread_unix.P .deps/tokenfactory.P \
-.deps/tokenparser.P .deps/winscard.P .deps/winscard_clnt.P \
-.deps/winscard_msg.P .deps/winscard_svc.P
+.deps/ifdwrapper.P .deps/musclecard.P .deps/muscletest.P \
+.deps/pcscdaemon.P .deps/powermgt_macosx.P .deps/prothandler.P \
+.deps/readerfactory.P .deps/sys_hpux.P .deps/sys_solaris.P \
+.deps/sys_unix.P .deps/testpcsc.P .deps/thread_macosx.P \
+.deps/thread_unix.P .deps/tokenfactory.P .deps/tokenparser.P \
+.deps/winscard.P .deps/winscard_clnt.P .deps/winscard_msg.P \
+.deps/winscard_svc.P
 SOURCES = $(libpcsclite_la_SOURCES) $(libpcsclite_core_la_SOURCES) $(EXTRA_libpcsclite_core_la_SOURCES) $(testpcsc_SOURCES) $(pcscd_SOURCES)
 OBJECTS = $(libpcsclite_la_OBJECTS) $(libpcsclite_core_la_OBJECTS) $(testpcsc_OBJECTS) $(pcscd_OBJECTS)
 
