@@ -38,6 +38,10 @@ $Id$
 
 #include "winscard_msg.h"
 
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
 static struct _psChannelMap
 {
 	SCARDHANDLE hCard;
@@ -877,7 +881,7 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
-	DWORD dwReaderLen;
+	DWORD dwReaderLen, dwAtrLen;
 	LONG liIndex, rv;
 	int i;
 	status_struct scStatusStruct;
@@ -887,7 +891,6 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 * Zero out everything
 	 */
 	liIndex = 0;
-	dwReaderLen = 0;
 	rv = 0;
 	i = 0;
 
@@ -895,22 +898,24 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 * Check for NULL parameters
 	 */
 
-	if (pcchReaderLen == 0 || pdwState == 0 ||
-		pdwProtocol == 0 || pcbAtrLen == 0)
-	{
+	if (pcchReaderLen == NULL || pdwState == NULL || pdwProtocol == NULL
+		|| pcbAtrLen == NULL)
 		return SCARD_E_INVALID_PARAMETER;
-	}
+
+	/* length passed from caller */
+	dwReaderLen = *pcchReaderLen;
+	dwAtrLen = *pcbAtrLen;
+
+	/* default output values */
+	*pdwState = 0;
+	*pdwProtocol = 0;
+	*pcchReaderLen = 0;
+	*pcbAtrLen = 0;
 
 	liIndex = SCardGetHandleIndice(hCard);
 
 	if (liIndex < 0)
-	{
-		*pcchReaderLen = 0;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
 	{
@@ -922,21 +927,15 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	}
 
 	if (i == PCSCLITE_MAX_CONTEXTS)
-	{
-		*pcchReaderLen = 0;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
 		return SCARD_E_READER_UNAVAILABLE;
-	}
 
-	/*
-	 * A small call must be made to pcscd to find out the event status of
-	 * other applications such as reset/removed.  Only hCard is needed so
-	 * I will not fill in the other information.
-	 */
-
+	/* initialise the structure */
+	memset(&scStatusStruct, 0, sizeof(scStatusStruct));
 	scStatusStruct.hCard = hCard;
+
+	/* those sizes need to be initialised */
+	scStatusStruct.pcchReaderLen = sizeof(scStatusStruct.mszReaderNames);
+	scStatusStruct.pcbAtrLen = sizeof(scStatusStruct.pbAtr);
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
@@ -946,13 +945,7 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scStatusStruct);
 
 	if (rv == -1)
-	{
-		*pcchReaderLen = 0;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
 		return SCARD_E_NO_SERVICE;
-	}
 
 	/*
 	 * Read a message from the server
@@ -962,69 +955,44 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	memcpy(&scStatusStruct, &msgStruct.data, sizeof(scStatusStruct));
 
 	if (rv == -1)
-	{
-		*pcchReaderLen = 0;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
 		return SCARD_F_COMM_ERROR;
-	}
 
-	if (scStatusStruct.rv != SCARD_S_SUCCESS)
+	rv = scStatusStruct.rv;
+	if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INSUFFICIENT_BUFFER)
 	{
 		/*
 		 * An event must have occurred
 		 */
-		*pcchReaderLen = 0;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
-		return scStatusStruct.rv;
+		return rv;
 	}
 
 	/*
 	 * Now continue with the client side SCardStatus
 	 */
 
-	dwReaderLen = strlen(psChannelMap[liIndex].readerName) + 1;
-
-	if (mszReaderNames == 0)
-	{
-		*pcchReaderLen = dwReaderLen;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
-		return SCARD_S_SUCCESS;
-	}
-
-	if (*pcchReaderLen == 0)
-	{
-		*pcchReaderLen = dwReaderLen;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
-		return SCARD_S_SUCCESS;
-	}
-
-	if (*pcchReaderLen < dwReaderLen)
-	{
-		*pcchReaderLen = dwReaderLen;
-		*pcbAtrLen = 0;
-		*pdwState = 0;
-		*pdwProtocol = 0;
-		return SCARD_E_INSUFFICIENT_BUFFER;
-	}
-
-	*pcchReaderLen = dwReaderLen;
-	*pdwState = (readerStates[i])->readerState;
-	*pdwProtocol = (readerStates[i])->cardProtocol;
+	*pcchReaderLen = strlen(psChannelMap[liIndex].readerName) + 1;
 	*pcbAtrLen = (readerStates[i])->cardAtrLength;
 
-	strcpy(mszReaderNames, psChannelMap[liIndex].readerName);
-	memcpy(pbAtr, (readerStates[i])->cardAtr,
-		(readerStates[i])->cardAtrLength);
+	*pdwState = (readerStates[i])->readerState;
+	*pdwProtocol = (readerStates[i])->cardProtocol;
 
-	return SCARD_S_SUCCESS;
+	/* return SCARD_E_INSUFFICIENT_BUFFER only if buffer pointer is non NULL */
+	if (mszReaderNames)
+	{
+		strncpy(mszReaderNames, psChannelMap[liIndex].readerName, dwReaderLen);
+		if (*pcchReaderLen > dwReaderLen)
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+	}
+
+	if (pbAtr)
+	{
+		memcpy(pbAtr, (readerStates[i])->cardAtr,
+			min((readerStates[i])->cardAtrLength, dwAtrLen));
+		if (*pcbAtrLen > dwAtrLen)
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+	}
+
+	return rv;
 }
 
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
