@@ -124,7 +124,6 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 		SYS_USleep(50000);
 	}
 	while (rContext->dwLockId == 0xFFFF);
-
 	/*
 	 * Zero out the public status struct to allow it to be recycled and
 	 * used again 
