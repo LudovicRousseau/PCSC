@@ -38,9 +38,9 @@ $Id$
 #define PCSCLITE_PRODKEY_NAME                   "ifdProductID"
 #define PCSCLITE_NAMEKEY_NAME                   "ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME                   "CFBundleExecutable"
-#define PCSCLITE_HP_MAX_IDENTICAL_READERS 	16
+#define PCSCLITE_HP_MAX_IDENTICAL_READERS	 	16
 #define PCSCLITE_HP_MAX_SIMUL_READERS           04
-#define PCSCLITE_HP_MAX_DRIVERS			20
+#define PCSCLITE_HP_MAX_DRIVERS					20
 
 extern int LCFBundleFindValueWithKey(char *, char *, char *);
 extern PCSCLITE_MUTEX usbNotifierMutex;
@@ -80,7 +80,7 @@ static struct _bundleTracker
 	long  manuID;
 	long  productID;
 
-        struct _deviceNumber {   
+	struct _deviceNumber {   
 	  int  id;
 	  char status;
 	} deviceNumber[PCSCLITE_HP_MAX_SIMUL_READERS];
@@ -112,7 +112,7 @@ LONG HPReadBundleValues()
 
 	if (hpDir == 0)
 	{
-		DebugLogA("Cannot open PC/SC drivers directory.");
+		DebugLogA("Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
 		DebugLogA("Disabling USB support for pcscd.");
 		return -1;
 	}
@@ -170,7 +170,7 @@ LONG HPReadBundleValues()
 
 	if (bundleSize == 0)
 	{
-		DebugLogA("No bundle files in pcsc drivers directory");
+		DebugLogA("No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
 		DebugLogA("Disabling USB support for pcscd");
 	}
 
