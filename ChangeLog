@@ -1,5 +1,5 @@
-pcsc-lite-1.1.2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
-3 Nov, 2002
+pcsc-lite-1.1.2beta3: Ludovic Rousseau, David Corcoran
+7 Nov, 2002
 - Support for Sun Microsystems' SCF
 - Patches from Dmitry Djachenko to:
   . init g_rgSCard??Pci variable at compile time
@@ -12,6 +12,17 @@ pcsc-lite-1.1.2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
       followed by a buffer in which to receive any returned protocol control
       information (PCI) specific to the protocol in use. This parameter may be
       NULL if no returned PCI is desired.
+- correct an overflow in SCardGetStatusChange(). Thanks to Michael Nidd
+- configure.in, src/pcscdaemon.c, src/pcsclite.h:
+  . add --enable-ipcdir=DIR option. Default is now /var/run/ instead of
+  /tmp/pcsc/
+- src/Makefile.am:
+  . reorganise conditionals to to have a src/Makefile.in file 142 (yes 142)
+  times smaller (33 KB instead of 4.7 MB)
+- src/eventhandler.c:
+  . add filename and error message to error logs for /var/run/pcsc.pub
+- src/debuglog.h:
+  . DebugLogC() uses 3 parameters not 2 (use DebugLogB() for that)
 
 
 pcsc-lite-1.1.2beta2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
