@@ -72,10 +72,12 @@ void SVCClientCleanup(psharedSegmentMsg msgStruct)
  */
 void SVCServiceRunLoop()
 {
-	sharedSegmentMsg msgStruct;
-	int currHandle, rsp;
-
-	currHandle = 0, rsp = 0;
+	int rsp;
+	LONG rv;
+	DWORD dwClientID;
+	
+	rsp = 0;
+	rv = 0;
 
 	/*
 	 * Initialize the comm structure 
@@ -89,13 +91,24 @@ void SVCServiceRunLoop()
 	}
 
 	/*
+	 * Initialize the contexts structure 
+	 */
+	rv = ContextsInitialize();
+
+	if (rv == -1)
+	{
+		DebugLogA("SVCServiceRunLoop: Error initializing pcscd.");
+		exit(-1);
+	}
+
+	/*
 	 * Solaris sends a SIGALRM and it is annoying 
 	 */
 
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
-					 * when the shell is existed */
+				 * when the shell is existed */
 
 	/*
 	 * This function always returns zero 
@@ -116,58 +129,35 @@ void SVCServiceRunLoop()
 	while (TRUE)
 	{
 
-		switch (rsp = SHMProcessEvents(&msgStruct, 0))
+		switch (rsp = SHMProcessEventsServer(&dwClientID, 0))
 		{
 
 		case 0:
-			if (msgStruct.mtype == CMD_CLIENT_DIED)
-			{
-				/*
-				 * Clean up the dead client 
-				 */
-				SYS_MutexLock(&usbNotifierMutex);
-				MSGCleanupClient(&msgStruct);
-				SYS_MutexUnLock(&usbNotifierMutex);
+			DebugLogB("SVCServiceRunLoop: A new context thread creation is requested: %d", dwClientID);
+			rv = CreateContextThread(&dwClientID);
 
-			} else
+ 			if (rv != SCARD_S_SUCCESS)
 			{
-				continue;
-			}
-
-			break;
-
-		case 1:
-			if (msgStruct.mtype == CMD_FUNCTION)
-			{
-				/*
-				 * Command must be found 
-				 */
-				SYS_MutexLock(&usbNotifierMutex);
-				MSGFunctionDemarshall(&msgStruct);
-				rsp = SHMMessageSend(&msgStruct, msgStruct.request_id,
-					PCSCLITE_SERVER_ATTEMPTS);
-				SYS_MutexUnLock(&usbNotifierMutex);
-			} else
-			{
-				continue;
+				DebugLogA("SVCServiceRunLoop: Problem during the context thread creation");
+				AraKiri = 1;
 			}
 
 			break;
 
 		case 2:
 			/*
-			 * timeout in SHMProcessEvents(): do nothing
+			 * timeout in SHMProcessEventsServer(): do nothing
 			 * this is used to catch the Ctrl-C signal at some time when
 			 * nothing else happens
 			 */
 			break;
 
 		case -1:
-			DebugLogA("SVCServiceRun: Error in SHMProcessEvents");
+			DebugLogA("SVCServiceRunLoop: Error in SHMProcessEventsServer");
 			break;
 
 		default:
-			DebugLogB("SVCServiceRun: SHMProcessEvents unknown retval: %d",
+			DebugLogB("SVCServiceRunLoop: SHMProcessEventsServer unknown retval: %d",
 				rsp);
 			break;
 		}
@@ -454,7 +444,7 @@ int main(int argc, char **argv)
 
 	SVCServiceRunLoop();
 
-	DebugLogA("pcscdaemon.c: main: SVCServiceRunLoop returned");
+	DebugLogA("main: SVCServiceRunLoop returned");
 	return EXIT_FAILURE;
 }
 
