@@ -15,7 +15,7 @@
 #ifndef __winscard_h__
 #define __winscard_h__
 
-#ifndef PCSC_TARGET_OSX
+#ifndef __APPLE__
 #include <pcsclite.h>
 #else
 #include <PCSC/pcsclite.h>

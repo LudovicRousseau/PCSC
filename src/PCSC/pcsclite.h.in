@@ -16,7 +16,7 @@ $Id$
 #ifndef __pcsclite_h__
 #define __pcsclite_h__
 
-#ifndef PCSC_TARGET_OSX
+#ifndef __APPLE__
 #include <wintypes.h>
 #endif
 

@@ -91,7 +91,7 @@ extern "C"
 
 	int SYS_GetSeed();
 
-	int SYS_Exit(int);
+	void SYS_Exit(int);
 
 	int SYS_Rmdir(char *pcFile);
 

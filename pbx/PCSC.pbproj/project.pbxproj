@@ -150,6 +150,91 @@
 			settings = {
 			};
 		};
+		F51121260272F895017BB957 = {
+			isa = PBXExecutableFileReference;
+			path = pcsctool;
+			refType = 3;
+		};
+		F51121270272F895017BB957 = {
+			buildPhases = (
+				F51121280272F895017BB957,
+				F51121290272F895017BB957,
+				F511212A0272F895017BB957,
+				F511212B0272F895017BB957,
+			);
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = /Users/corcoran/Sources/muscle/PCSC/pbx/build;
+				INSTALL_PATH = /usr/bin/;
+				OPTIMIZATION_CFLAGS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = pcsctool;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = pcsctool;
+			productInstallPath = /usr/bin/;
+			productName = pcsctool;
+			productReference = F51121260272F895017BB957;
+			shouldUseHeadermap = 0;
+		};
+		F51121280272F895017BB957 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F51121290272F895017BB957 = {
+			buildActionMask = 2147483647;
+			files = (
+				F511212D0272F8D9017BB957,
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F511212A0272F895017BB957 = {
+			buildActionMask = 2147483647;
+			files = (
+				F511213C0272FA92017BB957,
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F511212B0272F895017BB957 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F511212C0272F8D9017BB957 = {
+			isa = PBXFileReference;
+			name = bundleTool.c;
+			path = ../src/utils/bundleTool.c;
+			refType = 2;
+		};
+		F511212D0272F8D9017BB957 = {
+			fileRef = F511212C0272F8D9017BB957;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F511213B0272FA1C017BB957 = {
+			isa = PBXTargetDependency;
+			target = F51121270272F895017BB957;
+		};
+		F511213C0272FA92017BB957 = {
+			fileRef = F58F21310257B6E001ABCE6C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F520A5F60257B49C01D97E8A = {
 			isa = PBXTargetDependency;
 			target = F52A93D402541D8C01B94B21;
@@ -179,6 +264,7 @@
 				F52A93DA02541D8C01B94B21,
 				F52A93DF02541D8C01B94B21,
 				F52A93E602541DC601B94B21,
+				F51121270272F895017BB957,
 			);
 		};
 		F5294A500090C4CA01CD285A = {
@@ -186,6 +272,7 @@
 				F5294A520090C5DF01CD285A,
 				F52A94510254232701B94B21,
 				F52A948F0254242101B94B21,
+				F511212C0272F8D9017BB957,
 				F52A94900254242101B94B21,
 				F52A94910254242101B94B21,
 				F52A94920254242101B94B21,
@@ -249,6 +336,7 @@
 				F520A5F60257B49C01D97E8A,
 				F520E3A001F6204201B94B28,
 				F520E3A301F6204201B94B28,
+				F511213B0272FA1C017BB957,
 			);
 			isa = PBXAggregateTarget;
 			name = World;
@@ -263,6 +351,7 @@
 				F52A93D202541D8C01B94B21,
 				F52A93D302541D8C01B94B21,
 				F52A93E502541DC601B94B21,
+				F51121260272F895017BB957,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -368,7 +457,7 @@
 		};
 		F5294AD30090CAE601CD285A = {
 			isa = PBXExecutableFileReference;
-			path = testpcsc;
+			path = pcsctest;
 			refType = 3;
 		};
 		F5294AD40090CAE601CD285A = {
@@ -380,10 +469,11 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/bin;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = testpcsc;
+				PRODUCT_NAME = pcsctest;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
@@ -392,7 +482,7 @@
 			);
 			isa = PBXToolTarget;
 			name = pcsctest;
-			productInstallPath = /usr/local/bin;
+			productInstallPath = /usr/bin;
 			productName = testpcsc;
 			productReference = F5294AD30090CAE601CD285A;
 			shouldUseHeadermap = 0;
@@ -456,6 +546,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = "";
 				FRAMEWORK_VERSION = A;
+				INSTALL_PATH = /System/Library/Frameworks;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOL_FLAGS = "";
@@ -470,7 +561,7 @@
 			);
 			isa = PBXFrameworkTarget;
 			name = PCSC;
-			productInstallPath = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+			productInstallPath = /System/Library/Frameworks;
 			productName = PCSC;
 			productReference = F52A93D102541D8C01B94B21;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>

@@ -260,8 +260,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 
 	if (FD_ISSET(commonSocket, &read_fd))
 	{
-		DebugLogB("SHMProcessEvents: Common channel packet arrival: %s",
-			strerror(errno));
+		DebugLogA("SHMProcessEvents: Common channel packet arrival");
 		if (SHMProcessCommonChannelRequest() == -1)
 		{
 			return -1;
@@ -306,7 +305,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 }
 
 int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
-	int blockAmount)
+	           int blockAmount)
 {
 
 	/*
@@ -420,7 +419,7 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 }
 
 int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
-	int blockAmount)
+	              int blockAmount)
 {
 
 	/*

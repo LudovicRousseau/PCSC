@@ -23,6 +23,7 @@
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "debuglog.h"
+#include "sys_generic.h"
 
 static struct _psChannelMap
 {

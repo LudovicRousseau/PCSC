@@ -273,7 +273,7 @@ int SYS_GetSeed()
 	return myseed;
 }
 
-int SYS_Exit(int iRetVal)
+void SYS_Exit(int iRetVal)
 {
 	_exit(iRetVal);
 }
