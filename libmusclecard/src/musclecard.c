@@ -35,7 +35,7 @@ static PCSCLITE_MUTEX mcardMutex = PTHREAD_MUTEX_INITIALIZER;
 #include <stdio.h>
 
 static SCARDCONTEXT localHContext = 0;
-
+static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
 /*
  * internal function 
  */
@@ -735,31 +735,43 @@ void *_MSCEventThread(void *arg)
 	}
 
 	evlist = (MSCLPEventWaitInfo) arg;
+	blockingContext = MSC_BLOCKSTATUS_BLOCKING;
 
 	while (1)
 	{
-		rv = MSCWaitForTokenEvent(evlist->tokenArray, evlist->arraySize,
-			MSC_NO_TIMEOUT);
+		rv = MSCWaitForTokenEvent(evlist->tokenArray, 
+					  evlist->arraySize,
+					  MSC_NO_TIMEOUT);
 
 		if (rv == MSC_SUCCESS)
 		{
-			(evlist->callBack) (evlist->tokenArray, evlist->arraySize,
-				evlist->appData);
-		} else
-		{
-			for (curToken = 0; curToken < evlist->arraySize; curToken++)
-			{
-				if (evlist->tokenArray[curToken].addParams)
-				{
-					free(evlist->tokenArray[curToken].addParams);
-				}
-			}
-
-			free(evlist);
-			pthread_exit(&rv);
+		       (evlist->callBack) (evlist->tokenArray, 
+					   evlist->arraySize,
+					   evlist->appData);
+		} else {
+		       break;
 
 		}
+		
+		if (blockingContext == MSC_BLOCKSTATUS_CANCELLING)
+		{
+		        break;
+		}
 	}
+
+	for (curToken = 0; curToken < evlist->arraySize; curToken++)
+	{
+	        if (evlist->tokenArray[curToken].addParams)
+	        {
+		        free(evlist->tokenArray[curToken].addParams);
+	        }
+	}
+	
+
+	free(evlist);
+	blockingContext = MSC_BLOCKSTATUS_RESUME;
+	pthread_exit(&rv);
+
 }
 
 MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
@@ -822,7 +834,17 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 MSC_RV MSCCallbackCancelEvent()
 {
 
-	return MSCCancelEventWait();
+        LONG rv;
+
+        /* Release the thread and stop the GetStatusChange */
+        if (blockingContext == MSC_BLOCKSTATUS_BLOCKING)
+	{  
+                blockingContext = MSC_BLOCKSTATUS_CANCELLING;
+	        rv = MSCCancelEventWait();
+	} 
+
+
+      return MSC_SUCCESS;
 }
 
 #endif

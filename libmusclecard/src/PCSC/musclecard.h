@@ -131,6 +131,11 @@ extern "C"
 	 */
 #define MSC_SHARING_VIOLATION              0x9C60
 
+
+#define MSC_BLOCKSTATUS_RESUME             0x0000
+#define MSC_BLOCKSTATUS_BLOCKING           0x0001
+#define MSC_BLOCKSTATUS_CANCELLING         0x0002
+
 	/*
 	 * Some boundary defines 
 	 */
