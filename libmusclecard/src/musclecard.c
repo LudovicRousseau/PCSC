@@ -336,7 +336,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	mscUnLockThread();
 
 	rv = SCardConnect(pConnection->hContext, tokenStruct->slotName,
-		sharingMode, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
+		sharingMode, SCARD_PROTOCOL_T0, // | SCARD_PROTOCOL_T1,
 		&pConnection->hCard, &dwActiveProtocol);
 
 #ifdef MSC_DEBUG
@@ -797,12 +797,6 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	MSCLPEventWaitInfo evlist;
 	MSCULong32 curToken;
 
-
-        if (blockingContext == MSC_BLOCKSTATUS_BLOCKING)
-	{  
-	        return MSC_OPERATION_NOT_ALLOWED;
-	}
-
 	/*
 	 * Create the event wait list 
 	 */
@@ -864,7 +858,6 @@ MSC_RV MSCCallbackCancelEvent()
 	{  
                 blockingContext = MSC_BLOCKSTATUS_CANCELLING;
 	        rv = MSCCancelEventWait();
-		pthread_join(callbackThread,0);
 
 		SYS_ThreadJoin(&callbackThread, 0);
 
