@@ -1,11 +1,36 @@
+pcsc-lite-1.1.2beta1: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
+6 Sep, 2002
+- src/tokenfactory.c, configure.in and bundleTool.c:
+  . add support for --enable-muscledropdir=DIR
+- README:
+  . The licence file is COPYING and not LICENSE (thanks to Juha Tuomala)
+- doc/formaticc.1:
+  . add formaticc.1 manpage from Debian
+- doc/bundleTool.1:
+  . update and rename from .8 to .1
+- src/utils/formaticc.c:
+  . lots of debug and buffer overflow removal
+- src/ifdwrapper.c, src/debuglog.c, doc/pcscd.8:
+  . add support for --apdu|-a
+- src/pcscdaemon.c:
+  . add support for --apdu, test if the pcscd is still running before
+    complaining that /tmp/pcsc is present
+- src/Makefile.am:
+  . add -Wl,--export-dynamic link option
+- src/hotplug_linux.c:
+  . add support for --enable-usbdropdir=DIR
+
+
 pcsc-lite-1.1.1: (David Corcoran <corcoran@linuxnet.com>)
+5 Jun, 2002
 - src/readerfactory.c
   . Fixed multiple slot handling by adding dwFeeds to multiple slots
 - src/winscard_clnt.c
   . Fixed multi Establish/Release Context problem by removing CleanupClient
 
+
 pcsc-lite-1.1.0: (David Corcoran <corcoran@linuxnet.com>)
-28, May, 2002
+28 May, 2002
 - src/mscdefines.h added
 - src/musclecard.c/.h added
   . Added client side token/card plugin interface
