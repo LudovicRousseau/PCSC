@@ -35,18 +35,15 @@
 #include "parser.h"
 #include "hotplug.h"
 
-/* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
-#define PCSCLITE_MAX_DRIVERS			16
-#define BUS_DEVICE_STRSIZE			256
+#undef DEBUG_HOTPLUG
 
-#define READER_ABSENT	0
-#define READER_PRESENT	1
+#define BUS_DEVICE_STRSIZE	256
 
-#define FALSE 0
-#define TRUE 1
+#define READER_ABSENT		0
+#define READER_PRESENT		1
 
-/* set to 1 if you want to see USB hotplug debug messages */
-#define DEBUG_USB_HOTPLUG 0
+#define FALSE			0
+#define TRUE			1
 
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
@@ -54,7 +51,7 @@ static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
 
 /*
- * keep track of PCSCLITE_MAX_DRIVERS simultaneous drivers
+ * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous drivers
  */
 static struct _driverTracker
 {
@@ -64,7 +61,7 @@ static struct _driverTracker
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
-} driverTracker[PCSCLITE_MAX_DRIVERS];
+} driverTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 /*
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
@@ -152,7 +149,7 @@ LONG HPReadBundleValues(void)
 					driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
-#if DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 					DebugLogB("Found driver for: %s",
 						driverTracker[listCount].readerName);
 #endif
@@ -199,7 +196,7 @@ void HPEstablishUSBNotifications()
 			for (dev = bus->devices; dev; dev = dev->next)
 			{
 				/* check if the device is supported by one driver */
-				for (i=0; i<PCSCLITE_MAX_DRIVERS; i++)
+				for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 				{
 					if (driverTracker[i].libraryPath != NULL &&
 						dev->descriptor.idVendor == driverTracker[i].manuID &&
@@ -211,7 +208,7 @@ void HPEstablishUSBNotifications()
 						snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s",
 							bus->dirname, dev->filename);
 						bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-#if DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 						DebugLogB("Found matching USB device: %s", bus_device);
 #endif
 						newreader = TRUE;
@@ -225,7 +222,7 @@ void HPEstablishUSBNotifications()
 								/* The reader is already known */
 								readerTracker[j].status = READER_PRESENT;
 								newreader = FALSE;
-#if DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 								DebugLogB("Refresh USB device: %s", bus_device);
 #endif
 								break;
@@ -268,12 +265,12 @@ void HPEstablishUSBNotifications()
 				if (errno == EBUSY)
 				{
 					/* The device is present */
-#ifdef DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 					DebugLogB("BSD: EBUSY on %s", filename);
 #endif
 					readerTracker[i].status = READER_PRESENT;
 				}
-#ifdef DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 				else
 					DebugLogC("BSD: %s error: %s", filename,
 						strerror(errno));
@@ -281,7 +278,7 @@ void HPEstablishUSBNotifications()
 			}
 			else
 			{
-#ifdef DEBUG_USB_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 				DebugLogB("BSD: %s still present", filename);
 #endif
 				readerTracker[i].status = READER_PRESENT;
@@ -302,7 +299,7 @@ LONG HPSearchHotPluggables(void)
 {
 	int i;
 
-	for (i=0; i < PCSCLITE_MAX_DRIVERS; i++)
+	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		driverTracker[i].productID  = 0;
 		driverTracker[i].manuID     = 0;

@@ -29,7 +29,7 @@
 #include "parser.h"
 #include "hotplug.h"
 
-#define DEBUG_MACOS_HOTPLUG
+#undef DEBUG_HOTPLUG
 
 /*
  * An aggregation of useful information on a driver bundle in the
@@ -103,7 +103,7 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
 static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 {
 	int i;
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 	DebugLogB("Entering HPDriversGetFromDirectory: %s", driverBundlePath);
 #endif
 
@@ -161,7 +161,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			/* No alias, only one reader supported */
 			readersNumber++;
 	}
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 	DebugLogB("Total of %d readers supported", readersNumber);
 #endif
 
@@ -201,7 +201,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			CFArrayRef friendlyNameArray;
 			char *libPath = driverBundle->m_libPath;
 
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 			DebugLogB("Driver with aliases: %s", libPath);
 #endif
 			/* get list of ProductID */
@@ -258,7 +258,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				if (!driverBundle->m_libPath)
 					driverBundle->m_libPath = strdup(libPath);
 
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 				DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
 				DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
 				DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);
@@ -273,7 +273,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 		{
 			CFStringRef strValue = blobValue;
 
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 			DebugLogC("Driver without alias: %s", driverBundle, driverBundle->m_libPath);
 #endif
 
@@ -304,7 +304,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 				driverBundle->m_friendlyName = strdup(cstr);
 			}
-#ifdef DEBUG_MACOS_HOTPLUG
+#ifdef DEBUG_HOTPLUG
 			DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
 			DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
 			DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);

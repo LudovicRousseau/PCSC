@@ -33,12 +33,7 @@
 #include "parser.h"
 #include "hotplug.h"
 
-#define PCSCLITE_USB_PATH                       "/proc/bus/usb"
-
-/* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
-#define PCSCLITE_HP_MAX_IDENTICAL_READERS	16
-#define PCSCLITE_HP_MAX_SIMUL_READERS		04
-#define PCSCLITE_HP_MAX_DRIVERS			20
+#define PCSCLITE_USB_PATH		"/proc/bus/usb"
 
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
@@ -80,13 +75,13 @@ static struct _bundleTracker
 	struct _deviceNumber {
 		int  id;
 		char status;
-	} deviceNumber[PCSCLITE_HP_MAX_SIMUL_READERS];
+	} deviceNumber[PCSCLITE_MAX_READERS_CONTEXTS];
 
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
 }
-bundleTracker[PCSCLITE_HP_MAX_DRIVERS];
+bundleTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 LONG HPReadBundleValues()
 {
@@ -200,7 +195,7 @@ void HPEstablishUSBNotifications()
 			usbDeviceStatus     = 0;
 			suspectDeviceNumber = 0;
 
-			for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+			for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 				/* clear rollcall */
 				bundleTracker[i].deviceNumber[j].status = 0;
 
@@ -273,7 +268,7 @@ void HPEstablishUSBNotifications()
 						usbDescriptor.idVendor !=0 &&
 						usbDescriptor.idProduct != 0)
 					{
-						for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+						for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 						{
 							if (bundleTracker[i].deviceNumber[j].id == deviceNumber &&
 								bundleTracker[i].deviceNumber[j].id != 0)
@@ -283,7 +278,7 @@ void HPEstablishUSBNotifications()
 							}
 						}
 
-						if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
+						if (j == PCSCLITE_MAX_READERS_CONTEXTS)
 						{
 							usbDeviceStatus = 1;
 							suspectDeviceNumber = deviceNumber;
@@ -301,13 +296,13 @@ void HPEstablishUSBNotifications()
 			{
 				SYS_MutexLock(&usbNotifierMutex);
 
-				for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+				for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 				{
 					if (bundleTracker[i].deviceNumber[j].id == 0)
 						break;
 				}
 
-				if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
+				if (j == PCSCLITE_MAX_READERS_CONTEXTS)
 					DebugLogA("Too many identical readers plugged in");
 				else
 				{
@@ -321,7 +316,7 @@ void HPEstablishUSBNotifications()
 				if (usbDeviceStatus == 0)
 				{
 
-					for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+					for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 					{
 						if (bundleTracker[i].deviceNumber[j].id != 0 &&
 							bundleTracker[i].deviceNumber[j].status == 0)
@@ -354,12 +349,12 @@ LONG HPSearchHotPluggables()
 {
 	int i, j;
 
-	for (i = 0; i < PCSCLITE_HP_MAX_DRIVERS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		bundleTracker[i].productID  = 0;
 		bundleTracker[i].manuID     = 0;
 
-		for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+		for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 			 bundleTracker[i].deviceNumber[j].id = 0;
 	}
 
