@@ -1,4 +1,5 @@
 ## Process this file with automake to create Makefile.in.
+# $Id$
 
 AUTOMAKE_OPTIONS = no-dependencies
 SUBDIRS = src etc doc
@@ -15,7 +16,8 @@ AUX_DIST = $(ac_aux_dir)/acinclude.m4 \
 	$(ac_aux_dir)/mkinstalldirs \
 	$(ac_aux_dir)/ylwrap
 
-EXTRA_DIST = DRIVERS SECURITY reconf bootstrap $(ac_aux_dir) HELP
+EXTRA_DIST = DRIVERS SECURITY reconf bootstrap $(ac_aux_dir) HELP \
+	ChangeLog.cvs
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 configure config-h.in \
 	stamp-h.in $(AUX_DIST)
 
@@ -23,3 +25,7 @@ MAINTAINERCLEANFILES = Makefile.in aclocal.m4 configure config-h.in \
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
+
+ChangeLog.cvs:
+	rcs2log > ChangeLog
+
