@@ -996,10 +996,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (mszReaderNames)
 	{
 		if (*pcchReaderLen > dwReaderLen)
-		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
-		}
 
 		strncpy(mszReaderNames, 
 			psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName, 
@@ -1009,10 +1006,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (pbAtr)
 	{
 		if (*pcbAtrLen > dwAtrLen)
-		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
-		}
 
 		memcpy(pbAtr, (readerStates[i])->cardAtr,
 			min((readerStates[i])->cardAtrLength, dwAtrLen));
