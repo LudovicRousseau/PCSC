@@ -175,6 +175,19 @@ extern "C"
 	};
 	typedef struct transmit_struct transmit_struct;
 
+	struct control_struct
+	{
+		SCARDHANDLE hCard;
+		DWORD dwControlCode;
+		UCHAR pbSendBuffer[MAX_BUFFER_SIZE];
+		DWORD cbSendLength;
+		UCHAR pbRecvBuffer[MAX_BUFFER_SIZE];
+		DWORD cbRecvLength;
+		DWORD dwBytesReturned;
+		LONG rv;
+	};
+	typedef struct control_struct control_struct;
+
 	/*
 	 * Now some function definitions 
 	 */

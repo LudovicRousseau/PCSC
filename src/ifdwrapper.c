@@ -6,6 +6,7 @@
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -20,6 +21,8 @@
 #include "dyn_generic.h"
 #include "sys_generic.h"
 #include "debuglog.h"
+
+#undef PCSCLITE_STATIC_DRIVER
 
 /*
  * Function: IFDSetPTS Purpose : To set the protocol type selection (PTS). 
@@ -479,7 +482,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		rv = IFD_Power_ICC(dwAction);
 	}
 	else
-		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, dwAtrLen);
+		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, pdwAtrLen);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -660,7 +663,11 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
  * biometric. 
  */
 
-LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
+/*
+ * Valid only for IFDHandler version 2.0
+ */
+
+LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	DWORD TxLength, PUCHAR RxBuffer, PDWORD RxLength)
 {
 	RESPONSECODE rv;
@@ -668,7 +675,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	RESPONSECODE(*IFDH_control) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
+	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 #endif
 
 	/*
@@ -687,7 +694,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	if (vFunction == 0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
-	IFDH_control = (RESPONSECODE(*)(DWORD, PUCHAR, DWORD,
+	IFDH_control_v2 = (RESPONSECODE(*)(DWORD, PUCHAR, DWORD,
 			PUCHAR, PDWORD)) vFunction;
 #endif
 
@@ -698,17 +705,90 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->dwVersion != IFD_HVERSION_1_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	else
-		rv = (*IFDH_control) (rContext->dwSlot, TxBuffer, TxLength,
+		rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
 			RxBuffer, RxLength);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->dwVersion != IFD_HVERSION_1_0)
 		rv = SCARD_E_UNSUPPORTED_FEATURE;
 	else
-		rv = IFDHControl(rContext->dwSlot, TxBuffer, TxLength,
+		rv = IFDHControl_v2(rContext->dwSlot, TxBuffer, TxLength,
 			RxBuffer, RxLength);
+#endif
+	SYS_MutexUnLock(rContext->mMutex);
+
+	/*
+	 * END OF LOCKED REGION 
+	 */
+
+	if (rv == IFD_SUCCESS)
+		return SCARD_S_SUCCESS;
+	else
+		return SCARD_E_NOT_TRANSACTED;
+}
+
+/*
+ * Function: IFDControl Purpose : This function provides a means for
+ * toggling a specific action on the reader such as swallow, eject,
+ * biometric. 
+ */
+
+/*
+ * Valid only for IFDHandler version 3.0 and up
+ */
+
+LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
+	LPCVOID TxBuffer, DWORD TxLength, LPCVOID RxBuffer, DWORD RxLength,
+	LPDWORD BytesReturned)
+{
+	RESPONSECODE rv;
+	LPVOID vFunction;
+	UCHAR ucValue[1];
+
+#ifndef PCSCLITE_STATIC_DRIVER
+	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPCVOID, DWORD, LPDWORD);
+#endif
+
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	vFunction = 0;
+	ucValue[0] = 0;
+
+#ifndef PCSCLITE_STATIC_DRIVER
+	/*
+	 * Make sure the symbol exists in the driver 
+	 */
+	vFunction = rContext->psFunctions.pvfControl;
+
+	if (vFunction == NULL)
+		return SCARD_E_UNSUPPORTED_FEATURE;
+
+	IFDH_control = (RESPONSECODE(*)(DWORD, DWORD, LPCVOID, DWORD,
+			LPVOID, DWORD, LPDWORD)) vFunction;
+#endif
+
+	/*
+	 * LOCK THIS CODE REGION 
+	 */
+
+	SYS_MutexLock(rContext->mMutex);
+
+#ifndef PCSCLITE_STATIC_DRIVER
+	if (rContext->dwVersion < IFD_HVERSION_3_0)
+		return SCARD_E_UNSUPPORTED_FEATURE;
+	else
+		rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
+			TxLength, RxBuffer, RxLength, BytesReturned);
+#else
+	if (rContext->dwVersion < IFD_HVERSION_3_0)
+		rv = SCARD_E_UNSUPPORTED_FEATURE;
+	else
+		rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
+			TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 

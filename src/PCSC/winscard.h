@@ -60,9 +60,9 @@ extern "C"
 		DWORD dwTimeout,
 		LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders);
 
-	LONG SCardControl(SCARDHANDLE hCard,
-		LPCBYTE pbSendBuffer, DWORD cbSendLength,
-		LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength);
+	LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
+		LPCVOID pbSendBuffer, DWORD cbSendLength,
+		LPVOID pbRecvBuffer, DWORD cbRecvLength, DWORD *lpBytesReturned);
 
 	LONG SCardTransmit(SCARDHANDLE hCard,
 		LPCSCARD_IO_REQUEST pioSendPci,

@@ -190,6 +190,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 	end_struct *enStr;
 	status_struct *stStr;
 	transmit_struct *trStr;
+	control_struct *ctStr;
 
 	/*
 	 * Zero out everything 
@@ -291,6 +292,16 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			trStr->pbSendBuffer, trStr->cbSendLength,
 			&trStr->pioRecvPci, trStr->pbRecvBuffer,
 			&trStr->pcbRecvLength);
+		break;
+
+	case SCARD_CONTROL:
+		ctStr = ((control_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(ctStr->hCard, dwContextIndex);
+		if (rv != 0) return rv;
+		ctStr->rv = SCardControl(ctStr->hCard, ctStr->dwControlCode,
+			ctStr->pbSendBuffer, ctStr->cbSendLength,
+			ctStr->pbRecvBuffer, ctStr->cbRecvLength,
+			&ctStr->dwBytesReturned);
 		break;
 
 	default:

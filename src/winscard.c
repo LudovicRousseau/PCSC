@@ -724,7 +724,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		controlBuffer[3] = 0x00;
 		controlBuffer[4] = 0x00;
 		receiveLength = 2;
-		rv = IFDControl(rContext, controlBuffer, 5, receiveBuffer,
+		rv = IFDControl_v2(rContext, controlBuffer, 5, receiveBuffer,
 			&receiveLength);
 
 		if (rv == SCARD_S_SUCCESS)
@@ -950,7 +950,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		controlBuffer[3] = 0x00;
 		controlBuffer[4] = 0x00;
 		receiveLength = 2;
-		rv = IFDControl(rContext, controlBuffer, 5, receiveBuffer,
+		rv = IFDControl_v2(rContext, controlBuffer, 5, receiveBuffer,
 			&receiveLength);
 
 		if (rv == SCARD_S_SUCCESS)
@@ -1156,15 +1156,60 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardControl(SCARDHANDLE hCard, LPCBYTE pbSendBuffer,
-	DWORD cbSendLength, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
+LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
+	LPCVOID pbSendBuffer, DWORD cbSendLength,
+	LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned)
 {
-	/*
-	 * This is not used.  SCardControl is passed through SCardTransmit.
-	 * This is here to make the compiler happy. 
-	 */
+	LONG rv;
+	PREADER_CONTEXT rContext;
 
-	return SCARD_S_SUCCESS;
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	rContext = 0;
+
+	/* 0 bytes returned by default */
+	*lpBytesReturned = 0;
+
+	if (0 == hCard)
+		return SCARD_E_INVALID_HANDLE;
+
+	if (NULL == pbSendBuffer || 0 == cbSendLength)
+		return SCARD_E_INVALID_PARAMETER;
+
+	/*
+	 * Make sure no one has a lock on this reader 
+	 */
+	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure the reader is working properly 
+	 */
+	rv = RFCheckReaderStatus(rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFFindReaderHandle(hCard);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure some event has not occurred 
+	 */
+	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	if (cbSendLength > MAX_BUFFER_SIZE)
+		return SCARD_E_INSUFFICIENT_BUFFER;
+
+	return IFDControl(rContext, dwControlCode, pbSendBuffer, cbSendLength,
+			pbRecvBuffer, cbRecvLength, lpBytesReturned);
 }
 
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
@@ -1305,7 +1350,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	if (pioSendPci->dwProtocol == SCARD_PROTOCOL_RAW)
 	{
-		rv = IFDControl(rContext, (PUCHAR) pbSendBuffer, cbSendLength,
+		rv = IFDControl_v2(rContext, (PUCHAR) pbSendBuffer, cbSendLength,
 			pbRecvBuffer, &dwRxLength);
 	} else
 	{

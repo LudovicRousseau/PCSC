@@ -1524,16 +1524,108 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardControl(SCARDHANDLE hCard, LPCBYTE pbSendBuffer,
-	DWORD cbSendLength, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
+LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
+	DWORD cbSendLength, LPVOID pbRecvBuffer, DWORD cbRecvLength,
+	LPDWORD lpBytesReturned)
 {
-	SCARD_IO_REQUEST pioSendPci, pioRecvPci;
+	LONG rv;
+	control_struct scControlStruct;
+	sharedSegmentMsg msgStruct;
+	int i;
+	DWORD dwContextIndex, dwChannelIndex;
 
-	pioSendPci.dwProtocol = SCARD_PROTOCOL_RAW;
-	pioRecvPci.dwProtocol = SCARD_PROTOCOL_RAW;
+	/*
+	 * Zero out everything
+	 */
+	rv = 0;
+	i = 0;
 
-	return SCardTransmit(hCard, &pioSendPci, pbSendBuffer, cbSendLength,
-		&pioRecvPci, pbRecvBuffer, pcbRecvLength);
+	/* 0 bytes received by default */
+	if (NULL != lpBytesReturned)
+		*lpBytesReturned = 0;
+
+	if (pbSendBuffer == 0)
+		return SCARD_E_INVALID_PARAMETER;
+
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_NO_SERVICE;
+
+	/*
+	 * Make sure this handle has been opened
+	 */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+
+	if (rv == -1)
+		return SCARD_E_INVALID_HANDLE;
+
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
+			break;
+	}
+
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+	{
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		return SCARD_E_READER_UNAVAILABLE;
+	}
+
+	if (cbSendLength > MAX_BUFFER_SIZE)
+	{
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		return SCARD_E_INSUFFICIENT_BUFFER;
+	}
+
+	scControlStruct.hCard = hCard;
+	scControlStruct.dwControlCode = dwControlCode;
+	scControlStruct.cbSendLength = cbSendLength;
+	scControlStruct.cbRecvLength = cbRecvLength;
+	memcpy(scControlStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
+
+	rv = WrapSHMWrite(SCARD_CONTROL, psContextMap[dwContextIndex].dwClientID,
+		sizeof(scControlStruct), PCSCLITE_CLIENT_ATTEMPTS, &scControlStruct);
+
+	if (rv == -1)
+	{
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		return SCARD_E_NO_SERVICE;
+	}
+
+	/*
+	 * Read a message from the server
+	 */
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+
+	if (rv == -1)
+	{
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		return SCARD_F_COMM_ERROR;
+	}
+
+	memcpy(&scControlStruct, &msgStruct.data, sizeof(scControlStruct));
+
+	if (NULL != lpBytesReturned)
+		*lpBytesReturned = scControlStruct.dwBytesReturned;
+
+	if (scControlStruct.rv == SCARD_S_SUCCESS)
+	{
+		/*
+		 * Copy and zero it so any secret information is not leaked
+		 */
+		memcpy(pbRecvBuffer, scControlStruct.pbRecvBuffer,
+			scControlStruct.cbRecvLength);
+		memset(scControlStruct.pbRecvBuffer, 0x00,
+			sizeof(scControlStruct.pbRecvBuffer));
+	}
+
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		
+	return scControlStruct.rv;
 }
 
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
