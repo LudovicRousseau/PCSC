@@ -165,18 +165,16 @@ extern "C"
 	 * Now some function definitions 
 	 */
 
-	int SHMClientRead(psharedSegmentMsg, int);
-	int SHMClientSetupSession(int);
-	int SHMClientCloseSession();
-	int SHMInitializeCommonConnect();
+	int SHMClientRead(psharedSegmentMsg, DWORD, int);
+	int SHMClientSetupSession(PDWORD);
+	int SHMClientCloseSession(DWORD);
 	int SHMInitializeCommonSegment();
-	int SHMProcessCommonChannelRequest();
-	int SHMProcessEvents(psharedSegmentMsg, int);
+	int SHMProcessCommonChannelRequest(PDWORD);
+	int SHMProcessEventsContext(PDWORD, psharedSegmentMsg, int);
+	int SHMProcessEventsServer(PDWORD, int);
 	int SHMMessageSend(psharedSegmentMsg, int, int);
 	int SHMMessageReceive(psharedSegmentMsg, int, int);
-	int WrapSHMWrite(unsigned int, unsigned int, unsigned int,
-		unsigned int, void *);
-	int WrapSHMWriteCommon(unsigned int, unsigned qint, unsigned int,
+	int WrapSHMWrite(unsigned int, unsigned int, DWORD, unsigned int,
 		unsigned int, void *);
 	void SHMCleanupSharedSegment(int, char *);
 

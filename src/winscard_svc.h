@@ -17,14 +17,8 @@
 extern "C"
 {
 #endif
-
-	LONG MSGFunctionDemarshall(psharedSegmentMsg);
-	LONG MSGAddContext(SCARDCONTEXT, DWORD);
-	LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
-	LONG MSGAddHandle(SCARDCONTEXT, DWORD, SCARDHANDLE);
-	LONG MSGRemoveHandle(SCARDCONTEXT, DWORD, SCARDHANDLE);
-	LONG MSGCleanupClient(psharedSegmentMsg);
-
+	LONG ContextsInitialize();
+	LONG CreateContextThread(PDWORD);
 #ifdef __cplusplus
 }
 #endif
