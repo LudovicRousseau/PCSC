@@ -132,7 +132,10 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		 * Initialize debug
 		 */
 		if (getenv("MUSCLECARD_DEBUG"))
+		{
 			DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+			DebugLogSetLevel(PCSC_LOG_DEBUG);
+		}
 
 		/*
 		 * Do any system initilization here
