@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
 	if (fd == NULL)
 	{
 		printf("Cannot open file %s: %s\n", PCSCLITE_READER_CONFIG, strerror(errno));
-		free(lpcPortID);
 		return 1;
 	}
 
