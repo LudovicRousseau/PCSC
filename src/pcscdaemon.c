@@ -22,7 +22,10 @@ $Id$
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef  HAVE_GETOPT_LONG
 #include <getopt.h>
+#endif
 
 #include "config.h"
 #include "wintypes.h"
