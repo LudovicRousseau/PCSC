@@ -184,6 +184,12 @@ int main(int argc, char **argv)
 	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
 
 	printf("Testing SCardGetAttrib           : ");
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAtrLen);
+	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	if (rv == SCARD_S_SUCCESS)
+		printf("ATR length: %ld\n", dwAtrLen);
+
+	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
 	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
