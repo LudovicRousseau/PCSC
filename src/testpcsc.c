@@ -233,6 +233,20 @@ int main(int argc, char **argv)
 		SCardReleaseContext(hContext);
 	}
 
+	printf("Press enter: ");
+	getchar();
+	printf("Testing SCardReconnect           : ");
+	rv = SCardReconnect(hCard, SCARD_SHARE_SHARED,
+		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD, &dwPref);
+
+	printf("%s\n", pcsc_stringify_error(rv));
+
+	if (rv != SCARD_S_SUCCESS)
+	{
+		SCardReleaseContext(hContext);
+		return -1;
+	}
+
 	printf("Testing SCardDisconnect          : ");
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
 
