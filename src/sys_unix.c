@@ -293,16 +293,16 @@ int SYS_Fstat(int iFd)
 
 int SYS_Random(int iSeed, float fStart, float fEnd)
 {
-
+	static int iInitialized = 0;
 	int iRandNum = 0;
 
-	if (iSeed != 0)
+	if (0 == iInitialized)
 	{
-		srand(iSeed);
+		srand(SYS_GetSeed());
+		iInitialized = 1;
 	}
 
 	iRandNum = 1 + (int) (fEnd * rand() / (RAND_MAX + fStart));
-	srand(iRandNum);
 
 	return iRandNum;
 }
