@@ -106,7 +106,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 					MAX_READERNAME);
 				tmplen = strlen(lpcStripReader);
-				lpcStripReader[tmplen - 4] = 0;
+				lpcStripReader[tmplen - 6] = 0;
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
 					(dwPort == (sReadersContexts[i])->dwPort))
 				{
@@ -554,6 +554,11 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	UCHAR tagValue;
 	static int lastDigit = 0;
 	int currentDigit;
+	int highCurrentDigit, lowCurrentDigit;
+	int highLastDigit, lowLastDigit;
+	int highSlot, lowSlot;
+	UCHAR ucHighSlot, ucLowSlot;
+	UCHAR ucHighLastDigit, ucLowLastDigit;
 	int supportedChannels;
 	int usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
 	int i;
@@ -571,6 +576,22 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	{
 		usedDigits[i] = 0;
 	}
+
+	/*
+	 * Compute the slot number
+	 */
+	highSlot = (int) dwSlot / 16;
+	lowSlot = (int) dwSlot % 16;
+
+	if (highSlot <= 9)
+		ucHighSlot = '0' + highSlot;
+	else
+		ucHighSlot = 'A' + ((int) highSlot % 10);
+	if (lowSlot <= 9)
+		ucLowSlot = '0' + lowSlot;
+	else
+		ucLowSlot = 'A' + ((int) lowSlot % 10);
+
 
 	if (dwSlot == 0)
 	{
@@ -627,17 +648,26 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 							 * enumerate the readername 
 							 */
 
-							currentDigit = (sReadersContexts[i])->
+							lowCurrentDigit = (sReadersContexts[i])->
 								lpcReader[strlen((sReadersContexts[i])->
-									lpcReader) - 3] - '0';
+									lpcReader) - 4] - '0';
+							highCurrentDigit = (sReadersContexts[i])->
+								lpcReader[strlen((sReadersContexts[i])->
+									lpcReader) - 5] - '0';
 
-							if (currentDigit > 9)
+							/*
+							 * 0-9 -> A-F is 7 apart 
+							 */
+							if (highCurrentDigit > 9)
 							{
-								/*
-								 * 0-9 -> A-F is 7 apart 
-								 */
-								currentDigit -= 7;
+								highCurrentDigit -= 7;
 							}
+							if (lowCurrentDigit > 9)
+							{
+								lowCurrentDigit -= 7;
+							}
+
+							currentDigit = highCurrentDigit*16 + lowCurrentDigit;
 
 							/*
 							 * This spot is taken 
@@ -650,16 +680,9 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 		}
 
 		/*
-		 * No other identical reader exists on the same bus 
+		 * Other identical reader exists on the same bus 
 		 */
-		if (currentDigit == -1)
-		{
-			sprintf(rContext->lpcReader, "%s 0 %ld", readerName, dwSlot);
-			/*
-			 * Set the slot in 0xDDDDCCCC 
-			 */
-			rContext->dwSlot = dwSlot;
-		} else
+		if (currentDigit != -1)
 		{
 
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -678,51 +701,35 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 				return -1;
 			}
 
-			if (i <= 9)
-			{
-				sprintf(rContext->lpcReader, "%s %d %ld", readerName, i,
-					dwSlot);
-			} else
-			{
-				sprintf(rContext->lpcReader, "%s %c %ld", readerName,
-					'A' + (i % 10), dwSlot);
-			}
-
-			/*
-			 * Set the slot in 0xDDDDCCCC 
-			 */
-			rContext->dwSlot = (0x00010000 * i) + dwSlot;
 			lastDigit = i;
 		}
 
-		/*
-		 * On the second, third slot of the reader use the last used
-		 * reader number 
-		 */
-
-	} else
-	{
-		if (lastDigit <= 9 && dwSlot <= 9)
-		{
-			sprintf(rContext->lpcReader, "%s %d %ld", readerName,
-				lastDigit, dwSlot);
-		} else if (lastDigit > 9 && dwSlot <= 9)
-		{
-			sprintf(rContext->lpcReader, "%s %c %ld", readerName,
-				'A' + (lastDigit % 10), dwSlot);
-		} else if (lastDigit <= 9 && dwSlot > 9)
-		{
-			sprintf(rContext->lpcReader, "%s %d %c", readerName,
-				lastDigit, 'A' + ((int) dwSlot % 10));
-		} else if (lastDigit > 9 && dwSlot > 9)
-		{
-			sprintf(rContext->lpcReader, "%s %c %c", readerName,
-				'A' + (lastDigit % 10), 'A' + ((int) dwSlot % 10));
-		}
-
-		rContext->dwSlot = (0x00010000 * lastDigit) + dwSlot;
 	}
+	/*
+	 * On the second, third slot of the reader use the last used
+	 * reader number.
+	 * Compute the reader number
+	 */
+	highLastDigit = (int) lastDigit / 16;
+	lowLastDigit = (int) lastDigit % 16;
 
+	if (highLastDigit <= 9)
+		ucHighLastDigit = '0' + highLastDigit;
+	else
+		ucHighLastDigit = 'A' + ((int) highLastDigit % 10);
+	if (lowLastDigit <= 9)
+		ucLowLastDigit = '0' + lowLastDigit;
+	else
+		ucLowLastDigit = 'A' + ((int) lowLastDigit % 10);
+
+	
+	sprintf(rContext->lpcReader, "%s %c%c %c%c", readerName, ucHighLastDigit, ucLowLastDigit, ucHighSlot, ucLowSlot);
+	
+	/*
+	 * Set the slot in 0xDDDDCCCC 
+	 */
+	rContext->dwSlot = (0x00010000 * lastDigit) + dwSlot;
+	
 	return rv;
 }
 
@@ -864,7 +871,7 @@ LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 				MAX_READERNAME);
 			tmplen = strlen(lpcStripReader);
-			lpcStripReader[tmplen - 4] = 0;
+			lpcStripReader[tmplen - 6] = 0;
 
 			if ((strcmp(lpcReader, lpcStripReader) == 0) &&
 				(dwPort == (sReadersContexts[i])->dwPort))
@@ -1684,9 +1691,9 @@ void RFCleanupReaders(int shouldExit)
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 				MAX_READERNAME);
 			/*
-			 * strip the 4 last char ' 0 0' 
+			 * strip the 6 last char ' 00 00' 
 			 */
-			lpcStripReader[strlen(lpcStripReader) - 4] = '\0';
+			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
 
 			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->dwPort);
 
