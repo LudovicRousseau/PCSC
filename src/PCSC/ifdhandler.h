@@ -106,6 +106,7 @@ extern "C"
 	 */
 #define IFD_HVERSION_1_0               0x00010000
 #define IFD_HVERSION_2_0               0x00020000
+#define IFD_HVERSION_3_0               0x00030000
 	/*
 	 * End of version number enummerations 
 	 */
@@ -138,6 +139,16 @@ extern "C"
 #define IFD_NOT_SUPPORTED		614
 #define IFD_ICC_PRESENT			615
 #define IFD_ICC_NOT_PRESENT		616
+
+	/*
+	 * List of Defined Functions Available to IFD_Handler 3.0 
+	 *
+	 * All the functions of IFD_Handler 2.0 are available
+	 * and there is one new.
+	 */
+
+	RESPONSECODE IFDHCreateChannelByName(DWORD, LPSTR);
+
 
 	/*
 	 * List of Defined Functions Available to IFD_Handler 2.0 
