@@ -886,8 +886,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	 * Check for NULL parameters
 	 */
 
-	if (pcchReaderLen == NULL || pdwState == NULL || pdwProtocol == NULL
-		|| pcbAtrLen == NULL)
+	if (pcchReaderLen == NULL || pcbAtrLen == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	/* length passed from caller */
@@ -895,8 +894,12 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	dwAtrLen = *pcbAtrLen;
 
 	/* default output values */
-	*pdwState = 0;
-	*pdwProtocol = 0;
+	if (pdwState)
+		*pdwState = 0;
+
+	if (pdwProtocol)
+		*pdwProtocol = 0;
+
 	*pcchReaderLen = 0;
 	*pcbAtrLen = 0;
 
@@ -976,8 +979,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	*pcchReaderLen = strlen(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName) + 1;
 	*pcbAtrLen = (readerStates[i])->cardAtrLength;
 
-	*pdwState = (readerStates[i])->readerState;
-	*pdwProtocol = (readerStates[i])->cardProtocol;
+	if (pdwState)
+		*pdwState = (readerStates[i])->readerState;
+
+	if (pdwProtocol)
+		*pdwProtocol = (readerStates[i])->cardProtocol;
 
 	/* return SCARD_E_INSUFFICIENT_BUFFER only if buffer pointer is non NULL */
 	if (mszReaderNames)
