@@ -145,6 +145,17 @@ void DebugLogSuppress(const int lSType)
 
 void DebugLogSetLogType(const int dbgtype)
 {
+	switch (dbgtype)
+	{
+		case DEBUGLOG_NO_DEBUG:
+		case DEBUGLOG_SYSLOG_DEBUG:
+		case DEBUGLOG_STDERR_DEBUG:
+			break;
+		default:
+			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stderr",
+				dbgtype);
+			dbgtype = DEBUGLOG_STDERR_DEBUG;
+	}
 	debug_msg_type = dbgtype;
 }
 
