@@ -329,6 +329,8 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		   (sReadersContexts[dwContext])->mMutex;
 		(sReadersContexts[dwContextB])->pdwMutex =
 		   (sReadersContexts[dwContext])->pdwMutex;
+		sReadersContexts[dwContextB]->dwSlot =
+			sReadersContexts[dwContext]->dwSlot + j;
 
 		/* 
 		 * Added by Dave - slots did not have a pdwFeeds
