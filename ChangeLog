@@ -1,3 +1,25 @@
+pcsc-lite-1.2.9-beta5: Ludovic Rousseau
+16 July 2004
+- src/PCSC/wintypes.h:
+  . add type LPSTR (again) so that "old" drivers and applications can
+    compile but mark the type deprecated.
+	See http://gcc.gnu.org/onlinedocs/gcc-3.1/gcc/Type-Attributes.html
+- src/tokenfactory.c:
+  . TPSearchBundlesForAtr(): use "%s/%s" insead of "%s%s" when
+    generating the MuscleCard bundle name on MacOSX
+- src/winscard.c:
+  . SCardControl() (new API) can now be used with a IFDHandler v2.0 or v3.0.
+    The previous code was broken and only worked with an IFDHandler v3.0
+	(crashed with a v2.0).
+- src/PCSC/ifdhandler.h:
+  . IFDHControl(): use PUCHAR instead of LPCVOID and LPVOID so the
+    driver can use TxBuffer[x] without needing a cast.
+  . it is now possible to compile a IFDHandler v2.0 with this include
+	file.  Just #define IFDHANDLERv2 in your source code before
+	#include <ifdhandler.h>
+	By default it is setup for for most recent version of the API (V3.0)
+
+
 pcsc-lite-1.2.9-beta4: Ludovic Rousseau
 3 July 2004
 - src/libmusclecard.pc.in and src/libpcsclite.pc.in
