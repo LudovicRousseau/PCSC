@@ -19,6 +19,7 @@
 #include "atrhandler.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
+#include "debuglog.h"
 
 /*
  * Function: IFDSetPTS Purpose : To set the protocol type selection (PTS). 
@@ -795,6 +796,9 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 #endif
 
+	// log the APDU
+	DebugLogCategory(DEBUG_CATEGORY_APDU, pucTxBuffer, dwTxLength);
+
 	/*
 	 * Zero out everything 
 	 */
@@ -868,6 +872,9 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	 * END OF LOCKED REGION 
 	 */
 
+	// log the returned status word
+	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);
+
 	if (rv == IFD_SUCCESS)
 	{
 		return SCARD_S_SUCCESS;
@@ -877,3 +884,4 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	}
 
 }
+
