@@ -31,6 +31,7 @@ $Id$
 #include "winscard_msg.h"
 #include "debuglog.h"
 #include "sys_generic.h"
+#include "parser.h"
 
 // PCSCLITE_HP_DROPDIR is defined using ./configure --enable-usbdropdir=foobar
 #define PCSCLITE_USB_PATH                       "/proc/bus/usb"
@@ -100,9 +101,9 @@ LONG HPReadBundleValues()
 	LONG rv;
 	DIR *hpDir;
 	struct dirent *currFP = 0;
-	char fullPath[200];
-	char fullLibPath[250];
-	char keyValue[200];
+	char fullPath[FILENAME_MAX];
+	char fullLibPath[FILENAME_MAX];
+	char keyValue[TOKEN_MAX_VALUE_SIZE];
 	int listCount = 0;
 
 	hpDir = opendir(PCSCLITE_HP_DROPDIR);
@@ -124,8 +125,9 @@ LONG HPReadBundleValues()
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle
 			 */
-			sprintf(fullPath, "%s%s%s", PCSCLITE_HP_DROPDIR,
+			snprintf(fullPath, FILENAME_MAX, "%s%s%s", PCSCLITE_HP_DROPDIR,
 				currFP->d_name, "/Contents/Info.plist");
+			fullPath[FILENAME_MAX - 1] = '\0';
 
 			// while we find a nth ifdVendorID in Info.plist
 			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
@@ -157,8 +159,9 @@ LONG HPReadBundleValues()
 					keyValue, 0);
 				if (rv == 0)
 				{
-					sprintf(fullLibPath, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
+					snprintf(fullLibPath, FILENAME_MAX, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
 						currFP->d_name, "/Contents/Linux/", keyValue);
+					fullLibPath[FILENAME_MAX - 1] = '\0';
 					bundleTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
@@ -188,8 +191,8 @@ void HPEstablishUSBNotifications()
 	struct dirent *entry, *entryB;
 	int deviceNumber;
 	int suspectDeviceNumber;
-	char dirpath[150];
-	char filename[150];
+	char dirpath[FILENAME_MAX];
+	char filename[FILENAME_MAX];
 	int fd, ret;
 	struct usb_device_descriptor usbDescriptor;
 
@@ -204,9 +207,8 @@ void HPEstablishUSBNotifications()
 			suspectDeviceNumber = 0;
 
 			for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
-			{
-				bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
-			}
+				/* clear rollcall */
+				bundleTracker[i].deviceNumber[j].status = 0;
 
 			dir = NULL;
 			dir = opendir(PCSCLITE_USB_PATH);
@@ -312,9 +314,7 @@ void HPEstablishUSBNotifications()
 				}
 
 				if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
-				{
 					DebugLogA("Too many identical readers plugged in");
-				}
 				else
 				{
 					HPAddHotPluggable(i, j+1);
@@ -322,7 +322,6 @@ void HPEstablishUSBNotifications()
 				}
 
 				SYS_MutexUnLock(&usbNotifierMutex);
-
 			}
 			else
 				if (usbDeviceStatus == 0)
@@ -337,7 +336,6 @@ void HPEstablishUSBNotifications()
 							HPRemoveHotPluggable(i, j+1);
 							bundleTracker[i].deviceNumber[j].id = 0;
 							SYS_MutexUnLock(&usbNotifierMutex);
-
 						}
 					}
 				}
@@ -356,7 +354,6 @@ void HPEstablishUSBNotifications()
 		SYS_Sleep(1);
 
 	}	/* End of while loop */
-
 }
 
 LONG HPSearchHotPluggables()
