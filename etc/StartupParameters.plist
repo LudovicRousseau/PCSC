@@ -1,0 +1,11 @@
+{
+  Description     = "PC/SC Daemon";
+  Provides        = ("SmartcardServices");
+  Requires        = ("Portmap", "Network");
+  OrderPreference = "None";
+  Messages =
+  {
+    start = "Starting Smartcard Services";
+    stop  = "Stopping Smartcard Services";
+  };
+}

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+autoreconf --force --localdir=build --verbose
+./configure --prefix=/usr/local/

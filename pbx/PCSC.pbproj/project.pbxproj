@@ -1,0 +1,1367 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 34;
+	objects = {
+		01B2E3050091091211CD2984 = {
+			buildRules = (
+			);
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				OPTIMIZATION_CFLAGS = "-O0";
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		01B2E3060091091211CD2984 = {
+			buildRules = (
+			);
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+//010
+//011
+//012
+//013
+//014
+//F50
+//F51
+//F52
+//F53
+//F54
+		F503CACD025425E601B94B21 = {
+			isa = PBXFileReference;
+			name = testpcsc.c;
+			path = ../src/testpcsc.c;
+			refType = 2;
+		};
+		F503CACE025425E601B94B21 = {
+			isa = PBXFileReference;
+			name = muscletest.c;
+			path = ../src/muscletest.c;
+			refType = 2;
+		};
+		F503CACF025425E601B94B21 = {
+			fileRef = F503CACD025425E601B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD0025425E601B94B21 = {
+			fileRef = F503CACE025425E601B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD40254283801B94B21 = {
+			isa = PBXFileReference;
+			path = config.h;
+			refType = 2;
+		};
+		F503CAD50254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD60254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD70254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD80254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAD90254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CADA0254283801B94B21 = {
+			fileRef = F503CAD40254283801B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CADB025428F601B94B21 = {
+			isa = PBXFrameworkReference;
+			name = CoreFoundation.framework;
+			path = /System/Library/Frameworks/CoreFoundation.framework;
+			refType = 0;
+		};
+		F503CADC025428F601B94B21 = {
+			isa = PBXFrameworkReference;
+			name = IOKit.framework;
+			path = /System/Library/Frameworks/IOKit.framework;
+			refType = 0;
+		};
+		F503CADD025428F601B94B21 = {
+			fileRef = F503CADB025428F601B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CADE025428F601B94B21 = {
+			fileRef = F503CADC025428F601B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CADF0254294101B94B21 = {
+			isa = PBXFileReference;
+			name = libl.a;
+			path = /usr/lib/libl.a;
+			refType = 0;
+		};
+		F503CAE00254294101B94B21 = {
+			fileRef = F503CADF0254294101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F503CAE402542A9201B94B21 = {
+			fileRef = F52A94AD0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F503CAE502542A9201B94B21 = {
+			fileRef = F503CADB025428F601B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F520E3A001F6204201B94B28 = {
+			isa = PBXTargetDependency;
+			target = F5294A800090C73501CD285A;
+		};
+		F520E3A301F6204201B94B28 = {
+			isa = PBXTargetDependency;
+			target = F5294AD40090CAE601CD285A;
+		};
+		F5294A4F0090C4CA01CD285A = {
+			buildStyles = (
+				01B2E3050091091211CD2984,
+				01B2E3060091091211CD2984,
+			);
+			isa = PBXProject;
+			mainGroup = F5294A500090C4CA01CD285A;
+			productRefGroup = F5294A520090C5DF01CD285A;
+			projectDirPath = "";
+			targets = (
+				F5294A510090C54E01CD285A,
+				F5294A800090C73501CD285A,
+				F52A93D402541D8C01B94B21,
+				F5294AD40090CAE601CD285A,
+				F52A93DA02541D8C01B94B21,
+				F52A93DF02541D8C01B94B21,
+				F52A93E602541DC601B94B21,
+			);
+		};
+		F5294A500090C4CA01CD285A = {
+			children = (
+				F5294A520090C5DF01CD285A,
+				F52A944E0254224301B94B21,
+				F52A94510254232701B94B21,
+				F52A948F0254242101B94B21,
+				F52A94900254242101B94B21,
+				F52A94910254242101B94B21,
+				F52A94920254242101B94B21,
+				F52A94930254242101B94B21,
+				F52A94940254242101B94B21,
+				F52A94950254242101B94B21,
+				F52A94960254242101B94B21,
+				F52A94970254242101B94B21,
+				F52A94980254242101B94B21,
+				F52A94990254242101B94B21,
+				F52A949A0254242101B94B21,
+				F52A949B0254242101B94B21,
+				F52A949C0254242101B94B21,
+				F52A949D0254242101B94B21,
+				F52A949E0254242101B94B21,
+				F52A949F0254242101B94B21,
+				F52A94A00254242101B94B21,
+				F52A94A10254242101B94B21,
+				F52A94A20254242101B94B21,
+				F52A94A30254242101B94B21,
+				F52A94A40254242101B94B21,
+				F52A94A50254242101B94B21,
+				F52A94A60254242101B94B21,
+				F52A94A70254242101B94B21,
+				F52A94A80254242101B94B21,
+				F52A94A90254242101B94B21,
+				F52A94AA0254242101B94B21,
+				F52A94AB0254242101B94B21,
+				F52A94AC0254242101B94B21,
+				F52A94AD0254242101B94B21,
+				F52A94CD025424AC01B94B21,
+				F52A94CE025424AC01B94B21,
+				F52A94CF025424AC01B94B21,
+				F52A94D0025424AC01B94B21,
+				F52A94D1025424AC01B94B21,
+				F52A94D2025424AC01B94B21,
+				F52A94D4025424AC01B94B21,
+				F503CACD025425E601B94B21,
+				F503CACE025425E601B94B21,
+				F503CAD40254283801B94B21,
+				F503CADB025428F601B94B21,
+				F503CADC025428F601B94B21,
+				F503CADF0254294101B94B21,
+			);
+			isa = PBXGroup;
+			refType = 4;
+		};
+		F5294A510090C54E01CD285A = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = World;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				F520E3A001F6204201B94B28,
+				F520E3A301F6204201B94B28,
+			);
+			isa = PBXAggregateTarget;
+			name = World;
+			productName = World;
+			shouldUseHeadermap = 0;
+		};
+		F5294A520090C5DF01CD285A = {
+			children = (
+				F5294A7E0090C73501CD285A,
+				F5294AD30090CAE601CD285A,
+				F52A93D102541D8C01B94B21,
+				F52A93D202541D8C01B94B21,
+				F52A93D302541D8C01B94B21,
+				F52A93E502541DC601B94B21,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+		};
+		F5294A7E0090C73501CD285A = {
+			isa = PBXExecutableFileReference;
+			path = pcscd;
+			refType = 3;
+		};
+		F5294A800090C73501CD285A = {
+			buildPhases = (
+				F5294A810090C73501CD285A,
+				F5294A820090C73501CD285A,
+				F5294A830090C73501CD285A,
+				F5294A840090C73501CD285A,
+			);
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = /Users/corcoran/sources/PCSC/build;
+				HEADER_SEARCH_PATHS = "/System/Library/Frameworks/CoreFoundation.framework/Headers /System/Library/Frameworks/IOKit.framework/Headers/usb /System/Library/Frameworks/IOKit.framework/Headers";
+				INSTALL_PATH = /usr/sbin;
+				LIBRARY_SEARCH_PATHS = "\"\" \"\" \"\"";
+				OTHER_CFLAGS = "-DPCSC_DEBUG=1 -DUSE_SYSLOG=1 -DUSE_DAEMON=1";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = pcscd;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = pcscd;
+			productInstallPath = /usr/sbin;
+			productName = pcscd;
+			productReference = F5294A7E0090C73501CD285A;
+			shouldUseHeadermap = 0;
+		};
+		F5294A810090C73501CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A94AE0254242101B94B21,
+				F52A94AF0254242101B94B21,
+				F52A94B00254242101B94B21,
+				F52A94B10254242101B94B21,
+				F52A94B20254242101B94B21,
+				F52A94B30254242101B94B21,
+				F52A94B40254242101B94B21,
+				F52A94B50254242101B94B21,
+				F52A94B60254242101B94B21,
+				F52A94B70254242101B94B21,
+				F52A94B80254242101B94B21,
+				F52A94B90254242101B94B21,
+				F52A94BA0254242101B94B21,
+				F52A94BB0254242101B94B21,
+				F52A94BC0254242101B94B21,
+				F52A94BD0254242101B94B21,
+				F52A94BE0254242101B94B21,
+				F503CAD50254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F5294A820090C73501CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A94520254232701B94B21,
+				F52A94BF0254242101B94B21,
+				F52A94C00254242101B94B21,
+				F52A94C10254242101B94B21,
+				F52A94C20254242101B94B21,
+				F52A94C30254242101B94B21,
+				F52A94C40254242101B94B21,
+				F52A94C50254242101B94B21,
+				F52A94C60254242101B94B21,
+				F52A94C70254242101B94B21,
+				F52A94C80254242101B94B21,
+				F52A94C90254242101B94B21,
+				F52A94CA0254242101B94B21,
+				F52A94CB0254242101B94B21,
+				F52A94CC0254242101B94B21,
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F5294A830090C73501CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CADD025428F601B94B21,
+				F503CADE025428F601B94B21,
+				F503CAE00254294101B94B21,
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F5294A840090C73501CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F5294AD30090CAE601CD285A = {
+			isa = PBXExecutableFileReference;
+			path = testpcsc;
+			refType = 3;
+		};
+		F5294AD40090CAE601CD285A = {
+			buildPhases = (
+				F5294AD50090CAE601CD285A,
+				F5294AD60090CAE601CD285A,
+				F5294AD70090CAE601CD285A,
+				F5294AD80090CAE601CD285A,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = testpcsc;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = pcsctest;
+			productInstallPath = /usr/local/bin;
+			productName = testpcsc;
+			productReference = F5294AD30090CAE601CD285A;
+			shouldUseHeadermap = 0;
+		};
+		F5294AD50090CAE601CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CAD60254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F5294AD60090CAE601CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CACF025425E601B94B21,
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F5294AD70090CAE601CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A944F0254224301B94B21,
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F5294AD80090CAE601CD285A = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52A93D102541D8C01B94B21 = {
+			isa = PBXFrameworkReference;
+			path = PCSC.framework;
+			refType = 3;
+		};
+		F52A93D202541D8C01B94B21 = {
+			isa = PBXExecutableFileReference;
+			path = mcardtest;
+			refType = 3;
+		};
+		F52A93D302541D8C01B94B21 = {
+			isa = PBXBundleReference;
+			path = ifdhandler.bundle;
+			refType = 3;
+		};
+		F52A93D402541D8C01B94B21 = {
+			buildPhases = (
+				F52A93D502541D8C01B94B21,
+				F52A93D602541D8C01B94B21,
+				F52A93D702541D8C01B94B21,
+				F52A93D802541D8C01B94B21,
+				F52A93D902541D8C01B94B21,
+			);
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRINCIPAL_CLASS = "";
+				PRODUCT_NAME = PCSC;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = framework;
+			};
+			dependencies = (
+			);
+			isa = PBXFrameworkTarget;
+			name = PCSC;
+			productInstallPath = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+			productName = PCSC;
+			productReference = F52A93D102541D8C01B94B21;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F52A93D502541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A94D5025424AC01B94B21,
+				F52A94D6025424AC01B94B21,
+				F52A94D7025424AC01B94B21,
+				F52A94D8025424AC01B94B21,
+				F52A94D9025424AC01B94B21,
+				F52A94DA025424AC01B94B21,
+				F52A94DB025424AC01B94B21,
+				F52A94DC025424AC01B94B21,
+				F503CAE402542A9201B94B21,
+				F52A94DD025424AC01B94B21,
+				F503CAD70254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F52A93D602541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			name = "Bundle Resources";
+		};
+		F52A93D702541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A94DE025424AC01B94B21,
+				F52A94DF025424AC01B94B21,
+				F52A94E5025424F101B94B21,
+				F52A94E6025424F101B94B21,
+				F52A94E0025424AC01B94B21,
+				F52A94E7025424F101B94B21,
+				F52A94E1025424AC01B94B21,
+				F52A94E3025424AC01B94B21,
+				F52A94E4025424AC01B94B21,
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F52A93D802541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CAE502542A9201B94B21,
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F52A93D902541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52A93DA02541D8C01B94B21 = {
+			buildPhases = (
+				F52A93DB02541D8C01B94B21,
+				F52A93DC02541D8C01B94B21,
+				F52A93DD02541D8C01B94B21,
+				F52A93DE02541D8C01B94B21,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = mcardtest;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = mcardtest;
+			productInstallPath = /usr/local/bin;
+			productName = mcardtest;
+			productReference = F52A93D202541D8C01B94B21;
+			shouldUseHeadermap = 0;
+		};
+		F52A93DB02541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CAD80254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F52A93DC02541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CAD0025425E601B94B21,
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F52A93DD02541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F52A94500254224301B94B21,
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F52A93DE02541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52A93DF02541D8C01B94B21 = {
+			buildPhases = (
+				F52A93E002541D8C01B94B21,
+				F52A93E102541D8C01B94B21,
+				F52A93E202541D8C01B94B21,
+				F52A93E302541D8C01B94B21,
+				F52A93E402541D8C01B94B21,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bundle -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ifdhandler;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = ifdhandler;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = ifdhandler;
+			productReference = F52A93D302541D8C01B94B21;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F52A93E002541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CAD90254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F52A93E102541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			name = "Bundle Resources";
+		};
+		F52A93E202541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F52A93E302541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F52A93E402541D8C01B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52A93E502541DC601B94B21 = {
+			isa = PBXBundleReference;
+			path = mcardplugin.bundle;
+			refType = 3;
+		};
+		F52A93E602541DC601B94B21 = {
+			buildPhases = (
+				F52A93E702541DC601B94B21,
+				F52A93E802541DC601B94B21,
+				F52A93E902541DC601B94B21,
+				F52A93EA02541DC601B94B21,
+				F52A93EB02541DC601B94B21,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bundle -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = mcardplugin;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = mcardplugin;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = mcardplugin;
+			productReference = F52A93E502541DC601B94B21;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F52A93E702541DC601B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+				F503CADA0254283801B94B21,
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F52A93E802541DC601B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			name = "Bundle Resources";
+		};
+		F52A93E902541DC601B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F52A93EA02541DC601B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F52A93EB02541DC601B94B21 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52A944E0254224301B94B21 = {
+			isa = PBXFrameworkReference;
+			name = PCSC.framework;
+			path = ../../../../../../../System/Library/Frameworks/PCSC.framework;
+			refType = 3;
+		};
+		F52A944F0254224301B94B21 = {
+			fileRef = F52A944E0254224301B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94500254224301B94B21 = {
+			fileRef = F52A944E0254224301B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94510254232701B94B21 = {
+			isa = PBXFileReference;
+			name = atrhandler.c;
+			path = ../src/atrhandler.c;
+			refType = 2;
+		};
+		F52A94520254232701B94B21 = {
+			fileRef = F52A94510254232701B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A948F0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = atrhandler.h;
+			path = ../src/atrhandler.h;
+			refType = 2;
+		};
+		F52A94900254242101B94B21 = {
+			isa = PBXFileReference;
+			name = configfile.c;
+			path = ../src/configfile.c;
+			refType = 2;
+		};
+		F52A94910254242101B94B21 = {
+			isa = PBXFileReference;
+			name = configfile.h;
+			path = ../src/configfile.h;
+			refType = 2;
+		};
+		F52A94920254242101B94B21 = {
+			isa = PBXFileReference;
+			name = debuglog.c;
+			path = ../src/debuglog.c;
+			refType = 2;
+		};
+		F52A94930254242101B94B21 = {
+			isa = PBXFileReference;
+			name = debuglog.h;
+			path = ../src/debuglog.h;
+			refType = 2;
+		};
+		F52A94940254242101B94B21 = {
+			isa = PBXFileReference;
+			name = dyn_generic.h;
+			path = ../src/dyn_generic.h;
+			refType = 2;
+		};
+		F52A94950254242101B94B21 = {
+			isa = PBXFileReference;
+			name = dyn_macosx.c;
+			path = ../src/dyn_macosx.c;
+			refType = 2;
+		};
+		F52A94960254242101B94B21 = {
+			isa = PBXFileReference;
+			name = eventhandler.c;
+			path = ../src/eventhandler.c;
+			refType = 2;
+		};
+		F52A94970254242101B94B21 = {
+			isa = PBXFileReference;
+			name = eventhandler.h;
+			path = ../src/eventhandler.h;
+			refType = 2;
+		};
+		F52A94980254242101B94B21 = {
+			isa = PBXFileReference;
+			name = hotplug_macosx.c;
+			path = ../src/hotplug_macosx.c;
+			refType = 2;
+		};
+		F52A94990254242101B94B21 = {
+			isa = PBXFileReference;
+			name = hotplug.h;
+			path = ../src/hotplug.h;
+			refType = 2;
+		};
+		F52A949A0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = ifdhandler.h;
+			path = ../src/ifdhandler.h;
+			refType = 2;
+		};
+		F52A949B0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = ifdwrapper.c;
+			path = ../src/ifdwrapper.c;
+			refType = 2;
+		};
+		F52A949C0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = ifdwrapper.h;
+			path = ../src/ifdwrapper.h;
+			refType = 2;
+		};
+		F52A949D0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = pcscdaemon.c;
+			path = ../src/pcscdaemon.c;
+			refType = 2;
+		};
+		F52A949E0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = pcsclite.h;
+			path = ../src/pcsclite.h;
+			refType = 2;
+		};
+		F52A949F0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = prothandler.c;
+			path = ../src/prothandler.c;
+			refType = 2;
+		};
+		F52A94A00254242101B94B21 = {
+			isa = PBXFileReference;
+			name = prothandler.h;
+			path = ../src/prothandler.h;
+			refType = 2;
+		};
+		F52A94A10254242101B94B21 = {
+			isa = PBXFileReference;
+			name = readerfactory.c;
+			path = ../src/readerfactory.c;
+			refType = 2;
+		};
+		F52A94A20254242101B94B21 = {
+			isa = PBXFileReference;
+			name = readerfactory.h;
+			path = ../src/readerfactory.h;
+			refType = 2;
+		};
+		F52A94A30254242101B94B21 = {
+			isa = PBXFileReference;
+			name = sys_generic.h;
+			path = ../src/sys_generic.h;
+			refType = 2;
+		};
+		F52A94A40254242101B94B21 = {
+			isa = PBXFileReference;
+			name = sys_unix.c;
+			path = ../src/sys_unix.c;
+			refType = 2;
+		};
+		F52A94A50254242101B94B21 = {
+			isa = PBXFileReference;
+			name = thread_generic.h;
+			path = ../src/thread_generic.h;
+			refType = 2;
+		};
+		F52A94A60254242101B94B21 = {
+			isa = PBXFileReference;
+			name = thread_macosx.c;
+			path = ../src/thread_macosx.c;
+			refType = 2;
+		};
+		F52A94A70254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard_msg.c;
+			path = ../src/winscard_msg.c;
+			refType = 2;
+		};
+		F52A94A80254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard_msg.h;
+			path = ../src/winscard_msg.h;
+			refType = 2;
+		};
+		F52A94A90254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard_svc.c;
+			path = ../src/winscard_svc.c;
+			refType = 2;
+		};
+		F52A94AA0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard_svc.h;
+			path = ../src/winscard_svc.h;
+			refType = 2;
+		};
+		F52A94AB0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard.c;
+			path = ../src/winscard.c;
+			refType = 2;
+		};
+		F52A94AC0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = winscard.h;
+			path = ../src/winscard.h;
+			refType = 2;
+		};
+		F52A94AD0254242101B94B21 = {
+			isa = PBXFileReference;
+			name = wintypes.h;
+			path = ../src/wintypes.h;
+			refType = 2;
+		};
+		F52A94AE0254242101B94B21 = {
+			fileRef = F52A948F0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94AF0254242101B94B21 = {
+			fileRef = F52A94910254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B00254242101B94B21 = {
+			fileRef = F52A94930254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B10254242101B94B21 = {
+			fileRef = F52A94940254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B20254242101B94B21 = {
+			fileRef = F52A94970254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B30254242101B94B21 = {
+			fileRef = F52A94990254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B40254242101B94B21 = {
+			fileRef = F52A949A0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B50254242101B94B21 = {
+			fileRef = F52A949C0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B60254242101B94B21 = {
+			fileRef = F52A949E0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B70254242101B94B21 = {
+			fileRef = F52A94A00254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B80254242101B94B21 = {
+			fileRef = F52A94A20254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94B90254242101B94B21 = {
+			fileRef = F52A94A30254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BA0254242101B94B21 = {
+			fileRef = F52A94A50254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BB0254242101B94B21 = {
+			fileRef = F52A94A80254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BC0254242101B94B21 = {
+			fileRef = F52A94AA0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BD0254242101B94B21 = {
+			fileRef = F52A94AC0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BE0254242101B94B21 = {
+			fileRef = F52A94AD0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94BF0254242101B94B21 = {
+			fileRef = F52A94900254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C00254242101B94B21 = {
+			fileRef = F52A94920254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C10254242101B94B21 = {
+			fileRef = F52A94950254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C20254242101B94B21 = {
+			fileRef = F52A94960254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C30254242101B94B21 = {
+			fileRef = F52A94980254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C40254242101B94B21 = {
+			fileRef = F52A949B0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C50254242101B94B21 = {
+			fileRef = F52A949D0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C60254242101B94B21 = {
+			fileRef = F52A949F0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C70254242101B94B21 = {
+			fileRef = F52A94A10254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C80254242101B94B21 = {
+			fileRef = F52A94A40254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94C90254242101B94B21 = {
+			fileRef = F52A94A60254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94CA0254242101B94B21 = {
+			fileRef = F52A94A70254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94CB0254242101B94B21 = {
+			fileRef = F52A94A90254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94CC0254242101B94B21 = {
+			fileRef = F52A94AB0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94CD025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = mscdefines.h;
+			path = ../src/mscdefines.h;
+			refType = 2;
+		};
+		F52A94CE025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = musclecard.c;
+			path = ../src/musclecard.c;
+			refType = 2;
+		};
+		F52A94CF025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = musclecard.h;
+			path = ../src/musclecard.h;
+			refType = 2;
+		};
+		F52A94D0025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = tokenfactory.c;
+			path = ../src/tokenfactory.c;
+			refType = 2;
+		};
+		F52A94D1025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = tokenfactory.h;
+			path = ../src/tokenfactory.h;
+			refType = 2;
+		};
+		F52A94D2025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = tokenparser.c;
+			path = ../src/tokenparser.c;
+			refType = 2;
+		};
+		F52A94D4025424AC01B94B21 = {
+			isa = PBXFileReference;
+			name = winscard_clnt.c;
+			path = ../src/winscard_clnt.c;
+			refType = 2;
+		};
+		F52A94D5025424AC01B94B21 = {
+			fileRef = F52A94A50254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94D6025424AC01B94B21 = {
+			fileRef = F52A949E0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F52A94D7025424AC01B94B21 = {
+			fileRef = F52A94CD025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F52A94D8025424AC01B94B21 = {
+			fileRef = F52A94CF025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F52A94D9025424AC01B94B21 = {
+			fileRef = F52A94A80254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94DA025424AC01B94B21 = {
+			fileRef = F52A94D1025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94DB025424AC01B94B21 = {
+			fileRef = F52A94AC0254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F52A94DC025424AC01B94B21 = {
+			fileRef = F52A94940254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94DD025424AC01B94B21 = {
+			fileRef = F52A94930254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+				);
+			};
+		};
+		F52A94DE025424AC01B94B21 = {
+			fileRef = F52A94CE025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94DF025424AC01B94B21 = {
+			fileRef = F52A94950254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E0025424AC01B94B21 = {
+			fileRef = F52A94D0025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E1025424AC01B94B21 = {
+			fileRef = F52A94D2025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E3025424AC01B94B21 = {
+			fileRef = F52A94920254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E4025424AC01B94B21 = {
+			fileRef = F52A94D4025424AC01B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E5025424F101B94B21 = {
+			fileRef = F52A94A70254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E6025424F101B94B21 = {
+			fileRef = F52A94A60254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52A94E7025424F101B94B21 = {
+			fileRef = F52A94A40254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+	};
+	rootObject = F5294A4F0090C4CA01CD285A;
+}

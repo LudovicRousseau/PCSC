@@ -1,0 +1,263 @@
+dnl -*- mode: m4; -*-
+dnl Process this file with autoconf to produce a configure script.
+
+dnl Autoconf boilerplate/
+AC_INIT(src/winscard.h)
+AC_CONFIG_AUX_DIR(build)
+
+dnl Default install dir
+AC_PREFIX_DEFAULT(/usr/local)
+
+dnl Automake boilerplate.
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(pcsc-lite, 1.0.2.beta5)
+AM_CONFIG_HEADER(config.h)
+
+dnl Options.
+#AC_DISABLE_FAST_INSTALL
+#AC_DISABLE_SHARED
+AM_MAINTAINER_MODE
+
+dnl Select OS specific versions of source files.
+case "${build_os}" in
+ linux-gnu)	arch=linux ;;
+ *bsd*)		arch=bsd ;;
+ *darwin*)	arch=darwin ;;
+ *solaris*)	arch=solaris ;;
+ *hpux*)        arch=hpux ;;
+ *osf*)         arch=tru64 ;;
+ *) AC_MSG_ERROR([Operating system ${build_os} not supported]) ;;
+esac
+
+AM_CONDITIONAL(PCSC_ARCH_LINUX, test x$arch = xlinux)
+AM_CONDITIONAL(PCSC_ARCH_BSD, test x$arch = xbsd)
+AM_CONDITIONAL(PCSC_ARCH_OSX, test x$arch = xdarwin)
+AM_CONDITIONAL(PCSC_ARCH_SOLARIS, test x$arch = xsolaris)
+AM_CONDITIONAL(PCSC_ARCH_HPUX, test x$arch = xhpux)
+AM_CONDITIONAL(PCSC_ARCH_TRU64, test x$arch = xtru64)  
+
+if test x$arch = xlinux ; then
+  AC_DEFINE(PCSC_TARGET_LINUX, 1, [Linux])
+  AC_DEFINE(MSC_TARGET_LINUX, 1, [Linux])
+fi
+
+if test x$arch = xbsd ; then
+  AC_DEFINE(PCSC_TARGET_BSD, 1, [BSD])
+  AC_DEFINE(MSC_TARGET_BSD, 1, [BSD])
+fi
+
+if test x$arch = xdarwin ; then
+  AC_DEFINE(PCSC_TARGET_OSX, 1, [OSX])
+  AC_DEFINE(MSC_TARGET_OSX, 1, [OSX])
+fi
+
+if test x$arch = xsolaris ; then
+  AC_DEFINE(PCSC_TARGET_SOLARIS, 1, [Solaris])
+  AC_DEFINE(MSC_TARGET_SOLARIS, 1, [Solaris])
+fi
+
+if test x$arch = xhpux ; then
+  AC_DEFINE(PCSC_TARGET_HPUX, 1, [HP-UX])
+  AC_DEFINE(MSC_TARGET_HPUX, 1, [HP-UX])
+fi
+
+if test x$arch = xtru64 ; then
+  AC_DEFINE(PCSC_TARGET_TRU64, 1, [TRU64])
+  AC_DEFINE(MSC_TARGET_TRU64, 1, [TRU64])
+fi
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_LN_S
+AM_PROG_LEX
+
+dnl Special check for pthread support.
+ACX_PTHREAD(
+[
+ AC_DEFINE(HAVE_PTHREAD,1,
+  [Define if you have POSIX threads libraries and header files.])
+], [
+ AC_MSG_ERROR([POSIX thread support required])
+])
+
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS -Wall -fno-common $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
+AC_CHECK_FUNCS(daemon)
+
+
+dnl Add libtool support.
+AM_PROG_LIBTOOL
+dnl Automatically update the libtool script if it becomes out-of-date.
+AC_SUBST(LIBTOOL_DEPS)
+
+dnl Checks for header files.
+#AC_HEADER_STDC
+#AC_HEADER_SYS_WAIT
+#AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+#AC_C_CONST
+#AC_HEADER_TIME
+
+dnl Checks for library functions.
+#AC_FUNC_MMAP
+#AC_TYPE_SIGNAL
+#AC_CHECK_FUNCS(gettimeofday strdup strtoul)
+
+
+dnl Setup dist stuff
+AC_SUBST(ac_aux_dir)
+
+
+dnl --enable-usb option.
+AC_ARG_ENABLE(usb,
+[  --enable-usb            enable USB hotplug support (Linux only)],
+[ case "${enableval}" in
+  yes)
+   case "${build_os}" in
+    linux-gnu)	usb=true ;;
+    *) AC_MSG_WARN([USB hotplug support only available on Linux])
+		usb=false
+     ;;
+   esac
+   ;;
+  no)	usb=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-usb]) ;;
+ esac], 
+[ case "${build_os}" in
+    linux-gnu)	usb=true ;;
+    *) usb=false
+     ;;
+   esac
+])
+
+AC_MSG_RESULT([enable linux usb capability: $usb])
+
+AM_CONDITIONAL(PCSC_LINUX_USB, test x$usb = xtrue)
+
+AC_ARG_ENABLE(threadsafe,
+[  --enable-threadsafe     enable client side thread safety.],
+[case "${enableval}" in
+  yes)	threadsafe=true ;;
+  no)	threadsafe=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-threadsafe]) ;;
+ esac], [threadsafe=true])
+
+AC_MSG_RESULT([enable threadsafe client   : $threadsafe])
+
+AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
+
+
+AC_ARG_ENABLE(debug,
+[  --enable-debug          enable debug messages from pcscd.],
+[ case "${enableval}" in
+  yes)	
+    debug=true ;;
+  no)	
+    debug=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+ esac], [debug=false])
+
+AC_MSG_RESULT([enable debug messages      : $debug])
+
+if test x${debug} = xtrue ; then
+  AC_DEFINE(PCSC_DEBUG, 1, [enable full PCSC debug messaging.])
+  AC_DEFINE(MSC_DEBUG, 1, [enable full musclecard debug messaging.])
+fi
+
+
+AC_ARG_ENABLE(debugatr,
+[  --enable-debugatr       enable ATR debug messages from pcscd.],
+[ case "${enableval}" in
+  yes)	debugatr=true ;;
+  no)	debugatr=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-debugatr]) ;;
+esac], [debugatr=false])
+
+AC_MSG_RESULT([enable ATR parsing messages: $debugatr])
+
+if test x${debugatr} = xtrue ; then
+  AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
+fi
+
+AC_ARG_ENABLE(syslog,
+[  --enable-syslog         send messages to syslog instead of stdout.],
+[case "${enableval}" in
+  yes)	syslog=true ;;
+  no)	syslog=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-syslog]) ;;
+ esac], [syslog=false])
+
+AC_MSG_RESULT([enable debug out to syslog : $syslog])
+
+if test x${syslog} = xtrue ; then
+  AC_DEFINE(USE_SYSLOG, 1, [send messages to syslog instead of stdout])
+fi
+
+
+AC_ARG_ENABLE(daemon,
+[  --enable-daemon         pcscd runs as a true daemon.],
+[case "${enableval}" in
+  yes)	daemon=true ;;
+  no)	daemon=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-daemon]) ;;
+ esac], [daemon=false])
+
+AC_MSG_RESULT([enable pcscd forked daemon : $daemon])
+
+if test x${daemon} = xtrue ; then
+  AC_DEFINE(USE_DAEMON, 1, [pcsc runs as a daemon in the background.])
+fi
+
+AC_ARG_ENABLE(musclecard,
+[  --disable-musclecard         musclecard framework disabled.],
+[case "${enableval}" in
+  yes)	musclecard=false ;;
+  no)	musclecard=true ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --disable-musclecard]) ;;
+ esac], [musclecard=false])
+
+AC_MSG_RESULT([disable musclecard         : $musclecard])
+
+if test x${musclecard} = xfalse ; then
+  AM_CONDITIONAL(MCARD_ENABLED, test x$musclecard = xfalse)
+fi
+
+
+AC_ARG_ENABLE(confdir,
+[  --enable-confdir=DIR    directory containing reader.conf (default /etc)],
+[confdir="${enableval}"], [confdir=false])
+
+if test x${confdir} != xfalse ; then
+	AC_MSG_RESULT([enable confdir             : $confdir])
+
+	AC_DEFINE_UNQUOTED(USE_READER_CONF, "$confdir", [directory containing reader.conf (default /etc)])
+else
+	AC_MSG_RESULT([enable confdir             : /etc (default)])
+fi
+
+
+AC_ARG_ENABLE(runpid,
+[  --enable-runpid=FILE    file containing pcscd pid],
+[runpid="${enableval}"], [runpid=false])
+
+AC_MSG_RESULT([enable runpid              : $runpid])
+
+if test x${runpid} != xfalse ; then
+	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])
+fi
+
+
+if test x${threadsafe} = xtrue ; then
+  AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])
+  AC_DEFINE(USE_THREAD_SAFETY, 1, [enable client side thread safety.])
+fi
+
+dnl Write Makefiles.
+AC_OUTPUT(Makefile src/Makefile src/utils/Makefile etc/Makefile doc/Makefile)
+

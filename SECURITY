@@ -1,0 +1,21 @@
+SECURITY
+
+This file will discuss security related issues with pcsc-lite and how to
+handle them.
+
+Sometimes it is dangerous to run daemons under a root account.  If there is
+a chance to exploit a buffer overflow you can protect sensitive information 
+by running it under a different account. It might be useful to create another
+user with hardware priveledges and run pcscd as that user.  Be sure this user
+can manipulate the server sockets.
+
+
+Application suggestions:
+
+Recycle SCARDHANDLE's.  It is not good practice to call SCardConnect and wait
+for something to occur.  Make your connections short so that your handle
+does not become stale and heighten the chance of session guessing.  1.0.0 
+releases bind sessions with sockets so other processes cannot guess handles.
+
+Make sure you Disconnect when you are not using the reader.  Also be sure to
+ReleaseContext before exiting your program.

@@ -1,0 +1,81 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if lex declares yytext as a char * by default, not a char[].  */
+#undef YYTEXT_POINTER
+
+/* Define if you have the daemon function.  */
+#undef HAVE_DAEMON
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Linux */
+#undef PCSC_TARGET_LINUX
+
+/* Linux */
+#undef MSC_TARGET_LINUX
+
+/* BSD */
+#undef PCSC_TARGET_BSD
+
+/* BSD */
+#undef MSC_TARGET_BSD
+
+/* OSX */
+#undef PCSC_TARGET_OSX
+
+/* OSX */
+#undef MSC_TARGET_OSX
+
+/* Solaris */
+#undef PCSC_TARGET_SOLARIS
+
+/* Solaris */
+#undef MSC_TARGET_SOLARIS
+
+/* HP-UX */
+#undef PCSC_TARGET_HPUX
+
+/* HP-UX */
+#undef MSC_TARGET_HPUX
+
+/* TRU64 */
+#undef PCSC_TARGET_TRU64
+
+/* TRU64 */
+#undef MSC_TARGET_TRU64
+
+/* Define to the necessary symbol if this constant
+                           uses a non-standard name on your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* enable full PCSC debug messaging. */
+#undef PCSC_DEBUG
+
+/* enable full musclecard debug messaging. */
+#undef MSC_DEBUG
+
+/* display ATR parsing debug messages. */
+#undef ATR_DEBUG
+
+/* send messages to syslog instead of stdout */
+#undef USE_SYSLOG
+
+/* pcsc runs as a daemon in the background. */
+#undef USE_DAEMON
+
+/* directory containing reader.conf (default /etc) */
+#undef USE_READER_CONF
+
+/* file containing pcscd pid */
+#undef USE_RUN_PID
+
+/* enable client side thread safety. */
+#undef USE_THREAD_SAFETY
+

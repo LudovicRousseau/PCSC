@@ -1,0 +1,11 @@
+#!/bin/sh
+
+##
+# Start PC/SC
+##
+
+. /etc/rc.common
+
+	ConsoleMessage "Starting Smartcard Services"
+	nohup /usr/local/pcsc/bin/pcscd </dev/null >> /var/log/pcscd.log 2>&1 &
+

@@ -1,0 +1,51 @@
+.\" Process this file with
+.\" groff -man -Tascii pcscd.txt
+.\"
+.TH BUNDLETOOL 1 "March 2002" Linux "User Manual"
+.SH NAME
+bundleTool
+.SH SYNOPSIS
+.B bundleTool
+.SH DESCRPTION
+BundleTool Introduces new smart cards to pcscd and assigns a plugin to 
+service the card.
+.SH OPTIONS 
+None
+.SH USAGE
+bundleTool lists the currently installed bundles and asks you to 
+select one.  You select the plugin bundle that services your 
+smartcard. bundleTool will then ask you to insert the new card.  The 
+application exits and pcsc is now configured to use your card.
+
+Example:
+
+.RS
+[root@linux]# bundleTool
+.RE
+.RS 
+Select the approprate token driver:
+.RE
+.RS
+-----------------------------------
+.RE
+.RS
+  1.     mscMuscleCard.bundle
+.RE
+.RS
+-----------------------------------
+.RE
+.RS
+Enter the number: 1
+
+Insert your token in: Schlumberger Reflex 72 COM1 0 0
+
+Token support updated successfully !
+.RE
+.RS
+[root@linux]# 
+.RE
+.SH SEE ALSO
+.B pcscd(8)
+.SH BUGS
+Plugins MUST reside in 
+.I /usr/local/pcsc/services

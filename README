@@ -1,0 +1,107 @@
+Title   : PCSC Lite
+Author  : David Corcoran
+Version : 1.0.1
+LICENSE : See file LICENSE
+Document: docs/pcsc-lite-0.8.7.pdf
+Requires: C compiler (gcc)
+          GNU tools (gmake, ld, ar, gcc ...)
+          Lex (Lexical Analyzer).
+
+
+Tested Platforms: 
+	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2)
+	Solaris Solaris 2.8
+	Mac OS X 10.1        
+	HP-UX 11
+	OpenBSD 2.9, 3.0 (with libc.so.28.2)
+
+Welcome to PCSC Lite.  The purpose of PCSC Lite is to
+provide a Windows(R) SCard interface in a very small form factor for
+communicating to smartcards and readers. PCSC Lite can be compiled
+directly to a desired reader driver or can be used to dynamically
+allocate/deallocate reader drivers at runtime (default).
+
+PCSC Lite uses the same winscard api as used under Windows(R).  
+
+For security aware persons please read the SECURITY file on possible
+vulnerabilites to pcsclite, how you can fix some, and how some will
+be fixed.
+
+For information on how to install driver please read the DRIVERS file.
+
+Memory cards are supported through MCT specifications which is an APDU
+like manner sent normally through the SCardTransmit() function.  This
+functionality is done in the driver. 
+
+INSTALLATION:
+
+Installation is simple.  Type ./configure and then make and make install.
+Options:
+
+   ./configure 
+
+          --enable-usb           Enable USB on Linux 2.4 platforms
+          --enable-syslog        Use syslog for error output.
+          --enable-daemon        Run as a daemon.
+          --enable-debug         Enable full debugging messages
+          --enable-threadsafe    Enable a thread safe client (reqs pthread)
+          --enable-debugatr      Enable ATR parsing debug output
+          --prefix=location      Install to <location>
+          --enable-confdir=DIR   Use DIR as the configuration directory
+                                 (/etc by default)
+          --enable-runpid=FILE   Store the daemon pid in file FILE
+
+By running pcscd under a priveledged account you can link to 
+libpcsclite.so and it will act as a client to the pcscd allowing multiple 
+applications to be run under non-priveledged accounts.
+
+Then type make install to copy etc/reader.conf to
+/etc/reader.conf and the libraries to /usr/local/pcsc/lib. If you choose 
+not to have your reader.conf in /etc  then edit the file include/pcsclite.h 
+and edit the PCSC_READER_CONFIG option and change the
+Makefile to make install to your location. 
+
+You must be root to do make install in the default locations.
+
+Be sure to edit the /etc/reader.conf file to fit your needs and make sure
+your IFD Handler driver is located in the path specified as LIBRARYPATH
+in reader.conf.  If you are using a reader with multiple smartcard slots
+all you have to do is define a different FRIENDLYNAME in the reader.conf
+for each reader.  Both will have the same information otherwise.  
+
+There is an config file generator in the utils directory.  It is called
+installifd.  You may use this to generate the /etc/reader.conf file.
+
+USB users do not need to use the /etc/reader.conf.  pcscd will give
+a warning that the file does not exist or contain anything useful.  
+
+If you try out the test programs included in this package be sure to set your 
+system's LD_LIBRARY_PATH to the locations where the libs are or move the
+libpcsclite-core.so and the libpcsclite.so into a directory that is 
+specified in your LD_LIBRARY_PATH. 
+
+There is a test program with this package:
+
+testpcsc: Linked to libpcsclite.  Must run /usr/local/pcsc/bin/pcscd
+          and then ./testpcsc.  pcscd must be run as root or a hardware
+          priveledged user.  ./testpcsc can be run under any account.
+          You can create testpcsc by doing the following:
+          gcc -o testpcsc test.c -L/usr/local/pcsc/lib -lpcsclite -I.
+
+THREAD SAFETY:
+If pcsc-lite is compiled with thread safety, each application linked with
+libpcsclite.so must also link with pthread libraries.
+
+OCF users should compile in --threadsafe so the OCF->PC/SC bridge behaves
+correctly.
+
+SOLARIS:
+Solaris PC/SC applications must link with -lsocket and -lposix4 since
+the libraries are not statically linked.
+
+QUESTIONS: 
+
+The API documentation is provided in PDF format under the docs 
+directory.  For questions, please email me at: 
+<David Corcoran> corcoran@linuxnet.com
+

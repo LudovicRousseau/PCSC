@@ -1,0 +1,376 @@
+pcsc-lite-1.0.2beta5: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
+10 Mar, 2002
+- src/pcscdaemon.c:
+   . move the pid file creation earlier (before drivers loading)
+   . allow to properly kill pcscd before or during driver loading
+     this is usefull when the driver init is buggy
+- src/pcsclite.h: change PCSCLITE_VERSION_NUMBER to 1.0.2.beta5
+- configure.in: change version number to 1.0.2.beta5
+
+
+pcsc-lite-1.0.2beta4: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
+13 Feb, 2002
+- configure.in: change version number to 1.0.2.beta4
+(from Douglas Atique bugs report and patch)
+- etc/Makefile.am
+   . add the files makeFMStyle, makeSTDStyle and moveFMCode to the
+     distribution archive
+- src/Makefile.am
+   . add the files sys_solaris.c, sys_hpux.c and powermgt_macosx.c to the
+     distribution archive
+- src/pcscdaemon.c
+   . ignore SIGHUP signal
+   . remove pid file if USE_RUN_PID is defined
+- src/winscard_msg.c
+   . move #ifdef PCSC_TARGET_SOLARIS _after_ the inclusion of config.h since
+     PCSC_TARGET_SOLARIS is defined in config.h
+
+
+pcsc-lite-1.0.2beta3: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
+10 Jan, 2002
+(from Carlos Prados Debian package)
+- configure.in
+   . add AC_PREFIX_DEFAULT(/usr/local/pcsc) to install in /usr/local/pcsc by
+   default 
+- etc/
+   . add makeFMStyle, makeSTDStyle and moveFMCode scripts
+- src/utils/Makefile.am
+   . add EXTRA_DIST = sample.in sample.ibm sample.out
+- src/dyn_bsd.c
+   . try without a leading '_' in cas of failure (needed by FreeBSD) thanks to
+   Toni Andjelkovic <toni@soth.at> for the patch)
+- src/test.c
+   . commented declarations on unused variables
+   . corrected three %x to %lx for long arguments
+- README
+   . add documentation for --enable-confdir and --enable-runpid
+- src/README_INTERNALS.txt: new file containing some documenation for source
+  code hackers
+- src/Makefile.am: add EXTRA_DIST = README_INTERNALS.txt
+- src/pcscdaemon.c: the daemon now cleany stops the drivers before exiting
+   . the global variable AraKiri is set in signal_trap()
+   . this variable is checked in the main loop of SVCServiceRunLoop()
+   . RFCleanupReaders() is then called if AraKiri
+- src/readerfactory.c: add RFCleanupReaders() to do the cleaning job at exit
+- src/test.c: change %x to %02X for the ATR bytes
+- src/debuglog.c and src/debuglog.h:
+   . rewrote the DebugLog[ABCD] function
+   . the function are now defines than include __FILE__ and __LINE__
+   . the test #ifdef USE_SYSLOG if moved from the source code to the
+     src/debuglog.c function only -> the source is more readable
+   . the new log functions are now used everywhere
+- src/configfile.l:
+   . changed syslog() to DebugLog()
+   . add #include "debuglog.h"
+- README: add a supported platform: OpenBSD 3.0 (with libc.so.28.2)
+- Makefile.am: add HELP file to EXTRA_DIST
+
+
+pcsc-lite-1.0.2beta2: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
+20 Dec, 2001
+- bootstrap: added --verbose
+- reconf: added --verbose and --enable-debug
+- configure.in:
+   . changed release number to 1.0.2.beta2
+   . added -Wall to CFLAGS to compile with all the warnings ON. This change
+	 implied many small corrections: mainly addition of include file to add
+	 functions prototyping, adding return values when needed, removing unused
+	 variables.
+   . add doc/ directory (from Carlos Prados Debian package)
+   . add --enable-confdir=DIR (default to /etc)
+     inspiration from Shell Hin-Lik Hung, OpenBSD pcsc-lite port
+   . add --enable-runpid=FILE to store the pcscd pid
+     inspiration from Carlos Prados, Debian package maintainer
+- many C source files includes <pcsclite.h> (or somilar). I changed to
+  "pcsclite.h" since the local .h should be more recent and with less
+  bugs than the one in /usr/local/include/
+- src/dyn_bsd.c, src/dyn_unix.c: in DYN_LoadLibrary() changed 0 to
+  NULL, "char *" to "const char *"
+- src/dyn_hpux.c: removed declared but unused variables
+- src/ifdwrapper.c: initialize IFD_? functions pointer to NULL
+- src/pcscdaemon.c:
+   . removed declartion of errno (already made in errno.h)
+   . exit with code value
+   . more explicit error message when /tmp/pcsc/ already exist
+   . test if VERSION and PCSCLITE_VERSION_NUMBER are the same
+     release numbers
+   . create a file containing the PID (see configure --enable-runpid=FILE)
+     ("stolen" from Carlos Prados Debian package)
+- src/readerfactory.c
+   . removed unused variables
+   . dwSlot is a long, use %ld instead of %d
+   . changed "SCARD_F_UNKNOWN_ERROR;" to "return SCARD_F_UNKNOWN_ERROR;"
+- src/readerfactory.h: corrected "RVAllocateReaderSpace" to
+  "RFAllocateReaderSpace" (RVA -> RFA)
+- sys_*.c: removed declaration of errno
+- src/sys_unix.c: add "return 0;" in SYS_Initialize()
+- winscard.c: in SCardReconnect()
+   . initialize dwAction to 0
+   . remove unused variables dwReaderLen and dwProtocol
+- src/winscard_clnt.c: commented out declaration and definition of
+  SCardSetupThreadSafety(). It is not used anywhere.
+- src/winscard_msg.c:
+   . add the error message "strerror(errno)" returned by the socket
+     functions in the debug message logged
+   . removed unused variables
+   . removed (fd_set *) cast in select calls. (compiles OK without)
+- src/winscard_svc.c: add a "return 0;" in MSGCleanupClient()
+- src/winscard_svc.h: add prototype for MSGCleanupClient()
+- doc/Makefile.am: ("stolen" from Carlos Prados Debian package)
+   . add this directory in dist files
+- Makefile.am: ("stolen" from Carlos Prados Debian package)
+   . add doc directory
+   . add reconf bootstrap in dist files
+- src/Makefile.am: ("stolen" from Carlos Prados Debian package)
+   . add utils directory
+   . remove libpcsclite-core.la from install target
+   . add dyn_bsd.c dyn_hpux.c to EXTRA_libpcsclite_core_la_SOURCES
+- src/utils/Makefile.am: ("stolen" from Carlos Prados Debian package)
+   . converted LIBS line into formaticc_LDADD line
+- src/hotplug_linux.c
+   . add some includes files
+   . commented useless declarations of hpManu_id, hpProd_id, bundleArraySize
+- src/utils/installifd.c
+   . rv, dwRecvLength and dwSendLength are long, use %ld instead of %d
+   . commented useless declarations of many variables
+   . add some (int *) casts
+- etc/ ("stolen" from Carlos Prados Debian package)
+   . added SmartcardServices
+   . added StartupParameters.plist
+- src/debuglog.c:
+   . put the ATR on just one line even with syslog
+   . changed LOG_DEBUG to LOG_INFO since the LOG_DEBUG level messages are
+     seldom logged
+- src/pcsclite.h: test if USE_READER_CONF is defined (see
+     --enable-confdir=DIR)
+
+pcsc-lite-1.0.2beta: (Ludovic Rousseau)
+29 Nov, 2001
+- stop if /tmp/pcsc already exists
+- clean and remove /tmp/pcsc on exit using signal() and atexit()
+- renamed SYS_Exit to exit in many places to use the atexit() defined
+  cleaning function
+- removed \n in debug messages (syslog does not need it)
+- some minor print cosmetic modification in atrhandler.c
+- use a define DEBUG_BUFFER_LENGTH instead of 150 in debuglog.c
+- use snprintf() instead of sprintf() in debuglog.c
+- add a error on compile in pcscdaemon.c
+   You must use '--enable-syslog' when also using '--enable-daemon' or
+   you will not get any message
+- renamed SYS_Stat to SYS_Fstat since the system call is fstat and stat
+  is another one
+- use PCSCLITE_IPC_DIR instead of repeating "/tmp/pcsc/" in pcsclite.h
+
+pcsc-lite-1.0.1:
+added -fno-common to CCFLAGS
+fixed syslog error on ATR
+lengthened the default client timeout on commands
+fixed bus error when vendir/id not found
+Added support for HP-UX 11 and OpenBSD 2.9
+Removed callback socket from server
+Fixed GetStatusChange bug on small timeouts
+Fix bug in transmit where reader sends back
+wrong length causes client to overwrite buffer
+
+pcsc-lite-1.0.0b:
+Fixed numerous NULL pointer errors
+Fixed many, many behaviors
+Tried Windows compatibility testing
+Switched to sockets based implementation
+Basically, it's had 2 months testing
+
+pcsc-lite-0.9.3:
+Changed test.c
+Added buffered read/write layer
+Shortened timeouts on outgoing commands
+Added support for Solaris 2.6 2.8
+Fixed autoconf problems
+Added an option for client side thread safety
+Fixed '-' problem for bundleparser
+
+pcsc-lite-0.9.1:
+Switched to named pipes for transport
+Fixed SCARD_POWERED tag when card inserted upside down
+Added non-polling request blocking
+Switched to autoconf thanks to some help
+Added timeouts for client/server
+
+pcsc-lite-0.8.7:
+Added kernel IoKit notifications for USB devices on OS X
+Added polling support for USB devices on Linux
+Added XML parsing for bundles on Linux
+Fixed GetStatusChange's SCARD_READERSTATE structure problem
+Fixed random generation in EstablishContext ( Carl-Magnus Pettersson )
+Fixed RPC Channel leak in EstablishContext  ( Carl-Magnus Pettersson )
+Updated documentation to 0.8.7
+
+pcsc-lite-0.8.6:
+Added empty file powermgt_macosx.c for future power management
+Added ability for multiple identical readers on OS X
+Fixed bug enabling SCardTransmit to pass memory card functions
+by allowing sSendPci to be NULL
+Fixed some possible buffer overrun exploits
+
+pcsc-lite-0.8.5:
+Moved to 'fat client' architecture
+Mapped status to clients so events are immediate
+Removed fork() from server, and wait() calls
+Added multi readers to GetStatusChange
+Added block for reader in GetStatusChange
+Added Reader Lun naming mechanism for friendlynames
+Updated the documentation
+
+pcsc-lite-0.8.2:
+Added more error checking to all winscard functions.
+Added the ability to use Domain Sockets on Linux, Solaris.
+Increased the select sleep time to conserve cpu time.
+Added the ability to recover from errors by reloading drivers/etc.
+Pre-allocated bundle array list to save cpu time and memory leakage.
+Added SECURITY file.
+
+pcsc-lite-0.8.0:
+Added Hot Pluggable search function to select loop.
+Fixed Makefiles to do copies not moves
+Changed some filenames.
+
+pcsc-lite-0.7.8:
+Fixed race condition between pcscusb and eventhandler.c
+Fixed core dump on error startup.
+Added T=1 detection to test.c.
+Added SCardControl()
+
+pcsc-lite-0.7.5:
+Dynamically addable readers.
+Multiple dynamically addable readers.
+More startup error checking.
+Full support for OS X
+
+pcsc-lite-0.7.3:
+Added stringified error responses.
+Fixed some error returning bugs.
+Support for dynamic readers such as USB readers.
+More support for OS X
+
+pcsc-lite-0.7.1:
+Fixed bugs causing problems in Redhat regarding mutex pointers.
+Fixed exiting problem causing random zombie processes.
+Removed thread libs and dyn libs from local library.
+Abstracted thread libs in thread_generic.h
+Added support for Mac OS X.
+
+pcsc-lite-0.7.0:
+Support for ifd handler 2.0 specifications.
+
+pcsc-lite-0.6.9:
+Fixed bug in readerfactory.c that only allowed 2 applications
+to run simultaneously.
+Fixed bug in rpc/winscard.c so that some applications which
+while looped on Begin/End could not cause starvation.
+
+
+pcsc-lite-0.6.8
+Fixed mutex bug in readerfactory.c
+Added SCardListReaderGroups for compatibility
+Fixed NULL in for ListReaders
+Fixed NULL as pioRecvPci in Transmit
+Added multi-sys Makefiles
+Pulled Windows(r) defs from pcsclite.h
+Added INFINITE to GetStatusChange.
+
+pcsc-lite-0.6.6
+Added application event notification on calls
+Added SCardReconnect
+
+pcsc-lite-0.6.5
+Added -v option for version checking
+Added security module for future encryption/decryption
+Added function to allow only from localhost
+Added default values to all variables
+Proper freeing of all pointer values
+Fixed Reset on Disconnect
+Removed any dangerous pointer references
+
+pcsc-lite-0.6.4
+Shortened the thread zombie cleanup time.
+
+pcsc-lite-0.6.3
+Fixed readerfactory assignment of ID problem
+
+pcsc-lite-0.6.2
+Using pthreads for status poll.
+Using pthread mutexes instead of test and set.
+Fixed problem in GetStatusChange.
+Fixed SCardBeginTransaction.
+
+pcsc-lite-0.6.0
+Removed SCardReadMemory, SCardWriteMemory
+Added Mutex locks around all driver calls
+Added ability to do startup allocation
+Fixed memory leak in RFAddReader
+Removed some warnings
+
+pcsc-lite-0.5.5
+Added multi-slot support
+Fixed T=0/1 protocol definition
+
+pcsc-lite-0.5.2
+Fixed protocol negotiation
+Modified defines to work with OCF
+
+pcsc-lite-0.5.0
+Fixed the Makefiles to include
+symbolic links to external libraries
+
+pcsc-lite-0.4.9
+Added some objects to the client's
+library so it can be used with ssp-lite
+
+pcsc-lite-0.4.7
+Added Server State Machine
+Kills dead clients and frees resources
+Added SCardSetTimeout
+Fixed Makefile for non-rpc
+Added BSD style Makefile for BSD compilation
+Fixed SCardRead/Write functions
+
+pcsc-lite-0.4.0
+Fixed SCardStatus Function
+Added IFD Wrapper Abstraction Layer
+Began support for multiple slots
+Fixed bug in SCardStatus with overflow
+Added code to remove zombie processes
+Added support for connecting to multiple
+readers/resource managers from the client.
+
+pcsc-lite-0.3.0:
+Added RPC abstraction layer.
+Added Server Forking on Transmit and GetStatusChange.
+Fixed overflowed buffer in atrhandler.c
+Fixed Disconnect Bug.
+
+pcsc-lite-0.2.4:
+Added ATR Handling.
+Added support for T=1
+Added support for PTS negotiation
+Added abstraction for more slots/terminal
+Added correct ATR size return
+
+pcsc-lite-0.2.2:
+Added some defines in pcsclite.h
+Added support for Memory cards.
+Added support for SCardCancel.
+
+pcsc-lite-0.2.0:
+Fixed powering up error in GetStatusChange.
+Added some type defines in pcsclite.h
+
+pcsc-lite-0.1.0:
+Fixed bug in readerfactory.c line 117 lpcReaders[p] = 0
+to lpcTReaders[p] = 0.  This was giving strange errors.
+Fixed return rv at SCardStatus function to return SCARD_S_SUCCESS.
+Added 7 more defines to pcsclite.h
+
+pcsc-lite-0.0.2:
+Added functions Status, and GetStatusChange
+Fixed Connect to look for card
+Fixed return values for functions
