@@ -1102,9 +1102,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext,
 
 \parameters
 
-\begin{tabular}{lll}
+\begin{tabular}{llp{10cm}}
 \texttt{hContext} &	IN &	Connection context to the PC/SC Resource Manager\\
-\texttt{dwTimeout} &	IN &	Maximum block waiting time for status change, zero for infinite\\
+\texttt{dwTimeout} &	IN &	Maximum waiting time (in miliseconds)
+for status change, zero (or \texttt{INFINITE}) for infinite\\
 \texttt{rgReaderStates} & INOUT & Structures of readers with current states\\
 \texttt{cReaders} &	IN &	Number of structures\\
 \end{tabular}
@@ -1192,20 +1193,16 @@ this bit is set, SCARD\_STATE\_PRESENT will also be set\\
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard;
-DWORD dwActiveProtocol, cReaders;
 SCARD_READERSTATE_A rgReaderStates[1];
 LONG rv;
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 
-rgReaderStates[0].szReader = strdup("Reader X");
-rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
+rgReaderStates[0].szReader = "Reader X";
+rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
 
-cReaders = 1;
-rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, cReaders);
-rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
-         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+printf("reader state: 0x%04X\n", rgReaderStates[0].dwEventState);
 \end{verbatim}
 
 
