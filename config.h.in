@@ -64,12 +64,6 @@
 /* display ATR parsing debug messages. */
 #undef ATR_DEBUG
 
-/* send messages to syslog instead of stdout */
-#undef USE_SYSLOG
-
-/* pcsc runs as a daemon in the background. */
-#undef USE_DAEMON
-
 /* directory containing reader.conf (default /etc) */
 #undef USE_READER_CONF
 

@@ -156,9 +156,11 @@ int main(int argc, char **argv) {
     printf("pcscd -v       - Display version and exit\n");
     printf("pcscd -c file  - New path to reader.conf\n");
     printf("pcscd -fg      - Run in foreground (no daemon)\n");
+#ifdef PCSC_DEBUG
     printf("pcscd -d0      - Debugging messages go to syslog\n");
     printf("pcscd -d1      - Debugging messages go to stderr\n");
     printf("pcscd -d2      - Debugging messages go to stdout\n");
+#endif
     printf("pcscd -help    - This help menu\n");
     return 0;
   }
@@ -167,6 +169,7 @@ int main(int argc, char **argv) {
   if ( argc > 1 ) {
     /* Check for each argument */
     for (i=1; i < argc; i++) {
+#ifdef PCSC_DEBUG
       if (strncmp(argv[i], "-d0", PCSCLITE_MAX_COMSIZE) == 0) {
 	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
       } else if (strncmp(argv[i], "-d1", PCSCLITE_MAX_COMSIZE) == 0) {
@@ -174,7 +177,9 @@ int main(int argc, char **argv) {
       } else if (strncmp(argv[i], "-d2", PCSCLITE_MAX_COMSIZE) == 0) {
 	DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
 	DebugLogA("main: debug messages to stdout\n" );
-      }	else if (strncmp(argv[i], "-fg", PCSCLITE_MAX_COMSIZE) == 0) {
+      }	
+#endif
+      if (strncmp(argv[i], "-fg", PCSCLITE_MAX_COMSIZE) == 0) {
 	DebugLogA("main: pcscd set to foreground\n" );
 	setToForeground = 1;
       } else if (strncmp(argv[i], "-c", PCSCLITE_MAX_COMSIZE) == 0) {
@@ -286,7 +291,7 @@ int main(int argc, char **argv) {
   g_rgSCardT1Pci.dwProtocol  = SCARD_PROTOCOL_T1;  
   g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
   
-  DebugLogA("main: PC/SC Lite Daemon Ready.");
+  DebugLogA("main: pcsc-lite daemon ready.");
 
   /* post initialistion */
   Init = 0;

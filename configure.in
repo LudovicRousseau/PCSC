@@ -161,7 +161,7 @@ AC_ARG_ENABLE(debug,
   no)	
     debug=false ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
- esac], [debug=false])
+ esac], [debug=true])
 
 AC_MSG_RESULT([enable debug messages      : $debug])
 
@@ -183,35 +183,6 @@ AC_MSG_RESULT([enable ATR parsing messages: $debugatr])
 
 if test x${debugatr} = xtrue ; then
   AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
-fi
-
-AC_ARG_ENABLE(syslog,
-[  --enable-syslog         send messages to syslog instead of stdout.],
-[case "${enableval}" in
-  yes)	syslog=true ;;
-  no)	syslog=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-syslog]) ;;
- esac], [syslog=false])
-
-AC_MSG_RESULT([enable debug out to syslog : $syslog])
-
-if test x${syslog} = xtrue ; then
-  AC_DEFINE(USE_SYSLOG, 1, [send messages to syslog instead of stdout])
-fi
-
-
-AC_ARG_ENABLE(daemon,
-[  --enable-daemon         pcscd runs as a true daemon.],
-[case "${enableval}" in
-  yes)	daemon=true ;;
-  no)	daemon=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-daemon]) ;;
- esac], [daemon=false])
-
-AC_MSG_RESULT([enable pcscd forked daemon : $daemon])
-
-if test x${daemon} = xtrue ; then
-  AC_DEFINE(USE_DAEMON, 1, [pcsc runs as a daemon in the background.])
 fi
 
 AC_ARG_ENABLE(musclecard,

@@ -77,10 +77,12 @@ ac_aux_dir = @ac_aux_dir@
 
 INCLUDES = -I$(top_srcdir)/src
 
-bin_PROGRAMS = installifd formaticc
+bin_PROGRAMS = installifd formaticc bundleTool
 installifd_SOURCES = installifd.c
 formaticc_SOURCES = formaticc.c
 formaticc_LDADD = $(top_builddir)/src/libpcsclite.la
+bundleTool_SOURCES = bundleTool.c
+bundleTool_LDADD = $(top_builddir)/src/libpcsclite.la
 
 EXTRA_DIST = sample.in sample.ibm sample.out
 mkinstalldirs = $(SHELL) $(top_srcdir)/build/mkinstalldirs
@@ -100,6 +102,9 @@ installifd_LDFLAGS =
 formaticc_OBJECTS =  formaticc.o
 formaticc_DEPENDENCIES =  $(top_builddir)/src/libpcsclite.la
 formaticc_LDFLAGS = 
+bundleTool_OBJECTS =  bundleTool.o
+bundleTool_DEPENDENCIES =  $(top_builddir)/src/libpcsclite.la
+bundleTool_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -115,9 +120,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/formaticc.P .deps/installifd.P
-SOURCES = $(installifd_SOURCES) $(formaticc_SOURCES)
-OBJECTS = $(installifd_OBJECTS) $(formaticc_OBJECTS)
+DEP_FILES =  .deps/bundleTool.P .deps/formaticc.P .deps/installifd.P
+SOURCES = $(installifd_SOURCES) $(formaticc_SOURCES) $(bundleTool_SOURCES)
+OBJECTS = $(installifd_OBJECTS) $(formaticc_OBJECTS) $(bundleTool_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -194,6 +199,10 @@ installifd: $(installifd_OBJECTS) $(installifd_DEPENDENCIES)
 formaticc: $(formaticc_OBJECTS) $(formaticc_DEPENDENCIES)
 	@rm -f formaticc
 	$(LINK) $(formaticc_LDFLAGS) $(formaticc_OBJECTS) $(formaticc_LDADD) $(LIBS)
+
+bundleTool: $(bundleTool_OBJECTS) $(bundleTool_DEPENDENCIES)
+	@rm -f bundleTool
+	$(LINK) $(bundleTool_LDFLAGS) $(bundleTool_OBJECTS) $(bundleTool_LDADD) $(LIBS)
 
 tags: TAGS
 

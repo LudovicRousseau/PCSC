@@ -3,22 +3,30 @@
 .\"
 .TH PCSCD 8 "March 2002" Linux "User Manual"
 .SH NAME
-pcscd \- PC/Smart Card Lite Daemon
+pcscd \- PC/SC Smartcard Daemon
 .SH SYNOPSIS
 .B pcscd [-v] [-c
 .I file
-.B ] [-help]
+.B ] [-d0] [-d1] [-d2] [-fg] [-help]
 .SH OPTIONS
 .IP -v	
 Displays the version of pcscd
 .IP "-c file"
 Specifies the file as an alternate location for reader.conf
+.IP -d0
+Outputs debugging to syslog (requires debugging on)
+.IP -d1
+Outputs debugging to stderr (requires debugging on)
+.IP -d2
+Outputs debugging to stdout (requires debugging on)
+.IP -fg
+Runs pcscd in the foreground (disables daemon)
 .IP -help 
 Displays information about the pcscd command line
 .SH DESCRIPTION
-pcscd is the daemon program for PC/SC Lite and MUSCLE Card. It is a resource 
-manager that coordinates communications with smart-card readers and smart 
-cards that are connected to the system.
+pcscd is the daemon program for pcsc-lite and musclecard framework. It is 
+a resource manager that coordinates communications with smart-card readers 
+and smart cards and cryptographic tokens that are connected to the system.
 
 pcscd is normally started at boot from 
 .I /etc/rc.  
@@ -27,22 +35,21 @@ It allows applications to access smart cards and readers without knowing details
 pcscd coordinates the loading of drivers for card readers and plug-ins 
 for different card types.
 
-The purpose of PC/SC Lite is to provide a Windows(R) SCard interface in 
-a very small form factor for communicating to smartcards and readers.  
-PC/SC Lite can be used to allocate/deallocate reader drivers dynamically 
-at runtime.
-
-PC/SC Lite uses the same winscard api as used under Windows(R).
+The purpose of pcsc-lite is to provide both a cross compatible API for
+migrating Windows based PCSC applications to Unix and to provide a 
+pluggable architecture for supporting smartcards and cryptographic tokens 
+through high level API's.
 
 At startup, pcscd loads the smart card reader drivers specified in the 
-.I usr/local/etc/reader.conf 
+.I /etc/reader.conf 
 file.  
 
 When a smart card is inserted into a reader, pcscd uses the ATR string from 
 the card to identify this card.  The 
 .I /usr/local/pcsc/serices 
 directory contains plug-ins for the card.  These plug-ins are searched.  If 
-the ATR string matches, pcscd loads that plug-in for the card.
+the ATR string matches, the client library loads that plug-in for that 
+token.
 .SH "SERIAL SMART CARD READER DRIVERS"
 Smart card reader drivers are placed in the 
 .I /usr/local/pcsc/drivers 
@@ -58,13 +65,13 @@ file.  The file has the following format:
 .RS
 # Comment Line 
 
-FRIENDLYNAME	"Schlumberger Reflex 72 COM1"
+FRIENDLYNAME	"My Smartcard Reader"
 .RE
 .RS
 DEVICENAME	GEN_SMART_RDR
 .RE
 .RS
-LIBPATH	/usr/local/pcsc/drivers/libslb_rf72.so
+LIBPATH	        /usr/local/pcsc/drivers/my_reader.so
 .RE
 .RS
 CHANNELID	0x0103F8
@@ -82,7 +89,9 @@ is a driver specific value.  If you do not know this value, GEN_SMART_RDR is a g
 is the full path to the shared library. 
 
 .IP CHANNELID 
-is the channel ID for serial-port, smart-card readers, use the following:
+is the channel ID for serial-port, smart-card readers.  This could vary 
+depending on the driver in which you are using - check the driver README
+for more information.  Some use the following:
 
 .RS 
 COM1     0x0103F8
@@ -99,16 +108,16 @@ COM4     0x0102E8
 Multiple drivers can be listed in 
 .I usr/local/etc/reader.conf.
 
-Drivers are available at http://www.linuxnet.com
+Drivers are available at http://www.musclecard.com
 .SH "SMART CARD PLUG-INS"
-pcscd uses plug-ins to handle different types of smart cards. There is a 
-plug-in for each smart-card type. Plug-ins are installed in the 
+pcsc-lite uses plug-ins to handle different types of smart cards. There is 
+a plug-in for each smart-card type. Plug-ins are installed in the 
 .I /usr/local/pcsc/services 
-directory.  pcscd comes with the plug-in for CAC card smart cards. Plug-ins 
-for other card types are available.
+directory.  Plug-ins for cards/tokens are available from the MUSCLE
+web site [http://www.musclecard.com].
 .SH FILES
-.I usr/local/reader.conf
-.I usr/local/libpcsc.so
+.I /etc/reader.conf
+.I /usr/local/sbin/pcscd
 .SH BUGS
 None known.
 .SH "SEE ALSO"
