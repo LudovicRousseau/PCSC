@@ -402,7 +402,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		rv = RFCheckReaderEventState(rContext, hCard);
 		switch(rv)
 		{
-			// avoid deadlock
+			/* avoid deadlock */
 			case SCARD_W_RESET_CARD:
 				break;
 
@@ -410,12 +410,12 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				DebugLogA("SCardReconnect: card removed");
 				return SCARD_W_REMOVED_CARD;
 
-			// invalid EventStatus
+			/* invalid EventStatus */
 			case SCARD_E_INVALID_VALUE:
 				DebugLogA("SCardReconnect: invalid EventStatus");
 				return SCARD_F_INTERNAL_ERROR;
 
-			// invalid hCard, but hCard was widely used some lines above :(
+			/* invalid hCard, but hCard was widely used some lines above :( */
 			case SCARD_E_INVALID_HANDLE:
 				DebugLogA("SCardReconnect: invalid handle");
 				return SCARD_F_INTERNAL_ERROR;

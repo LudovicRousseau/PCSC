@@ -325,7 +325,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 		}	/* if .bundle */
 	}	/* while readdir */
 #ifdef WIN32
-	// This is part of a Do..While loop (see above)
+	/* This is part of a Do..While loop (see above) */
 	while (FindNextFile(hFind, &findData) != 0);
 #endif
 

@@ -42,10 +42,10 @@
 #define PCSC_SCF_MAX_ATR_BUFFER_LENGTH 32
 #define PCSC_SCF_MAX_RECV_LEN 265
 
-//Global session to manage Readers, Card events.
+/* Global session to manage Readers, Card events. */
 static SCF_Session_t  g_hSession = NULL;
 
-//Have to define this because they are defined in pcsclite.h as externs
+/* Have to define this because they are defined in pcsclite.h as externs */
 SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 
 static struct _psTransmitMap {
@@ -55,7 +55,7 @@ static struct _psTransmitMap {
 } psTransmitMap[PCSCLITE_MAX_CONTEXTS];
 
 
-//Channel Map to manage Card Connections.
+/* Channel Map to manage Card Connections. */
 static struct _psChannelMap {
   SCARDHANDLE  PCSC_hCard;
   SCARDCONTEXT hContext;
@@ -67,14 +67,14 @@ static struct _psChannelMap {
   int ReaderIndice;
 } psChannelMap[PCSCLITE_MAX_CONTEXTS];
 
-//Context Map to manage contexts and sessions.
+/* Context Map to manage contexts and sessions. */
 static struct _psContextMap {
   SCARDCONTEXT hContext;
   SCF_Session_t  hSession;
   DWORD        contextBlockStatus;
 } psContextMap[PCSCLITE_MAX_CONTEXTS];
 
-//Reader Map to handle Status and GetStatusChange.
+/* Reader Map to handle Status and GetStatusChange. */
 static struct _psReaderMap {
   SCF_Terminal_t hTerminal;
   LPSTR ReaderName;
@@ -86,14 +86,14 @@ static struct _psReaderMap {
 } psReaderMap[PCSC_SCF_MAX_READERS];
 
 
-//LPSTR ReaderLists = NULL;
-
 #ifdef USE_THREAD_SAFETY
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
-//Mutex for the Smardcard Event Handling, different from client Mutex
-//because event reporting from the ocfserver is done using a single thread,
-//so to get lock on the clientMutex may affect the performance of the ocf server.
+/*
+ * Mutex for the Smardcard Event Handling, different from client Mutex
+ * because event reporting from the ocfserver is done using a single thread,
+ * so to get lock on the clientMutex may affect the performance of the ocf server.
+ */
 static PCSCLITE_MUTEX EventMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -319,8 +319,8 @@ static LONG SCardConnectTH( SCARDCONTEXT hContext, LPCSTR szReader, DWORD dwShar
      (SCARD_SHARE_DIRECT != dwShareMode) ){
     return SCARD_E_INVALID_VALUE;
   }
-  //TODO Which Protocols have to be supported
-  /*Ignoring protocols for now*/
+  /* TODO Which Protocols have to be supported */
+  /* Ignoring protocols for now */
   /* Make sure this handle has been opened */
 
   rv = getNewHandle(hContext,szReader,phCard,dwShareMode);
@@ -370,9 +370,9 @@ static LONG SCardDisconnectTH( SCARDHANDLE hCard, DWORD dwDisposition ) {
     return SCARD_E_INVALID_HANDLE;
   }
   
-  //TODO Take Care of the Disposition... 
-  /*Resetting the card for SCARD_RESET_CARD | 
-    SCARD_UNPOWER_CARD | SCARD_EJECT_CARD */
+  /* TODO Take Care of the Disposition...  */
+  /* Resetting the card for SCARD_RESET_CARD | 
+     SCARD_UNPOWER_CARD | SCARD_EJECT_CARD */
   if(SCARD_LEAVE_CARD != dwDisposition) {
     /*must acquire the lock to reset card*/ 
     status = SCF_Card_lock(psChannelMap[retIndice].SCF_hCard, 0);
@@ -529,11 +529,11 @@ static LONG SCardEndTransactionTH( SCARDHANDLE hCard, DWORD dwDisposition ) {
   if(rv != SCARD_S_SUCCESS)
     return rv;
   
-  //TODO Take Care of the Disposition... 
+  /* TODO Take Care of the Disposition... */
   if(SCARD_LEAVE_CARD != dwDisposition) {
     status = SCF_Card_reset(psChannelMap[retIndice].SCF_hCard);
     if(SCF_STATUS_SUCCESS == status) {
-      //reset the isReset for this card
+      /* reset the isReset for this card */
       SYS_USleep(10);
       SCardEventLock();
       psChannelMap[retIndice].isReset = 0;
@@ -560,8 +560,7 @@ static LONG SCardCancelTransactionTH( SCARDHANDLE hCard ) {
    if(SCARD_S_SUCCESS != isOCFServerRunning())
     return SCARD_E_NO_SERVICE;
    
-   //TODO ....
-
+  /* TODO */
   return SCARD_S_SUCCESS;
 }
 
@@ -705,8 +704,6 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
      return the first available reader 
   */
   if ( cReaders == 0 ) {
-    // while (1) {
-   
       for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
 	if(psReaderMap[i].ReaderName) 
 	  return SCARD_S_SUCCESS;
@@ -839,7 +836,7 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
 	    currReader->dwEventState |= SCARD_STATE_CHANGED;
 	    dwBreakFlag = 1;
 	  }	
-	  //TO DO ....
+	  /* TODO */
 	  if ( 0 && dwState & SCARD_SWALLOWED ) {
 	    if ( currReader->dwCurrentState & SCARD_STATE_MUTE ) {
 	      currReader->dwEventState |= SCARD_STATE_MUTE;
@@ -907,7 +904,7 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
     }
 
  /* Declare all the break conditions */
-    //TO DO think about this
+    /* TODO think about this */
        if ( psContextMap[retIndice].contextBlockStatus == 
 	 BLOCK_STATUS_RESUME ) {
       break;
@@ -917,7 +914,7 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
     if ( ( dwBreakFlag == 1 ) && ( j == 0 ) ) {
       break;
     }
-  } while ( 1 );  // end of do 
+  } while ( 1 ); /* end of do */
 
   if ( psContextMap[retIndice].contextBlockStatus == 
          BLOCK_STATUS_RESUME ) {
@@ -931,8 +928,7 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
 LONG SCardControl( SCARDHANDLE hCard, LPCBYTE pbSendBuffer, DWORD cbSendLength,
                    LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength ) {
 
-  //TODO .....
-
+  /* TODO */
   return SCARD_S_SUCCESS;
 }
 
@@ -963,8 +959,8 @@ static LONG SCardTransmitTH( SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	(*pcbRecvLength < 2)) 
      return SCARD_E_INSUFFICIENT_BUFFER;
    
-  //TODO which protocols to support
-  //if(pioSendPci && pioSendPci->dwProtocol) {
+  /* TODO which protocols to support */
+  /* if(pioSendPci && pioSendPci->dwProtocol) { */
    retIndice = SCardGetHandleIndice(hCard);
    if((pbSendBuffer[1] == 0xC0) &&
       psTransmitMap[retIndice].isResponseCached) {
@@ -1011,8 +1007,8 @@ static LONG SCardTransmitTH( SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
     }
   }
   
-  //TO DO fill the received Pci ...
-  //For now  just filling the send pci protocol.
+  /* TODO fill the received Pci ... */
+  /* For now  just filling the send pci protocol. */
   if(pioRecvPci && pioSendPci)
     pioRecvPci->dwProtocol = pioSendPci->dwProtocol;
 
@@ -1217,7 +1213,6 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
   if ( retIndice == -1 ) {
     return SCARD_E_INVALID_HANDLE;
   } 
-  //else
   SCardEventLock();
   SCF_Session_close(psChannelMap[retIndice].hSession);
   psChannelMap[retIndice].PCSC_hCard = 0;
@@ -1416,7 +1411,7 @@ static LONG SCardRemoveContext ( SCARDCONTEXT hContext ) {
   if ( retIndice == -1 ) {
     return SCARD_E_INVALID_HANDLE;
   } else {
-    //Free all handles for this context.
+    /* Free all handles for this context. */
     for(i=0;i<PCSCLITE_MAX_CONTEXTS;i++) {
       if(psChannelMap[i].hContext == hContext) {
 	SCardRemoveHandle(psChannelMap[i].PCSC_hCard);
@@ -1442,8 +1437,6 @@ static SCF_Session_t getSessionForContext(SCARDCONTEXT hContext ) {
   if ( retIndice == -1 ) {
     return NULL;
   }
-  //else
-  
   return(psContextMap[retIndice].hSession);
 }
       
@@ -1502,34 +1495,44 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
   
   SCF_Status_t status;
   
-  //struct _psReaderMap *readerMap;
-  //readerMap = (struct _psReaderMap *) cbdata;
+#if 0
+  struct _psReaderMap *readerMap;
+  readerMap = (struct _psReaderMap *) cbdata;
+#endif
   
   ReaderIndice = (int) cbdata;
   SCardEventLock();
   switch (eventType) {
   case SCF_EVENT_CARDINSERTED:
   case SCF_EVENT_CARDPRESENT:
-    //printf("card present dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#if 0
+    printf("card present dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#endif
     psReaderMap[ReaderIndice].dwCurrentState &= (~(SCARD_STATE_UNKNOWN | SCARD_STATE_UNAVAILABLE | SCARD_STATE_EMPTY));
     psReaderMap[ReaderIndice].dwCurrentState |= SCARD_STATE_PRESENT;
-    //    printf("card present post dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
-    // TO DO get the ATR... filled
+#if 0
+    printf("card present post dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#endif
+    /* TODO get the ATR... filled */
     status = SCF_Terminal_getCard(psReaderMap[ReaderIndice].hTerminal,
 				  &hCard);
     if(SCF_STATUS_SUCCESS == status) {
-      //printf("Setting ATR...\n");
+#if 0
+      printf("Setting ATR...\n");
+#endif
       PCSC_SCF_getATR(hCard, psReaderMap[ReaderIndice].bAtr,
 		      &psReaderMap[ReaderIndice].dwAtrLength);
-      //printf("Atrlen = %d\n",psReaderMap[ReaderIndice].dwAtrLength);
+#if 0
+      printf("Atrlen = %d\n",psReaderMap[ReaderIndice].dwAtrLength);
+#endif
     }
-    //else
-    //printf("getcard failed ret = %x\n", status);
     SCF_Card_close(hCard);
     break;
   case SCF_EVENT_CARDREMOVED:
   case SCF_EVENT_CARDABSENT:
-    //printf("card absent dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#if 0
+    printf("card absent dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#endif
     psReaderMap[ReaderIndice].dwCurrentState &= (~(SCARD_STATE_PRESENT | 
 						   SCARD_STATE_EXCLUSIVE | 
 						   SCARD_STATE_INUSE | 
@@ -1544,11 +1547,12 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
        psChannelMap[i].haveLock = FALSE;
      }
     }
-    //printf("card absent dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
-
+#if 0
+    printf("card absent dwState = %x\n", psReaderMap[ReaderIndice].dwCurrentState);
+#endif
     break;
   case SCF_EVENT_TERMINALCLOSED:
-    //TODO ....
+    /* TODO .... */
     break;
   case SCF_EVENT_CARDRESET:
     for(i=0;i<PCSCLITE_MAX_CONTEXTS;i++) {
@@ -1667,9 +1671,11 @@ static LONG ConvertStatus(SCF_Status_t status)
     return SCARD_W_REMOVED_CARD;
   case SCF_STATUS_TIMEOUT:
     return SCARD_E_TIMEOUT;
-    // case SCF_STATUS_DOUBLELOCK:
-    //TODO
+#if 0
+  case SCF_STATUS_DOUBLELOCK:
+    /* TODO */
     break;
+#endif
   case SCF_STATUS_CARDLOCKED:
     return SCARD_E_SHARING_VIOLATION;
   case SCF_STATUS_NOSPACE:
@@ -1705,24 +1711,8 @@ LONG SCardCheckReaderAvailability( LPSTR readerName, LONG errorCode ) {
 }
 LONG SCardCheckDaemonAvailability() {
 
-  LONG rv;
+  LONG rv = 1;	/* assume it exists */
   int fd;
-
-  //fd = open( PCSCLITE_SHM_FILE, O_RDWR );
-  //if ( fd < 0 ) {
-#ifdef PCSC_DEBUG
-    DebugLogA("Error: Cannot open shared file\n", __FILE__, __LINE__);
-#endif
-    // }
-
-  /* Attempt a passive lock on the shared memory file */
-  //rv = SYS_LockFile( fd );
-
-  //close(fd);
-
-  /* If the lock succeeds then the daemon is not there, 
-     otherwise if an error is returned then it is 
-  */
 
   if ( rv == 0 ) {
     return SCARD_E_NO_SERVICE;

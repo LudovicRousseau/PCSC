@@ -796,7 +796,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 #endif
 
-	// log the APDU
+	/* log the APDU */
 	DebugLogCategory(DEBUG_CATEGORY_APDU, pucTxBuffer, dwTxLength);
 
 	/*
@@ -872,7 +872,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	 * END OF LOCKED REGION 
 	 */
 
-	// log the returned status word
+	/* log the returned status word */
 	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);
 
 	if (rv == IFD_SUCCESS)

@@ -33,15 +33,17 @@ $Id$
 #include "sys_generic.h"
 #include "parser.h"
 
-// PCSCLITE_HP_DROPDIR is defined using ./configure --enable-usbdropdir=foobar
 #define PCSCLITE_USB_PATH                       "/proc/bus/usb"
+
 #define PCSCLITE_MANUKEY_NAME                   "ifdVendorID"
 #define PCSCLITE_PRODKEY_NAME                   "ifdProductID"
 #define PCSCLITE_NAMEKEY_NAME                   "ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME                   "CFBundleExecutable"
-#define PCSCLITE_HP_MAX_IDENTICAL_READERS	 	16
-#define PCSCLITE_HP_MAX_SIMUL_READERS           04
-#define PCSCLITE_HP_MAX_DRIVERS					20
+
+/* PCSCLITE_MAX_READERS is defined in pcsclite.h */
+#define PCSCLITE_HP_MAX_IDENTICAL_READERS	16
+#define PCSCLITE_HP_MAX_SIMUL_READERS		04
+#define PCSCLITE_HP_MAX_DRIVERS			20
 
 extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
@@ -92,9 +94,6 @@ static struct _bundleTracker
 }
 bundleTracker[PCSCLITE_HP_MAX_DRIVERS];
 
-// static LONG hpManu_id, hpProd_id;
-// static int bundleArraySize;
-
 LONG HPReadBundleValues()
 {
 
@@ -129,32 +128,32 @@ LONG HPReadBundleValues()
 				currFP->d_name, "/Contents/Info.plist");
 			fullPath[FILENAME_MAX - 1] = '\0';
 
-			// while we find a nth ifdVendorID in Info.plist
+			/* while we find a nth ifdVendorID in Info.plist */
 			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
 				keyValue, alias) == 0)
 			{
 				bundleTracker[listCount].bundleName = strdup(currFP->d_name);
 
-				// Get ifdVendorID
+				/* Get ifdVendorID */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
-				// get ifdProductID
+				/* get ifdProductID */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].productID =
 						strtol(keyValue, 0, 16);
 
-				// get ifdFriendlyName
+				/* get ifdFriendlyName */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].readerName = strdup(keyValue);
 
-				// get CFBundleExecutable
+				/* get CFBundleExecutable */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
 					keyValue, 0);
 				if (rv == 0)

@@ -1,4 +1,3 @@
-
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
@@ -29,7 +28,6 @@ int main(int argc, char **argv)
 	SCARDCONTEXT hContext;
 	SCARD_READERSTATE_A rgReaderStates[1];
 	unsigned long dwReaderLen, dwState, dwProt, dwAtrLen;
-	// unsigned long dwSendLength, dwRecvLength;
 	unsigned long dwPref, dwReaders;
 	char *pcReaders, *mszReaders;
 	unsigned char pbAtr[MAX_ATR_SIZE];
@@ -37,8 +35,9 @@ int main(int argc, char **argv)
 	long rv;
 	int i, p, iReader;
 	int iList[16];
-
-	// int t = 0;
+#ifdef REPEAT_TEST
+	int t = 0;
+#endif
 
 	printf("\nMUSCLE PC/SC Lite Test Program\n\n");
 

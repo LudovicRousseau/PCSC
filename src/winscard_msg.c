@@ -249,7 +249,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 	}
 
 	if (selret == 0)
-		// timeout
+		/* timeout */
 		return 2;
 
 	/*

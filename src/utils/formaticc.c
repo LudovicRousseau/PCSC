@@ -31,15 +31,10 @@ int main(int argc, char *argv[])
 {
 	SCARDHANDLE hCard;
 	SCARDCONTEXT hContext;
-	// struct ReaderContext *rContext;
-	// SCARD_IO_REQUEST sSendPci;
 	SCARD_IO_REQUEST sRecvPci;
 	SCARD_READERSTATE_A rgReaderStates[1];
-	// DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
 	DWORD dwSendLength, dwRecvLength, dwPref, dwReaders;
-	// LPSTR pcReaders;
 	LPSTR mszReaders;
-	// BYTE pbAtr[MAX_ATR_SIZE];
 	BYTE s[MAX_BUFFER_SIZE], r[MAX_BUFFER_SIZE];
 	LPCSTR mszGroups;
 	LONG rv;
@@ -53,8 +48,6 @@ int main(int argc, char *argv[])
 	char line[80];
 	char *line_ptr;
 	unsigned int x;
-
-	// int t = 0;
 
 	printf("\nWinscard PC/SC Lite Test Program\n\n");
 

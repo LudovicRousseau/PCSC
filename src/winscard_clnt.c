@@ -84,7 +84,6 @@ static LONG SCardCheckReaderAvailability(LPSTR, LONG);
 /*
  * Thread safety functions
  */
-// static LONG SCardSetupThreadSafety ( );
 static LONG SCardLockThread();
 static LONG SCardUnlockThread();
 
@@ -1882,17 +1881,6 @@ LONG SCardRemoveHandle(SCARDHANDLE hCard)
 		return SCARD_S_SUCCESS;
 	}
 }
-
-/*
- * This function sets up the mutex when the first call to EstablishContext
- * is made by the first thread
- */
-
-/*
- * LONG SCardSetupThreadSafety() {
- *
- * #ifdef USE_THREAD_SAFETY return 0; #else return 0; #endif }
- */
 
 /*
  * This function locks a mutex so another thread must wait to use this

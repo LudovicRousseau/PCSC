@@ -170,9 +170,11 @@ void SVCServiceRunLoop()
 			break;
 
 		case 2:
-			// timeout in SHMProcessEvents(): do nothing
-			// this is used to catch the Ctrl-C signal at some time when
-			// nothing else happens
+			/*
+			 * timeout in SHMProcessEvents(): do nothing
+			 * this is used to catch the Ctrl-C signal at some time when
+			 * nothing else happens
+			 */
 			break;
 
 		case -1:
@@ -302,12 +304,13 @@ int main(int argc, char **argv)
 	{
 #ifdef USE_RUN_PID
 
-		// read the pid file to get the old pid and test if the old pcscd is
-		// still running 
-
+		/* read the pid file to get the old pid and test if the old pcscd is
+		 * still running 
+		 */
 		FILE *f;
-		// pids are only 15 bits but 4294967296 (32 bits in case of a new
-		// system use it) is on 10 bytes
+		/* pids are only 15 bits but 4294967296
+		 * (32 bits in case of a new system use it) is on 10 bytes
+		 */
 #define PID_ASCII_SIZE 11
 		char pid_ascii[PID_ASCII_SIZE];
 		int pid;
@@ -326,7 +329,7 @@ int main(int argc, char **argv)
 				return 1;
 			}
 			else
-				// the old pcscd is dead. make some cleanup
+				/* the old pcscd is dead. make some cleanup */
 				clean_temp_files();
 		}
 		else
@@ -495,14 +498,15 @@ void clean_temp_files(void)
 
 void signal_trap(int sig)
 {
-	// the signal handler is called several times for the same Ctrl-C
+	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == 0)
 	{
 		DebugLogA("Preparing for suicide");
 		AraKiri = 1;
 
-		// if still in the init/loading phase the AraKiri will not be
-		// seen by the main event loop
+		/* if still in the init/loading phase the AraKiri will not be
+		 * seen by the main event loop
+		 */
 		if (Init)
 		{
 			DebugLogA("Suicide during init");

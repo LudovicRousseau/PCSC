@@ -30,7 +30,7 @@ $Id$
 #include "debuglog.h"
 #include "sys_generic.h"
 
-// Max string size when dumping a 256 bytes longs APDU
+/* Max string size when dumping a 256 bytes longs APDU */
 #define DEBUG_BUF_SIZE (256*3+30)
 
 static char DebugBuffer[DEBUG_BUF_SIZE];
@@ -171,14 +171,15 @@ int DebugLogSetCategory(const int dbginfo)
 #define DEBUG_INFO_LENGTH 80
 	char text[DEBUG_INFO_LENGTH];
 
-	// use a negative number to UNset
-	// typically use ~DEBUG_CATEGORY_APDU
+	/* use a negative number to UNset
+	 * typically use ~DEBUG_CATEGORY_APDU
+	 */
 	if (dbginfo < 0)
 		debug_category &= dbginfo;
 	else
 		debug_category |= dbginfo;
 
-	// set to empty string
+	/* set to empty string */
 	text[0] = '\0';
 
 	if (debug_category & DEBUG_CATEGORY_APDU)

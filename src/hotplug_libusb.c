@@ -35,14 +35,14 @@ $Id$
 #include "sys_generic.h"
 #include "parser.h"
 
-// PCSCLITE_HP_DROPDIR is defined using ./configure --enable-usbdropdir=foobar
 #define PCSCLITE_MANUKEY_NAME			"ifdVendorID"
 #define PCSCLITE_PRODKEY_NAME			"ifdProductID"
 #define PCSCLITE_NAMEKEY_NAME			"ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME			"CFBundleExecutable"
-// PCSCLITE_MAX_READERS is defined in pcsclite.h
+
+/* PCSCLITE_MAX_READERS is defined in pcsclite.h */
 #define PCSCLITE_MAX_DRIVERS			16
-#define BUS_DEVICE_STRSIZE				256
+#define BUS_DEVICE_STRSIZE			256
 #define PCSCLITE_HP_BASE_PORT			0x200000
 
 #define READER_ABSENT	0
@@ -78,7 +78,6 @@ static struct _driverTracker
  */
 static struct _readerTracker
 {
-//	short plugged;
 	char status;
 	char bus_device[BUS_DEVICE_STRSIZE];	/* device name */
 
@@ -123,32 +122,32 @@ LONG HPReadBundleValues(void)
 				currFP->d_name, "/Contents/Info.plist");
 			fullPath[FILENAME_MAX - 1] = '\0';
 
-			// while we find a nth ifdVendorID in Info.plist
+			/* while we find a nth ifdVendorID in Info.plist */
 			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
 				keyValue, alias) == 0)
 			{
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 
-				// Get ifdVendorID
+				/* Get ifdVendorID */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
-				// get ifdProductID
+				/* get ifdProductID */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].productID =
 						strtol(keyValue, 0, 16);
 
-				// get ifdFriendlyName
+				/* get ifdFriendlyName */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].readerName = strdup(keyValue);
 
-				// get CFBundleExecutable
+				/* get CFBundleExecutable */
 				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
 					keyValue, 0);
 				if (rv == 0)
