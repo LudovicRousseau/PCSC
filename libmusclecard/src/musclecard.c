@@ -359,9 +359,9 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 #endif
 
 	if (pcscToMSC(rv) != MSC_SUCCESS)
-	{
 		return pcscToMSC(rv);
-	}
+
+	pConnection->shareMode = sharingMode;
 
 	/*
 	 * Set the sendPCI value based on the ActiveProtocol 
@@ -400,12 +400,10 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 
 	if ((sharingMode == MSC_SHARE_DIRECT) && (slotState & SCARD_ABSENT))
 	{
-
 		/*
 		 * They asked for direct mode and no card is inserted so we are
 		 * done with this 
 		 */
-		pConnection->shareMode = sharingMode;
 		return MSC_SUCCESS;
 	}
 
@@ -518,16 +516,12 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 			pConnection->hCard = 0;
 
 			if (rv == MSC_SHARING_VIOLATION)
-			{
 				return rv;
-			} else
-			{
+			else
 				return MSC_UNRECOGNIZED_TOKEN;
-			}
 		}
 	}
 
-	pConnection->shareMode = sharingMode;
 	return MSC_SUCCESS;
 }
 
