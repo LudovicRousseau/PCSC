@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	SCARDCONTEXT hContext;
 	DWORD dwReaders;
 	LPSTR mszReaders;
-	char *ptr, *readers[PCSCLITE_MAX_CHANNELS];
+	char *ptr, *readers[PCSCLITE_MAX_READERS_CONTEXTS];
 	int nbReaders;
 	SCARDHANDLE hCard;
 	DWORD dwActiveProtocol, dwReaderLen, dwState, dwProt, dwAtrLen;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	 */
 	nbReaders = 0;
 	ptr = mszReaders;
-	while ((*ptr != '\0') && (nbReaders < PCSCLITE_MAX_CHANNELS))
+	while ((*ptr != '\0') && (nbReaders < PCSCLITE_MAX_READERS_CONTEXTS))
 	{
 		printf("%d: %s\n", nbReaders, ptr);
 		readers[nbReaders] = ptr;
