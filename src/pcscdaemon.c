@@ -103,7 +103,7 @@ void SVCServiceRunLoop()
 	while (1)
 	{
 
-		switch (SHMProcessEvents(&msgStruct, 0))
+		switch (rsp = SHMProcessEvents(&msgStruct, 0))
 		{
 
 		case 0:
@@ -150,10 +150,12 @@ void SVCServiceRunLoop()
 			break;
 
 		case -1:
-			DebugLogA("SVCServiceRun: Error in ProcessEvents.");
+			DebugLogA("SVCServiceRun: Error in SHMProcessEvents");
 			break;
 
 		default:
+			DebugLogB("SVCServiceRun: SHMProcessEvents unknown retval: %d",
+				rsp);
 			break;;
 		}
 
