@@ -45,7 +45,6 @@ typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
 
 struct _psContextMap
 {
-	int ownerPID;
 	DWORD dwClientID;
 	SCARDCONTEXT hContext;
 	DWORD contextBlockStatus;
@@ -70,7 +69,7 @@ SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, 8 };
 SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
 
 
-static LONG SCardAddContext(SCARDCONTEXT, int, DWORD);
+static LONG SCardAddContext(SCARDCONTEXT, DWORD);
 static LONG SCardGetContextIndice(SCARDCONTEXT);
 static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
@@ -117,7 +116,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	int i, j, pageSize;
 	establish_struct scEstablishStruct;
 	sharedSegmentMsg msgStruct;
-	int currentPID = 0;
 	DWORD dwClientID = 0;
 
 	/*
@@ -183,7 +181,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			/*
 			 * Initially set the context struct to zero
 			 */
-			psContextMap[i].ownerPID = 0;
 			psContextMap[i].dwClientID = 0;
 			psContextMap[i].hContext = 0;
 			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
@@ -208,7 +205,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
-		if (psContextMap[i].ownerPID == 0)
+		if (psContextMap[i].dwClientID == 0)
 			break;
 	}
 
@@ -216,11 +213,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	{
 		return SCARD_E_NO_MEMORY;
 	}
-
-	/*
-	 * Set up the current process ID - identify a thread on Linux
-	 */
-	currentPID = SYS_GetPID();
 
 	if (SHMClientSetupSession(&dwClientID) != 0)
 	{
@@ -241,7 +233,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, currentPID, dwClientID,
+	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, dwClientID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
 		(void *) &scEstablishStruct);
 
@@ -267,7 +259,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	 * Allocate the new hContext - if allocator full return an error
 	 */
 
-	rv = SCardAddContext(*phContext, currentPID, dwClientID);
+	rv = SCardAddContext(*phContext, dwClientID);
 
 	return rv;
 }
@@ -312,7 +304,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	scReleaseStruct.hContext = hContext;
 
-	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, psContextMap[dwContextIndex].dwClientID,
 			  sizeof(scReleaseStruct),
 			  PCSCLITE_MCLIENT_ATTEMPTS, (void *) &scReleaseStruct);
 
@@ -414,7 +406,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.phCard = *phCard;
 	scConnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
 
-	rv = WrapSHMWrite(SCARD_CONNECT, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_CONNECT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scConnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scConnectStruct);
 
@@ -524,7 +516,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	scReconnectStruct.dwInitialization = dwInitialization;
 	scReconnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
 
-	rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scReconnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scReconnectStruct);
 
@@ -590,7 +582,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	scDisconnectStruct.hCard = hCard;
 	scDisconnectStruct.dwDisposition = dwDisposition;
 
-	rv = WrapSHMWrite(SCARD_DISCONNECT, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_DISCONNECT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scDisconnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scDisconnectStruct);
 
@@ -696,7 +688,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 			}
 		}
 
-		rv = WrapSHMWrite(SCARD_BEGIN_TRANSACTION, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+		rv = WrapSHMWrite(SCARD_BEGIN_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
 			sizeof(scBeginStruct),
 			PCSCLITE_CLIENT_ATTEMPTS, (void *) &scBeginStruct);
 
@@ -783,7 +775,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	scEndStruct.hCard = hCard;
 	scEndStruct.dwDisposition = dwDisposition;
 
-	rv = WrapSHMWrite(SCARD_END_TRANSACTION, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_END_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scEndStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scEndStruct);
 
@@ -861,7 +853,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	scCancelStruct.hCard = hCard;
 
-	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scCancelStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scCancelStruct);
 
@@ -960,7 +952,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	scStatusStruct.pcchReaderLen = sizeof(scStatusStruct.mszReaderNames);
 	scStatusStruct.pcbAtrLen = sizeof(scStatusStruct.pbAtr);
 
-	rv = WrapSHMWrite(SCARD_STATUS, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_STATUS, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scStatusStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scStatusStruct);
 
@@ -1584,7 +1576,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	else
 		scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
 
-	rv = WrapSHMWrite(SCARD_TRANSMIT, psContextMap[dwContextIndex].ownerPID, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_TRANSMIT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scTransmitStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scTransmitStruct);
 
@@ -1791,7 +1783,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
  * variable contextBlockStatus to an hContext
  */
 
-static LONG SCardAddContext(SCARDCONTEXT hContext, int currentPID, DWORD dwClientID)
+static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 {
 	int i;
 
@@ -1801,7 +1793,6 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, int currentPID, DWORD dwClien
 		{
 			psContextMap[i].hContext = hContext;
 			psContextMap[i].TID = SYS_ThreadSelf();
-			psContextMap[i].ownerPID = currentPID;
 			psContextMap[i].dwClientID = dwClientID;
 			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
 			psContextMap[i].mMutex = (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
@@ -1854,7 +1845,6 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 	else
 	{
 		psContextMap[retIndice].hContext = 0;
-		psContextMap[retIndice].ownerPID = 0;
 		SHMClientCloseSession(psContextMap[retIndice].dwClientID);
 		psContextMap[retIndice].dwClientID = 0;
 		free(psContextMap[retIndice].mMutex);
