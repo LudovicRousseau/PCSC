@@ -32,19 +32,13 @@
 #include "debuglog.h"
 
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
-static DWORD *dwNumReadersContexts = 0;
+static DWORD dwNumReadersContexts = 0;
 
 LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 {
 
 	int i;   					/* Counter */
 	LONG rv; 					/* Return tester */
-
-	/*
-	 * Allocate global dwNumReadersContexts 
-	 */
-	dwNumReadersContexts = (DWORD *) malloc(sizeof(DWORD));
-	*dwNumReadersContexts = 0;
 
 	/*
 	 * Allocate each reader structure 
@@ -222,7 +216,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		*(sReadersContexts[dwContext])->dwMutex = 1;
 	}
 
-	*dwNumReadersContexts += 1;
+	dwNumReadersContexts += 1;
 
 	rv = RFInitializeReader(sReadersContexts[dwContext]);
 	if (rv != SCARD_S_SUCCESS)
@@ -266,7 +260,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			(sReadersContexts[dwContext])->dwFeeds = 0;
 		}
 
-		*dwNumReadersContexts -= 1;
+		dwNumReadersContexts -= 1;
 
 		return rv;
 	}
@@ -401,7 +395,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 				*(sReadersContexts[dwContextB])->dwMutex += 1;
 			}
 
-			*dwNumReadersContexts += 1;
+			dwNumReadersContexts += 1;
 
 			rv = RFInitializeReader(sReadersContexts[dwContextB]);
 			if (rv != SCARD_S_SUCCESS)
@@ -446,7 +440,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 					(sReadersContexts[dwContextB])->dwFeeds = 0;
 				}
 
-				*dwNumReadersContexts -= 1;
+				dwNumReadersContexts -= 1;
 
 				return rv;
 			}
@@ -536,7 +530,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 			sContext->psHandles[i].hCard = 0;
 		}
 
-		*dwNumReadersContexts -= 1;
+		dwNumReadersContexts -= 1;
 
 	}
 
@@ -591,10 +585,9 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	else
 		ucLowSlot = 'A' + ((int) lowSlot % 10);
 
-
 	if (dwSlot == 0)
 	{
-		if (*dwNumReadersContexts != 0)
+		if (dwNumReadersContexts != 0)
 		{
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
@@ -747,7 +740,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 	i = 0;
 	p = 0;
 
-	if (*dwNumReadersContexts == 0)
+	if (dwNumReadersContexts == 0)
 	{
 		return SCARD_E_READER_UNAVAILABLE;
 	}
@@ -764,7 +757,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 		}
 	}
 
-	if (p > *dwNumReadersContexts)
+	if (p > dwNumReadersContexts)
 	{
 		/*
 		 * We are severely hosed here 
