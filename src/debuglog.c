@@ -296,7 +296,9 @@ char* pcsc_stringify_error(long pcscError)
 	case SCARD_E_SERVICE_STOPPED:
 		strncpy(strError, "Service was stopped.", sizeof(strError)-1);
 		break;
-
+	default:
+		snprintf(strError, sizeof(strError)-1, "Unkown error: 0x%08lX",
+			pcscError);
 	};
 
 	/* add a null byte */
