@@ -1,606 +1,663 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : hotplug_macosx.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 10/25/00
-	    License: Copyright (C) 2000 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This provides a search API for hot pluggble
-	             devices.
-	            
+	Title  : hotplug_macosx.c
+	Package: pcsc lite
+	Author : Stephen M. Webb <stephenw@cryptocard.com>
+	Date   : 03 Dec 2002
+	License: Copyright (C) 2002 David Corcoran <corcoran@linuxnet.com>
+
+	Purpose: This provides a search API for hot pluggble devices.
+
+$Id$
 ********************************************************************/
 
-#include <IOKitLib.h>
-#include <IOCFPlugIn.h>
-#include <USB.h>
-#include <USBSpec.h>
-#include <IOUSBLib.h>
-#include <string.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <CoreFoundation/CFPlugIn.h>
-#include <CoreFoundation/CFBundle.h>
-#include <CoreFoundation/CFString.h>
-#include <CoreFoundation/CFURL.h>
-#include <stdio.h>
+#include <IOKit/IOCFPlugIn.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/usb/IOUSBLib.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "debuglog.h"
+#include "hotplug.h"
 #include "readerfactory.h"
 #include "thread_generic.h"
-#include "sys_generic.h"
-#include "winscard_msg.h"
 
-#define PCSCLITE_HP_DROPDIR                 	"/usr/local/pcsc/drivers/"
-#define PCSCLITE_HP_MAX_IDENTICAL_READERS 	16
-#define PCSCLITE_HP_MAX_DRIVERS			20
-
-LONG HPAddHotPluggable(int, unsigned long);
-LONG HPRemoveHotPluggable(int, unsigned long);
-LONG HPSetupHotPlugDevice();
-void HPEstablishUSBNotifications();
-void RawDeviceAdded(void *, io_iterator_t);
-void RawDeviceRemoved(void *, io_iterator_t);
-
-extern PCSCLITE_MUTEX usbNotifierMutex;
-
-static io_iterator_t gRawAddedIter;
-static io_iterator_t gRawRemovedIter;
-static IONotificationPortRef gNotifyPort;
+#define PCSCLITE_HP_DROPDIR        "/usr/local/pcsc/drivers/"
+#define PCSCLITE_HP_MANUKEY_NAME   "ifdVendorID"
+#define PCSCLITE_HP_PRODKEY_NAME   "ifdProductID"
+#define PCSCLITE_HP_NAMEKEY_NAME   "ifdFriendlyName"
+#define PCSCLITE_HP_BASE_PORT       0x200000
 
 /*
- * A list to keep track of 20 simultaneous readers 
+ * An aggregation of useful information on a driver bundle in the
+ * drop directory.
  */
-
-static struct _bundleTracker
+typedef struct HPDriver
 {
-	int addrList[PCSCLITE_HP_MAX_IDENTICAL_READERS];
-	CFMutableDictionaryRef matchingDict;
-}
-bundleTracker[PCSCLITE_HP_MAX_DRIVERS];
+	UInt32 m_vendorId;			/* unique vendor's manufacturer code */
+	UInt32 m_productId;			/* manufacturer's unique product code */
+	char *m_friendlyName;		/* bundle friendly name */
+	char *m_libPath;			/* bundle's plugin library location */
+} HPDriver, *HPDriverVector;
 
-static mach_port_t masterPort;
-static CFURLRef pluginDirURL;
-static LONG hpManu_id, hpProd_id;
-static CFArrayRef bundleArray;
-static int bundleArraySize;
-static CFBundleRef currBundle;
-static CFDictionaryRef bundleInfoDict;
-static PCSCLITE_THREAD_T usbNotifyThread;
-
-void RawDeviceAdded(void *refCon, io_iterator_t iterator)
+/*
+ * An aggregation on information on currently active reader drivers.
+ */
+typedef struct HPDevice
 {
+	HPDriver *m_driver;			/* driver bundle information */
+	UInt32 m_address;			/* unique system address of device */
+	struct HPDevice *m_next;	/* next device in list */
+} HPDevice, *HPDeviceList;
 
-	kern_return_t kr;
+/*
+ * Pointer to a list of (currently) known hotplug reader devices (and their
+ * drivers).
+ */
+static HPDeviceList sDeviceList = NULL;
+
+/*
+ * A callback to handle the asynchronous appearance of new devices that are
+ * candidates for PCSC readers.
+ */
+static void HPDeviceAppeared(void *refCon, io_iterator_t iterator)
+{
+	kern_return_t kret;
 	io_service_t obj;
 
-	while (obj = IOIteratorNext(iterator))
+	while ((obj = IOIteratorNext(iterator)))
 	{
-
-		if (refCon == NULL)
-		{	/* Dont do this on (void *)1 */  
-                        SYS_MutexLock(&usbNotifierMutex); 
-                	HPSetupHotPlugDevice();
-                        SYS_MutexUnLock(&usbNotifierMutex); 
-		}
-
-		kr = IOObjectRelease(obj);
+		kret = IOObjectRelease(obj);
 	}
-
+	HPSearchHotPluggables();
 }
 
-void RawDeviceRemoved(void *refCon, io_iterator_t iterator)
+/*
+ * A callback to handle the asynchronous disappearance of devices that are
+ * possibly PCSC readers.
+ */
+static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
 {
-	kern_return_t kr;
+	kern_return_t kret;
 	io_service_t obj;
 
-	while (obj = IOIteratorNext(iterator))
+	while ((obj = IOIteratorNext(iterator)))
 	{
+		kret = IOObjectRelease(obj);
+	}
+	HPSearchHotPluggables();
+}
 
-		if (refCon == NULL)
-		{ 
-                        SYS_MutexLock(&usbNotifierMutex); 
-                        HPSetupHotPlugDevice();
-                        SYS_MutexUnLock(&usbNotifierMutex); 
+
+/*
+ * Creates a vector of driver bundle info structures from the hot-plug driver
+ * directory.
+ *
+ * Returns NULL on error and a pointer to an allocated HPDriver vector on
+ * success.  The caller must free the HPDriver with a call to
+ * HPDriversRelease().
+ */
+static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
+{
+	HPDriverVector bundleVector = NULL;
+	CFArrayRef bundleArray;
+	CFStringRef driverBundlePathString =
+		CFStringCreateWithCString(kCFAllocatorDefault,
+		driverBundlePath,
+		kCFStringEncodingMacRoman);
+	CFURLRef pluginUrl = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
+		driverBundlePathString,
+		kCFURLPOSIXPathStyle, TRUE);
+
+	CFRelease(driverBundlePathString);
+	if (!pluginUrl)
+	{
+		DebugLogA("error getting plugin directory URL");
+		return bundleVector;
+	}
+	bundleArray = CFBundleCreateBundlesFromDirectory(kCFAllocatorDefault,
+		pluginUrl, NULL);
+	if (!bundleArray)
+	{
+		DebugLogA("error getting plugin directory bundles");
+		return bundleVector;
+	}
+	CFRelease(pluginUrl);
+
+	size_t bundleArraySize = CFArrayGetCount(bundleArray);
+
+	bundleVector = (HPDriver *) calloc(bundleArraySize + 1, sizeof(HPDriver));
+	if (!bundleVector)
+	{
+		DebugLogA("memory allocation failure");
+		return bundleVector;
+	}
+
+	for (int i = 0; i < bundleArraySize; i++)
+	{
+		HPDriver *driverBundle = bundleVector + i;
+		CFBundleRef currBundle =
+			(CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
+		CFDictionaryRef dict = CFBundleGetInfoDictionary(currBundle);
+
+		CFURLRef bundleUrl = CFBundleCopyBundleURL(currBundle);
+		CFStringRef bundlePath = CFURLCopyPath(bundleUrl);
+
+		driverBundle->m_libPath = strdup(CFStringGetCStringPtr(bundlePath,
+				CFStringGetSystemEncoding()));
+
+		CFStringRef strValue = (CFStringRef) CFDictionaryGetValue(dict,
+			CFSTR(PCSCLITE_HP_MANUKEY_NAME));
+
+		if (!strValue)
+		{
+			DebugLogA("error getting vendor ID from bundle");
+			return bundleVector;
 		}
+		driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
+				CFStringGetSystemEncoding()), NULL, 16);
 
-		kr = IOObjectRelease(obj);
+		strValue = (CFStringRef) CFDictionaryGetValue(dict,
+			CFSTR(PCSCLITE_HP_PRODKEY_NAME));
+		if (!strValue)
+		{
+			DebugLogA("error getting product ID from bundle");
+			return bundleVector;
+		}
+		driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
+				CFStringGetSystemEncoding()), NULL, 16);
+
+		strValue = (CFStringRef) CFDictionaryGetValue(dict,
+			CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
+		if (!strValue)
+		{
+			DebugLogA("error getting product friendly name from bundle");
+			driverBundle->m_friendlyName = strdup("unnamed device");
+		}
+		else
+		{
+			const char *cstr = CFStringGetCStringPtr(strValue,
+				CFStringGetSystemEncoding());
+
+			driverBundle->m_friendlyName = strdup(cstr);
+		}
+	}
+	CFRelease(bundleArray);
+	return bundleVector;
+}
+
+/*
+ * Copies a driver bundle instance.
+ */
+static HPDriver *HPDriverCopy(HPDriver * rhs)
+{
+	if (!rhs)
+	{
+		return NULL;
+	}
+	HPDriver *newDriverBundle = (HPDriver *) calloc(1, sizeof(HPDriver));
+
+	if (!newDriverBundle)
+	{
+		return NULL;
+	}
+	newDriverBundle->m_vendorId = rhs->m_vendorId;
+	newDriverBundle->m_productId = rhs->m_productId;
+	newDriverBundle->m_friendlyName = strdup(rhs->m_friendlyName);
+	newDriverBundle->m_libPath = strdup(rhs->m_libPath);
+	return newDriverBundle;
+}
+
+/*
+ * Releases resources allocated to a driver bundle vector.
+ */
+static void HPDriverRelease(HPDriver * driverBundle)
+{
+	if (driverBundle)
+	{
+		free(driverBundle->m_friendlyName);
+		free(driverBundle->m_libPath);
 	}
 }
 
-void HPEstablishUSBNotifications()
+/*
+ * Releases resources allocated to a driver bundle vector.
+ */
+static void HPDriverVectorRelease(HPDriverVector driverBundleVector)
 {
-        mach_port_t 		tmpMasterPort;
-	const char 		*cStringValue;
-	CFStringRef 		propertyString;
-	kern_return_t 		kr;
-	CFRunLoopSourceRef 	runLoopSource;
-	int 			i;
-
-        // first create a master_port for my task
-        kr = IOMasterPort(MACH_PORT_NULL, &tmpMasterPort);
-        if (kr || !tmpMasterPort)
-        {
-            printf("ERR: Couldn't create a master IOKit Port(%08x)\n", kr);
-            return;
-        }
-
-
-	for (i = 0; i < bundleArraySize; i++)
+	if (driverBundleVector)
 	{
-		currBundle = (CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
-		bundleInfoDict = CFBundleGetInfoDictionary(currBundle);
+		HPDriver *b = driverBundleVector;
 
-		propertyString = CFDictionaryGetValue(bundleInfoDict,
-                                                        CFSTR("ifdVendorID"));
-		if (propertyString == 0)
+		for (; b->m_vendorId; ++b)
 		{
-			DebugLogA
-				("HPEstablishUSBNotifications: No vendor id in bundle.");
-			continue;
+			HPDriverRelease(b);
 		}
-
-		cStringValue = CFStringGetCStringPtr(propertyString,
-                                                        CFStringGetSystemEncoding());
-		hpManu_id = strtoul(cStringValue, 0, 16);
-
-		propertyString = CFDictionaryGetValue(bundleInfoDict,
-                                                        CFSTR("ifdProductID"));
-		if (propertyString == 0)
-		{
-			DebugLogA
-				("HPEstablishUSBNotifications: No product id in bundle.");
-			continue;
-		}
-
-		cStringValue = CFStringGetCStringPtr(propertyString,
-                                                        CFStringGetSystemEncoding());
-		hpProd_id = strtoul(cStringValue, 0, 16);
-
-		// Set up the matching criteria for the devices we're interested
-		// in
-		bundleTracker[i].matchingDict = IOServiceMatching(kIOUSBDeviceClassName);
-                
-		if (!bundleTracker[i].matchingDict)
-		{
-			DebugLogA
-				("HPEstablishUSBNotifications: Can't make USBMatch dict.");
-			continue;
-		}
-		// Add our vendor and product IDs to the matching criteria
-		CFDictionarySetValue(bundleTracker[i].matchingDict,
-                                        CFSTR(kUSBVendorName),
-                                        CFNumberCreate(kCFAllocatorDefault, 
-                                        kCFNumberSInt32Type,
-                                        &hpManu_id));
-		CFDictionarySetValue(bundleTracker[i].matchingDict,
-                                        CFSTR(kUSBProductName), 
-                                        CFNumberCreate(kCFAllocatorDefault,
-                                        kCFNumberSInt32Type, 
-                                        &hpProd_id));
-
-		// Create a notification port and add its run loop event source to 
-		// our run loop
-		// This is how async notifications get set up.
-		gNotifyPort = IONotificationPortCreate(tmpMasterPort);
-		runLoopSource = IONotificationPortGetRunLoopSource(gNotifyPort);
-
-		CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource,
-                                    kCFRunLoopDefaultMode);
-
-		// Retain additional references because we use this same
-		// dictionary with four calls to 
-		// IOServiceAddMatchingNotification, each of which consumes one
-		// reference.
-		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
-		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
-		bundleTracker[i].matchingDict =
-			(CFMutableDictionaryRef) CFRetain(bundleTracker[i].matchingDict);
-
-		// Now set up two notifications, one to be called when a raw
-		// device is first matched by I/O Kit, and the other to be
-		// called when the device is terminated.
-		kr = IOServiceAddMatchingNotification(gNotifyPort,
-                                                        kIOFirstMatchNotification,
-                                                        bundleTracker[i].matchingDict,
-                                                        RawDeviceAdded, NULL, 
-                                                        &gRawAddedIter);
-
-		/*
-		 * The void * 1 allows me to distinguish this initialization
-		 * packet from a real event so that I can filter it well 
-		 */
-
-		RawDeviceAdded((void *) 1, gRawAddedIter);
-
-		kr = IOServiceAddMatchingNotification(gNotifyPort,
-                                                        kIOTerminatedNotification,
-                                                        bundleTracker[i].matchingDict,
-                                                        RawDeviceRemoved, NULL, 
-                                                        &gRawRemovedIter);
-
-		RawDeviceRemoved((void *) 1, gRawRemovedIter);
+		free(driverBundleVector);
 	}
-        
-        // Now done with the master_port
-        mach_port_deallocate(mach_task_self(), tmpMasterPort);
-        tmpMasterPort = 0;
-
-	CFRunLoopRun();
-
 }
 
-LONG HPSearchHotPluggables()
+/*
+ * Inserts a new reader device in the list.
+ */
+static HPDeviceList
+HPDeviceListInsert(HPDeviceList list, HPDriver * bundle, UInt32 address)
 {
+	HPDevice *newReader = (HPDevice *) calloc(1, sizeof(HPDevice));
 
-	LONG rv;
-	IOReturn iorv;
-	CFStringRef pluginDirString;
-	int i, j;
-
-	for (i = 0; i < PCSCLITE_HP_MAX_DRIVERS; i++)
+	if (!newReader)
 	{
-		for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
-		{
-			bundleTracker[i].addrList[j] = 0;
-		}
+		DebugLogA("memory allocation failure");
+		return list;
 	}
-
-	iorv = IOMasterPort(MACH_PORT_NULL, &masterPort);
-	if (iorv != 0)
-        {
-                printf("ERR: Couldn't create a master IOKit Port(%08x)\n", iorv);
-		return -1;
-        }
-
-	pluginDirString = CFStringCreateWithCString(NULL, PCSCLITE_HP_DROPDIR,
-                                                    kCFStringEncodingMacRoman);
-
-	if (pluginDirString == NULL) 
-        {
-                printf("ERR: Couldn't create pluginDirString\n");
-		return -1;
-        }
-
-	pluginDirURL = CFURLCreateWithFileSystemPath(NULL, pluginDirString,
-                                                    kCFURLPOSIXPathStyle, TRUE);
-	CFRelease(pluginDirString);
-
-	if (pluginDirURL == NULL)
-        {
-                printf("ERR: Couldn't create pluginDirURL\n");
-		return -1;
-        }
-
-
-	bundleArray = CFBundleCreateBundlesFromDirectory(NULL, pluginDirURL,
-                                                         NULL);
-
-	if (bundleArray == NULL)
-        {
-                printf("ERR: Couldn't create bundleArray\n");
-		return -1;
-        }
-
-
-	bundleArraySize = CFArrayGetCount(bundleArray);
-
-	/*
-	 * Look for initial USB devices 
-	 */
-        SYS_MutexLock(&usbNotifierMutex); 
-        HPSetupHotPlugDevice();
-        SYS_MutexUnLock(&usbNotifierMutex); 
-
-	rv = SYS_ThreadCreate(&usbNotifyThread, NULL,
-                                (LPVOID) HPEstablishUSBNotifications, 0);
-
-	return rv;
+	newReader->m_driver = HPDriverCopy(bundle);
+	newReader->m_address = address;
+	newReader->m_next = list;
+	return newReader;
 }
 
-LONG HPSetupHotPlugDevice()
+/*
+ * Frees resources allocated to a HPDeviceList.
+ */
+static void HPDeviceListRelease(HPDeviceList list)
 {
+	HPDevice *p = list;
 
-	kern_return_t kr;
-	io_iterator_t iter = 0;
-	io_service_t USBDevice = 0;
-
-	UInt32 usbAddr;
-	CFStringRef propertyString;
-	CFDictionaryRef USBMatch;
-	const char *cStringValue;
-	int i, j, k, x;
-
-	UInt32 addrHolder[PCSCLITE_HP_MAX_IDENTICAL_READERS];
-
-	for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
+	for (; p; p = p->m_next)
 	{
-		addrHolder[j] = 0;
+		HPDriverRelease(p->m_driver);
+	}
+}
+
+/*
+ * Compares two driver bundle instances for equality.
+ */
+static int HPDeviceEquals(HPDevice * a, HPDevice * b)
+{
+	return (a->m_driver->m_vendorId == b->m_driver->m_vendorId)
+		&& (a->m_driver->m_productId == b->m_driver->m_productId)
+		&& (a->m_address == b->m_address);
+}
+
+/*
+ * Finds USB devices currently registered in the system that match any of
+ * the drivers detected in the driver bundle vector.
+ */
+static int
+HPDriversMatchUSBDevices(HPDriverVector driverBundle,
+	HPDeviceList * readerList)
+{
+	CFDictionaryRef usbMatch = IOServiceMatching("IOUSBDevice");
+
+	if (0 == usbMatch)
+	{
+		DebugLogA("error getting USB match from IOServiceMatching()");
+		return 1;
 	}
 
-	USBMatch = IOServiceMatching(kIOUSBDeviceClassName);
-	if (!USBMatch)
+	io_iterator_t usbIter;
+	kern_return_t kret = IOServiceGetMatchingServices(kIOMasterPortDefault,
+		usbMatch,
+		&usbIter);
+
+	if (kret != 0)
 	{
-		DebugLogA("HPSearchHotPluggables: Can't make USBMatch dict.");
-		return -1;
+		DebugLogA
+			("error getting iterator from IOServiceGetMatchingServices()");
+		return 1;
 	}
 
-	/*
-	 * create an iterator over all matching IOService nubs 
-	 */
-	kr = IOServiceGetMatchingServices(masterPort, USBMatch, &iter);
-	if (kr)
+	IOIteratorReset(usbIter);
+	io_object_t usbDevice = 0;
+
+	while ((usbDevice = IOIteratorNext(usbIter)))
 	{
-		DebugLogB("HPSearchHotPluggables: Can't make USBSvc iter: %x.",
-			kr);
-		if (USBMatch)
-			CFRelease(USBMatch);
-		return -1;
+		char namebuf[1024];
+
+		kret = IORegistryEntryGetName(usbDevice, namebuf);
+		if (kret != 0)
+		{
+			DebugLogA
+				("error getting device name from IORegistryEntryGetName()");
+			return 1;
+		}
+
+		IOCFPlugInInterface **iodev;
+		SInt32 score;
+
+		kret = IOCreatePlugInInterfaceForService(usbDevice,
+			kIOUSBDeviceUserClientTypeID,
+			kIOCFPlugInInterfaceID, &iodev, &score);
+		if (kret != 0)
+		{
+			DebugLogA
+				("error getting plugin interface from IOCreatePlugInInterfaceForService()");
+			return 1;
+		}
+		IOObjectRelease(usbDevice);
+
+		IOUSBDeviceInterface **usbdev;
+		HRESULT hres = (*iodev)->QueryInterface(iodev,
+			CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
+			(LPVOID *) & usbdev);
+
+		(*iodev)->Release(iodev);
+		if (hres)
+		{
+			DebugLogA("error querying interface in QueryInterface()");
+			return 1;
+		}
+
+		UInt16 vendorId = 0;
+		UInt16 productId = 0;
+		UInt32 usbAddress = 0;
+
+		kret = (*usbdev)->GetDeviceVendor(usbdev, &vendorId);
+		kret = (*usbdev)->GetDeviceProduct(usbdev, &productId);
+		kret = (*usbdev)->GetLocationID(usbdev, &usbAddress);
+		(*usbdev)->Release(usbdev);
+
+		HPDriver *driver = driverBundle;
+
+		for (; driver->m_vendorId; ++driver)
+		{
+			if ((driver->m_vendorId == vendorId)
+				&& (driver->m_productId == productId))
+			{
+				*readerList =
+					HPDeviceListInsert(*readerList, driver, usbAddress);
+			}
+		}
 	}
 
-	for (i = 0; i < bundleArraySize; i++)
-	{
-		currBundle = (CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
-		bundleInfoDict = CFBundleGetInfoDictionary(currBundle);
-		if (bundleInfoDict == NULL)
-		{
-			if (USBMatch)
-				CFRelease(USBMatch);
-			return SCARD_E_NO_MEMORY;
-		}
-
-		propertyString = CFDictionaryGetValue(bundleInfoDict,
-                                                        CFSTR("ifdVendorID"));
-		if (propertyString == 0)
-		{
-			if (USBMatch)
-				CFRelease(USBMatch);
-			return -1;
-		}
-
-		cStringValue = CFStringGetCStringPtr(propertyString,
-                                                        CFStringGetSystemEncoding());
-		hpManu_id = strtoul(cStringValue, 0, 16);
-
-		propertyString = CFDictionaryGetValue(bundleInfoDict,
-                                                        CFSTR("ifdProductID"));
-		if (propertyString == 0)
-		{
-			if (USBMatch)
-				CFRelease(USBMatch);
-			return 0;
-		}
-
-		cStringValue = CFStringGetCStringPtr(propertyString,
-                                                        CFStringGetSystemEncoding());
-		hpProd_id = strtoul(cStringValue, 0, 16);
-
-		IOIteratorReset(iter);
-		j = 0;
-
-		while ((USBDevice = IOIteratorNext(iter)))
-		{
-			IOCFPlugInInterface **iodev = NULL;
-			IOUSBDeviceInterface **dev = NULL;
-			HRESULT res;
-			SInt32 score;
-			UInt16 vendor;
-			UInt16 product;
-
-			kr = IOCreatePlugInInterfaceForService(USBDevice,
-                                                                kIOUSBDeviceUserClientTypeID, 
-                                                                kIOCFPlugInInterfaceID,
-                                                                &iodev, &score);
-			if (kr || !iodev)
-			{
-				DebugLogB
-					("HPSearchHotPluggables: Can't make plugin intface: %x.",
-					kr);
-				SYS_Sleep(1);
-				kr = IOCreatePlugInInterfaceForService(USBDevice,
-                                                                        kIOUSBDeviceUserClientTypeID, 											kIOCFPlugInInterfaceID,
-                                                                        &iodev, &score);
-				if (kr || !iodev)
-				{
-					DebugLogB
-						("HPSearchHotPluggables: Can't make plugin intface: %x.",
-						kr);
-
-					IOObjectRelease(USBDevice);
-					continue;
-				}
-			}
-
-			IOObjectRelease(USBDevice);
-
-			/*
-			 * i have the device plugin. I need the device interface 
-			 */
-			res =
-				(*iodev)->QueryInterface(iodev,
-                                                            CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
-                                                            (LPVOID) &dev);
-			//IODestroyPlugInInterface(iodev);
-                        (*iodev)->Release(iodev);
-			if (res || !dev)
-			{
-				DebugLogB
-					("HPSearchHotPluggables: Can't query interface: %x.",
-					res);
-				continue;
-			}
-
-			kr = (*dev)->GetDeviceVendor(dev, &vendor);
-			kr = (*dev)->GetDeviceProduct(dev, &product);
-			kr = (*dev)->GetLocationID(dev, &usbAddr);
-			(*dev)->Release(dev);
-
-			if ((vendor == hpManu_id) && (product == hpProd_id))
-			{
-				addrHolder[j++] = usbAddr;
-			}
-
-		}	/* End of while */
-
-		/*
-		 * Look through the addresses of devices connected for one's that
-		 * we have not seen yet, see if we must add anything 
-		 */
-
-		for (k = 0; k < j; k++)
-		{
-			for (x = 0; x < PCSCLITE_HP_MAX_IDENTICAL_READERS; x++)
-			{
-				if (addrHolder[k] == bundleTracker[i].addrList[x])
-				{
-					break;
-				}
-			}
-
-			if (x == PCSCLITE_HP_MAX_IDENTICAL_READERS)
-			{
-				/*
-				 * Here we will add the reader, since it is not in the
-				 * address list 
-				 */
-				HPAddHotPluggable(i, addrHolder[k]);
-			} else
-                        {
-				DebugLogA("HPSearchHotPluggables: Warning - reader already in list.");
-			}
-		}
-
-		/*
-		 * Look through the addresses of already connected devices for
-		 * one's not seen on the subsystem, see if we must delete anything 
-		 */
-
-		for (x = 0; x < PCSCLITE_HP_MAX_IDENTICAL_READERS; x++)
-		{
-			if (bundleTracker[i].addrList[x] != 0)
-			{
-				for (k = 0; k < j; k++)
-				{
-					if (bundleTracker[i].addrList[x] == addrHolder[k])
-					{
-						break;
-					}
-				}
-
-				if (k == j)
-				{
-					/*
-					 * Here we will remove the reader, since it is not in
-					 * the device address list 
-					 */
-                                        HPRemoveHotPluggable(i, bundleTracker[i].addrList[x]);
-                                }
-			}
-		}
-
-	}	/* End of for */
-
-	if (iter)
-		IOObjectRelease(iter);
-
+	IOObjectRelease(usbIter);
 	return 0;
 }
 
-LONG HPAddHotPluggable(int i, unsigned long usbAddr)
+/*
+ * Finds PC Card devices currently registered in the system that match any of
+ * the drivers detected in the driver bundle vector.
+ */
+static int
+HPDriversMatchPCCardDevices(HPDriver * driverBundle,
+	HPDeviceList * readerList)
 {
+	CFDictionaryRef pccMatch = IOServiceMatching("IOPCCard16Device");
 
-	int j;
-	LONG rv;
-	const char *cStringValue, *cStringLibPath;
-	CFURLRef bundPathURL;
-	CFStringRef propertyString, cfStringURL;
+	if (pccMatch == NULL)
+	{
+		DebugLogA("error getting PCCard match from IOServiceMatching()");
+		return 1;
+	}
 
-	propertyString = CFDictionaryGetValue(bundleInfoDict,
-		CFSTR("ifdFriendlyName"));
-	if (propertyString == 0)
+	io_iterator_t pccIter;
+	kern_return_t kret =
+		IOServiceGetMatchingServices(kIOMasterPortDefault, pccMatch,
+		&pccIter);
+	if (kret != 0)
+	{
+		DebugLogA("error getting iterator from IOServiceGetMatchingServices()");
+		return 1;
+	}
+
+	IOIteratorReset(pccIter);
+	io_object_t pccDevice = 0;
+
+	while ((pccDevice = IOIteratorNext(pccIter)))
+	{
+		char namebuf[1024];
+
+		kret = IORegistryEntryGetName(pccDevice, namebuf);
+		if (kret != 0)
+		{
+			DebugLogA("error getting plugin interface from IOCreatePlugInInterfaceForService()");
+			return 1;
+		}
+		UInt32 vendorId = 0;
+		UInt32 productId = 0;
+		UInt32 pccAddress = 0;
+		CFTypeRef valueRef =
+			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("VendorID"),
+			kCFAllocatorDefault, NULL);
+
+		if (!valueRef)
+		{
+			DebugLogA("error getting vendor");
+		}
+		else
+		{
+			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
+				&vendorId);
+		}
+		valueRef =
+			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("DeviceID"),
+			kCFAllocatorDefault, NULL);
+		if (!valueRef)
+		{
+			DebugLogA("error getting device");
+		}
+		else
+		{
+			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
+				&productId);
+		}
+		valueRef =
+			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("SocketNumber"),
+			kCFAllocatorDefault, NULL);
+		if (!valueRef)
+		{
+			DebugLogA("error getting PC Card socket");
+		}
+		else
+		{
+			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
+				&pccAddress);
+		}
+		HPDriver *driver = driverBundle;
+
+		for (; driver->m_vendorId; ++driver)
+		{
+			if ((driver->m_vendorId == vendorId)
+				&& (driver->m_productId == productId))
+			{
+				*readerList =
+					HPDeviceListInsert(*readerList, driver, pccAddress);
+			}
+		}
+	}
+	IOObjectRelease(pccIter);
+	return 0;
+}
+
+
+static void HPEstablishUSBNotification(void)
+{
+	io_iterator_t deviceAddedIterator;
+	io_iterator_t deviceRemovedIterator;
+	CFMutableDictionaryRef matchingDictionary;
+	IONotificationPortRef notificationPort;
+	IOReturn kret;
+
+	notificationPort = IONotificationPortCreate(kIOMasterPortDefault);
+	CFRunLoopAddSource(CFRunLoopGetCurrent(),
+		IONotificationPortGetRunLoopSource(notificationPort),
+		kCFRunLoopDefaultMode);
+
+	matchingDictionary = IOServiceMatching("IOUSBDevice");
+	if (!matchingDictionary)
+	{
+		DebugLogB("IOServiceMatching() failed", 0);
+	}
+	matchingDictionary =
+		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
+
+	kret = IOServiceAddMatchingNotification(notificationPort,
+		kIOMatchedNotification,
+		matchingDictionary, HPDeviceAppeared, NULL, &deviceAddedIterator);
+	if (kret)
+	{
+		DebugLogB("IOServiceAddMatchingNotification()-1 failed with code %d",
+			kret);
+	}
+	HPDeviceAppeared(NULL, deviceAddedIterator);
+
+	kret = IOServiceAddMatchingNotification(notificationPort,
+		kIOTerminatedNotification,
+		matchingDictionary,
+		HPDeviceDisappeared, NULL, &deviceRemovedIterator);
+	if (kret)
+	{
+		DebugLogB("IOServiceAddMatchingNotification()-2 failed with code %d",
+			kret);
+	}
+	HPDeviceDisappeared(NULL, deviceRemovedIterator);
+}
+
+static void HPEstablishPCCardNotification(void)
+{
+	io_iterator_t deviceAddedIterator;
+	io_iterator_t deviceRemovedIterator;
+	CFMutableDictionaryRef matchingDictionary;
+	IONotificationPortRef notificationPort;
+	IOReturn kret;
+
+	notificationPort = IONotificationPortCreate(kIOMasterPortDefault);
+	CFRunLoopAddSource(CFRunLoopGetCurrent(),
+		IONotificationPortGetRunLoopSource(notificationPort),
+		kCFRunLoopDefaultMode);
+
+	matchingDictionary = IOServiceMatching("IOPCCard16Device");
+	if (!matchingDictionary)
+	{
+		DebugLogB("IOServiceMatching() failed", 0);
+	}
+	matchingDictionary =
+		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
+
+	kret = IOServiceAddMatchingNotification(notificationPort,
+		kIOMatchedNotification,
+		matchingDictionary, HPDeviceAppeared, NULL, &deviceAddedIterator);
+	if (kret)
+	{
+		DebugLogB("IOServiceAddMatchingNotification()-1 failed with code %d",
+			kret);
+	}
+	HPDeviceAppeared(NULL, deviceAddedIterator);
+
+	kret = IOServiceAddMatchingNotification(notificationPort,
+		kIOTerminatedNotification,
+		matchingDictionary,
+		HPDeviceDisappeared, NULL, &deviceRemovedIterator);
+	if (kret)
+	{
+		DebugLogB("IOServiceAddMatchingNotification()-2 failed with code %d",
+			kret);
+	}
+	HPDeviceDisappeared(NULL, deviceRemovedIterator);
+}
+
+/*
+ * Thread runner (does not return).
+ */
+static void HPDeviceNotificationThread(void)
+{
+	HPEstablishUSBNotification();
+	HPEstablishPCCardNotification();
+	CFRunLoopRun();
+}
+
+/*
+ * Scans the hotplug driver directory and looks in the system for
+ * matching devices.
+ * Adds or removes matching readers as necessary.
+ */
+LONG HPSearchHotPluggables(void)
+{
+	HPDriver *drivers = HPDriversGetFromDirectory(PCSCLITE_HP_DROPDIR);
+
+	if (!drivers)
+		return 1;
+
+	HPDeviceList devices = NULL;
+	int istat;
+
+	istat = HPDriversMatchUSBDevices(drivers, &devices);
+	if (istat)
+	{
+		return -1;
+	}
+	istat = HPDriversMatchPCCardDevices(drivers, &devices);
+	if (istat)
 	{
 		return -1;
 	}
 
-	bundPathURL = CFBundleCopyBundleURL(currBundle);
-	cfStringURL = CFURLCopyPath(bundPathURL);
-	cStringLibPath = strdup(CFStringGetCStringPtr(cfStringURL,
-			CFStringGetSystemEncoding()));
-	cStringValue = strdup(CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding()));
+	HPDevice *a = devices;
 
-	for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
+	for (; a; a = a->m_next)
 	{
-		if (bundleTracker[i].addrList[j] == 0)
+		int found = 0;
+		HPDevice *b = sDeviceList;
+
+		for (; b; b = b->m_next)
 		{
-			bundleTracker[i].addrList[j] = usbAddr;
-			break;
+			if (HPDeviceEquals(a, b))
+			{
+				found = 1;
+				break;
+			}
+		}
+		if (!found)
+		{
+			RFAddReader(a->m_driver->m_friendlyName,
+				PCSCLITE_HP_BASE_PORT + a->m_address, a->m_driver->m_libPath);
 		}
 	}
 
-	if (j == PCSCLITE_HP_MAX_IDENTICAL_READERS)
+	a = sDeviceList;
+	for (; a; a = a->m_next)
 	{
-		/*
-		 * We have run out of room 
-		 */
-		rv = SCARD_E_INSUFFICIENT_BUFFER;
-	} else
-	{
-		rv = RFAddReader((LPSTR) cStringValue, 0x200000 + j,
-                                (LPSTR) cStringLibPath);
+		int found = 0;
+		HPDevice *b = devices;
+
+		for (; b; b = b->m_next)
+		{
+			if (HPDeviceEquals(a, b))
+			{
+				found = 1;
+				break;
+			}
+		}
+		if (!found)
+		{
+			RFRemoveReader(a->m_driver->m_friendlyName,
+				PCSCLITE_HP_BASE_PORT + a->m_address);
+		}
 	}
 
-	if (rv != SCARD_S_SUCCESS)
-	{
-		/*
-		 * Function had error so do not keep track of reader 
-		 */
-                 
-		bundleTracker[i].addrList[j] = 0;
-	}
+	HPDeviceListRelease(sDeviceList);
+	sDeviceList = devices;
+	HPDriverVectorRelease(drivers);
+	return 0;
+}
 
-	free((LPSTR) cStringValue);
-	free((LPSTR) cStringLibPath);
 
-	return rv;
-}	/* End of function */
+PCSCLITE_THREAD_T sHotplugWatcherThread;
 
-LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
+/*
+ * Sets up callbacks for device hotplug events.
+ */
+ULONG HPRegisterForHotplugEvents(void)
 {
+	LONG sstat;
 
-	int j;
-	LONG rv;
-	const char *cStringValue;
-	CFStringRef propertyString;
-
-	propertyString = CFDictionaryGetValue(bundleInfoDict,
-		CFSTR("ifdFriendlyName"));
-	if (propertyString == 0)
-	{
-		return -1;
-	}
-
-	cStringValue = strdup(CFStringGetCStringPtr(propertyString,
-			CFStringGetSystemEncoding()));
-
-	for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
-	{
-		if (bundleTracker[i].addrList[j] == usbAddr)
-		{
-			bundleTracker[i].addrList[j] = 0;
-			break;
-		}
-	}
-
-	rv = RFRemoveReader((LPSTR) cStringValue, 0x200000 + j);
-
-	free((LPSTR) cStringValue);
-
-	return rv;
-}	/* End of function */
+	sstat = SYS_ThreadCreate(&sHotplugWatcherThread,
+		NULL, (LPVOID) HPDeviceNotificationThread, NULL);
+	return 0;
+}
 

@@ -68,7 +68,7 @@ void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * m
           break;
     case kIOMessageSystemHasPoweredOn: 
         DebugLogA("PMPowerEventCallback: system coming out of sleep");
-        HPSetupHotPlugDevice();       
+        HPSearchHotPluggables();
         RFAwakeAllReaders();
         SYS_MutexUnLock(&usbNotifierMutex);
         break;

@@ -5,8 +5,8 @@
 	Package: pcsc lite
 	Author : David Corcoran, Ludovic Rousseau
 	Date   : 02/28/01, last update 4/6/2003
-	License: Copyright (C) 2001,2003 David Corcoran, Ludovic Rousseau
-			<corcoran@linuxnet.com>
+	License: Copyright (C) 2001,2003 David Corcoran, <corcoran@linuxnet.com>
+							Ludovic Rousseau, <ludovic.rousseau>
 	Purpose: This provides a search API for hot pluggble devices.
 	Credits: The USB code was based partly on Johannes Erdfelt
 		libusb code found at libusb.sourceforge.org
@@ -391,4 +391,13 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 
 	return 1;
 }	/* End of function */
+
+/*
+ * Sets up callsbacks for device hotplug events.  Not currently implemented
+ * for Linux.
+ */
+ULONG HPRegisterForHotplugEvents(void)
+{
+	return 0;
+}
 

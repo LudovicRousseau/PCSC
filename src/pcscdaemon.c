@@ -112,13 +112,13 @@ void SVCServiceRunLoop()
 	 * Set up the search for USB/PCMCIA devices 
 	 */
 	HPSearchHotPluggables();
+	HPRegisterForHotplugEvents();
 
-        /*
-         * Set up the power management callback routine for OS X
-         */
-         
+	/*
+	 * Set up the power management callback routine for OS X
+	 */
 #ifdef PCSC_TARGET_OSX
-        PMRegisterForPowerEvents();
+	PMRegisterForPowerEvents();
 #endif
 
 	while (1)

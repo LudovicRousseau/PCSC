@@ -1,15 +1,15 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : hotplug.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 10/25/00
-	    License: Copyright (C) 2000 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This provides a search API for hot pluggble
-	             devices.
-	            
+	Title  : hotplug.h
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 10/25/00
+	License: Copyright (C) 2000-2003 David Corcoran <corcoran@linuxnet.com>
+
+	Purpose: This provides a search API for hot pluggble devices.
+$Id$
+
 ********************************************************************/
 
 #ifndef __hotplug_h__
@@ -19,11 +19,11 @@
 extern "C"
 {
 #endif
-
-	LONG HPSearchHotPluggables();
-
+	LONG HPSearchHotPluggables(void);
+	ULONG HPRegisterForHotplugEvents(void);
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
