@@ -20,7 +20,7 @@ umask 077
 
 start() {
  	echo -n $"Starting smart card daemon: "
-	daemon pcscd $SYSLOGD_OPTIONS
+	pcscd $SYSLOGD_OPTIONS
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pcscd

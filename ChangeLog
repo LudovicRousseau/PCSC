@@ -1,3 +1,22 @@
+pcsc-lite-1.1.0: (David Corcoran <corcoran@linuxnet.com>)
+28, May, 2002
+- src/mscdefines.h added
+- src/musclecard.c/.h added
+  . Added client side token/card plugin interface
+- src/tokenfactory.c added
+- src/powermgt_macosx.h added
+- src/powermgt_macosx.c added
+  . Support for sleep mode on OS X
+- src/tokenparser.l added
+- src/dyn_hpux modified with new include <errno.h>
+- src/winscard_svc.c
+  . Added session checking so rogue clients cannot steal hCard values
+- src/readerfactory.c
+  . removed world writable files in /tmp/pcsc
+- configure.in
+  . Added support for SCF with SCF plugin
+- Added command line arguments for debug/daemon mode <cprados@yahoo.com>
+- Previous additions from Ludovic Rousseau <ludovic.rousseau@free.fr>
 
 pcsc-lite-1.0.2beta5: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 10 Mar, 2002

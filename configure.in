@@ -183,6 +183,18 @@ if test x${debugatr} = xtrue ; then
   AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
 fi
 
+AC_ARG_ENABLE(scf,
+[  --enable-scf            use SCF for reader support.],
+[ case "${enableval}" in
+  yes)	scf=true ;;
+  no)	scf=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-scf]) ;;
+esac], [scf=false])
+
+AC_MSG_RESULT([enable SCF reader support  : $scf])
+
+AM_CONDITIONAL(MSC_ENABLE_SCF, test x$scf = xtrue)
+
 AC_ARG_ENABLE(musclecard,
 [  --disable-musclecard    musclecard framework disabled.],
 [case "${enableval}" in
@@ -221,6 +233,9 @@ if test x${runpid} != xfalse ; then
 	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])
 fi
 
+if test x${scf} = xtrue ; then
+  AC_MSG_RESULT([NOTE :: SCF winscard_clnt.c required for operation.])
+fi
 
 if test x${threadsafe} = xtrue ; then
   AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])

@@ -1,7 +1,7 @@
 {
   Description     = "PC/SC Daemon";
   Provides        = ("SmartcardServices");
-  Requires        = ("Portmap", "Network");
+  Requires        = ();
   OrderPreference = "None";
   Messages =
   {

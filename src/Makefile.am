@@ -51,7 +51,14 @@ INCLUDES  = -I/System/Library/Frameworks/IOKit.framework/Headers/usb \
 else
 if PCSC_ARCH_SOLARIS
 PCSC_MYLDFLAGS      =
+
+if MSC_ENABLE_SCF
+PCSC_INCLUDE_LIBS   = -ll -ldl -lnsl -lsocket -lposix4 -lsmartcard
+INCLUDES = -I/usr/include/smartcard
+else
 PCSC_INCLUDE_LIBS   = -ll -ldl -lnsl -lsocket -lposix4
+endif
+
 PCSCD_INCLUDE_LIBS  = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
