@@ -52,7 +52,6 @@ int main(int argc, char **argv)
 	DWORD readerListSize;
 	struct stat statBuffer;
 	char spAtrValue[100];
-	char tempString[1024];
 	char chosenInfoPlist[1024];
 	char *readerList;
 	char *restFile;
@@ -207,4 +206,7 @@ int main(int argc, char **argv)
 	fclose(fp);
 
 	printf("Token support updated successfully !\n");
+
+	return 0;
 }
+
