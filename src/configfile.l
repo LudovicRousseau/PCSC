@@ -6,6 +6,7 @@
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -14,12 +15,12 @@
 int evaluatetoken(char *pcToken);
 
 static int iLinenumber = 1;
-static char *pcPrevious = 0;
-static char *pcCurrent = 0;
-static char *pcFriendlyname = 0;
-static char *pcDevicename = 0;                
-static char *pcLibpath = 0;
-static char *pcChannelid = 0;
+static char *pcPrevious = NULL;
+static char *pcCurrent = NULL;
+static char *pcFriendlyname = NULL;
+static char *pcDevicename = NULL;                
+static char *pcLibpath = NULL;
+static char *pcChannelid = NULL;
 static int badError = 0;
 
 void tok_error(char *pcToken_error);
@@ -53,7 +54,7 @@ int evaluatetoken(char *pcToken)
 	int p = 0;
 	int n = 0;
 
-	if (pcPrevious == 0)
+	if (pcPrevious == NULL)
 	{							/* This is the key */
 		pcPrevious = strdup(pcToken);
 	}
@@ -62,7 +63,7 @@ int evaluatetoken(char *pcToken)
 		pcCurrent = pcToken;
 		if (strcmp(pcPrevious, "FRIENDLYNAME") == 0)
 		{
-			if (pcFriendlyname == 0)
+			if (pcFriendlyname == NULL)
 			{
 				pcFriendlyname = (char *) malloc(strlen(pcCurrent) - 1);
 				for (n = 0; n < strlen(pcCurrent); n++)
@@ -72,7 +73,7 @@ int evaluatetoken(char *pcToken)
 						pcFriendlyname[p++] = pcCurrent[n];
 					}
 				}
-				pcFriendlyname[p++] = 0;
+				pcFriendlyname[p++] = '\0';
 			}
 			else
 			{
@@ -82,9 +83,10 @@ int evaluatetoken(char *pcToken)
 		}
 		else if (strcmp(pcPrevious, "DEVICENAME") == 0)
 		{
-			if (pcDevicename == 0)
+			if (pcDevicename == NULL)
 			{
 				struct stat fStatBuf;
+
 				pcDevicename = strdup(pcCurrent);
 				if (SYS_Stat(pcDevicename, &fStatBuf) != 0)
 				{
@@ -100,9 +102,10 @@ int evaluatetoken(char *pcToken)
 		}
 		else if (strcmp(pcPrevious, "LIBPATH") == 0)
 		{
-			if (pcLibpath == 0)
+			if (pcLibpath == NULL)
 			{
 				struct stat fStatBuf;
+
 				pcLibpath = strdup(pcCurrent);
 				if (SYS_Stat(pcLibpath, &fStatBuf) != 0)
 				{
@@ -118,7 +121,7 @@ int evaluatetoken(char *pcToken)
 		}
 		else if (strcmp(pcPrevious, "CHANNELID") == 0)
 		{
-			if (pcChannelid == 0)
+			if (pcChannelid == NULL)
 			{
 				pcChannelid = strdup(pcCurrent);
 			}
@@ -135,11 +138,11 @@ int evaluatetoken(char *pcToken)
 		}
 
 		free(pcPrevious);
-		pcPrevious = 0;
+		pcPrevious = NULL;
 	}
 
-	if (pcFriendlyname != 0 && pcDevicename != 0 &&
-		pcLibpath != 0 && pcChannelid != 0 && badError != 1)
+	if (pcFriendlyname != NULL && pcDevicename != NULL &&
+		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
 	{
 
 		dwChannelId = strtoul(pcChannelid, 0, 16);
@@ -149,10 +152,10 @@ int evaluatetoken(char *pcToken)
 		free(pcDevicename);
 		free(pcLibpath);
 		free(pcChannelid);
-		pcFriendlyname = 0;
-		pcDevicename = 0;
-		pcLibpath = 0;
-		pcChannelid = 0;
+		pcFriendlyname = NULL;
+		pcDevicename = NULL;
+		pcLibpath = NULL;
+		pcChannelid = NULL;
 	}
 
 	return 0;
@@ -167,15 +170,12 @@ void tok_error(char *token_error)
 int DBUpdateReaders(char *readerconf)
 {
 
-	FILE *configFile;
-	configFile = 0;
+	FILE *configFile = NULL;
 
 	configFile = fopen(readerconf, "r");
 
-	if (configFile == 0)
-	{
+	if (configFile == NULL)
 		return 1;
-	}
 
 	yyin = configFile;
 
@@ -188,12 +188,8 @@ int DBUpdateReaders(char *readerconf)
 	fclose(configFile);
 
 	if (badError == 1)
-	{
 		return -1;
-	}
 	else
-	{
 		return 0;
-	}
 }								/* End of configfile.c */
 
