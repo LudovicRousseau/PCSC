@@ -131,7 +131,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 	char findPath[200];
 #endif
 
-	char atrString[MAX_ATR_SIZE];
+	char atrString[MAX_ATR_SIZE*2 +1]; /* ATR in ASCII */
 	char fullPath[200];
 	char fullLibPath[250];
 	char keyValue[TOKEN_MAX_VALUE_SIZE];
