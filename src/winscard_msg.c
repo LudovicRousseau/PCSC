@@ -493,7 +493,7 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
-int WrapSHMWrite(unsigned int command, unsigned int pid, DWORD dwClientID,
+int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
 
@@ -507,7 +507,6 @@ int WrapSHMWrite(unsigned int command, unsigned int pid, DWORD dwClientID,
 	msgStruct.user_id = SYS_GetUID();
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
-	msgStruct.request_id = pid;
 	msgStruct.date = time(NULL);
 	memcpy(msgStruct.data, data, size);
 
