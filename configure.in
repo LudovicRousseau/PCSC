@@ -194,22 +194,6 @@ fi
 AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
-AC_ARG_ENABLE(debug,
-  AC_HELP_STRING([--enable-debug],[enable debug messages from pcscd]),
-[ case "${enableval}" in
-  yes)	
-    debug=true ;;
-  no)	
-    debug=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
- esac], [debug=true])
-
-AC_MSG_RESULT([enable debug messages         : $debug])
-
-if test x${debug} = xfalse ; then
-  AC_DEFINE(NO_PCSC_DEBUG, 1, [disable PCSC debug messaging.])
-fi
-
 dnl --enable-debugatr
 AC_ARG_ENABLE(debugatr,
   AC_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
