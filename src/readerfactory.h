@@ -15,31 +15,73 @@
 #define __readerfactory_h__
 
 #include "thread_generic.h"
+#include "ifdhandler.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-	struct FctMap
+	struct FctMap_V1
 	{
-		LPVOID pvfCreateChannel;
-		LPVOID pvfCreateChannelByName;	/* MUSCLE IFD 3.0 Compliance */
-		LPVOID pvfCloseChannel;
-		LPVOID pvfGetCapabilities;
-		LPVOID pvfSetCapabilities;
-		LPVOID pvfSetProtocolParameters;
-		LPVOID pvfPowerICC;
+		RESPONSECODE (*pvfCreateChannel)(DWORD);
+		RESPONSECODE (*pvfCloseChannel)(void);
+		RESPONSECODE (*pvfGetCapabilities)(DWORD, PUCHAR);
+		RESPONSECODE (*pvfSetCapabilities)(DWORD, PUCHAR);
+		RESPONSECODE (*pvfSetProtocolParameters)(DWORD, UCHAR, UCHAR, UCHAR,
+			UCHAR);
+		RESPONSECODE (*pvfPowerICC)(DWORD);
 		LPVOID pvfSwallowICC;		/* Deprecated in 2.0 */
 		LPVOID pvfEjectICC;		/* Deprecated in 2.0 */
 		LPVOID pvfConfiscateICC;	/* Deprecated in 2.0 */
-		LPVOID pvfTransmitToICC;
-		LPVOID pvfICCPresence;
+		RESPONSECODE (*pvfTransmitToICC)(SCARD_IO_HEADER, PUCHAR, DWORD,
+			PUCHAR, PDWORD, PSCARD_IO_HEADER);
+		RESPONSECODE (*pvfICCPresence)(void);
 		LPVOID pvfICCAbsent;		/* Deprecated in 2.0 */
-		LPVOID pvfControl;		/* MUSCLE IFD 2.0 Compliance */
 	};
 
-	typedef struct FctMap FCT_MAP, *PFCT_MAP;
+	typedef struct FctMap_V1 FCT_MAP_V1, *PFCT_MAP_V1;
+
+	struct FctMap_V2
+	{
+		RESPONSECODE (*pvfCreateChannel)(DWORD, DWORD);
+		RESPONSECODE (*pvfCloseChannel)(DWORD);
+		RESPONSECODE (*pvfGetCapabilities)(DWORD, DWORD, PDWORD, PUCHAR);
+		RESPONSECODE (*pvfSetCapabilities)(DWORD, DWORD, DWORD, PUCHAR);
+		RESPONSECODE (*pvfSetProtocolParameters)(DWORD, DWORD, UCHAR, UCHAR,
+			UCHAR, UCHAR);
+		RESPONSECODE (*pvfPowerICC)(DWORD, DWORD, PUCHAR, PDWORD);
+		RESPONSECODE (*pvfTransmitToICC)(DWORD, SCARD_IO_HEADER, PUCHAR,
+			DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER);
+		RESPONSECODE (*pvfICCPresence)(DWORD);
+
+		/* API v2.0 only */
+		RESPONSECODE (*pvfControl)(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
+	};
+
+	typedef struct FctMap_V2 FCT_MAP_V2, *PFCT_MAP_V2;
+
+	struct FctMap_V3
+	{
+		/* the common fields SHALL be in the same order as in FctMap_V2 */
+		RESPONSECODE (*pvfCreateChannel)(DWORD, DWORD);
+		RESPONSECODE (*pvfCloseChannel)(DWORD);
+		RESPONSECODE (*pvfGetCapabilities)(DWORD, DWORD, PDWORD, PUCHAR);
+		RESPONSECODE (*pvfSetCapabilities)(DWORD, DWORD, DWORD, PUCHAR);
+		RESPONSECODE (*pvfSetProtocolParameters)(DWORD, DWORD, UCHAR, UCHAR,
+				UCHAR, UCHAR);
+		RESPONSECODE (*pvfPowerICC)(DWORD, DWORD, PUCHAR, PDWORD);
+		RESPONSECODE (*pvfTransmitToICC)(DWORD, SCARD_IO_HEADER, PUCHAR,
+			DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER);
+		RESPONSECODE (*pvfICCPresence)(DWORD);
+
+		/* API V3.0 only */
+		RESPONSECODE (*pvfControl)(DWORD, DWORD, LPCVOID, DWORD, LPVOID,
+			DWORD, LPDWORD);
+		RESPONSECODE (*pvfCreateChannelByName)(DWORD, LPTSTR);
+	};
+
+	typedef struct FctMap_V3 FCT_MAP_V3, *PFCT_MAP_V3;
 
 	/*
 	 * The following is not currently used but in place if needed 
@@ -97,7 +139,13 @@ extern "C"
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
 		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];	
                                          /* Structure of connected handles */
-		FCT_MAP psFunctions;	/* Structure of function pointers */
+		union
+		{
+			FCT_MAP_V1 psFunctions_v1;	/* API V1.0 */
+			FCT_MAP_V2 psFunctions_v2;	/* API V2.0 */
+			FCT_MAP_V3 psFunctions_v3;	/* API V3.0 */
+		} psFunctions;
+
 		LPVOID vHandle;			/* Dlopen handle */
 		DWORD dwVersion;		/* IFD Handler version number */
 		DWORD dwPort;			/* Port ID */
