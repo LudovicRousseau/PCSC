@@ -13,7 +13,7 @@
 #ifndef _ifd_handler_h_
 #define _ifd_handler_h_
 
-#include <pcsclite.h>
+#include <PCSC/pcsclite.h>
 
 #ifdef __cplusplus
 extern "C"
