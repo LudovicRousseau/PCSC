@@ -139,7 +139,7 @@ libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c \
 	thread_generic.h readerfactory.h \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h hotplug.h \
-	ifdhandler.h ifdwrapper.h powermgt_generic.h prothandler.h \
+	ifdhandler.h ifdwrapper.h parser.h powermgt_generic.h prothandler.h \
 	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h \
 	winscard_svc.h
 pcscd_LDADD   = libpcsclite-core.la
