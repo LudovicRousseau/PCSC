@@ -156,17 +156,11 @@ testpcsc_LDADD = libpcsclite.la
 muscletest_SOURCES = muscletest.c
 muscletest_LDADD = libmusclecard.la
 
-# EXTRA_DIST = dyn_unix.c dyn_macosx.c \
-# 	hotplug_generic.c hotplug_linux.c hotplug_libusb.c hotplug_macosx.c \
-# 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
-# 	sys_solaris.c sys_hpux.c powermgt_macosx.c \
-# 	winscard_scf.c
-
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
 # this automagically.  This breaks if lex is not flex!!
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
-EXTRA_DIST = README_INTERNALS.txt dyn_win32.c
+EXTRA_DIST = README_INTERNALS.txt dyn_win32.c thread_win32.c
 
