@@ -10,6 +10,14 @@
  * $Id$
  */
 
+#ifndef __parser_h__
+#define __parser_h__
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define TOKEN_MAX_KEY_SIZE   200
 #define TOKEN_MAX_VALUE_SIZE 200
 
@@ -19,3 +27,8 @@
 int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
                               char *tokenValue, int tokenIndice);
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif

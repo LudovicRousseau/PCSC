@@ -37,8 +37,6 @@
 #define MSC_LIBRMSC_KEY_NAME                "CFBundleExecutable"
 #define MSC_DEFAULTAPP_NAME                 "spDefaultApplication"
 
-extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
-
 int atrToString(MSCPUChar8 Atr, MSCULong32 Length, char *outAtr)
 {
 

@@ -16,11 +16,23 @@
 extern "C"
 {
 #endif
+
+#ifndef PCSCLITE_HP_DROPDIR
+#define PCSCLITE_HP_DROPDIR		"/usr/local/pcsc/drivers/"
+#endif
+
+#define PCSCLITE_HP_MANUKEY_NAME	"ifdVendorID"
+#define PCSCLITE_HP_PRODKEY_NAME	"ifdProductID"
+#define PCSCLITE_HP_NAMEKEY_NAME	"ifdFriendlyName"
+#define PCSCLITE_HP_LIBRKEY_NAME	"CFBundleExecutable"
+
+#define PCSCLITE_HP_BASE_PORT		0x200000
+
 	LONG HPSearchHotPluggables(void);
 	ULONG HPRegisterForHotplugEvents(void);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

@@ -33,16 +33,11 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 #include "parser.h"
-
-#define PCSCLITE_MANUKEY_NAME			"ifdVendorID"
-#define PCSCLITE_PRODKEY_NAME			"ifdProductID"
-#define PCSCLITE_NAMEKEY_NAME			"ifdFriendlyName"
-#define PCSCLITE_LIBRKEY_NAME			"CFBundleExecutable"
+#include "hotplug.h"
 
 /* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
 #define PCSCLITE_MAX_DRIVERS			16
 #define BUS_DEVICE_STRSIZE			256
-#define PCSCLITE_HP_BASE_PORT			0x200000
 
 #define READER_ABSENT	0
 #define READER_PRESENT	1
@@ -53,7 +48,6 @@
 /* set to 1 if you want to see USB hotplug debug messages */
 #define DEBUG_USB_HOTPLUG 0
 
-extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
 static PCSCLITE_THREAD_T usbNotifyThread;
@@ -122,32 +116,32 @@ LONG HPReadBundleValues(void)
 			fullPath[sizeof(fullPath) - 1] = '\0';
 
 			/* while we find a nth ifdVendorID in Info.plist */
-			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
 				keyValue, alias) == 0)
 			{
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 
 				/* Get ifdVendorID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
 				/* get ifdProductID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_PRODKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].productID =
 						strtol(keyValue, 0, 16);
 
 				/* get ifdFriendlyName */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_NAMEKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].readerName = strdup(keyValue);
 
 				/* get CFBundleExecutable */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_LIBRKEY_NAME,
 					keyValue, 0);
 				if (rv == 0)
 				{

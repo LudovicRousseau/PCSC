@@ -31,20 +31,15 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 #include "parser.h"
+#include "hotplug.h"
 
 #define PCSCLITE_USB_PATH                       "/proc/bus/usb"
-
-#define PCSCLITE_MANUKEY_NAME                   "ifdVendorID"
-#define PCSCLITE_PRODKEY_NAME                   "ifdProductID"
-#define PCSCLITE_NAMEKEY_NAME                   "ifdFriendlyName"
-#define PCSCLITE_LIBRKEY_NAME                   "CFBundleExecutable"
 
 /* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
 #define PCSCLITE_HP_MAX_IDENTICAL_READERS	16
 #define PCSCLITE_HP_MAX_SIMUL_READERS		04
 #define PCSCLITE_HP_MAX_DRIVERS			20
 
-extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
 struct usb_device_descriptor
@@ -128,32 +123,32 @@ LONG HPReadBundleValues()
 			fullPath[FILENAME_MAX - 1] = '\0';
 
 			/* while we find a nth ifdVendorID in Info.plist */
-			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
 				keyValue, alias) == 0)
 			{
 				bundleTracker[listCount].bundleName = strdup(currFP->d_name);
 
 				/* Get ifdVendorID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
 				/* get ifdProductID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_PRODKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].productID =
 						strtol(keyValue, 0, 16);
 
 				/* get ifdFriendlyName */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_NAMEKEY_NAME,
 					keyValue, alias);
 				if (rv == 0)
 					bundleTracker[listCount].readerName = strdup(keyValue);
 
 				/* get CFBundleExecutable */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_LIBRKEY_NAME,
 					keyValue, 0);
 				if (rv == 0)
 				{
@@ -378,7 +373,7 @@ LONG HPSearchHotPluggables()
 
 LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 {
-	RFAddReader(bundleTracker[i].readerName, 0x200000 + usbAddr,
+	RFAddReader(bundleTracker[i].readerName, PCSCLITE_HP_BASE_PORT + usbAddr,
 		bundleTracker[i].libraryPath);
 
 	return 1;
@@ -386,7 +381,7 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 
 LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 {
-	RFRemoveReader(bundleTracker[i].readerName, 0x200000 + usbAddr);
+	RFRemoveReader(bundleTracker[i].readerName, PCSCLITE_HP_BASE_PORT + usbAddr);
 
 	return 1;
 }	/* End of function */

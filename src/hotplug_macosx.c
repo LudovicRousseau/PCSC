@@ -22,19 +22,12 @@
 
 #include "wintypes.h"
 #include "pcsclite.h"
-#include "debuglog.h"
-#include "hotplug.h"
 #include "readerfactory.h"
-#include "thread_generic.h"
-
-#ifndef PCSCLITE_HP_DROPDIR
-#define PCSCLITE_HP_DROPDIR        "/usr/local/pcsc/drivers/"
-#endif
-
-#define PCSCLITE_HP_MANUKEY_NAME   "ifdVendorID"
-#define PCSCLITE_HP_PRODKEY_NAME   "ifdProductID"
-#define PCSCLITE_HP_NAMEKEY_NAME   "ifdFriendlyName"
-#define PCSCLITE_HP_BASE_PORT       0x200000
+#include "winscard_msg.h"
+#include "debuglog.h"
+#include "sys_generic.h"
+#include "parser.h"
+#include "hotplug.h"
 
 #define DEBUG_MACOS_HOTPLUG
 
