@@ -41,11 +41,12 @@ static PCSCLITE_MUTEX PCSC_MCARD_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* This is initialized once in PCSC.cpp */
 PCSCLITE_MUTEX PCSC_MCARD_mutex;
 #endif
+
 static PCSCLITE_THREAD_T callbackThread;
-#endif
+static ULONG blockingContext = MSC_BLOCKSTATUS_RESUME;
+#endif	/* USE_THREAD_SAFETY */
 
 static SCARDCONTEXT localHContext = 0;
-static ULONG blockingContext = MSC_BLOCKSTATUS_RESUME;
 
 /*
  * internal function 
