@@ -49,7 +49,7 @@ SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 static struct _psTransmitMap {
   BYTE Buffer[266];
   int isResponseCached;
-  BYTE bufferLength;
+  LONG bufferLength;
 } psTransmitMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 /* Channel Map to manage Card Connections. */
