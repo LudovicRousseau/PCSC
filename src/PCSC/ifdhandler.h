@@ -24,7 +24,6 @@ extern "C"
 
 	typedef struct _DEVICE_CAPABILITIES
 	{
-
 		LPSTR Vendor_Name;		/* Tag 0x0100 */
 		LPSTR IFD_Type;			/* Tag 0x0101 */
 		DWORD IFD_Version;		/* Tag 0x0102 */
@@ -43,24 +42,20 @@ extern "C"
 		DWORD User_Auth_Device;	/* Tag 0x0142 */
 		DWORD Mechanics_Supported;	/* Tag 0x0150 */
 		DWORD Vendor_Features;	/* Tag 0x0180 - 0x01F0 User Defined. */
-
 	}
 	DEVICE_CAPABILITIES, *PDEVICE_CAPABILITIES;
 
 	typedef struct _ICC_STATE
 	{
-
 		UCHAR ICC_Presence;		/* Tag 0x0300 */
 		UCHAR ICC_Interface_Status;	/* Tag 0x0301 */
 		UCHAR ATR[MAX_ATR_SIZE];	/* Tag 0x0303 */
 		UCHAR ICC_Type;			/* Tag 0x0304 */
-
 	}
 	ICC_STATE, *PICC_STATE;
 
 	typedef struct _PROTOCOL_OPTIONS
 	{
-
 		DWORD Protocol_Type;	/* Tag 0x0201 */
 		DWORD Current_Clock;	/* Tag 0x0202 */
 		DWORD Current_F;		/* Tag 0x0203 */
@@ -145,11 +140,13 @@ extern "C"
 	 * List of Defined Functions Available to IFD_Handler 3.0 
 	 *
 	 * All the functions of IFD_Handler 2.0 are available
-	 * and there is one new.
+	 * IFDHCreateChannelByName() is new
+	 * IFDHControl() API changed
 	 */
 
 	RESPONSECODE IFDHCreateChannelByName(DWORD, LPSTR);
-
+	RESPONSECODE IFDHControl(DWORD, DWORD, PUCHAR, DWORD, PUCHAR, DWORD,
+		PDWORD);
 
 	/*
 	 * List of Defined Functions Available to IFD_Handler 2.0 
@@ -164,7 +161,7 @@ extern "C"
 	RESPONSECODE IFDHPowerICC(DWORD, DWORD, PUCHAR, PDWORD);
 	RESPONSECODE IFDHTransmitToICC(DWORD, SCARD_IO_HEADER, PUCHAR,
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER);
-	RESPONSECODE IFDHControl(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
+	RESPONSECODE IFDHControl_v2(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 	RESPONSECODE IFDHICCPresence(DWORD);
 
 	/*
