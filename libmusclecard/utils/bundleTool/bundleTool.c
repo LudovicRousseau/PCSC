@@ -72,8 +72,7 @@ int main(int argc, char **argv)
 
 	if (argc > 1)
 	{
-		printf("Invalid arguments\n");
-		printf("./bundleTool\n");
+		printf("Invalid arguments\nUsage: %s\n", argv[0]);
 		return -1;
 	}
 
