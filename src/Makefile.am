@@ -5,7 +5,7 @@ SUBDIRS = . utils
 if HAVE_MUSCLECARD
 MC_LIBS = libmusclecard.la
 MC_BIN = muscletest
-MC_HDR = mscdefines.h musclecard.h
+MC_HDR = PCSC/mscdefines.h PCSC/musclecard.h
 endif
 
 lib_LTLIBRARIES = libpcsclite.la $(MC_LIBS)
@@ -76,12 +76,12 @@ testpcsc_LDADD = libpcsclite.la
 muscletest_SOURCES = muscletest.c
 muscletest_LDADD = libmusclecard.la
 
-include_HEADERS = \
-	debuglog.h ifdhandler.h pcsclite.h winscard.h wintypes.h \
-	$(MC_HDR)
+nobase_include_HEADERS = \
+	PCSC/debuglog.h PCSC/ifdhandler.h PCSC/pcsclite.h PCSC/winscard.h \
+	PCSC/wintypes.h PCSC/parser.h $(MC_HDR)
 noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
-	hotplug.h ifdwrapper.h parser.h pcsclite.h.in \
+	hotplug.h ifdwrapper.h pcsclite.h.in \
 	powermgt_generic.h prothandler.h readerfactory.h \
 	sys_generic.h thread_generic.h tokenfactory.h \
 	winscard_msg.h winscard_svc.h
