@@ -252,10 +252,6 @@ if test x${runpid} != xfalse ; then
 	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])
 fi
 
-if test x${scf} = xtrue ; then
-  AC_MSG_RESULT([NOTE :: SCF winscard_clnt.c required for operation.])
-fi
-
 if test x${threadsafe} = xtrue ; then
   AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])
   AC_DEFINE(USE_THREAD_SAFETY, 1, [enable client side thread safety.])

@@ -1,4 +1,7 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if lex declares yytext as a char * by default, not a char[].  */
+#undef YYTEXT_POINTER
 
 /* Define if you have the daemon function.  */
 #undef HAVE_DAEMON
@@ -8,6 +11,12 @@
 
 /* Define if you have the <getopt.h> header file.  */
 #undef HAVE_GETOPT_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
 
 /* Linux */
 #undef PCSC_TARGET_LINUX
@@ -44,6 +53,13 @@
 
 /* TRU64 */
 #undef MSC_TARGET_TRU64
+
+/* Define to the necessary symbol if this constant
+                           uses a non-standard name on your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
 
 /* directory containing USB drivers */
 #undef PCSCLITE_HP_DROPDIR

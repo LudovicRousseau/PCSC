@@ -1,10 +1,14 @@
+pcsc-lite-1.1.2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
+15 Oct, 2002
+- Support for Sun Microsystems' SCF
+
 pcsc-lite-1.1.2beta2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
 12 Oct, 2002
 - OpenBSD 3.1 and FreeBSD 4.7RC2 debug and testing
 - MacOSX debug and improvement
 - support multiple identical USB readers under GNU/Linux
 - more debug
-
+- Bug in winscard.c for protocol when ANY is chosen
 
 pcsc-lite-1.1.2beta1: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 6 Sep, 2002

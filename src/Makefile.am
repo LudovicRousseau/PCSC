@@ -19,6 +19,7 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_linux.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 else
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl -ldl
@@ -27,6 +28,7 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 else
 if PCSC_ARCH_BSD
@@ -37,6 +39,7 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_bsd.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 else
 if PCSC_ARCH_OSX
 PCSC_MYLDFLAGS      = -framework CoreFoundation
@@ -46,6 +49,7 @@ PCSC_THREAD_SOURCE  = thread_macosx.c
 PCSC_DYNLOAD_SOURCE = dyn_macosx.c
 PCSC_HOTPLUG_SOURCE = hotplug_macosx.c powermgt_macosx.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 INCLUDES  = -I/System/Library/Frameworks/IOKit.framework/Headers/usb \
             -I/System/Library/Frameworks/IOKit.framework/Headers
 else
@@ -55,8 +59,10 @@ PCSC_MYLDFLAGS      =
 if MSC_ENABLE_SCF
 PCSC_INCLUDE_LIBS   = -ll -ldl -lnsl -lsocket -lposix4 -lsmartcard
 INCLUDES = -I/usr/include/smartcard
+PCSC_CLIENT_SRC     = winscard_scf.c
 else
 PCSC_INCLUDE_LIBS   = -ll -ldl -lnsl -lsocket -lposix4
+PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 
 PCSCD_INCLUDE_LIBS  = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
@@ -73,6 +79,7 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_hpux.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_hpux.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 else
 if PCSC_ARCH_TRU64
 PCSC_MYLDFLAGS      =
@@ -82,6 +89,7 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 endif
 endif
@@ -109,7 +117,7 @@ libpcsclite_core_la_SOURCES = configfile.l driverparser.l \
 
 libpcsclite_core_la_LDFLAGS = -version-info 0:2:0 $(PCSC_INCLUDE_LIBS)
 
-libpcsclite_la_SOURCES = winscard_clnt.c debuglog.c $(PCSC_SYSTEM_SOURCE) \
+libpcsclite_la_SOURCES = $(PCSC_CLIENT_SRC) debuglog.c $(PCSC_SYSTEM_SOURCE) \
 			 winscard_msg.c $(PCSC_CLIENT) $(MCARD_CLIENT)
 
 libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
