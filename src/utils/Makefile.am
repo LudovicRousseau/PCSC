@@ -1,5 +1,7 @@
 # Process this file with automake to create Makefile.in.
 
+AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC
+
 bin_PROGRAMS = formaticc
 sbin_PROGRAMS = bundleTool installifd
 
