@@ -1545,7 +1545,7 @@ void RFCleanupReaders(int shouldExit)
 		exit(0);
 }
 
-void RFSuspendAllReaders() 
+void RFSuspendAllReaders(void) 
 {
 	int i;
 
@@ -1560,7 +1560,7 @@ void RFSuspendAllReaders()
 
 }
 
-void RFAwakeAllReaders() 
+void RFAwakeAllReaders(void) 
 {
 	LONG rv = IFD_SUCCESS;
 	int i, j;
