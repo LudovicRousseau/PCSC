@@ -795,6 +795,7 @@ void *_MSCEventThread(void *arg)
 	blockingContext = MSC_BLOCKSTATUS_RESUME;
 	SYS_ThreadExit(&rv);
 
+	return NULL;
 }
 
 MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
