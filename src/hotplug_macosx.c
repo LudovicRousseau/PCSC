@@ -735,7 +735,8 @@ LONG HPSearchHotPluggables(void)
 		}
 		if (!found)
 		{
-			/* NOTE: The deviceName is empy string as soon as someone implements the function to get it */
+			/* NOTE: The deviceName is an empty string "" until someone
+			 * implements the code to get it */
 			RFAddReader(a->m_driver->m_friendlyName,
 				PCSCLITE_HP_BASE_PORT + a->m_address, a->m_driver->m_libPath, "");
 		}

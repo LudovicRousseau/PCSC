@@ -368,7 +368,8 @@ LONG HPSearchHotPluggables()
 
 LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 {
-	/* NOTE: The deviceName is empy string as soon as someone implements the function to get it */
+	/* NOTE: The deviceName is an empty string "" until someone implements
+	 * the code to get it */
 	RFAddReader(bundleTracker[i].readerName, PCSCLITE_HP_BASE_PORT + usbAddr,
 		bundleTracker[i].libraryPath, "");
 
