@@ -7,21 +7,18 @@ pcscd \- PC/SC Smartcard Daemon
 .SH SYNOPSIS
 .B pcscd [-v] [-c
 .I file
-.B ] [-d0] [-d1] [-d2] [-fg] [-help]
+.B ] [-d stdout | stderr | syslog] [-f] [-h]
 .SH OPTIONS
 .IP -v	
-Displays the version of pcscd
+Displays the program version number
 .IP "-c file"
 Specifies the file as an alternate location for reader.conf
-.IP -d0
-Outputs debugging to syslog (requires debugging on)
-.IP -d1
-Outputs debugging to stderr (requires debugging on)
-.IP -d2
-Outputs debugging to stdout (requires debugging on)
-.IP -fg
-Runs pcscd in the foreground (disables daemon)
-.IP -help 
+.IP -f
+Runs pcscd in the foreground (no daemon)
+.IP -d stdout stderr syslog
+Outputs debugging to either stdout, stderr, or syslog
+stdout and stderr implies -f
+.IP -h
 Displays information about the pcscd command line
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite and musclecard framework. It is 
