@@ -6,6 +6,7 @@
  * Copyright (C) 2000-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -17,98 +18,66 @@
 #define PCSC_MUTEX_LOCKED    1
 #define PCSC_MUTEX_UNLOCKED  0
 
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
 {
-	int retval;
-	retval = pthread_mutex_init(mMutex, NULL);
-	return retval;
+	return pthread_mutex_init(mMutex, NULL);
 }
 
 int SYS_MutexDestroy(PCSCLITE_MUTEX_T mMutex)
 {
-	int retval;
-	retval = pthread_mutex_destroy(mMutex);
-	return retval;
+	return pthread_mutex_destroy(mMutex);
 }
 
 int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
 {
-	int retval;
-	retval = pthread_mutex_lock(mMutex);
-	return retval;
+	return pthread_mutex_lock(mMutex);
 }
 
 int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
 {
-	int retval;
-	retval = pthread_mutex_unlock(mMutex);
-	return retval;
+	return pthread_mutex_unlock(mMutex);
 }
 
 int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, LPVOID pthAttr,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
-
-	int retval;
-	retval = pthread_create(pthThread, NULL, pvFunction, pvArg);
-
-	if (retval == 0)
-	{
-		return 1;	/* TRUE */
-	} else
-	{
-		return 0;	/* FALSE */
-	}
+	if (0 == pthread_create(pthThread, NULL, pvFunction, pvArg))
+		return TRUE;
+	else
+		return FALSE;
 }
 
 int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
 {
-
-	int retval;
-	retval = pthread_cancel(*pthThread);
-
-	if (retval == 0)
-	{
-		return 1;
-	} else
-	{
-		return 0;
-	}
+	if (0 == pthread_cancel(*pthThread))
+		return TRUE;
+	else
+		return FALSE;
 }
 
 int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
 {
-
-	int retval;
-	retval = pthread_detach(pthThread);
-
-	if (retval == 0)
-	{
-		return 1;
-	} else
-	{
-		return 0;
-	}
+	if (0 == pthread_detach(pthThread))
+		return TRUE;
+	else
+		return FALSE;
 }
 
 int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
 {
-
-	int retval;
-	retval = pthread_join(*pthThread, pvRetVal);
-
-	if (retval == 0)
-	{
-		return 1;
-	} else
-	{
-		return 0;
-	}
+	if (0 == pthread_join(*pthThread, pvRetVal))
+		return TRUE;
+	else
+		return FALSE;
 }
 
 int SYS_ThreadExit(LPVOID pvRetVal)
 {
-
 	pthread_exit(pvRetVal);
 	return 1;
 }
@@ -120,14 +89,6 @@ PCSCLITE_THREAD_T SYS_ThreadSelf()
 
 int SYS_ThreadEqual(PCSCLITE_THREAD_T *pthThread1, PCSCLITE_THREAD_T *pthThread2)
 {
-	int retval;
-	retval = pthread_equal(*pthThread1, *pthThread2);
-
-	if (retval == 0)
-	{
-		return 0;
-	} else
-	{
-		return 1;
-	}
+	return pthread_equal(*pthThread1, *pthThread2);
 }
+
