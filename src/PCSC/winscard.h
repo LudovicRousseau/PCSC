@@ -32,7 +32,7 @@ extern "C"
 	LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout);
 
 	LONG SCardConnect(SCARDCONTEXT hContext,
-		LPCSTR szReader,
+		LPCTSTR szReader,
 		DWORD dwShareMode,
 		DWORD dwPreferredProtocols,
 		LPSCARDHANDLE phCard, LPDWORD pdwActiveProtocol);
@@ -51,7 +51,7 @@ extern "C"
 	LONG SCardCancelTransaction(SCARDHANDLE hCard);
 
 	LONG SCardStatus(SCARDHANDLE hCard,
-		LPSTR mszReaderNames, LPDWORD pcchReaderLen,
+		LPTSTR mszReaderNames, LPDWORD pcchReaderLen,
 		LPDWORD pdwState,
 		LPDWORD pdwProtocol,
 		LPBYTE pbAtr, LPDWORD pcbAtrLen);
@@ -71,11 +71,11 @@ extern "C"
 		LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength);
 
 	LONG SCardListReaderGroups(SCARDCONTEXT hContext,
-		LPSTR mszGroups, LPDWORD pcchGroups);
+		LPTSTR mszGroups, LPDWORD pcchGroups);
 
 	LONG SCardListReaders(SCARDCONTEXT hContext,
-		LPCSTR mszGroups,
-		LPSTR mszReaders, LPDWORD pcchReaders);
+		LPCTSTR mszGroups,
+		LPTSTR mszReaders, LPDWORD pcchReaders);
 
 	LONG SCardCancel(SCARDCONTEXT hContext);
 

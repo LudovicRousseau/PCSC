@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	LONG rv;
 	SCARDCONTEXT hContext;
 	DWORD dwReaders;
-	LPSTR mszReaders;
+	LPTSTR mszReaders;
 	char *ptr, **readers = NULL;
 	int nbReaders;
 	SCARDHANDLE hCard;

@@ -47,7 +47,7 @@
 struct _psChannelMap
 {
 	SCARDHANDLE hCard;
-	LPSTR readerName;
+	LPTSTR readerName;
 };
 
 typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
@@ -79,7 +79,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT);
 static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
 
-static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPSTR);
+static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPTSTR);
 static LONG SCardGetIndicesFromHandle(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardRemoveHandle(SCARDHANDLE);
@@ -381,7 +381,7 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
+LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -471,7 +471,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Keep track of the handle locally
 		 */
-		rv = SCardAddHandle(*phCard, dwContextIndex, (LPSTR) szReader);
+		rv = SCardAddHandle(*phCard, dwContextIndex, (LPTSTR) szReader);
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 		return rv;
 	}
@@ -915,7 +915,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	return scCancelStruct.rv;
 }
 
-LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1069,7 +1069,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LONG rv;
 	PSCARD_READERSTATE_A currReader;
 	PREADER_STATES rContext;
-	LPSTR lpcReaderName;
+	LPTSTR lpcReaderName;
 	DWORD dwTime;
 	DWORD dwState;
 	DWORD dwBreakFlag;
@@ -1879,8 +1879,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	}
 }
 
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
-	LPSTR mszReaders, LPDWORD pcchReaders)
+LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
+	LPTSTR mszReaders, LPDWORD pcchReaders)
 {
 	DWORD dwGroupsLen, dwReadersLen;
 	int i, lastChrPtr;
@@ -1962,7 +1962,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
+LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	LONG rv = SCARD_S_SUCCESS;
@@ -2116,7 +2116,7 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
  */
 
 static LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex,
-	LPSTR readerName)
+	LPTSTR readerName)
 {
 	int i;
 

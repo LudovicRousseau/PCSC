@@ -39,11 +39,11 @@ extern "C"
 	typedef unsigned short WORD;
 	typedef long LONG;
 	typedef long RESPONSECODE;
-	typedef const char *LPCSTR;
+	typedef const char *LPCTSTR;
 	typedef const BYTE *LPCBYTE;
 	typedef BYTE *LPBYTE;
 	typedef DWORD *LPDWORD;
-	typedef char *LPSTR;
+	typedef char *LPTSTR;
 
 #else
 #include <windows.h>

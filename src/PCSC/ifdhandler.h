@@ -24,10 +24,10 @@ extern "C"
 
 	typedef struct _DEVICE_CAPABILITIES
 	{
-		LPSTR Vendor_Name;		/* Tag 0x0100 */
-		LPSTR IFD_Type;			/* Tag 0x0101 */
+		LPTSTR Vendor_Name;		/* Tag 0x0100 */
+		LPTSTR IFD_Type;			/* Tag 0x0101 */
 		DWORD IFD_Version;		/* Tag 0x0102 */
-		LPSTR IFD_Serial;		/* Tag 0x0103 */
+		LPTSTR IFD_Serial;		/* Tag 0x0103 */
 		DWORD IFD_Channel_ID;	/* Tag 0x0110 */
 
 		DWORD Asynch_Supported;	/* Tag 0x0120 */
@@ -144,7 +144,7 @@ extern "C"
 	 * IFDHControl() API changed
 	 */
 
-	RESPONSECODE IFDHCreateChannelByName(DWORD, LPSTR);
+	RESPONSECODE IFDHCreateChannelByName(DWORD, LPTSTR);
 	RESPONSECODE IFDHControl(DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD,
 		LPDWORD);
 

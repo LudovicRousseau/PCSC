@@ -132,7 +132,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IO_create_channel) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
-	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPSTR) = NULL;
+	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPTSTR) = NULL;
 #endif
 
 	/*
@@ -162,7 +162,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	else
 	{
 		IFDH_create_channel = (RESPONSECODE(*)(DWORD, DWORD)) vFunction;
-		IFDH_create_channel_by_name = (RESPONSECODE(*)(DWORD, LPSTR)) vFunction1;
+		IFDH_create_channel_by_name = (RESPONSECODE(*)(DWORD, LPTSTR)) vFunction1;
 	}
 #endif
 

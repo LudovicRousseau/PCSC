@@ -119,12 +119,12 @@ extern "C"
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(DWORD);
-	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
-	LONG RFRemoveReader(LPSTR, DWORD);
-	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
-	LONG RFListReaders(LPSTR, LPDWORD);
-	LONG RFReaderInfo(LPSTR, struct ReaderContext **);
-	LONG RFReaderInfoNamePort(DWORD, LPSTR, struct ReaderContext **);
+	LONG RFAddReader(LPTSTR, DWORD, LPTSTR, LPTSTR);
+	LONG RFRemoveReader(LPTSTR, DWORD);
+	LONG RFSetReaderName(PREADER_CONTEXT, LPTSTR, LPTSTR, DWORD, DWORD);
+	LONG RFListReaders(LPTSTR, LPDWORD);
+	LONG RFReaderInfo(LPTSTR, struct ReaderContext **);
+	LONG RFReaderInfoNamePort(DWORD, LPTSTR, struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, struct ReaderContext **);
 	LONG RFCheckSharing(DWORD);
 	LONG RFLockSharing(DWORD);

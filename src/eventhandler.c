@@ -151,7 +151,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 {
 	LONG rv;
-	LPCSTR lpcReader;
+	LPCTSTR lpcReader;
 	DWORD dwStatus, dwProtocol;
 	int i;
 
@@ -214,7 +214,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
 	LONG rv;
-	LPCSTR lpcReader;
+	LPCTSTR lpcReader;
 	DWORD dwStatus, dwProtocol, dwReaderSharing;
 	DWORD dwErrorCount, dwCurrentState;
 	int i, pageSize;
