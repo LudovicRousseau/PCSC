@@ -498,7 +498,7 @@ Value of \texttt{dwPreferredProtocols} & Meaning \\
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 LONG rv;
 
@@ -603,18 +603,19 @@ Value of \texttt{dwInitialization} & Meaning \\
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
-DWORD dwActiveProtocol;
+SCARDHANDLE hCard;
+DWORD dwActiveProtocol, dwSendLength, dwRecvLength;
 LONG rv;
 BYTE pbRecvBuffer[10];
-BYTE pbSendBuffer = {0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00};
+BYTE pbSendBuffer[] = {0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00};
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
     SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
 dwSendLength = sizeof(pbSendBuffer);
+dwRecvLength = sizeof(pbRecvBuffer);
 rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
-    &pioRecvPci, pbRecvBuffer, &pcbRecvLength);
+    &pioRecvPci, pbRecvBuffer, &dwRecvLength);
 
 /* Card has been reset by another application */
 if (rv == SCARD_W_RESET_CARD)
@@ -676,7 +677,7 @@ Value of \texttt{dwDisposition} & Meaning \\
 \example
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 LONG rv;
 
@@ -724,7 +725,7 @@ another application has a lock on this reader or this application is in
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 LONG rv;
 
@@ -789,7 +790,7 @@ Value of dwDisposition & Meaning \\
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 LONG rv;
 
@@ -872,20 +873,19 @@ Value of \texttt{pioSendPci} & Meaning \\
 \begin{verbatim}
 LONG rv;
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
-DWORD dwActiveProtocol, dwSendLength, pcbRecvLength;
+SCARDHANDLE hCard;
+DWORD dwActiveProtocol, dwSendLength, dwRecvLength;
 SCARD_IO_REQUEST pioRecvPci;
 BYTE pbRecvBuffer[10];
-BYTE pbSendBuffer = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
-
-dwSendLength = sizeof(pbSendBuffer);
+BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
-pcbRecvLength = sizeof(pbRecvBuffer);
+dwSendLength = sizeof(pbSendBuffer);
+dwRecvLength = sizeof(pbRecvBuffer);
 rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
-         &pioRecvPci, pbRecvBuffer, &pcbRecvLength);
+         &pioRecvPci, pbRecvBuffer, &dwRecvLength);
 \end{verbatim}
 
 \returns
@@ -947,17 +947,18 @@ corrected.
 \begin{verbatim}
 LONG rv;
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
-DWORD dwActiveProtocol, dwSendLength, pcbRecvLength;
+SCARDHANDLE hCard;
+DWORD dwActiveProtocol, dwSendLength, dwRecvLength;
 BYTE pbRecvBuffer[10];
-BYTE pbSendBuffer = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10 0x00 };
+BYTE pbSendBuffer[] = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10 0x00 };
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
          SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
-pcbRecvLength = sizeof(pbRecvBuffer);
-rv = SCardControl(hCard, 0x42000001, pbSendBuffer, sizeof(pbSendBuffer),
-         pbRecvBuffer, sizeof(pbRecvBuffer), &pcbRecvLength);
+dwSendLength = sizeof(pbSendBuffer);
+dwRecvLength = sizeof(pbRecvBuffer);
+rv = SCardControl(hCard, 0x42000001, pbSendBuffer, dwSendLength,
+         pbRecvBuffer, sizeof(pbRecvBuffer), &dwRecvLength);
 \end{verbatim}
 
 \returns
@@ -1043,9 +1044,9 @@ Value of \texttt{dwPreferredProtocols} & Meaning \\
 \begin{verbatim}
 SCARDCONTEXT hContext;
 SCARDHANDLE hCard;
-DWORD dwActiveProtocol, cReaders;
+DWORD dwActiveProtocol;
 DWORD dwState, dwProtocol, dwAtrLen, dwReaderLen;
-BYTE pbAtr[MAX_ATR_SIZE]
+BYTE pbAtr[MAX_ATR_SIZE];
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
@@ -1173,7 +1174,7 @@ this bit is set, SCARD\_STATE\_PRESENT will also be set\\
 
 \begin{verbatim}
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol, cReaders;
 SCARD_READERSTATE_A rgReaderStates[1];
 LONG rv;
@@ -1235,7 +1236,7 @@ rgReaderStates.szReader = strdup("Reader X");
 rgReaderStates.dwCurrentState = SCARD_STATE_EMPTY;
 
 /* Spawn off thread for following function */
-rv = SCardGetStatusChange(hContext, 0, rgReaderStates, &cReaders);
+rv = SCardGetStatusChange(hContext, 0, rgReaderStates, cReaders);
 
 rv = SCardCancel(hContext);
 \end{verbatim}
@@ -1377,7 +1378,7 @@ listed here may be implemented.
 \begin{verbatim}
 LONG rv;
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 unsigned char pbAtr[MAX_ATR_SIZE];
 DWORD dwAtrLen;
@@ -1430,7 +1431,7 @@ attributes you can set is dependent on the IFD Handler you are using.
 \begin{verbatim}
 LONG rv;
 SCARDCONTEXT hContext;
-SCARDHANDLE hCard
+SCARDHANDLE hCard;
 DWORD dwActiveProtocol;
 unsigned char pbAtr[MAX_ATR_SIZE];
 DWORD dwAtrLen;
