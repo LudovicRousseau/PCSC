@@ -199,11 +199,22 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 						memcpy(currentToken->tokenId,
 							rgReaderStates.rgbAtr, rgReaderStates.cbAtr);
 						currentToken->tokenIdLength = rgReaderStates.cbAtr;
+
+       						memcpy(currentToken->tokenApp,
+                					tokenInfo.tokenApp, tokenInfo.tokenAppLen);
+        					currentToken->tokenAppLen = tokenInfo.tokenAppLen;
+        
+					        strncpy(currentToken->svProvider,
+                					tokenInfo.svProvider, MSC_MAXSIZE_SVCPROV);
 					}
 					else
 					{
 						memset(currentToken->tokenId, 0x00, MAX_ATR_SIZE);
 						currentToken->tokenIdLength = 0x00;
+
+					        memset(currentToken->tokenApp, 0x00, MSC_MAXSIZE_AID);
+        					currentToken->tokenAppLen = 0x00;
+        					memset(currentToken->svProvider, 0x00, MSC_MAXSIZE_SVCPROV);
 					}
 
 					currentToken->tokenState = rgReaderStates.dwEventState;
