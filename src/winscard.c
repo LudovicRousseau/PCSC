@@ -1,14 +1,14 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-    Title  : winscard.c
-    Package: pcsc lite
+	Title  : winscard.c
+	Package: pcsc lite
 	Author : David Corcoran
 	Date   : 7/27/1999, 11/29/2002
 	License: Copyright (C) 1999 David Corcoran
-		<corcoran@linuxnet.com>
+				<corcoran@linuxnet.com>
 			Copyright (C) 2002 Ludovic Rousseau
-		<ludovic.rousseau@free.fr>
+				<ludovic.rousseau@free.fr>
 	Purpose: This handles smartcard reader communications. 
 		This is the heart of the M$ smartcard API.
 
@@ -1179,8 +1179,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	if (pbSendBuffer == 0 || pbRecvBuffer == 0 || pioRecvPci == 0 ||
-			pioSendPci == 0)
+	if (pbSendBuffer == NULL || pbRecvBuffer == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	/*
@@ -1347,3 +1346,4 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	 */
 	return SCARD_S_SUCCESS;
 }
+
