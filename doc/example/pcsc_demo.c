@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	DWORD dwSendLength, dwRecvLength;
 
 	printf("PC/SC sample code\n");
-	printf("V 1.1 2003-2004, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
+	printf("V 1.2 2003-2005, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
 
 	printf("\nTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
 	printf("Do NOT use it unless you really know what you do.\n\n");
@@ -217,6 +217,19 @@ int main(int argc, char *argv[])
 		printf(" %02X", pbAtr[i]);
 	printf("\n");
 	PCSC_ERROR(rv, "SCardStatus")
+
+	/* get card status change */
+	{
+		/* check only one reader */
+		SCARD_READERSTATE_A rgReaderStates[1];
+
+		rgReaderStates[0].szReader = pbReader;
+		rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
+
+		rv = SCardGetStatusChange(hContext, 0, rgReaderStates, 1);
+		printf(" state: 0x%04X\n", rgReaderStates[0].dwEventState);
+		PCSC_ERROR(rv, "SCardGetStatusChange")
+	}
 
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
