@@ -52,7 +52,7 @@ $Id$
 #define TRUE 1
 
 /* set to 1 if you want to see USB hotplug debug messages */
-#define DEBUG_USB_HOTPLUG 1
+#define DEBUG_USB_HOTPLUG 0
 
 extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
