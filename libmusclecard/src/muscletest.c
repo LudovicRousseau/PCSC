@@ -26,7 +26,6 @@ MSCString pcsc_stringify_error(MSCLong32 Error);
 
 int main(int argc, char **argv)
 {
-
 	MSCLong32 rv;
 	MSCTokenConnection pConnection;
 	MSCStatusInfo statusInf;
@@ -46,7 +45,7 @@ int main(int argc, char **argv)
 	printf("********************************************************\n");
 	printf("\n");
 
-	tokenList = 0;
+	tokenList = NULL;
 	tokenSize = 0;
 
 	rv = MSCListTokens(MSC_LIST_SLOTS, tokenList, &tokenSize);
@@ -70,12 +69,12 @@ int main(int argc, char **argv)
 		printf("Token #%d\n", i);
 		printf("Token name     : %s\n", tokenList[i].tokenName);
 		printf("Slot name      : %s\n", tokenList[i].slotName);
+
 		printf("Token id       : ");
 		for (j = 0; j < tokenList[i].tokenIdLength; j++)
-		{
 			printf("%02X", tokenList[i].tokenId[j]);
-		}
 		printf("\n");
+
 		printf("Token state    : %04lX\n", tokenList[i].tokenState);
 		printf("\n");
 
@@ -92,12 +91,12 @@ int main(int argc, char **argv)
 		printf("Token #%d\n", i);
 		printf("Token name     : %s\n", tokenList[i].tokenName);
 		printf("Slot name      : %s\n", tokenList[i].slotName);
+
 		printf("Token id       : ");
 		for (j = 0; j < tokenList[i].tokenIdLength; j++)
-		{
 			printf("%02X", tokenList[i].tokenId[j]);
-		}
 		printf("\n");
+
 		printf("Token state    : %04lX\n", tokenList[i].tokenState);
 		printf("\n");
 
@@ -147,8 +146,7 @@ int main(int argc, char **argv)
 	objACL.writePermission = MSC_AUT_ALL;
 	objACL.deletePermission = MSC_AUT_ALL;
 
-	rv = MSCCreateObject(&pConnection, MY_OBJECT_ID, MY_OBJECT_SIZE,
-		&objACL);
+	rv = MSCCreateObject(&pConnection, MY_OBJECT_ID, MY_OBJECT_SIZE, &objACL);
 	printf("CreateObject returns        : %s\n", msc_error(rv));
 
 	rv = MSCWriteObject(&pConnection, MY_OBJECT_ID, 0, myData,
@@ -162,12 +160,9 @@ int main(int argc, char **argv)
 	{
 		printf("Object data                 : %s\n", readData);
 		if (strcmp(readData, myData) == 0)
-		{
 			printf("Data comparison             : Successful\n");
-		} else
-		{
+		else
 			printf("Data comparison             : Data mismatch\n");
-		}
 	}
 
 	rv = MSCListObjects(&pConnection, MSC_SEQUENCE_RESET, &objInfo);
@@ -198,10 +193,7 @@ int main(int argc, char **argv)
 				objInfo.objectACL.writePermission,
 				objInfo.objectACL.deletePermission);
 		} else
-		{
 			break;
-		}
-
 	}
 	while (1);
 
@@ -220,12 +212,10 @@ int main(int argc, char **argv)
 	memset(pRandomData, 0, sizeof(pRandomData));
 	rv = MSCGetChallenge(&pConnection, pSeed, 0, pRandomData, 8);
 	printf("GetChallenge returns        : %s\n", msc_error(rv));
-	printf("Random data                 : ");
 
+	printf("Random data                 : ");
 	for (i = 0; i < 8; i++)
-	{
 		printf("%02X ", pRandomData[i]);
-	}
 	printf("\n");
 
 	rv = MSCLogoutAll(&pConnection);
@@ -246,7 +236,6 @@ int main(int argc, char **argv)
 #ifdef WIN32
 MSCString pcsc_stringify_error(MSCLong32 Error)
 {
-
 	static char strError[75];
 
 	switch (Error)
