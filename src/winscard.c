@@ -103,23 +103,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-	UCHAR pucAtr[MAX_ATR_SIZE], ucAvailable;
-	DWORD dwAtrLength, dwState, dwStatus;
-	DWORD dwReaderLen, dwProtocol;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
-	ucAvailable = 0;
-	dwAtrLength = 0;
-	dwState = 0;
-	dwStatus = 0;
-	dwReaderLen = 0;
-	dwProtocol = 0;
-	memset(pucAtr, 0x00, MAX_ATR_SIZE);
+	PREADER_CONTEXT rContext = NULL;
+	DWORD dwStatus;
 
 	/*
 	 * Check for NULL parameters
@@ -201,35 +186,26 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
-			memcpy(pucAtr, rContext->readerState->cardAtr,
-				rContext->readerState->cardAtrLength);
-			dwAtrLength = rContext->readerState->cardAtrLength;
-			if (rContext->readerState->cardAtrLength > 0)
-				DebugXxd("Card ATR: ", rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+			UCHAR ucAvailable, ucDefault;
 
-			rContext->readerState->cardProtocol =
-				PHGetDefaultProtocol(pucAtr, dwAtrLength);
-			ucAvailable = PHGetAvailableProtocols(pucAtr, dwAtrLength);
+			ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
+				rContext->readerState->cardAtrLength);
+			ucAvailable =
+				PHGetAvailableProtocols(rContext->readerState->cardAtr,
+						rContext->readerState->cardAtrLength);
 
 			/*
-			 * If it is set to any let it do any of the protocols
+			 * If it is set to ANY let it do any of the protocols
 			 */
 			if (dwPreferredProtocols & SCARD_PROTOCOL_ANY)
-			{
-				rContext->readerState->cardProtocol = PHSetProtocol(rContext,
-						ucAvailable, ucAvailable);
-			}
-			else
-			{
-				rContext->readerState->cardProtocol =
-					PHSetProtocol(rContext, dwPreferredProtocols,
-					ucAvailable);
-				if (rContext->readerState->cardProtocol == -1)
-				{
-					return SCARD_E_PROTO_MISMATCH;
-				}
-			}
+				dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
+
+			rContext->readerState->cardProtocol =
+				PHSetProtocol(rContext, dwPreferredProtocols,
+				ucAvailable, ucDefault);
+
+			if (rContext->readerState->cardProtocol == -1)
+				return SCARD_E_PROTO_MISMATCH;
 		}
 	}
 
@@ -312,20 +288,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-	UCHAR pucAtr[MAX_ATR_SIZE], ucAvailable;
-	DWORD dwAtrLength;
+	PREADER_CONTEXT rContext = NULL;
 
 	DebugLogA("Attempting reconnect to token.");
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
-	ucAvailable = 0;
-	dwAtrLength = 0;
-	memset(pucAtr, 0x00, MAX_ATR_SIZE);
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -484,44 +449,36 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			 */
 		}
 
-	/*
-	 * Handle the dwActive/Preferred Protocols
-	 */
+	/*******************************************
+	 *
+	 * This section tries to decode the ATR
+	 * and set up which protocol to use
+	 *
+	 *******************************************/
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-	{
 		rContext->readerState->cardProtocol = -1;
-	}
 	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
-			dwAtrLength = rContext->readerState->cardAtrLength;
-			memcpy(pucAtr, rContext->readerState->cardAtr, dwAtrLength);
+			UCHAR ucAvailable, ucDefault;
+
+			ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
+				rContext->readerState->cardAtrLength);
+			ucAvailable =
+				PHGetAvailableProtocols(rContext->readerState->cardAtr,
+						rContext->readerState->cardAtrLength);
+
+			/* If it is set to ANY let it do any of the protocols */
+			if (dwPreferredProtocols & SCARD_PROTOCOL_ANY)
+				dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
 			rContext->readerState->cardProtocol =
-				PHGetDefaultProtocol(pucAtr, dwAtrLength);
-			ucAvailable = PHGetAvailableProtocols(pucAtr, dwAtrLength);
+				PHSetProtocol(rContext, dwPreferredProtocols,
+				ucAvailable, ucDefault);
 
-			/*
-			 * If it is set to any let it do any of the protocols
-			 */
-			if (dwPreferredProtocols & SCARD_PROTOCOL_ANY)
-			{
-				rContext->readerState->cardProtocol =
-					PHSetProtocol(rContext,
-					SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, ucAvailable);
-			}
-			else
-			{
-				rContext->readerState->cardProtocol =
-					PHSetProtocol(rContext, dwPreferredProtocols,
-					ucAvailable);
-
-				if (rContext->readerState->cardProtocol == -1)
-				{
-					return SCARD_E_PROTO_MISMATCH;
-				}
-			}
+			if (rContext->readerState->cardProtocol == -1)
+				return SCARD_E_PROTO_MISMATCH;
 		}
 	}
 
