@@ -7,19 +7,22 @@
             Date   : 7/27/99
  	    License: Copyright (C) 1999 David Corcoran
 	             <corcoran@linuxnet.com>
+		     Copyright (C) 2003, Ludovic Rousseau
+		     <ludovic.rousseau@free.fr>
             Purpose: This handles smartcard reader communications. 
 	            
+$Id$
 
 ********************************************************************/
 
 #ifndef __winscard_h__
 #define __winscard_h__
 
-#ifndef __APPLE__
+//#ifndef __APPLE__
 #include <pcsclite.h>
-#else
-#include <PCSC/pcsclite.h>
-#endif
+//#else
+//#include <PCSC/pcsclite.h>
+//#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -89,3 +92,4 @@ extern "C"
 #endif
 
 #endif
+
