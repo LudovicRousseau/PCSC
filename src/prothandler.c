@@ -107,6 +107,9 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 	/* set default value */
 	protocol = ucDefault;
 
+	/* keep only the available protocols */
+	dwPreferred &= ucAvailable;
+
 	/* we try to use T=1 first */
 	if (dwPreferred & SCARD_PROTOCOL_T1)
 		ucChosen = SCARD_PROTOCOL_T1;
