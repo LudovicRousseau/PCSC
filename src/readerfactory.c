@@ -64,7 +64,7 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 
 LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDevice)
 {
-	DWORD dwContext, dwContextB, dwGetSize;
+	DWORD dwContext, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
 	LONG rv, parentNode;
 
@@ -74,7 +74,6 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	 * Zero out everything 
 	 */
 	dwContext = 0;
-	dwContextB = 0;
 	rv = 0;
 	i = 0;
 	psize = 0;
@@ -301,6 +300,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	for (j = 1; j < ucGetData[0]; j++)
 	{
 		char *tmpReader = NULL;
+		DWORD dwContextB = 0;
 
 		/*
 		 * We must find an empty spot to put the 
