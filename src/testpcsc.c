@@ -180,6 +180,39 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+#ifdef PCSC_PRE_120
+	{
+		char buffer[1024] = "Foobar";
+		DWORD cbRecvLength = sizeof(buffer);
+
+		printf("Testing SCardControl             : ");
+		
+		rv = SCardControl(hCard, buffer, 7, buffer, &cbRecvLength);
+
+		printf("%s\n", pcsc_stringify_error(rv));
+
+		/* may fail if not supported by the driver */
+		if (rv != SCARD_S_SUCCESS)
+			SCardReleaseContext(hContext);
+	}
+#else
+	{
+		char buffer[1024] = "Foobar";
+		DWORD cbRecvLength = sizeof(buffer);
+
+		printf("Testing SCardControl             : ");
+		
+		rv = SCardControl(hCard, 0x42000001, buffer, 7, buffer, sizeof(buffer),
+			&cbRecvLength);
+
+		printf("%s\n", pcsc_stringify_error(rv));
+
+		/* may fail if not supported by the driver */
+		if (rv != SCARD_S_SUCCESS)
+			SCardReleaseContext(hContext);
+	}
+#endif
+
 	printf("Testing SCardStatus              : ");
 
 	dwReaderLen = 50;
