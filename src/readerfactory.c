@@ -474,7 +474,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	LPSTR libraryName, DWORD dwPort, DWORD dwSlot)
 {
 
-	LONG rv;					/* rv is the reader number of the parent
+	LONG rv=-1;					/* rv is the reader number of the parent
 								 * of the clone */
 	LONG ret;
 	DWORD valueLength;
