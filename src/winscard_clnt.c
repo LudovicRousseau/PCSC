@@ -160,7 +160,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		/*
 		 * Initialize debug
 		 */
-		DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+		if (getenv("MUSCLECARD_DEBUG"))
+			DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
 
 		g_rgSCardT0Pci.dwProtocol = SCARD_PROTOCOL_T0;
 		g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
