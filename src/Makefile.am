@@ -68,6 +68,7 @@ libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
+pcscd_LDFLAGS = @LDFLAGS@ -rdynamic
 pcscd_LDADD = libpcsclite-core.la \
 	@PTHREAD_LIBS@ @COREFOUNDATION@ \
 	@LIBUSB@ @LIBDL@ @LIBFL@ @IOKIT@
