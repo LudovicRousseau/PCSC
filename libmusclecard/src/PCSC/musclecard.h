@@ -320,6 +320,7 @@ extern "C"
 		MSCUChar8 keyNum;
 		MSCUChar8 keyType;
 		MSCUChar8 keyPartner;
+	        MSCUChar8 keyMapping;
 		MSCUShort16 keySize;
 		MSCKeyPolicy keyPolicy;
 		MSCKeyACL keyACL;
@@ -782,6 +783,7 @@ extern "C"
 
 	MSC_RV MSCImportKey(MSCLPTokenConnection pConnection,
 		MSCUChar8 keyNum,
+		MSCUChar8 keyPartner,
 		MSCLPKeyACL pKeyACL,
 		MSCPUChar8 pKeyBlob,
 		MSCULong32 keyBlobSize,

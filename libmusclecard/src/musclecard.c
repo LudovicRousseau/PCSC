@@ -1048,15 +1048,17 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
-	MSCLPKeyACL pKeyACL, MSCPUChar8 pKeyBlob,
-	MSCULong32 keyBlobSize, MSCLPKeyPolicy keyPolicy,
-	MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
+		    MSCUChar8 keyPartner, MSCLPKeyACL pKeyACL, 
+		    MSCPUChar8 pKeyBlob,MSCULong32 keyBlobSize, 
+		    MSCLPKeyPolicy keyPolicy, MSCPVoid32 pAddParams, 
+		    MSCUChar8 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
-	MSCLong32(*libMSCImportKey) (MSCLPTokenConnection, MSCUChar8,
-		MSCLPKeyACL, MSCPUChar8, MSCULong32, MSCLPKeyPolicy, MSCPVoid32,
-		MSCUChar8);
+	MSCLong32(*libMSCImportKey) (MSCLPTokenConnection, MSCUChar8, 
+				     MSCUChar8, MSCLPKeyACL, MSCPUChar8, 
+				     MSCULong32, MSCLPKeyPolicy, MSCPVoid32,
+				     MSCUChar8);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1067,11 +1069,16 @@ MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	if (vFunction != 0)
 	{
-		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
-				MSCLPKeyACL, MSCPUChar8, MSCULong32,
-				MSCLPKeyPolicy, MSCPVoid32, MSCUChar8)) vFunction;
-		rv = (*libMSCImportKey) (pConnection, keyNum, pKeyACL, pKeyBlob,
-			keyBlobSize, keyPolicy, pAddParams, addParamsSize);
+		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection, 
+						MSCUChar8, MSCUChar8,
+						MSCLPKeyACL, MSCPUChar8, 
+						MSCULong32, MSCLPKeyPolicy, 
+						MSCPVoid32, MSCUChar8)) 
+		  vFunction;
+
+		rv = (*libMSCImportKey) (pConnection, keyNum, keyPartner, 
+					 pKeyACL, pKeyBlob, keyBlobSize, 
+					 keyPolicy, pAddParams, addParamsSize);
 
 	} else
 	{
@@ -1082,8 +1089,8 @@ MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 }
 
 MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
-	MSCPUChar8 pKeyBlob, MSCPULong32 keyBlobSize,
-	MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
+		    MSCPUChar8 pKeyBlob, MSCPULong32 keyBlobSize,
+		    MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
