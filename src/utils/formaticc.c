@@ -13,8 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "winscard.h"
+#include <wintypes.h>
+#include <winscard.h>
 #include "configfile.h"
 
 int main(int argc, char *argv[])
