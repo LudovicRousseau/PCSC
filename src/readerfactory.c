@@ -31,6 +31,12 @@
 #include "ifdhandler.h"
 #include "ifdwrapper.h"
 #include "debuglog.h"
+#include "hotplug.h"
+
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
 
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static DWORD dwNumReadersContexts = 0;
@@ -73,7 +79,6 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	dwContextB = 0;
 	rv = 0;
 	i = 0;
-	j = 0;
 	psize = 0;
 	ucGetData[0] = 0;
 	ucThread[0] = 0;
@@ -293,6 +298,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 
 	for (j = 1; j < ucGetData[0]; j++)
 	{
+		char *tmpReader = NULL;
 
 		/*
 		 * We must find an empty spot to put the 
@@ -312,16 +318,16 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			/*
 			 * No more spots left return 
 			 */
-			rv = RFRemoveReader(lpcReader, dwPort);
+			rv = RFRemoveReader(tmpReader, dwPort);
 			return SCARD_E_NO_MEMORY;
 		}
 
 		/*
-		 * Check and set the readername to see if it must be
-		 * enumerated 
+		 * Copy the previous reader name and increment the slot number
 		 */
-		rv = RFSetReaderName(sReadersContexts[dwContextB], lpcReader,
-			lpcLibrary, dwPort, j);
+		tmpReader = sReadersContexts[dwContextB]->lpcReader;
+		strcpy(tmpReader, sReadersContexts[dwContext]->lpcReader);
+		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
 		strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
 		strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
@@ -364,7 +370,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
-					  TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
+			TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
@@ -397,7 +403,6 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			(sReadersContexts[dwContextB])->vHandle = 0;
 			(sReadersContexts[dwContextB])->dwPublicID = 0;
 			(sReadersContexts[dwContextB])->dwIdentity = 0;
-
 
 			/*
 			 * Destroy and free the mutex 
@@ -439,12 +444,6 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 {
 	LONG rv;
 	PREADER_CONTEXT sContext;
-	int i;
-
-	/*
-	 * Zero out everything 
-	 */
-	i = 0;
 
 	if (lpcReader == 0)
 		return SCARD_E_INVALID_VALUE;
@@ -452,6 +451,7 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 	while ((rv = RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
 		== SCARD_S_SUCCESS)
 	{
+		int i;
 
 		/*
 		 * Try to destroy the thread 
@@ -512,7 +512,6 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 			sContext->psHandles[i].hCard = 0;
 
 		dwNumReadersContexts -= 1;
-
 	}
 
 	return SCARD_S_SUCCESS;
@@ -521,174 +520,109 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 LONG RFSetReaderName(PREADER_CONTEXT rContext, LPTSTR readerName,
 	LPTSTR libraryName, DWORD dwPort, DWORD dwSlot)
 {
-	LONG rv;	/* rv is the reader number of the parent of the clone */
+	LONG parent = -1;	/* reader number of the parent of the clone */
 	LONG ret;
 	DWORD valueLength;
-	UCHAR tagValue;
-	static int lastDigit = 0;
-	int currentDigit;
-	int highCurrentDigit, lowCurrentDigit;
-	int highLastDigit, lowLastDigit;
-	int highSlot, lowSlot;
-	UCHAR ucHighSlot, ucLowSlot;
-	UCHAR ucHighLastDigit, ucLowLastDigit;
-	int supportedChannels;
+	int currentDigit = -1;
+	int supportedChannels = 0;
 	int usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
 	int i;
 
-	currentDigit = -1;
-	i = 0;
-	rv = -1;
-	supportedChannels = 0;
-	tagValue = 0;
-
 	/*
-	 * Clear the taken list 
+	 * Clear the list 
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		usedDigits[i] = 0;
+		usedDigits[i] = FALSE;
 
-	/*
-	 * Compute the slot number
-	 */
-	highSlot = (int) dwSlot / 16;
-	lowSlot = (int) dwSlot % 16;
-
-	if (highSlot <= 9)
-		ucHighSlot = '0' + highSlot;
-	else
-		ucHighSlot = 'A' + ((int) highSlot % 10);
-	if (lowSlot <= 9)
-		ucLowSlot = '0' + lowSlot;
-	else
-		ucLowSlot = 'A' + ((int) lowSlot % 10);
-
-	if (dwSlot == 0)
+	if ((0 == dwSlot) && (dwNumReadersContexts != 0))
 	{
-		if (dwNumReadersContexts != 0)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+			if ((sReadersContexts[i])->vHandle != 0)
 			{
-				if ((sReadersContexts[i])->vHandle != 0)
+				if (strcmp((sReadersContexts[i])->lpcLibrary, libraryName) == 0)
 				{
-					if (strcmp((sReadersContexts[i])->lpcLibrary,
-							libraryName) == 0)
+					UCHAR tagValue[1];
+
+					/*
+					 * Ask the driver if it supports multiple channels 
+					 */
+					valueLength = sizeof(tagValue);
+					ret = IFDGetCapabilities((sReadersContexts[i]),
+						TAG_IFD_SIMULTANEOUS_ACCESS,
+						&valueLength, tagValue);
+
+					if ((ret == IFD_SUCCESS) && (valueLength == 1) &&
+						(tagValue[0] > 1))
 					{
+						supportedChannels = tagValue[0];
+						DebugLogB("Support %d simultaneous readers",
+							tagValue[0]);
+					}
+					else
+						supportedChannels = -1;
+
+					/*
+					 * Check to see if it is a hotplug reader and
+					 * different 
+					 */
+					if (((((sReadersContexts[i])->dwPort & 0xFFFF0000) ==
+							PCSCLITE_HP_BASE_PORT)
+						&& ((sReadersContexts[i])->dwPort != dwPort))
+						|| (supportedChannels > 1))
+					{
+						char *lpcReader = sReadersContexts[i]->lpcReader;
 
 						/*
-						 * Ask the driver if it supports multiple channels 
+						 * tells the caller who the parent of this
+						 * clone is so it can use it's shared
+						 * resources like mutex/etc. 
 						 */
-						valueLength = sizeof(tagValue);
-						ret = IFDGetCapabilities((sReadersContexts[i]),
-							TAG_IFD_SIMULTANEOUS_ACCESS,
-							&valueLength, &tagValue);
-
-						if ((ret == IFD_SUCCESS) && (valueLength == 1) &&
-							(tagValue > 1))
-						{
-							supportedChannels = tagValue;
-							DebugLogB("Support %d simultaneous readers",
-								tagValue);
-						}
-						else
-							supportedChannels = -1;
+						parent = i;
 
 						/*
-						 * Check to see if it is a hotplug reader and
-						 * different 
+						 * If the same reader already exists and it is 
+						 * hotplug then we must look for others and
+						 * enumerate the readername 
 						 */
-						if (((((sReadersContexts[i])->dwPort & 0xFFFF0000) ==
-									0x200000)
-								&& (sReadersContexts[i])->dwPort != dwPort)
-							|| (supportedChannels > 1))
-						{
+						currentDigit = strtol(lpcReader + strlen(lpcReader) - 5, NULL, 16);
 
-							/*
-							 * rv tells the caller who the parent of this
-							 * clone is so it can use it's shared
-							 * resources like mutex/etc. 
-							 */
-
-							rv = i;
-
-							/*
-							 * If the same reader already exists and it is 
-							 * hotplug then we must look for others and
-							 * enumerate the readername 
-							 */
-
-							lowCurrentDigit = (sReadersContexts[i])->
-								lpcReader[strlen((sReadersContexts[i])->
-									lpcReader) - 4] - '0';
-							highCurrentDigit = (sReadersContexts[i])->
-								lpcReader[strlen((sReadersContexts[i])->
-									lpcReader) - 5] - '0';
-
-							if (highCurrentDigit > 9)
-								highCurrentDigit -= 'A'-('9'+1);
-							if (lowCurrentDigit > 9)
-								lowCurrentDigit -= 'A'-('9'+1);
-
-							currentDigit = highCurrentDigit*16 + lowCurrentDigit;
-
-							/*
-							 * This spot is taken 
-							 */
-							usedDigits[currentDigit] = 1;
-						}
+						/*
+						 * This spot is taken 
+						 */
+						usedDigits[currentDigit] = TRUE;
 					}
 				}
 			}
 		}
 
-		/*
-		 * Other identical reader exists on the same bus 
-		 */
-		if (currentDigit != -1)
+	}
+
+	/* default value */
+	i = 0;
+
+	/* Other identical readers exist on the same bus */
+	if (currentDigit != -1)
+	{
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-
-			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-			{
-				if (usedDigits[i] == 0)
-					break;
-			}
-
-			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-				return -1;
-			else
-				if (i > supportedChannels)
-					return -1;
-
-			lastDigit = i;
+			/* get the first free digit */
+			if (usedDigits[i] == FALSE)
+				break;
 		}
 
+		if ((i == PCSCLITE_MAX_READERS_CONTEXTS) || (i > supportedChannels))
+			return -1;
 	}
-	/*
-	 * On the second, third slot of the reader use the last used
-	 * reader number.
-	 * Compute the reader number
-	 */
-	highLastDigit = (int) lastDigit / 16;
-	lowLastDigit = (int) lastDigit % 16;
 
-	if (highLastDigit <= 9)
-		ucHighLastDigit = '0' + highLastDigit;
-	else
-		ucHighLastDigit = 'A' + ((int) highLastDigit % 10);
-	if (lowLastDigit <= 9)
-		ucLowLastDigit = '0' + lowLastDigit;
-	else
-		ucLowLastDigit = 'A' + ((int) lowLastDigit % 10);
-
-
-	sprintf(rContext->lpcReader, "%s %c%c %c%c", readerName, ucHighLastDigit, ucLowLastDigit, ucHighSlot, ucLowSlot);
+	sprintf(rContext->lpcReader, "%s %02X %02lX", readerName, i, dwSlot);
 
 	/*
 	 * Set the slot in 0xDDDDCCCC 
 	 */
-	rContext->dwSlot = (0x00010000 * lastDigit) + dwSlot;
+	rContext->dwSlot = (i << 16) + dwSlot;
 
-	return rv;
+	return parent;
 }
 
 LONG RFListReaders(LPTSTR lpcReaders, LPDWORD pdwReaderNum)
