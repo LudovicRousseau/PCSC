@@ -1,6 +1,8 @@
 # Process this file with automake to create Makefile.in.
 
-SUBDIRS = aclocal win32 src etc doc
+SUBDIRS = m4 win32 src etc doc
+
+ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.cvs
 

@@ -1,13 +1,14 @@
 dnl -*- mode: m4; -*-
 dnl Process this file with autoconf to produce a configure script
 
-# Require autoconf 2.52
-AC_PREREQ(2.52)
+AC_PREREQ(2.58)
 
 AC_INIT(pcsc-lite, 1.2.9-beta7)
 AC_CONFIG_SRCDIR(src/pcscdaemon.c)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(1.8)
 AM_CONFIG_HEADER(config.h)
+
+AC_CONFIG_MACRO_DIR(m4)
 
 AC_CANONICAL_HOST
 AC_PROG_CC
@@ -331,9 +332,9 @@ AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
 dnl Write Makefiles
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
-aclocal/Makefile
+m4/Makefile
 doc/Makefile
 doc/pcscd.8
 doc/reader.conf.5
@@ -348,3 +349,5 @@ src/PCSC/pcsclite.h
 src/utils/Makefile
 win32/Makefile
 ])
+AC_OUTPUT
+
