@@ -25,18 +25,14 @@
 #include "sys_generic.h"
 #include "thread_generic.h"
 
-struct _psContext
+static struct _psContext
 {
 	SCARDCONTEXT hContext;
 	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 	DWORD dwClientID;
 	PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 	sharedSegmentMsg msgStruct;
-};
-
-typedef struct _psContext CONTEXT, *PCONTEXT;
-
-static CONTEXT psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
+} psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
 static DWORD dwNextContextIndex;
 
@@ -52,7 +48,7 @@ static void ContextThread(DWORD* pdwIndex);
 
 LONG ContextsInitialize()
 {
-	memset(psContext, 0, sizeof(CONTEXT)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
+	memset(psContext, 0, sizeof(struct _psContext)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
 	return 1;
 }
 

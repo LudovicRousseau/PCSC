@@ -44,7 +44,7 @@ struct _psChannelMap
 
 typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
 
-struct _psContextMap
+static struct _psContextMap
 {
 	DWORD dwClientID;
 	SCARDCONTEXT hContext;
@@ -52,11 +52,7 @@ struct _psContextMap
 	PCSCLITE_THREAD_T TID;            /* Thread owner of this context */
 	PCSCLITE_MUTEX_T mMutex;          /* Mutex for this context */
 	CHANNEL_MAP psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
-};
-
-typedef struct _psContextMap CONTEXT_MAP, *PCONTEXT_MAP;
-
-static CONTEXT_MAP psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
+} psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 static short isExecuted = 0;
 static int mapAddr = 0;
