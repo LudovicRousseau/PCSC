@@ -92,8 +92,8 @@ static LONG SCardCheckDaemonAvailability(void);
 /*
  * Thread safety functions
  */
-static LONG SCardLockThread(void);
-static LONG SCardUnlockThread(void);
+inline static LONG SCardLockThread(void);
+inline static LONG SCardUnlockThread(void);
 
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
