@@ -15,6 +15,7 @@ $Id$
 
 #ifndef WIN32
 #include <syslog.h>
+#include <unistd.h>
 #endif
 
 #include <stdio.h>
