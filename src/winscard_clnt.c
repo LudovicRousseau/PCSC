@@ -1396,8 +1396,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					dwBreakFlag = 1;
 				}
 
-				SYS_USleep(PCSCLITE_STATUS_WAIT);
-
 			}	/* End of SCARD_STATE_UNKNOWN */
 
 		}	/* End of SCARD_STATE_IGNORE */
