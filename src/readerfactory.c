@@ -41,11 +41,6 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 	LONG rv; 					/* Return tester */
 
 	/*
-	 * Zero out everything 
-	 */
-	i = 0;
-
-	/*
 	 * Allocate global dwNumReadersContexts 
 	 */
 	dwNumReadersContexts = (DWORD *) malloc(sizeof(DWORD));
@@ -57,6 +52,7 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 	for (i = 0; i < dwAllocNum; i++)
 	{
 		sReadersContexts[i] = (PREADER_CONTEXT) malloc(sizeof(READER_CONTEXT));
+		(sReadersContexts[i])->vHandle = NULL;
 	}
 
 	/*
@@ -1787,3 +1783,4 @@ void RFAwakeAllReaders()
 		}
 	}
 }
+
