@@ -43,11 +43,9 @@ void log_msg(const int priority, const char *fmt, ...)
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
-		return;
-
-	/* log priority lower than threshold? */
-	if (priority < log_level)
+	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (priority < log_level) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
 		return;
 
 	va_start(argptr, fmt);
@@ -62,29 +60,12 @@ void log_msg(const int priority, const char *fmt, ...)
 #endif
 	va_end(argptr);
 
-	switch(debug_msg_type) {
-		case DEBUGLOG_NO_DEBUG:
-		/*
-		 * Do nothing, it hasn't been set 
-		 */
-		break;
-
-		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
-			syslog(LOG_INFO, "%s", DebugBuffer);
-#else
-			fprintf(stderr, "%s\n", DebugBuffer);
+	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
+		syslog(LOG_INFO, "%s", DebugBuffer);
+	else
 #endif
-			break;
-
-		case DEBUGLOG_STDERR_DEBUG:
-			fprintf(stderr, "%s\n", DebugBuffer);
-			break;
-
-		default:
-			/* Unknown type. Do nothing. */
-			assert(0);
-	}
+		fprintf(stderr, "%s\n", DebugBuffer);
 } /* log_msg */
 
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
@@ -93,13 +74,11 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
 	char *c;
-        char *debug_buf_end;
+	char *debug_buf_end;
 
-	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
-		return;
-
-	/* log priority lower than threshold? */
-	if (priority <= log_level)
+	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (priority < log_level) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
 		return;
 
 	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
@@ -113,29 +92,12 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 		c += strlen(c);
 	}
 
-	switch( debug_msg_type ) {
-		case DEBUGLOG_NO_DEBUG:
-		/*
-		 * Do nothing, it hasn't been set 
-		 */
-		break;
-
-		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
+	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
 		syslog(LOG_INFO, "%s", DebugBuffer);
-#else
-		fprintf(stderr, "%s\n", DebugBuffer);
+	else
 #endif
-		break;
-
-		case DEBUGLOG_STDERR_DEBUG:
 		fprintf(stderr, "%s\n", DebugBuffer);
-		break;
-
-		default:
-			/* Unknown type - do nothing */
-			assert(0);
-	}
 } /* log_xxd */
 
 void DebugLogSuppress(const int lSType)
@@ -359,7 +321,8 @@ void debug_msg(const char *fmt, ...)
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
+	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
 		return;
 
 	va_start(argptr, fmt);
@@ -374,29 +337,12 @@ void debug_msg(const char *fmt, ...)
 #endif
 	va_end(argptr);
 
-	switch(debug_msg_type) {
-		case DEBUGLOG_NO_DEBUG:
-		/*
-		 * Do nothing, it hasn't been set 
-		 */
-		break;
-
-		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
-			syslog(LOG_INFO, "%s", DebugBuffer);
-#else
-			fprintf(stderr, "%s\n", DebugBuffer);
+	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
+		syslog(LOG_INFO, "%s", DebugBuffer);
+	else
 #endif
-			break;
-
-		case DEBUGLOG_STDERR_DEBUG:
-			fprintf(stderr, "%s\n", DebugBuffer);
-			break;
-
-		default:
-			/* Unknown type. Do nothing. */
-			assert(0);
-	}
+		fprintf(stderr, "%s\n", DebugBuffer);
 } /* debug_msg */
 
 void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
