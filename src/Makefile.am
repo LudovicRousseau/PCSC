@@ -14,24 +14,21 @@ check_PROGRAMS = testpcsc
 TESTS = testpcsc
 
 if PCSC_ARCH_LINUX
+PCSC_MYLDFLAGS      =
+PCSC_INCLUDE_LIBS   = -lfl -ldl
+PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
+PCSC_THREAD_SOURCE  = thread_unix.c
+PCSC_DYNLOAD_SOURCE = dyn_unix.c
+PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_CLIENT_SRC     = winscard_clnt.c
 if PCSC_LINUX_USB
-PCSC_MYLDFLAGS      =
-PCSC_INCLUDE_LIBS   = -lfl -ldl
-PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_linux.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
-PCSC_CLIENT_SRC     = winscard_clnt.c
 else
-PCSC_MYLDFLAGS      =
-PCSC_INCLUDE_LIBS   = -lfl -ldl
-PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
+if PCSC_USE_LIBUSB
+PCSC_HOTPLUG_SOURCE = hotplug_libusb.c
+else
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
-PCSC_CLIENT_SRC     = winscard_clnt.c
+endif
 endif
 endif
 
@@ -41,9 +38,13 @@ PCSC_INCLUDE_LIBS   = -lfl
 PCSCD_INCLUDE_LIBS  = -lfl -pthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_bsd.c
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
+if PCSC_USE_LIBUSB
+PCSC_HOTPLUG_SOURCE = hotplug_libusb.c
+else
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c
+endif
 endif
 
 if PCSC_ARCH_OSX
@@ -150,7 +151,7 @@ testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
 EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
-	hotplug_generic.c hotplug_linux.c hotplug_macosx.c \
+	hotplug_generic.c hotplug_linux.c hotplug_libusb.c hotplug_macosx.c \
 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
 	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c \
 	winscard_scf.c

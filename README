@@ -42,6 +42,8 @@ Options:
 
    ./configure 
 
+          --enable-libusb=PATH   Enable libusb support
+                                 (experimental, see below).
           --enable-usb           Enable USB on Linux 2.4 platforms
           --enable-syslog        Use syslog for error output.
           --enable-daemon        Run as a daemon.
@@ -97,6 +99,26 @@ libpcsclite.so must also link with pthread libraries.
 
 OCF users should compile in --threadsafe so the OCF->PC/SC bridge behaves
 correctly.
+
+LIBUSB SUPPORT:
+Versions after 1.1.2beta5 feature experimental support for libusb.
+In order to use it, you should call ./configure with
+
+	--enable-libusb=PATH --enable-usb=no
+
+where PATH is the base directory containing the libusb include
+file and library. For example, "--enable-libusb=/usr/local" looks
+for /usr/local/include/usb.h and /usr/local/lib/libusb.[so|a]
+
+Please note that you shouldn't specify "--enable-libusb" and
+"--enable-usb" at the same time.
+
+In order to use dynamic driver loading, you need to supply a directory
+called "XXXX.bundle" in the usb dropdir directory (--enable-usbdropdir=PATH).
+Here, the string "XXXX" stands for an arbitrary driver name, like in
+"ifd-GemPC430.bundle". An example .bundle-directory can be found in the
+source distribution of the ifd-gempc driver
+(http://ludovic.rousseau.free.fr/softwares/ifd-GemPC/ifd-GemPC.html)
 
 SOLARIS:
 Solaris PC/SC applications must link with -lsocket and -lposix4 since
