@@ -349,7 +349,7 @@ etc/reader.conf
 src/Makefile
 src/libmusclecard.pc
 src/libpcsclite.pc
-src/pcsclite.h
+src/PCSC/pcsclite.h
 src/utils/Makefile
 win32/Makefile
 ])
