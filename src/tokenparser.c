@@ -20,10 +20,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-
-#ifdef HAVE_STDINT_H
-#include <stdint.h>  /* May break IA64 test-noansi-r */
-#endif
+#include <stdint.h> /* May break IA64 test-noansi-r */
 
 /* end standard C headers. */
 
@@ -467,30 +464,32 @@ char *tptext;
 #line 1 "tokenparser.l"
 /*****************************************************************
 
-  File   :   configfile.ll
+  File   :   tokenparser.l
   Author :   David Corcoran
-  Date   :   February 12, 1999, modified 4/6/2003
+  Date   :   February 12, 1999, modified August 2003
   Purpose:   Reads lexical config files and updates database.
              See http://www.linuxnet.com for more information.
-  License:   Copyright (C) 1999 David Corcoran, Ludovic Rousseau
-             <corcoran@linuxnet.com>
+  License:   Copyright (C) 1999-2003 David Corcoran <corcoran@linuxnet.com>
+             Ludovic Rousseau <ludovic.rousseau@free.fr>
 $Id$
 
 ******************************************************************/
 #line 15 "tokenparser.l"
 
+#include "parser.h"
+
 void tpevalToken(char *pcToken, int tokType);
 
 static char *pcDesiredKey = 0;
-static char pcKey[200];
-static char pcValue[200];
-static char pcFinValue[200];
+static char pcKey[TOKEN_MAX_KEY_SIZE];
+static char pcValue[TOKEN_MAX_VALUE_SIZE];
+static char pcFinValue[TOKEN_MAX_VALUE_SIZE];
 static int valueIndex = 0;
 static int desiredIndex = 0;
 
 void tperrorCheck (char *pcToken_error);
 
-#line 491 "tokenparser.c"
+#line 493 "tokenparser.c"
 
 #define INITIAL 0
 
@@ -499,11 +498,7 @@ void tperrorCheck (char *pcToken_error);
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
-
-#ifndef WIN32
 #include <unistd.h>
-#endif
-
 #endif
 
 #ifndef YY_EXTRA_TYPE
@@ -645,10 +640,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 29 "tokenparser.l"
+#line 31 "tokenparser.l"
 
 
-#line 645 "tokenparser.c"
+#line 647 "tokenparser.c"
 
 	if ( (yy_init) )
 		{
@@ -733,41 +728,41 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 31 "tokenparser.l"
+#line 33 "tokenparser.l"
 {}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 32 "tokenparser.l"
+#line 34 "tokenparser.l"
 {}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 33 "tokenparser.l"
-{ valueIndex = 0; tpevalToken(tptext, 1); }
+#line 35 "tokenparser.l"
+{ valueIndex = 0; tpevalToken(tptext, TOKEN_TYPE_KEY); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 34 "tokenparser.l"
+#line 36 "tokenparser.l"
 {}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 35 "tokenparser.l"
-{tpevalToken(tptext, 2); valueIndex += 1;}
+#line 37 "tokenparser.l"
+{tpevalToken(tptext, TOKEN_TYPE_STRING); valueIndex += 1;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 36 "tokenparser.l"
+#line 38 "tokenparser.l"
 { tperrorCheck( tptext ); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 37 "tokenparser.l"
+#line 39 "tokenparser.l"
 ECHO;
 	YY_BREAK
-#line 764 "tokenparser.c"
+#line 766 "tokenparser.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1505,10 +1500,10 @@ YY_BUFFER_STATE tp_scan_buffer  (char * base, yy_size_t  size )
  * @note If you want to scan bytes that may contain NUL values, then use
  *       tp_scan_bytes() instead.
  */
-YY_BUFFER_STATE tp_scan_string (yyconst char * str )
+YY_BUFFER_STATE tp_scan_string (yyconst char * yy_str )
 {
     
-	return tp_scan_bytes(str,strlen(str) );
+	return tp_scan_bytes(yy_str,strlen(yy_str) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to tplex() will
@@ -1733,20 +1728,14 @@ void tpfree (void * ptr )
 #undef YY_DECL_IS_OURS
 #undef YY_DECL
 #endif
-#line 37 "tokenparser.l"
+#line 39 "tokenparser.l"
 
 
 
 #include <stdio.h>
 #include <string.h>
 #include "debuglog.h"
-
-#ifndef WIN32
 #include "config.h"
-#else
-#include "win32_config.h"
-#endif
-
 
 int tpwrap()
 {
@@ -1759,23 +1748,42 @@ void tpevalToken(char *pcToken, int tokType)
 	int len;
 	len = 0;
 
-	if (tokType == 1)
+	if (tokType == TOKEN_TYPE_KEY)
 	{
 		for (len=5; pcToken[len] != '<'; len++)
 			;
-		strncpy(pcKey, &pcToken[5], len - 5);
-		pcKey[len-5] = 0;
+		if (len - 5 > TOKEN_MAX_KEY_SIZE)
+		{
+			strncpy(pcKey, &pcToken[5], TOKEN_MAX_KEY_SIZE);
+			pcKey[TOKEN_MAX_KEY_SIZE - 1] = '\0';
+		}
+		else
+		{
+			strncpy(pcKey, &pcToken[5], len - 5);
+			pcKey[len-5] = 0;
+		}
 	}
 
-	if (tokType == 2)
+	if (tokType == TOKEN_TYPE_STRING)
 	{
 		for (len=8; pcToken[len] != '<'; len++)
 			;
-		strncpy(pcValue, &pcToken[8], len - 8);
-		pcValue[len-8] = 0;
+		if (len - 8 > TOKEN_MAX_VALUE_SIZE)
+		{
+			strncpy(pcValue, &pcToken[8], TOKEN_MAX_VALUE_SIZE);
+			pcValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+		}
+		else
+		{
+			strncpy(pcValue, &pcToken[8], len - 8);
+			pcValue[len-8] = 0;
+		}
 		if (strcmp(pcKey, pcDesiredKey) == 0)
 			if (desiredIndex == valueIndex)
-				strcpy(pcFinValue, pcValue);
+			{
+				strncpy(pcFinValue, pcValue, TOKEN_MAX_VALUE_SIZE);
+				pcFinValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+			}
 	}
 }
 
@@ -1819,7 +1827,10 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		ret = -1;
 	}
 	else
-		strcpy(tokenValue, pcFinValue);
+	{
+		strncpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
+		tokenValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+	}
 
 	fclose(file);
 	return ret;
