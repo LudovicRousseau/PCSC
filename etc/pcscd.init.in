@@ -30,7 +30,7 @@ fi
 
 start() {
     echo -n $"Starting PC/SC smart card daemon ($prog): "
-    daemon $prog $PCSCD_OPTIONS
+    @sbindir_exp@/update-reader.conf && daemon $prog $PCSCD_OPTIONS
     retval=$?
     echo
     [ $retval -eq 0 ] && touch $lockfile
