@@ -7,6 +7,7 @@
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *  Toni Andjelkovic <toni@soth.at>
+ *  Damien Sauveron <damien.sauveron@labri.fr>
  *
  * $Id$
  */
