@@ -56,7 +56,7 @@ libpcsclite_la_SOURCES = \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_CLIENT_THR)
-libpcsclite_la_LDFLAGS = -version-info 0:1:0
+libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@
 
 libmusclecard_la_SOURCES = \
