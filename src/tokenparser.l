@@ -134,7 +134,7 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		ret = -1;
 	}
 	else
-		strlcpy(tokenValue, pcFinValue, sizeof(tokenValue));
+		strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
 
 	fclose(file);
 	return ret;
