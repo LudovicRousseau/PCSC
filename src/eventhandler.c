@@ -1,14 +1,16 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : eventhandler.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 3/13/00
-	    License: Copyright (C) 2000 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This keeps track of card insertion/removal events
-	    and updates ATR, protocol, and status information.
+	Title  : eventhandler.c
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 3/13/00
+	License: Copyright (C) 2000 David Corcoran
+		<corcoran@linuxnet.com>
+	Purpose: This keeps track of card insertion/removal events
+	and updates ATR, protocol, and status information.
+
+$Id$
 
 ********************************************************************/
 
@@ -104,14 +106,14 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 
 	i = 0;
 	rv = 0;
-        
-        
+
+
 	i = rContext->dwPublicID;
-        if ((readerStates[i])->readerName[0] == 0)
-        {
-                DebugLogA("EHDestroyEventHandler: Thread already stomped.");
-                return SCARD_S_SUCCESS;
-        }
+	if ((readerStates[i])->readerName[0] == 0)
+	{
+		DebugLogA("EHDestroyEventHandler: Thread already stomped.");
+		return SCARD_S_SUCCESS;
+	}
 
 	/*
 	 * Set the thread to 0 to exit thread 
@@ -142,8 +144,8 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	(readerStates[i])->cardAtrLength = 0;
 	(readerStates[i])->cardProtocol = 0;
 
-        /* Zero the thread */
-        rContext->pthThread = 0;
+	/* Zero the thread */
+	rContext->pthThread = 0;
 
 	DebugLogA("EHDestroyEventHandler: Thread stomped.");
 
@@ -185,15 +187,11 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
 	{
 		if ((readerStates[i])->readerID == 0)
-		{
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_CONTEXTS)
-	{
 		return SCARD_F_INTERNAL_ERROR;
-	}
 
 	/*
 	 * Set all the attributes to this reader 
@@ -214,18 +212,13 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	rv = SYS_ThreadCreate(&rContext->pthThread, NULL,
 		(LPVOID) EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv == 1)
-	{
 		return SCARD_S_SUCCESS;
-	} else
-	{
+	else
 		return SCARD_E_NO_MEMORY;
-	}
-
 }
 
 void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
-
 	LONG rv;
 	LPCSTR lpcReader;
 	DWORD dwStatus, dwProtocol, dwReaderSharing;
@@ -269,7 +262,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			rContext->dwStatus &= ~SCARD_SPECIFIC;
 			rContext->dwStatus &= ~SCARD_SWALLOWED;
 			rContext->dwStatus &= ~SCARD_UNKNOWN;
-		} else
+		}
+		else
 		{
 			rContext->dwStatus |= SCARD_PRESENT;
 			rContext->dwStatus &= ~SCARD_ABSENT;
@@ -284,7 +278,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 		dwCurrentState = SCARD_PRESENT;
 
-	} else
+	}
+	else
 	{
 		dwCurrentState = SCARD_ABSENT;
 		rContext->dwStatus |= SCARD_ABSENT;
@@ -313,7 +308,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 	while (1)
 	{
-
 		dwStatus = 0;
 
 		rv = IFDStatusICC(rContext, &dwStatus,
@@ -370,7 +364,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			/*
 			 * End of race condition code block 
 			 */
-
 		}
 
 		if (dwStatus & SCARD_ABSENT)
@@ -378,7 +371,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			if (dwCurrentState == SCARD_PRESENT ||
 				dwCurrentState == SCARD_UNKNOWN)
 			{
-
 				/*
 				 * Change the status structure 
 				 */
@@ -412,12 +404,12 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				SYS_MMapSynchronize((void *) readerStates[i], pageSize);
 			}
 
-		} else if (dwStatus & SCARD_PRESENT)
+		}
+		else if (dwStatus & SCARD_PRESENT)
 		{
 			if (dwCurrentState == SCARD_ABSENT ||
 				dwCurrentState == SCARD_UNKNOWN)
 			{
-
 				/*
 				 * Power and reset the card 
 				 */
@@ -444,7 +436,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					/*
 					 * RFSetReaderEventState( rContext, SCARD_RESET ); 
 					 */
-				} else
+				}
+				else
 				{
 					rContext->dwStatus |= SCARD_PRESENT;
 					rContext->dwStatus &= ~SCARD_ABSENT;
@@ -479,16 +472,12 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					{
 						DebugXxd("EHSpawnEventHandler: Card ATR: ",
 							rContext->ucAtr, rContext->dwAtrLen);
-					} else
-					{
-						DebugLogA("EHSpawnEventHandler: Card ATR: (NULL)");
 					}
-
-				} else
-				{
-					DebugLogA
-						("EHSpawnEventHandler: Error powering up card.");
+					else
+						DebugLogA("EHSpawnEventHandler: Card ATR: (NULL)");
 				}
+				else
+					DebugLogA("EHSpawnEventHandler: Error powering up card.");
 			}
 		}
 
@@ -519,7 +508,5 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 void EHSetSharingEvent(PREADER_CONTEXT rContext, DWORD dwValue)
 {
-
 	(readerStates[rContext->dwPublicID])->lockState = dwValue;
-
 }
