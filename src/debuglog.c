@@ -22,6 +22,7 @@ $Id$
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <sys/types.h>
 
 #ifndef WIN32
 #include "config.h"
@@ -367,3 +368,4 @@ finish:
   free(filename);
 
 }
+
