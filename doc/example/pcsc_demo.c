@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 	/* connect to a card */
 	dwActiveProtocol = -1;
 	rv = SCardConnect(hContext, readers[reader_nb], SCARD_SHARE_EXCLUSIVE,
-		SCARD_PROTOCOL_ANY, &hCard, &dwActiveProtocol);
+		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &dwActiveProtocol);
 	printf(" Protocol: %ld\n", dwActiveProtocol);
 	PCSC_ERROR(rv, "SCardConnect")
 
@@ -167,7 +167,8 @@ int main(int argc, char *argv[])
 
 	/* card reconnect */
 	rv = SCardReconnect(hCard, SCARD_SHARE_EXCLUSIVE,
-		SCARD_PROTOCOL_ANY, SCARD_UNPOWER_CARD, &dwActiveProtocol);
+		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD,
+		&dwActiveProtocol);
 	PCSC_ERROR(rv, "SCardReconnect")
 
 	/* get card status */
