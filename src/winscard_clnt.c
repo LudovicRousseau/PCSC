@@ -82,8 +82,6 @@ static LONG SCardCheckReaderAvailability(LPSTR, LONG);
 static LONG SCardLockThread();
 static LONG SCardUnlockThread();
 
-static void SCardCleanupClient();
-
 /*
  * by najam 
  */
@@ -1969,23 +1967,6 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 		psContextMap[retIndice].hContext = 0;
 		psContextMap[retIndice].contextBlockStatus = 
 		  BLOCK_STATUS_RESUME;
-
-		/* If all the handles are ZERO then it must be the
-		   last one so let's clean up the session          
-		*/
-	        for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
-	        {
-		        if ((psContextMap[i].hContext != 0))
-		        {
-			          break;
-		        }
-	        }
-
-		if (i == PCSCLITE_MAX_CONTEXTS)
-		{
-		        SCardCleanupClient();    
-		}
-
 		return SCARD_S_SUCCESS;
 	}
 
@@ -2150,13 +2131,5 @@ LONG SCardCheckReaderAvailability(LPSTR readerName, LONG errorCode)
 		return SCARD_S_SUCCESS;
 	}
 
-}
-
-void SCardCleanupClient()
-{
-	/*
-	 * Close down the client socket 
-	 */
-	SHMClientCloseSession();
 }
 
