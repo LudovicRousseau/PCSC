@@ -618,13 +618,10 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 								lpcReader[strlen((sReadersContexts[i])->
 									lpcReader) - 5] - '0';
 
-							/*
-							 * 0-9 -> A-F is 7 apart 
-							 */
 							if (highCurrentDigit > 9)
-								highCurrentDigit -= 7;
+								highCurrentDigit -= 'A'-('9'+1);
 							if (lowCurrentDigit > 9)
-								lowCurrentDigit -= 7;
+								lowCurrentDigit -= 'A'-('9'+1);
 
 							currentDigit = highCurrentDigit*16 + lowCurrentDigit;
 
