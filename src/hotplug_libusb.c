@@ -14,6 +14,7 @@
 
 #include "config.h"
 #ifdef HAVE_LIBUSB
+
 #include <string.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -40,6 +41,7 @@
 
 #define READER_ABSENT		0
 #define READER_PRESENT		1
+#define READER_FAILED		2
 
 #define FALSE			0
 #define TRUE			1
@@ -364,15 +366,16 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		return 0;
 	}
 
+	strncpy(readerTracker[i].bus_device, bus_device, BUS_DEVICE_STRSIZE);
+	readerTracker[i].bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+   
+	readerTracker[i].driver = driver;
+
 	if (RFAddReader(driver->readerName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
-	{
-		strncpy(readerTracker[i].bus_device, bus_device, BUS_DEVICE_STRSIZE);
-		readerTracker[i].bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-   
 		readerTracker[i].status = READER_PRESENT;
-		readerTracker[i].driver = driver;
-	}
+	else
+		readerTracker[i].status = READER_FAILED;
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
@@ -405,3 +408,4 @@ ULONG HPRegisterForHotplugEvents(void)
 }
 
 #endif
+
