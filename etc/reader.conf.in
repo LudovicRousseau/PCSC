@@ -1,7 +1,7 @@
 # Configuration file for pcsc-lite
 #
-# This file has to be configured for serial readers only.
-# USB readers shall _not_ be configured here!
+# This file has to be configured for serial and PCMCIA readers only.
+# normal USB readers shall _not_ be configured here!
 #
 # David Corcoran <corcoran@linuxnet.com>
 
