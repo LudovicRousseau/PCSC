@@ -33,7 +33,10 @@ int main(int argc, char **argv)
 	int i, p, iReader;
 	int iList[16];
 
-	printf("\nMUSCLE PC/SC Lite Test Program\n\n");
+	printf("\nMUSCLE PC/SC Lite unitary test Program\n\n");
+
+	printf("THIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
+	printf("Do NOT use it unless you really know what you do.\n\n");
 
 	printf("Testing SCardEstablishContext    : ");
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
