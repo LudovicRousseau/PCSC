@@ -215,13 +215,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			return SCARD_E_NO_SERVICE;
 		}
 
-		if (atexit((void *) &SCardCleanupClient))
-		{
-			DebugLogB("ERROR: Cannot atexit(): %s", strerror(errno));
-			SYS_CloseFile(mapAddr);
-			return SCARD_F_INTERNAL_ERROR;
-		}
-
 		isExecuted = 1;
 	}
 
@@ -1961,9 +1954,11 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 {
 
-	LONG retIndice;
-	retIndice = 0;
+	LONG  retIndice;
+	UCHAR isLastContext;
+	int i;
 
+	retIndice = 0; isLastContext = 1;
 	retIndice = SCardGetContextIndice(hContext);
 
 	if (retIndice == -1)
@@ -1972,7 +1967,25 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 	} else
 	{
 		psContextMap[retIndice].hContext = 0;
-		psContextMap[retIndice].contextBlockStatus = BLOCK_STATUS_RESUME;
+		psContextMap[retIndice].contextBlockStatus = 
+		  BLOCK_STATUS_RESUME;
+
+		/* If all the handles are ZERO then it must be the
+		   last one so let's clean up the session          
+		*/
+	        for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	        {
+		        if ((psContextMap[i].hContext != 0))
+		        {
+			          break;
+		        }
+	        }
+
+		if (i == PCSCLITE_MAX_CONTEXTS)
+		{
+		        SCardCleanupClient();    
+		}
+
 		return SCARD_S_SUCCESS;
 	}
 
