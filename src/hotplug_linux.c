@@ -113,8 +113,8 @@ LONG HPReadBundleValues()
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle
 			 */
-			snprintf(fullPath, FILENAME_MAX, "%s%s%s", PCSCLITE_HP_DROPDIR,
-				currFP->d_name, "/Contents/Info.plist");
+			snprintf(fullPath, FILENAME_MAX, "%s/%s/Contents/Info.plist",
+				PCSCLITE_HP_DROPDIR, currFP->d_name);
 			fullPath[FILENAME_MAX - 1] = '\0';
 
 			/* while we find a nth ifdVendorID in Info.plist */
