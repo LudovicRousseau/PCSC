@@ -246,14 +246,33 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 
 		(sContexts[dwContext])->dwVersion = 0;
 		(sContexts[dwContext])->dwPort = 0;
-		(sContexts[dwContext])->mMutex = 0;
 		(sContexts[dwContext])->vHandle = 0;
 		(sContexts[dwContext])->dwPublicID = 0;
 		(sContexts[dwContext])->dwIdentity = 0;
 
-		if (parentNode >= 0)
+		/*
+		 * Destroy and free the mutex 
+		 */
+		if (*(sContexts[dwContext])->dwMutex == 1)
 		{
-			*(sContexts[dwContext])->dwFeeds -= 1;
+			SYS_MutexDestroy((sContexts[dwContext])->mMutex);
+			free((sContexts[dwContext])->mMutex);
+		}
+
+		*(sContexts[dwContext])->dwMutex -= 1;
+
+		if (*(sContexts[dwContext])->dwMutex == 0)
+		{
+			free((sContexts[dwContext])->dwMutex);
+			(sContexts[dwContext])->dwMutex = 0;
+		}
+
+		*(sContexts[dwContext])->dwFeeds -= 1;
+
+		if (*(sContexts[dwContext])->dwFeeds == 0)
+		{
+			free((sContexts[dwContext])->dwFeeds);
+			(sContexts[dwContext])->dwFeeds = 0;
 		}
 
 		*dwNumContexts -= 1;
@@ -405,12 +424,36 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				
 				(sContexts[dwContextB])->dwVersion = 0;
 				(sContexts[dwContextB])->dwPort = 0;
-				(sContexts[dwContextB])->mMutex = 0;
 				(sContexts[dwContextB])->vHandle = 0;
 				(sContexts[dwContextB])->dwPublicID = 0;
 				(sContexts[dwContextB])->dwIdentity = 0;
 				
+
+				/*
+				 * Destroy and free the mutex 
+				 */
+				if (*(sContexts[dwContextB])->dwMutex == 1)
+				{
+					SYS_MutexDestroy((sContexts[dwContextB])->mMutex);
+					free((sContexts[dwContextB])->mMutex);
+				}
+
+				*(sContexts[dwContextB])->dwMutex -= 1;
+
+				if (*(sContexts[dwContextB])->dwMutex == 0)
+				{
+					free((sContexts[dwContextB])->dwMutex);
+					(sContexts[dwContextB])->dwMutex = 0;
+				}
+
 				*(sContexts[dwContextB])->dwFeeds -= 1;
+
+				if (*(sContexts[dwContextB])->dwFeeds == 0)
+				{
+					free((sContexts[dwContextB])->dwFeeds);
+					(sContexts[dwContextB])->dwFeeds = 0;
+				}
+
 				*dwNumContexts -= 1;
 
 				return rv;
