@@ -1,17 +1,18 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : hotplug_linux.c
-	    Package: pcsc lite
-            Author : David Corcoran 
-            Date   : 02/28/01
-	    License: Copyright (C) 2001 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This provides a search API for hot pluggble
-	             devices.
-            Credits: The USB code was based partly on Johannes Erdfelt
-                     libusb code found at libusb.sourceforge.org
-	            
+	Title  : hotplug_linux.c
+	Package: pcsc lite
+	Author : David Corcoran 
+	Date   : 02/28/01, updated 11 Aug 2002
+	License: Copyright (C) 2001 David Corcoran, Ludovic Rousseau
+			<corcoran@linuxnet.com>
+	Purpose: This provides a search API for hot pluggble devices.
+	Credits: The USB code was based partly on Johannes Erdfelt
+		libusb code found at libusb.sourceforge.org
+
+$Id$
+
 ********************************************************************/
 
 #include <string.h>
@@ -31,7 +32,7 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 
-#define PCSCLITE_HP_DROPDIR                 	"/usr/local/pcsc/drivers/"
+// PCSCLITE_HP_DROPDIR is defined using ./configure --enable-usbdropdir=foobar
 #define PCSCLITE_USB_PATH                       "/proc/bus/usb"
 #define PCSCLITE_MANUKEY_NAME                   "ifdVendorID"
 #define PCSCLITE_PRODKEY_NAME                   "ifdProductID"
@@ -376,3 +377,4 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 
 	return 1;
 }	/* End of function */
+

@@ -1,5 +1,6 @@
 dnl -*- mode: m4; -*-
 dnl Process this file with autoconf to produce a configure script.
+dnl $Id$
 
 dnl Autoconf boilerplate/
 AC_INIT(src/winscard.h)
@@ -137,6 +138,16 @@ AC_ARG_ENABLE(usb,
 AC_MSG_RESULT([enable linux usb capability: $usb])
 
 AM_CONDITIONAL(PCSC_LINUX_USB, test x$usb = xtrue)
+
+dnl --enable-usbdropdir
+AC_ARG_ENABLE(usbdropdir,
+[  --enable-usbdropdir=DIR directory containing USB drivers (default /usr/local/pcsc/drivers/)],
+[usbdropdir="${enableval}"], [usbdropdir=false])
+if test x${usbdropdir} == xfalse ; then
+	usbdropdir="/usr/local/pcsc/drivers/"
+fi
+AC_MSG_RESULT([enable USB drop directory  : $usbdropdir])
+AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
 AC_ARG_ENABLE(threadsafe,
 [  --enable-threadsafe     enable client side thread safety.],
