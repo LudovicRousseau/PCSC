@@ -1,7 +1,4 @@
-# Makefile for utilities
-# David Corcoran <corcoran@linuxnet.com>
-
-INCLUDES = -I$(top_srcdir)/src
+# Process this file with automake to create Makefile.in.
 
 bin_PROGRAMS = installifd formaticc bundleTool
 installifd_SOURCES = installifd.c

@@ -1,6 +1,4 @@
-# $Id$
-
-INCLUDES = -I$(top_srcdir)/src
+# Process this file with automake to create Makefile.in.
 
 bin_PROGRAMS = pcsc_demo
 pcsc_demo_SOURCES = pcsc_demo.c

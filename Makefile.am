@@ -1,7 +1,4 @@
-## Process this file with automake to create Makefile.in.
-# You may need to use automake 1.6.3 or newer
-
-# $Id$
+# Process this file with automake to create Makefile.in.
 
 AUTOMAKE_OPTIONS = no-dependencies
 SUBDIRS = src etc doc

@@ -1,4 +1,4 @@
-## Process this file with automake to create Makefile.in.
+# Process this file with automake to create Makefile.in.
 
 sysconf_DATA = reader.conf
 
