@@ -43,24 +43,24 @@ static struct _psChannelMap
 	SCARDHANDLE hCard;
 	LPSTR readerName;
 }
-psChannelMap[PCSCLITE_MAX_CONTEXTS];
+psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 
 static struct _psContextMap
 {
 	SCARDCONTEXT hContext;
 	DWORD contextBlockStatus;
 }
-psContextMap[PCSCLITE_MAX_CONTEXTS];
+psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 static short isExecuted = 0;
-static int parentPID = 0;
+static int currentPID = 0;
 static int mapAddr = 0;
 
 #ifdef USE_THREAD_SAFETY
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
-static PREADER_STATES readerStates[PCSCLITE_MAX_CONTEXTS];
+static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, 8 };
 SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, 8 };
@@ -169,11 +169,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		SYS_Initialize();
 
 		/*
-		 * Set up the parent's process ID
-		 */
-		parentPID = SYS_GetPID();
-
-		/*
 		 * Set up the memory mapped reader stats structures
 		 */
 		mapAddr = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDONLY, 0);
@@ -189,16 +184,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		/*
 		 * Allocate each reader structure
 		 */
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			/*
-			 * Initially set the context, hcard structs to zero
-			 */
-			psChannelMap[i].hCard = 0;
-			psChannelMap[i].readerName = 0;
-			psContextMap[i].hContext = 0;
-			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
-
 			readerStates[i] = (PREADER_STATES)
 				SYS_PublicMemoryMap(sizeof(READER_STATES),
 				mapAddr, (i * pageSize));
@@ -210,7 +197,30 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			}
 		}
 
-		if (SHMClientSetupSession(parentPID) != 0)
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+		{
+			/*
+			 * Initially set the hcard structs to zero
+			 */
+			psChannelMap[i].hCard = 0;
+			psChannelMap[i].readerName = 0;
+		}
+
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+		{
+			/*
+			 * Initially set the context struct to zero
+			 */
+			psContextMap[i].hContext = 0;
+			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
+		}
+
+		/*
+		 * Set up the current process ID
+		 */
+		currentPID = SYS_GetPID();
+
+		if (SHMClientSetupSession(currentPID) != 0)
 		{
 			SYS_CloseFile(mapAddr);
 			return SCARD_E_NO_SERVICE;
@@ -231,7 +241,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, parentPID,
+	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, currentPID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
 		(void *) &scEstablishStruct);
 
@@ -302,7 +312,7 @@ static LONG SCardReleaseContextTH(SCARDCONTEXT hContext)
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, parentPID,
+	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, currentPID,
 		sizeof(scReleaseStruct),
 		PCSCLITE_MCLIENT_ATTEMPTS, (void *) &scReleaseStruct);
 
@@ -403,7 +413,7 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCSTR szReader,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_CONNECT, parentPID,
+	rv = WrapSHMWrite(SCARD_CONNECT, currentPID,
 		sizeof(scConnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scConnectStruct);
 
@@ -490,7 +500,7 @@ LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (liIndex < 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -499,7 +509,7 @@ LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	scReconnectStruct.hCard = hCard;
@@ -511,7 +521,7 @@ LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_RECONNECT, parentPID,
+	rv = WrapSHMWrite(SCARD_RECONNECT, currentPID,
 		sizeof(scReconnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scReconnectStruct);
 
@@ -583,7 +593,7 @@ static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_DISCONNECT, parentPID,
+	rv = WrapSHMWrite(SCARD_DISCONNECT, currentPID,
 		sizeof(scDisconnectStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scDisconnectStruct);
 
@@ -636,7 +646,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (liIndex < 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -645,7 +655,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	scBeginStruct.hCard = hCard;
@@ -685,7 +695,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		 * Begin lock
 		 */
 		SCardLockThread();
-		rv = WrapSHMWrite(SCARD_BEGIN_TRANSACTION, parentPID,
+		rv = WrapSHMWrite(SCARD_BEGIN_TRANSACTION, currentPID,
 			sizeof(scBeginStruct),
 			PCSCLITE_CLIENT_ATTEMPTS, (void *) &scBeginStruct);
 
@@ -758,7 +768,7 @@ LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (liIndex < 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -767,7 +777,7 @@ LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	scEndStruct.hCard = hCard;
@@ -776,7 +786,7 @@ LONG SCardEndTransactionTH(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_END_TRANSACTION, parentPID,
+	rv = WrapSHMWrite(SCARD_END_TRANSACTION, currentPID,
 		sizeof(scEndStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scEndStruct);
 
@@ -832,7 +842,7 @@ LONG SCardCancelTransactionTH(SCARDHANDLE hCard)
 	if (liIndex < 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -841,7 +851,7 @@ LONG SCardCancelTransactionTH(SCARDHANDLE hCard)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	scCancelStruct.hCard = hCard;
@@ -849,7 +859,7 @@ LONG SCardCancelTransactionTH(SCARDHANDLE hCard)
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION, parentPID,
+	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION, currentPID,
 		sizeof(scCancelStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scCancelStruct);
 
@@ -922,7 +932,7 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (liIndex < 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -931,7 +941,7 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	/* initialise the structure */
@@ -945,7 +955,7 @@ LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_STATUS, parentPID,
+	rv = WrapSHMWrite(SCARD_STATUS, currentPID,
 		sizeof(scStatusStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scStatusStruct);
 
@@ -1064,7 +1074,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 				return SCARD_E_NO_SERVICE;
 
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if ((readerStates[i])->readerID != 0)
 				{
@@ -1097,7 +1107,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		}
 	}
 	else
-		if (cReaders >= PCSCLITE_MAX_CONTEXTS)
+		if (cReaders >= PCSCLITE_MAX_READERS_CONTEXTS)
 			return SCARD_E_INVALID_VALUE;
 
 	/*
@@ -1156,7 +1166,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			lpcReaderName = (char *) currReader->szReader;
 
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if (strcmp(lpcReaderName,
 						(readerStates[i])->readerName) == 0)
@@ -1168,7 +1178,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			/*
 			 * The requested reader name is not recognized
 			 */
-			if (i == PCSCLITE_MAX_CONTEXTS)
+			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
@@ -1508,7 +1518,7 @@ LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (strcmp(psChannelMap[liIndex].readerName,
 				(readerStates[i])->readerName) == 0)
@@ -1517,7 +1527,7 @@ LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	if (cbSendLength > MAX_BUFFER_SIZE)
@@ -1541,7 +1551,7 @@ LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	rv = WrapSHMWrite(SCARD_TRANSMIT, parentPID,
+	rv = WrapSHMWrite(SCARD_TRANSMIT, currentPID,
 		sizeof(scTransmitStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scTransmitStruct);
 
@@ -1633,7 +1643,7 @@ LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((readerStates[i])->readerID != 0)
 		{
@@ -1657,7 +1667,7 @@ LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCSTR mszGroups,
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	} else
 	{
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			if ((readerStates[i])->readerID != 0)
 			{
@@ -1767,13 +1777,13 @@ static LONG SCardAddContext(SCARDCONTEXT hContext)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
 		if (psContextMap[i].hContext == hContext)
 			return SCARD_S_SUCCESS;
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
 		if (psContextMap[i].hContext == 0)
 		{
@@ -1794,7 +1804,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 	/*
 	 * Find this context and return it's spot in the array
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
 		if ((hContext == psContextMap[i].hContext) && (hContext != 0))
 			return i;
@@ -1831,7 +1841,7 @@ LONG SCardGetHandleIndice(SCARDHANDLE hCard)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
 		if ((hCard == psChannelMap[i].hCard) && (hCard != 0))
 			return i;
@@ -1845,7 +1855,7 @@ LONG SCardAddHandle(SCARDHANDLE hCard, LPSTR readerName)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
 		if (psChannelMap[i].hCard == hCard)
 		{
@@ -1853,7 +1863,7 @@ LONG SCardAddHandle(SCARDHANDLE hCard, LPSTR readerName)
 		}
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
 		if (psChannelMap[i].hCard == 0)
 		{
@@ -1943,7 +1953,7 @@ LONG SCardCheckReaderAvailability(LPSTR readerName, LONG errorCode)
 
 	if (errorCode != SCARD_S_SUCCESS)
 	{
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 		{
 			if (strcmp(psChannelMap[i].readerName, readerName) == 0)
 			{
