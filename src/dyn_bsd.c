@@ -1,14 +1,14 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : dyn_bsd.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 8/12/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This abstracts dynamic library loading 
-                     functions and timing. 
+    Title  : dyn_bsd.c
+    Package: pcsc lite
+	Author : David Corcoran
+	Date   : 8/12/99
+	License: Copyright (C) 1999 David Corcoran <corcoran@linuxnet.com>
+	Purpose: This abstracts dynamic library loading functions and timing. 
+
+$Id$
 
 ********************************************************************/
 
@@ -24,20 +24,12 @@
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
-
-	const char *error;
-
-	/*
-	 * Zero out everything 
-	 */
-	error = NULL;
-
-	*pvLHandle = 0;
+	*pvLHandle = NULL;
 	*pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
 
-	if ((error = dlerror()) != NULL)
+	if (*pvLHandle == NULL)
 	{
-		DebugLogB("DYN_LoadLibrary: dlerror() reports %s", error);
+		DebugLogB("DYN_LoadLibrary: dlerror() reports %s", dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -46,20 +38,14 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 
 int DYN_CloseLibrary(void **pvLHandle)
 {
+	int ret;
 
-	const char *error;
+	ret = dlclose(*pvLHandle);
+	*pvLHandle = NULL;
 
-	/*
-	 * Zero out everything 
-	 */
-	error = NULL;
-
-	dlclose(*pvLHandle);
-	*pvLHandle = 0;
-
-	if ((error = dlerror()) != NULL)
+	if (ret)
 	{
-		DebugLogB("DYN_CloseLibrary: dlerror() reports %s", error);
+		DebugLogB("DYN_CloseLibrary: dlerror() reports %s", dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -68,17 +54,14 @@ int DYN_CloseLibrary(void **pvLHandle)
 
 int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 {
-
 	int rv, iSize;
-	const char *error;
 	char *pcFunctionName;
 
 	/*
 	 * Zero out everything 
 	 */
 	rv = 0;
-	error = 0;
-	pcFunctionName = 0;
+	pcFunctionName = NULL;
 	iSize = 0;
 
 	iSize = strlen(pcFunction) + 2;	/* 1-NULL, 2-_ */
@@ -95,17 +78,15 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	if (*pvFHandle == NULL)
 		*pvFHandle = dlsym(pvLHandle, pcFunction);
 
-	if ((error = dlerror()) != 0)
+	if (*pvFHandle == NULL)
 	{
-		DebugLogB("DYN_GetAddress: dlerror() reports %s", error);
+		DebugLogB("DYN_GetAddress: dlerror() reports %s", dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
 	} else
-	{
 		rv = SCARD_S_SUCCESS;
-	}
 
 	free(pcFunctionName);
-	pcFunctionName = NULL;
 
 	return rv;
 }
+
