@@ -232,6 +232,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	scEstablishStruct.dwScope = dwScope;
 	scEstablishStruct.phContext = 0;
 
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_NO_SERVICE;
+
 	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, parentPID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
 		(void *) &scEstablishStruct);
