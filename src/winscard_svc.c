@@ -25,11 +25,11 @@
 static struct _psChannelMap
 {
 	SCARDCONTEXT hContext;
-	SCARDHANDLE hCard[PCSCLITE_MAX_CONTEXTS];
+	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 	DWORD dwClientID;
 	DWORD dwHandleID;
 }
-psChannelMap[PCSCLITE_MAX_CHANNELS];
+psChannelMap[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
 LONG MSGCheckHandleAssociation(DWORD, SCARDHANDLE);
 
@@ -170,7 +170,7 @@ LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 
 	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].dwClientID == 0)
 		{
@@ -180,7 +180,7 @@ LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CHANNELS)
+	if (i == PCSCLITE_MAX_APPLICATIONS_CONTEXTS)
 	{
 		return SCARD_F_INTERNAL_ERROR;
 	} else
@@ -196,13 +196,13 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	int i, j;
 	LONG rv;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].hContext == hContext &&
 			psChannelMap[i].dwClientID == dwClientID)
 		{
 
-			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
 				/*
 				 * Disconnect each of these just in case 
@@ -252,7 +252,7 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 
 	int i, j;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].hContext == hContext &&
 			psChannelMap[i].dwClientID == dwClientID)
@@ -261,7 +261,7 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 			/*
 			 * Find an empty spot to put the hCard value 
 			 */
-			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
 				if (psChannelMap[i].hCard[j] == 0)
 				{
@@ -270,7 +270,7 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 				}
 			}
 
-			if (j == PCSCLITE_MAX_CONTEXTS)
+			if (j == PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS)
 			{
 				return SCARD_F_INTERNAL_ERROR;
 			} else
@@ -292,12 +292,12 @@ LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 
 	int i, j;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].hContext == hContext &&
 			psChannelMap[i].dwClientID == dwClientID)
 		{
-			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
 				if (psChannelMap[i].hCard[j] == hCard)
 				{
@@ -317,11 +317,11 @@ LONG MSGCheckHandleAssociation(DWORD dwClientID, SCARDHANDLE hCard)
 
 	int i, j;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].dwClientID == dwClientID)
 		{
-			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
 				if (psChannelMap[i].hCard[j] == hCard)
 				{
@@ -343,7 +343,7 @@ LONG MSGCleanupClient(psharedSegmentMsg msgStruct)
 
 	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_CHANNELS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
 		if (psChannelMap[i].dwClientID == msgStruct->request_id)
 		{
