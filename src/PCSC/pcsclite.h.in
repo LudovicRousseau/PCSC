@@ -178,7 +178,7 @@ extern "C"
 #define INFINITE                     0xFFFFFFFF	/* Infinite timeout */
 #define PCSCLITE_INFINITE_TIMEOUT    4320000	/* 50 day infinite t/o */
 
-#define PCSCLITE_VERSION_NUMBER		"1.1.2"	/* Current version */
+#define PCSCLITE_VERSION_NUMBER		"1.2.0-rc1"	/* Current version */
 #define PCSCLITE_CLIENT_ATTEMPTS        120	/* Attempts to reach sv */
 #define PCSCLITE_MCLIENT_ATTEMPTS       20	/* Attempts to reach sv */
 #define PCSCLITE_STATUS_POLL_RATE       400000	/* Status polling rate */
@@ -186,7 +186,8 @@ extern "C"
 #define PCSCLITE_RW_ATTEMPTS            100	/* Attempts to rd/wrt */
 #define PCSCLITE_MAX_CHANNELS           16	/* Maximum channels */
 #define PCSCLITE_MAX_APPLICATIONS       16	/* Maximum applications */
-#define PCSCLITE_MAX_CONTEXTS           16	/* Maximum readers */
+#define PCSCLITE_MAX_READERS            16  /* Maximum readers */
+#define PCSCLITE_MAX_CONTEXTS           PCSCLITE_MAX_READERS
 #define PCSCLITE_MAX_THREADS            16	/* Stat change threads */
 #define PCSCLITE_MAX_COMSIZE            64	/* Maximum arg size */
 #define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
