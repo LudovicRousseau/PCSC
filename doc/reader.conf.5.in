@@ -7,7 +7,7 @@ reader.conf - configuration file for pcscd readers' drivers
 .SH DESCRIPTION
 The
 .I @confdir@/reader.conf
-file contains configuration informations for serial and (some) PCMCIA
+file contains configuration information for serial and (some) PCMCIA
 smart card readers.
 
 USB readers SHALL NOT be configured using this file.
@@ -29,7 +29,7 @@ reader. This text is displayed by commands like
 that prints the names of all the connected and detected readers.
 
 The "DEVICENAME" field was not used for old drivers (using the IFD
-handler version 2.0 or previous). It is now (IFD handler version 3.0) used
+handler version 2.0 or earlier). It is now (IFD handler version 3.0) used
 to identify the physical port on which the reader is connected. This
 is the device name of this port. It is dependent of the OS kernel. The
 first serial port device is called
