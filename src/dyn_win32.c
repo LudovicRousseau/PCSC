@@ -20,7 +20,7 @@
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
-	*pvLHandle = 0;
+	*pvLHandle = NULL;
 	*pvLHandle = LoadLibrary(pcLibrary);
 
 	if (*pvLHandle == NULL)
@@ -39,9 +39,11 @@ int DYN_CloseLibrary(void **pvLHandle)
 	int ret;
 
 	ret = FreeLibrary(*pvLHandle);
-	*pvLHandle = 0;
+	*pvLHandle = NULL;
 
-	if (ret)
+	/* If the function fails, the return value is zero. To get extended error
+	 * information, call GetLastError. */
+	if (ret == 0)
 	{
 #if 0
 		DebugLogB("DYN_CloseLibrary: dlerror() reports %s", dlerror());
@@ -61,11 +63,11 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	 * Zero out everything 
 	 */
 	rv = 0;
-	pcFunctionName = 0;
+	pcFunctionName = NULL;
 
 	pcFunctionName = pcFunction;
 
-	*pvFHandle = 0;
+	*pvFHandle = NULL;
 	*pvFHandle = GetProcAddress(pvLHandle, pcFunctionName);
 
 	if (*pvFHandle == NULL)
@@ -82,3 +84,4 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 }
 
 #endif	/* WIN32 */
+
