@@ -1,6 +1,18 @@
 pcsc-lite-1.1.2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
-15 Oct, 2002
+3 Nov, 2002
 - Support for Sun Microsystems' SCF
+- Patches from Dmitry Djachenko to:
+  . init g_rgSCard??Pci variable at compile time
+  . return more meaningfull error codes in SCardReconnect()
+  . return more information in SCardStatus()
+  . accept pioRecvPci == NULL in SCardTransmit()
+    according to MSDN (July 2002) : SCardTransmit description
+     pioRecvPci
+      [in, out] Pointer to the protocol header structure for the instruction,
+      followed by a buffer in which to receive any returned protocol control
+      information (PCI) specific to the protocol in use. This parameter may be
+      NULL if no returned PCI is desired.
+
 
 pcsc-lite-1.1.2beta2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
 12 Oct, 2002
