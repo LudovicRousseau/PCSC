@@ -69,10 +69,6 @@ extern "C"
 		MSCPVoid32 pvfExportKey;
 		MSCPVoid32 pvfComputeCrypt;
 		MSCPVoid32 pvfExtAuthenticate;
-		MSCPVoid32 pvfImportCertificate;
-		MSCPVoid32 pvfExportCertificate;
-		MSCPVoid32 pvfDeleteCertificate;
-		MSCPVoid32 pvfListCertificates;
 		MSCPVoid32 pvfListKeys;
 		MSCPVoid32 pvfCreatePIN;
 		MSCPVoid32 pvfVerifyPIN;
@@ -103,19 +99,17 @@ extern "C"
 
 	typedef struct
 	{
-		MSCChar8 tokenName[MSC_MAXSIZE_TOKENAME];	/* Token friendly name 
-													 */
-		MSCChar8 slotName[MAX_READERNAME];	/* Slot/reader name */
-		MSCChar8 svProvider[MSC_MAXSIZE_SVCPROV];	/* Service Provider
-													 * (lib) */
-		MSCUChar8 tokenId[MAX_ATR_SIZE];	/* Token ID (ATR) */
-		MSCUChar8 tokenApp[MSC_MAXSIZE_AID];	/* Default application ID */
-		MSCULong32 tokenAppLen;	/* Default AID Length */
-		MSCULong32 tokenIdLength;	/* ID Length (ATR Length) */
-		MSCULong32 tokenState;	/* State (dwEventState) */
-		MSCULong32 tokenType;	/* Type - RFU */
-		MSCPVoid32 addParams;	/* Additional Data */
-		MSCULong32 addParamsSize;	/* Size of additional data */
+	        MSCChar8 tokenName[MSC_MAXSIZE_TOKENAME]; /* Token name */ 
+                MSCChar8 slotName[MAX_READERNAME];	/* Slot/reader name */
+		MSCChar8 svProvider[MSC_MAXSIZE_SVCPROV]; /* Library */
+		MSCUChar8 tokenId[MAX_ATR_SIZE];     /* Token ID (ATR) */
+		MSCUChar8 tokenApp[MSC_MAXSIZE_AID]; /* Default app ID */
+		MSCULong32 tokenAppLen;	  /* Default AID Length */
+		MSCULong32 tokenIdLength; /* ID Length (ATR Length) */
+		MSCULong32 tokenState;	  /* State (dwEventState) */
+		MSCULong32 tokenType;	  /* Type - RFU */
+		MSCPVoid32 addParams;	  /* Additional Data */
+		MSCULong32 addParamsSize; /* Size of additional data */
 	}
 	MSCTokenInfo, *MSCLPTokenInfo;
 
@@ -124,7 +118,7 @@ extern "C"
 	 */
 
 	typedef MSCULong32(*MSCCallBack) (MSCLPTokenInfo, MSCULong32,
-		MSCPVoid32);
+					  MSCPVoid32);
 
 	typedef struct
 	{
@@ -139,13 +133,13 @@ extern "C"
 
 	typedef struct
 	{
-		MSCLong32 hContext;		/* Handle to resource manager */
-		MSCLong32 hCard;		/* Handle to the connection */
-		LPSCARD_IO_REQUEST ioType;	/* Type of protocol */
-		MSCUChar8 pMac[MSC_MAXSIZE_MAC];	/* MAC code */
-		MSCULong32 macSize;		/* Size of the MAC code */
-		MSCPVoid32 tokenLibHandle;	/* Handle to token library */
-		CFDyLibPointers libPointers;	/* Function pointers */
+		MSCLong32 hContext;	      /* Handle to resource manager */
+		MSCLong32 hCard;	      /* Handle to the connection */
+		LPSCARD_IO_REQUEST ioType;    /* Type of protocol */
+		MSCUChar8 pMac[MSC_MAXSIZE_MAC];  /* MAC code */
+		MSCULong32 macSize;	      /* Size of the MAC code */
+		MSCPVoid32 tokenLibHandle;    /* Handle to token library */
+		CFDyLibPointers libPointers;  /* Function pointers */
 		MSCTokenInfo tokenInfo;	/* token information */
 		MSCUChar8 loggedIDs;	/* Verification bit mask */
 		MSCULong32 shareMode;	/* Sharing mode for this */
