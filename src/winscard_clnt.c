@@ -157,7 +157,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		{
 			DebugLogB("ERROR: Cannot open public shared file: %s",
 				PCSCLITE_PUBSHM_FILE);
-			return SCARD_F_INTERNAL_ERROR;
+			return SCARD_E_NO_SERVICE;
 		}
 
 		pageSize = SYS_GetPageSize();
