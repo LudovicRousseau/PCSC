@@ -24,7 +24,6 @@ extern "C"
 		unsigned int user_id;
 		unsigned int group_id;
 		unsigned int command;
-		unsigned int request_id;
 		time_t date;
 		unsigned char key[PCSCLITE_MSG_KEY_LEN];
 		unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
@@ -174,7 +173,7 @@ extern "C"
 	int SHMProcessEventsServer(PDWORD, int);
 	int SHMMessageSend(psharedSegmentMsg, int, int);
 	int SHMMessageReceive(psharedSegmentMsg, int, int);
-	int WrapSHMWrite(unsigned int, unsigned int, DWORD, unsigned int,
+	int WrapSHMWrite(unsigned int, DWORD, unsigned int,
 		unsigned int, void *);
 	void SHMCleanupSharedSegment(int, char *);
 
