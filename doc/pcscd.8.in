@@ -128,7 +128,7 @@ web site \fIhttp://www.musclecard.com\fR.
 .br
 .I @usbdropdir@
 : directory containing bundles for USB
-drivers"
+drivers
 .SH BUGS
 None known.
 .SH "SEE ALSO"
