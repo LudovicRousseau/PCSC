@@ -13,7 +13,7 @@ dnl Automake boilerplate.
 AC_CANONICAL_HOST
 
 dnl Every other copy of the package version number gets its value from here
-AM_INIT_AUTOMAKE(pcsc-lite, 1.1.2)
+AM_INIT_AUTOMAKE(pcsc-lite, 1.2.0-rc1)
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
@@ -123,14 +123,16 @@ if test x$arch = xaix ; then
 fi
 
 
+dnl check if libusb is available
+AC_CHECK_LIB(usb, usb_init, [ use_libusb=true ], [ use_libusb=false ])
+AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
+
 dnl --enable-libusb=DIR
-AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable libusb support],
+AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb],
 	[
 		use_libusb=false
 		case ${enableval} in
 			"" | "yes" | "YES")
-				AC_CHECK_LIB(usb, usb_init, [ use_libusb=true ], [ use_libusb=false ])
-				AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
 				if test x$use_libusb = xtrue; then
 					LIBS="${LIBS} -lusb"
 				fi
@@ -149,9 +151,6 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable libusb support],
 				fi
 				;;
 		esac
-	],
-	[
-		use_libusb=false
 	]
 )
 
@@ -176,11 +175,15 @@ AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
 
 dnl --enable-usb option.
 AC_ARG_ENABLE(usb,
-[  --enable-usb            enable USB hotplug support (Linux only)],
+[  --enable-usb            enable USB hotplug support (Linux only), deprecated],
 [ case "${enableval}" in
   yes)
+   AC_MSG_WARN([This option is deprecated. Use libusb instead.])
    case "${build_os}" in
-    *linux*)	usb=true ;;
+    *linux*)
+		usb=true
+		libusb=false
+	;;
     *) AC_MSG_WARN([USB hotplug support only available on Linux])
 		usb=false
      ;;
@@ -189,14 +192,11 @@ AC_ARG_ENABLE(usb,
   no)	usb=false ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-usb]) ;;
  esac], 
-[ case "${build_os}" in
-    *linux*)	usb=true ;;
-    *) usb=false
-     ;;
-   esac
+[
+    usb=false
 ])
 
-AC_MSG_RESULT([enable linux usb capability   : $usb])
+AC_MSG_RESULT([enable linux usb capability   : $usb (deprecated, use libusb)])
 
 AM_CONDITIONAL(PCSC_LINUX_USB, test x$usb = xtrue)
 
@@ -346,6 +346,7 @@ AC_SUBST(runpid)
 dnl Write Makefiles.
 AC_CONFIG_FILES(Makefile src/Makefile src/utils/Makefile etc/Makefile
 				doc/Makefile doc/bundleTool.8 doc/pcscd.8
+				doc/example/Makefile
 				etc/reader.conf src/libpcsclite.pc)
 AC_OUTPUT
 
