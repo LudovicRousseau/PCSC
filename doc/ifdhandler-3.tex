@@ -1077,49 +1077,73 @@ an array.
 
 
 %---------%---------%---------%---------%---------%---------
-\subsection{debug\_msg}
+\subsection{log\_msg}
 
 \synopsis
 \begin{verbatim}
-#include <PCSC/debuglog.h>
+#include <debuglog.h>
 
-void debug_msg(const char *fmt,
+void debug_msg(const int priority,
+    const char *fmt,
     ...);
 \end{verbatim}
 
 \parameters
 
 \begin{tabular}{lll}
+\texttt{priority} & IN & priority level \\
 \texttt{fmt} & IN & format string as in \texttt{printf()} \\
 \texttt{...} & IN & optionnal parameters as in \texttt{printf()} \\
 \end{tabular}
 
+The \texttt{priority} parameter may be:
+
+\begin{tabular}{ll}
+\texttt{PCSC\_LOG\_DEBUG} & for debug information \\
+\texttt{PCSC\_LOG\_INFO} & default \texttt{pcscd} level \\
+\texttt{PCSC\_LOG\_ERROR} & for errors \\
+\texttt{PCSC\_LOG\_CRITICAL} & for critical messages (like the driver
+fails to start) \\
+\end{tabular}
+
 \desc
 
-This function is used by the driver to send debug information. The
-advantage of using the same debug function as pcsc-lite is that you also
-benefit from the debug redirection provided by pcsc-lite. For example
-you can use \texttt{pcscd --foreground} to start \texttt{pcscd} and keep
-it in the forground with the debug sent to stderr. You will then get
-\texttt{pcscd} and the driver' debug messages in the same place.
+This function is used by the driver to send debug or log information to
+the administrator. The advantage of using the same debug function as
+pcsc-lite is that you also benefit from the debug redirection provided
+by pcsc-lite. You will then get \texttt{pcscd} and the driver' debug
+messages in the same place.
+
+The log messages are displayed by \texttt{pcscd} either on
+\texttt{stderr} (if \texttt{pcscd} is called with \texttt{--foreground})
+or using \texttt{syslog(3)} (default).
+
+The level is set using \texttt{pcscd} arguments \texttt{--debug},
+\texttt{--info}, \texttt{--error} or \texttt{--critical}.
+
+The levels are ordered. if \texttt{--info} is given all the messages of
+priority \texttt{PCSC\_LOG\_INFO}, \texttt{PCSC\_LOG\_ERROR} and
+\texttt{PCSC\_LOG\_CRITICAL} are displayed.
+
 
 \example
 \begin{verbatim}
-#define DebugLogB(fmt, data) debug_msg("%s:%d:%s " fmt, \
+#define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s " fmt, \
     __FILE__, __LINE__, __FUNCTION__, data)
 
-DebugLogB("received bytes: %d", r);
+Log2("received bytes: %d", r);
 \end{verbatim}
 
 
 %---------%---------%---------%---------%---------%---------
-\subsection{debug\_xxd}
+\subsection{log\_xxd}
 
 \synopsis
 \begin{verbatim}
-#include <PCSC/debuglog.h>
+#include <debuglog.h>
 
-void debug_xxd(const char *msg,
+void log_xxd(const int priority,
+    const char *msg,
     const unsigned char *buffer,
     const int size);
 \end{verbatim}
@@ -1127,6 +1151,7 @@ void debug_xxd(const char *msg,
 \parameters
 
 \begin{tabular}{lll}
+\texttt{priority} & IN & priority level \\
 \texttt{msg} & IN & text string \\
 \texttt{buffer} & IN & buffer you want to dump in hex \\
 \texttt{size} & IN & size of the buffer \\
@@ -1134,11 +1159,11 @@ void debug_xxd(const char *msg,
 
 \desc
 
-Same idea as \texttt{debug\_msg()} put print the hex dump of a buffer.
+Same idea as \texttt{log\_msg()} put print the hex dump of a buffer.
 
 \example
 \begin{verbatim}
-debug_xxd("received frame: ", buff, buff_size);
+log_xxd(PCSC_LOG_DEBUG, "received frame: ", buff, buff_size);
 \end{verbatim}
 
 
