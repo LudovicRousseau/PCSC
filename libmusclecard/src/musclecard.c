@@ -336,7 +336,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	mscUnLockThread();
 
 	rv = SCardConnect(pConnection->hContext, tokenStruct->slotName,
-		sharingMode, SCARD_PROTOCOL_T0, // | SCARD_PROTOCOL_T1,
+		sharingMode, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&pConnection->hCard, &dwActiveProtocol);
 
 #ifdef MSC_DEBUG
