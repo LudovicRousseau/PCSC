@@ -69,9 +69,8 @@ static void HPDeviceAppeared(void *refCon, io_iterator_t iterator)
 	io_service_t obj;
 
 	while ((obj = IOIteratorNext(iterator)))
-	{
 		kret = IOObjectRelease(obj);
-	}
+
 	HPSearchHotPluggables();
 }
 
@@ -85,9 +84,8 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
 	io_service_t obj;
 
 	while ((obj = IOIteratorNext(iterator)))
-	{
 		kret = IOObjectRelease(obj);
-	}
+
 	HPSearchHotPluggables();
 }
 
@@ -122,14 +120,14 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	if (!pluginUrl)
 	{
 		DebugLogA("error getting plugin directory URL");
-		return bundleVector;
+		return NULL;
 	}
 	bundleArray = CFBundleCreateBundlesFromDirectory(kCFAllocatorDefault,
 		pluginUrl, NULL);
 	if (!bundleArray)
 	{
 		DebugLogA("error getting plugin directory bundles");
-		return bundleVector;
+		return NULL;
 	}
 	CFRelease(pluginUrl);
 
@@ -148,7 +146,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 		if (!blobValue)
 		{
 			DebugLogA("error getting vendor ID from bundle");
-			return bundleVector;
+			return NULL;
 		}
 
 		if (CFGetTypeID(blobValue) == CFArrayGetTypeID())
@@ -174,7 +172,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	if (!bundleVector)
 	{
 		DebugLogA("memory allocation failure");
-		return bundleVector;
+		return NULL;
 	}
 
 	HPDriver *driverBundle = bundleVector;
@@ -330,19 +328,18 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 static HPDriver *HPDriverCopy(HPDriver * rhs)
 {
 	if (!rhs)
-	{
 		return NULL;
-	}
+
 	HPDriver *newDriverBundle = (HPDriver *) calloc(1, sizeof(HPDriver));
 
 	if (!newDriverBundle)
-	{
 		return NULL;
-	}
+
 	newDriverBundle->m_vendorId = rhs->m_vendorId;
 	newDriverBundle->m_productId = rhs->m_productId;
 	newDriverBundle->m_friendlyName = strdup(rhs->m_friendlyName);
 	newDriverBundle->m_libPath = strdup(rhs->m_libPath);
+
 	return newDriverBundle;
 }
 
@@ -365,12 +362,11 @@ static void HPDriverVectorRelease(HPDriverVector driverBundleVector)
 {
 	if (driverBundleVector)
 	{
-		HPDriver *b = driverBundleVector;
+		HPDriver *b;
 
-		for (; b->m_vendorId; ++b)
-		{
+		for (b = driverBundleVector; b->m_vendorId; ++b)
 			HPDriverRelease(b);
-		}
+
 		free(driverBundleVector);
 	}
 }
@@ -388,9 +384,11 @@ HPDeviceListInsert(HPDeviceList list, HPDriver * bundle, UInt32 address)
 		DebugLogA("memory allocation failure");
 		return list;
 	}
+
 	newReader->m_driver = HPDriverCopy(bundle);
 	newReader->m_address = address;
 	newReader->m_next = list;
+
 	return newReader;
 }
 
@@ -399,12 +397,10 @@ HPDeviceListInsert(HPDeviceList list, HPDriver * bundle, UInt32 address)
  */
 static void HPDeviceListRelease(HPDeviceList list)
 {
-	HPDevice *p = list;
+	HPDevice *p;
 
-	for (; p; p = p->m_next)
-	{
+	for (p = list; p; p = p->m_next)
 		HPDriverRelease(p->m_driver);
-	}
 }
 
 /*
@@ -435,8 +431,7 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 
 	io_iterator_t usbIter;
 	kern_return_t kret = IOServiceGetMatchingServices(kIOMasterPortDefault,
-		usbMatch,
-		&usbIter);
+		usbMatch, &usbIter);
 
 	if (kret != 0)
 	{
@@ -495,9 +490,8 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 		kret = (*usbdev)->GetLocationID(usbdev, &usbAddress);
 		(*usbdev)->Release(usbdev);
 
-		HPDriver *driver = driverBundle;
-
-		for (; driver->m_vendorId; ++driver)
+		HPDriver *driver;
+		for (driver = driverBundle; driver->m_vendorId; ++driver)
 		{
 			if ((driver->m_vendorId == vendorId)
 				&& (driver->m_productId == productId))
@@ -717,31 +711,25 @@ LONG HPSearchHotPluggables(void)
 		return 1;
 
 	HPDeviceList devices = NULL;
-	int istat;
 
-	istat = HPDriversMatchUSBDevices(drivers, &devices);
-	if (istat)
-	{
+	if (HPDriversMatchUSBDevices(drivers, &devices))
 		return -1;
-	}
-	istat = HPDriversMatchPCCardDevices(drivers, &devices);
-	if (istat)
-	{
+
+	if (HPDriversMatchPCCardDevices(drivers, &devices))
 		return -1;
-	}
 
-	HPDevice *a = devices;
+	HPDevice *a;
 
-	for (; a; a = a->m_next)
+	for (a = devices; a; a = a->m_next)
 	{
-		int found = 0;
-		HPDevice *b = sDeviceList;
+		int found = FALSE;
+		HPDevice *b;
 
-		for (; b; b = b->m_next)
+		for (b = sDeviceList; b; b = b->m_next)
 		{
 			if (HPDeviceEquals(a, b))
 			{
-				found = 1;
+				found = TRUE;
 				break;
 			}
 		}
@@ -752,17 +740,16 @@ LONG HPSearchHotPluggables(void)
 		}
 	}
 
-	a = sDeviceList;
-	for (; a; a = a->m_next)
+	for (a = sDeviceList; a; a = a->m_next)
 	{
-		int found = 0;
-		HPDevice *b = devices;
+		int found = FALSE;
+		HPDevice *b;
 
-		for (; b; b = b->m_next)
+		for (b = devices; b; b = b->m_next)
 		{
 			if (HPDeviceEquals(a, b))
 			{
-				found = 1;
+				found = TRUE;
 				break;
 			}
 		}
@@ -776,6 +763,7 @@ LONG HPSearchHotPluggables(void)
 	HPDeviceListRelease(sDeviceList);
 	sDeviceList = devices;
 	HPDriverVectorRelease(drivers);
+
 	return 0;
 }
 
@@ -787,11 +775,11 @@ PCSCLITE_THREAD_T sHotplugWatcherThread;
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
-	LONG sstat;
-
-	sstat = SYS_ThreadCreate(&sHotplugWatcherThread,
+	SYS_ThreadCreate(&sHotplugWatcherThread,
 		NULL, (LPVOID) HPDeviceNotificationThread, NULL);
+
 	return 0;
 }
 
 #endif	/* __APPLE__ */
+
