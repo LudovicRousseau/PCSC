@@ -9,6 +9,5 @@ Makefile
 Makefile.in
 muscletest
 pcscd
-pcsclite.h
 testpcsc
 tokenparser.c
