@@ -1438,7 +1438,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 				return SCARD_E_TIMEOUT;
 			}
+		}
 
+		/*
+		 * Only sleep once for each cycle of reader checks.
+		 */
+		if (j == 0)
+		{
+			SYS_USleep(PCSCLITE_STATUS_WAIT);
 			dwTime += PCSCLITE_STATUS_WAIT;
 		}
 	}
