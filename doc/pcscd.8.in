@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii pcscd.txt
 .\"
-.TH PCSCD 8 "March 2002" Linux "User Manual"
+.TH PCSCD 8 "March 2005" Linux "User Manual"
 .SH NAME
 pcscd \- PC/SC Smart Card Daemon
 .SH SYNOPSIS
@@ -15,16 +15,21 @@ log APDUs and SW using the debug method (see \fB\-d\fR)
 Specifies the file \fIfile\fR as an alternate location for
 \fI@confdir@/reader.conf\fR
 .TP
-\fB\-d\fR, \fB\-\-debug\fR \fIOUTPUT\fR
-display debug messages.
-
-\fIOUTPUT\fR may be:
- \fBstdout\fR (imply \-\-foreground),
- \fBstderr\fR (imply \-\-foreground),
- or \fBsyslog\fR
-.TP
 \fB\-f\fR, \fB\-\-foreground\fR
-Runs pcscd in the foreground (imply \-\-debug stdout)
+Runs pcscd in the foreground and send logs to stderr instead of syslog
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+use lowest log level. Any log message of this level or above will be
+sent to stderr or syslog depending on the use of \fB\-\-foreground\fR
+.TP
+\fB\-\-info\fR
+use info log level
+.TP
+\fB\-\-error\fR
+use error log level
+.TP
+\fB\-\-critical\fR
+use critical log level
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Displays information about the pcscd command line
