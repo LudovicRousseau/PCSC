@@ -99,7 +99,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	}
 
 	/*
-	 * We must find an empty spot to put the reader structure 
+	 * We must find an empty slot to put the reader structure 
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
