@@ -40,6 +40,7 @@ void tok_error(char *pcToken_error);
 #include <stdio.h>
 #include <string.h>
 #include <wintypes.h>
+#include <errno.h>
 
 #include "config.h"
 #include "pcsclite.h"
@@ -90,7 +91,8 @@ int evaluatetoken(char *pcToken)
 				pcDevicename = strdup(pcCurrent);
 				if (SYS_Stat(pcDevicename, &fStatBuf) != 0)
 				{
-					DebugLogB("The device %s doesn't exist", pcDevicename);
+					DebugLogC("Error with device %s: %s",
+						pcDevicename, strerror(errno));
 					badError = 1;
 				}
 			}
@@ -109,7 +111,8 @@ int evaluatetoken(char *pcToken)
 				pcLibpath = strdup(pcCurrent);
 				if (SYS_Stat(pcLibpath, &fStatBuf) != 0)
 				{
-					DebugLogB("The library %s doesn't exist", pcLibpath);
+					DebugLogC("Error with library %s: %s",
+						pcLibpath, strerror(errno));
 					badError = 1;
 				}
 			}
@@ -122,9 +125,7 @@ int evaluatetoken(char *pcToken)
 		else if (strcmp(pcPrevious, "CHANNELID") == 0)
 		{
 			if (pcChannelid == NULL)
-			{
 				pcChannelid = strdup(pcCurrent);
-			}
 			else
 			{
 				tok_error(pcPrevious);
