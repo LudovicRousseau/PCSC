@@ -27,13 +27,13 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 
-/* Max string size when dumping a 256 bytes longs APDU */
-#define DEBUG_BUF_SIZE (256*3+30)
+/* Max string size when dumping a 256 bytes longs APDU
+ * Should be bigger than 256*3+30 */
+#define DEBUG_BUF_SIZE 2048
 
 static int lSuppress = DEBUGLOG_LOG_ENTRIES;
 static int debug_msg_type = DEBUGLOG_NO_DEBUG;
 static int debug_category = DEBUG_CATEGORY_NOTHING;
-static FILE *debug_file = NULL;
 
 void debug_msg(const char *fmt, ...)
 {
@@ -64,28 +64,18 @@ void debug_msg(const char *fmt, ...)
 
 		case DEBUGLOG_SYSLOG_DEBUG:
 #ifndef WIN32
-		syslog(LOG_INFO, "%s", DebugBuffer);
+			syslog(LOG_INFO, "%s", DebugBuffer);
 #else
-		fprintf(stderr, "%s\n", DebugBuffer);
+			fprintf(stderr, "%s\n", DebugBuffer);
 #endif
-		break;
+			break;
 
 		case DEBUGLOG_STDERR_DEBUG:
-		fprintf(stderr, "%s\n", DebugBuffer);
-		break;
+			fprintf(stderr, "%s\n", DebugBuffer);
+			break;
 
 		case DEBUGLOG_STDOUT_DEBUG:
-		fprintf(stdout, "%s\n", DebugBuffer);
-		break;
-
-		case DEBUGLOG_FILE_DEBUG:
-			if (debug_file) {
-				fprintf(debug_file, "%s\n", DebugBuffer);
-			} else {
-				/* File not setup, do nothing. But assert to catch this in debug
-				 * builds */
-				assert(0);
-			}
+			fprintf(stdout, "%s\n", DebugBuffer);
 			break;
 
 		default:
@@ -136,16 +126,6 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 		case DEBUGLOG_STDOUT_DEBUG:
 		fprintf(stdout, "%s\n", DebugBuffer);
 		break;
-
-		case DEBUGLOG_FILE_DEBUG:
-			if (debug_file) {
-				fprintf(debug_file, "%s\n", DebugBuffer);
-			} else {
-				/* File not setup, do nothing.  But assert to catch this in debug
-				 * builds. */
-				assert(0);
-			}
-			break;
 
 		default:
 			/* Unknown type - do nothing */
@@ -318,6 +298,9 @@ char* pcsc_stringify_error(long pcscError)
 
 	};
 
+	/* add a null byte */
+	strError[sizeof(strError)] = '\0';
+
 	return strError;
 }
 
@@ -327,28 +310,3 @@ static DWORD SYS_GetPID() {
 }
 #endif
 
-void DebugLogSetupLogFile(const char* filename_base) {
-  char *filename = NULL;
-  int bufsize;
-
-  bufsize = strlen(filename_base) + 22;
-  filename = (char *)malloc(bufsize);
-  if (filename == NULL) {
-	  goto finish;
-  }
-
-  if ( debug_file != NULL ) {
-	  fclose(debug_file);
-	  debug_file = NULL;
-  }
-
-  sprintf(filename, "%s.%20d", filename_base, SYS_GetPID());
-  debug_file = fopen(filename, "a");
-
-  /* In debug mode, catch the case where we couldn't open the file */
-  assert(debug_file);
-
-finish:
-  free(filename);
-
-}

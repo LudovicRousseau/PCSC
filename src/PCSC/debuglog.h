@@ -41,13 +41,12 @@ extern "C"
 #define DEBUGLOG_LOG_ENTRIES    1
 #define DEBUGLOG_IGNORE_ENTRIES 2
 
-	typedef enum {
+typedef enum {
 	DEBUGLOG_NO_DEBUG = 0,
 	DEBUGLOG_SYSLOG_DEBUG,
 	DEBUGLOG_STDERR_DEBUG,
 	DEBUGLOG_STDOUT_DEBUG,
-	DEBUGLOG_FILE_DEBUG,
-	} DebugLogType;
+} DebugLogType;
 
 #define DEBUG_CATEGORY_NOTHING  0
 #define DEBUG_CATEGORY_APDU     1 
@@ -65,16 +64,15 @@ extern "C"
 #define DebugXxd(msg, buffer, size)
 #endif
 
-	void debug_msg(const char *fmt, ...);
-	void debug_xxd(const char *msg, const unsigned char *buffer,
-		const int size);
+void debug_msg(const char *fmt, ...);
+void debug_xxd(const char *msg, const unsigned char *buffer, const int size);
 
-	void DebugLogSuppress(const int);
-	void DebugLogSetLogType(const int);
-	int DebugLogSetCategory(const int);
-	void DebugLogCategory(const int, const char *, const int);
+void DebugLogSuppress(const int);
+void DebugLogSetLogType(const int);
+int DebugLogSetCategory(const int);
+void DebugLogCategory(const int, const char *, const int);
 
-	char *pcsc_stringify_error(long);
+char *pcsc_stringify_error(long);
 
 #ifdef __cplusplus
 }
