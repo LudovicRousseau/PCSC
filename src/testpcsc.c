@@ -211,7 +211,7 @@ int main(int argc, char **argv)
 
 	printf("Current Reader Name              : %s\n", pcReaders);
 	printf("Current Reader State             : 0x%.4lx\n", dwState);
-	printf("Current Reader Protocol          : %lx\n", dwProt - 1);
+	printf("Current Reader Protocol          : T=%ld\n", dwProt - 1);
 	printf("Current Reader ATR Size          : %lx\n", dwAtrLen);
 	printf("Current Reader ATR Value         : ");
 
