@@ -46,24 +46,15 @@ pcscd is normally started at boot time from
 It allows applications to access smart cards and readers without knowing
 details of the card or reader.  
 
-pcscd coordinates the loading of drivers for card readers and plug-ins 
-for different card types.
+pcscd coordinates the loading of drivers for card readers.
 
-The purpose of pcsc-lite is to provide both a cross compatible API for
-migrating Windows based PC/SC applications to Unix and to provide a 
-pluggable architecture for supporting smart cards and cryptographic tokens 
-through high level API's.
+The purpose of pcsc-lite is to provide a cross compatible API (called
+winscard) for migrating Windows based PC/SC applications to Unix.
 
 At startup, pcscd loads the smart card reader drivers specified in the 
 .I @confdir@/reader.conf 
 file (or specified using \fB-c\fR \fIfile\fR).
 
-When a smart card is inserted into a reader, pcscd uses the ATR string from 
-the card to identify this card.  The 
-.I @muscledropdir@
-directory contains plug-ins for the card.  These plug-ins are searched.  If 
-the ATR string matches, the client library loads that plug-in for that 
-token.
 .SH "SERIAL SMART CARD READER DRIVERS"
 Smart card reader drivers are placed in the 
 .I @usbdropdir@
@@ -76,12 +67,6 @@ file.  See the
 manual page for more information.
 Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fR.
 
-.SH "SMART CARD PLUG-INS"
-pcsc-lite uses plug-ins to handle different types of smart cards. There is 
-a plug-in for each smart card type. Plug-ins are installed in the 
-.I @muscledropdir@
-directory.  Plug-ins for cards/tokens are available from the MUSCLE
-web site \fIhttp://www.musclecard.com/\fR.
 .SH FILES
 .I @confdir@/reader.conf
 : Reader configuration file
