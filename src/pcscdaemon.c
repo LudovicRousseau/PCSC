@@ -22,6 +22,7 @@ $Id$
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 
 #include "config.h"
 #include "wintypes.h"
@@ -46,6 +47,8 @@ void SVCServiceRunLoop();
 void SVCClientCleanup(psharedSegmentMsg);
 void at_exit(void);
 void signal_trap(int);
+void print_version (void);
+void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
@@ -170,11 +173,22 @@ int main(int argc, char **argv)
 {
 
 	int rv;
-	int i;
 	char setToForeground;
 	char *newReaderConfig;
 	struct stat fStatBuf;
-
+	int opt;
+#ifdef HAVE_GETOPT_LONG
+	int option_index;
+	static struct option long_options[] = {
+		{"config", 1, 0, 'c'},
+		{"foreground", 0, 0, 'f'},
+		{"debug", 1, 0, 'd'},
+		{"help", 0, 0, 'h'},
+		{"version", 0, 0, 'v'},
+		{0, 0, 0, 0}
+	};
+#endif
+	
 	rv = 0;
 	newReaderConfig = 0;
 	setToForeground = 0;
@@ -198,65 +212,51 @@ int main(int argc, char **argv)
 	/*
 	 * Handle any command line arguments 
 	 */
-	if (argc == 2 && (strcmp(argv[1], "-v") == 0))
-	{
-		printf("pcsc-lite version: %s <corcoran@linuxnet.com>\n",
-			PCSCLITE_VERSION_NUMBER);
-		return 0;
-	} else if (argc == 2 && (strcmp(argv[1], "-help") == 0))
-	{
-		printf("pcscd -v       - Display version and exit\n");
-		printf("pcscd -c file  - New path to reader.conf\n");
-		printf("pcscd -fg      - Run in foreground (no daemon)\n");
-		printf("pcscd -d0      - Debug messages go to syslog (syslog must be enabled)\n");
-		printf("pcscd -d1      - Debug messages go to stderr (imply -fg)\n");
-		printf("pcscd -d2      - Debug messages go to stdout (imply -fg)\n");
-		printf("pcscd -help    - This help menu\n");
-		return 0;
-	}
+#ifdef  HAVE_GETOPT_LONG
+	while ((opt = getopt_long (argc, argv, "c:fd:hv", long_options, &option_index)) != -1) {
+#else
+	while ((opt = getopt (argc, argv, "c:fd:hv")) != -1) {
+#endif
+		switch (opt) {
+			case 'c':
+				DebugLogB("main: using new config file: %s", optarg);
+				newReaderConfig = optarg;
+				break;
 
-	/*
-	 * Time to look for arguments 
-	 */
-	if (argc > 1)
-	{
-		/*
-		 * Check for each argument 
-		 */
-		for (i = 1; i < argc; i++)
-		{
-
-			if (strncmp(argv[i], "-d0", PCSCLITE_MAX_COMSIZE) == 0)
-			{
-				DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
-			} else if (strncmp(argv[i], "-d1", PCSCLITE_MAX_COMSIZE) == 0)
-			{
-				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
-				DebugLogA("main: debug messages to stderr");
-				setToForeground = 1;
-			} else if (strncmp(argv[i], "-d2", PCSCLITE_MAX_COMSIZE) == 0)
-			{
-				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
-				DebugLogA("main: debug messages to stdout");
-				setToForeground = 1;
-			} else if (strncmp(argv[i], "-fg", PCSCLITE_MAX_COMSIZE) == 0)
-			{
+			case 'f':
 				DebugLogA("main: pcscd set to foreground");
 				setToForeground = 1;
-			} else if (strncmp(argv[i], "-c", PCSCLITE_MAX_COMSIZE) == 0)
-			{
-				DebugLogB("main: using new config file: %s", argv[i + 1]);
-				newReaderConfig = argv[i + 1];
-				i += 1;
-			} else
-			{
-				printf("pcsc-lite: invalid arguments, try -help \n");
+				break;
+
+			case 'd':
+				if (strncmp(optarg, "syslog", PCSCLITE_MAX_COMSIZE) == 0) 
+					DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
+
+				else if (strncmp(optarg, "stderr", PCSCLITE_MAX_COMSIZE) == 0) {
+					DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+					DebugLogA("main: debug messages to stderr");
+					setToForeground = 1;
+				} 
+				else if (strncmp(optarg, "stdout", PCSCLITE_MAX_COMSIZE) == 0) {
+					DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
+					DebugLogA("main: debug messages to stdout");
+					setToForeground = 1;
+				}
+				break;
+
+			case 'h':
+				print_usage (argv[0]);
+				return 0;
+			case 'v':
+				print_version ();
+				return 0;
+			default:
+				print_usage (argv[0]);
 				return 1;
-			}
-
 		}
-	}
 
+	}
+	
 	/*
 	 * test the presence of /tmp/pcsc 
 	 */
@@ -462,4 +462,34 @@ void signal_trap(int sig)
 			at_exit();
 		}
 	}
+}
+
+void print_version (void)
+{
+	printf("%s version %s.\n",  PACKAGE, VERSION);
+	printf("Copyright (C) 2000 by David Corcoran <corcoran@linuxnet.com>.\n");
+	printf("Report bugs to <sclinux@linuxnet.com>.\n");
+}
+
+void print_usage (char const * const progname)
+{
+	printf("Usage: %s [-c file] [-f] [-d output] [-v] [-h]\n", progname);
+	printf("Options:\n");
+#ifdef HAVE_GETOPT_LONG
+	printf("  -c, --config		path to reader.conf\n");
+	printf("  -f, --foreground	run in foreground (no daemon)\n");
+	printf("  -d, --debug		display debug messages. Output may be:\n"); 
+	printf("			stdout (imply -f), stderr (imply -f),\n");
+	printf("			or syslog\n");
+	printf("  -h, --help		display usage information\n");
+	printf("  -v, --version		display the program version number\n");
+#else
+	printf("  -c 	path to reader.conf\n");
+	printf("  -f 	run in foreground (no daemon)\n");
+	printf("  -d 	display debug messages. Output may be:\n"); 
+	printf("	stdout (imply -f), stderr (imply -f),\n");
+	printf("	or syslog\n");
+	printf("  -h 	display usage information\n");
+	printf("  -v 	display the program version number\n");
+#endif
 }
