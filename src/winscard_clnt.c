@@ -1407,21 +1407,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		if (j == cReaders)
 			j = 0;
 
-		if (dwTimeout != INFINITE && dwTimeout != 0)
-		{
-			/*
-			 * If time is greater than timeout and all readers have been
-			 * checked
-			 */
-			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
-			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-				return SCARD_E_TIMEOUT;
-			}
-
-			dwTime += PCSCLITE_STATUS_WAIT;
-		}
-
 		/*
 		 * Declare all the break conditions
 		 */
@@ -1442,6 +1427,20 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		if ((dwTimeout == 0) && (j == 0))
 			break;
 
+		if (dwTimeout != INFINITE && dwTimeout != 0)
+		{
+			/*
+			 * If time is greater than timeout and all readers have been
+			 * checked
+			 */
+			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
+			{
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				return SCARD_E_TIMEOUT;
+			}
+
+			dwTime += PCSCLITE_STATUS_WAIT;
+		}
 	}
 	while (1);
 
