@@ -427,7 +427,17 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 						rContext->readerState->cardAtrLength);
 				}
 				else
+				{
+					DWORD dwStatus, dwAtrLen;
+					UCHAR ucAtr[MAX_ATR_SIZE];
+
 					DebugLogA("Error resetting card.");
+					IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
+					if (dwStatus & SCARD_PRESENT)
+						return SCARD_W_UNRESPONSIVE_CARD;
+					else
+						return SCARD_E_NO_SMARTCARD;
+				}
 				break;
 
 			default:
