@@ -44,7 +44,6 @@ int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount
 
 int SHMClientSetupSession(PDWORD pdwClientID)
 {
-
 	struct sockaddr_un svc_addr;
 	int one;
 
@@ -86,9 +85,8 @@ int SHMClientCloseSession(DWORD dwClientID)
 	return 0;
 }
 
-int SHMInitializeCommonSegment()
+int SHMInitializeCommonSegment(void)
 {
-
 	static struct sockaddr_un serv_adr;
 
 	/*
@@ -130,7 +128,6 @@ int SHMInitializeCommonSegment()
 
 int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 {
-
 	int clnt_len;
 	int new_sock;
 	struct sockaddr_un clnt_addr;
@@ -262,9 +259,8 @@ int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int
 }
 
 int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
-	           int blockAmount)
+	int blockAmount)
 {
-
 	/*
 	 * default is success 
 	 */
@@ -374,9 +370,8 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 }
 
 int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
-	              int blockAmount)
+	int blockAmount)
 {
-
 	/*
 	 * default is success 
 	 */
@@ -488,7 +483,6 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
-
 	sharedSegmentMsg msgStruct;
 
 	/*
