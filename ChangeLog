@@ -1,3 +1,34 @@
+pcsc-lite-1.2.9-beta7: Ludovic Rousseau
+2 March 2005
+- SCARD_PROTOCOL_ANY is defined as (SCARD_PROTOCOL_T0|SCARD_PROTOCOL_T1)
+  You should not use SCARD_PROTOCOL_ANY since it is not defined in
+  Windows PC/SC. It is just defined for backward source code compatibility
+- define SCARD_STATE_UNPOWERED even it is a state never used so source
+  code using it can compile
+- SCardStatus(): pdwState and pdwProtocol parameters may be NULL (mimic
+  Windows)
+- provide a script update-reader.conf to update the /etc/reader.conf
+  file from /etc/reader.conf.d/* files
+  This script is called by /etc/init.d/pcscd before starting the daemon
+- add support of SCardGetAttrib() with a NULL pbAttr parameter to only
+  get the needed lenth in pcbAttrLen
+- SCardReconnect() now works after a card movement.  Previously
+  SCardReconnect() returned "Card was removed" even if the new card is
+  reseted.
+- SCardGetStatusChange(): greatly improve performances. Thanks to Oivind
+  H. Danielsen
+- SCardControl(): check if the pbSendBuffer is NULL or no bytes are sent
+  for driver API v2 only. With API v3 we can use dwControlCode as the
+  only data to send.
+- Implement the dynamic level logging in pcscd
+  The new command line options are:
+    -d, --debug           display lower level debug messages
+        --info            display info level debug messages (default level)
+        --error           display error level debug messages
+        --critical        display critical only level debug messages
+- some documentation update
+
+
 pcsc-lite-1.2.9-beta6: Ludovic Rousseau
 15 August 2004
 - The debug messages are now displayed by default. This prevented error
