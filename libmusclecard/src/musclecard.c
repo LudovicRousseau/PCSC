@@ -1769,33 +1769,48 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 	MSCString objectID, MSCPUChar8 * pOutputData,
 	MSCPULong32 dataSize, LPRWEventCallback rwCallback, MSCPVoid32 addParams)
 {
-	MSC_RV rv;
-	MSCObjectInfo objInfo;
-	MSCULong32 objectSize;
+    MSC_RV rv;
+    MSCObjectInfo objInfo;
+    MSCULong32 objectSize;
+    MSCPUChar8  data = NULL;
+    
+    if (pConnection == NULL)
+        return MSC_INVALID_PARAMETER;
+     if (localHContext == 0)
+         return MSC_INTERNAL_ERROR;
 
-	if (pConnection == NULL)
-		return MSC_INVALID_PARAMETER;
-	if (localHContext == 0)
-		return MSC_INTERNAL_ERROR;
+    if (pOutputData == 0)
+    {
+        return MSC_INVALID_PARAMETER;
+    }
 
-	if (pOutputData == NULL)
-		return MSC_INVALID_PARAMETER;
+    *dataSize = 0;
+    *pOutputData = 0;
 
-	rv = MSCGetObjectAttributes(pConnection, objectID, &objInfo);
+    rv = MSCGetObjectAttributes(pConnection, objectID, &objInfo);
+    if (rv == MSC_SUCCESS) 
+    {
+        objectSize = objInfo.objectSize;
+        data = (MSCPUChar8) malloc(sizeof(MSCUChar8) * objectSize);
+        if(data)
+        {
+            rv =  MSCReadObject(pConnection, objectID, 0, data,
+                     objectSize, rwCallback, addParams);
+            
+            if (rv == MSC_SUCCESS)
+            {
+                *dataSize = objectSize;
+                *pOutputData = data;
+            }
+            else
+            {
+                rv = MSC_INTERNAL_ERROR;
+                free(data);
+            }
+        }
+    }
 
-	if (rv != MSC_SUCCESS)
-	{
-		*dataSize = 0;
-		*pOutputData = '\0';
-		return rv;
-	}
-
-	objectSize = objInfo.objectSize;
-	*dataSize = objectSize;
-	*pOutputData = (MSCPUChar8) malloc(sizeof(MSCUChar8) * objectSize);
-
-	return MSCReadObject(pConnection, objectID, 0, *pOutputData,
-		objectSize, rwCallback, addParams);
+    return rv;
 }
 
 
