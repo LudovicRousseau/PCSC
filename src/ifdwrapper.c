@@ -414,7 +414,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	RESPONSECODE rv, ret;
 	LPVOID vFunction;
 	SMARTCARD_EXTENSION sSmartCard;
-	DWORD dwStatus, dwProtocol;
+	DWORD dwStatus;
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -428,13 +428,12 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	rv = 0;
 	vFunction = NULL;
 	dwStatus = 0;
-	dwProtocol = 0;
 	ucValue[0] = 0;
 
 	/*
 	 * Check that the card is inserted first 
 	 */
-	IFDStatusICC(rContext, &dwStatus, &dwProtocol, pucAtr, pdwAtrLen);
+	IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
 	if (dwStatus & SCARD_ABSENT)
 		return SCARD_W_REMOVED_CARD;
@@ -451,7 +450,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		IFD_power_icc = (RESPONSECODE(*)(DWORD)) vFunction;
 	else
 		IFDH_power_icc = (RESPONSECODE(*)(DWORD, DWORD, PUCHAR,
-				PDWORD)) vFunction;
+			PDWORD)) vFunction;
 #endif
 
 	/*
@@ -463,8 +462,8 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_power_icc) (dwAction);
 	}
 	else
@@ -477,8 +476,8 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
 	}
 	else
@@ -490,11 +489,18 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 * END OF LOCKED REGION 
 	 */
 
+	/* use clean values in case of error */
+	if (rv != IFD_SUCCESS)
+	{
+		*pdwAtrLen = 0;
+		pucAtr[0] = '\0';
+	}
+
 	/*
 	 * Get the ATR and it's length 
 	 */
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFDStatusICC(rContext, &dwStatus, &dwProtocol, pucAtr, pdwAtrLen);
+		IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
 	return rv;
 }
@@ -506,7 +512,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
  */
 
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
-	PDWORD pdwProtocol, PUCHAR pucAtr, PDWORD pdwAtrLen)
+	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv, rv1;
 	LPVOID vFunctionA, vFunctionB;
@@ -563,8 +569,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_is_icc_present) ();
 	}
 	else
@@ -572,8 +578,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
 	}
 	else
@@ -653,7 +659,6 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	}
 
 	*pdwStatus = dwCardStatus;
-	*pdwProtocol = rContext->dwProtocol;
 
 	return SCARD_S_SUCCESS;
 }
