@@ -1564,6 +1564,14 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 	LPDWORD pcbAttrLen)
 {
+	if (NULL == pcbAttrLen)
+		return SCARD_E_INVALID_PARAMETER;
+
+	/* if only get the length */
+	if (NULL == pbAttr)
+		/* this variable may not be set by the caller. use a reasonable size */
+		*pcbAttrLen = MAX_BUFFER_SIZE;
+
 	return SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, pbAttr,
 		pcbAttrLen);
 }
@@ -1571,6 +1579,9 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 	DWORD cbAttrLen)
 {
+	if (NULL == pbAttr || 0 == cbAttrLen)
+		return SCARD_E_INVALID_PARAMETER;
+
 	return SCardGetSetAttrib(hCard, SCARD_SET_ATTRIB, dwAttrId, (LPBYTE)pbAttr,
 		&cbAttrLen);
 }
@@ -1583,9 +1594,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	sharedSegmentMsg msgStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
-
-	if (NULL == pbAttr || 0 == *pcbAttrLen)
-		return SCARD_E_INVALID_PARAMETER;
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
@@ -1625,7 +1633,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	scGetSetStruct.dwAttrId = dwAttrId;
 	scGetSetStruct.cbAttrLen = *pcbAttrLen;
 	scGetSetStruct.rv = SCARD_E_NO_SERVICE;
-	memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
+	if (SCARD_SET_ATTRIB == command)
+		memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
 
 	rv = WrapSHMWrite(command,
 		psContextMap[dwContextIndex].dwClientID, sizeof(scGetSetStruct),
@@ -1663,7 +1672,9 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		else
 			*pcbAttrLen = scGetSetStruct.cbAttrLen;
 
-		memcpy(pbAttr, scGetSetStruct.pbAttr, scGetSetStruct.cbAttrLen);
+		if (pbAttr)
+			memcpy(pbAttr, scGetSetStruct.pbAttr, scGetSetStruct.cbAttrLen);
+
 		memset(scGetSetStruct.pbAttr, 0x00, sizeof(scGetSetStruct.pbAttr));
 	}
 
