@@ -1,7 +1,7 @@
 .\" Process this file with
-.\" groff -man -Tascii pcscd.txt
+.\" groff -man -Tascii bundleTool.8
 .\"
-.TH BUNDLETOOL 1 "March 2002" Linux "User Manual"
+.TH BUNDLETOOL 8 "March 2002" Linux "User Manual"
 .SH NAME
 bundleTool
 .SH SYNOPSIS
@@ -19,33 +19,19 @@ application exits and pcsc is now configured to use your card.
 
 Example:
 
-.RS
-[root@linux]# bundleTool
-.RE
-.RS 
-Select the approprate token driver:
-.RE
-.RS
------------------------------------
-.RE
-.RS
-  1.     mscMuscleCard.bundle
-.RE
-.RS
------------------------------------
-.RE
-.RS
-Enter the number: 1
-
-Insert your token in: My Friendly Reader 0 0
-
-Token support updated successfully !
-.RE
-.RS
-[root@linux]# 
-.RE
+ [root@linux]# bundleTool
+ Select the approprate token driver:
+ -----------------------------------
+   1.     mscMuscleCard.bundle
+ -----------------------------------
+ Enter the number: 1
+ 
+ Insert your token in: My Friendly Reader 0 0
+ 
+ Token support updated successfully !
+ [root@linux]# 
 .SH SEE ALSO
-.B pcscd(8)
+.BR pcscd (8)
 .SH BUGS
 Plugins MUST reside in 
 .I /usr/local/pcsc/services
