@@ -76,11 +76,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 	DWORD dwPreferred, UCHAR ucAvailable)
 {
 	LONG rv;
-
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
+	DWORD protocol = rContext->dwProtocol;
 
 	if (dwPreferred == 0)
 	{
@@ -103,11 +99,12 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			 *
 			 * Action: Change to T=0 protocol.  
 			 */
-			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T0, 0x00,
-				0x00, 0x00, 0x00);
+			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T0, 0x00, 0x00, 0x00, 0x00);
 
-			if (rv != SCARD_S_SUCCESS)
-				return SCARD_PROTOCOL_T1;
+			if (rv != IFD_SUCCESS)
+				protocol = SCARD_PROTOCOL_T1;
+			else
+				protocol = SCARD_PROTOCOL_T0;
 		}
 		else
 		{
@@ -136,9 +133,9 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 				0x00, 0x00, 0x00);
 
 			if (rv != SCARD_S_SUCCESS)
-				return SCARD_PROTOCOL_T0;
+				protocol = SCARD_PROTOCOL_T0;
 			else
-				return SCARD_PROTOCOL_T1;
+				protocol = SCARD_PROTOCOL_T1;
 		}
 		else
 		{
@@ -157,9 +154,8 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		 *
 		 * Action: No need to change protocols 
 		 */
-		return rContext->dwProtocol;
 	}
 
-	return rContext->dwProtocol;
+	return protocol;
 }
 
