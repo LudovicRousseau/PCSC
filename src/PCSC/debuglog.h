@@ -52,10 +52,15 @@ typedef enum {
 #define DEBUG_CATEGORY_APDU     1 
 #define DEBUG_CATEGORY_SW       2 
 
+/* You can't do #ifndef __FUNCTION__ */
+#if !defined(__GNUC__) && !defined(__IBMC__)
+#define __FUNCTION__ ""
+#endif
+
 #ifdef PCSC_DEBUG
-#define DebugLogA(fmt) debug_msg("%s:%d " fmt, __FILE__, __LINE__)
-#define DebugLogB(fmt, data) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data)
-#define DebugLogC(fmt, data1, data2) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data1, data2)
+#define DebugLogA(fmt) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
+#define DebugLogB(fmt, data) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data)
+#define DebugLogC(fmt, data1, data2) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
 #define DebugXxd(msg, buffer, size) debug_xxd(msg, buffer, size)
 #else
 #define DebugLogA(fmt)
