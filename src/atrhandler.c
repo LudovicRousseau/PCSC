@@ -22,7 +22,7 @@
 /*
  * Uncomment the following for ATR debugging 
  */
-/* #define ATR_DEBUG 1 */
+#undef ATR_DEBUG
 
 #define SCARD_PROTOCOL_UNSET 0x00
 
@@ -40,7 +40,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	p = K = TCK = Y1i = T = 0;
 
 #ifdef ATR_DEBUG
-	DebugXxd("ATR: ", pucAtr, dwLength);
+	if (dwLength > 0)
+		DebugXxd("ATR: ", pucAtr, dwLength);
 #endif
 
 	if (dwLength < 2)
@@ -83,7 +84,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	p = 2;
 
 #ifdef ATR_DEBUG
-	debug_msg("Conv: %02X, Y1: %02X, K: %02X",
+	debug_msg("%s:%d:%s Conv: %02X, Y1: %02X, K: %02X",
+		__FILE__, __LINE__, __FUNCTION__,
 		psExtension->CardCapabilities.Convention, Y1i, K);
 #endif
 
@@ -100,7 +102,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
 #ifdef ATR_DEBUG
-		debug_msg("TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
+		debug_msg("%s:%d:%s TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
+			__FILE__, __LINE__, __FUNCTION__,
 			i, TAi, i, TBi, i, TCi, i, TDi);
 #endif
 
@@ -132,11 +135,11 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 				}
 			}
 
-			if (T == 0)
-			{
 #ifdef ATR_DEBUG
-				debug_msg("T=0 Protocol Found");
+			DebugLogB("T=%d Protocol Found", T);
 #endif
+			if (0 == T)
+			{
 				psExtension->CardCapabilities.AvailableProtocols |=
 					SCARD_PROTOCOL_T0;
 				psExtension->CardCapabilities.T0.BGT = 0;
@@ -146,11 +149,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 				psExtension->CardCapabilities.T0.WT = 0;
 			}
 			else
-				if (T == 1)
+				if (1 == T)
 				{
-#ifdef ATR_DEBUG
-					debug_msg("T=1 Protocol Found");
-#endif
 					psExtension->CardCapabilities.AvailableProtocols |=
 						SCARD_PROTOCOL_T1;
 					psExtension->CardCapabilities.T1.BGT = 0;
@@ -160,13 +160,18 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 					psExtension->CardCapabilities.T1.WT = 0;
 				}
 				else
-				{
-					psExtension->CardCapabilities.AvailableProtocols |= T;
-					/*
-					 * Do nothing for now since other protocols are not
-					 * supported at this time 
-					 */
-				}
+					if (15 == T)
+					{
+						psExtension->CardCapabilities.AvailableProtocols |=
+							SCARD_PROTOCOL_T15;
+					}
+					else
+					{
+						/*
+						 * Do nothing for now since other protocols are not
+						 * supported at this time 
+						 */
+					}
 
 			/* test presence of TA2 */
 			if ((2 == i) && (TAi >= 0))
@@ -178,11 +183,15 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 				switch (T)
 				{
 					case 0:
-						psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T0;
+						psExtension->CardCapabilities.CurrentProtocol =
+							psExtension->CardCapabilities.AvailableProtocols =
+							SCARD_PROTOCOL_T0;
 						break;
 
 					case 1:
-						psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T1;
+						psExtension->CardCapabilities.CurrentProtocol =
+							psExtension->CardCapabilities.AvailableProtocols =
+							SCARD_PROTOCOL_T1;
 						break;
 
 					default:
