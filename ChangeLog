@@ -1,3 +1,56 @@
+pcsc-lite-1.2.0-rc1: Ludovic Rousseau
+26 August, 2003
+- configure.in: --enable-usb is now deprecated and off by default.
+  --enable-libusb is selected by default and will be used if libusb is
+  installed in /usr. If libusb is installed in /usr/local use
+  --enable-libusb=/usr/local
+- src/hotplug_macosx.c: Add support of reader aliases using <array></array> in
+  driver Info.plist on MacOS X.
+  The old syntax did not work since pcscd on MacOS X wants a correct XML file.
+  The new syntax is:
+    <key>ifdVendorID</key>
+    <array>
+        <string>0x08E6</string> <!-- 1, Gemplus -->
+        <string>0x04E6</string> <!-- 2, SCM Microsystems -->
+        <string>0x076B</string> <!-- 3, OmniKey -->
+        <string>0x0783</string> <!-- 4, C3PO -->
+    </array>
+
+    <key>ifdProductID</key>
+    <array>
+        <string>0x3437</string> <!-- 1 -->
+        <string>0x5115</string> <!-- 2 -->
+        <string>0x3021</string> <!-- 3 -->
+        <string>0x0003</string> <!-- 4 -->
+    </array>
+
+    <key>ifdFriendlyName</key>
+    <array>
+        <string>GemPC Twin</string>   <!-- 1 -->
+        <string>SCR 335</string>      <!-- 2 -->
+        <string>CardMan 3121</string> <!-- 3 -->
+        <string>LTC31</string>        <!-- 4 -->
+    </array>
+- src/powermgt_macosx.c, src/hotplug_macosx.c and some others: Add support of
+  PCMCIA for MacOS X. Thanks to Stephen M. Webb.
+- src/hotplug_libusb.c: Add support of libusb. Allow to use USB readers on
+  *BSD or any plateform supported by libusb. Thanks to Toni Andjelkovic for
+  the great job.
+  I also redesigned the code to support up to PCSCLITE_MAX_READERS readers
+  whatever the driver they use.
+- src/musclecard.c:
+  . fix an initialisation problem of pConnection->shareMode (thanks to Wan-Teh
+  Chang)
+  . avoid a memory leak (Toni Andjelkovic)
+- doc/example: sample demo application using pcsc-lite API
+- src/winscard.c:
+  . pcscd reported card is present when there is no card in the reader
+  . return SCARD_E_INVALID_PARAMETER for APDU of less than 4 bytes
+- src/winscard_svc.c: Sometimes unknown APDUs were being transmitted when
+  'SCardStatus' function was invoked
+- some code cleanup and compilation problems removed.
+
+
 pcsc-lite-1.1.2beta5: Ludovic Rousseau
 30 May, 2003
 - src/winscard.c: SCardStatus(): do not return before filling buffers
