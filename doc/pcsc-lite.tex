@@ -924,9 +924,9 @@ rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
 
 LONG SCardControl(SCARDHANDLE hCard,
     DWORD dwControlCode,
-    LPCBYTE pbSendBuffer,
+    LPCVOID pbSendBuffer,
     DWORD cbSendLength,
-    LPBYTE pbRecvBuffer,
+    LPVOID pbRecvBuffer,
     DWORD pcbRecvLength,
     LPDWORD lpBytesReturned);
 \end{verbatim}
