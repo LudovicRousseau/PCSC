@@ -123,6 +123,8 @@ pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c \
 pcscd_LDADD   = libpcsclite-core.la $(PCSCD_INCLUDE_LIBS)
 pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -Wl,--export-dynamic
 
+CFLAGS = @CFLAGS@ -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
+
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
