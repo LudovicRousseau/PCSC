@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Merge all reader config file snippets for pcsc-lite from a reader.conf.d
+# directory into a reader.conf.
+
+CONF=@confdir@/reader.conf
+CONFDIR=@confdir@/reader.conf.d
+
+umask 0022
+set -e
+
+trap cleanup EXIT
+cleanup()
+{
+    test -z "$tmpfile" || rm -f "$tmpfile"
+}
+
+tmpfile=`mktemp /tmp/reader.conf.XXXXXX`
+
+cat > "$tmpfile" << EOF
+# Configuration file for pcsc-lite
+#
+# Don't modify this file. Instead put a file or modify the files in
+# @confdir@/reader.conf.d/ and run @sbindir_exp@/update-reader.conf
+# afterwards.  Note that when starting pcscd with the init script,
+# update-reader.conf will be run automatically.
+#
+# Note also that this file should include configuration for serial and PCMCIA
+# readers only; USB readers should _not_ be configured here.
+
+EOF
+
+for f in `ls -1d "$CONFDIR"/*.conf 2>/dev/null` ; do
+    echo "# $f" >> "$tmpfile"
+    cat "$f" >> "$tmpfile"
+    echo >> "$tmpfile"
+done
+
+echo "# End of file" >> "$tmpfile"
+
+cat "$tmpfile" > "$CONF"
+
