@@ -206,12 +206,9 @@ int main(int argc, char **argv)
 		printf("pcscd -v       - Display version and exit\n");
 		printf("pcscd -c file  - New path to reader.conf\n");
 		printf("pcscd -fg      - Run in foreground (no daemon)\n");
-		printf
-			("pcscd -d0      - Debug messages go to syslog (must be enabled)\n");
-		printf
-			("pcscd -d1      - Debug messages go to stderr (must be enabled)\n");
-		printf
-			("pcscd -d2      - Debug messages go to stdout (must be enabled)\n");
+		printf("pcscd -d0      - Debug messages go to syslog (syslog must be enabled)\n");
+		printf("pcscd -d1      - Debug messages go to stderr (imply -fg)\n");
+		printf("pcscd -d2      - Debug messages go to stdout (imply -fg)\n");
 		printf("pcscd -help    - This help menu\n");
 		return 0;
 	}
@@ -233,13 +230,16 @@ int main(int argc, char **argv)
 			} else if (strncmp(argv[i], "-d1", PCSCLITE_MAX_COMSIZE) == 0)
 			{
 				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+				DebugLogA("main: debug messages to stderr");
+				setToForeground = 1;
 			} else if (strncmp(argv[i], "-d2", PCSCLITE_MAX_COMSIZE) == 0)
 			{
 				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
-				DebugLogA("main: debug messages to stdout\n");
+				DebugLogA("main: debug messages to stdout");
+				setToForeground = 1;
 			} else if (strncmp(argv[i], "-fg", PCSCLITE_MAX_COMSIZE) == 0)
 			{
-				DebugLogA("main: pcscd set to foreground\n");
+				DebugLogA("main: pcscd set to foreground");
 				setToForeground = 1;
 			} else if (strncmp(argv[i], "-c", PCSCLITE_MAX_COMSIZE) == 0)
 			{
