@@ -839,222 +839,83 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		int rv;
-
 		DebugLogA("Loading IFD Handler 1.0");
 
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfCloseChannel, "IO_Close_Channel");
+#define GET_ADDRESS_OPTIONALv1(field, function, code) \
+{ \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &rContext->psFunctions.pvf ## field, "IFD_" #function)) \
+	{ \
+		rContext->psFunctions.pvf ## field = NULL; \
+		code \
+	} \
+}
 
-		if (rv != SCARD_S_SUCCESS)
+#define GET_ADDRESSv1(field, function) \
+	GET_ADDRESS_OPTIONALv1(field, function, \
+		DebugLogA("IFDHandler functions missing: " #function ); \
+		exit(1); )
+
+		if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle,
+			&rContext->psFunctions.pvfCloseChannel, "IO_Close_Channel"))
 		{
 			rContext->psFunctions.pvfCloseChannel = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
 
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfGetCapabilities,
-			"IFD_Get_Capabilities");
+		GET_ADDRESSv1(GetCapabilities, Get_Capabilities)
+		GET_ADDRESSv1(SetCapabilities, Set_Capabilities)
+		GET_ADDRESSv1(PowerICC, Power_ICC)
+		GET_ADDRESSv1(TransmitToICC, Transmit_to_ICC)
+		GET_ADDRESSv1(ICCPresence, Is_ICC_Present)
 
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfGetCapabilities = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfSetCapabilities,
-			"IFD_Set_Capabilities");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfSetCapabilities = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfSetProtocol,
-			"IFD_Set_Protocol_Parameters");
-
-		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfSetProtocol = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfPowerICC, "IFD_Power_ICC");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfPowerICC = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfSwallowICC, "IFD_Swallow_ICC");
-
-		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfSwallowICC = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfEjectICC, "IFD_Eject_ICC");
-
-		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfEjectICC = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfConfiscateICC, "IFD_Confiscate_ICC");
-
-		if (rv != SCARD_S_SUCCESS)
-			rContext->psFunctions.pvfConfiscateICC = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfTransmitICC, "IFD_Transmit_to_ICC");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfTransmitICC = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfICCPresent, "IFD_Is_ICC_Present");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfICCPresent = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfICCAbsent, "IFD_Is_ICC_Absent");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfICCAbsent = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-		}
-
+		GET_ADDRESS_OPTIONALv1(SwallowICC, Swallow_ICC, )
+		GET_ADDRESS_OPTIONALv1(EjectICC, Eject_ICC, )
+		GET_ADDRESS_OPTIONALv1(ConfiscateICC, Confiscate_ICC, )
+		GET_ADDRESS_OPTIONALv1(SetProtocolParameters, Set_Protocol_Parameters, )
+		GET_ADDRESS_OPTIONALv1(ICCAbsent, Is_ICC_Absent, )
+	}
+	else if ((rContext->dwVersion == IFD_HVERSION_2_0) || (rContext->dwVersion == IFD_HVERSION_3_0))
+	{
 		/*
 		 * The following binds version 2.0/3.0 of the IFD Handler specs 
 		 */
-	} else if ((rContext->dwVersion == IFD_HVERSION_2_0) || (rContext->dwVersion == IFD_HVERSION_3_0))
-	{
-		int rv;
+
+#define GET_ADDRESS_OPTIONALv3(s, code) \
+{ \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &rContext->psFunctions.pvf ## s, "IFDH" #s)) \
+	{ \
+		rContext->psFunctions.pvf ## s = NULL; \
+		code \
+	} \
+}
+
+#define GET_ADDRESSv3(s) \
+	GET_ADDRESS_OPTIONALv3(s, \
+		DebugLogA("IFDHandler functions missing: " #s ); \
+		exit(1); )
 
 		if (rContext->dwVersion == IFD_HVERSION_2_0)
 			DebugLogA("Loading IFD Handler 2.0");
 		else
 			DebugLogA("Loading IFD Handler 3.0");
 
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfCloseChannel, "IFDHCloseChannel");
+		GET_ADDRESSv3(CloseChannel)
+		GET_ADDRESSv3(GetCapabilities)
+		GET_ADDRESSv3(SetCapabilities)
+		GET_ADDRESSv3(PowerICC)
+		GET_ADDRESSv3(TransmitToICC)
+		GET_ADDRESSv3(Control)
+		GET_ADDRESSv3(ICCPresence)
 
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfCloseChannel = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfGetCapabilities,
-			"IFDHGetCapabilities");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfGetCapabilities = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfSetCapabilities,
-			"IFDHSetCapabilities");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfSetCapabilities = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfSetProtocol,
-			"IFDHSetProtocolParameters");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfSetProtocol = NULL;
-			/*
-			 * Not a completely required function 
-			 */
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfPowerICC, "IFDHPowerICC");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfPowerICC = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfTransmitICC, "IFDHTransmitToICC");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfTransmitICC = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfControl, "IFDHControl");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfControl = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-		rv = DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfICCPresent, "IFDHICCPresence");
-
-		if (rv != SCARD_S_SUCCESS)
-		{
-			rContext->psFunctions.pvfICCPresent = NULL;
-			DebugLogA("IFDHandler functions missing");
-			exit(1);
-		}
-
-	} else
+		GET_ADDRESS_OPTIONALv3(SetProtocolParameters, )
+	}
+	else
 	{
 		/*
 		 * Who knows what could have happenned for it to get here. 
 		 */
-		DebugLogA("IFD Handler not 1.0/2.0/3.0");
+		DebugLogA("IFD Handler not 1.0/2.0 or 3.0");
 		exit(1);
 	}
 
@@ -1072,13 +933,13 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 	rContext->psFunctions.pvfCloseChannel = NULL;
 	rContext->psFunctions.pvfGetCapabilities = NULL;
 	rContext->psFunctions.pvfSetCapabilities = NULL;
-	rContext->psFunctions.pvfSetProtocol = NULL;
+	rContext->psFunctions.pvfSetProtocolParameters = NULL;
 	rContext->psFunctions.pvfPowerICC = NULL;
 	rContext->psFunctions.pvfSwallowICC = NULL;
 	rContext->psFunctions.pvfEjectICC = NULL;
 	rContext->psFunctions.pvfConfiscateICC = NULL;
-	rContext->psFunctions.pvfTransmitICC = NULL;
-	rContext->psFunctions.pvfICCPresent = NULL;
+	rContext->psFunctions.pvfTransmitToICC = NULL;
+	rContext->psFunctions.pvfICCPresence = NULL;
 	rContext->psFunctions.pvfICCAbsent = NULL;
 
 	return SCARD_S_SUCCESS;
