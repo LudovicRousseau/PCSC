@@ -60,8 +60,7 @@ int SHMClientSetupSession(int processID)
 
 	if ((appSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB
-			("SHMInitializeSharedSegment: Error: create on client socket: %s",
+		DebugLogB("SHMInitializeSharedSegment: Error: create on client socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -71,13 +70,10 @@ int SHMClientSetupSession(int processID)
 		sizeof(svc_addr.sun_path));
 
 	if (connect(appSocket, (struct sockaddr *) &svc_addr,
-			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) <
-		0)
+			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) < 0)
 	{
-		DebugLogB
-			("SHMInitializeSharedSegment: Error: connect to client socket: %s",
+		DebugLogB("SHMInitializeSharedSegment: Error: connect to client socket: %s",
 			strerror(errno));
-
 		SYS_CloseFile(appSocket);
 		return -1;
 	}
@@ -85,8 +81,8 @@ int SHMClientSetupSession(int processID)
 	one = 1;
 	if (ioctl(appSocket, FIONBIO, &one) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket "
-			"nonblocking: %s", strerror(errno));
+		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket nonblocking: %s",
+			strerror(errno));
 		SYS_CloseFile(appSocket);
 		return -1;
 	}
@@ -116,8 +112,7 @@ int SHMInitializeCommonSegment()
 	 */
 	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB
-			("SHMInitializeSharedSegment: Unable to create common socket: %s",
+		DebugLogB("SHMInitializeSharedSegment: Unable to create common socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -128,11 +123,9 @@ int SHMInitializeCommonSegment()
 	SYS_Unlink(PCSCLITE_CSOCK_NAME);
 
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
-			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) <
-		0)
+			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
 	{
-		DebugLogB
-			("SHMInitializeSharedSegment: Unable to bind common socket: %s",
+		DebugLogB("SHMInitializeSharedSegment: Unable to bind common socket: %s",
 			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
@@ -140,8 +133,7 @@ int SHMInitializeCommonSegment()
 
 	if (listen(commonSocket, 1) < 0)
 	{
-		DebugLogB
-			("SHMInitializeSharedSegment: Unable to listen common socket: %s",
+		DebugLogB("SHMInitializeSharedSegment: Unable to listen common socket: %s",
 			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
@@ -168,8 +160,7 @@ int SHMProcessCommonChannelRequest()
 	if ((new_sock = accept(commonSocket, (struct sockaddr *) &clnt_addr,
 				&clnt_len)) < 0)
 	{
-		DebugLogB
-			("SHMProcessCommonChannelRequest: ER: Accept on common socket: %s",
+		DebugLogB("SHMProcessCommonChannelRequest: ER: Accept on common socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -402,8 +393,7 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB
-					("SHMProcessEvents: Select returns with failure: %s",
+				DebugLogB("SHMProcessEvents: Select returns with failure: %s",
 					strerror(errno));
 				retval = -1;
 				break;
@@ -516,8 +506,7 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB
-					("SHMProcessEvents: Select returns with failure: %s",
+				DebugLogB("SHMProcessEvents: Select returns with failure: %s",
 					strerror(errno));
 				retval = -1;
 				break;
