@@ -1686,13 +1686,14 @@ static LONG ConvertStatus(SCF_Status_t status)
   return SCARD_F_UNKNOWN_ERROR;
      
 }
+
 LONG SCardCheckReaderAvailability( LPSTR readerName, LONG errorCode ) {
 
   LONG retIndice;
   int i;
 
   retIndice=0; i=0;
-#ifdef 0  
+#if 0
   if ( errorCode != SCARD_S_SUCCESS ) {
     for ( i=0; i < PCSCLITE_MAX_CONTEXTS; i++ ) {
       if ( strcmp(psChannelMap[i].readerName, readerName) == 0 ) {
@@ -1709,10 +1710,27 @@ LONG SCardCheckReaderAvailability( LPSTR readerName, LONG errorCode ) {
   return 0;
 
 }
+
+/*
+ * free resources allocated by the library
+ * You _shall_ call this function if you use dlopen/dlclose to load/unload the
+ * library. Otherwise you will exhaust the ressources available.
+ */
+void SCardUnload(void)
+{
+#if 0
+	if (!isExecuted)
+		return;
+
+	SHMClientCloseSession();
+	SYS_CloseFile(mapAddr);
+	isExecuted = 0;
+#endif
+}
+
 LONG SCardCheckDaemonAvailability() {
 
   LONG rv = 1;	/* assume it exists */
-  int fd;
 
   if ( rv == 0 ) {
     return SCARD_E_NO_SERVICE;
