@@ -1,19 +1,14 @@
-/******************************************************************
- 
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : installifd.c
-            Package: pcsc lite
-            Author : David Corcoran
-            Date   : 5/16/00
-            License: Copyright (C) 2000 David Corcoran
-                     <corcoran@linuxnet.com>
-                     2003 Ludovic Rousseau
-                     <ludovic.rousseau@free.fr>
-            Purpose: This is a reader installer for pcsc-lite.
- 
-$Id$
-
-********************************************************************/
+/*
+ * This is a reader installer for pcsc-lite.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000-2003
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <stdio.h>

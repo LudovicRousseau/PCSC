@@ -1,16 +1,13 @@
- /******************************************************************
- 
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : test.c
-            Package: card edge
-            Author : David Corcoran
-            Date   : 10/04/01
-            License: Copyright (C) 2001 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This tests the virtual card edge
- 
- 
-********************************************************************/
+/*
+ * This tests the virtual card edge.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

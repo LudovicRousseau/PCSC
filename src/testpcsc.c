@@ -1,15 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : test.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This is a test program for pcsc-lite.
-	            
-********************************************************************/
+/*
+ * This is a test program for pcsc-lite.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <stdio.h>

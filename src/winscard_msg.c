@@ -1,16 +1,13 @@
-/******************************************************************
-
-	Title  : winscard_msg.c
-	Package: PC/SC Lite
-	Author : David Corcoran
-	Date   : 04/19/01
-	License: Copyright (C) 2001 David Corcoran
-			<corcoran@linuxnet.com>
-	Purpose: This is responsible for client/server transport.
-
-$Id$
-
-********************************************************************/
+/*
+ * This is responsible for client/server transport.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <fcntl.h>

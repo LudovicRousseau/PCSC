@@ -1,15 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : thread_generic.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 3/24/00
-	    License: Copyright (C) 2000 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This provides system specific thread calls. 
-	            
-********************************************************************/
+/*
+ * This provides system specific thread calls.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __thread_generic_h__
 #define __thread_generic_h__

@@ -1,15 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : thread_unix.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/6/00
-	    License: Copyright (C) 2000 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles thread function abstraction.
-	            
-********************************************************************/
+/*
+ * This handles thread function abstraction.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include "wintypes.h"

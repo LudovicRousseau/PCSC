@@ -1,24 +1,20 @@
-/******************************************************************
- 
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : formaticc.c
-            Package: pcsc lite
-            Author : David Corcoran, Ludovic Rousseau
-            Date   : 5/16/00, 8/16/2002
-            License: Copyright (C) 2000 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This is an APDU robot for pcsc-lite.
- 
-$Id$
-
-********************************************************************/
+/*
+ * This is an APDU robot for pcsc-lite.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000-2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wintypes.h>
 #include <winscard.h>
-#include "configfile.h"
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 64
@@ -235,4 +231,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-

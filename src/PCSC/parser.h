@@ -1,15 +1,14 @@
-/*****************************************************************
-
-  File   :   parser.h
-  Author :   Toni Andjelkovic
-  Date   :   August 11, 2003
-  Purpose:   Reads lexical config files and updates database.
-             See http://www.linuxnet.com for more information.
-  License:   Copyright (C) 2003 Toni Andjelkovic <toni@soth.at>
-             Ludovic Rousseau <ludovic.rousseau@free.fr>
-$Id$
-
-******************************************************************/
+/*
+ * Reads lexical config files and updates database.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2003
+ *  Toni Andjelkovic <toni@soth.at>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 #define TOKEN_MAX_KEY_SIZE   200
 #define TOKEN_MAX_VALUE_SIZE 200

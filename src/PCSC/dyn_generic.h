@@ -1,16 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : dyn_generic.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 8/12/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This abstracts dynamic library loading 
-                     functions. 
-
-********************************************************************/
+/*
+ * This abstracts dynamic library loading functions.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __dyn_generic_h__
 #define __dyn_generic_h__

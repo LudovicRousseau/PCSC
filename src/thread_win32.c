@@ -1,14 +1,13 @@
-/******************************************************************
-
-    MUSCLE SmartCard Development ( http://www.linuxnet.com )
-    Title  : thread_win32.c
-    Package: pcsc lite
-    Author : Jamie Nicolson
-    Date   : 02/20/2003
-    License: Copyright (C) 2003 Netscape Communications Corporation
-    Purpose: This handles thread and mutex functions for Windows.
-
-********************************************************************/
+/*
+ * This handles thread and mutex functions for Windows.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2003
+ *  Jamie Nicolson / Netscape Communications Corporation
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include "thread_generic.h"

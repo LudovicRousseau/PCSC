@@ -1,18 +1,14 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : eventhandler.c
-	Package: pcsc lite
-	Author : David Corcoran
-	Date   : 3/13/00
-	License: Copyright (C) 2000 David Corcoran
-		<corcoran@linuxnet.com>
-	Purpose: This keeps track of card insertion/removal events
-	and updates ATR, protocol, and status information.
-
-$Id$
-
-********************************************************************/
+/*
+ * This keeps track of card insertion/removal events
+ * and updates ATR, protocol, and status information.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <sys/types.h>

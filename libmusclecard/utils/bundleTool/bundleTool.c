@@ -1,20 +1,13 @@
-/******************************************************************
- 
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : bundleTool.c
-	Package: MuscleCard Framework
-	Author : David Corcoran
-	Date   : 03/11/01
-	License: Copyright (C) 2002 David Corcoran
-			<corcoran@linuxnet.com>
-	Purpose: This automatically updates the Info.plist
-
-	You may not remove this header from this file
-	without prior permission from the author.
-
-$Id$
- 
-********************************************************************/
+/*
+ * This automatically updates the Info.plist.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001-2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <string.h>

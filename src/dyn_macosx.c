@@ -1,16 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : dyn_macosx.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 3/15/00
-            License: Copyright (C) 2000 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This abstracts dynamic library loading 
-                     functions and timing. 
-
-********************************************************************/
+/*
+ * This abstracts dynamic library loading functions and timing.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #ifdef __APPLE__

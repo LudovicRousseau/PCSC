@@ -1,18 +1,16 @@
-/******************************************************************
- 
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : musclecard.h
-            Package: MuscleCard Framework
-            Author : David Corcoran
-            Date   : 11/28/01
-            License: Copyright (C) 2001 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This abstracts the MUSCLE Card Edge Inteface
-
-	    You may not remove this header from this file
-	    without prior permission from the author.
- 
-********************************************************************/
+/*
+ * This abstracts the MUSCLE Card Edge Inteface.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001-2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * You may not remove this header from this file
+ * without prior permission from the author.
+ *
+ * $Id$
+ */
 
 #ifndef __musclecard_h__
 #define __musclecard_h__

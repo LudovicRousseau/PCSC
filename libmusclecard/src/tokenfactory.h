@@ -1,16 +1,16 @@
-/******************************************************************
+/*
+ * This handles card abstraction attachment.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2000
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : cardfactory.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 01/01/00
-            Purpose: This handles card abstraction attachment. 
-	            
-********************************************************************/
-
-#ifndef __cardfactory_h__
-#define __cardfactory_h__
+#ifndef __tokenfactory_h__
+#define __tokenfactory_h__
 
 #include "mscdefines.h"
 
@@ -30,4 +30,4 @@ extern "C"
 }
 #endif
 
-#endif							/* __cardfactory_h__ */
+#endif							/* __tokenfactory_h__ */

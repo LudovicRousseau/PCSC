@@ -1,17 +1,14 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : pcsclite.h
-	Package: pcsc lite
-	Author : David Corcoran
-	Date   : 7/27/99
-	License: Copyright (C) 1999 David Corcoran
-			<corcoran@linuxnet.com>
-	Purpose: This keeps a list of defines for pcsc lite.            
-
-$Id$
-
-********************************************************************/
+/*
+ * This keeps a list of defines for pcsc-lite.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999-2003
+ * 	David Corcoran <corcoran@linuxnet.com>
+ * 	Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 #ifndef __pcsclite_h__
 #define __pcsclite_h__

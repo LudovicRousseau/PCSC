@@ -1,14 +1,13 @@
-/*****************************************************************
-/
-/ File   :   configfile.h
-/ Author :   David Corcoran
-/ Date   :   February 12, 1999 modified 7/28/99
-/ License:   Copyright (C) 1999 David Corcoran
-/	     <corcoran@linuxnet.com>
-/ Purpose:   Header file for reading lexical config files.
-/            See http://www.linuxnet.com for more information.
-/
-******************************************************************/
+/*
+ * Header file for reading lexical config files.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __configfile_h__
 #define __configfile_h__

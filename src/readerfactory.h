@@ -1,16 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : readerfactory.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This keeps track of a list of currently 
-	             available reader structures.
-
-********************************************************************/
+/*
+ * This keeps track of a list of currently available reader structures.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __readerfactory_h__
 #define __readerfactory_h__

@@ -1,16 +1,14 @@
-/******************************************************************
-
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : winscard_scf.c
-            Package: pcsc-lite
-            Author : Najam Siddiqui
-                     David Corcoran
-            Date   : 6/24/02
-            License: Copyright (C) 2002 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This provides PC/SC to SCF shimming.. 
-                     Copy this file to pcsc-lite../src/winscard_clnt.c
-********************************************************************/
+/*
+ * This provides PC/SC to SCF shimming.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Najam Siddiqui
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <stdlib.h>

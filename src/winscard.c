@@ -1,20 +1,15 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : winscard.c
-	Package: pcsc lite
-	Author : David Corcoran
-	Date   : 7/27/1999, 11/29/2002
-	License: Copyright (C) 1999 David Corcoran
-				<corcoran@linuxnet.com>
-			Copyright (C) 2002,2003 Ludovic Rousseau
-				<ludovic.rousseau@free.fr>
-	Purpose: This handles smartcard reader communications. 
-		This is the heart of the M$ smartcard API.
-
-	$Id$
-
-********************************************************************/
+/*
+ * This handles smartcard reader communications.
+ * This is the heart of the M$ smartcard API.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999-2003
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <stdlib.h>

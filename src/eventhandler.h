@@ -1,15 +1,14 @@
-/******************************************************************
-
-            Title  : eventhandler.h
-            Package: PC/SC Lite
-            Author : David Corcoran
-            Date   : 10/06/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles card insertion/removal events, 
-                     updates ATR, protocol, and status information.
-
-********************************************************************/
+/*
+ * This handles card insertion/removal events, updates ATR,
+ * protocol, and status information.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __eventhandler_h__
 #define __eventhandler_h__

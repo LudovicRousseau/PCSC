@@ -1,14 +1,13 @@
-/*****************************************************************
-/
-/ File   :   ifdhandler.h
-/ Author :   David Corcoran
-/ Date   :   November 7, 1998
-/ License:   Copyright (C) 1999 David Corcoran
-/	     <corcoran@linuxnet.com>
-/ Purpose:   This provides reader specific low-level calls.
-/            See http://www.linuxnet.com for more information.
-/
-******************************************************************/
+/*
+ * This provides reader specific low-level calls.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef _ifd_handler_h_
 #define _ifd_handler_h_

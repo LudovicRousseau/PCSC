@@ -1,16 +1,14 @@
-/******************************************************************
-
-            Title  : ifdwrapper.h
-            Package: PC/SC Lite
-            Author : David Corcoran
-            Date   : 10/08/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This wraps the dynamic ifdhandler functions.
-	             This abstraction will eventually allow multiple card
-	             slots in the same terminal.
-
-********************************************************************/
+/*
+ * This wraps the dynamic ifdhandler functions. The abstraction will
+ * eventually allow multiple card slots in the same terminal.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __ifdwrapper_h__
 #define __ifdwrapper_h__

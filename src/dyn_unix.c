@@ -1,16 +1,13 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : dyn_unix.c
-	Package: pcsc lite
-	Author : David Corcoran
-	Date   : 8/12/99
-	License: Copyright (C) 1999 David Corcoran <corcoran@linuxnet.com>
-	Purpose: This abstracts dynamic library loading functions and timing. 
-
-$Id$
-
-********************************************************************/
+/*
+ * This abstracts dynamic library loading functions and timing.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #include <stdio.h>

@@ -1,19 +1,16 @@
-/******************************************************************
-
-        MUSCLE SmartCard Development ( http://www.linuxnet.com )
-            Title  : mscdefines.h
-            Package: MuscleCard Framework
-            Author : David Corcoran
-            Date   : 10/02/01
-            License: Copyright (C) 2001-2002 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This provides high level definitions for
-                     data types, structures.
-
-	    You may not remove this header from this file
-	    without prior permission from the author.
-   
-********************************************************************/
+/*
+ * This provides high level definitions for data types, structures.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001-2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * You may not remove this header from this file
+ * without prior permission from the author.
+ *
+ * $Id$
+ */
 
 #ifndef __mscdefines_h__
 #define __mscdefines_h__

@@ -1,17 +1,14 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-    Title  : debuglog.h
-    Package: pcsc lite
-	Authors: David Corcoran, Ludovic Rousseau
-	Date   : 7/27/99, updated 11 Aug, 2002
-	License: Copyright (C) 1999,2002 David Corcoran
-			<corcoran@linuxnet.com>
-	Purpose: This handles debugging. 
-
-$Id$
-
-********************************************************************/
+/*
+ * This handles debugging.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999-2002
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 /*
  * log message is sent to syslog, stdout or stderr depending on --debug

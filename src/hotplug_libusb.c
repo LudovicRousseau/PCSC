@@ -1,19 +1,17 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : hotplug_linux.c
-	Package: pcsc lite
-	Author : David Corcoran, Ludovic Rousseau
-	Date   : 02/28/01, last update 4/6/2003
-	License: Copyright (C) 2001,2003 David Corcoran, Ludovic Rousseau
-			<corcoran@linuxnet.com>
-	Purpose: This provides a search API for hot pluggble devices.
-	Credits: The USB code was based partly on Johannes Erdfelt
-		libusb code found at libusb.sourceforge.org
-
-$Id$
-
-********************************************************************/
+/*
+ * This provides a search API for hot pluggble devices.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001-2003
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * The USB code was based partly on Johannes Erdfelt
+ * libusb code found at libusb.sourceforge.net
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #ifdef HAVE_LIBUSB

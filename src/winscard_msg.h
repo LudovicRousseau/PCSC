@@ -1,16 +1,14 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : winscard_msg.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 03/30/01
-	    License: Copyright (C) 2001 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This defines some structures and defines to
-	             be used over the transport layer.
-
-********************************************************************/
+/*
+ * This defines some structures and defines to be used over
+ * the transport layer.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #ifndef __winscard_msg_h__
 #define __winscard_msg_h__

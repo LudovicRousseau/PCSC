@@ -1,17 +1,15 @@
-/******************************************************************
-
-	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	Title  : hotplug_macosx.c
-	Package: pcsc lite
-	Author : Stephen M. Webb <stephenw@cryptocard.com>
-			Ludovic Rousseau <ludovic.rousseau@free.fr>
-	Date   : 03 Dec 2002
-	License: Copyright (C) 2002 David Corcoran <corcoran@linuxnet.com>
-
-	Purpose: This provides a search API for hot pluggble devices.
-
-$Id$
-********************************************************************/
+/*
+ * This provides a search API for hot pluggble devices.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2002
+ *  Stephen M. Webb <stephenw@cryptocard.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 #include "config.h"
 #ifdef __APPLE__
