@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 38;
+	objectVersion = 34;
 	objects = {
 		01B2E3050091091211CD2984 = {
 			buildRules = (
@@ -87,18 +87,6 @@
 			settings = {
 			};
 		};
-		F503CAD90254283801B94B21 = {
-			fileRef = F503CAD40254283801B94B21;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F503CADA0254283801B94B21 = {
-			fileRef = F503CAD40254283801B94B21;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F503CADB025428F601B94B21 = {
 			isa = PBXFrameworkReference;
 			name = CoreFoundation.framework;
@@ -163,7 +151,8 @@
 				F511212B0272F895017BB957,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/corcoran/Sources/muscle/PCSC/pbx/build;
+				CURRENT_PROJECT_VERSION = 7;
+				FRAMEWORK_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/bin/;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
@@ -171,6 +160,7 @@
 				PRODUCT_NAME = pcsctool;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
@@ -257,8 +247,6 @@
 				F52A93D402541D8C01B94B21,
 				F5294AD40090CAE601CD285A,
 				F52A93DA02541D8C01B94B21,
-				F52A93DF02541D8C01B94B21,
-				F52A93E602541DC601B94B21,
 				F51121270272F895017BB957,
 			);
 		};
@@ -346,8 +334,6 @@
 				F5294AD30090CAE601CD285A,
 				F52A93D102541D8C01B94B21,
 				F52A93D202541D8C01B94B21,
-				F52A93D302541D8C01B94B21,
-				F52A93E502541DC601B94B21,
 				F51121260272F895017BB957,
 			);
 			isa = PBXGroup;
@@ -367,16 +353,18 @@
 				F5294A840090C73501CD285A,
 			);
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 7;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "/System/Library/Frameworks/CoreFoundation.framework/Headers /System/Library/Frameworks/IOKit.framework/Headers/usb /System/Library/Frameworks/IOKit.framework/Headers";
 				INSTALL_PATH = /usr/sbin;
-				LIBRARY_SEARCH_PATHS = "\"\" \"\" \"\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DPCSC_DEBUG=1 -DUSE_SYSLOG=1 -DUSE_DAEMON=1";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = pcscd;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
@@ -463,6 +451,7 @@
 				F5294AD80090CAE601CD285A,
 			);
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 7;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/bin;
 				OTHER_CFLAGS = "";
@@ -471,6 +460,7 @@
 				PRODUCT_NAME = pcsctest;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
@@ -519,11 +509,6 @@
 			path = mcardtest;
 			refType = 3;
 		};
-		F52A93D302541D8C01B94B21 = {
-			isa = PBXBundleReference;
-			path = ifdhandler.bundle;
-			refType = 3;
-		};
 		F52A93D402541D8C01B94B21 = {
 			buildPhases = (
 				F52A93D502541D8C01B94B21,
@@ -533,8 +518,9 @@
 				F52A93D902541D8C01B94B21,
 			);
 			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
+				DYLIB_COMPATIBILITY_VERSION = 7;
+				DYLIB_CURRENT_VERSION = 7;
 				FRAMEWORK_SEARCH_PATHS = "";
 				FRAMEWORK_VERSION = A;
 				INSTALL_PATH = /System/Library/Frameworks;
@@ -545,6 +531,7 @@
 				PRINCIPAL_CLASS = "";
 				PRODUCT_NAME = PCSC;
 				SECTORDER_FLAGS = "";
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -556,31 +543,31 @@
 			productName = PCSC;
 			productReference = F52A93D102541D8C01B94B21;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>PCSC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>PCSC 3.0 Copyright © 2002, David Corcoran</string>
+	<string>PCSC 7.0 Copyright © 2002, David Corcoran</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>com.apple.pcsc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
+	<string>7.0</string>
 	<key>CFBundleName</key>
 	<string>pcsc-lite</string>
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.0</string>
+	<string>7.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>3.0</string>
+	<string>7.0</string>
 </dict>
 </plist>
 ";
@@ -645,6 +632,7 @@
 				F52A93DE02541D8C01B94B21,
 			);
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 7;
 				FRAMEWORK_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
@@ -652,6 +640,7 @@
 				PRODUCT_NAME = mcardtest;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
@@ -685,187 +674,6 @@
 			isa = PBXFrameworksBuildPhase;
 		};
 		F52A93DE02541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXRezBuildPhase;
-		};
-		F52A93DF02541D8C01B94B21 = {
-			buildPhases = (
-				F52A93E002541D8C01B94B21,
-				F52A93E102541D8C01B94B21,
-				F52A93E202541D8C01B94B21,
-				F52A93E302541D8C01B94B21,
-				F52A93E402541D8C01B94B21,
-			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bundle -undefined suppress";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = ifdhandler;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = bundle;
-			};
-			dependencies = (
-			);
-			isa = PBXBundleTarget;
-			name = ifdhandler;
-			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
-			productName = ifdhandler;
-			productReference = F52A93D302541D8C01B94B21;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string></string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>BNDL</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.0.1d1</string>
-</dict>
-</plist>
-";
-			shouldUseHeadermap = 0;
-		};
-		F52A93E002541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-				F503CAD90254283801B94B21,
-			);
-			isa = PBXHeadersBuildPhase;
-		};
-		F52A93E102541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-		};
-		F52A93E202541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXSourcesBuildPhase;
-		};
-		F52A93E302541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-				F58F21350257B6E101ABCE6C,
-			);
-			isa = PBXFrameworksBuildPhase;
-		};
-		F52A93E402541D8C01B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXRezBuildPhase;
-		};
-		F52A93E502541DC601B94B21 = {
-			isa = PBXBundleReference;
-			path = mcardplugin.bundle;
-			refType = 3;
-		};
-		F52A93E602541DC601B94B21 = {
-			buildPhases = (
-				F52A93E702541DC601B94B21,
-				F52A93E802541DC601B94B21,
-				F52A93E902541DC601B94B21,
-				F52A93EA02541DC601B94B21,
-				F52A93EB02541DC601B94B21,
-			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bundle -undefined suppress";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = mcardplugin;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = bundle;
-			};
-			dependencies = (
-			);
-			isa = PBXBundleTarget;
-			name = mcardplugin;
-			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
-			productName = mcardplugin;
-			productReference = F52A93E502541DC601B94B21;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string></string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>BNDL</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.0.1d1</string>
-</dict>
-</plist>
-";
-			shouldUseHeadermap = 0;
-		};
-		F52A93E702541DC601B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-				F503CADA0254283801B94B21,
-			);
-			isa = PBXHeadersBuildPhase;
-		};
-		F52A93E802541DC601B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-		};
-		F52A93E902541DC601B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXSourcesBuildPhase;
-		};
-		F52A93EA02541DC601B94B21 = {
-			buildActionMask = 2147483647;
-			files = (
-				F58F21360257B6E101ABCE6C,
-			);
-			isa = PBXFrameworksBuildPhase;
-		};
-		F52A93EB02541DC601B94B21 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1456,18 +1264,6 @@
 			};
 		};
 		F58F21340257B6E001ABCE6C = {
-			fileRef = F58F21310257B6E001ABCE6C;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F58F21350257B6E101ABCE6C = {
-			fileRef = F58F21310257B6E001ABCE6C;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F58F21360257B6E101ABCE6C = {
 			fileRef = F58F21310257B6E001ABCE6C;
 			isa = PBXBuildFile;
 			settings = {

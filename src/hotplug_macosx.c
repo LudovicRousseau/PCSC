@@ -19,7 +19,7 @@
 #include <IOUSBLib.h>
 #include <string.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <CoreFoundation/CFPlugin.h>
+#include <CoreFoundation/CFPlugIn.h>
 #include <CoreFoundation/CFBundle.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFURL.h>
