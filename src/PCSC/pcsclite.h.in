@@ -164,8 +164,8 @@ extern "C"
 #else
 #define PCSCLITE_IPC_DIR		USE_IPCDIR
 #endif
-#define PCSCLITE_PUBSHM_FILE            PCSCLITE_IPC_DIR "/pcsc.pub"
-#define PCSCLITE_CSOCK_NAME             PCSCLITE_IPC_DIR "/pcsc.comm"
+#define PCSCLITE_PUBSHM_FILE            PCSCLITE_IPC_DIR "/pcscd.pub"
+#define PCSCLITE_CSOCK_NAME             PCSCLITE_IPC_DIR "/pcscd.comm"
 
 #define PCSCLITE_SVC_IDENTITY	     0x01030000	/* Service ID */
 
