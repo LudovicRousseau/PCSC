@@ -31,7 +31,7 @@
 #include "ifdwrapper.h"
 #include "debuglog.h"
 
-static PREADER_CONTEXT sContexts[PCSCLITE_MAX_CONTEXTS];
+static PREADER_CONTEXT sContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static DWORD *dwNumContexts = 0;
 
 LONG RFAllocateReaderSpace(DWORD dwAllocNum)
@@ -99,7 +99,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	 */
 	if (dwNumContexts != 0)
 	{
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			if ((sContexts[i])->vHandle != 0)
 			{
@@ -120,7 +120,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	/*
 	 * We must find an empty spot to put the reader structure 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle == 0)
 		{
@@ -129,7 +129,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
 		/*
 		 * No more spots left return 
@@ -158,7 +158,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	(sContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << (sizeof(DWORD) / 2) * 8;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		(sContexts[dwContext])->psHandles[i].hCard = 0;
 	}
@@ -166,7 +166,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	/*
 	 * If a clone to this reader exists take some values from that clone 
 	 */
-	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_CONTEXTS)
+	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
 		(sContexts[dwContext])->dwFeeds = 
 		  (sContexts[parentNode])->dwFeeds;
@@ -319,7 +319,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			 * We must find an empty spot to put the 
 			 * reader structure 
 			 */
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if ((sContexts[i])->vHandle == 0)
 				{
@@ -328,7 +328,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				}
 			}
 
-			if (i == PCSCLITE_MAX_CONTEXTS)
+			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				/*
 				 * No more spots left return 
@@ -375,7 +375,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			(sContexts[dwContextB])->dwIdentity =
 				(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
 
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 			{
 				(sContexts[dwContextB])->psHandles[i].hCard = 0;
 			}
@@ -532,7 +532,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		sContext->dwIdentity = 0;
 		sContext->dwPublicID = 0;
 
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 		{
 			sContext->psHandles[i].hCard = 0;
 		}
@@ -555,7 +555,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	static int lastDigit = 0;
 	int currentDigit;
 	int supportedChannels;
-	int usedDigits[PCSCLITE_MAX_CONTEXTS];
+	int usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
 	int i;
 
 	currentDigit = -1;
@@ -567,7 +567,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	/*
 	 * Clear the taken list 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		usedDigits[i] = 0;
 	}
@@ -576,7 +576,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	{
 		if (*dwNumContexts != 0)
 		{
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if ((sContexts[i])->vHandle != 0)
 				{
@@ -662,7 +662,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 		} else
 		{
 
-			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if (usedDigits[i] == 0)
 				{
@@ -670,7 +670,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 				}
 			}
 
-			if (i == PCSCLITE_MAX_CONTEXTS)
+			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				return -1;
 			} else if (i > supportedChannels)
@@ -749,7 +749,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 	/*
 	 * Ignore the groups for now, return all readers 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
@@ -798,7 +798,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 	/*
 	 * Creating MultiString 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
@@ -829,7 +829,7 @@ LONG RFReaderInfo(LPSTR lpcReader, PREADER_CONTEXT * sReader)
 		return SCARD_E_UNKNOWN_READER;
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
@@ -857,7 +857,7 @@ LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 	i = 0;
 	tmplen = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
@@ -895,7 +895,7 @@ LONG RFReaderInfoById(DWORD dwIdentity, PREADER_CONTEXT * sReader)
 	dwIdentity = dwIdentity >> (sizeof(DWORD) / 2) * 8;
 	dwIdentity = dwIdentity << (sizeof(DWORD) / 2) * 8;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (dwIdentity == (sContexts[i])->dwIdentity)
 		{
@@ -1353,7 +1353,7 @@ LONG RFUnblockContext(SCARDCONTEXT hContext)
 	 */
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		(sContexts[i])->dwBlockStatus = hContext;
 	}
@@ -1473,11 +1473,11 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 
 	while (1)
 	{
-		for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			if ((sContexts[i])->vHandle != 0)
 			{
-				for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+				for (j = 0; j < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; j++)
 				{
 					if ((rContext->dwIdentity + randHandle) ==
 						(sContexts[i])->psHandles[j].hCard)
@@ -1497,7 +1497,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 		 * found and the loop can be exited. 
 		 */
 
-		if (i == PCSCLITE_MAX_CONTEXTS)
+		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			break;
 		}
@@ -1514,11 +1514,11 @@ LONG RFFindReaderHandle(SCARDHANDLE hCard)
 	i = 0;
 	j = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
-			for (j = 0; j < PCSCLITE_MAX_CONTEXTS; j++)
+			for (j = 0; j < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; j++)
 			{
 				if (hCard == (sContexts[i])->psHandles[j].hCard)
 				{
@@ -1543,7 +1543,7 @@ LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		if (rContext->psHandles[i].hCard == 0)
 		{
@@ -1553,7 +1553,7 @@ LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
 	{	/* List is full */
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
@@ -1567,7 +1567,7 @@ LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		if (rContext->psHandles[i].hCard == hCard)
 		{
@@ -1577,7 +1577,7 @@ LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
 	{	/* Not Found */
 		return SCARD_E_INVALID_HANDLE;
 	}
@@ -1594,7 +1594,7 @@ LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 	/*
 	 * Set all the handles for that reader to the event 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		if (rContext->psHandles[i].hCard != 0)
 		{
@@ -1611,7 +1611,7 @@ LONG RFCheckReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		if (rContext->psHandles[i].hCard == hCard)
 		{
@@ -1640,7 +1640,7 @@ LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	int i;
 	i = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
 		if (rContext->psHandles[i].hCard == hCard)
 		{
@@ -1648,7 +1648,7 @@ LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 		}
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
 	{	/* Not Found */
 		return SCARD_E_INVALID_HANDLE;
 	}
@@ -1675,7 +1675,7 @@ void RFCleanupReaders(int shouldExit)
 	char lpcStripReader[MAX_READERNAME];
 
 	DebugLogA("RFCleanupReaders: entering cleaning function");
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (sContexts[i]->vHandle != 0)
 		{
@@ -1710,7 +1710,7 @@ void RFSuspendAllReaders()
 {
         int i;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sContexts[i])->vHandle != 0)
 		{
@@ -1729,7 +1729,7 @@ void RFAwakeAllReaders()
         
         initFlag = 0;
 
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
                 /* If the library is loaded and the event handler is not running */
 	        if ( ((sContexts[i])->vHandle   != 0) &&

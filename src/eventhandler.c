@@ -30,7 +30,7 @@
 #include "debuglog.h"
 #include "prothandler.h"
 
-static PREADER_STATES readerStates[PCSCLITE_MAX_CONTEXTS];
+static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 void EHStatusHandlerThread(PREADER_CONTEXT);
 
@@ -61,13 +61,13 @@ LONG EHInitializeEventStructures()
 	/*
 	 * Jump to end of file space and allocate zero's 
 	 */
-	SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_CONTEXTS);
+	SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_READERS_CONTEXTS);
 	SYS_WriteFile(fd, "", 1);
 
 	/*
 	 * Allocate each reader structure 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		readerStates[i] = (PREADER_STATES)
 			SYS_MemoryMap(sizeof(READER_STATES), fd, (i * pageSize));
@@ -180,13 +180,13 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	/*
 	 * Find an empty reader slot and insert the new reader 
 	 */
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((readerStates[i])->readerID == 0)
 			break;
 	}
 
-	if (i == PCSCLITE_MAX_CONTEXTS)
+	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		return SCARD_F_INTERNAL_ERROR;
 
 	/*
