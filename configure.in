@@ -13,7 +13,7 @@ dnl Automake boilerplate.
 AC_CANONICAL_HOST
 
 dnl Every other copy of the package version number gets its value from here
-AM_INIT_AUTOMAKE(pcsc-lite, 1.2.0-rc1)
+AM_INIT_AUTOMAKE(pcsc-lite, 1.2.0-rc2)
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
