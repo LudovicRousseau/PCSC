@@ -60,14 +60,14 @@ static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
 MSC_RV pcscToMSC(MSCLong32);
 MSC_RV MSCReEstablishConnection(MSCLPTokenConnection);
 
-void mscLockThread()
+static void mscLockThread(void)
 {
 #ifdef USE_THREAD_SAFETY
 	SYS_MutexLock(&PCSC_MCARD_mutex);
 #endif
 }
 
-void mscUnLockThread()
+static void mscUnLockThread(void)
 {
 #ifdef USE_THREAD_SAFETY
 	SYS_MutexUnLock(&PCSC_MCARD_mutex);
@@ -864,7 +864,7 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	return MSC_SUCCESS;
 }
 
-MSC_RV MSCCallbackCancelEvent()
+MSC_RV MSCCallbackCancelEvent(void)
 {
 
         LONG rv;

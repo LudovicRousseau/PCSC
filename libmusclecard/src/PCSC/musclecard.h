@@ -726,7 +726,7 @@ extern "C"
 	 * Cancels all callback registrations 
 	 */
 	PCSC_API
-	MSC_RV MSCCallbackCancelEvent();
+	MSC_RV MSCCallbackCancelEvent(void);
 
 	/*
 	 * Locks a transaction to the token 
