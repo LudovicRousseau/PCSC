@@ -7,7 +7,7 @@
 	Date   : 7/27/1999, 11/29/2002
 	License: Copyright (C) 1999 David Corcoran
 				<corcoran@linuxnet.com>
-			Copyright (C) 2002 Ludovic Rousseau
+			Copyright (C) 2002,2003 Ludovic Rousseau
 				<ludovic.rousseau@free.fr>
 	Purpose: This handles smartcard reader communications. 
 		This is the heart of the M$ smartcard API.
@@ -1071,7 +1071,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 			else
 			{        /* may report only reader name len */
 				*pcchReaderLen = strlen(rContext->lpcReader);
-				return SCARD_E_INSUFFICIENT_BUFFER;
+				rv = SCARD_E_INSUFFICIENT_BUFFER;
 			}           
 		}
 		else
@@ -1109,7 +1109,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 			else
 			{ /* may report only ATR len */
 				*pcbAtrLen = rContext->dwAtrLen;
-				return SCARD_E_INSUFFICIENT_BUFFER;
+				rv = SCARD_E_INSUFFICIENT_BUFFER;
 			}           
 		}
 		else
@@ -1129,7 +1129,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		}
 	}
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
