@@ -39,11 +39,15 @@ extern "C"
 #define PCSCLITE_THREAD_FUNCTION(f)      void *(*f)(void *)
 #endif
 
+/* thread attributes */
+#define THREAD_ATTR_DEFAULT			0
+#define THREAD_ATTR_DETACHED		1
+
 	int SYS_MutexInit(PCSCLITE_MUTEX_T);
 	int SYS_MutexDestroy(PCSCLITE_MUTEX_T);
 	int SYS_MutexLock(PCSCLITE_MUTEX_T);
 	int SYS_MutexUnLock(PCSCLITE_MUTEX_T);
-	int SYS_ThreadCreate(PCSCLITE_THREAD_T *, LPVOID, PCSCLITE_THREAD_FUNCTION( ), LPVOID);
+	int SYS_ThreadCreate(PCSCLITE_THREAD_T *, int, PCSCLITE_THREAD_FUNCTION( ), LPVOID);
 	int SYS_ThreadCancel(PCSCLITE_THREAD_T *);
 	int SYS_ThreadDetach(PCSCLITE_THREAD_T);
 	int SYS_ThreadJoin(PCSCLITE_THREAD_T *, LPVOID*);
