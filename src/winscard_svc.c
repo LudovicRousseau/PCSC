@@ -76,7 +76,7 @@ LONG CreateContextThread(PDWORD pdwClientID)
 	
 	dwNextContextIndex = i;
 
-	if (SYS_ThreadCreate(&psContext[i].pthThread, NULL,
+	if (SYS_ThreadCreate(&psContext[i].pthThread, THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( )) ContextThread,
 		(LPVOID) &dwNextContextIndex) != 1)
 	{
