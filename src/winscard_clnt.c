@@ -677,7 +677,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 				/*
 				 * This helps prevent starvation
 				 */
-				randnum = SYS_Random(randnum, 1000.0, 10000.0);
+				randnum = SYS_RandomInt(1000, 10000);
 				SYS_USleep(randnum);
 
 				if ((readerStates[i])->lockState == 0)
@@ -798,7 +798,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * This helps prevent starvation
 	 */
-	randnum = SYS_Random(randnum, 1000.0, 10000.0);
+	randnum = SYS_RandomInt(1000, 10000);
 	SYS_USleep(randnum);
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	

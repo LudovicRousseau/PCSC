@@ -64,8 +64,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	 * identified by clients and distinguished from others
 	 */
 
-	*phContext = (PCSCLITE_SVC_IDENTITY + SYS_Random(SYS_GetSeed(),
-			1.0, 65535.0));
+	*phContext = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
 
 	DebugLogB("Establishing Context: %d", *phContext);
 

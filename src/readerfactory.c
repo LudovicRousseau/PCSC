@@ -1136,7 +1136,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 	 * Create a random handle with 16 bits check to see if it already is
 	 * used. 
 	 */
-	randHandle = SYS_Random(SYS_GetSeed(), 10, 65000);
+	randHandle = SYS_RandomInt(10, 65000);
 
 	while (1)
 	{
@@ -1156,7 +1156,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 						/*
 						 * Get a new handle and loop again 
 						 */
-						randHandle = SYS_Random(randHandle, 10, 65000);
+						randHandle = SYS_RandomInt(10, 65000);
 						continue;
 					}
 				}

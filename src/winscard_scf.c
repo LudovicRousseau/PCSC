@@ -1315,8 +1315,7 @@ static LONG getNewHandle(SCARDCONTEXT hContext,LPCTSTR szReader,
   }
   
   while(1) {
-    *phCard =  (PCSCLITE_SVC_IDENTITY + SYS_Random(SYS_GetSeed(), 
-						   1.0, 65535.0));
+    *phCard = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
     if(SCardGetHandleIndice(*phCard) == -1)
       break;
   }
@@ -1355,8 +1354,7 @@ static LONG getNewContext(SCARDCONTEXT *phContext) {
   if (status != SCF_STATUS_SUCCESS) return SCARD_E_NO_SERVICE;
    
   while(1) {
-    *phContext = (PCSCLITE_SVC_IDENTITY + SYS_Random(SYS_GetSeed(), 
-						   1.0, 65535.0));
+    *phContext = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
     if(-1 == SCardGetContextIndice(*phContext))
       break;
   }
