@@ -27,7 +27,10 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 ChangeLog.cvs:
-	rcs2log > $@
+	rcs2log | perl -e 'while (<>) { s/corcoran /David Corcoran /; \
+	s/oznet /Chris Osgood /; s/cprados /Carlos Prados /; \
+	s/mikeg /Michael Gile /; s/rousseau /Ludovic Rousseau /; \
+	s+/home/cvsroot/muscle/PCSC/++g; print ; }' > $@
 
 .PHONY: ChangeLog.cvs
 
