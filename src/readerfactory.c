@@ -92,7 +92,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			if ((sReadersContexts[i])->vHandle != 0)
 			{
 				strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
-					MAX_READERNAME);
+					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
@@ -810,7 +810,7 @@ LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
-				MAX_READERNAME);
+				sizeof(lpcStripReader));
 			tmplen = strlen(lpcStripReader);
 			lpcStripReader[tmplen - 6] = 0;
 
@@ -1586,7 +1586,7 @@ void RFCleanupReaders(int shouldExit)
 			DebugLogB("Stopping reader: %s", sReadersContexts[i]->lpcReader);
 
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
-				MAX_READERNAME);
+				sizeof(lpcStripReader));
 			/*
 			 * strip the 6 last char ' 00 00' 
 			 */
