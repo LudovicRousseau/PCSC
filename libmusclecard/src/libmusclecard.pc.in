@@ -7,6 +7,6 @@ muscledropdir=@muscledropdir@
 Name: MuscleCard
 Description: MuscleCard interface (uses PC/SC smart card interface)
 Version: @VERSION@
-Requires: libpcsclite = @VERSION@
+Requires: libpcsclite
 Libs: -L${libdir} -lmusclecard
 Cflags: -I${includedir}
