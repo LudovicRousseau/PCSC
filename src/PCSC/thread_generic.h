@@ -39,6 +39,8 @@ extern "C"
 
 	int SYS_ThreadDetach(PCSCLITE_THREAD_T);
 
+        int SYS_ThreadJoin(PCSCLITE_THREAD_T *, LPVOID*);
+
 	int SYS_ThreadExit(LPVOID);
 
 #ifdef __cplusplus

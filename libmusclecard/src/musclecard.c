@@ -43,7 +43,7 @@ static PCSCLITE_MUTEX mcardMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static SCARDCONTEXT localHContext = 0;
 static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
-static pthread_t callbackThread;
+static PCSCLITE_THREAD_T callbackThread;
 
 /*
  * internal function 
@@ -746,7 +746,7 @@ void *_MSCEventThread(void *arg)
 
 	if (arg == NULL)
 	{
-		pthread_exit(NULL);
+		SYS_ThreadExit(NULL);
 	}
 
 	evlist = (MSCLPEventWaitInfo) arg;
@@ -785,7 +785,7 @@ void *_MSCEventThread(void *arg)
 
 	free(evlist);
 	blockingContext = MSC_BLOCKSTATUS_RESUME;
-	pthread_exit(&rv);
+	SYS_ThreadExit(&rv);
 
 }
 
@@ -796,6 +796,12 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 {
 	MSCLPEventWaitInfo evlist;
 	MSCULong32 curToken;
+
+
+        if (blockingContext == MSC_BLOCKSTATUS_BLOCKING)
+	{  
+	        return MSC_OPERATION_NOT_ALLOWED;
+	}
 
 	/*
 	 * Create the event wait list 
@@ -839,8 +845,8 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	}
 	mscUnLockThread();
 
-	if (pthread_create(&callbackThread, NULL, _MSCEventThread, 
-			   (void *) evlist))
+	if (SYS_ThreadCreate(&callbackThread, NULL, _MSCEventThread, 
+			     (void *) evlist))
 	{
 		return MSC_INTERNAL_ERROR;
 	}
@@ -859,16 +865,8 @@ MSC_RV MSCCallbackCancelEvent()
                 blockingContext = MSC_BLOCKSTATUS_CANCELLING;
 	        rv = MSCCancelEventWait();
 
-		pthread_join(&callbackThread, 0);
+		SYS_ThreadJoin(&callbackThread, 0);
 
-		/*
-                while (1) {
-		        if (blockingContext == MSC_BLOCKSTATUS_RESUME) 
-		        {
-		                break;
-		        }
-		}
-		*/
 	} 
 
       return MSC_SUCCESS;
