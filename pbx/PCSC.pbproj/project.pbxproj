@@ -165,7 +165,6 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = /Users/corcoran/Sources/muscle/PCSC/pbx/build;
 				INSTALL_PATH = /usr/bin/;
-				OPTIMIZATION_CFLAGS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -306,6 +305,8 @@
 				F52A94CD025424AC01B94B21,
 				F52A94CE025424AC01B94B21,
 				F52A94CF025424AC01B94B21,
+				F555DF370274968F01D2E99F,
+				F555DF350274962801D2E99F,
 				F52A94D0025424AC01B94B21,
 				F52A94D1025424AC01B94B21,
 				F52A94D2025424AC01B94B21,
@@ -412,6 +413,7 @@
 				F52A94BD0254242101B94B21,
 				F52A94BE0254242101B94B21,
 				F503CAD50254283801B94B21,
+				F555DF380274968F01D2E99F,
 			);
 			isa = PBXHeadersBuildPhase;
 			name = Headers;
@@ -434,6 +436,7 @@
 				F52A94CA0254242101B94B21,
 				F52A94CB0254242101B94B21,
 				F52A94CC0254242101B94B21,
+				F555DF360274962801D2E99F,
 			);
 			isa = PBXSourcesBuildPhase;
 			name = Sources;
@@ -1443,6 +1446,30 @@
 		};
 		F52A94E7025424F101B94B21 = {
 			fileRef = F52A94A40254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F555DF350274962801D2E99F = {
+			isa = PBXFileReference;
+			name = powermgt_macosx.c;
+			path = ../src/powermgt_macosx.c;
+			refType = 2;
+		};
+		F555DF360274962801D2E99F = {
+			fileRef = F555DF350274962801D2E99F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F555DF370274968F01D2E99F = {
+			isa = PBXFileReference;
+			name = powermgt_generic.h;
+			path = ../src/powermgt_generic.h;
+			refType = 2;
+		};
+		F555DF380274968F01D2E99F = {
+			fileRef = F555DF370274968F01D2E99F;
 			isa = PBXBuildFile;
 			settings = {
 			};

@@ -242,7 +242,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 	if (dwStatus & SCARD_PRESENT)
 	{
-
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->ucAtr, &rContext->dwAtrLen);
 

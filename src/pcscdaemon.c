@@ -40,6 +40,10 @@ $Id$
 #include "readerfactory.h"
 #include "configfile.h"
 
+#ifdef PCSC_TARGET_OSX
+#include "powermgt_generic.h"
+#endif
+
 static char AraKiri = 0;
 static char Init = 1;
 extern int errno;
@@ -108,6 +112,14 @@ void SVCServiceRunLoop()
 	 */
 	HPSearchHotPluggables();
 
+        /*
+         * Set up the power management callback routine for OS X
+         */
+         
+#ifdef PCSC_TARGET_OSX
+        PMRegisterForPowerEvents();
+#endif
+
 	while (1)
 	{
 
@@ -165,11 +177,11 @@ void SVCServiceRunLoop()
 		default:
 			DebugLogB("SVCServiceRun: SHMProcessEvents unknown retval: %d",
 				rsp);
-			break;;
+			break;
 		}
 
 		if (AraKiri)
-			RFCleanupReaders();
+			RFCleanupReaders(1);
 	}
 }
 

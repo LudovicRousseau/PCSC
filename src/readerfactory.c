@@ -371,7 +371,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	/*
 	 * Destroy and free the mutex 
 	 */
-	if (*sContext->dwFeeds == 0)
+	if (*sContext->dwFeeds == 1)
 	{
 		SYS_MutexDestroy(sContext->mMutex);
 		free(sContext->mMutex);
@@ -1136,7 +1136,8 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 	/*
 	 * Make sure no one else is using this library 
 	 */
-	if (*rContext->dwFeeds == 0)
+
+	if (*rContext->dwFeeds == 1)
 	{
 		DYN_CloseLibrary(&rContext->vHandle);
 	}
@@ -1273,7 +1274,6 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	 */
   /******************************************/
 	rv = RFLoadReader(rContext);
-
 	if (rv != SCARD_S_SUCCESS)
 	{
 		return rv;
@@ -1552,7 +1552,7 @@ LONG RFCheckReaderStatus(PREADER_CONTEXT rContext)
 	}
 }
 
-void RFCleanupReaders(void)
+void RFCleanupReaders(int shouldExit)
 {
 	int i;
 	LONG rv;
@@ -1583,5 +1583,9 @@ void RFCleanupReaders(void)
 	/*
 	 * exit() will call at_exit() 
 	 */
-	exit(0);
+
+        if (shouldExit) 
+        {
+                exit(0);
+        }
 }

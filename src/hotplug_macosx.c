@@ -81,8 +81,8 @@ void RawDeviceAdded(void *refCon, io_iterator_t iterator)
 	{
 
 		if (refCon == NULL)
-		{	/* Dont do this on (void *)1 */
-			HPSetupHotPlugDevice();
+		{	/* Dont do this on (void *)1 */  
+                	HPSetupHotPlugDevice();
 		}
 
 		kr = IOObjectRelease(obj);
@@ -99,8 +99,8 @@ void RawDeviceRemoved(void *refCon, io_iterator_t iterator)
 	{
 
 		if (refCon == NULL)
-		{
-			HPSetupHotPlugDevice();
+		{ 
+                        HPSetupHotPlugDevice();
 		}
 
 		kr = IOObjectRelease(obj);
@@ -173,7 +173,7 @@ void HPEstablishUSBNotifications()
 		runLoopSource = IONotificationPortGetRunLoopSource(gNotifyPort);
 
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource,
-			kCFRunLoopDefaultMode);
+                                    kCFRunLoopDefaultMode);
 
 		// Retain additional references because we use this same
 		// dictionary with four calls to 
@@ -432,11 +432,12 @@ LONG HPSetupHotPlugDevice()
 				 * Here we will add the reader, since it is not in the
 				 * address list 
 				 */
+                                SYS_MutexLock(&usbNotifierMutex);
 				HPAddHotPluggable(i, addrHolder[k]);
+                                SYS_MutexUnLock(&usbNotifierMutex);                                
 			} else
-			{
-				DebugLogA
-					("HPSearchHotPluggables: Warning - reader already in list.");
+                        {
+				DebugLogA("HPSearchHotPluggables: Warning - reader already in list.");
 			}
 		}
 
@@ -463,7 +464,10 @@ LONG HPSetupHotPlugDevice()
 					 * Here we will remove the reader, since it is not in
 					 * the device address list 
 					 */
-					HPRemoveHotPluggable(i, bundleTracker[i].addrList[x]);
+                                        SYS_MutexLock(&usbNotifierMutex); 
+                                        HPRemoveHotPluggable(i, bundleTracker[i].addrList[x]);
+                                        SYS_MutexUnLock(&usbNotifierMutex);
+
 				}
 			}
 		}
@@ -516,10 +520,8 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 		rv = SCARD_E_INSUFFICIENT_BUFFER;
 	} else
 	{
-		SYS_MutexLock(&usbNotifierMutex);
 		rv = RFAddReader((LPSTR) cStringValue, 0x200000 + j,
-			(LPSTR) cStringLibPath);
-		SYS_MutexUnLock(&usbNotifierMutex);
+                                (LPSTR) cStringLibPath);
 	}
 
 	if (rv != SCARD_S_SUCCESS)
@@ -527,6 +529,7 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 		/*
 		 * Function had error so do not keep track of reader 
 		 */
+                 
 		bundleTracker[i].addrList[j] = 0;
 	}
 
@@ -563,11 +566,47 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 		}
 	}
 
-	SYS_MutexLock(&usbNotifierMutex);
 	rv = RFRemoveReader((LPSTR) cStringValue, 0x200000 + j);
-	SYS_MutexUnLock(&usbNotifierMutex);
 
 	free((LPSTR) cStringValue);
 
 	return rv;
 }	/* End of function */
+
+LONG HPRemoveAllHotPluggables() {
+
+        LONG rv;
+        int i, j;
+        const char *cStringValue;
+        CFStringRef propertyString;
+        
+	for (i = 0; i < bundleArraySize; i++)
+	{
+        
+            currBundle = (CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
+            bundleInfoDict = CFBundleGetInfoDictionary(currBundle);
+            propertyString = CFDictionaryGetValue(bundleInfoDict, CFSTR("ifdFriendlyName"));
+
+            if (propertyString == 0)
+            {
+		return -1;
+            }
+
+            cStringValue = strdup(CFStringGetCStringPtr(propertyString,
+                                CFStringGetSystemEncoding()));
+
+            for (j = 0; j < PCSCLITE_HP_MAX_IDENTICAL_READERS; j++)
+            {
+		if (bundleTracker[i].addrList[j] != 0)
+		{ 
+	           rv = RFRemoveReader((LPSTR) cStringValue, 0x200000 + j);
+                   bundleTracker[i].addrList[j] = 0;
+		}
+            }
+            
+        }
+
+        free((LPSTR)cStringValue);
+        return 0;
+}
+
