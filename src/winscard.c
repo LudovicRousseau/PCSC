@@ -1109,8 +1109,19 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if (cbSendLength > MAX_BUFFER_SIZE)
 		return SCARD_E_INSUFFICIENT_BUFFER;
 
-	return IFDControl(rContext, dwControlCode, pbSendBuffer, cbSendLength,
-			pbRecvBuffer, cbRecvLength, lpBytesReturned);
+	if (IFD_HVERSION_2_0 == rContext->dwVersion)
+	{
+		/* we must wrap a API 3.0 client in an API 2.0 driver */
+		*lpBytesReturned = cbRecvLength;
+		return IFDControl_v2(rContext, (PUCHAR)pbSendBuffer,
+			cbSendLength, pbRecvBuffer, lpBytesReturned);
+	}
+	else
+		if (IFD_HVERSION_3_0 == rContext->dwVersion)
+			return IFDControl(rContext, dwControlCode, pbSendBuffer,
+				cbSendLength, pbRecvBuffer, cbRecvLength, lpBytesReturned);
+		else
+			return SCARD_E_UNSUPPORTED_FEATURE;
 }
 
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
