@@ -25,8 +25,6 @@
  */
 /* #define ATR_DEBUG */
 
-#define SCARD_PROTOCOL_UNSET 0x00
-
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
 {
