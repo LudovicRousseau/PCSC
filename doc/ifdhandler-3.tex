@@ -1,0 +1,994 @@
+%
+% MUSCLE SmartCard Development (http://www.musclecard.com)
+%
+% Copyright (C) 2004
+%  David Corcoran <corcoran@musclecard.com>
+%  Ludovic Rousseau <ludovic.rousseau@free.fr>
+%
+% $Id$
+
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{longtable}
+\usepackage{url}
+\usepackage{varioref}
+
+% Détection de pdflatex
+\ifx\pdfcompresslevel\undefined
+% Si on fait un postscript
+\typeout{Postscript version}
+\usepackage[dvips]{graphicx,rotating}
+%\usepackage[dvips,matrix,line,curve,arrow,frame]{xy}
+\DeclareGraphicsExtensions{.eps}
+\else
+% Si on fait un PDF
+\typeout{PDF version}
+\usepackage[pdftex]{graphicx,rotating}
+%\usepackage[matrix,line,curve,arrow,frame]{xy}
+\DeclareGraphicsExtensions{.jpg,.pdf}
+\usepackage[pdftex]{hyperref}
+\usepackage{ae,aeguill}
+\fi
+
+% smaller margins
+\usepackage{fullpage}
+
+% do not number subsubsection
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+\newcommand{\tab}{}
+\newcommand{\synopsis}{\subsubsection{Synopsis:}}
+\newcommand{\parameters}{\subsubsection{Parameters:}}
+\newcommand{\desc}{\subsubsection{Description:}}
+\newcommand{\example}{\subsubsection{Example:}}
+\newcommand{\returns}{\subsubsection{Returns:}}
+
+\title{MUSCLE PC/SC IFD Driver API}
+\author{David Corcoran \& Ludovic Rousseau\\
+\url{corcoran@musclecard.com}, \url{ludovic.rousseau@free.fr}}
+\date{May 10, 2004}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This toolkit and documentation is provided on an as is basis. The
+authors shall not be held responsible for any mishaps caused by the use
+of this software.
+
+For more information please visit \url{http://www.musclecard.com/}.
+
+\end{abstract}
+
+% space between paragraphs
+\parskip = 8pt
+
+% remove paragraph indentation
+\addtolength{\parindent}{-\parindent}
+
+Document history: \\
+\begin{tabular}{|l|l|l|}
+\hline
+3.0.1 & August 9, 2004 & latest PDF only version \\
+\hline
+3.1.0 & May 7, 2004 & reformat using \LaTeX{} and correct bugs \\
+\hline
+\end{tabular}
+
+\newpage
+\tableofcontents
+\newpage
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Introduction/Overview}
+
+This document describes the API calls required to make a PC/SC driver
+for a device to be supported under the MUSCLE PC/SC resource manager. By
+implementing these calls correctly in a driver or shared object form,
+reader manufacturers can fit their hardware into an already existing
+infrastructure under several operating systems and hardware platforms.
+This IFD Handler interface is not restricted to smart cards and readers
+and could also be used for other types of smart card like devices. I
+would really like to hear from you. If you have any feedback either on
+this documentation or on the MUSCLE project please feel free to email me
+at: \url{corcoran@musclecard.com}.
+
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Definitions}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{Defined types}
+
+The following is a list of commonly used type definitions in the
+following API. These definitions and more can be found in the
+\texttt{ifdhandler.h} file.
+
+{\tt
+\begin{longtable}{|l|l|}
+\hline
+\textrm{PC/SC type} & \textrm{C type} \\
+\hline
+\hline
+DWORD & unsigned long \\
+LPSTR & char * \\
+PDWORD & unsigned long * \\
+PUCHAR & unsigned char * \\
+RESPONSECODE & long \\
+VOID & void \\
+\hline
+\end{longtable}
+}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{Error codes}
+
+The following is a list of returned values:
+
+{\tt
+\begin{longtable}{|l|}
+\hline
+IFD\_SUCCESS \\
+\hline
+IFD\_COMMUNICATION\_ERROR\\
+IFD\_ERROR\_CONFISCATE\\
+IFD\_ERROR\_EJECT\\
+IFD\_ERROR\_NOT\_SUPPORTED\\
+IFD\_ERROR\_POWER\_ACTION\\
+IFD\_ERROR\_PTS\_FAILURE\\
+IFD\_ERROR\_SET\_FAILURE\\
+IFD\_ERROR\_SWALLOW\\
+IFD\_ERROR\_TAG\\
+IFD\_ERROR\_VALUE\_READ\_ONLY\\
+IFD\_ICC\_NOT\_PRESENT\\
+IFD\_ICC\_PRESENT\\
+IFD\_NOT\_SUPPORTED\\
+IFD\_PROTOCOL\_NOT\_SUPPORTED\\
+IFD\_RESPONSE\_TIMEOUT\\
+\hline
+\end{longtable}
+}
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Readers configuration}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{USB readers}
+
+USB readers use the bundle approach so that the reader can be loaded and
+unloaded upon automatic detection of the device. The bundle approach is
+simple: the actual library is just embedded in a directory so additional
+information can be gathered about the device.
+
+A bundle looks like the following:
+
+\begin{verbatim}
+GenericReader.bundle/
+  Contents/
+    Info.plist  - XML file describing the reader
+    MacOS/      - Driver directory for OS X
+    Solaris/    - Driver directory for Solaris
+    Linux/      - Driver directory for Linux
+    HPUX/       - Driver directory for HPUX
+\end{verbatim}
+
+The \texttt{Info.plist} file describes the driver and gives the loader all
+the necessary information. The following must be contained in the
+\texttt{Info.plist} file:
+
+\begin{itemize}
+\item \texttt{ifdVendorID}
+
+The vendor ID of the USB device.
+
+Example:
+\begin{verbatim}
+<key>ifdVendorID</key>
+<string>0x04E6</string>
+\end{verbatim}
+
+You may have an OEM of this reader in which an additional
+\texttt{<string>} can be used like in the below example:
+\begin{verbatim}
+<key>ifdVendorID</key>
+<array>
+  <string>0x04E6</string>
+  <string>0x0973</string>
+</array>
+\end{verbatim}
+
+If multiples exist all the other parameters must have a second value
+also. You may chose not to support this feature but it is useful when
+reader vendors OEM products so you only distribute one driver.
+
+The CCID driver from Ludovic
+Rousseau\footnote{\url{http://pcsclite.alioth.debian.org/ccid.html}}
+uses this feature since the same driver supports many different readers.
+
+\item \texttt{ifdProductID}
+
+The product id of the USB device.
+
+\begin{verbatim}
+<key>ifdProductID</key>
+<string>0x3437</string>
+\end{verbatim}
+
+\item \texttt{ifdFriendlyName}
+
+Example:
+\begin{verbatim}
+<key>ifdFriendlyName</key>
+<string>SCM Microsystems USB Reader</string>
+\end{verbatim}
+
+\item \texttt{CFBundleExecutable}
+
+The executable name which exists in the particular platform's directory.
+
+Example:
+\begin{verbatim}
+<key>CFBundleExecutable</key>
+<string>libccid.so.0.4.2</string>
+\end{verbatim}
+
+\end{itemize}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{Serial readers}
+
+Serial drivers must be configured to operate on a particular port and
+respond to a particular name. The \texttt{reader.conf} file is used for
+this purpose.
+
+It has the following syntax:
+
+\begin{verbatim}
+# Configuration file for pcsc-lite
+# David Corcoran <corcoran@musclecard.com>
+
+FRIENDLYNAME  Generic Reader
+DEVICENAME    /dev/ttyS0
+LIBPATH       /usr/lib/pcsc/drivers/libgen_ifd.so
+CHANNELID     1
+\end{verbatim}
+
+\begin{itemize}
+\item The pound sign \verb+#+ denotes a comment.
+
+\item The \texttt{FRIENDLYNAME} field is an arbitrary text used to
+identify the reader. This text is displayed by commands like
+\texttt{pcsc\_scan}\footnote{\url{http://ludovic.rousseau.free.fr/softwares/pcsc-tools/}}
+that prints the names of all the connected and detected readers.
+
+\item The \texttt{DEVICENAME} field was not used for old drivers (using
+the IFD handler version 2.0 or previous). It is now (IFD handler version
+3.0) used to identify the physical port on which the reader is
+connected. This is the device name of this port. It is dependent of the
+OS kernel. For example the first serial port device is called
+\texttt{/dev/ttyS0} under Linux and \texttt{/dev/cuaa0} under FreeBSD.
+
+\item The \texttt{LIBPATH} field is the filename of the driver code. The
+driver is a dynamically loaded piece of code (generally a
+\texttt{drivername.so*} file).
+
+\item The \texttt{CHANNELID} is no more used for recent drivers (IFD
+handler 3.0) and has been superseded by \texttt{DEVICENAME}. If you
+have an old driver this field is used to indicate the port to use. You
+should read your driver documentation to know what information is needed
+here. It should be the serial port number for a serial reader.
+
+\texttt{CHANNELID} was the numeric version of the port in which the
+reader will be located. This may be done by a symbolic link where
+\texttt{/dev/pcsc/1} is the first device which may be a symbolic link to
+\texttt{/dev/ttyS0} or whichever location your reader resides.
+
+\end{itemize}
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{API Routines}
+
+The routines specified hereafter will allow you to write an IFD handler
+for the PC/SC Lite resource manager. Please use the complement
+developer's kit complete with headers and Makefile at:
+\url{http://www.musclecard.com/drivers.html}.
+
+This gives a common API for communication to most readers in a
+homogeneous fashion. This document assumes that the driver developer is
+experienced with standards such as ISO-7816-(1, 2, 3, 4), EMV and MCT
+specifications. For listings of these specifications please access the
+above web site.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHCreateChannel}
+
+\synopsis
+
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHCreateChannel(DWORD Lun,
+    DWORD Channel);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number \\
+\texttt{Channel} & IN & Channel ID \\
+\end{tabular}
+
+\desc
+
+This function is required to open a communications channel to the port
+listed by \texttt{Channel}. For example, the first serial reader on COM1
+would link to \texttt{/dev/pcsc/1} which would be a symbolic link to
+\texttt{/dev/ttyS0} on some machines This is used to help with
+inter-machine independence.
+
+On machines with no \texttt{/dev} directory the driver writer may choose to
+map their \texttt{Channel} to whatever they feel is appropriate.
+
+Once the channel is opened the reader must be in a state in which it is
+possible to query \texttt{IFDHICCPresence()} for card status.
+
+\begin{itemize}
+\item \texttt{Lun} - Logical Unit Number
+
+Use this for multiple card slots or multiple readers.
+\texttt{0xXXXXYYYY} - \texttt{XXXX} multiple readers, \texttt{YYYY}
+multiple slots. The resource manager will set these automatically. By
+default the resource manager loads a new instance of the driver so if
+your reader does not have more than one smart card slot then ignore the
+Lun in all the functions.
+
+PC/SC supports the loading of multiple readers through one instance of
+the driver in which \texttt{XXXX} is important. \texttt{XXXX} identifies
+the unique reader in which the driver communicates to. The driver should
+set up an array of structures that associate this \texttt{XXXX} with the
+underlying details of the particular reader.
+
+\item \texttt{Channel} - Channel ID
+
+This is denoted by the following:
+
+{\tt
+\begin{tabular}{ll}
+0x000001 & /dev/pcsc/1\\
+0x000002 & /dev/pcsc/2\\
+0x000003 & /dev/pcsc/3\\
+0x000004 & /dev/pcsc/4\\
+\end{tabular}
+}
+
+USB readers can ignore the \texttt{Channel} parameter and query the USB
+bus for the particular reader by manufacturer and product id.
+
+\end{itemize}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Successful\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHCreateChannelByName}
+\label{IFDHCreateChannelByName}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHCreateChannelByName(DWORD Lun,
+    LPSTR deviceName);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number \\
+\texttt{DeviceName} & IN & String device path \\
+\end{tabular}
+
+
+\desc
+
+This function is required to open a communications channel to the port
+listed by \texttt{DeviceName}.
+
+Once the channel is opened the reader must be in a state in which it is
+possible to query \texttt{IFDHICCPresence()} for card status.
+
+\begin{itemize}
+\item \texttt{Lun} - Logical Unit Number
+
+Use this for multiple card slots or multiple readers.
+\texttt{0xXXXXYYYY} - \texttt{XXXX} multiple readers, \texttt{YYYY}
+multiple slots. The resource manager will set these automatically. By
+default the resource manager loads a new instance of the driver so if
+your reader does not have more than one smart card slot then ignore the
+Lun in all the functions.
+
+PC/SC supports the loading of multiple readers through one instance of
+the driver in which \texttt{XXXX} is important. \texttt{XXXX} identifies
+the unique reader in which the driver communicates to. The driver should
+set up an array of structures that associate this \texttt{XXXX} with the
+underlying details of the particular reader.
+
+\item \texttt{DeviceName} - filename to use by the driver.
+
+For drivers configured by \texttt{/etc/reader.conf} this is the value of
+the field \texttt{DEVICENAME}.
+
+For USB drivers under platforms using
+\texttt{libusb}\footnote{\url{http://libusb.sourceforge.net/}} for USB
+abstraction (Any Unix except MacOSX) the \texttt{DeviceName} field uses
+the string generated by:
+\begin{verbatim}
+printf("usb:%04x/%04x:libusb:%s:%s",
+    idVendor, idProduct,
+    bus->dirname, dev->filename)
+\end{verbatim}
+
+So it is something like: \texttt{usb:08e6/3437:libusb:001:042} under
+Linux.
+
+It is the responsability of the driver to correctly identify the reader.
+This scheme was put in place to be able to distinguish two identical
+readers connected at the same time.
+
+\end{itemize}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Successful\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHCloseChannel}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHCloseChannel(DWORD Lun);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number \\
+\end{tabular}
+
+\desc
+
+This function should close the reader communication channel for the
+particular reader. Prior to closing the communication channel the reader
+should make sure the card is powered down and the terminal is also
+powered down.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Successful\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHGetCapabilities}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHGetCapabilities(DWORD Lun,
+    DWORD Tag,
+    PDWORD Length,
+    PUCHAR Value);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number \\
+\texttt{Tag} & IN & Tag of the desired data value \\
+\texttt{Length} & INOUT & Length of the desired data value \\
+\texttt{Value} & OUT & Value of the desired data \\
+\end{tabular}
+
+\desc
+
+This function should get the slot/card capabilities for a particular
+slot/card specified by \texttt{Lun}. Again, if you have only 1 card slot
+and don't mind loading a new driver for each reader then ignore
+\texttt{Lun}.
+
+\begin{itemize}
+\item \texttt{Tag} - the tag for the information requested
+
+\begin{itemize}
+\item \texttt{TAG\_IFD\_ATR}
+
+return the Atr and it's size (required).
+
+\item \texttt{TAG\_IFD\_SIMULTANEOUS\_ACCESS}
+
+return the number of sessions the driver can handle
+
+this is used for multiple readers sharing the same driver
+
+\item \texttt{TAG\_IFD\_SLOTS\_NUMBER}
+
+return the number of slots in this reader
+
+\end{itemize}
+
+\item \texttt{Length} - the length of the returned data
+
+\item \texttt{Value} - the value of the data
+
+\end{itemize}
+
+This function is also called when the application uses the PC/SC
+\texttt{SCardGetAttrib()} function. The list of supported tags is not
+limited.  The ones above are used by the PC/SC lite resource manager.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Successful\\
+\texttt{IFD\_ERROR\_TAG} & Invalid tag given
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHSetCapabilities}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHSetCapabilities(DWORD Lun,
+    DWORD Tag,
+    DWORD Length,
+    PUCHAR Value);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number\\
+\texttt{Tag} & IN & Tag of the desired data value\\
+\texttt{Length} & INOUT & Length of the desired data value\\
+\texttt{Value} & OUT & Value of the desired data\\
+\end{tabular}
+
+\desc
+
+This function should set the slot/card capabilities for a particular
+slot/card specified by Lun. Again, if you have only 1 card slot and
+don't mind loading a new driver for each reader then ignore Lun.
+
+\begin{itemize}
+\item \texttt{Tag} - the tag for the information needing set
+\item \texttt{Length} - the length of the data
+\item \texttt{Value} - the value of the data
+\end{itemize}
+
+This function is also called when the application uses the PC/SC
+\texttt{SCardGetAttrib()} function. The list of supported tags is not limited.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Success\\
+\texttt{IFD\_ERROR\_TAG} & Invalid tag given\\
+\texttt{IFD\_ERROR\_SET\_FAILURE} & Could not set value\\
+\texttt{IFD\_ERROR\_VALUE\_READ\_ONLY} & Trying to set read only value
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHSetProtocolParameters}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHSetProtocolParameters(DWORD Lun,
+    DWORD Protocol,
+    UCHAR Flags,
+    UCHAR PTS1,
+    UCHAR PTS2,
+    UCHAR PTS3);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number\\
+\texttt{Protocol} & IN & Desired protocol\\
+\texttt{Flags} & IN & OR'd Flags (See below)\\
+\texttt{PTS1} & IN & 1st PTS Value\\
+\texttt{PTS2} & IN & 2nd PTS Value\\
+\texttt{PTS3} & IN & 3rd PTS Value\\
+\end{tabular}
+
+\desc
+
+This function should set the Protocol Type Selection (PTS) of a
+particular card/slot using the three PTS parameters sent
+
+\begin{itemize}
+\item \texttt{Protocol} - 0...14
+
+T=0 to T=14 protocol
+
+\item \texttt{Flags} - Logical OR of possible values to determine which PTS
+values to negotiate
+
+\begin{itemize}
+\item \texttt{IFD\_NEGOTIATE\_PTS1}
+\item \texttt{IFD\_NEGOTIATE\_PTS2}
+\item \texttt{IFD\_NEGOTIATE\_PTS3}
+\end{itemize}
+
+\item \texttt{PTS1}, \texttt{PTS2}, \texttt{PTS3} - PTS Values
+
+See ISO 7816/EMV documentation.
+
+\end{itemize}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Success\\
+\texttt{IFD\_ERROR\_PTS\_FAILURE} & Could not set PTS value\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred\\
+\texttt{IFD\_PROTOCOL\_NOT\_SUPPORTED} & Protocol is not supported\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHPowerICC}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHPowerICC(DWORD Lun,
+    DWORD Action,
+    PUCHAR Atr,
+    PDWORD AtrLength);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number\\
+\texttt{Action} & IN & Action to be taken\\
+\texttt{Atr} & OUT & Answer to Reset (ATR) value of the inserted card\\
+\texttt{AtrLength} & INOUT & Length of the ATR\\
+\end{tabular}
+
+\desc
+
+This function controls the power and reset signals of the smart card
+reader at the particular reader/slot specified by Lun.
+
+\begin{itemize}
+\item \texttt{Action} - Action to be taken on the card
+
+\begin{itemize}
+\item \texttt{IFD\_POWER\_UP}
+
+Power and reset the card if not done so (store the ATR and return it and
+it's length)
+
+\item \texttt{IFD\_POWER\_DOWN}
+
+Power down the card then power up if not done already (\texttt{Atr} and
+\texttt{AtrLength} should be zeroed)
+
+\item \texttt{IFD\_RESET}
+
+Perform a quick reset on the card. If the card is not powered power up
+the card. (Store and return \texttt{Atr} and \texttt{Length})
+
+\end{itemize}
+
+\item \texttt{Atr} - Answer to Reset of the card
+
+The driver is responsible for caching this value in case
+\texttt{IFDHGetCapabilities()} is called requesting the ATR and it's
+length. The ATR length should not exceed \texttt{MAX\_ATR\_SIZE}.
+
+\item \texttt{AtrLength} - Length of the Atr
+
+This should not exceed \texttt{MAX\_ATR\_SIZE}.
+
+\end{itemize}
+
+\textbf{Notes:}
+
+Memory cards without an ATR should return \texttt{IFD\_SUCCESS} on reset
+but the \texttt{Atr} should be zeroed and the length should be zero
+Reset errors should return zero for the \texttt{AtrLength} and return
+\texttt{IFD\_ERROR\_POWER\_ACTION}.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Success\\
+\texttt{IFD\_ERROR\_POWER\_ACTION} & Error powering/resetting card\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
+\texttt{IFD\_NOT\_SUPPORTED} & Action not supported\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHTransmitToICC}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHTransmitToICC(DWORD Lun,
+    SCARD_IO_HEADER SendPci,
+    PUCHAR TxBuffer,
+    DWORD TxLength,
+    PUCHAR RxBuffer,
+    PDWORD RxLength,
+    PSCARD_IO_HEADER RecvPci);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number\\
+\texttt{SendPci} & IN & Protocol structure\\
+\texttt{TxBuffer} & IN & APDU to be sent\\
+\texttt{TxLength} & IN & Length of sent APDU\\
+\texttt{RxBuffer} & OUT & APDU response\\
+\texttt{RxLength} & INOUT & Length of APDU response\\
+\texttt{RecvPci} & INOUT & Receive protocol structure
+\end{tabular}
+
+\desc
+
+This function performs an APDU exchange with the card/slot specified by
+\texttt{Lun}. The driver is responsible for performing any protocol
+specific exchanges such as T=0, 1, etc. differences. Calling this function
+will abstract all protocol differences.
+
+\begin{itemize}
+\item \texttt{SendPci} - contains two structure members
+
+\begin{itemize}
+\item \texttt{Protocol} - 0, 1, ... 14
+
+T=0 ... T=14
+
+\item \texttt{Length} \tab - Not used.
+\end{itemize}
+
+\item \texttt{TxBuffer} \tab - Transmit APDU
+
+example: \verb+"\x00\xA4\x00\x00\x02\x3F\x00"+
+
+\item \texttt{TxLength} \tab - Length of this buffer
+\item \texttt{RxBuffer} \tab - Receive APDU
+
+example: \verb+"\x61\x14"+
+
+\item \texttt{RxLength} \tab - Length of the received APDU
+
+This function will be passed the size of the buffer of \texttt{RxBuffer}
+and this function is responsible for setting this to the length of the
+received APDU response. This should be ZERO on all errors. The resource
+manager will take responsibility of zeroing out any temporary APDU
+buffers for security reasons.
+
+\item \texttt{RecvPci} - contains two structure members
+
+\begin{itemize}
+\item \texttt{Protocol} - 0, 1, ... 14
+
+T=0 ... T=14
+
+\item \texttt{Length} - Not used.
+\end{itemize}
+\end{itemize}
+
+\textbf{Notes:}
+
+The driver is responsible for knowing what type of card it has.  If the
+current slot/card contains a memory card then this command should ignore
+the \texttt{Protocol} and use the MCT style commands for support for
+these style cards and transmit them appropriately. If your reader does
+not support memory cards or you don't want to implement this
+functionality, then ignore this.
+
+\texttt{RxLength} should be set to zero on error.
+
+The driver is \emph{not} responsible for doing an automatic Get Response
+command for received buffers containing \texttt{61 XX}.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Success\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
+\texttt{IFD\_RESPONSE\_TIMEOUT} & The response timed out\\
+\texttt{IFD\_ICC\_NOT\_PRESENT} & ICC is not present\\
+\texttt{IFD\_PROTOCOL\_NOT\_SUPPORTED} & Protocol is not supported
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHControl}
+\label{IFDHControl}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHControl(DWORD Lun,
+    DWORD dwControlCode,
+    PUCHAR TxBuffer,
+    DWORD TxLength,
+    PUCHAR RxBuffer,
+    PDWORD RxLength,
+    PDWORD pdwBytesReturned);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number\\
+\texttt{dwControlCode} & IN & Control code for the operation\\
+\texttt{TxBuffer} & IN & Bytes to be sent\\
+\texttt{TxLength} & IN & Length of sent bytes\\
+\texttt{RxBuffer} & OUT & Response\\
+\texttt{RxLength} & IN & Length of response buffer\\
+\texttt{pdwBytesReturned} & OUT & Length of response \\
+\end{tabular}
+
+\desc
+
+This function performs a data exchange with the reader (not the card)
+specified by \texttt{Lun}. It is responsible for abstracting
+functionality such as PIN pads, biometrics, LCD panels, etc.  You should
+follow the MCT and CTBCS specifications for a list of accepted commands
+to implement. This function is fully voluntary and does not have to be
+implemented unless you want extended functionality.
+
+\begin{itemize}
+\item \texttt{dwControlCode} - Control code for the operation
+
+This value identifies the specific operation to be performed. This value
+is driver specific.
+
+\item \texttt{TxBuffer} - Transmit data
+\item \texttt{TxLength} - Length of this buffer
+\item \texttt{RxBuffer} - Receive data
+\item \texttt{RxLength} - Length of the response buffer
+
+\item \texttt{pdwBytesReturned} - Length of response
+
+This function will be passed the length of the buffer \texttt{RxBuffer}
+in \texttt{RxLength} and it must set the length of the received data in
+\texttt{pdwBytesReturned}.
+
+\end{itemize}
+
+\textbf{Notes:}
+
+\texttt{*pdwBytesReturned} should be set to zero on error.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_SUCCESS} & Success\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
+\texttt{IFD\_RESPONSE\_TIMEOUT} & The response timed out
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFDHICCPresence}
+
+\synopsis
+\begin{verbatim}
+#include <ifdhandler.h>
+
+RESPONSECODE IFDHICCPresence(DWORD Lun);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{Lun} & IN & Logical Unit Number
+\end{tabular}
+
+\desc
+
+This function returns the status of the card inserted in the reader/slot
+specified by \texttt{Lun}. In cases where the device supports
+asynchronous card insertion/removal detection, it is advised that the
+driver manages this through a thread so the driver does not have to send
+and receive a command each time this function is called.
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{IFD\_ICC\_PRESENT} & ICC is present\\
+\texttt{IFD\_ICC\_NOT\_PRESENT} & ICC is not present\\
+\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{API changes}
+
+The IFD handler API changed over the time.
+
+If the driver provides a \texttt{IFDHCreateChannelByName()} function is
+supposed to use API v3.0. Otherwise it is used with API v2.0.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{API version 2.0}
+
+\begin{itemize}
+\item \texttt{DEVICENAME} in \texttt{reader.conf} is not used. 
+
+\item \texttt{IFDHControl()} API was:
+\begin{verbatim}
+RESPONSECODE IFDHControl(DWORD Lun,
+    PUCHAR TxBuffer,
+    DWORD TxLength,
+    PUCHAR RxBuffer,
+    PDWORD RxLength);
+\end{verbatim}
+
+\end{itemize}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{API version 3.0}
+
+\begin{itemize}
+\item introduction of \texttt{IFDHCreateChannelByName()}.
+
+For serial drivers, \texttt{CHANNELID} is no more used and
+\texttt{DEVICENAME} is used instead.
+
+For USB drivers the device name if \verb+usb:%04x/%04x:libusb:%s:%s+.
+See \ref{IFDHCreateChannelByName}.
+
+\item \texttt{IFDHControl()} API changed
+
+See \ref{IFDHControl}.
+
+\end{itemize}
+
+
+\end{document}
+
