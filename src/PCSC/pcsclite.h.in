@@ -186,17 +186,17 @@ extern "C"
 #define PCSCLITE_MAX_READER_CONTEXT_CHANNELS      16    /* Maximum channels on a reader context */
 #define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS 16    /* Maximum channels on an application context */
 
-#define PCSCLITE_MAX_READERS_CONTEXTS   16     /* Maximum readers context (a slot is count as a reader) */
+#define PCSCLITE_MAX_READERS_CONTEXTS   256     /* Maximum readers context (a slot is count as a reader) */
 
 #define PCSCLITE_MAX_CONTEXTS           16    /* Only here because it is used in winscard_scf.c */
 
 #define PCSCLITE_MAX_THREADS            16	/* Stat change threads */
 #define PCSCLITE_MAX_COMSIZE            64	/* Maximum arg size */
-#define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
+#define PCSCLITE_STATUS_WAIT            200000	/* Status Change Sleep */
 #define PCSCLITE_TRANSACTION_TIMEOUT    40	/* Transaction timeout */
 #define MAX_ATR_SIZE                    33	/* Maximum ATR size */
-#define MAX_READERNAME			50	/* 50 char Reader Name */
-#define MAX_LIBNAME			100	/* 100 char Lib Name */
+#define MAX_READERNAME                  52	/* 52 char Reader Name */
+#define MAX_LIBNAME		      100	/* 100 char Lib Name */
 
 #define SCARD_ATR_LENGTH           MAX_ATR_SIZE	/* Maximum ATR size */
 
