@@ -17,8 +17,9 @@
 #include <string.h>
 #include <errno.h>
 
-#include "PCSC/debuglog.h"
-#include "PCSC/parser.h"
+#include "debuglog.h"
+#include "parser.h"
+#include "strlcpycat.h"
 
 void tpevalToken(char *pcToken, int tokType);
 
@@ -38,9 +39,9 @@ void tperrorCheck (char *pcToken_error);
 #.*                                             {}
 "\n"                                            {}
 \<key\>([A-Z]|[a-z]|[0-9]|[ \t])+\<\/key\>      { valueIndex = 0; tpevalToken(yytext, TOKEN_TYPE_KEY); }
-[ \t]                     		        {}
+[ \t]                                           {}
 \<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'"])+\<\/string\> {tpevalToken(yytext, TOKEN_TYPE_STRING); valueIndex += 1;}
-.                                               { tperrorCheck( yytext ); }
+.                                               { tperrorCheck(yytext); }
 %%
 
 
@@ -57,40 +58,38 @@ void tpevalToken(char *pcToken, int tokType)
 
 	if (tokType == TOKEN_TYPE_KEY)
 	{
-		for (len=5; pcToken[len] != '<'; len++)
+		/* <key>foobar</key>
+		 * 012345 : 5 is the first key character index */
+
+		/* calculate the argument length */
+		for (len=0; pcToken[len+5] != '<'; len++)
 			;
-		if (len - 5 > TOKEN_MAX_KEY_SIZE)
-		{
-			strncpy(pcKey, &pcToken[5], TOKEN_MAX_KEY_SIZE);
-			pcKey[TOKEN_MAX_KEY_SIZE - 1] = '\0';
-		}
+		len++;	/* final NULL byte */
+
+		if (len > sizeof(pcKey))
+			strlcpy(pcKey, &pcToken[5], sizeof(pcKey));
 		else
-		{
-			strncpy(pcKey, &pcToken[5], len - 5);
-			pcKey[len-5] = 0;
-		}
+			strlcpy(pcKey, &pcToken[5], len);
 	}
 
 	if (tokType == TOKEN_TYPE_STRING)
 	{
-		for (len=8; pcToken[len] != '<'; len++)
+		/* <string>foobar</string>
+		 * 012345678 : 8 is the first string character index */
+
+		/* calculate the argument length */
+		for (len=0; pcToken[len+8] != '<'; len++)
 			;
-		if (len - 8 > TOKEN_MAX_VALUE_SIZE)
-		{
-			strncpy(pcValue, &pcToken[8], TOKEN_MAX_VALUE_SIZE);
-			pcValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
-		}
+		len++;	/* final NULL byte */
+
+		if (len > sizeof(pcValue))
+			strlcpy(pcValue, &pcToken[8], sizeof(pcValue));
 		else
-		{
-			strncpy(pcValue, &pcToken[8], len - 8);
-			pcValue[len-8] = 0;
-		}
+			strlcpy(pcValue, &pcToken[8], len);
+
 		if (strcmp(pcKey, pcDesiredKey) == 0)
 			if (desiredIndex == valueIndex)
-			{
-				strncpy(pcFinValue, pcValue, TOKEN_MAX_VALUE_SIZE);
-				pcFinValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
-			}
+				strlcpy(pcFinValue, pcValue, sizeof(pcFinValue));
 	}
 }
 
@@ -135,10 +134,7 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		ret = -1;
 	}
 	else
-	{
-		strncpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
-		tokenValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
-	}
+		strlcpy(tokenValue, pcFinValue, sizeof(tokenValue));
 
 	fclose(file);
 	return ret;
