@@ -1932,7 +1932,7 @@ char *msc_error(MSC_RV errorCode)
 			break;
 
 		default:
-			sprintf(message, "Unknown SW: %04ld", errorCode);
+			sprintf(message, "Unknown SW: %04lX", errorCode);
 			break;
 	}
 
