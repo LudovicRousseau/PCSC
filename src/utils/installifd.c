@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 	fprintf(fd, "%s", "\n\n");
 
 	fprintf(fd, "FRIENDLYNAME     \"%s\"\n", lpcReader);
-	fprintf(fd, "DEVICENAME       GEN_SMART_RDR\n");
+	fprintf(fd, "DEVICENAME       /dev/null\n");
 	fprintf(fd, "LIBPATH          %s\n", lpcLibrary);
 	fprintf(fd, "CHANNELID        %s\n", lpcPortID);
 
