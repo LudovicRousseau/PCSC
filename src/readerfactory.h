@@ -5,6 +5,8 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -12,7 +14,7 @@
 #ifndef __readerfactory_h__
 #define __readerfactory_h__
 
-#include <thread_generic.h>
+#include "thread_generic.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -96,21 +98,20 @@ extern "C"
 		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];	
                                          /* Structure of connected handles */
 		FCT_MAP psFunctions;	/* Structure of function pointers */
-		UCHAR ucAtr[MAX_ATR_SIZE];	/* Atr for inserted card */
-		DWORD dwAtrLen;			/* Size of the ATR */
 		LPVOID vHandle;			/* Dlopen handle */
 		DWORD dwVersion;		/* IFD Handler version number */
 		DWORD dwPort;			/* Port ID */
-		DWORD dwProtocol;		/* Currently used protocol */
 		DWORD dwSlot;			/* Current Reader Slot */
 		DWORD dwBlockStatus;	/* Current blocking status */
-		DWORD dwStatus;			/* Current Status Mask */
 		DWORD dwLockId;			/* Lock Id */
 		DWORD dwIdentity;		/* Shared ID High Nibble */
 		DWORD dwContexts;		/* Number of open contexts */
-		DWORD dwPublicID;		/* Public id of public state struct */
 		PDWORD pdwFeeds;		/* Number of shared client to lib */
 		PDWORD pdwMutex;		/* Number of client to mutex */
+
+		struct pubReaderStatesList *readerState; /* link to the reader state */
+		/* we can't use PREADER_STATE here since eventhandler.h can't be
+		 * included because of circular dependencies */
 
 		/* these structures are unused */
 #if 0
