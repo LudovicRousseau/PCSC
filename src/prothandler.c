@@ -70,7 +70,9 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
  * SCardConnect has a DWORD dwPreferredProtocols that is a bitmask of what 
  * protocols to use.  Basically, if T=N where N is not zero will be used
  * first if it is available in ucAvailable.  Otherwise it will always
- * default to T=0.  Do nothing if the default rContext->dwProtocol is OK. 
+ * default to T=0.
+ *
+ * IFDSetPTS() is _always_ called so that the driver can initialise its data
  */
 
 DWORD PHSetProtocol(struct ReaderContext * rContext,
@@ -82,7 +84,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 
 	/* App has specified no protocol */
 	if (dwPreferred == 0)
-		return -1;
+		return SET_PROTOCOL_WRONG_ARGUMENT;
 
 	/* requested protocol is not available */
 	if (! (dwPreferred & ucAvailable))
@@ -101,7 +103,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 		 */
 		DebugLogB("Protocol T=%d requested but unsupported by the card",
 			(SCARD_PROTOCOL_T0 == dwPreferred) ? 0 : 1);
-		return -1;
+		return SET_PROTOCOL_WRONG_ARGUMENT;
 	}
 
 	/* set default value */
@@ -118,7 +120,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			ucChosen = SCARD_PROTOCOL_T0;
 		else
 			/* App wants unsupported protocol */
-			return -1;
+			return SET_PROTOCOL_WRONG_ARGUMENT;
 
 	DebugLogB("Attempting PTS to T=%d",
 		(SCARD_PROTOCOL_T0 == ucChosen ? 0 : 1));
@@ -131,8 +133,16 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			DebugLogB("PTS not supported by driver, using T=%d",
 				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 		else
+		{
 			DebugLogB("PTS failed, using T=%d",
 				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+
+ 			/* ISO 7816-3:1997 ch. 7.2 PPS protocol page 14
+ 			 * - If the PPS exchange is unsuccessful, then the interface device
+ 			 *   shall either reset or reject the card.
+ 			 */
+ 			return SET_PROTOCOL_PPS_FAILED;
+ 		}
 
 	return protocol;
 }
