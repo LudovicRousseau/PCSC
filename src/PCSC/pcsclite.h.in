@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999-2003
+ * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -34,6 +34,8 @@ typedef long SCARDHANDLE;
 typedef SCARDHANDLE *PSCARDHANDLE;
 typedef SCARDHANDLE *LPSCARDHANDLE;
 
+#define MAX_ATR_SIZE			33	/* Maximum ATR size */
+
 typedef struct
 {
 	const char *szReader;
@@ -41,7 +43,7 @@ typedef struct
 	unsigned long dwCurrentState;
 	unsigned long dwEventState;
 	unsigned long cbAtr;
-	unsigned char rgbAtr[33];
+	unsigned char rgbAtr[MAX_ATR_SIZE];
 }
 SCARD_READERSTATE_A;
 
@@ -205,7 +207,6 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define PCSCLITE_MAX_THREADS		16	/* Stat change threads */
 #define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
 #define PCSCLITE_TRANSACTION_TIMEOUT	40	/* Transaction timeout */
-#define MAX_ATR_SIZE			33	/* Maximum ATR size */
 #define MAX_READERNAME			52
 #define MAX_LIBNAME			100
 #define MAX_DEVICENAME		255
