@@ -429,45 +429,71 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Not doing this could result in deadlock 
 		 */
-		if (RFCheckReaderEventState(rContext, hCard) != SCARD_W_RESET_CARD)
+		rv = RFCheckReaderEventState(rContext, hCard);
+		switch(rv)
 		{
-			rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
-				&rContext->dwAtrLen);
+			// avoid deadlock
+			case SCARD_W_RESET_CARD:
+				break;
 
-			/*
-			 * Notify the card has been reset 
-			 */
-			RFSetReaderEventState(rContext, SCARD_RESET);
+			case SCARD_W_REMOVED_CARD:
+				DebugLogA("SCardReconnect: card removed");
+				return SCARD_W_REMOVED_CARD;
 
-			/*
-			 * Set up the status bit masks on dwStatus 
-			 */
-			if (rv == SCARD_S_SUCCESS)
-			{
-				rContext->dwStatus |= SCARD_PRESENT;
-				rContext->dwStatus &= ~SCARD_ABSENT;
-				rContext->dwStatus |= SCARD_POWERED;
-				rContext->dwStatus |= SCARD_NEGOTIABLE;
-				rContext->dwStatus &= ~SCARD_SPECIFIC;
-				rContext->dwStatus &= ~SCARD_SWALLOWED;
-				rContext->dwStatus &= ~SCARD_UNKNOWN;
-			} else
-			{
-				rContext->dwStatus |= SCARD_PRESENT;
-				rContext->dwStatus &= ~SCARD_ABSENT;
-				rContext->dwStatus |= SCARD_SWALLOWED;
-				rContext->dwStatus &= ~SCARD_POWERED;
-				rContext->dwStatus &= ~SCARD_NEGOTIABLE;
-				rContext->dwStatus &= ~SCARD_SPECIFIC;
-				rContext->dwStatus &= ~SCARD_UNKNOWN;
-				rContext->dwProtocol = 0;
-				rContext->dwAtrLen = 0;
-			}
+			// invalid EventStatus
+			case SCARD_E_INVALID_VALUE:
+				DebugLogA("SCardReconnect: invalid EventStatus");
+				return SCARD_F_INTERNAL_ERROR;
 
-			if (rContext->dwAtrLen > 0)
-				DebugLogA("SCardReconnect: Reset complete.");
-			else
-				DebugLogA("SCardReconnect: Error resetting card.");
+			// invalid hCard, but hCard was widely used some lines above :(
+			case SCARD_E_INVALID_HANDLE:
+				DebugLogA("SCardReconnect: invalid handle");
+				return SCARD_F_INTERNAL_ERROR;
+
+			case SCARD_S_SUCCESS:
+				rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
+					&rContext->dwAtrLen);
+
+				/*
+				 * Notify the card has been reset 
+				 */
+				RFSetReaderEventState(rContext, SCARD_RESET);
+
+				/*
+				 * Set up the status bit masks on dwStatus 
+				 */
+				if (rv == SCARD_S_SUCCESS)
+				{
+					rContext->dwStatus |= SCARD_PRESENT;
+					rContext->dwStatus &= ~SCARD_ABSENT;
+					rContext->dwStatus |= SCARD_POWERED;
+					rContext->dwStatus |= SCARD_NEGOTIABLE;
+					rContext->dwStatus &= ~SCARD_SPECIFIC;
+					rContext->dwStatus &= ~SCARD_SWALLOWED;
+					rContext->dwStatus &= ~SCARD_UNKNOWN;
+				} else
+				{
+					rContext->dwStatus |= SCARD_PRESENT;
+					rContext->dwStatus &= ~SCARD_ABSENT;
+					rContext->dwStatus |= SCARD_SWALLOWED;
+					rContext->dwStatus &= ~SCARD_POWERED;
+					rContext->dwStatus &= ~SCARD_NEGOTIABLE;
+					rContext->dwStatus &= ~SCARD_SPECIFIC;
+					rContext->dwStatus &= ~SCARD_UNKNOWN;
+					rContext->dwProtocol = 0;
+					rContext->dwAtrLen = 0;
+				}
+
+				if (rContext->dwAtrLen > 0)
+					DebugLogA("SCardReconnect: Reset complete.");
+				else
+					DebugLogA("SCardReconnect: Error resetting card.");
+				break;
+
+			default:
+				DebugLogB("SCardReconnect: invalid retcode from RFCheckReaderEventState (%X)", rv);
+				return SCARD_F_INTERNAL_ERROR;
+				break;
 		}
 
 	} else if (dwInitialization == SCARD_LEAVE_CARD)
