@@ -36,14 +36,12 @@ int main(int argc, char **argv)
 	MSCUChar8 pRandomData[20];
 	MSCUChar8 pSeed[8];
 	MSCUChar8 defaultPIN[16];
-	MSCUChar8 AID[6] = { 0xA0, 0x00, 0x00, 0x00, 0x01, 0x01 };
-	MSCUChar8 myData[] =
-		{ 'M', 'U', 'S', 'C', 'L', 'E', ' ', 'V', 'I', 'R',
-		'T', 'U', 'A', 'L', ' ', 'C', 'A', 'R', 'D', '.', 0
-	};
+	MSCUChar8 AID[] = { 0xA0, 0x00, 0x00, 0x00, 0x01, 0x01 };
+	MSCUChar8 myData[] = "MUSCLE VIRTUAL CARD.";
 	MSCUChar8 readData[50];
 	MSCLPTokenInfo tokenList;
 	MSCULong32 tokenSize;
+	int reader_to_use;
 	int i, j;
 
 	printf("********************************************************\n");
@@ -79,7 +77,7 @@ int main(int argc, char **argv)
 			printf("%02X", tokenList[i].tokenId[j]);
 		}
 		printf("\n");
-		printf("Token state    : %ld\n", tokenList[i].tokenState);
+		printf("Token state    : %04lX\n", tokenList[i].tokenState);
 		printf("\n");
 
 		tokenList[i].tokenState = MSC_STATE_EMPTY;
@@ -89,6 +87,7 @@ int main(int argc, char **argv)
 
 	rv = MSCWaitForTokenEvent(tokenList, tokenSize, MSC_NO_TIMEOUT);
 
+	reader_to_use = -1;
 	for (i = 0; i < tokenSize; i++)
 	{
 		printf("Token #%d\n", i);
@@ -100,12 +99,21 @@ int main(int argc, char **argv)
 			printf("%02X", tokenList[i].tokenId[j]);
 		}
 		printf("\n");
-		printf("Token state    : %ld\n", tokenList[i].tokenState);
+		printf("Token state    : %04lX\n", tokenList[i].tokenState);
 		printf("\n");
+
+		if (tokenList[i].tokenState & SCARD_STATE_PRESENT)
+			reader_to_use = i;
 	}
 
-	rv = MSCEstablishConnection(&tokenList[0], MSC_SHARE_SHARED, AID,
-		6, &pConnection);
+	if (reader_to_use == -1)
+	{
+		printf("No valid token found\n");
+		return -1;
+	}
+
+	rv = MSCEstablishConnection(&tokenList[reader_to_use], MSC_SHARE_SHARED,
+		AID, 6, &pConnection);
 	if (rv != MSC_SUCCESS)
 	{
 		printf("EstablishConn returns     : %s\n", msc_error(rv));
@@ -117,22 +125,24 @@ int main(int argc, char **argv)
 
 	rv = MSCGetStatus(&pConnection, &statusInf);
 	printf("GetStatus returns           : %s\n", msc_error(rv));
-	printf("Protocol version            : %04x\n", statusInf.appVersion);
-	printf("Applet version              : %04x\n", statusInf.swVersion);
+	printf("Protocol version            : %04X\n", statusInf.appVersion);
+	printf("Applet version              : %04X\n", statusInf.swVersion);
 	printf("Total object memory         : %08ld\n", statusInf.totalMemory);
 	printf("Free object memory          : %08ld\n", statusInf.freeMemory);
 	printf("Number of used PINs         : %02d\n", statusInf.usedPINs);
 	printf("Number of used Keys         : %02d\n", statusInf.usedKeys);
-	printf("Currently logged identities : %04x\n", statusInf.loggedID);
+	printf("Currently logged identities : %04X\n", statusInf.loggedID);
 
-        printf("Please enter the pin value\n");
-        fgets(defaultPIN, sizeof(defaultPIN), stdin);
+	printf("Please enter the PIN value: ");
+	fgets(defaultPIN, sizeof(defaultPIN), stdin);
+	if (defaultPIN[0] == '\n')
+		strcpy(defaultPIN, "Muscle00\n");
 
 	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN, strlen(defaultPIN) - 1);
 	printf("Verify default PIN          : %s\n", msc_error(rv));
 
 	rv = MSCGetStatus(&pConnection, &statusInf);
-	printf("Currently logged identities : %04x\n", statusInf.loggedID);
+	printf("Currently logged identities : %04X\n", statusInf.loggedID);
 
 	objACL.readPermission = MSC_AUT_ALL;
 	objACL.writePermission = MSC_AUT_ALL;
@@ -166,13 +176,12 @@ int main(int argc, char **argv)
 	printf("\n");
 	printf("Listing objects             : %s\n", msc_error(rv));
 	printf("------------------------------------------------------\n");
-	printf("%20s %12s %6s %6s  %6s\n", "Object ID", "Object Size",
-		"READ", "WRITE", "DELETE");
+	printf("           Object ID  Object Size   READ  WRITE  DELETE\n");
 	printf("   -----------------  -----------   ----  -----  ------\n");
 
 	if (rv == MSC_SUCCESS)
 	{
-		printf("%20s %12d   %04x   %04x    %04x\n", objInfo.objectID,
+		printf("%20s %12ld   %04X   %04X    %04X\n", objInfo.objectID,
 			objInfo.objectSize,
 			objInfo.objectACL.readPermission,
 			objInfo.objectACL.writePermission,
@@ -184,7 +193,7 @@ int main(int argc, char **argv)
 		rv = MSCListObjects(&pConnection, MSC_SEQUENCE_NEXT, &objInfo);
 		if (rv == MSC_SUCCESS)
 		{
-			printf("%20s %12d   %04x   %04x    %04x\n", objInfo.objectID,
+			printf("%20s %12ld   %04X   %04X    %04X\n", objInfo.objectID,
 				objInfo.objectSize,
 				objInfo.objectACL.readPermission,
 				objInfo.objectACL.writePermission,
@@ -209,13 +218,14 @@ int main(int argc, char **argv)
 	rv = MSCGetStatus(&pConnection, &statusInf);
 	printf("Free object memory          : %08ld\n", statusInf.freeMemory);
 
+	memset(pRandomData, 0, sizeof(pRandomData));
 	rv = MSCGetChallenge(&pConnection, pSeed, 0, pRandomData, 8);
 	printf("GetChallenge returns        : %s\n", msc_error(rv));
 	printf("Random data                 : ");
 
 	for (i = 0; i < 8; i++)
 	{
-		printf("%x ", pRandomData[i]);
+		printf("%02X ", pRandomData[i]);
 	}
 	printf("\n");
 
@@ -223,7 +233,7 @@ int main(int argc, char **argv)
 	printf("Logout all identities       : %s\n", msc_error(rv));
 
 	rv = MSCGetStatus(&pConnection, &statusInf);
-	printf("Currently logged identities : %04x\n", statusInf.loggedID);
+	printf("Currently logged identities : %04X\n", statusInf.loggedID);
 
 	rv = MSCEndTransaction(&pConnection, SCARD_LEAVE_CARD);
 	printf("EndTransaction returns      : %s\n", msc_error(rv));
