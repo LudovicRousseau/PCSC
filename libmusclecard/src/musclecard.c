@@ -791,7 +791,7 @@ void *_MSCEventThread(void *arg)
 	        }
 	}
 	
-
+	free(evlist->tokenArray);
 	free(evlist);
 	blockingContext = MSC_BLOCKSTATUS_RESUME;
 	SYS_ThreadExit(&rv);
