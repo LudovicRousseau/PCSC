@@ -74,7 +74,7 @@ ACX_PTHREAD(
 
 dnl --enable-threadsafe
 AC_ARG_ENABLE(threadsafe,
-[  --enable-threadsafe     enable client side thread safety.],
+  AC_HELP_STRING([--enable-threadsafe],[enable client side thread safety]),
 [case "${enableval}" in
   yes)	threadsafe=true ;;
   no)	threadsafe=false ;;
@@ -142,7 +142,8 @@ AC_CHECK_LIB(usb, usb_init, [LIBUSB="$LIBUSB -lusb" use_libusb=true ], [ use_lib
 AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
 
 dnl --enable-libusb=DIR
-AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb],
+AC_ARG_ENABLE(libusb,
+  AC_HELP_STRING([--enable-libusb=PATH],[enable USB hotplug using libusb]),
 	[
 		case ${enableval} in
 			"" | "yes" | "YES")
@@ -173,7 +174,8 @@ fi
 
 dnl --enable-usbdropdir=DIR
 AC_ARG_ENABLE(usbdropdir,
-[  --enable-usbdropdir=DIR directory containing USB drivers                                                (default /usr/local/pcsc/drivers)],
+  AC_HELP_STRING([--enable-usbdropdir=DIR],[directory containing USB
+				  drivers (default /usr/local/pcsc/drivers)]),
 [usbdropdir="${enableval}"], [usbdropdir=false])
 if test x${usbdropdir} = xfalse ; then
 	usbdropdir="/usr/local/pcsc/drivers"
@@ -182,7 +184,7 @@ AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
 AC_ARG_ENABLE(debug,
-[  --enable-debug          enable debug messages from pcscd.],
+  AC_HELP_STRING([--enable-debug],[enable debug messages from pcscd]),
 [ case "${enableval}" in
   yes)	
     debug=true ;;
@@ -200,7 +202,7 @@ fi
 
 dnl --enable-debugatr
 AC_ARG_ENABLE(debugatr,
-[  --enable-debugatr       enable ATR debug messages from pcscd.],
+  AC_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
 [ case "${enableval}" in
   yes)	debugatr=true ;;
   no)	debugatr=false ;;
@@ -215,7 +217,7 @@ fi
 
 dnl --enable-scf
 AC_ARG_ENABLE(scf,
-[  --enable-scf            use SCF for reader support.],
+  AC_HELP_STRING([--enable-scf],[use SCF for reader support]),
 [ case "${enableval}" in
   yes)	scf=true ;;
   no)	scf=false ;;
@@ -233,7 +235,7 @@ AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
 
 dnl --disable-musclecard
 AC_ARG_ENABLE(musclecard,
-[  --disable-musclecard    musclecard framework disabled.],
+  AC_HELP_STRING([--disable-musclecard],[musclecard framework disabled]),
 [case "${enableval}" in
   yes)	musclecard=true ;;
   no)	musclecard=false ;;
@@ -246,7 +248,8 @@ AM_CONDITIONAL(HAVE_MUSCLECARD, test x$musclecard = xtrue)
 
 dnl --enable-muscledropdir=DIR
 AC_ARG_ENABLE(muscledropdir,
-[  --enable-muscledropdir=DIR directory containing MuscleCard bundles                                      (default /usr/local/pcsc/services)],
+  AC_HELP_STRING([--enable-muscledropdir=DIR],[directory containing
+				  MuscleCard bundles (default /usr/local/pcsc/services)]),
 [muscledropdir="${enableval}"], [muscledropdir=false])
 if test x${muscledropdir} = xfalse ; then
 	muscledropdir="/usr/local/pcsc/services"
@@ -256,7 +259,8 @@ AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing Musc
 
 dnl --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
-[  --enable-confdir=DIR    directory containing reader.conf (default /etc)],
+AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
+				(default /etc)]),
 [confdir="${enableval}"], [confdir=false])
 
 if test x${confdir} != xfalse ; then
@@ -269,7 +273,7 @@ fi
 
 dnl --enable-runpid=FILE
 AC_ARG_ENABLE(runpid,
-[  --enable-runpid=FILE    file containing pcscd pid],
+  AC_HELP_STRING([--enable-runpid=FILE],[file containing pcscd pid]),
 [runpid="${enableval}"], [runpid=false])
 
 AC_MSG_RESULT([enable runpid                 : $runpid])
@@ -280,7 +284,8 @@ fi
 
 dnl --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
-[  --enable-ipcdir=DIR     directory containing IPC files (default /var/run)],
+  AC_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
+				  (default /var/run)]),
 [ipcdir="${enableval}"], [ipcdir=false])
 
 if test x${ipcdir} != xfalse ; then
