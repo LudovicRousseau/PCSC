@@ -29,7 +29,6 @@
 LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
-
 	RESPONSECODE rv;
 	LPVOID vFunction;
 	UCHAR ucValue[1];
@@ -55,9 +54,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	vFunction = rContext->psFunctions.pvfSetProtocol;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
@@ -87,7 +84,8 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 	        rv = (*IFD_set_protocol_parameters) (dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
-	} else
+	}
+	else
 	{
 		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot, 
 						      dwProtocol,
@@ -101,7 +99,8 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
-	} else
+	}
+	else
 	{
 		rv = IFDHSetProtocolParameters(rContext->dwSlot, dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
@@ -123,7 +122,6 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 
 LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 {
-
 	RESPONSECODE rv;
 	LPVOID vFunction;
 	LPVOID vFunction1;
@@ -149,9 +147,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	vFunction1 = rContext->psFunctions.pvfCreateChannelByName;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
@@ -219,7 +215,6 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 {
-
 	RESPONSECODE rv;
 	LPVOID vFunction;
 
@@ -241,17 +236,12 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	vFunction = rContext->psFunctions.pvfCloseChannel;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		IO_close_channel = (RESPONSECODE(*)())vFunction;
-	} else
-	{
+	else
 		IFDH_close_channel = (RESPONSECODE(*)(DWORD)) vFunction;
-	}
 #endif
 
 	/*
@@ -261,20 +251,15 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	SYS_MutexLock(rContext->mMutex);
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
+	
 		rv = (*IO_close_channel) ();
-	} else
-	{
+	else
 		rv = (*IFDH_close_channel) (rContext->dwSlot);
-	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = IO_Close_Channel();
-	} else
-	{
+	else
 		rv = IFDHCloseChannel(rContext->dwSlot);
-	}
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -293,7 +278,6 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
-
 	LONG rv;
 	LPVOID vFunction;
 
@@ -316,19 +300,13 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	vFunction = rContext->psFunctions.pvfSetCapabilities;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
-		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
-		  vFunction;
-	} else
-	{
+		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) vFunction;
+	else
 		IFDH_set_capabilities = (RESPONSECODE(*)(DWORD, DWORD, DWORD,
-				PUCHAR)) vFunction;
-	}
+			PUCHAR)) vFunction;
 #endif
 
 	/*
@@ -338,22 +316,16 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = (*IFD_set_capabilities) (dwTag, pucValue);
-	} else
-	{
+	else
 		rv = (*IFDH_set_capabilities) (rContext->dwSlot, dwTag,
 			dwLength, pucValue);
-	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = IFD_Set_Capabilities(dwTag, pucValue);
-	} else
-	{
+	else
 		rv = IFDHSetCapabilities(rContext->dwSlot, dwTag, dwLength,
 			pucValue);
-	}
 #endif
 
 	return rv;
@@ -368,7 +340,6 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
-
 	LONG rv;
 	LPVOID vFunction;
 
@@ -391,19 +362,14 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	vFunction = rContext->psFunctions.pvfGetCapabilities;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
-		  vFunction;
-	} else
-	{
+			vFunction;
+	else
 		IFDH_get_capabilities = (RESPONSECODE(*)(DWORD, DWORD, PDWORD,
-				PUCHAR)) vFunction;
-	}
+			PUCHAR)) vFunction;
 #endif
 
 	/*
@@ -414,22 +380,16 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = (*IFD_get_capabilities) (dwTag, pucValue);
-	} else
-	{
+	else
 		rv = (*IFDH_get_capabilities) (rContext->dwSlot, dwTag,
 			pdwLength, pucValue);
-	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = IFD_Get_Capabilities(dwTag, pucValue);
-	} else
-	{
+	else
 		rv = IFDHGetCapabilities(rContext->dwSlot, dwTag, pdwLength,
 			pucValue);
-	}
 #endif
 
 	SYS_MutexUnLock(rContext->mMutex);
@@ -449,7 +409,6 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
-
 	RESPONSECODE rv, ret;
 	LPVOID vFunction;
 	SMARTCARD_EXTENSION sSmartCard;
@@ -476,9 +435,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	IFDStatusICC(rContext, &dwStatus, &dwProtocol, pucAtr, pdwAtrLen);
 
 	if (dwStatus & SCARD_ABSENT)
-	{
 		return SCARD_W_REMOVED_CARD;
-	}
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
@@ -486,18 +443,13 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	vFunction = rContext->psFunctions.pvfPowerICC;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		IFD_power_icc = (RESPONSECODE(*)(DWORD)) vFunction;
-	} else
-	{
+	else
 		IFDH_power_icc = (RESPONSECODE(*)(DWORD, DWORD, PUCHAR,
 				PDWORD)) vFunction;
-	}
 #endif
 
 	/*
@@ -525,10 +477,9 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
-	} else
-	{
-		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, dwAtrLen);
 	}
+	else
+		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, dwAtrLen);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -540,9 +491,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 * Get the ATR and it's length 
 	 */
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		IFDStatusICC(rContext, &dwStatus, &dwProtocol, pucAtr, pdwAtrLen);
-	}
 
 	return rv;
 }
@@ -556,7 +505,6 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	PDWORD pdwProtocol, PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
-
 	RESPONSECODE rv, rv1;
 	LPVOID vFunctionA, vFunctionB;
 	DWORD dwTag, dwCardStatus;
@@ -588,24 +536,19 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	vFunctionB = rContext->psFunctions.pvfGetCapabilities;
 
 	if (vFunctionA == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if ((vFunctionB == 0) && (rContext->dwVersion == IFD_HVERSION_1_0))
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_is_icc_present = (RESPONSECODE(*)())vFunctionA;
 		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
 		  vFunctionB;
-	} else
-	{
-		IFDH_icc_presence = (RESPONSECODE(*)(DWORD)) vFunctionA;
 	}
+	else
+		IFDH_icc_presence = (RESPONSECODE(*)(DWORD)) vFunctionA;
 #endif
 
 	/*
@@ -620,20 +563,18 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_is_icc_present) ();
-	} else
-	{
-		rv = (*IFDH_icc_presence) (rContext->dwSlot);
 	}
+	else
+		rv = (*IFDH_icc_presence) (rContext->dwSlot);
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
-	} else
-	{
-		rv = IFDHICCPresence(rContext->dwSlot);
 	}
+	else
+		rv = IFDHICCPresence(rContext->dwSlot);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -642,15 +583,12 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	 */
 
 	if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
-	{
 		dwCardStatus |= SCARD_PRESENT;
-	} else if (rv == IFD_ICC_NOT_PRESENT)
-	{
-		dwCardStatus |= SCARD_ABSENT;
-	} else
-	{
-		return SCARD_E_NOT_TRANSACTED;
-	}
+	else
+		if (rv == IFD_ICC_NOT_PRESENT)
+			dwCardStatus |= SCARD_ABSENT;
+		else
+			return SCARD_E_NOT_TRANSACTED;
 
 	/*
 	 * Now lets get the ATR and process it if IFD Handler version 1.0.
@@ -695,12 +633,9 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			 * Might be a memory card without an ATR 
 			 */
 			if (rv == 0)
-			{
 				*pdwAtrLen = 0;
-			} else
-			{
+			else
 				*pdwAtrLen = sSmartCard.ATR.Length;
-			}
 		} else
 		{
 			/*
@@ -728,7 +663,6 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	DWORD TxLength, PUCHAR RxBuffer, PDWORD RxLength)
 {
-
 	RESPONSECODE rv;
 	LPVOID vFunction;
 	UCHAR ucValue[1];
@@ -751,9 +685,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	vFunction = rContext->psFunctions.pvfControl;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	IFDH_control = (RESPONSECODE(*)(DWORD, PUCHAR, DWORD,
 			PUCHAR, PDWORD)) vFunction;
@@ -767,22 +699,16 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	} else
-	{
+	else
 		rv = (*IFDH_control) (rContext->dwSlot, TxBuffer, TxLength,
 			RxBuffer, RxLength);
-	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		rv = SCARD_E_UNSUPPORTED_FEATURE;
-	} else
-	{
+	else
 		rv = IFDHControl(rContext->dwSlot, TxBuffer, TxLength,
 			RxBuffer, RxLength);
-	}
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -791,12 +717,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	 */
 
 	if (rv == IFD_SUCCESS)
-	{
 		return SCARD_S_SUCCESS;
-	} else
-	{
+	else
 		return SCARD_E_NOT_TRANSACTED;
-	}
 }
 
 /*
@@ -808,7 +731,6 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	PUCHAR pucTxBuffer, DWORD dwTxLength, PUCHAR pucRxBuffer,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)
 {
-
 	RESPONSECODE rv;
 	LPVOID vFunction;
 	UCHAR ucValue[1];
@@ -837,23 +759,17 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	vFunction = rContext->psFunctions.pvfTransmitICC;
 
 	if (vFunction == 0)
-	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
-	}
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
 		IFD_transmit_to_icc = (RESPONSECODE(*)(SCARD_IO_HEADER, PUCHAR,
 						       DWORD, PUCHAR, DWORD *,
-						       PSCARD_IO_HEADER)) 
-		  vFunction;
-	} else
-	{
+						       PSCARD_IO_HEADER)) vFunction;
+	else
 		IFDH_transmit_to_icc =
 			(RESPONSECODE(*)(DWORD, SCARD_IO_HEADER, PUCHAR, 
 					 DWORD, PUCHAR, DWORD *, 
 					 PSCARD_IO_HEADER)) vFunction;
-	}
 #endif
 
 	/*
@@ -866,29 +782,27 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_transmit_to_icc) (pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
-	} else
-	{
+	}
+	else
 		rv = (*IFDH_transmit_to_icc) (rContext->dwSlot, pioTxPci,
 			(LPBYTE) pucTxBuffer, dwTxLength,
 			pucRxBuffer, pdwRxLength, pioRxPci);
-	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Transmit_to_ICC(pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
-	} else
-	{
+	}
+	else
 		rv = IFDHTransmitToICC(rContext->dwSlot, pioTxPci,
 			(LPBYTE) pucTxBuffer, dwTxLength,
 			pucRxBuffer, pdwRxLength, pioRxPci);
-	}
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
@@ -900,12 +814,8 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);
 
 	if (rv == IFD_SUCCESS)
-	{
 		return SCARD_S_SUCCESS;
-	} else
-	{
+	else
 		return SCARD_E_NOT_TRANSACTED;
-	}
-
 }
 
