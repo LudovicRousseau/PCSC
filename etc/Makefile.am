@@ -6,5 +6,5 @@ sbin_SCRIPTS = update-reader.conf
 EXTRA_DIST = StartupParameters.plist SmartcardServices
 
 install-data-hook:
-	$(mkdir_p) "$(DESTDIR)$(confdir)/reader.conf.d"
+	$(mkinstalldirs) "$(DESTDIR)$(confdir)/reader.conf.d"
 
