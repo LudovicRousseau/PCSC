@@ -1,3 +1,90 @@
+pcsc-lite-1.2.9-beta1: Ludovic Rousseau
+6 May 2004
+- configure: add support of --enable-extendedapdu argument to allow the use of
+  big APDUs (APDU size between 256-Bytes and 128-KBytes)
+- API changes:
+  . SCardControl() API changed to be similar to the Microsoft PC/SC
+    implementation
+  . add SCardGetAttrib()/SCardSetAttrib() functions
+  . the driver need to be compliant to IFDHandler API v3 to support these new
+    functions
+- multithreading:
+  Damien Sauveron added the support of multiplexing multi-readers
+  communications. In the previous version the communications were serialized
+  and not simultaneous even if it was not needed. Thanks Damien.
+- src/pcscdaemon.c:
+  . remove the warning if no /etc/reader.conf is found. It is normal to not
+    have an /etc/reader.conf for USB readers only.
+  . send debug to syslog by default
+  . send debug to stderr if --foreground|-f is used (no need to add
+    --debug stderr anymore)
+- doc/pcsc-lite.pdf: doc improved to add the new functions and API. The doc is
+  now generated from a LaTeX file (easier to maintain, html version available,
+  much more nice, etc.)
+- src/testpcsc.c:
+  . added tests for the new functions SCardGetAttrib(), SCardSetAttrib() and
+    SCardControl() and also the old SCardListReaderGroups()
+  . do not ask for reader number if only one reader is present
+  . some more debug
+- pcscd and libpcsclite now exchange a protocol version to know what API to
+  use. This will be usefull if/when the API change again
+- change library version to 1:0:0 since the interface changed
+- hotplug: the daemon pcscd do not try to restart drivers anymore when it is
+  exiting
+- src/hotplug_libusb.c:
+  . do not try to restart a USB driver if the first execution fails (because
+    of a bug in the driver or whatever) since the next execution of the driver
+    will, with a great probability, also fail. The user has to unplug/replug
+    the reader to restart the driver. This prevents to fill the system logs
+    with an error message every 1 second.
+  . use deviceName defined as usb:idVendor/idProduct:libusb:busname:filename
+    in HPAddHotPluggable(). This should avoid wrong USB enumeration when used
+    in IFDHCreateChannelByName()
+- src/hotplug_macosx.c:
+  . buffer overflow: the driver list was not terminated and caused crashes.
+- src/winscard.c:
+  . remove the code to map SCARD_UNPOWER_CARD on IFD_RESET.
+    SCARD_UNPOWER_CARD is power down and power up (cold reset) => IFD_POWER_DOWN
+    SCARD_RESET_CARD is just power up (warm reset) => IFD_RESET
+- src/winscard.h:
+  . use SCARDCONTEXT, DWORD, LPSCARDHANDLE, etc. instead of long, unsigned
+    long, long *, etc. to be more Windows PC/SC compliant
+- doc/reader.conf.5.in: new manpage to make it clear that this configuration
+  file SHOULD not be used for USB readers
+- src/configfile.l:
+  . print a warning if the LIBPATH contains ".bundle". USB drivers SHOULD NOT
+    be declared in reader.conf
+  . Check that DEVICENAME and LIBPATH files exist and if an error occurs
+    during the parsing the reader is not added and pcscd exit.
+- doc/example/pcsc_demo.c:
+  . recode the readers enumeration to avoid the use of
+    PCSCLITE_MAX_READERS_CONTEXTS. You do not and should not need
+    PCSCLITE_MAX_READERS_CONTEXTS. Use a dynamic management instead.
+  . add SCardReconnect() sample code
+  . allow to select the reader number instead of always selecting the first
+    reader
+  . some minor debug
+- src/musclecard.c:
+  . Initialize currentToken->tokenType in MSCListTokens(). Closes "[ #300607 ]
+    MSCListTokens should set tokenType to know state before OR operation"
+- src/tokenfactory.c:
+  . correct atrString[] buffer size. The ATR is in ASCII so it must be
+    MAX_ATR_SIZE*2 +1. This was problematic for cards with a "long" ATR.
+- src/readerfactory.c:
+  . initialize vHandle field to NULL in RFAllocateReaderSpace() (caused a
+    crash under MacOS X)
+- aclocal/acx_pthread.m4:
+  . new upstream version to avoid checking for pthread.h which does not exist
+    on *BSD
+- src/libmusclecard.pc.in, src/libpcsclite.pc.in:
+  . add muscledropdir (in libmusclecard) and usbdropdir (in libpcsclite) so we
+    can use `pkg-config libpcsclite --variable=usbdropdir` to find the
+    directory to use. Should be used by drivers and plugins installation.
+    Thanks to Ville Skyttä for the patch.
+- many other minor patches and corrections. Read ChangeLog.cvs for a complete
+  list
+
+
 pcsc-lite-1.2.0: Ludovic Rousseau
 27 october, 2003
 - the 1.2.0 version is the same as 1.2.0-rc3 version
