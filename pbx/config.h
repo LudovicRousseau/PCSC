@@ -7,7 +7,7 @@
 #define PACKAGE "PCSC Framework"
 
 /* Version number of package */
-#define VERSION "1.1.1"
+#define VERSION "1.1.2beta1"
 
 /* OSX */
 #define PCSC_TARGET_OSX 1
@@ -33,4 +33,7 @@
 
 /* enable client side thread safety. */
 #define USE_THREAD_SAFETY 1
+
+/* file containing pcscd pid */
+#define USE_RUN_PID "/var/run/pcscd.pid"
 
