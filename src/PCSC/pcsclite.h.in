@@ -204,6 +204,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define MAX_ATR_SIZE			33	/* Maximum ATR size */
 #define MAX_READERNAME			52
 #define MAX_LIBNAME			100
+#define MAX_DEVICENAME		255
 
 #ifndef SCARD_ATR_LENGTH
 #define SCARD_ATR_LENGTH		MAX_ATR_SIZE	/* Maximum ATR size */
