@@ -354,6 +354,7 @@ doc/example/Makefile
 etc/Makefile
 etc/pcscd.init
 etc/reader.conf
+etc/update-reader.conf
 src/Makefile
 src/libmusclecard.pc
 src/libpcsclite.pc
