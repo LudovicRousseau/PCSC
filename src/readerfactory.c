@@ -621,6 +621,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPTSTR readerName,
 	return parent;
 }
 
+#if 0
 LONG RFListReaders(LPTSTR lpcReaders, LPDWORD pdwReaderNum)
 {
 	DWORD dwCSize;
@@ -696,6 +697,7 @@ LONG RFListReaders(LPTSTR lpcReaders, LPDWORD pdwReaderNum)
 
 	return SCARD_S_SUCCESS;
 }
+#endif
 
 LONG RFReaderInfo(LPTSTR lpcReader, PREADER_CONTEXT * sReader)
 {
