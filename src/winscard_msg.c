@@ -35,29 +35,21 @@
 #include "debuglog.h"
 
 static int commonSocket = 0;
-static int appSocket = 0;
 
-struct _clientSockets
+int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
 {
-	int sd;
-};
-
-static struct _clientSockets clientSockets[PCSCLITE_MAX_APPLICATIONS];
-
-int SHMClientRead(psharedSegmentMsg msgStruct, int blockamount)
-{
-	return SHMMessageReceive(msgStruct, appSocket, blockamount);
+	return SHMMessageReceive(msgStruct, dwClientID, blockamount);
 }
 
-int SHMClientSetupSession(int processID)
+int SHMClientSetupSession(PDWORD pdwClientID)
 {
 
 	struct sockaddr_un svc_addr;
 	int one;
 
-	if ((appSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+	if ((*pdwClientID = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Error: create on client socket: %s",
+		DebugLogB("SHMClientSetupSession: Error: create on client socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -66,50 +58,44 @@ int SHMClientSetupSession(int processID)
 	strncpy(svc_addr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(svc_addr.sun_path));
 
-	if (connect(appSocket, (struct sockaddr *) &svc_addr,
+	if (connect(*pdwClientID, (struct sockaddr *) &svc_addr,
 			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Error: connect to client socket: %s",
+		DebugLogB("SHMClientSetupSession: Error: connect to client socket: %s",
 			strerror(errno));
-		SYS_CloseFile(appSocket);
+		SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
 
 	one = 1;
-	if (ioctl(appSocket, FIONBIO, &one) < 0)
+	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket nonblocking: %s",
+		DebugLogB("SHMClientSetupSession: Error: cannot set socket nonblocking: %s",
 			strerror(errno));
-		SYS_CloseFile(appSocket);
+		SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
 
 	return 0;
 }
 
-int SHMClientCloseSession()
+int SHMClientCloseSession(DWORD dwClientID)
 {
-	SYS_CloseFile(appSocket);
+	SYS_CloseFile(dwClientID);
 	return 0;
 }
 
 int SHMInitializeCommonSegment()
 {
 
-	int i;
 	static struct sockaddr_un serv_adr;
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS; i++)
-	{
-		clientSockets[i].sd = -1;
-	}
 
 	/*
 	 * Create the common shared connection socket 
 	 */
 	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Unable to create common socket: %s",
+		DebugLogB("SHMInitializeCommonSegment: Unable to create common socket: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -122,7 +108,7 @@ int SHMInitializeCommonSegment()
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
 			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Unable to bind common socket: %s",
+		DebugLogB("SHMInitializeCommonSegment: Unable to bind common socket: %s",
 			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
@@ -130,7 +116,7 @@ int SHMInitializeCommonSegment()
 
 	if (listen(commonSocket, 1) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Unable to listen common socket: %s",
+		DebugLogB("SHMInitializeCommonSegment: Unable to listen common socket: %s",
 			strerror(errno));
 		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
@@ -144,10 +130,10 @@ int SHMInitializeCommonSegment()
 	return 0;
 }
 
-int SHMProcessCommonChannelRequest()
+int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 {
 
-	int i, clnt_len;
+	int clnt_len;
 	int new_sock;
 	struct sockaddr_un clnt_addr;
 	int one;
@@ -162,44 +148,27 @@ int SHMProcessCommonChannelRequest()
 		return -1;
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS; i++)
-	{
-		if (clientSockets[i].sd == -1)
-		{
-			break;
-		}
-	}
-
-	if (i == PCSCLITE_MAX_APPLICATIONS)
-	{
-		SYS_CloseFile(new_sock);
-		return -1;
-	}
-
-	clientSockets[i].sd = new_sock;
+	*pdwClientID = new_sock;
 
 	one = 1;
-	if (ioctl(clientSockets[i].sd, FIONBIO, &one) < 0)
+	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
-		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket "
+		DebugLogB("SHMProcessCommonChannelRequest: Error: cannot set socket "
 			"nonblocking: %s", strerror(errno));
-		SYS_CloseFile(clientSockets[i].sd);
-		clientSockets[i].sd = -1;
+		SYS_CloseFile(*pdwClientID);
+		*pdwClientID = -1;
 		return -1;
 	}
 
 	return 0;
 }
 
-int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
+int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
-	static int last_client = 0;
-	static fd_set read_fd;
-	int i, j, selret, largeSock, rv;
+	fd_set read_fd;
+	int selret;
 	struct timeval tv;
-
-	largeSock = 0;
-
+	
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
 
@@ -209,26 +178,58 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 	 * Set up the bit masks for select 
 	 */
 	FD_SET(commonSocket, &read_fd);
-	largeSock = commonSocket;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS; i++)
-	{
-		if (clientSockets[i].sd != -1)
-		{
-			FD_SET(clientSockets[i].sd, &read_fd);
-			if (clientSockets[i].sd > largeSock)
-			{
-				largeSock = clientSockets[i].sd;
-			}
-		}
-	}
-
-	selret = select(largeSock + 1, &read_fd, (fd_set *) NULL,
+	selret = select(commonSocket + 1, &read_fd, (fd_set *) NULL,
 		(fd_set *) NULL, &tv);
 
 	if (selret < 0)
 	{
-		DebugLogB("SHMProcessEvents: Select returns with failure: %s",
+		DebugLogB("SHMProcessEventsServer: Select returns with failure: %s",
+			strerror(errno));
+		return -1;
+	}
+
+	if (selret == 0)
+		/* timeout */
+		return 2;
+	/*
+	 * A common pipe packet has arrived - it could be a new application  
+	 */
+	if (FD_ISSET(commonSocket, &read_fd))
+	{
+		DebugLogA("SHMProcessEventsServer: Common channel packet arrival");
+		if (SHMProcessCommonChannelRequest(pdwClientID) == -1)
+		{
+			DebugLogB("SHMProcessEventsServer: error in SHMProcessCommonChannelRequest: %d", *pdwClientID);
+			return -1;
+		} else
+		{
+			DebugLogB("SHMProcessEventsServer: SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
+			return 0;
+		}
+	}
+	
+	return -1;
+}
+
+int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int blocktime)
+{
+	fd_set read_fd;
+	int selret, rv;
+	struct timeval tv;
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+
+	FD_ZERO(&read_fd);
+	FD_SET(*pdwClientID, &read_fd);
+
+	selret = select(*pdwClientID + 1, &read_fd, (fd_set *) NULL,
+		(fd_set *) NULL, &tv);
+
+	if (selret < 0)
+	{
+		DebugLogB("SHMProcessEventsContext: Select returns with failure: %s",
 			strerror(errno));
 		return -1;
 	}
@@ -237,62 +238,33 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 		/* timeout */
 		return 2;
 
-	/*
-	 * A common pipe packet has arrived - it could be a new application or 
-	 * it could be a reader event packet coming from another thread 
-	 */
-
-	if (FD_ISSET(commonSocket, &read_fd))
+	if (FD_ISSET(*pdwClientID, &read_fd))
 	{
-		DebugLogA("SHMProcessEvents: Common channel packet arrival");
-		if (SHMProcessCommonChannelRequest() == -1)
-		{
-			return -1;
-		} else
-		{
+		/*
+		 * Return the current handle 
+		 */
+		rv = SHMMessageReceive(msgStruct, *pdwClientID,
+				       PCSCLITE_SERVER_ATTEMPTS);
+		
+		if (rv == -1)
+		{	/* The client has died */
+			DebugLogB("SHMProcessEventsContext: Client has disappeared: %d", *pdwClientID);
+			msgStruct->mtype = CMD_CLIENT_DIED;
+			msgStruct->command = 0;
+			SYS_CloseFile(*pdwClientID);
+
 			return 0;
 		}
+		
+		/*
+		 * Set the identifier handle 
+		 */
+		DebugLogB("SHMProcessEventsContext: correctly processed client: %d", *pdwClientID);
+		return 1;
 	}
-
-	/* Start each time with the last client and go round, else
-	 * in case of much traffic only two clients will be serviced */
-	for (j = 0; j < PCSCLITE_MAX_APPLICATIONS; j++)
-	{
-		i = (j+last_client) % PCSCLITE_MAX_APPLICATIONS;
-		if (clientSockets[i].sd != -1)
-		{
-			if (FD_ISSET(clientSockets[i].sd, &read_fd))
-			{
-				/*
-				 * Return the current handle 
-				 */
-				rv = SHMMessageReceive(msgStruct, clientSockets[i].sd,
-					PCSCLITE_SERVER_ATTEMPTS);
-
-				if (rv == -1)
-				{	/* The client has died */
-					DebugLogB("SHMProcessEvents: Client has disappeared: %d", i);
-					msgStruct->mtype = CMD_CLIENT_DIED;
-					msgStruct->request_id = clientSockets[i].sd;
-					msgStruct->command = 0;
-					SYS_CloseFile(clientSockets[i].sd);
-					clientSockets[i].sd = -1;
-					return 0;
-				}
-
-				/*
-				 * Set the identifier handle 
-				 */
-				last_client = i;
-				DebugLogB("SHMProcessEvents: correctly processed client: %d",
-					last_client);
-				msgStruct->request_id = clientSockets[i].sd;
-				return 1;
-			}
-		}
-	}
-
+	
 	return -1;
+
 }
 
 int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
@@ -397,7 +369,7 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB("SHMProcessEvents: Select returns with failure: %s",
+				DebugLogB("SHMMessageSend: Select returns with failure: %s",
 					strerror(errno));
 				retval = -1;
 				break;
@@ -510,7 +482,7 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 			 */
 			if (errno != EINTR)
 			{
-				DebugLogB("SHMProcessEvents: Select returns with failure: %s",
+				DebugLogB("SHMMessageReceive: Select returns with failure: %s",
 					strerror(errno));
 				retval = -1;
 				break;
@@ -521,7 +493,7 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
-int WrapSHMWrite(unsigned int command, unsigned int pid,
+int WrapSHMWrite(unsigned int command, unsigned int pid, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
 
@@ -539,7 +511,7 @@ int WrapSHMWrite(unsigned int command, unsigned int pid,
 	msgStruct.date = time(NULL);
 	memcpy(msgStruct.data, data, size);
 
-	return SHMMessageSend(&msgStruct, appSocket, blockAmount);
+	return SHMMessageSend(&msgStruct, dwClientID, blockAmount);
 }
 
 void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
