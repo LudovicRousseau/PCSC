@@ -291,7 +291,7 @@ int SYS_Fstat(int iFd)
 	return fstat(iFd, &sStatus);
 }
 
-int SYS_Random(int iSeed, float fStart, float fEnd)
+int SYS_RandomInt(int fStart, int fEnd)
 {
 	static int iInitialized = 0;
 	int iRandNum = 0;
@@ -302,7 +302,7 @@ int SYS_Random(int iSeed, float fStart, float fEnd)
 		iInitialized = 1;
 	}
 
-	iRandNum = 1 + (int) (fEnd * rand() / (RAND_MAX + fStart));
+	iRandNum = (int)((float)rand()/RAND_MAX * (fEnd - fStart)) + fStart;
 
 	return iRandNum;
 }

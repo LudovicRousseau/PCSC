@@ -81,7 +81,7 @@ extern "C"
 
 	int SYS_Fstat(int);
 
-	int SYS_Random(int, float, float);
+	int SYS_RandomInt(int, int);
 
 	int SYS_GetSeed(void);
 
