@@ -10,8 +10,8 @@ noinst_LTLIBRARIES = libpcsclite-core.la
 sbin_PROGRAMS = pcscd
 include_HEADERS = mscdefines.h musclecard.h pcsclite.h winscard.h \
 	wintypes.h debuglog.h
-check_PROGRAMS = testpcsc
-TESTS = testpcsc
+check_PROGRAMS = testpcsc muscletest
+#TESTS = testpcsc
 
 if PCSC_ARCH_LINUX
 PCSC_MYLDFLAGS      =
@@ -150,10 +150,13 @@ AM_CFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
+muscletest_SOURCES = muscletest.c
+muscletest_LDADD = libpcsclite.la
+
 EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
 	hotplug_generic.c hotplug_linux.c hotplug_libusb.c hotplug_macosx.c \
 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
-	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c \
+	sys_solaris.c sys_hpux.c powermgt_macosx.c \
 	winscard_scf.c
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
