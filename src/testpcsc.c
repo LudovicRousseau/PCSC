@@ -29,7 +29,8 @@ int main(int argc, char **argv)
 	unsigned long dwPref, dwReaders;
 	char *pcReaders, *mszReaders;
 	unsigned char pbAtr[MAX_ATR_SIZE];
-	const char *mszGroups;
+	char *mszGroups;
+	unsigned long dwGroups;
 	long rv;
 	int i, p, iReader;
 	int iList[16];
@@ -59,6 +60,39 @@ int main(int argc, char **argv)
 	{
 		SCardReleaseContext(hContext);
 		return -1;
+	}
+
+	printf("Testing SCardListReaderGroups    : ");
+
+	rv = SCardListReaderGroups(hContext, 0, &dwGroups);
+
+	printf("%s\n", pcsc_stringify_error(rv));
+
+	if (rv != SCARD_S_SUCCESS)
+	{
+		SCardReleaseContext(hContext);
+		return -1;
+	}
+
+	mszGroups = (char *) malloc(sizeof(char) * dwGroups);
+	rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
+
+	if (rv != SCARD_S_SUCCESS)
+	{
+		SCardReleaseContext(hContext);
+		return -1;
+	}
+
+	/*
+	 * Have to understand the multi-string here 
+	 */
+	p = 0;
+	for (i = 0; i < dwGroups - 1; i++)
+	{
+		++p;
+		printf("Group %02d: %s\n", p, &mszGroups[i]);
+		iList[p] = i;
+		while (mszGroups[++i] != 0) ;
 	}
 
 	printf("Testing SCardListReaders         : ");
