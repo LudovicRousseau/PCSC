@@ -148,7 +148,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	i = 0;
 	pageSize = 0;
 
-	if (phContext == 0)
+	if (phContext == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 	else
 		*phContext = 0;
@@ -158,6 +158,11 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	 */
 	if (isExecuted == 0)
 	{
+		/*
+		 * Initialize debug
+		 */
+		DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+
 		g_rgSCardT0Pci.dwProtocol = SCARD_PROTOCOL_T0;
 		g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
 		g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
@@ -200,7 +205,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			readerStates[i] = (PREADER_STATES)
 				SYS_PublicMemoryMap(sizeof(READER_STATES),
 				mapAddr, (i * pageSize));
-			if (readerStates[i] == 0)
+			if (readerStates[i] == NULL)
 			{
 				DebugLogA("ERROR: Cannot public memory map");
 				SYS_CloseFile(mapAddr);	/* Close the memory map file */
@@ -1962,5 +1967,20 @@ LONG SCardCheckReaderAvailability(LPSTR readerName, LONG errorCode)
 	}
 	else
 		return SCARD_S_SUCCESS;
+}
+
+/*
+ * free resources allocated by the library
+ * You _shall_ call this function if you use dlopen/dlclose to load/unload the
+ * library. Otherwise you will exhaust the ressources available.
+ */
+void SCardUnload(void)
+{
+	if (!isExecuted)
+		return;
+
+	SHMClientCloseSession();
+	SYS_CloseFile(mapAddr);
+	isExecuted = 0;
 }
 
