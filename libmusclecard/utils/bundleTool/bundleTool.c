@@ -25,8 +25,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/winscard.h"
+#include "pcsclite.h"
+#include "winscard.h"
 
 /*
  * The following defines personalize this for different tokens 
@@ -37,7 +37,7 @@
 /* redefine MSC_SVC_DROPDIR only if not yet defined */
 #ifndef MSC_SVC_DROPDIR
 #ifndef WIN32
-#define MSC_SVC_DROPDIR      "/usr/local/pcsc/services"
+#define MSC_SVC_DROPDIR      "/usr/local/musclecard/services"
 #else
 #define MSC_SVC_DROPDIR      "C:\\Program Files\\Muscle\\Services"
 #endif

@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 			printf("token reset ");
 		printf("\n\n");
 
-		if (tokenList[i].tokenState & SCARD_STATE_PRESENT)
+		if (tokenList[i].tokenState & MSC_STATE_PRESENT)
 			reader_to_use = i;
 	}
 
@@ -245,10 +245,10 @@ int main(int argc, char **argv)
 	rv = MSCGetStatus(&pConnection, &statusInf);
 	printf("Currently logged identities : %04X\n", statusInf.loggedID);
 
-	rv = MSCEndTransaction(&pConnection, SCARD_LEAVE_CARD);
+	rv = MSCEndTransaction(&pConnection, MSC_LEAVE_TOKEN);
 	printf("EndTransaction returns      : %s\n", msc_error(rv));
 
-	MSCReleaseConnection(&pConnection, SCARD_LEAVE_CARD);
+	MSCReleaseConnection(&pConnection, MSC_LEAVE_TOKEN);
 	printf("ReleaseConn returns         : %s\n", msc_error(rv));
 
 	return 0;

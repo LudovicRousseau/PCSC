@@ -18,9 +18,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <pcsclite.h>
+#include <winscard.h>
 #include "musclecard.h"
 #include "debuglog.h"
 #include "tokenfactory.h"
+#include "strlcpycat.h"
 
 #ifdef USE_THREAD_SAFETY
 #include "wintypes.h"
@@ -175,23 +178,23 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 					if (rgReaderStates.dwEventState & SCARD_STATE_EMPTY)
 					{
 						currentToken->tokenType |= MSC_TOKEN_TYPE_REMOVED;
-						strncpy(currentToken->tokenName,
+						strlcpy(currentToken->tokenName,
 							MSC_TOKEN_EMPTY_STR, MSC_MAXSIZE_TOKENAME);
 					}
 					else if (rv == 0)
 					{
 						currentToken->tokenType |= MSC_TOKEN_TYPE_KNOWN;
-						strncpy(currentToken->tokenName,
+						strlcpy(currentToken->tokenName,
 							tokenInfo.tokenName, MSC_MAXSIZE_TOKENAME);
 					}
 					else
 					{
 						currentToken->tokenType |= MSC_TOKEN_TYPE_UNKNOWN;
-						strncpy(currentToken->tokenName,
+						strlcpy(currentToken->tokenName,
 							MSC_TOKEN_UNKNOWN_STR, MSC_MAXSIZE_TOKENAME);
 					}
 
-					strncpy(currentToken->slotName,
+					strlcpy(currentToken->slotName,
 						rgReaderStates.szReader, MAX_READERNAME);
 
 					if (rgReaderStates.dwEventState & SCARD_STATE_PRESENT)
@@ -200,11 +203,14 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 							rgReaderStates.rgbAtr, rgReaderStates.cbAtr);
 						currentToken->tokenIdLength = rgReaderStates.cbAtr;
 
-       						memcpy(currentToken->tokenApp,
-                					tokenInfo.tokenApp, tokenInfo.tokenAppLen);
-        					currentToken->tokenAppLen = tokenInfo.tokenAppLen;
-        
-					        strncpy(currentToken->svProvider,
+						if (rv != -1) {
+       							memcpy(currentToken->tokenApp,
+                						tokenInfo.tokenApp,
+								tokenInfo.tokenAppLen);
+        						currentToken->tokenAppLen =
+								tokenInfo.tokenAppLen;
+						}
+					        strlcpy(currentToken->svProvider,
                 					tokenInfo.svProvider, MSC_MAXSIZE_SVCPROV);
 					}
 					else
@@ -412,9 +418,9 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 
 	memcpy(pConnection->tokenInfo.tokenId, tokenId, tokenIdLength);
 	pConnection->tokenInfo.tokenIdLength = tokenIdLength;
-	strncpy(pConnection->tokenInfo.slotName, tokenStruct->slotName,
+	strlcpy(pConnection->tokenInfo.slotName, tokenStruct->slotName,
 		MAX_READERNAME);
-	strncpy(pConnection->tokenInfo.tokenName, tokenStruct->tokenName,
+	strlcpy(pConnection->tokenInfo.tokenName, tokenStruct->tokenName,
 		MSC_MAXSIZE_TOKENAME);
 
 	/*
@@ -683,7 +689,7 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 				memset(tokenArray[i].tokenId, 0x00, MAX_ATR_SIZE);
 				tokenArray[i].tokenIdLength = 0;
 				tokenArray[i].tokenType = MSC_TOKEN_TYPE_REMOVED;
-				strncpy(tokenArray[i].tokenName, MSC_TOKEN_EMPTY_STR,
+				strlcpy(tokenArray[i].tokenName, MSC_TOKEN_EMPTY_STR,
 					MSC_MAXSIZE_TOKENAME);
 			}
 			else if (tokenArray[i].tokenState & MSC_STATE_PRESENT)
@@ -700,13 +706,13 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 				if (rt == 0)
 				{
 					tokenArray[i].tokenType = MSC_TOKEN_TYPE_KNOWN;
-					strncpy(tokenArray[i].tokenName, tokenInfo.tokenName,
+					strlcpy(tokenArray[i].tokenName, tokenInfo.tokenName,
 						MSC_MAXSIZE_TOKENAME);
 				}
 				else
 				{
 					tokenArray[i].tokenType = MSC_TOKEN_TYPE_UNKNOWN;
-					strncpy(tokenArray[i].tokenName, MSC_TOKEN_UNKNOWN_STR,
+					strlcpy(tokenArray[i].tokenName, MSC_TOKEN_UNKNOWN_STR,
 						MSC_MAXSIZE_TOKENAME);
 				}
 			}
@@ -1736,7 +1742,7 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 			objInfo.objectACL.writePermission;
 		pObjectInfo->objectACL.deletePermission =
 			objInfo.objectACL.deletePermission;
-		strncpy(pObjectInfo->objectID, objectID, MSC_MAXSIZE_OBJID);
+		strlcpy(pObjectInfo->objectID, objectID, MSC_MAXSIZE_OBJID);
 		return MSC_SUCCESS;
 	}
 
@@ -1760,7 +1766,7 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 		objInfo.objectACL.writePermission;
 	pObjectInfo->objectACL.deletePermission =
 		objInfo.objectACL.deletePermission;
-	strncpy(pObjectInfo->objectID, objectID, MSC_MAXSIZE_OBJID);
+	strlcpy(pObjectInfo->objectID, objectID, MSC_MAXSIZE_OBJID);
 
 	return MSC_SUCCESS;
 }
@@ -1861,94 +1867,94 @@ char *msc_error(MSC_RV errorCode)
 	switch (errorCode)
 	{
 		case MSC_SUCCESS:
-			strncpy(message, "Successful", sizeof(message));
+			strlcpy(message, "Successful", sizeof(message));
 			break;
 		case MSC_NO_MEMORY_LEFT:
-			strncpy(message, "No more memory", sizeof(message));
+			strlcpy(message, "No more memory", sizeof(message));
 			break;
 		case MSC_AUTH_FAILED:
-			strncpy(message, "Authentication failed", sizeof(message));
+			strlcpy(message, "Authentication failed", sizeof(message));
 			break;
 		case MSC_OPERATION_NOT_ALLOWED:
-			strncpy(message, "Operation not allowed", sizeof(message));
+			strlcpy(message, "Operation not allowed", sizeof(message));
 			break;
 		case MSC_INCONSISTENT_STATUS:
-			strncpy(message, "Inconsistent status", sizeof(message));
+			strlcpy(message, "Inconsistent status", sizeof(message));
 			break;
 		case MSC_UNSUPPORTED_FEATURE:
-			strncpy(message, "Feature unsupported", sizeof(message));
+			strlcpy(message, "Feature unsupported", sizeof(message));
 			break;
 		case MSC_UNAUTHORIZED:
-			strncpy(message, "Unauthorized usage", sizeof(message));
+			strlcpy(message, "Unauthorized usage", sizeof(message));
 			break;
 		case MSC_OBJECT_NOT_FOUND:
-			strncpy(message, "Object not found", sizeof(message));
+			strlcpy(message, "Object not found", sizeof(message));
 			break;
 		case MSC_OBJECT_EXISTS:
-			strncpy(message, "Object already exists", sizeof(message));
+			strlcpy(message, "Object already exists", sizeof(message));
 			break;
 		case MSC_INCORRECT_ALG:
-			strncpy(message, "Incorrect algorithm", sizeof(message));
+			strlcpy(message, "Incorrect algorithm", sizeof(message));
 			break;
 		case MSC_SIGNATURE_INVALID:
-			strncpy(message, "Invalid signature", sizeof(message));
+			strlcpy(message, "Invalid signature", sizeof(message));
 			break;
 		case MSC_IDENTITY_BLOCKED:
-			strncpy(message, "Identity is blocked", sizeof(message));
+			strlcpy(message, "Identity is blocked", sizeof(message));
 			break;
 		case MSC_UNSPECIFIED_ERROR:
-			strncpy(message, "Unspecified error", sizeof(message));
+			strlcpy(message, "Unspecified error", sizeof(message));
 			break;
 		case MSC_TRANSPORT_ERROR:
-			strncpy(message, "Transport error", sizeof(message));
+			strlcpy(message, "Transport error", sizeof(message));
 			break;
 		case MSC_INVALID_PARAMETER:
-			strncpy(message, "Invalid parameter", sizeof(message));
+			strlcpy(message, "Invalid parameter", sizeof(message));
 			break;
 		case MSC_INCORRECT_P1:
-			strncpy(message, "Incorrect P1 parameter", sizeof(message));
+			strlcpy(message, "Incorrect P1 parameter", sizeof(message));
 			break;
 		case MSC_INCORRECT_P2:
-			strncpy(message, "Incorrect P2 parameter", sizeof(message));
+			strlcpy(message, "Incorrect P2 parameter", sizeof(message));
 			break;
 		case MSC_SEQUENCE_END:
-			strncpy(message, "End of sequence", sizeof(message));
+			strlcpy(message, "End of sequence", sizeof(message));
 			break;
 		case MSC_INTERNAL_ERROR:
-			strncpy(message, "Internal Error", sizeof(message));
+			strlcpy(message, "Internal Error", sizeof(message));
 			break;
 		case MSC_CANCELLED:
-			strncpy(message, "Operation Cancelled", sizeof(message));
+			strlcpy(message, "Operation Cancelled", sizeof(message));
 			break;
 		case MSC_INSUFFICIENT_BUFFER:
-			strncpy(message, "Buffer is too small", sizeof(message));
+			strlcpy(message, "Buffer is too small", sizeof(message));
 			break;
 		case MSC_UNRECOGNIZED_TOKEN:
-			strncpy(message, "Token is unsupported", sizeof(message));
+			strlcpy(message, "Token is unsupported", sizeof(message));
 			break;
 		case MSC_SERVICE_UNRESPONSIVE:
-			strncpy(message, "Service is not running", sizeof(message));
+			strlcpy(message, "Service is not running", sizeof(message));
 			break;
 		case MSC_TIMEOUT_OCCURRED:
-			strncpy(message, "Timeout has occurred", sizeof(message));
+			strlcpy(message, "Timeout has occurred", sizeof(message));
 			break;
 		case MSC_TOKEN_REMOVED:
-			strncpy(message, "Token was removed", sizeof(message));
+			strlcpy(message, "Token was removed", sizeof(message));
 			break;
 		case MSC_TOKEN_RESET:
-			strncpy(message, "Token was reset", sizeof(message));
+			strlcpy(message, "Token was reset", sizeof(message));
 			break;
 		case MSC_TOKEN_INSERTED:
-			strncpy(message, "Token was inserted", sizeof(message));
+			strlcpy(message, "Token was inserted", sizeof(message));
 			break;
 		case MSC_TOKEN_UNRESPONSIVE:
-			strncpy(message, "Token is unresponsive", sizeof(message));
+			strlcpy(message, "Token is unresponsive", sizeof(message));
 			break;
 		case MSC_INVALID_HANDLE:
-			strncpy(message, "Handle is invalid", sizeof(message));
+			strlcpy(message, "Handle is invalid", sizeof(message));
 			break;
 		case MSC_SHARING_VIOLATION:
-			strncpy(message, "Sharing violation", sizeof(message));
+			strlcpy(message, "Sharing violation", sizeof(message));
 			break;
 
 		default:
