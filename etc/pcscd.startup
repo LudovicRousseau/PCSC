@@ -11,6 +11,13 @@
 
 . /etc/init.d/functions
 
+# Source config
+if [ -f /etc/sysconfig/pscsd ] ; then
+	. /etc/sysconfig/pcscd
+else
+	PCSCD_OPTIONS=""
+fi
+
 [ -f /usr/local/sbin/pcscd ] || exit 0
 
 
@@ -23,14 +30,14 @@ umask 077
 
 start() {
  	echo -n $"Starting smart card daemon: "
-	pcscd $SYSLOGD_OPTIONS
+	daemon pcscd $PCSCD_OPTIONS
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pcscd
 	return $RETVAL
 }	
 stop() {
-	echo -n $"Shutting down kernel logger: "
+	echo -n $"Shutting down smart card daemon: "
 	killproc pcscd
 	RETVAL=$?
 	echo
