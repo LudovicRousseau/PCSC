@@ -3,19 +3,28 @@
         MUSCLE SmartCard Development ( http://www.linuxnet.com )
             Title  : formaticc.c
             Package: pcsc lite
-            Author : David Corcoran
-            Date   : 5/16/00
+            Author : David Corcoran, Ludovic Rousseau
+            Date   : 5/16/00, 8/16/2002
             License: Copyright (C) 2000 David Corcoran
                      <corcoran@linuxnet.com>
             Purpose: This is an APDU robot for pcsc-lite.
  
+$Id$
+
 ********************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include <wintypes.h>
 #include <winscard.h>
+
 #include "configfile.h"
+
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 64
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -37,37 +46,54 @@ int main(int argc, char *argv[])
 	FILE *fo;
 	int i, p, iReader, cnum, iProtocol;
 	int iList[16];
-	char pcHost[50];
-	char pcAFile[50];
-	char pcOFile[50];
+	char pcHost[MAXHOSTNAMELEN];
+	char pcAFile[FILENAME_MAX];
+	char pcOFile[FILENAME_MAX];
+	char line[80];
+	char *line_ptr;
+	unsigned int x;
 
 	// int t = 0;
 
 	printf("\nWinscard PC/SC Lite Test Program\n\n");
 
-	printf("Please enter the desired host (localhost for this machine): ");
-	scanf("%s", pcHost);
+	printf("Please enter the desired host (localhost for this machine) [localhost]: ");
+	fgets(line, sizeof(line), stdin);
+	if (line[0] == '\n')
+		strncpy(pcHost, "localhost", sizeof(pcHost)-1);
+	else
+		strncpy(pcHost, line, sizeof(pcHost)-1);
 
-	printf("Please input the desired transmit protocol (0/1): ");
-	scanf("%d", &iProtocol);
+	printf("Please input the desired transmit protocol (0/1) [0]: ");
+	fgets(line, sizeof(line), stdin);
+	if (line[0] == '\n')
+		iProtocol = 0;
+	else
+		sscanf(line, "%d", &iProtocol);
 
 	printf("Please input the desired input apdu file: ");
-	scanf("%s", pcAFile);
+	fgets(line, sizeof(line), stdin);
+	sscanf(line, "%s", pcAFile);
 
 	printf("Please input the desired output apdu file: ");
-	scanf("%s", pcOFile);
+	fgets(line, sizeof(line), stdin);
+	sscanf(line, "%s", pcOFile);
 
 	fp = fopen(pcAFile, "r");
-	fo = fopen(pcOFile, "w");
-
-	if (fp == NULL || fo == NULL)
+	if (fp == NULL)
 	{
-		printf("File not found\n");
+		perror(pcAFile);
 		return 1;
 	}
 
-	rv = SCardEstablishContext(SCARD_SCOPE_GLOBAL, pcHost, NULL,
-		&hContext);
+	fo = fopen(pcOFile, "w");
+	if (fo == NULL)
+	{
+		perror(pcOFile);
+		return 1;
+	}
+
+	rv = SCardEstablishContext(SCARD_SCOPE_GLOBAL, pcHost, NULL, &hContext);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
@@ -94,8 +120,9 @@ int main(int argc, char *argv[])
 
 	do
 	{
-		printf("Enter the desired reader number : ");
-		scanf("%d", &iReader);
+		printf("Enter the desired reader number: ");
+		fgets(line, sizeof(line), stdin);
+		sscanf(line, "%d", &iReader);
 		printf("\n");
 
 		if (iReader > p || iReader <= 0)
@@ -108,7 +135,7 @@ int main(int argc, char *argv[])
 	rgReaderStates[0].szReader = &mszReaders[iList[iReader]];
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
-	printf("Please input a smartcard\n");
+	printf("Please insert a smartcard\n");
 	SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
@@ -131,27 +158,39 @@ int main(int argc, char *argv[])
 
 	do
 	{
-
 		cnum += 1;
 
-		if (fscanf(fp, "%x", (int *) &dwSendLength) == EOF)
-		{
+		if (fgets(line, sizeof(line), fp) == NULL)
 			break;
-		}
+
+		line_ptr = line;
+		if (sscanf(line_ptr, "%x", &x) == 0)
+			break;
+		dwSendLength = x;
+
+		line_ptr = strchr(line_ptr, ' ') +1;
+		if (line_ptr == NULL+1)
+			break;
 
 		for (i = 0; i < dwSendLength; i++)
 		{
-			if (fscanf(fp, "%x", (int *) &s[i]) == EOF)
+			if (sscanf(line_ptr, "%x", &x) == 0)
 			{
-				printf("Corrupt APDU\n");
+				printf("Corrupt APDU: %s\n", line);
 				SCardDisconnect(hCard, SCARD_RESET_CARD);
 				SCardReleaseContext(hContext);
 				return 1;
 			}
+			s[i] = x;
+
+			line_ptr = strchr(line_ptr, ' ') +1;
+
+			if (line_ptr == NULL+1)
+				break;
 		}
 
-		printf("Processing Command %03d of length %03lx\n", cnum,
-			dwSendLength);
+		printf("Processing Command %03d of length %03lX: %s", cnum,
+			dwSendLength, line);
 
 		memset(r, 0x00, MAX_BUFFER_SIZE);
 		dwRecvLength = MAX_BUFFER_SIZE;
@@ -160,29 +199,32 @@ int main(int argc, char *argv[])
 		{
 			rv = SCardTransmit(hCard, SCARD_PCI_T0, s, dwSendLength,
 				&sRecvPci, r, &dwRecvLength);
-		} else if (iProtocol == 1)
+		}
+		else
 		{
-			rv = SCardTransmit(hCard, SCARD_PCI_T1, s, dwSendLength,
-				&sRecvPci, r, &dwRecvLength);
-		} else
-		{
-			printf("Invalid Protocol\n");
-			SCardDisconnect(hCard, SCARD_RESET_CARD);
-			SCardReleaseContext(hContext);
-			return 1;
+			if (iProtocol == 1)
+			{
+				rv = SCardTransmit(hCard, SCARD_PCI_T1, s, dwSendLength,
+					&sRecvPci, r, &dwRecvLength);
+			}
+			else
+			{
+				printf("Invalid Protocol\n");
+				SCardDisconnect(hCard, SCARD_RESET_CARD);
+				SCardReleaseContext(hContext);
+				return 1;
+			}
 		}
 
 		if (rv != SCARD_S_SUCCESS)
-		{
 			fprintf(fo, ".error %ld\n", rv);
-		} else
+		else
 		{
 			fprintf(fo, "%02ld ", dwRecvLength);
 
 			for (i = 0; i < dwRecvLength; i++)
-			{
-				fprintf(fo, "%02x ", r[i]);
-			}
+				fprintf(fo, "%02X ", r[i]);
+
 			fprintf(fo, "\n");
 		}
 
@@ -202,3 +244,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
