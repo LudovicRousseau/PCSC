@@ -37,7 +37,7 @@ a resource manager that coordinates communications with smart card readers
 and smart cards and cryptographic tokens that are connected to the system.
 
 pcscd is normally started at boot time from 
-.IR /etc/init.d/pcscd .
+.IR @sysconfdir_exp@/init.d/pcscd .
 It allows applications to access smart cards and readers without knowing
 details of the card or reader.  
 
@@ -64,52 +64,13 @@ Smart card reader drivers are placed in the
 .I @usbdropdir@
 directory. Each driver is simply an 
 .I .so 
-file.  The pcscd locates the driver with the 
+file.  pcscd locates the driver using the 
 .I @confdir@/reader.conf 
-file.  The file has the following format:
-
- # comment
- FRIENDLYNAME <Descriptive name>
- DEVICENAME   <Short name>
- LIBPATH      <Location of the driver library>
- CHANNELID    <Channel identifier>
-
-.IP FRIENDLYNAME 
-is a user friendly name of the reader that is served by this driver.
-This name is displayed to the user when necessary.
-
-.IP DEVICENAME 
-is a driver specific value.  If you do not know this value,
-GEN_SMART_RDR is a good choice.
-	
-.IP LIBPATH 
-is the full path to the shared library. 
-
-.IP CHANNELID 
-is the channel ID for serial port smart card readers.  This could vary 
-depending on the driver in which you are using - check the driver README
-for more information.  Some use the following:
-
- \fI/dev/ttyS0\fR (COM1) ->  0x0103F8 or 1
- \fI/dev/ttyS1\fR (COM2) ->  0x0102F8 or 2
- \fI/dev/ttyS2\fR (COM3) ->  0x0103E8 or 3
- \fI/dev/ttyS3\fR (COM4) ->  0x0102E8 or 4
-.PP
-Example:
-
- # Configuration file for pcsc-lite
- 
- FRIENDLYNAME "My Smart Card Reader"
- DEVICENAME   GEN_SMART_RDR
- LIBPATH      @usbdropdir@/my_reader.so
- CHANNELID    0x0103F8
- 
- # End of file
-
-Multiple drivers can be listed in 
-.I @confdir@/reader.conf.
-
+file.  See the
+.BR reader.conf (5)
+manual page for more information.
 Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fR.
+
 .SH "SMART CARD PLUG-INS"
 pcsc-lite uses plug-ins to handle different types of smart cards. There is 
 a plug-in for each smart card type. Plug-ins are installed in the 
@@ -120,11 +81,11 @@ web site \fIhttp://www.musclecard.com/\fR.
 .I @confdir@/reader.conf
 : Reader configuration file
 
-.I /etc/init.d/pcscd
+.I @sysconfdir_exp@/init.d/pcscd
 : pcscd startup script
 
-.I @runpid@
-: process id of the running pcscd
+@HAVE_RUNPID@.I @runpid@
+@HAVE_RUNPID@: process id of the running pcscd
 
 .I @usbdropdir@
 : directory containing bundles for USB
@@ -133,7 +94,8 @@ drivers
 None known.
 .SH "SEE ALSO"
 .BR bundleTool (8),
-.BR formaticc (1)
+.BR formaticc (1),
+.BR reader.conf (5)
 .SH AUTHORS
 David Corcoran <corcoran@musclecard.com> and Ludovic Rousseau
 <ludovic.rousseau@free.fr>

@@ -284,8 +284,12 @@ AC_ARG_ENABLE(runpid,
 
 AC_MSG_RESULT([enable runpid                 : $runpid])
 
+dnl HAVE_RUNPID is for pcscd.8
 if test x${runpid} != xfalse ; then
 	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])
+	AC_SUBST(HAVE_RUNPID,'')
+else
+	AC_SUBST(HAVE_RUNPID,'.\" ')
 fi
 
 dnl --enable-ipcdir=DIR
