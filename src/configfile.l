@@ -39,6 +39,7 @@ void tok_error ( char *pcToken_error );
 #include <string.h>
 #include <wintypes.h>
 
+#include "config.h"
 #include "pcsclite.h"
 #include "sys_generic.h"
 #include "readerfactory.h"
@@ -107,8 +108,7 @@ int evaluatetoken( char *pcToken ) {
 }
 
 void tok_error ( char *token_error ) {
-  debug_msg("%s:%d tok_error: invalid value in reader.conf", 
-             __FILE__, __LINE__);
+  DebugLogB("tok_error: invalid value in reader.conf: %s", token_error);
   badError = 1;
 }
 
