@@ -8,7 +8,8 @@
 	    License: Copyright (C) 1999 David Corcoran
 	             <corcoran@linuxnet.com>
             Purpose: This keeps a list of Windows(R) types.
-	            
+
+	$Id$
 ********************************************************************/
 
 #ifndef __wintypes_h__
@@ -36,7 +37,7 @@ extern "C"
 	typedef const void *LPCVOID;
 	typedef unsigned long DWORD;
 	typedef unsigned long *PDWORD;
-        typedef unsigned short WORD;       /* H. Bragstad Schlumberger */
+	typedef unsigned short WORD;       /* H. Bragstad Schlumberger */
 	typedef long LONG;
 	typedef long RESPONSECODE;
 	typedef const char *LPCSTR;
@@ -44,8 +45,9 @@ extern "C"
 	typedef BYTE *LPBYTE;
 	typedef DWORD *LPDWORD;
 	typedef char *LPSTR;
-	typedef char *LPTSTR;
-	typedef char *LPCWSTR;
+	//typedef unsigned short WCHAR;
+	//typedef WCHAR * LPTSTR;
+	//typedef const WCHAR * LPCWSTR;
 
 #ifdef __cplusplus
 }
