@@ -119,8 +119,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
 
-	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s %d", szReader,
-		dwPreferredProtocols);
+	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s using protocol: %d",
+		szReader, dwPreferredProtocols);
 
 	rv = RFReaderInfo((LPTSTR) szReader, &rContext);
 
