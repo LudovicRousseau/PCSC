@@ -34,6 +34,8 @@ void tperrorCheck (char *pcToken_error);
 
 %}
 
+%option nounput
+
 %%
 
 #.*                                             {}
