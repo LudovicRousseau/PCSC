@@ -103,7 +103,6 @@ static void ContextThread(DWORD* pdwIndex)
 	
 	while (1)
 	{
-		
 		switch (rv = SHMProcessEventsContext(&psContext[dwContextIndex].dwClientID, &msgStruct, 0))
 		{
 		case 0:
@@ -197,7 +196,6 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 	 * Zero out everything 
 	 */
 	rv = 0;
-
 	switch (msgStruct->command)
 	{
 
@@ -318,7 +316,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		gsStr->rv = SCardSetAttrib(gsStr->hCard, gsStr->dwAttrId,
-			gsStr->pbAttr, &gsStr->cbAttrLen);
+			gsStr->pbAttr, gsStr->cbAttrLen);
 		break;
 
 	default:
