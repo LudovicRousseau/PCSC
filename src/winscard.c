@@ -185,6 +185,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 			if (SCARD_PROTOCOL_UNSET == rContext->readerState->cardProtocol)
 			{
 				UCHAR ucAvailable, ucDefault;
+				int ret;
 
 				ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
@@ -198,15 +199,18 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
-				rContext->readerState->cardProtocol =
-					PHSetProtocol(rContext, dwPreferredProtocols,
+				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					ucAvailable, ucDefault);
 
-				if (SET_PROTOCOL_PPS_FAILED == rContext->readerState->cardProtocol)
+				/* keep cardProtocol = SCARD_PROTOCOL_UNSET in case of error  */
+				if (SET_PROTOCOL_PPS_FAILED == ret)
 					return SCARD_W_UNRESPONSIVE_CARD;
 
-				if (SET_PROTOCOL_WRONG_ARGUMENT == rContext->readerState->cardProtocol)
+				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 					return SCARD_E_PROTO_MISMATCH;
+
+				/* use negociated protocol */
+				rContext->readerState->cardProtocol = ret;
 			}
 			else
 			{
@@ -484,6 +488,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			if (SCARD_PROTOCOL_UNSET == rContext->readerState->cardProtocol)
 			{
 				UCHAR ucAvailable, ucDefault;
+				int ret;
 
 				ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
@@ -495,15 +500,18 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
-				rContext->readerState->cardProtocol =
-					PHSetProtocol(rContext, dwPreferredProtocols,
+				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					ucAvailable, ucDefault);
 
-				if (SET_PROTOCOL_PPS_FAILED == rContext->readerState->cardProtocol)
+				/* keep cardProtocol = SCARD_PROTOCOL_UNSET in case of error  */
+				if (SET_PROTOCOL_PPS_FAILED == ret)
 					return SCARD_W_UNRESPONSIVE_CARD;
 
-				if (SET_PROTOCOL_WRONG_ARGUMENT == rContext->readerState->cardProtocol)
+				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 					return SCARD_E_PROTO_MISMATCH;
+
+				/* use negociated protocol */
+				rContext->readerState->cardProtocol = ret;
 			}
 			else
 			{
