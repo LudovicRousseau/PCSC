@@ -1,12 +1,12 @@
 /*****************************************************************
 
-  File   :   configfile.ll
+  File   :   tokenparser.l
   Author :   David Corcoran
-  Date   :   February 12, 1999, modified 4/6/2003
+  Date   :   February 12, 1999, modified August 2003
   Purpose:   Reads lexical config files and updates database.
              See http://www.linuxnet.com for more information.
-  License:   Copyright (C) 1999 David Corcoran, Ludovic Rousseau
-             <corcoran@linuxnet.com>
+  License:   Copyright (C) 1999-2003 David Corcoran <corcoran@linuxnet.com>
+             Ludovic Rousseau <ludovic.rousseau@free.fr>
 $Id$
 
 ******************************************************************/
