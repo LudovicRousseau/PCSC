@@ -168,6 +168,8 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 				if ((tokensFound <= *arrayLength) && (tokenArray != 0))
 				{
 					currentToken = &tokenArray[tokensFound - 1];
+					currentToken->addParams     = 0;
+					currentToken->addParamsSize = 0;
 
 					if (rgReaderStates.dwEventState & SCARD_STATE_EMPTY)
 					{
@@ -570,7 +572,8 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
-			    MSCULong32 arraySize, MSCULong32 timeoutValue)
+			    MSCULong32 arraySize, 
+			    MSCULong32 timeoutValue)
 {
 
 	MSCLong32 rv, rt;
@@ -775,7 +778,9 @@ void *_MSCEventThread(void *arg)
 }
 
 MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
-	MSCULong32 arraySize, MSCCallBack callBack, MSCPVoid32 appData)
+				MSCULong32 arraySize, 
+				MSCCallBack callBack, 
+				MSCPVoid32 appData)
 {
 	MSCLPEventWaitInfo evlist;
 	MSCULong32 curToken;
@@ -841,8 +846,14 @@ MSC_RV MSCCallbackCancelEvent()
 	{  
                 blockingContext = MSC_BLOCKSTATUS_CANCELLING;
 	        rv = MSCCancelEventWait();
-	} 
 
+                while (1) {
+		        if (blockingContext == MSC_BLOCKSTATUS_RESUME) 
+		        {
+		                break;
+		        }
+		}
+	} 
 
       return MSC_SUCCESS;
 }
