@@ -83,10 +83,6 @@ ACX_PTHREAD(
  AC_MSG_ERROR([POSIX thread support required])
 ])
 
-LIBS="$PTHREAD_LIBS $LIBS"
-CFLAGS="$CFLAGS -Wall -fno-common $PTHREAD_CFLAGS"
-CC="$PTHREAD_CC"
-
 AC_CHECK_FUNCS(daemon)
 AC_CHECK_FUNCS(getopt_long)
 
@@ -229,6 +225,11 @@ fi
 if test x${threadsafe} = xtrue ; then
   AC_MSG_RESULT([NOTE :: You must link pthread libraries with your app.])
   AC_DEFINE(USE_THREAD_SAFETY, 1, [enable client side thread safety.])
+  LIBS="$PTHREAD_LIBS $LIBS"
+  CFLAGS="$CFLAGS -Wall -fno-common $PTHREAD_CFLAGS"
+  CC="$PTHREAD_CC"
+else
+  CFLAGS="$CFLAGS -Wall -fno-common"
 fi
 
 dnl Write Makefiles.

@@ -6,6 +6,12 @@
 /* Define if you have the daemon function.  */
 #undef HAVE_DAEMON
 
+/* Define if you have the getopt_long function.  */
+#undef HAVE_GETOPT_LONG
+
+/* Define if you have the <getopt.h> header file.  */
+#undef HAVE_GETOPT_H
+
 /* Name of package */
 #undef PACKAGE
 
