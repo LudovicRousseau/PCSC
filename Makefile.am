@@ -43,7 +43,7 @@ ChangeLog.cvs:
 	s/oznet /Chris Osgood /; s/cprados /Carlos Prados /; \
 	s/mikeg /Michael Gile /; s/rousseau /Ludovic Rousseau /; \
 	s/giraud /Jean-Luc Giraud /; \
-	s+/home/cvsroot/muscle/PCSC/++g; print ; }' > $@
+	s+/cvsroot/pcsclite/PCSC/++g; print ; }' > $@
 
 .PHONY: ChangeLog.cvs
 
