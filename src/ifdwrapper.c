@@ -476,7 +476,10 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		if (rv == IFD_ICC_NOT_PRESENT)
 			dwCardStatus |= SCARD_ABSENT;
 		else
+		{
+			DebugLogB("Card not transacted: %ld", rv);
 			return SCARD_E_NOT_TRANSACTED;
+		}
 
 	/*
 	 * Now lets get the ATR and process it if IFD Handler version 1.0.
@@ -588,7 +591,10 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
 	else
+	{
+		DebugLogB("Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
+	}
 }
 
 /*
@@ -640,7 +646,10 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
 	else
+	{
+		DebugLogB("Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
+	}
 }
 
 /*
@@ -718,6 +727,9 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
 	else
+	{
+		DebugLogB("Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
+	}
 }
 

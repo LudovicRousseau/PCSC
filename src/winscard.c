@@ -1395,6 +1395,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (rv != SCARD_S_SUCCESS)
 	{
 		*pcbRecvLength = 0;
+		DebugLogB("Card not transacted: %ld", rv);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 
