@@ -1,15 +1,19 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : winscard.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles smartcard reader communications. 
-	             This is the heart of the M$ smartcard API.
-	            
+    Title  : winscard.c
+    Package: pcsc lite
+	Author : David Corcoran
+	Date   : 7/27/1999, 11/29/2002
+	License: Copyright (C) 1999 David Corcoran
+		<corcoran@linuxnet.com>
+			Copyright (C) 2002 Ludovic Rousseau
+		<ludovic.rousseau@free.fr>
+	Purpose: This handles smartcard reader communications. 
+		This is the heart of the M$ smartcard API.
+
+	$Id$
+
 ********************************************************************/
 
 #include <stdlib.h>
@@ -44,7 +48,6 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
 LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
-
 	LONG rv;
 
 	/*
@@ -56,9 +59,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	 * Check for NULL pointer 
 	 */
 	if (phContext == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
 
 	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
 		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
@@ -130,29 +131,20 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Check for NULL parameters 
 	 */
 	if (szReader == 0 || phCard == 0 || pdwActiveProtocol == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	} else
-	{
+	else
 		*phCard = 0;
-	}
 
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
-	{
-
+			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
 		return SCARD_E_PROTO_MISMATCH;
-	}
 
 	if (dwShareMode != SCARD_SHARE_EXCLUSIVE &&
-		dwShareMode != SCARD_SHARE_SHARED &&
-		dwShareMode != SCARD_SHARE_DIRECT)
-	{
-
+			dwShareMode != SCARD_SHARE_SHARED &&
+			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
-	}
 
 	DebugLogB("SCardConnect: Attempting Connect to %s", szReader);
 
@@ -169,15 +161,13 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
-  /*******************************************/
+	/*******************************************/
 	/*
 	 * This section checks for simple errors 
 	 */
-  /*******************************************/
+	/*******************************************/
 
 	/*
 	 * Connect if not exclusive mode 
@@ -188,14 +178,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_E_SHARING_VIOLATION;
 	}
 
-  /*******************************************/
+	/*******************************************/
 	/*
 	 * This section tries to determine the 
 	 */
 	/*
 	 * presence of a card or not 
 	 */
-  /*******************************************/
+	/*******************************************/
 	dwStatus = rContext->dwStatus;
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
@@ -207,19 +197,18 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		}
 	}
 
-  /*******************************************/
+	/*******************************************/
 	/*
 	 * This section tries to decode the ATR 
 	 */
 	/*
 	 * and set up which protocol to use 
 	 */
-  /*******************************************/
+	/*******************************************/
 
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-	{
 		rContext->dwProtocol = -1;
-	} else
+	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
@@ -237,7 +226,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 			{
 				rContext->dwProtocol = PHSetProtocol(rContext, ucAvailable,
 					ucAvailable);
-			} else
+			}
+			else
 			{
 				rContext->dwProtocol =
 					PHSetProtocol(rContext, dwPreferredProtocols,
@@ -261,14 +251,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	DebugLogB("SCardConnect: hCard Identity: %x", *phCard);
 
-  /*******************************************/
+	/*******************************************/
 	/*
 	 * This section tries to set up the 
 	 */
 	/*
 	 * exclusivity modes. -1 is exclusive 
 	 */
-  /*******************************************/
+	/*******************************************/
 
 	if (dwShareMode == SCARD_SHARE_EXCLUSIVE)
 	{
@@ -276,13 +266,15 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			rContext->dwContexts = SCARD_EXCLUSIVE_CONTEXT;
 			RFLockSharing(*phCard);
-		} else
+		}
+		else
 		{
 			RFDestroyReaderHandle(*phCard);
 			*phCard = 0;
 			return SCARD_E_SHARING_VIOLATION;
 		}
-	} else
+	}
+	else
 	{
 		/*
 		 * Add a connection to the context stack 
@@ -302,12 +294,11 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		 */
 		RFDestroyReaderHandle(*phCard);
 		if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
-		{
 			rContext->dwContexts = SCARD_NO_CONTEXT;
-		} else if (rContext->dwContexts > SCARD_NO_CONTEXT)
-		{
-			rContext->dwContexts -= 1;
-		}
+		else
+			if (rContext->dwContexts > SCARD_NO_CONTEXT)
+				rContext->dwContexts -= 1;
+
 		*phCard = 0;
 		return SCARD_F_INTERNAL_ERROR;
 	}
@@ -332,68 +323,47 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
         DebugLogA("SCardReconnect: Attempting reconnect to token.");
 
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	if (dwInitialization != SCARD_LEAVE_CARD &&
-		dwInitialization != SCARD_RESET_CARD &&
-		dwInitialization != SCARD_UNPOWER_CARD)
-	{
-
+			dwInitialization != SCARD_RESET_CARD &&
+			dwInitialization != SCARD_UNPOWER_CARD)
 		return SCARD_E_INVALID_VALUE;
-	}
 
 	if (dwShareMode != SCARD_SHARE_SHARED &&
-		dwShareMode != SCARD_SHARE_EXCLUSIVE &&
-		dwShareMode != SCARD_SHARE_DIRECT)
-	{
-
+			dwShareMode != SCARD_SHARE_EXCLUSIVE &&
+			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
-	}
 
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
-	{
-
+			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
 		return SCARD_E_PROTO_MISMATCH;
-	}
 
 	if (pdwActiveProtocol == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
 
 	rv = RFReaderInfoById(hCard, &rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure the reader is working properly 
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure no one has a lock on this reader 
 	 */
 	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Handle the dwInitialization 
@@ -401,25 +371,23 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	switch (dwInitialization)
 	{
-	case SCARD_LEAVE_CARD:	/* Do nothing here */
-		break;
-	case SCARD_UNPOWER_CARD:
-		dwAction = IFD_POWER_DOWN;
-		break;
-	case SCARD_RESET_CARD:
-		dwAction = IFD_RESET;
-		break;
-	default:
-		return SCARD_E_INVALID_VALUE;
+		case SCARD_LEAVE_CARD:	/* Do nothing here */
+			break;
+		case SCARD_UNPOWER_CARD:
+			dwAction = IFD_POWER_DOWN;
+			break;
+		case SCARD_RESET_CARD:
+			dwAction = IFD_RESET;
+			break;
+		default:
+			return SCARD_E_INVALID_VALUE;
 	};
 
 	/*
 	 * Thread handles powering so just reset instead 
 	 */
 	if (dwInitialization == SCARD_UNPOWER_CARD)
-	{
 		dwAction = IFD_RESET;
-	}
 
 	/*
 	 * RFUnblockReader( rContext ); FIX - this doesn't work 
@@ -473,7 +441,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					rContext->dwStatus &= ~SCARD_SPECIFIC;
 					rContext->dwStatus &= ~SCARD_SWALLOWED;
 					rContext->dwStatus &= ~SCARD_UNKNOWN;
-				} else
+				}
+				else
 				{
 					rContext->dwStatus |= SCARD_PRESENT;
 					rContext->dwStatus &= ~SCARD_ABSENT;
@@ -498,12 +467,14 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				break;
 		}
 
-	} else if (dwInitialization == SCARD_LEAVE_CARD)
-	{
-		/*
-		 * Do nothing 
-		 */
 	}
+	else
+		if (dwInitialization == SCARD_LEAVE_CARD)
+		{
+			/*
+			 * Do nothing 
+			 */
+		}
 
 	/*
 	 * Handle the dwActive/Preferred Protocols 
@@ -511,7 +482,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
 	{
 		rContext->dwProtocol = -1;
-	} else
+	}
+	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
@@ -530,11 +502,13 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				rContext->dwProtocol =
 					PHSetProtocol(rContext,
 					SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, ucAvailable);
-			} else
+			}
+			else
 			{
 				rContext->dwProtocol =
 					PHSetProtocol(rContext, dwPreferredProtocols,
 					ucAvailable);
+
 				if (rContext->dwProtocol == -1)
 				{
 					return SCARD_E_PROTO_MISMATCH;
@@ -594,9 +568,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			rContext->dwContexts = SCARD_LAST_CONTEXT;
 		}
 	} else
-	{
 		return SCARD_E_INVALID_VALUE;
-	}
 
 	/*
 	 * Clear a previous event to the application 
@@ -613,7 +585,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	LONG rv;
 	UCHAR controlBuffer[5];
 	UCHAR receiveBuffer[MAX_BUFFER_SIZE];
@@ -630,45 +601,37 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	receiveLength = 0;
 
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	rv = RFReaderInfoById(hCard, &rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	switch (dwDisposition)
 	{
-	case SCARD_LEAVE_CARD:	/* Do nothing here */
-		break;
-	case SCARD_UNPOWER_CARD:
-		dwAction = IFD_POWER_DOWN;
-		break;
-	case SCARD_RESET_CARD:
-		dwAction = IFD_RESET;
-		break;
-	case SCARD_EJECT_CARD:
-		break;
-	default:
-		return SCARD_E_INVALID_VALUE;
+		case SCARD_LEAVE_CARD:	/* Do nothing here */
+			break;
+		case SCARD_UNPOWER_CARD:
+			dwAction = IFD_POWER_DOWN;
+			break;
+		case SCARD_RESET_CARD:
+			dwAction = IFD_RESET;
+			break;
+		case SCARD_EJECT_CARD:
+			break;
+		default:
+			return SCARD_E_INVALID_VALUE;
 	};
 
 	/*
 	 * Thread handles powering so just reset instead 
 	 */
 	if (dwDisposition == SCARD_UNPOWER_CARD)
-	{
 		dwAction = IFD_RESET;
-	}
 
 	/*
 	 * Unlock any blocks on this context 
@@ -719,7 +682,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			rContext->dwStatus &= ~SCARD_SPECIFIC;
 			rContext->dwStatus &= ~SCARD_SWALLOWED;
 			rContext->dwStatus &= ~SCARD_UNKNOWN;
-		} else
+		}
+		else
 		{
 			rContext->dwStatus |= SCARD_PRESENT;
 			rContext->dwStatus &= ~SCARD_ABSENT;
@@ -810,7 +774,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
-
 	LONG rv;
 	PREADER_CONTEXT rContext;
 
@@ -820,9 +783,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	rv = 0;
 
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	rv = RFReaderInfoById(hCard, &rContext);
 
@@ -830,32 +791,24 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	 * Cannot find the hCard in this context 
 	 */
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure the reader is working properly 
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure some event has not occurred 
 	 */
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFLockSharing(hCard);
 
@@ -866,7 +819,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
-
 	LONG rv;
 	PREADER_CONTEXT rContext;
 	UCHAR controlBuffer[5];
@@ -885,24 +837,22 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Ignoring dwDisposition for now 
 	 */
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	switch (dwDisposition)
 	{
-	case SCARD_LEAVE_CARD:	/* Do nothing here */
-		break;
-	case SCARD_UNPOWER_CARD:
-		dwAction = IFD_POWER_DOWN;
-		break;
-	case SCARD_RESET_CARD:
-		dwAction = IFD_RESET;
-		break;
-	case SCARD_EJECT_CARD:
-		break;
-	default:
-		return SCARD_E_INVALID_VALUE;
+		case SCARD_LEAVE_CARD:	/* Do nothing here */
+			break;
+		case SCARD_UNPOWER_CARD:
+			dwAction = IFD_POWER_DOWN;
+			break;
+		case SCARD_RESET_CARD:
+			dwAction = IFD_RESET;
+			break;
+		case SCARD_EJECT_CARD:
+			break;
+		default:
+			return SCARD_E_INVALID_VALUE;
 	};
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -911,36 +861,27 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Cannot find the hCard in this context 
 	 */
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure some event has not occurred 
 	 */
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Thread handles powering so just reset instead 
 	 */
 	if (dwDisposition == SCARD_UNPOWER_CARD)
-	{
 		dwAction = IFD_RESET;
-	}
 
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
-
 		/*
 		 * Currently pcsc-lite keeps the card always powered 
 		 */
@@ -964,7 +905,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 			rContext->dwStatus &= ~SCARD_SPECIFIC;
 			rContext->dwStatus &= ~SCARD_SWALLOWED;
 			rContext->dwStatus &= ~SCARD_UNKNOWN;
-		} else
+		}
+		else
 		{
 			rContext->dwStatus |= SCARD_PRESENT;
 			rContext->dwStatus &= ~SCARD_ABSENT;
@@ -1033,7 +975,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
-
 	LONG rv;
 	PREADER_CONTEXT rContext;
 
@@ -1047,9 +988,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	 * Ignoring dwDisposition for now 
 	 */
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	rv = RFReaderInfoById(hCard, &rContext);
 
@@ -1057,23 +996,17 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	 * Cannot find the hCard in this context 
 	 */
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure some event has not occurred 
 	 */
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFUnlockSharing(hCard);
 
@@ -1086,7 +1019,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
-
 	LONG rv;
 	PREADER_CONTEXT rContext;
 
@@ -1102,9 +1034,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 * Cannot find the hCard in this context 
 	 */
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (strlen(rContext->lpcReader) > MAX_BUFFER_SIZE
 			|| rContext->dwAtrLen > MAX_ATR_SIZE || rContext->dwAtrLen < 0)
@@ -1120,18 +1050,14 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 * Make sure some event has not occurred 
 	 */
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure the reader is working properly 
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (mszReaderNames)
 	{  /* want reader name */
@@ -1209,7 +1135,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
-
 	/*
 	 * Client side function 
 	 */
@@ -1219,7 +1144,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 LONG SCardControl(SCARDHANDLE hCard, LPCBYTE pbSendBuffer,
 	DWORD cbSendLength, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
 {
-
 	/*
 	 * This is not used.  SCardControl is passed through SCardTransmit.
 	 * This is here to make the compiler happy. 
@@ -1233,7 +1157,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer,
 	LPDWORD pcbRecvLength)
 {
-
 	LONG rv;
 	PREADER_CONTEXT rContext;
 	SCARD_IO_HEADER sSendPci, sRecvPci;
@@ -1248,68 +1171,50 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	tempRxLength = 0;
 
 	if (pcbRecvLength == 0)
-	{
 		return SCARD_E_INVALID_PARAMETER;
-	}
 
 	dwRxLength = *pcbRecvLength;
 	*pcbRecvLength = 0;
 
 	if (hCard == 0)
-	{
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	if (pbSendBuffer == 0 || pbRecvBuffer == 0 || pioRecvPci == 0 ||
-		pioSendPci == 0)
-	{
+			pioSendPci == 0)
 		return SCARD_E_INVALID_PARAMETER;
-	}
 
 	/*
 	 * Must at least have 2 status words even for SCardControl 
 	 */
 	if (dwRxLength < 2)
-	{
 		return SCARD_E_INSUFFICIENT_BUFFER;
-	}
 
 	/*
 	 * Make sure no one has a lock on this reader 
 	 */
 	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFReaderInfoById(hCard, &rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure the reader is working properly 
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Make sure some event has not occurred 
 	 */
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-	{
 		return rv;
-	}
 
 	/*
 	 * Check for some common errors 
@@ -1363,11 +1268,13 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_ANY)
 	{
 	  /* Fix by Amira (Athena) */
-                unsigned long i;
-                unsigned long prot = rContext->dwProtocol;
-                for (i = 0 ; prot != 1 ; i++)
-                        prot >>= 1;
-                sSendPci.Protocol = i;
+		unsigned long i;
+		unsigned long prot = rContext->dwProtocol;
+
+		for (i = 0 ; prot != 1 ; i++)
+			prot >>= 1;
+
+		sSendPci.Protocol = i;
 	}
 
 	sSendPci.Length = pioSendPci->cbPciLength;
@@ -1427,7 +1334,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	LPSTR mszReaders, LPDWORD pcchReaders)
 {
-
 	/*
 	 * Client side function 
 	 */
@@ -1436,7 +1342,6 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
-
 	/*
 	 * Client side function 
 	 */
