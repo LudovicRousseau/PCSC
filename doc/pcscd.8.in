@@ -3,7 +3,7 @@
 .\"
 .TH PCSCD 8 "March 2002" Linux "User Manual"
 .SH NAME
-pcscd \- PC/SC Smartcard Daemon
+pcscd \- PC/SC Smart Card Daemon
 .SH SYNOPSIS
 .BI "pcscd [" options "]"
 .SH OPTIONS
@@ -33,7 +33,7 @@ Displays information about the pcscd command line
 Displays the program version number
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite and musclecard framework. It is 
-a resource manager that coordinates communications with smart-card readers 
+a resource manager that coordinates communications with smart card readers 
 and smart cards and cryptographic tokens that are connected to the system.
 
 pcscd is normally started at boot time from 
@@ -45,27 +45,27 @@ pcscd coordinates the loading of drivers for card readers and plug-ins
 for different card types.
 
 The purpose of pcsc-lite is to provide both a cross compatible API for
-migrating Windows based PCSC applications to Unix and to provide a 
-pluggable architecture for supporting smartcards and cryptographic tokens 
+migrating Windows based PC/SC applications to Unix and to provide a 
+pluggable architecture for supporting smart cards and cryptographic tokens 
 through high level API's.
 
 At startup, pcscd loads the smart card reader drivers specified in the 
-.I /etc/reader.conf 
+.I @confdir@/reader.conf 
 file (or specified using \fB-c\fR \fIfile\fR).
 
 When a smart card is inserted into a reader, pcscd uses the ATR string from 
 the card to identify this card.  The 
-.I /usr/local/pcsc/services 
+.I @muscledropdir@
 directory contains plug-ins for the card.  These plug-ins are searched.  If 
 the ATR string matches, the client library loads that plug-in for that 
 token.
 .SH "SERIAL SMART CARD READER DRIVERS"
 Smart card reader drivers are placed in the 
-.I /usr/local/pcsc/drivers 
+.I @usbdropdir@
 directory. Each driver is simply an 
 .I .so 
 file.  The pcscd locates the driver with the 
-.I /usr/local/etc/reader.conf 
+.I @confdir@/reader.conf 
 file.  The file has the following format:
 
  # comment
@@ -75,7 +75,7 @@ file.  The file has the following format:
  CHANNELID    <Hexadecimal channel identificator>
 
 .IP FRIENDLYNAME 
-is a user-friendly name of the reader that is served by this driver.
+is a user friendly name of the reader that is served by this driver.
 This name is displayed to the user when necessary.
 
 .IP DEVICENAME 
@@ -86,7 +86,7 @@ GEN_SMART_RDR is a good choice.
 is the full path to the shared library. 
 
 .IP CHANNELID 
-is the channel ID for serial-port, smart-card readers.  This could vary 
+is the channel ID for serial port smart card readers.  This could vary 
 depending on the driver in which you are using - check the driver README
 for more information.  Some use the following:
 
@@ -101,38 +101,38 @@ Example:
  
  FRIENDLYNAME "My Smartcard Reader"
  DEVICENAME   GEN_SMART_RDR
- LIBPATH      /usr/local/pcsc/drivers/my_reader.so
+ LIBPATH      @usbdropdir@/my_reader.so
  CHANNELID    0x0103F8
  
  # End of file
 
 Multiple drivers can be listed in 
-.I /etc/reader.conf.
+.I @confdir@/reader.conf.
 
 Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fR.
 .SH "SMART CARD PLUG-INS"
 pcsc-lite uses plug-ins to handle different types of smart cards. There is 
-a plug-in for each smart-card type. Plug-ins are installed in the 
-.I /usr/local/pcsc/services 
+a plug-in for each smart card type. Plug-ins are installed in the 
+.I @muscledropdir@
 directory.  Plug-ins for cards/tokens are available from the MUSCLE
 web site \fIhttp://www.musclecard.com\fR.
 .SH FILES
-.I /etc/reader.conf
+.I @confdir@/reader.conf
 : Reader configuration file
 .br
 .I /etc/init.d/pcscd
 : pcscd startup script
 .br
-.I /var/run/pcscd.pid
+.I @runpid@
 : process id of the running pcscd
 .br
-.I /usr/local/pcsc/drivers/
+.I @usbdropdir@
 : directory containing bundles for USB
 drivers"
 .SH BUGS
 None known.
 .SH "SEE ALSO"
-.BR bundleTool (1),
+.BR bundleTool (8),
 .BR formaticc (1)
 .SH AUTHORS
 David Corcoran <corcoran@linuxnet.com> and Ludovic Rousseau

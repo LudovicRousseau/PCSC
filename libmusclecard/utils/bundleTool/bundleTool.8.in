@@ -34,4 +34,4 @@ Example:
 .BR pcscd (8)
 .SH BUGS
 Plugins MUST reside in 
-.I /usr/local/pcsc/services
+.I @muscledropdir@
