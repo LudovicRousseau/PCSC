@@ -181,12 +181,12 @@ int main(int argc, char **argv)
 			&cbRecvLength);
 	}
 #endif
-	printf("%s\n", pcsc_stringify_error(rv));
+	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
 
 	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
-	printf("%s\n", pcsc_stringify_error(rv));
+	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
 	if (rv == SCARD_S_SUCCESS)
 	{
 		for (i = 0; i < dwAtrLen; i++)
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 
 	printf("Testing SCardSetAttrib           : ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
-	printf("%s\n", pcsc_stringify_error(rv));
+	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
 
 	printf("Testing SCardStatus              : ");
 
