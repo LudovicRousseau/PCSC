@@ -81,12 +81,11 @@ muscletest_SOURCES = muscletest.c
 muscletest_LDADD = libmusclecard.la
 
 include_HEADERS = \
-	debuglog.h pcsclite.h winscard.h wintypes.h \
+	debuglog.h ifdhandler.h pcsclite.h winscard.h wintypes.h \
 	$(MC_HDR)
 noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
-	hotplug.h ifdhandler.h ifdwrapper.h parser.h \
-	pcsclite.h.in \
+	hotplug.h ifdwrapper.h parser.h pcsclite.h.in \
 	powermgt_generic.h prothandler.h readerfactory.h \
 	sys_generic.h thread_generic.h tokenfactory.h \
 	winscard_msg.h winscard_svc.h
@@ -101,3 +100,4 @@ tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
 EXTRA_DIST = README_INTERNALS.txt dyn_win32.c thread_win32.c winscard_scf.c
+
