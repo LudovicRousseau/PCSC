@@ -20,9 +20,10 @@
 #include <dirent.h>
 #endif
 
-#include "debuglog.h"
-#include "parser.h"
-#include "dyn_generic.h"
+#include <debuglog.h>
+#include <parser.h>
+#include <dyn_generic.h>
+
 #include "tokenfactory.h"
 #include "strlcpycat.h"
 

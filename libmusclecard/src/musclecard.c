@@ -18,17 +18,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <pcsclite.h>
 #include <winscard.h>
+#include <debuglog.h>
+
 #include "musclecard.h"
-#include "debuglog.h"
 #include "tokenfactory.h"
 #include "strlcpycat.h"
 
 #ifdef USE_THREAD_SAFETY
-#include "wintypes.h"
-#include "thread_generic.h"
-#include "sys_generic.h"
+#include <wintypes.h>
+#include <thread_generic.h>
+#include <sys_generic.h>
 #endif
 
 #ifdef USE_THREAD_SAFETY
