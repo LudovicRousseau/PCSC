@@ -51,6 +51,7 @@ extern PCSCLITE_MUTEX   usbNotifierMutex;
 
 void PMPowerRegistrationThread();
 extern LONG HPRemoveAllHotPluggables();
+extern LONG HPSetupHotPlugDevice();
 
 void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * messageArgument)
 {
@@ -82,7 +83,7 @@ void PMPowerRegistrationThread() {
   
     if ( root_port == NULL ) {
             printf("IORegisterForSystemPower failed\n");
-            return 1;
+            return;
     }
     
     CFRunLoopAddSource(CFRunLoopGetCurrent(),

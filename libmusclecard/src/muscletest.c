@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	MSCObjectInfo objInfo;
 	MSCUChar8 pRandomData[20];
 	MSCUChar8 pSeed[8];
-	MSCUChar8 defaultPIN[8] = { 'M', 'u', 's', 'c', 'l', 'e', '0', '0' };
+	MSCUChar8 defaultPIN[16];
 	MSCUChar8 AID[6] = { 0xA0, 0x00, 0x00, 0x00, 0x01, 0x01 };
 	MSCUChar8 myData[] =
 		{ 'M', 'U', 'S', 'C', 'L', 'E', ' ', 'V', 'I', 'R',
@@ -125,7 +125,10 @@ int main(int argc, char **argv)
 	printf("Number of used Keys         : %02d\n", statusInf.usedKeys);
 	printf("Currently logged identities : %04x\n", statusInf.loggedID);
 
-	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN, 8);
+        printf("Please enter the pin value\n");
+        fgets(defaultPIN, sizeof(defaultPIN), stdin);
+
+	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN, strlen(defaultPIN) - 1);
 	printf("Verify default PIN          : %s\n", msc_error(rv));
 
 	rv = MSCGetStatus(&pConnection, &statusInf);
@@ -140,10 +143,10 @@ int main(int argc, char **argv)
 	printf("CreateObject returns        : %s\n", msc_error(rv));
 
 	rv = MSCWriteObject(&pConnection, MY_OBJECT_ID, 0, myData,
-		sizeof(myData));
+		            sizeof(myData), 0, 0);
 	printf("WriteObject returns         : %s\n", msc_error(rv));
 
-	rv = MSCReadObject(&pConnection, MY_OBJECT_ID, 0, readData, 25);
+	rv = MSCReadObject(&pConnection, MY_OBJECT_ID, 0, readData, 25, 0, 0);
 	printf("ReadObject returns          : %s\n", msc_error(rv));
 
 	if (rv == MSC_SUCCESS)

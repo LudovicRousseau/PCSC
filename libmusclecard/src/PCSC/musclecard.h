@@ -264,22 +264,16 @@ extern "C"
 	/*
 	 * Direction policy bitmasks for MSCKeyPolicy 
 	 */
-#define MSC_KEYPOLICY_SIGN                0x0001
-#define MSC_KEYPOLICY_ENCRYPT             0x0002
-#define MSC_KEYPOLICY_DECRYPT             0x0004
-#define MSC_KEYPOLICY_VERIFY              0x0008
-#define MSC_KEYPOLICY_VERIFY_RECOVER      0x0010
-#define MSC_KEYPOLICY_SIGN_RECOVER        0x0020
-#define MSC_KEYPOLICY_WRAP                0x0040
-#define MSC_KEYPOLICY_UNWRAP              0x0080
-#define MSC_KEYPOLICY_DERIVE              0x0100
-#define MSC_KEYPOLICY_NON_REPUDIATION     0x0200
+#define MSC_KEYPOLICY_MODE_RSA_NOPAD      0x0001
+#define MSC_KEYPOLICY_MODE_RSA_PAD_PKCS1  0x0002
+#define MSC_KEYPOLICY_MODE_DSA_SHA        0x0004
+#define MSC_KEYPOLICY_MODE_DES_CBC_NOPAD  0x0008
+#define MSC_KEYPOLICY_MODE_DES_ECB_NOPAD  0x0010
 
-	/*
-	 * Mode policy bitmasks for MSCKeyPolicy 
-	 */
-#define MSC_KEYPOLICY_NO_PAD    0x0001
-#define MSC_KEYPOLICY_PKCS1_PAD 0x0002
+#define MSC_KEYPOLICY_DIR_SIGN            0x0100
+#define MSC_KEYPOLICY_DIR_VERIFY          0x0200
+#define MSC_KEYPOLICY_DIR_ENCRYPT         0x0400
+#define MSC_KEYPOLICY_DIR_DECRYPT         0x0800
 
 	typedef struct
 	{
@@ -324,8 +318,8 @@ extern "C"
 	{
 		MSCUChar8 keyNum;
 		MSCUChar8 keyType;
-		MSCUChar8 keyPartner;
-	        MSCUChar8 keyMapping;
+		MSCUChar8 keyPartner;   /* Do not use (deprecated) */
+	        MSCUChar8 keyMapping;   /* Do not use (deprecated) */
 		MSCUShort16 keySize;
 		MSCKeyPolicy keyPolicy;
 		MSCKeyACL keyACL;
@@ -415,8 +409,6 @@ extern "C"
 
 #define MSC_TAG_CAPABLE_MD5           207	/* MD5 capabilities */
 #define MSC_TAG_CAPABLE_SHA1          208	/* SHA1 capabilities */
-
-#define MSC_TAG_CAPABLE_KEYPOLICY     280	/* Key policy capabilities */
 
 	/*
 	 * object related tags 
@@ -591,23 +583,6 @@ extern "C"
 #define MSC_CAPABLE_RANDOM_SEED   0x00000001	/* Uses supplied seed */
 
 	/*
-	 * Bitmask for TAG MSC_TAG_CAPABLE_KEYPOLICY 
-	 */
-#define MSC_CAPABLE_KEYPOLICY_SIGN                0x00000001
-#define MSC_CAPABLE_KEYPOLICY_ENCRYPT             0x00000002
-#define MSC_CAPABLE_KEYPOLICY_DECRYPT             0x00000004
-#define MSC_CAPABLE_KEYPOLICY_VERIFY              0x00000008
-#define MSC_CAPABLE_KEYPOLICY_VERIFY_RECOVER      0x00000010
-#define MSC_CAPABLE_KEYPOLICY_SIGN_RECOVER        0x00000020
-#define MSC_CAPABLE_KEYPOLICY_WRAP                0x00000040
-#define MSC_CAPABLE_KEYPOLICY_UNWRAP              0x00000080
-#define MSC_CAPABLE_KEYPOLICY_DERIVE              0x00000100
-#define MSC_CAPABLE_KEYPOLICY_NON_REPUDIATION     0x00000200
-
-#define MSC_CAPABLE_KEYPOLICY_NO_PAD    0x00010000	/* No padding */
-#define MSC_CAPABLE_KEYPOLICY_PKCS1_PAD 0x00020000	/* PKCS padding */
-
-	/*
 	 * Structure used in MSCGetStatus to return status and capability
 	 * information about the inserted token 
 	 */
@@ -768,7 +743,6 @@ extern "C"
 
 	MSC_RV MSCImportKey(MSCLPTokenConnection pConnection,
 		MSCUChar8 keyNum,
-		MSCUChar8 keyPartner,
 		MSCLPKeyACL pKeyACL,
 		MSCPUChar8 pKeyBlob,
 		MSCULong32 keyBlobSize,

@@ -1085,15 +1085,14 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
-		    MSCUChar8 keyPartner, MSCLPKeyACL pKeyACL, 
-		    MSCPUChar8 pKeyBlob,MSCULong32 keyBlobSize, 
+                    MSCLPKeyACL pKeyACL, MSCPUChar8 pKeyBlob,MSCULong32 keyBlobSize, 
 		    MSCLPKeyPolicy keyPolicy, MSCPVoid32 pAddParams, 
 		    MSCUChar8 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
 	MSCLong32(*libMSCImportKey) (MSCLPTokenConnection, MSCUChar8, 
-				     MSCUChar8, MSCLPKeyACL, MSCPUChar8, 
+                                     MSCLPKeyACL, MSCPUChar8, 
 				     MSCULong32, MSCLPKeyPolicy, MSCPVoid32,
 				     MSCUChar8);
 
@@ -1107,13 +1106,13 @@ MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 	if (vFunction != 0)
 	{
 		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection, 
-						MSCUChar8, MSCUChar8,
+						MSCUChar8, 
 						MSCLPKeyACL, MSCPUChar8, 
 						MSCULong32, MSCLPKeyPolicy, 
 						MSCPVoid32, MSCUChar8)) 
 		  vFunction;
 
-		rv = (*libMSCImportKey) (pConnection, keyNum, keyPartner, 
+		rv = (*libMSCImportKey) (pConnection, keyNum,  
 					 pKeyACL, pKeyBlob, keyBlobSize, 
 					 keyPolicy, pAddParams, addParamsSize);
 
@@ -1753,7 +1752,6 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 	{
 		pKeyInfo->keyNum = keyInfo.keyNum;
 		pKeyInfo->keyType = keyInfo.keyType;
-		pKeyInfo->keyPartner = keyInfo.keyPartner;
 		pKeyInfo->keySize = keyInfo.keySize;
 
 		pKeyInfo->keyPolicy.cipherMode = keyInfo.keyPolicy.cipherMode;
@@ -1790,7 +1788,6 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 
 	pKeyInfo->keyNum = keyInfo.keyNum;
 	pKeyInfo->keyType = keyInfo.keyType;
-	pKeyInfo->keyPartner = keyInfo.keyPartner;
 	pKeyInfo->keySize = keyInfo.keySize;
 
 	pKeyInfo->keyPolicy.cipherMode = keyInfo.keyPolicy.cipherMode;
