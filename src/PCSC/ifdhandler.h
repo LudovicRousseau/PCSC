@@ -139,6 +139,15 @@ extern "C"
 #define IFD_ICC_NOT_PRESENT		616
 
 	/*
+	 * If you want to compile a V2.0 IFDHandler, define IFDHANDLERv2 before you
+	 * include this file.
+	 *
+	 * By default it is setup for for most recent version of the API (V3.0)
+	 */
+
+#ifndef IFDHANDLERv2
+
+	/*
 	 * List of Defined Functions Available to IFD_Handler 3.0 
 	 *
 	 * All the functions of IFD_Handler 2.0 are available
@@ -149,11 +158,19 @@ extern "C"
 	RESPONSECODE IFDHCreateChannelByName(DWORD, LPTSTR);
 	RESPONSECODE IFDHControl(DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD,
 		LPDWORD);
+#else
 
 	/*
 	 * List of Defined Functions Available to IFD_Handler 2.0 
 	 */
 
+	RESPONSECODE IFDHControl(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
+
+#endif
+
+	/*
+	 * common functions in IFD_Handler 2.0 and 3.0
+	 */
 	RESPONSECODE IFDHCreateChannel(DWORD, DWORD);
 	RESPONSECODE IFDHCloseChannel(DWORD);
 	RESPONSECODE IFDHGetCapabilities(DWORD, DWORD, PDWORD, PUCHAR);
@@ -163,7 +180,6 @@ extern "C"
 	RESPONSECODE IFDHPowerICC(DWORD, DWORD, PUCHAR, PDWORD);
 	RESPONSECODE IFDHTransmitToICC(DWORD, SCARD_IO_HEADER, PUCHAR,
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER);
-	RESPONSECODE IFDHControl_v2(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 	RESPONSECODE IFDHICCPresence(DWORD);
 
 	/*
