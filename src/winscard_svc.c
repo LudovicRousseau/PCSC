@@ -237,11 +237,10 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 					psChannelMap[i].hCard[j] = 0;
 				}
 
-				psChannelMap[i].hContext = 0;
-				psChannelMap[i].dwClientID = 0;
-
 			}
 
+			psChannelMap[i].hContext = 0;
+			psChannelMap[i].dwClientID = 0;
 			SCardReleaseContext(hContext);
 			return SCARD_S_SUCCESS;
 		}
