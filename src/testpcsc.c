@@ -122,27 +122,28 @@ int main(int argc, char **argv)
 		while (mszReaders[++i] != 0) ;
 	}
 
-	do
-	{
-		printf("Enter the reader number          : ");
-		scanf("%d", &iReader);
-		printf("\n");
-
-		if (iReader > p || iReader <= 0)
+	if (p > 1)
+		do
 		{
-			printf("Invalid Value - try again\n");
+			printf("Enter the reader number          : ");
+			scanf("%d", &iReader);
+			printf("\n");
+
+			if (iReader > p || iReader <= 0)
+				printf("Invalid Value - try again\n");
 		}
-	}
-	while (iReader > p || iReader <= 0);
+		while (iReader > p || iReader <= 0);
+	else
+		iReader = 1;
 
 	rgReaderStates[0].szReader = &mszReaders[iList[iReader]];
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
-	printf("Waiting for card insertion         \n");
+	printf("Waiting for card insertion       : ");
+	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 
-	printf("                                 : %s\n",
-		pcsc_stringify_error(rv));
+	printf("%s\n", pcsc_stringify_error(rv));
 
 	if (rv != SCARD_S_SUCCESS)
 	{
