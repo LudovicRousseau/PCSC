@@ -197,7 +197,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 				PHSetProtocol(rContext, dwPreferredProtocols,
 				ucAvailable, ucDefault);
 
-			if (rContext->readerState->cardProtocol == -1)
+			if (SET_PROTOCOL_PPS_FAILED == rContext->readerState->cardProtocol)
+				return SCARD_W_UNRESPONSIVE_CARD;
+
+			if (SET_PROTOCOL_WRONG_ARGUMENT == rContext->readerState->cardProtocol)
 				return SCARD_E_PROTO_MISMATCH;
 		}
 	}
@@ -470,7 +473,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				PHSetProtocol(rContext, dwPreferredProtocols,
 				ucAvailable, ucDefault);
 
-			if (rContext->readerState->cardProtocol == -1)
+			if (SET_PROTOCOL_PPS_FAILED == rContext->readerState->cardProtocol)
+				return SCARD_W_UNRESPONSIVE_CARD;
+
+			if (SET_PROTOCOL_WRONG_ARGUMENT == rContext->readerState->cardProtocol)
 				return SCARD_E_PROTO_MISMATCH;
 		}
 	}
