@@ -36,6 +36,10 @@
 #define FALSE 0
 #endif
 
+#ifndef PCSCLITE_MAX_READERS_CONTEXTS
+#define PCSCLITE_MAX_READERS_CONTEXTS	16
+#endif
+
 /* PCSC error message pretty print */
 #define PCSC_ERROR(rv, text) \
 if (rv != SCARD_S_SUCCESS) \
