@@ -844,6 +844,8 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 			break;
 		if (ret == MSC_TOKEN_RESET)
 		{
+		        pConnection->tokenInfo.tokenType |= 
+			  MSC_TOKEN_TYPE_RESET;
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
@@ -876,6 +878,8 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 			break;
 		if (ret == MSC_TOKEN_RESET)
 		{
+		        pConnection->tokenInfo.tokenType |= 
+			  MSC_TOKEN_TYPE_RESET;
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
@@ -2389,19 +2393,22 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 {
 
 	MSC_RV rv;
-	MSCPVoid32 vInitFunction, vFinFunction;
+	MSCPVoid32 vInitFunction, vFinFunction, vIdFunction;
 	MSCULong32 dwActiveProtocol;
 	MSCLong32(*libPL_MSCInitializePlugin) (MSCLPTokenConnection);
 	MSCLong32(*libPL_MSCFinalizePlugin) (MSCLPTokenConnection);
+        MSCLong32 (*libPL_MSCIdentifyToken)(MSCLPTokenConnection);
 
 	vInitFunction = 0;
-	vFinFunction = 0;
+	vFinFunction  = 0;
+	vIdFunction   = 0;
 
 	/*
 	 * Select the AID or initialization routine for the card 
 	 */
 	vInitFunction = pConnection->libPointers.pvfInitializePlugin;
-	vFinFunction = pConnection->libPointers.pvfFinalizePlugin;
+	vFinFunction  = pConnection->libPointers.pvfFinalizePlugin;
+	vIdFunction   = pConnection->libPointers.pvfIdentifyToken;
 
 	if (vInitFunction == 0)
 	{
@@ -2417,11 +2424,21 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 		return MSC_INTERNAL_ERROR;
 	}
 
+	if ( vIdFunction == 0 ) 
+	{
+	        DebugLogC("Error: Card service failure: %s\n", 
+			  "IdentifyToken function missing");
+		return MSC_INTERNAL_ERROR;
+	}
+
 	libPL_MSCInitializePlugin = (MSCLong32(*)(MSCLPTokenConnection))
 		vInitFunction;
 
 	libPL_MSCFinalizePlugin = (MSCLong32(*)(MSCLPTokenConnection))
 		vFinFunction;
+
+	libPL_MSCIdentifyToken = (MSCLong32 (*)(MSCLPTokenConnection))
+	        vIdFunction;
 
 	rv = SCardReconnect(pConnection->hCard, pConnection->shareMode,
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
@@ -2439,6 +2456,11 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 	 * Use the default AID given by the Info.plist 
 	 */
 	rv = (*libPL_MSCInitializePlugin) (pConnection);
+
+	/* 
+	 * Use the default AID given by the Info.plist 
+	 */
+	rv = (*libPL_MSCIdentifyToken)(pConnection);
 
 	if (rv != MSC_SUCCESS)
 		return rv;
