@@ -7,11 +7,14 @@
             Date   : 09/26/01
             License: Copyright (C) 2001-2002 David Corcoran
                      <corcoran@linuxnet.com>
-            Purpose: This loads MuscleCard plug-ins and provides
-	    functions for applications.
+                     2003 Ludovic Rousseau <ludovic.rousseau@free.fr>
+            Purpose: This loads MuscleCard plug-ins and provides functions for
+            applications.
 
-	    You may not remove this header from this file without 
-	    prior permission from the author.
+            You may not remove this header from this file without 
+            prior permission from the author.
+
+$Id$
   
 ********************************************************************/
 
@@ -2154,22 +2157,20 @@ MSCUChar8 MSCIsTokenReset(MSCLPTokenConnection pConnection)
 	MSCUChar8 tokenId[MAX_ATR_SIZE];
 	MSCULong32 tokenIdLength;
 
+	slotNameSize = sizeof(slotName);
+	tokenIdLength = sizeof(tokenId);
+
 	rv = SCardStatus(pConnection->hCard, slotName,
 			 &slotNameSize, &slotState, &slotProtocol, 
 			 tokenId, &tokenIdLength);
 
 	if (rv == SCARD_W_RESET_CARD)
-	{
-	        return 1;
-	} 
+		return 1;
 
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_RESET)
-	{
 		return 1;
-	} else
-	{
+	else
 		return 0;
-	}
 }
 
 MSCUChar8 MSCClearReset(MSCLPTokenConnection pConnection)
@@ -2186,52 +2187,48 @@ MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection)
 	MSCUChar8 tokenId[MAX_ATR_SIZE];
 	MSCULong32 tokenIdLength;
 
+	slotNameSize = sizeof(slotName);
+	tokenIdLength = sizeof(tokenId);
 
 	rv = SCardStatus(pConnection->hCard, slotName,
 			 &slotNameSize, &slotState, &slotProtocol, 
 			 tokenId, &tokenIdLength);
 
 	if (rv == SCARD_W_REMOVED_CARD)
-	{
 	        return 1;
-	} else if (rv == SCARD_W_INSERTED_CARD)
+	else
 	{
+		if (rv == SCARD_W_INSERTED_CARD)
 	        return 1;
-	} else if (slotState & SCARD_ABSENT)
-	{
-	        return 1;
+		else
+		{
+			if (slotState & SCARD_ABSENT)
+				return 1;
+		}
 	}
-
 
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_REMOVED)
-	{
 		return 1;
-	} else
-	{
+	else
 		return 0;
-	}
 }
 
 MSCUChar8 MSCIsTokenChanged(MSCLPTokenConnection pConnection)
 {
 	if (MSCIsTokenMoved(pConnection))
-	{
 		return 1;
-	} else if (MSCIsTokenReset(pConnection)) 
-	{
-		return 1;
-	} else {
-	        return 0;
-	}
+	else
+		if (MSCIsTokenReset(pConnection)) 
+			return 1;
+		else
+			return 0;
 }
 
 MSCUChar8 MSCIsTokenKnown(MSCLPTokenConnection pConnection)
 {
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_KNOWN)
-	{
 		return 1;
-	} else
-	{
+	else
 		return 0;
-	}
 }
+
