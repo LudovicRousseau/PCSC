@@ -216,16 +216,18 @@ int main(int argc, char **argv)
 	 */
 	if (strcmp(PCSCLITE_VERSION_NUMBER, VERSION) != 0)
 	{
-		printf
-			("BUILD ERROR: The release version number PCSCLITE_VERSION_NUMBER\n");
-		printf
-			("  in pcsclite.h (%s) does not match the release version number\n",
+		printf("BUILD ERROR: The release version number PCSCLITE_VERSION_NUMBER\n");
+		printf("  in pcsclite.h (%s) does not match the release version number\n",
 			PCSCLITE_VERSION_NUMBER);
-		printf("  generated in config.h (%s) (see configure.in).\n",
-			VERSION);
+		printf("  generated in config.h (%s) (see configure.in).\n", VERSION);
 
 		return 1;
 	}
+
+	/*
+	 * log to stderr by default
+	 */
+	DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
 
 	/*
 	 * Handle any command line arguments 
@@ -249,7 +251,6 @@ int main(int argc, char **argv)
 			case 'd':
 				if (strncmp(optarg, "syslog", PCSCLITE_MAX_COMSIZE) == 0) 
 					DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
-
 				else if (strncmp(optarg, "stderr", PCSCLITE_MAX_COMSIZE) == 0) {
 					DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
 					DebugLogA("main: debug messages to stderr");
@@ -260,17 +261,26 @@ int main(int argc, char **argv)
 					DebugLogA("main: debug messages to stdout");
 					setToForeground = 1;
 				}
+				else
+				{
+					DebugLogB("unknown debug argument: %s", optarg);
+					print_usage (argv[0]);
+					return 1;
+				}
 				break;
 
 			case 'h':
 				print_usage (argv[0]);
 				return 0;
+
 			case 'v':
 				print_version ();
 				return 0;
+
 			case 'a':
 				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
 				break;
+
 			default:
 				print_usage (argv[0]);
 				return 1;
@@ -544,9 +554,9 @@ void print_usage (char const * const progname)
 #ifdef HAVE_GETOPT_LONG
 	printf("  -c, --config		path to reader.conf\n");
 	printf("  -f, --foreground	run in foreground (no daemon)\n");
-	printf("  -d, --debug		display debug messages. Output may be:\n"); 
-	printf("			stdout (imply -f), stderr (imply -f),\n");
-	printf("			or syslog\n");
+	printf("  -d, --debug output	display debug messages. Output may be:\n"); 
+	printf("			\"stdout\" (imply -f), \"stderr\" (imply -f),\n");
+	printf("			or \"syslog\"\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -v, --version		display the program version number\n");
 #else
