@@ -7,12 +7,16 @@
  * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
 
 #ifndef __winscard_msg_h__
 #define __winscard_msg_h__
+
+#define PROTOCOL_VERSION_MAJOR 2
+#define PROTOCOL_VERSION_MINOR 0
 
 #ifdef __cplusplus
 extern "C"
@@ -40,7 +44,8 @@ extern "C"
 		CMD_CLIENT_DIED = 0xF4,
 		CMD_READER_EVENT = 0xF5,
 		CMD_SYN = 0xF6,
-		CMD_ACK = 0xF7
+		CMD_ACK = 0xF7,
+		CMD_VERSION = 0xF8
 	};
 
 	enum pcsc_msg_commands
@@ -61,6 +66,14 @@ extern "C"
 		SCARD_CANCEL = 0x0D,
 		SCARD_CANCEL_TRANSACTION = 0x0E
 	};
+
+	struct version_struct
+	{
+		int major;
+		int minor;
+		LONG rv;
+	};
+	typedef struct version_struct version_struct;
 
 	struct client_struct
 	{

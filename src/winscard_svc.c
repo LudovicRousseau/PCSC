@@ -7,6 +7,7 @@
  * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -32,6 +33,7 @@ static struct _psContext
 	DWORD dwClientID;
 	PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 	sharedSegmentMsg msgStruct;
+	int protocol_major, protocol_minor;
 } psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
 static DWORD dwNextContextIndex;
@@ -97,7 +99,6 @@ static void ContextThread(DWORD* pdwIndex)
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex = *pdwIndex;
 
-
 	DebugLogB("ContextThread: Thread is started: %d", psContext[dwContextIndex].dwClientID);
 	
 	while (1)
@@ -126,10 +127,33 @@ static void ContextThread(DWORD* pdwIndex)
 				MSGFunctionDemarshall(&msgStruct, dwContextIndex);
 				rv = SHMMessageSend(&msgStruct, psContext[dwContextIndex].dwClientID,
 						    PCSCLITE_SERVER_ATTEMPTS);
-			} else
-			{
-				continue;
 			}
+			else
+				/* pcsc-lite client/server protocol version */
+				if (msgStruct.mtype == CMD_VERSION)
+				{
+					version_struct *veStr;
+					veStr = (version_struct *) msgStruct.data;
+
+					/* get the client protocol version */
+					psContext[dwContextIndex].protocol_major = veStr->major;
+					psContext[dwContextIndex].protocol_minor = veStr->minor;
+
+					DebugLogC("Client is protocol version %d:%d",
+						veStr->major, veStr->minor);
+
+					/* set the server protocol version */
+					veStr->major = PROTOCOL_VERSION_MAJOR;
+					veStr->minor = PROTOCOL_VERSION_MINOR;
+					veStr->rv = SCARD_S_SUCCESS;
+
+					/* send back the response */
+					rv = SHMMessageSend(&msgStruct,
+						psContext[dwContextIndex].dwClientID,
+					    PCSCLITE_SERVER_ATTEMPTS);
+				}
+				else
+					continue;
 
 			break;
 
@@ -155,7 +179,6 @@ static void ContextThread(DWORD* pdwIndex)
 
 LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 {
-
 	LONG rv;
 	establish_struct *esStr;
 	release_struct *reStr;
@@ -279,14 +302,12 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 
 LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 {
-
 	psContext[dwContextIndex].hContext = hContext;
 	return SCARD_S_SUCCESS;
 }
 
 LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 {
-
 	int i;
 	LONG rv;
 
@@ -333,7 +354,6 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 
 LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD dwContextIndex)
 {
-
 	int i;
 
 	if (psContext[dwContextIndex].hContext == hContext)
@@ -366,7 +386,6 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD dwContextIndex
 
 LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
-
 	int i;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
@@ -384,9 +403,7 @@ LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
 
 LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
-
 	int i;
-
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
@@ -405,14 +422,14 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 
 LONG MSGCleanupClient(DWORD dwContextIndex)
 {
-
-
 	if (psContext[dwContextIndex].hContext == 0)
 		return 0;
 
 	SCardReleaseContext(psContext[dwContextIndex].hContext);	
 	MSGRemoveContext(psContext[dwContextIndex].hContext, dwContextIndex);
 	psContext[dwContextIndex].dwClientID = 0;
+	psContext[dwContextIndex].protocol_major = 0;
+	psContext[dwContextIndex].protocol_minor = 0;
 	
 	return 0;
 }

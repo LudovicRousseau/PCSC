@@ -128,6 +128,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	else
 		*phContext = 0;
 
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_NO_SERVICE;
+
 	/*
 	 * Do this only once
 	 */
@@ -193,7 +196,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			}
 		}
 
-		isExecuted = 1;
 	}
 
 	/*
@@ -217,6 +219,40 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		return SCARD_E_NO_SERVICE;
 	}
 
+	{	/* exchange client/server protocol versions */
+		sharedSegmentMsg msgStruct;
+		version_struct *veStr;
+
+		msgStruct.mtype = CMD_VERSION;
+		msgStruct.user_id = SYS_GetUID();
+		msgStruct.group_id = SYS_GetGID();
+		msgStruct.command = 0;
+		msgStruct.date = time(NULL);
+
+		veStr = (version_struct *) msgStruct.data;
+		veStr->major = PROTOCOL_VERSION_MAJOR;
+		veStr->minor = PROTOCOL_VERSION_MINOR;
+
+		if (-1 == SHMMessageSend(&msgStruct, dwClientID,
+			PCSCLITE_MCLIENT_ATTEMPTS))
+			return SCARD_E_NO_SERVICE;
+
+		/*
+		 * Read a message from the server
+		 */
+		if (-1 == SHMMessageReceive(&msgStruct, dwClientID,
+			PCSCLITE_CLIENT_ATTEMPTS))
+		{
+			DebugLogA("Your pcscd is too old and does not support CMD_VERSION");
+			return SCARD_F_COMM_ERROR;
+		}
+
+		DebugLogC("Server is protocol version %d:%d",
+			veStr->major, veStr->minor);
+
+		isExecuted = 1;
+	}
+
 
 	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
 		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
@@ -226,9 +262,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 
 	scEstablishStruct.dwScope = dwScope;
 	scEstablishStruct.phContext = 0;
-
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
 
 	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, dwClientID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
