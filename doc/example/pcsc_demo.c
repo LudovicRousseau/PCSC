@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 		rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
 
 		rv = SCardGetStatusChange(hContext, 0, rgReaderStates, 1);
-		printf(" state: 0x%04X\n", rgReaderStates[0].dwEventState);
+		printf(" state: 0x%04lX\n", rgReaderStates[0].dwEventState);
 		PCSC_ERROR(rv, "SCardGetStatusChange")
 	}
 
