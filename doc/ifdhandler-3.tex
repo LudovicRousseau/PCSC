@@ -47,7 +47,7 @@
 \title{MUSCLE PC/SC IFD Driver API}
 \author{David Corcoran \& Ludovic Rousseau\\
 \url{corcoran@musclecard.com}, \url{ludovic.rousseau@free.fr}}
-\date{June 11, 2004}
+\date{July 28, 2004}
 
 \begin{document}
 
@@ -71,9 +71,10 @@ For more information please visit \url{http://www.musclecard.com/}.
 Document history: \\
 \begin{tabular}{|l|l|l|}
 \hline
-3.0.1 & August 9, 2004 & latest PDF only version \\
+3.0.1 & August 9, 2003 & latest PDF only version \\
 \hline
-3.1.0 & June 11, 2004 & reformat using \LaTeX{} and correct bugs \\
+3.1.0 & July 28, 2004 & reformat using \LaTeX{}, correct bugs and add
+information \\
 \hline
 \end{tabular}
 
@@ -534,13 +535,32 @@ defined in Microsoft PC/SC \texttt{SCardGetAttrib()}.
 
 \item \texttt{TAG\_IFD\_SIMULTANEOUS\_ACCESS}
 
-Return the number of sessions the driver can handle.
+Return the number of sessions (readers) the driver can handle in
+\texttt{Value[0]}.
 
 This is used for multiple readers sharing the same driver.
 
+\item \texttt{TAG\_IFD\_THREAD\_SAFE}
+
+If the driver support more than one reader (see
+\texttt{TAG\_IFD\_SIMULTANEOUS\_ACCESS} above) this tag indicates if the
+driver supports access to multiple reader at the same time.
+
+\texttt{Value[0] = 1} indicates the driver supports simultaneous
+accesses.
+
 \item \texttt{TAG\_IFD\_SLOTS\_NUMBER}
 
-Return the number of slots in this reader.
+Return the number of slots in this reader in \texttt{Value[0]}.
+
+\item \texttt{TAG\_IFD\_SLOT\_THREAD\_SAFE}
+
+If the reader has more than one slot (see
+\texttt{TAG\_IFD\_SLOTS\_NUMBER} above) this tag indicates if the driver
+supports access to multiple slots of the same reader at the same time. 
+
+\texttt{Value[0] = 1} indicates the driver supports simultaneous slot
+accesses.
 
 \item \texttt{IOCTL\_SMARTCARD\_VENDOR\_VERIFY\_PIN}
 
@@ -598,6 +618,16 @@ don't mind loading a new driver for each reader then ignore Lun.
 
 \begin{itemize}
 \item \texttt{Tag} - the tag for the information needing set
+
+\begin{itemize}
+\item \texttt{TAG\_IFD\_SLOTNUM}
+
+This is used in IFDHandler v1.0 to select the slot to use for the next
+\texttt{IFD\_*} command. This tag is no more used with verions 2.0 and
+3.0 of the IFD Handler.
+
+\end{itemize}
+
 \item \texttt{Length} - the length of the data
 \item \texttt{Value} - the value of the data
 \end{itemize}
