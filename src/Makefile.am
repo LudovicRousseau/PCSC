@@ -35,7 +35,7 @@ endif
 if PCSC_ARCH_BSD
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
-PCSCD_INCLUDE_LIBS  = -lfl #-lpthread
+PCSCD_INCLUDE_LIBS  = -lfl -pthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_bsd.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -120,11 +120,10 @@ else
 PCSC_CLIENT = 
 endif
 
-libpcsclite_core_la_SOURCES = configfile.l driverparser.l \
+libpcsclite_core_la_SOURCES = configfile.l tokenparser.l \
 	winscard.c eventhandler.c ifdwrapper.c atrhandler.c prothandler.c \
 	readerfactory.c winscard_msg.c debuglog.c $(PCSC_SYSTEM_SOURCE) \
 	$(PCSC_THREAD_SOURCE) $(PCSC_HOTPLUG_SOURCE) $(PCSC_DYNLOAD_SOURCE)
-
 
 libpcsclite_core_la_LDFLAGS = -version-info 0:2:0 $(PCSC_INCLUDE_LIBS)
 
@@ -139,10 +138,10 @@ pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c \
 	ifdhandler.h ifdwrapper.h powermgt_generic.h prothandler.h \
 	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h \
 	winscard_svc.h
-pcscd_LDADD   = libpcsclite-core.la #$(PCSCD_INCLUDE_LIBS)
-pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic
+pcscd_LDADD   = libpcsclite-core.la
+pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic $(PCSCD_INCLUDE_LIBS)
 
-CFLAGS = @CFLAGS@ -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
+AM_CFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
@@ -156,9 +155,6 @@ EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
 # this automagically.  This breaks if lex is not flex!!
-driverparser.c: driverparser.l
-	$(SHELL) $(YLWRAP) "$(LEX)" $< lex.dp.c $@ -- -Pdp $(AM_LFLAGS) $(LFLAGS)
-
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) "$(LEX)" $< lex.tp.c $@ -- -Ptp $(AM_LFLAGS) $(LFLAGS)
 
