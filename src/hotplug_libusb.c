@@ -322,38 +322,9 @@ LONG HPSearchHotPluggables(void)
 	return 0;
 }
 
-static LONG HPGetDeviceName(LPSTR deviceName, struct usb_device *dev)
-{
-#ifdef __linux__
-#define LINUX_USB_PATH	"/proc/bus/usb"
-
-	struct stat fStatBuf;
-
-	if ((SYS_Stat(LINUX_USB_PATH, &fStatBuf) == 0) && S_ISDIR(fStatBuf.st_mode))
-	{
-		snprintf(deviceName, MAX_DEVICENAME, "%s/%s/%s", LINUX_USB_PATH, dev->bus->dirname, dev->filename);
-	}
-	else
-	{
-		DebugLogA("No USB VFS found");
-		return 1;
-	}
-#else
-#ifdef __FreeBSD__
-	snprintf(deviceName, MAX_DEVICENAME, "%s", dev->filename);
-#else
-	snprintf(deviceName, MAX_DEVICENAME, "%s.00", dev->filename);
-#endif
-#endif
-	DebugLogB("The fullname for this device is: %s", deviceName);
-
-	return 0;
-}
-
 LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver)
 {
-	LONG rv;
 	int i;
 	char deviceName[MAX_DEVICENAME];
 
@@ -361,37 +332,36 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 
 	DebugLogB("Adding USB device: %s", bus_device);
 
-	rv = HPGetDeviceName(deviceName, dev);
+	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb:%s",
+		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
+	deviceName[sizeof(deviceName)] = '\0';
 
-	if (rv == 0)
-	{	
-		/* find a free entry */
-		for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		{
-			if (readerTracker[i].driver == NULL)
-				break;
-		}
-	
-		if (i==PCSCLITE_MAX_READERS_CONTEXTS)
-		{
-			DebugLogB("Not enough reader entries. Already found %d readers", i);
-			return 0;
-		}
+	/* find a free entry */
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		if (readerTracker[i].driver == NULL)
+			break;
+	}
 
-		if (RFAddReader(driver->readerName, PCSCLITE_HP_BASE_PORT + i,
-			driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
-		{
-			strncpy(readerTracker[i].bus_device, bus_device, BUS_DEVICE_STRSIZE);
-			readerTracker[i].bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-       
-			readerTracker[i].status = READER_PRESENT;
-			readerTracker[i].driver = driver;
-		}
+	if (i==PCSCLITE_MAX_READERS_CONTEXTS)
+	{
+		DebugLogB("Not enough reader entries. Already found %d readers", i);
+		return 0;
+	}
+
+	if (RFAddReader(driver->readerName, PCSCLITE_HP_BASE_PORT + i,
+		driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
+	{
+		strncpy(readerTracker[i].bus_device, bus_device, BUS_DEVICE_STRSIZE);
+		readerTracker[i].bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+   
+		readerTracker[i].status = READER_PRESENT;
+		readerTracker[i].driver = driver;
 	}
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
-	return rv;
+	return 1;
 }	/* End of function */
 
 LONG HPRemoveHotPluggable(int index)
