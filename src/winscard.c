@@ -1413,12 +1413,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	sSendPci.Length = pioSendPci->cbPciLength;
 
-	if ((sSendPci.Protocol != SCARD_PROTOCOL_T0)
-		&& (sSendPci.Protocol != SCARD_PROTOCOL_T1))
-		DebugLogB("Send Protocol: unknown %d", sSendPci.Protocol);
-	else
-		DebugLogB("Send Protocol: T=%d",
-			(sSendPci.Protocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+	/* the protocol number is decoded a few lines above */
+	DebugLogB("Send Protocol: T=%d", sSendPci.Protocol);
 
 	tempRxLength = dwRxLength;
 
