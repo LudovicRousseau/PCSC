@@ -1,77 +1,76 @@
-#!/bin/bash
+#!/bin/sh
 #
-# pcscd        Starts the pcscd daemon
+# pcscd        Starts the pcscd Daemon
 #
-#
-# chkconfig: 2345 12 88
-# description: PCSC Smart Card Daemon
+# chkconfig:   2345 25 88
+# description: The PC/SC smart card daemon is a resource manager for the \
+#              PC/SC lite and Musclecard frameworks.  It coordinates \
+#              communications with smart card readers, smart cards, and \
+#              cryptographic tokens that are connected to the system.
 #
 # processname: pcscd
-# config: /etc/reader.conf
+# config:      /etc/reader.conf
+#
+# Note!  pcscd should be started after pcmcia, and shut down before it
+# for smooth experience with PCMCIA readers.
 
 . /etc/init.d/functions
 
+umask 077
+
+exec=/usr/local/sbin/pcscd
+prog=$(basename $exec)
+lockfile=/var/lock/subsys/$prog
+
 # Source config
 if [ -f /etc/sysconfig/pscsd ] ; then
-	. /etc/sysconfig/pcscd
+    . /etc/sysconfig/pcscd
 else
-	PCSCD_OPTIONS=""
+    PCSCD_OPTIONS=""
 fi
 
-[ -f /usr/local/sbin/pcscd ] || exit 0
-
-
+[ -x $exec ] || exit 0
 
 # Source config
 PATH=/sbin:/bin:/usr/local/sbin:/usr/bin:/usr/sbin
 LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
 
-umask 077
-
 start() {
- 	echo -n $"Starting smart card daemon: "
-	daemon pcscd $PCSCD_OPTIONS
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pcscd
-	return $RETVAL
-}	
-stop() {
-	echo -n $"Shutting down smart card daemon: "
-	killproc pcscd
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/pcscd
-	return $RETVAL
+    echo -n $"Starting PC/SC smart card daemon ($prog): "
+    daemon $prog $PCSCD_OPTIONS
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
 }
-rhstatus() {
-	status pcscd
+stop() {
+    echo -n $"Stopping PC/SC smart card daemon ($prog): "
+    killproc $prog
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
 }
 restart() {
-	stop
-	start
-}	
+    stop
+    start
+}
+
 
 case "$1" in
-  start)
-  	start
-	;;
-  stop)
-  	stop
-	;;
-  status)
-  	rhstatus
-	;;
-  restart|reload)
-  	restart
-	;;
-  condrestart)
-  	[ -f /var/lock/subsys/pcscd ] && restart || :
-	;;
-  *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart}"
-	exit 1
+    start|stop|restart)
+        $1
+        ;;
+    reload|force-reload)
+        restart
+        ;;
+    status)
+        status $prog
+        ;;
+    condrestart|try-restart)
+        [ ! -f $lockfile ] || restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|try-restart|reload|force-reload}"
+        exit 2
 esac
-
-exit $?
-
