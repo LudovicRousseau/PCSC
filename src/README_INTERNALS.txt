@@ -11,6 +11,7 @@ GNU/Linux.  Information may be wrong for other pcsc-lite versions.
 History:
 --------
 v 1.0, Jan 6 2002
+v 1.1, Jun 2004
 
 
 compositions:
@@ -49,15 +50,24 @@ PC/SC Lite Concepts:
 These concepts will be available after the next release of pcsc-lite-1.2.0.
 I (Damien Sauveron) will try to explain the following concepts:
 
-#define PCSCLITE_MAX_APPLICATIONS         4	/* Maximum applications */
-#define PCSCLITE_MAX_APPLICATION_CONTEXTS 16	/* Maximum contexts by application */
-#define PCSCLITE_MAX_APPLICATIONS_CONTEXTS PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
-	/* Maximum of applications contexts that PC/SC Ressources Manager can accept */
+Maximum applications
+	PCSCLITE_MAX_APPLICATIONS
 
-#define PCSCLITE_MAX_READER_CONTEXT_CHANNELS      16	/* Maximum channels on a reader context */
-#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS 16	/* Maximum channels on an application context */
+Maximum contexts by application
+	PCSCLITE_MAX_APPLICATION_CONTEXTS
 
-#define PCSCLITE_MAX_READERS_CONTEXTS            256	/* Maximum readers context (a slot is count as a reader) */
+Maximum of applications contexts that PC/SC Ressources Manager can accept
+	PCSCLITE_MAX_APPLICATIONS_CONTEXTS
+ 	= PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
+
+Maximum channels on a reader context
+	PCSCLITE_MAX_READER_CONTEXT_CHANNELS
+
+Maximum channels on an application context
+	PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS
+
+Maximum readers context (a slot is counted as a reader)
+	PCSCLITE_MAX_READERS_CONTEXTS
 
 First imagine:
 - 3 PC/SC daemons started on 3 different hosts (it is possible to
@@ -117,14 +127,12 @@ readerfactory.c
  static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
  static DWORD *dwNumReadersContexts = 0;
 
-*dwNumReadersContexts is the number of Readers Contexts
+dwNumReadersContexts is the number of Readers Contexts
 sReadersContexts[] contains the Readers Contexts
-
-Why dwNumContexts is a PDWORD (pointer) and not just a DWORD? no idea.
 
 
 eventhandler.c
- static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+ static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 
 
@@ -168,6 +176,37 @@ We can have:
  => new SCardControl
 - libpcsclite1, pcscd (<= 1.2.0)
  => does not work
+
+
+Memory structures
+-----------------
+
+pcscd side:
+
+- pcscd open/creates a shared memory segment (EHInitializeEventStructures()
+  in eventhandler.c)
+- static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS]; is
+  an array of pointers on READER_STATE.  each entry readerStates[i]
+  point to a memory shared segment It contains the state of each
+  readers.
+
+- reader contexts are also created and maintained
+- static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
+  is an array of pointers on READER_CONTEXT
+- the structure is allocated by RFAllocateReaderSpace() in
+  readerfactory.c
+- each READER_CONTEXT contains a pointer to a READER_STATE for the
+  context
+
+
+libpcsclite side:
+
+- the library open the shared memory segment (SCardEstablishContextTH()
+  in winscard_clnt.c)
+- each entry readerStates[i] get a reference to the memory segment of
+  the server.
+  
+The memory is READ ONLY on the library side.
 
 
 Inter-thread communication:
