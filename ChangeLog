@@ -15,6 +15,7 @@ pcsc-lite-1.1.2beta1: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 - src/pcscdaemon.c:
   . add support for --apdu, test if the pcscd is still running before
     complaining that /tmp/pcsc is present
+  . print an error message if the --debug argument is not known
 - src/Makefile.am:
   . add -Wl,--export-dynamic link option
 - src/hotplug_linux.c:
