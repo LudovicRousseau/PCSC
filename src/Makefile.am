@@ -32,7 +32,7 @@ else
 if PCSC_ARCH_BSD
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
-PCSCD_INCLUDE_LIBS  = -lfl -lpthread
+PCSCD_INCLUDE_LIBS  = -lfl #-lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_bsd.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
