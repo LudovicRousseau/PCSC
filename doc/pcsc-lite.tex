@@ -1285,27 +1285,16 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext,
 
 \desc
 
-This function updates the working waiting time that RPC uses when
-waiting for a server function to return.  This needs to be updated when
-a card command is sent that might take more time than usual.
+This function is not in Microsoft{\textregistered} WinSCard API and is
+deprecated in pcsc-lite API.
 
-This command is pcsc-lite specific and does not exist in Windows PC/SC.
-
-\example
-
-\begin{verbatim}
-SCARDCONTEXT hContext;
-LONG rv;
-
-rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
-rv = SCardSetTimeout(hContext, 50);   /* 50 second timeout */
-\end{verbatim}
+The function does not do anything except returning
+\texttt{SCARD\_S\_SUCCESS}.
 
 \returns
 
 \begin{tabular}{ll}
 \texttt{SCARD\_S\_SUCCESS}			& Successful\\
-\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hContext} handle\\
 \end{tabular}
 
 
