@@ -1,9 +1,13 @@
 # Configuration file for pcsc-lite
-# David Corcoran <corcoran@linuxnet.com
+#
+# This file has to be configured for serial readers only.
+# USB readers shall _not_ be configured here!
+#
+# David Corcoran <corcoran@linuxnet.com>
 
 
 FRIENDLYNAME     "Generic Reader"
-DEVICENAME       GEN_SMART_RDR
+DEVICENAME       /dev/ttySx
 LIBPATH          @usbdropdir@/libgen_ifd.so
 CHANNELID        0x0103F8
 
