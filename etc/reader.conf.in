@@ -7,7 +7,7 @@
 
 
 FRIENDLYNAME     "Generic Reader"
-DEVICENAME       /dev/ttySx
+DEVICENAME       /dev/ttySx_not_configured
 LIBPATH          @usbdropdir@/libgen_ifd.so
 CHANNELID        0x0103F8
 
