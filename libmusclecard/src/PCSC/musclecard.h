@@ -260,8 +260,28 @@ extern "C"
 	{
 		MSCPUChar8 transportKey[MAX_BUFFER_SIZE];
 		MSCULong32 transportKeyLen;
-		MSCUChar8 transportBehavior;
+		MSCUChar8  transportBehavior;
 		MSCULong32 objectMemory;
+
+		MSCUChar8  newTransportKey[MAX_BUFFER_SIZE];
+		MSCULong32 newTransportKeyLen;
+
+		MSCUChar8  defaultCHV[MAX_BUFFER_SIZE];
+		MSCULong32 defaultCHVLen;
+		MSCUChar8  defaultCHVTries;
+
+		MSCUChar8  defaultCHVUnblock[MAX_BUFFER_SIZE];
+		MSCULong32 defaultCHVUnblockSize;
+		MSCUChar8  defaultCHVUnblockTries;
+
+		MSCUShort16 createObjectACL;
+		MSCUShort16 createKeysACL;
+		MSCUShort16 createPINsACL;
+
+		MSCUChar8   maxNumberKeys;
+		MSCUChar8   maxNumberPINs;
+		MSCUShort16 maxNumberObjects;
+
 	}
 	MSCInitTokenParams, *MSCLPInitTokenParams;
 
