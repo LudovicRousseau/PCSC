@@ -337,20 +337,6 @@ extern "C"
 	}
 	MSCCryptInit, *MSCLPCryptInit;
 
-	typedef struct
-	{
-		MSCChar8 labelString[MSC_MAXSIZE_LABEL];
-		MSCChar8 issuerString[MSC_MAXSIZE_CERT_ISSUER];
-		MSCChar8 serialString[MSC_MAXSIZE_CERT_SERIAL];
-		MSCChar8 subjectString[MSC_MAXSIZE_CERT_SUBJECT];
-		MSCUChar8 certNum;
-		MSCCertACL certACL;
-		MSCULong32 certSize;
-		MSCUChar8 pubKeyNum;
-		MSCUChar8 prvKeyNum;
-	}
-	MSCCertInfo, *MSCLPCertInfo;
-
 	/*
 	 * Scope definitions for MSCListTokens 
 	 */
