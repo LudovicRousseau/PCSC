@@ -133,7 +133,7 @@ int DBUpdateReaders ( char *readerconf ) {
 
   fclose(configFile);
 
-  if (badError = 1) {
+  if (badError == 1) {
     return -1;
   } else {
     return 0;
