@@ -174,7 +174,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	 *
 	 *******************************************/
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-		rContext->readerState->cardProtocol = -1;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_RAW;
 	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
@@ -462,7 +462,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 *
 	 *******************************************/
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-		rContext->readerState->cardProtocol = -1;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_RAW;
 	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
