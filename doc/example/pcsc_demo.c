@@ -141,6 +141,9 @@ end:
 		printf("SCardReleaseContext: %s (0x%lX)\n", pcsc_stringify_error(rv),
 			rv);
 
+	/* Free allocated resources */
+	SCardUnload();
+
 	return 0;
 } /* main */
 
