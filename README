@@ -1,7 +1,7 @@
 Title   : PCSC Lite
 Author  : David Corcoran
 Version : 1.1.1
-LICENSE : See file LICENSE
+License : See file COPYING
 Document: docs/pcsc-lite-0.8.7.pdf
           docs/muscle-api-1.3.0.pdf
 Requires: C compiler (gcc)
