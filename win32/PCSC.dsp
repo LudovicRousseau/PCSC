@@ -155,7 +155,7 @@ SOURCE=..\win32\StdAfx.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\win32\win32_config.h
+SOURCE=..\win32\config.h
 # End Source File
 # Begin Source File
 
