@@ -16,6 +16,7 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
+#ifdef HAVE_LIBUSB
 #include <string.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -395,3 +396,4 @@ ULONG HPRegisterForHotplugEvents(void)
 	return 0;
 }
 
+#endif

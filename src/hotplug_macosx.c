@@ -14,6 +14,7 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
+#ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/IOKitLib.h>
@@ -794,3 +795,4 @@ ULONG HPRegisterForHotplugEvents(void)
 	return 0;
 }
 
+#endif	/* __APPLE__ */
