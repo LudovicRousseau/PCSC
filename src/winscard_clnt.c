@@ -189,7 +189,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 				 * Initially set the hcard structs to zero
 				 */
 				psContextMap[i].psChannelMap[j].hCard = 0;
-				psContextMap[i].psChannelMap[j].readerName = 0;
+				psContextMap[i].psChannelMap[j].readerName = NULL;
 			}
 		}
 
@@ -494,11 +494,11 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -642,11 +642,11 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -756,11 +756,11 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -835,11 +835,11 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -928,11 +928,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -1539,11 +1539,11 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (strcmp(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
-				(readerStates[i])->readerName) == 0)
-		{
+		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+
+		/* by default r == NULL */
+		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
-		}
 	}
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -1855,7 +1855,7 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 			 */
 			psContextMap[retIndice].psChannelMap[i].hCard = 0;
 			free(psContextMap[retIndice].psChannelMap[i].readerName);
-			psContextMap[retIndice].psChannelMap[i].readerName = 0;
+			psContextMap[retIndice].psChannelMap[i].readerName = NULL;
 		}
 
 		return SCARD_S_SUCCESS;
@@ -1896,7 +1896,7 @@ LONG SCardRemoveHandle(SCARDHANDLE hCard)
 	{
 		psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].hCard = 0;
 		free(psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].readerName);
-		psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].readerName = 0;
+		psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].readerName = NULL;
 		return SCARD_S_SUCCESS;
 	}
 }
