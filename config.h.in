@@ -1,77 +1,100 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* config.h.in.  Generated from configure.in by autoheader.  */
 
-/* Define if lex declares yytext as a char * by default, not a char[].  */
-#undef YYTEXT_POINTER
+/* display ATR parsing debug messages. */
+#undef ATR_DEBUG
 
-/* Define if you have the daemon function.  */
+/* Define to 1 if you have the `daemon' function. */
 #undef HAVE_DAEMON
 
-/* Define if you have the getopt_long function.  */
-#undef HAVE_GETOPT_LONG
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
 
-/* Define if you have the snprintf function.  */
-#undef HAVE_SNPRINTF
-
-/* Define if you have the vsnprintf function.  */
-#undef HAVE_VSNPRINTF
-
-/* Define if you have the <getopt.h> header file.  */
+/* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
-/* Name of package */
-#undef PACKAGE
+/* Define to 1 if you have the `getopt_long' function. */
+#undef HAVE_GETOPT_LONG
 
-/* Version number of package */
-#undef VERSION
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
 
-/* Linux */
-#undef PCSC_TARGET_LINUX
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
 
-/* Linux */
-#undef MSC_TARGET_LINUX
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
 
-/* BSD */
-#undef PCSC_TARGET_BSD
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* enable full musclecard debug messaging. */
+#undef MSC_DEBUG
+
+/* directory containing MuscleCard bundles */
+#undef MSC_SVC_DROPDIR
+
+/* AIX */
+#undef MSC_TARGET_AIX
 
 /* BSD */
 #undef MSC_TARGET_BSD
 
-/* OSX */
-#undef PCSC_TARGET_OSX
+/* HP-UX */
+#undef MSC_TARGET_HPUX
+
+/* Linux */
+#undef MSC_TARGET_LINUX
 
 /* OSX */
 #undef MSC_TARGET_OSX
 
 /* Solaris */
-#undef PCSC_TARGET_SOLARIS
-
-/* Solaris */
 #undef MSC_TARGET_SOLARIS
-
-/* HP-UX */
-#undef PCSC_TARGET_HPUX
-
-/* HP-UX */
-#undef MSC_TARGET_HPUX
-
-/* TRU64 */
-#undef PCSC_TARGET_TRU64
 
 /* TRU64 */
 #undef MSC_TARGET_TRU64
 
-/* AIX */
-#undef PCSC_TARGET_AIX
+/* Name of package */
+#undef PACKAGE
 
-/* AIX */
-#undef MSC_TARGET_AIX
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
 
-/* Define to the necessary symbol if this constant
-                           uses a non-standard name on your system. */
-#undef PTHREAD_CREATE_JOINABLE
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
 
-/* Define if you have POSIX threads libraries and header files. */
-#undef HAVE_PTHREAD
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
 /* directory containing USB drivers */
 #undef PCSCLITE_HP_DROPDIR
@@ -79,14 +102,36 @@
 /* enable full PCSC debug messaging. */
 #undef PCSC_DEBUG
 
-/* enable full musclecard debug messaging. */
-#undef MSC_DEBUG
+/* AIX */
+#undef PCSC_TARGET_AIX
 
-/* display ATR parsing debug messages. */
-#undef ATR_DEBUG
+/* BSD */
+#undef PCSC_TARGET_BSD
 
-/* directory containing MuscleCard bundles */
-#undef MSC_SVC_DROPDIR
+/* HP-UX */
+#undef PCSC_TARGET_HPUX
+
+/* Linux */
+#undef PCSC_TARGET_LINUX
+
+/* OSX */
+#undef PCSC_TARGET_OSX
+
+/* Solaris */
+#undef PCSC_TARGET_SOLARIS
+
+/* TRU64 */
+#undef PCSC_TARGET_TRU64
+
+/* Define to the necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* directory containing IPC files (default /var/run/) */
+#undef USE_IPCDIR
 
 /* directory containing reader.conf (default /etc) */
 #undef USE_READER_CONF
@@ -97,3 +142,9 @@
 /* enable client side thread safety. */
 #undef USE_THREAD_SAFETY
 
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
