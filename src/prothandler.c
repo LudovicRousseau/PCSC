@@ -82,7 +82,7 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
  * default to T=0.  Do nothing if the default rContext->dwProtocol is OK. 
  */
 
-UCHAR PHSetProtocol(struct ReaderContext * rContext,
+DWORD PHSetProtocol(struct ReaderContext * rContext,
 	DWORD dwPreferred, UCHAR ucAvailable)
 {
 	LONG rv;
