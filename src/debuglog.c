@@ -304,9 +304,3 @@ char* pcsc_stringify_error(long pcscError)
 	return strError;
 }
 
-#ifdef WIN32
-static DWORD SYS_GetPID() {
-	return GetCurrentProcessId();
-}
-#endif
-
