@@ -64,7 +64,8 @@ enum {
 #define __FUNCTION__ ""
 #endif
 
-#define Log1(priority, fmt) log_msg(priority, "i%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
+#define Log0(priority) log_msg(priority, "%s:%d:%s", __FILE__, __LINE__, __FUNCTION__)
+#define Log1(priority, fmt) log_msg(priority, "%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
 #define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data)
 #define Log3(priority, fmt, data1, data2) log_msg(priority, "%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
 #define LogXxd(priority, msg, buffer, size) log_xxd(priority, msg, buffer, size)
