@@ -701,12 +701,11 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	/*
 	 * LOCK THIS CODE REGION 
 	 */
-
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion != IFD_HVERSION_1_0)
-		return SCARD_E_UNSUPPORTED_FEATURE;
+		rv = SCARD_E_UNSUPPORTED_FEATURE;
 	else
 		rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
 			RxBuffer, RxLength);
@@ -718,7 +717,6 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 			RxBuffer, RxLength);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
-
 	/*
 	 * END OF LOCKED REGION 
 	 */
@@ -779,7 +777,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
-		return SCARD_E_UNSUPPORTED_FEATURE;
+		rv = SCARD_E_UNSUPPORTED_FEATURE;
 	else
 		rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
 			TxLength, RxBuffer, RxLength, BytesReturned);
