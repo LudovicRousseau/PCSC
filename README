@@ -4,18 +4,18 @@ Version : 1.2.0
 License : See file COPYING
 Document: docs/pcsc-lite-0.8.7.pdf
           docs/muscle-api-1.3.0.pdf
-Requires: C compiler (gcc)
-          GNU tools (gmake, ld, ar, gcc ...)
+Requires: A C compiler
+          Make, linker tools
           Lex (Lexical Analyzer).
-
 
 Tested Platforms: 
 	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2, Debian 3.0)
-	Solaris Solaris 2.8
-	Mac OS X 10.2
+	Mac OS X 10.2, 10.3
+	FreeBSD, NetBSD, OpenBSD
+	Solaris 8 / 9
+	Tru64 UNIX 5.1B
+	AIX 4.3, 5.2
 	HP-UX 11
-	True 64 Unix
-	OpenBSD 2.9, 3.0 (with libc.so.28.2), 3.2
 
 Welcome to PCSC Lite.  The purpose of PCSC Lite is to
 provide a Windows(R) SCard interface in a very small form factor for
@@ -81,8 +81,7 @@ a warning that the file does not exist or contain anything useful.
 
 If you try out the test programs included in this package be sure to set your 
 system's LD_LIBRARY_PATH to the locations where the libs are or move the
-libpcsclite-core.so and the libpcsclite.so into a directory that is 
-specified in your LD_LIBRARY_PATH. 
+libpcsclite.so into a directory that is specified in your LD_LIBRARY_PATH. 
 
 There is a test program with this package:
 
