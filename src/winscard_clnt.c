@@ -1810,14 +1810,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 	LPTSTR mszReaders, LPDWORD pcchReaders)
 {
-	DWORD dwReadersLen = 0;
-	int i, lastChrPtr = 0;
+	DWORD dwReadersLen;
+	int i, lastChrPtr;
 	DWORD dwContextIndex;
 
 	/*
 	 * Check for NULL parameters
 	 */
-	if (pcchReaders == 0)
+	if (pcchReaders == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
@@ -1832,46 +1832,42 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
 
+	dwReadersLen = 0;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
 		if ((readerStates[i])->readerID != 0)
-		{
-			dwReadersLen += (strlen((readerStates[i])->readerName) + 1);
-		}
-	}
+			dwReadersLen += strlen((readerStates[i])->readerName) + 1;
 
+	/* for the last NULL byte */
 	dwReadersLen += 1;
 
-	if (mszReaders == 0)
+	if ((mszReaders == NULL)	/* text array not allocated */
+		|| (*pcchReaders == 0))	/* size == 0 */
 	{
 		*pcchReaders = dwReadersLen;
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 		return SCARD_S_SUCCESS;
-	} else if (*pcchReaders == 0)
-	{
-		*pcchReaders = dwReadersLen;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-		return SCARD_S_SUCCESS;
-	} else if (*pcchReaders < dwReadersLen)
+	}
+	
+	if (*pcchReaders < dwReadersLen)
 	{
 		*pcchReaders = dwReadersLen;
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 		return SCARD_E_INSUFFICIENT_BUFFER;
-	} else
-	{
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		{
-			if ((readerStates[i])->readerID != 0)
-			{
-				/*
-				 * Build the multi-string
-				 */
-				strcpy(&mszReaders[lastChrPtr], (readerStates[i])->readerName);
-				lastChrPtr += strlen((readerStates[i])->readerName)+1;
-			}
-		}
-		mszReaders[lastChrPtr] = '\0';	/* Add the last null */
 	}
+
+	lastChrPtr = 0;
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		if ((readerStates[i])->readerID != 0)
+		{
+			/*
+			 * Build the multi-string
+			 */
+			strcpy(&mszReaders[lastChrPtr], (readerStates[i])->readerName);
+			lastChrPtr += strlen((readerStates[i])->readerName)+1;
+		}
+	}
+	mszReaders[lastChrPtr] = '\0';	/* Add the last null */
 
 	*pcchReaders = dwReadersLen;
 
