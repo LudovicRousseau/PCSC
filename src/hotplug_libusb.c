@@ -286,16 +286,22 @@ void HPEstablishUSBNotifications()
 								if (errno == EBUSY)
 								{
 									/* The device is present */
+#ifdef DEBUG_USB_HOTPLUG
 									DebugLogB("BSD: EBUSY on %s", filename);
+#endif
 									bundleTracker[i].deviceNumber[j].status = 1;
 								}
+#ifdef DEBUG_USB_HOTPLUG
 								else
 									DebugLogC("BSD: %s error: %s", filename,
 										strerror(errno));
+#endif
 							}
 							else
 							{
+#ifdef DEBUG_USB_HOTPLUG
 								DebugLogB("BSD: OK %s", filename);
+#endif
 								bundleTracker[i].deviceNumber[j].status = 1;
 								close(fd);
 							}
