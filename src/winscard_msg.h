@@ -50,7 +50,6 @@ extern "C"
 
 	enum pcsc_msg_commands
 	{
-
 		SCARD_ESTABLISH_CONTEXT = 0x01,
 		SCARD_RELEASE_CONTEXT = 0x02,
 		SCARD_LIST_READERS = 0x03,
@@ -64,7 +63,9 @@ extern "C"
 		SCARD_STATUS = 0x0B,
 		SCARD_GET_STATUS_CHANGE = 0x0C,
 		SCARD_CANCEL = 0x0D,
-		SCARD_CANCEL_TRANSACTION = 0x0E
+		SCARD_CANCEL_TRANSACTION = 0x0E,
+		SCARD_GET_ATTRIB = 0x0F,
+		SCARD_SET_ATTRIB = 0x10
 	};
 
 	struct version_struct
@@ -187,6 +188,16 @@ extern "C"
 		LONG rv;
 	};
 	typedef struct control_struct control_struct;
+
+	struct getset_struct
+	{
+		SCARDHANDLE hCard;
+		DWORD dwAttrId;
+		UCHAR pbAttr[MAX_BUFFER_SIZE];
+		DWORD cbAttrLen;
+		LONG rv;
+	};
+	typedef struct getset_struct getset_struct;
 
 	/*
 	 * Now some function definitions 

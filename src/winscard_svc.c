@@ -191,6 +191,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 	status_struct *stStr;
 	transmit_struct *trStr;
 	control_struct *ctStr;
+	getset_struct *gsStr;
 
 	/*
 	 * Zero out everything 
@@ -302,6 +303,22 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			ctStr->pbSendBuffer, ctStr->cbSendLength,
 			ctStr->pbRecvBuffer, ctStr->cbRecvLength,
 			&ctStr->dwBytesReturned);
+		break;
+
+	case SCARD_GET_ATTRIB:
+		gsStr = ((getset_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
+		if (rv != 0) return rv;
+		gsStr->rv = SCardGetAttrib(gsStr->hCard, gsStr->dwAttrId,
+			gsStr->pbAttr, &gsStr->cbAttrLen);
+		break;
+
+	case SCARD_SET_ATTRIB:
+		gsStr = ((getset_struct *) msgStruct->data);
+		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
+		if (rv != 0) return rv;
+		gsStr->rv = SCardSetAttrib(gsStr->hCard, gsStr->dwAttrId,
+			gsStr->pbAttr, &gsStr->cbAttrLen);
 		break;
 
 	default:

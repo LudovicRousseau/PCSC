@@ -62,7 +62,7 @@ extern "C"
 
 	LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 		LPCVOID pbSendBuffer, DWORD cbSendLength,
-		LPVOID pbRecvBuffer, DWORD cbRecvLength, DWORD *lpBytesReturned);
+		LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned);
 
 	LONG SCardTransmit(SCARDHANDLE hCard,
 		LPCSCARD_IO_REQUEST pioSendPci,
@@ -78,6 +78,12 @@ extern "C"
 		LPSTR mszReaders, LPDWORD pcchReaders);
 
 	LONG SCardCancel(SCARDCONTEXT hContext);
+
+	LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
+			LPDWORD pcbAttrLen);
+
+	LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
+			DWORD cbAttrLen);
 
 	void SCardUnload(void);
 

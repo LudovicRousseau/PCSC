@@ -1212,6 +1212,104 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 			pbRecvBuffer, cbRecvLength, lpBytesReturned);
 }
 
+LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
+	LPBYTE pbAttr, LPDWORD pcbAttrLen)
+{
+	LONG rv;
+	PREADER_CONTEXT rContext;
+
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	rContext = 0;
+
+	if (0 == hCard)
+		return SCARD_E_INVALID_HANDLE;
+
+	/*
+	 * Make sure no one has a lock on this reader 
+	 */
+	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure the reader is working properly 
+	 */
+	rv = RFCheckReaderStatus(rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFFindReaderHandle(hCard);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure some event has not occurred 
+	 */
+	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = IFDGetCapabilities(rContext, dwAttrId, pcbAttrLen, pbAttr);
+	if (rv == IFD_SUCCESS)
+		return SCARD_S_SUCCESS;
+	else
+		return SCARD_E_NOT_TRANSACTED;
+}
+
+LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
+	LPCBYTE pbAttr, DWORD cbAttrLen)
+{
+	LONG rv;
+	PREADER_CONTEXT rContext;
+
+	/*
+	 * Zero out everything 
+	 */
+	rv = 0;
+	rContext = 0;
+
+	if (0 == hCard)
+		return SCARD_E_INVALID_HANDLE;
+
+	/*
+	 * Make sure no one has a lock on this reader 
+	 */
+	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure the reader is working properly 
+	 */
+	rv = RFCheckReaderStatus(rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = RFFindReaderHandle(hCard);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure some event has not occurred 
+	 */
+	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
+	rv = IFDSetCapabilities(rContext, dwAttrId, cbAttrLen, (PUCHAR)pbAttr);
+	if (rv == IFD_SUCCESS)
+		return SCARD_S_SUCCESS;
+	else
+		return SCARD_E_NOT_TRANSACTED;
+}
+
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPCBYTE pbSendBuffer, DWORD cbSendLength,
 	LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer,
