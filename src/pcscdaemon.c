@@ -235,7 +235,7 @@ int main(int argc, char **argv)
 #ifdef  HAVE_GETOPT_LONG
 	while ((opt = getopt_long (argc, argv, "c:fd:hva", long_options, &option_index)) != -1) {
 #else
-	while ((opt = getopt (argc, argv, "c:fd:hv")) != -1) {
+	while ((opt = getopt (argc, argv, "c:fd:hva")) != -1) {
 #endif
 		switch (opt) {
 			case 'c':
@@ -552,6 +552,7 @@ void print_usage (char const * const progname)
 	printf("Usage: %s [-c file] [-f] [-d output] [-v] [-h]\n", progname);
 	printf("Options:\n");
 #ifdef HAVE_GETOPT_LONG
+	printf("  -a, --apdu		log APDU commands and results\n");
 	printf("  -c, --config		path to reader.conf\n");
 	printf("  -f, --foreground	run in foreground (no daemon)\n");
 	printf("  -d, --debug output	display debug messages. Output may be:\n"); 
@@ -560,6 +561,7 @@ void print_usage (char const * const progname)
 	printf("  -h, --help		display usage information\n");
 	printf("  -v, --version		display the program version number\n");
 #else
+	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
 	printf("  -f 	run in foreground (no daemon)\n");
 	printf("  -d 	display debug messages. Output may be:\n"); 
