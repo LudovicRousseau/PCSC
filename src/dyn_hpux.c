@@ -33,7 +33,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 
 	if (myHandle == 0)
 	{
-		DebugLogB("%s: %s", pcLibrary, strerror(errno));
+		DebugLogC("%s: %s", pcLibrary, strerror(errno));
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -45,10 +45,6 @@ int DYN_CloseLibrary(void **pvLHandle)
 {
 
 	int rv;
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
 
 	rv = shl_unload((shl_t) * pvLHandle);
 	*pvLHandle = 0;
@@ -66,15 +62,6 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 {
 
 	int rv;
-	char *pcFunctionName;
-
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	pcFunctionName = 0;
-
-	pcFunctionName = pcFunction;
 
 	*pvFHandle = 0;
 	rv = shl_findsym((shl_t *) & pvLHandle, pcFunction, TYPE_PROCEDURE,
@@ -82,7 +69,7 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 
 	if (rv == -1)
 	{
-		DebugLogB("%s: %s", pcFunction, strerror(errno));
+		DebugLogC("%s: %s", pcFunction, strerror(errno));
 		rv = SCARD_F_UNKNOWN_ERROR;
 	}
 	else

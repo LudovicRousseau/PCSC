@@ -43,13 +43,6 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
 LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
-	LONG rv;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-
 	/*
 	 * Check for NULL pointer
 	 */
@@ -551,18 +544,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	UCHAR controlBuffer[5];
-	UCHAR receiveBuffer[MAX_BUFFER_SIZE];
-	PREADER_CONTEXT rContext;
-	DWORD dwAtrLen, receiveLength;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
-	dwAtrLen = 0;
-	receiveLength = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -651,6 +633,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
+		UCHAR controlBuffer[5];
+		UCHAR receiveBuffer[MAX_BUFFER_SIZE];
+		DWORD receiveLength;
+
 		/*
 		 * Set up the CTBCS command for Eject ICC
 		 */
@@ -722,11 +708,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	LONG rv;
 	PREADER_CONTEXT rContext;
 
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -765,17 +746,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-	UCHAR controlBuffer[5];
-	UCHAR receiveBuffer[MAX_BUFFER_SIZE];
-	DWORD receiveLength;
-
-	/*
-	 * Zero out everything
-	 */
-	rContext = 0;
-	rv = 0;
-	receiveLength = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	/*
 	 * Ignoring dwDisposition for now
@@ -869,6 +840,10 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
+		UCHAR controlBuffer[5];
+		UCHAR receiveBuffer[MAX_BUFFER_SIZE];
+		DWORD receiveLength;
+
 		/*
 		 * Set up the CTBCS command for Eject ICC
 		 */
@@ -917,13 +892,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-
-	/*
-	 * Zero out everything
-	 */
-	rContext = 0;
-	rv = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	/*
 	 * Ignoring dwDisposition for now
@@ -961,13 +930,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-
-	/*
-	 * Zero out everything
-	 */
-	rContext = 0;
-	rv = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	rv = RFReaderInfoById(hCard, &rContext);
 
@@ -1089,13 +1052,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	/* 0 bytes returned by default */
 	*lpBytesReturned = 0;
@@ -1144,13 +1101,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	if (0 == hCard)
 		return SCARD_E_INVALID_HANDLE;
@@ -1193,13 +1144,7 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	LPCBYTE pbAttr, DWORD cbAttrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
+	PREADER_CONTEXT rContext = NULL;
 
 	if (0 == hCard)
 		return SCARD_E_INVALID_HANDLE;
@@ -1244,17 +1189,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
+	PREADER_CONTEXT rContext = NULL;
 	SCARD_IO_HEADER sSendPci, sRecvPci;
 	DWORD dwRxLength, tempRxLength;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
-	dwRxLength = 0;
-	tempRxLength = 0;
 
 	if (pcbRecvLength == 0)
 		return SCARD_E_INVALID_PARAMETER;

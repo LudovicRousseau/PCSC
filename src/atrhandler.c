@@ -32,13 +32,12 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	USHORT p;
 	UCHAR K, TCK;				/* MSN of T0/Check Sum */
 	UCHAR Y1i, T;				/* MSN/LSN of TDi */
-	short TAi, TBi, TCi, TDi;	/* Interface characters */
-	int i = 1;						/* value of the index in TAi, TBi, etc. */
+	int i = 1;					/* value of the index in TAi, TBi, etc. */
 
 	/*
 	 * Zero out everything 
 	 */
-	p = K = TCK = Y1i = T = TAi = TBi = TCi = TDi = 0;
+	p = K = TCK = Y1i = T = 0;
 
 #ifdef ATR_DEBUG
 	DebugXxd("ATR: ", pucAtr, dwLength);
@@ -93,6 +92,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	 */
 	do
 	{
+		short TAi, TBi, TCi, TDi;	/* Interface characters */
+
 		TAi = (Y1i & 0x01) ? pucAtr[p++] : -1;
 		TBi = (Y1i & 0x02) ? pucAtr[p++] : -1;
 		TCi = (Y1i & 0x04) ? pucAtr[p++] : -1;

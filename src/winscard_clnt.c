@@ -113,18 +113,10 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
-	int i, j, pageSize;
+	int i;
 	establish_struct scEstablishStruct;
 	sharedSegmentMsg msgStruct;
 	DWORD dwClientID = 0;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	i = 0;
-	j = 0;
-	pageSize = 0;
 
 	if (phContext == NULL)
 		return SCARD_E_INVALID_PARAMETER;
@@ -139,6 +131,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	 */
 	if (isExecuted == 0)
 	{
+		int pageSize;
+
 		/*
 		 * Initialize debug
 		 */
@@ -181,6 +175,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 
 		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 		{
+			int j;
+
 			/*
 			 * Initially set the context struct to zero
 			 */
@@ -305,11 +301,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	DWORD dwContextIndex;
 	PCSCLITE_THREAD_T currentTID;
 
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
@@ -388,11 +379,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	connect_struct scConnectStruct;
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
 
 	/*
 	 * Check for NULL parameters
@@ -489,12 +475,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	/*
-	 * Zero out everything
-	 */
-	i = 0;
-	rv = 0;
-
 	if (dwInitialization != SCARD_LEAVE_CARD &&
 		dwInitialization != SCARD_RESET_CARD &&
 		dwInitialization != SCARD_UNPOWER_CARD &&
@@ -586,11 +566,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-
 	if (dwDisposition != SCARD_LEAVE_CARD &&
 		dwDisposition != SCARD_RESET_CARD &&
 		dwDisposition != SCARD_UNPOWER_CARD &&
@@ -651,17 +626,9 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	LONG rv;
 	begin_struct scBeginStruct;
-	int timeval, randnum, i, j;
+	int i;
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex, dwChannelIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	timeval = 0;
-	randnum = 0;
-	i = 0;
-	rv = 0;
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
@@ -706,6 +673,9 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		 */
 		if ((readerStates[i])->lockState != 0)
 		{
+			int randnum = 0;
+			int j;
+
 			for (j = 0; j < 100; j++)
 			{
 				/*
@@ -766,8 +736,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Zero out everything
 	 */
 	randnum = 0;
-	i = 0;
-	rv = 0;
 
 	if (dwDisposition != SCARD_LEAVE_CARD &&
 		dwDisposition != SCARD_RESET_CARD &&
@@ -850,12 +818,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	/*
-	 * Zero out everything
-	 */
-	i = 0;
-	rv = 0;
-
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
@@ -924,12 +886,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	status_struct scStatusStruct;
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex, dwChannelIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	i = 0;
 
 	/*
 	 * Check for NULL parameters
@@ -1065,29 +1021,13 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
-	LONG rv;
 	PSCARD_READERSTATE_A currReader;
 	PREADER_STATE rContext;
-	LPTSTR lpcReaderName;
-	DWORD dwTime;
+	DWORD dwTime = 0;
 	DWORD dwState;
-	DWORD dwBreakFlag;
-	int i, j;
+	DWORD dwBreakFlag = 0;
+	int j;
 	DWORD dwContextIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	rContext = 0;
-	lpcReaderName = 0;
-	dwTime = 0;
-	j = 0;
-	dwState = 0;
-	i = 0;
-	currReader = 0;
-	dwContextIndex = 0;
-	dwBreakFlag = 0;
 
 	if (rgReaderStates == 0 && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
@@ -1117,6 +1057,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	{
 		while (1)
 		{
+			int i;
+
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 			{
 				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
@@ -1222,6 +1164,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			currReader->dwEventState = SCARD_STATE_IGNORE;
 		} else
 		{
+			LPTSTR lpcReaderName;
+			int i;
 
 	  /************ Looks for correct readernames *********************/
 
@@ -1537,12 +1481,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	i = 0;
-
 	/* 0 bytes received by default */
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
@@ -1654,12 +1592,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	i = 0;
-
 	if (NULL == pbAttr || 0 == *pcbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
@@ -1758,12 +1690,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	sharedSegmentMsg msgStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	rv = 0;
-	i = 0;
 
 	if (pbSendBuffer == 0 || pbRecvBuffer == 0 ||
 			pcbRecvLength == 0 || pioSendPci == 0)
@@ -1881,17 +1807,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 	LPTSTR mszReaders, LPDWORD pcchReaders)
 {
-	DWORD dwGroupsLen, dwReadersLen;
-	int i, lastChrPtr;
+	DWORD dwReadersLen = 0;
+	int i, lastChrPtr = 0;
 	DWORD dwContextIndex;
-
-	/*
-	 * Zero out everything
-	 */
-	dwGroupsLen = 0;
-	dwReadersLen = 0;
-	i = 0;
-	lastChrPtr = 0;
 
 	/*
 	 * Check for NULL parameters
@@ -2064,7 +1982,6 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
 {
 	int i;
-	i = 0;
 
 	/*
 	 * Find this context and return it's spot in the array
@@ -2081,7 +1998,6 @@ static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
 static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 {
 	LONG  retIndice;
-	int i;
 
 	retIndice = SCardGetContextIndiceTH(hContext);
 
@@ -2089,6 +2005,8 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 		return SCARD_E_INVALID_HANDLE;
 	else
 	{
+		int i;
+
 		psContextMap[retIndice].hContext = 0;
 		SHMClientCloseSession(psContextMap[retIndice].dwClientID);
 		psContextMap[retIndice].dwClientID = 0;
@@ -2163,15 +2081,14 @@ static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard, PDWORD pdwContextIndice
 
 static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
 {
-	int i, j;
-
-	i = 0;
-	j = 0;
+	int i;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
 		if (psContextMap[i].hContext != 0)
 		{
+			int j;
+
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
 				if (psContextMap[i].psChannelMap[j].hCard == hCard)

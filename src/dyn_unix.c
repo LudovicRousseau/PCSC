@@ -57,11 +57,6 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	char pcFunctionName[256];
 	int rv;
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-
 	/* Some platforms might need a leading underscore for the symbol */
 	snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);
 

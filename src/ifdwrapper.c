@@ -31,25 +31,16 @@
 LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
+	RESPONSECODE rv = 0;
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IFD_set_protocol_parameters) (DWORD, UCHAR, UCHAR,
 		UCHAR, UCHAR) = NULL;
 	RESPONSECODE(*IFDH_set_protocol_parameters) (DWORD, DWORD, UCHAR,
 		UCHAR, UCHAR, UCHAR) = NULL;
-#endif
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-	ucValue[0] = 0;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -124,24 +115,15 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 
 LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
-	LPVOID vFunction1;
+	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
+	LPVOID vFunction1;
 	RESPONSECODE(*IO_create_channel) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPTSTR) = NULL;
-#endif
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-	vFunction1 = NULL;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -217,21 +199,13 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
+	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IO_close_channel) () = NULL;
 	RESPONSECODE(*IFDH_close_channel) (DWORD) = NULL;
-#endif
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -280,22 +254,13 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
-	LONG rv;
+	LONG rv = 0;
+
+#ifndef PCSCLITE_STATIC_DRIVER
 	LPVOID vFunction;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_set_capabilities) (DWORD, PUCHAR) = NULL;
-	RESPONSECODE(*IFDH_set_capabilities) (DWORD, DWORD, DWORD, PUCHAR) =
-		NULL;
-#endif
+	RESPONSECODE(*IFDH_set_capabilities) (DWORD, DWORD, DWORD, PUCHAR) = NULL;
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -342,22 +307,13 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
-	LONG rv;
+	LONG rv = 0;
+
+#ifndef PCSCLITE_STATIC_DRIVER
 	LPVOID vFunction;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
-	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, PUCHAR) =
-		NULL;
-#endif
+	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, PUCHAR) = NULL;
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -412,12 +368,12 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv, ret;
-	LPVOID vFunction;
 	SMARTCARD_EXTENSION sSmartCard;
 	DWORD dwStatus;
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IFD_power_icc) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_power_icc) (DWORD, DWORD, PUCHAR, PDWORD) = NULL;
 #endif
@@ -426,7 +382,6 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 * Zero out everything 
 	 */
 	rv = 0;
-	vFunction = NULL;
 	dwStatus = 0;
 	ucValue[0] = 0;
 
@@ -514,30 +469,17 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
-	RESPONSECODE rv, rv1;
-	LPVOID vFunctionA, vFunctionB;
-	DWORD dwTag, dwCardStatus;
+	RESPONSECODE rv = 0;
+	DWORD dwTag = 0, dwCardStatus = 0;
 	SMARTCARD_EXTENSION sSmartCard;
-	UCHAR ucValue[1];
+	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunctionA, vFunctionB;
 	RESPONSECODE(*IFD_is_icc_present) () = NULL;
 	RESPONSECODE(*IFDH_icc_presence) (DWORD) = NULL;
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
-#endif
 
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	rv1 = 0;
-	vFunctionA = NULL;
-	vFunctionB = NULL;
-	dwTag = 0;
-	dwCardStatus = 0;
-	ucValue[0] = 0;
-
-#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
@@ -676,20 +618,12 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	DWORD TxLength, PUCHAR RxBuffer, PDWORD RxLength)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
-	UCHAR ucValue[1];
+	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 #endif
-
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-	ucValue[0] = 0;
 
 	if (rContext->dwVersion != IFD_HVERSION_1_0)
 		rv = SCARD_E_UNSUPPORTED_FEATURE;
@@ -744,20 +678,12 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	LPCVOID TxBuffer, DWORD TxLength, LPVOID RxBuffer, DWORD RxLength,
 	LPDWORD BytesReturned)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
-	UCHAR ucValue[1];
+	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD, LPDWORD);
 #endif
-
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-	ucValue[0] = 0;
 
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
 		rv = SCARD_E_UNSUPPORTED_FEATURE;
@@ -809,11 +735,11 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	PUCHAR pucTxBuffer, DWORD dwTxLength, PUCHAR pucRxBuffer,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)
 {
-	RESPONSECODE rv;
-	LPVOID vFunction;
-	UCHAR ucValue[1];
+	RESPONSECODE rv = 0;
+	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
+	LPVOID vFunction;
 	RESPONSECODE(*IFD_transmit_to_icc) (SCARD_IO_HEADER, PUCHAR, DWORD,
 		PUCHAR, DWORD *, PSCARD_IO_HEADER) = NULL;
 	RESPONSECODE(*IFDH_transmit_to_icc) (DWORD, SCARD_IO_HEADER, PUCHAR,
@@ -822,13 +748,6 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 
 	/* log the APDU */
 	DebugLogCategory(DEBUG_CATEGORY_APDU, pucTxBuffer, dwTxLength);
-
-	/*
-	 * Zero out everything 
-	 */
-	rv = 0;
-	vFunction = NULL;
-	ucValue[0] = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
