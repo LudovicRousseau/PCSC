@@ -12,7 +12,6 @@
 
 #include "config.h"
 #include "wintypes.h"
-#include "pcsclite.h"
 #include "thread_generic.h"
 
 #define PCSC_MUTEX_LOCKED    1
