@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2002
+ * Copyright (C) 2002-2004
  *  Stephen M. Webb <stephenw@cryptocard.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *  David Corcoran <corcoran@linuxnet.com>
@@ -164,6 +164,11 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 #ifdef DEBUG_HOTPLUG
 	DebugLogB("Total of %d readers supported", readersNumber);
 #endif
+
+	/* The last entry is an end marker (m_vendorId = 0)
+	 * see checks in HPDriversMatchUSBDevices:503
+	 *  and HPDriverVectorRelease:376 */
+	readersNumber++;
 
 	bundleVector = (HPDriver *) calloc(readersNumber, sizeof(HPDriver));
 	if (!bundleVector)
