@@ -134,7 +134,7 @@ void DebugLogSuppress(const int lSType)
 
 void DebugLogSetLogType(const int dbgtype)
 {
-	debug_msg_type |= dbgtype;
+	debug_msg_type = dbgtype;
 }
 
 int DebugLogSetCategory(const int dbginfo)
