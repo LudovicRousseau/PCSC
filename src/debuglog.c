@@ -220,10 +220,10 @@ char* pcsc_stringify_error(long pcscError)
 		strlcpy(strError, "RPC transport error.", sizeof(strError));
 		break;
 	case SCARD_F_INTERNAL_ERROR:
-		strlcpy(strError, "Unknown internal error.", sizeof(strError));
+		strlcpy(strError, "Internal error.", sizeof(strError));
 		break;
 	case SCARD_F_UNKNOWN_ERROR:
-		strlcpy(strError, "Unknown internal error.", sizeof(strError));
+		strlcpy(strError, "Unknown error.", sizeof(strError));
 		break;
 	case SCARD_F_WAITED_TOO_LONG:
 		strlcpy(strError, "Waited too long.", sizeof(strError));
