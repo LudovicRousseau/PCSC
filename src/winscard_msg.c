@@ -47,8 +47,6 @@ struct _clientSockets
 
 static struct _clientSockets clientSockets[PCSCLITE_MAX_APPLICATIONS];
 
-void SHMCleanupSharedSegment(int, char *);
-
 int SHMClientRead(psharedSegmentMsg msgStruct, int blockamount)
 {
 	return SHMMessageReceive(msgStruct, appSocket, blockamount);
@@ -127,7 +125,7 @@ int SHMInitializeCommonSegment()
 	serv_adr.sun_family = AF_UNIX;
 	strncpy(serv_adr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(serv_adr.sun_path));
-	unlink(PCSCLITE_CSOCK_NAME);
+	SYS_Unlink(PCSCLITE_CSOCK_NAME);
 
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
 			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) <
