@@ -438,7 +438,7 @@ int main(int argc, char **argv)
 	g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
 	g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
 
-	DebugLogA("pcsc-lite daemon ready.");
+	DebugLogA("pcsc-lite " VERSION " daemon ready.");
 
 	/*
 	 * post initialistion 
