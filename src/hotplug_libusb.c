@@ -48,6 +48,7 @@ extern PCSCLITE_MUTEX usbNotifierMutex;
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
+static int AraKiriHotPlug = FALSE;
 
 /*
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous drivers
@@ -290,6 +291,13 @@ void HPEstablishUSBNotifications()
 		}
 
 		SYS_Sleep(1);
+		if (AraKiriHotPlug)
+		{
+			int retval;
+
+			DebugLogA("Hotplug stopped");
+			pthread_exit(&retval);
+		}
 
 	}	/* End of while loop */
 }
@@ -318,6 +326,13 @@ LONG HPSearchHotPluggables(void)
 
 	SYS_ThreadCreate(&usbNotifyThread, NULL,
 		(LPVOID) HPEstablishUSBNotifications, 0);
+
+	return 0;
+}
+
+LONG HPStopHotPluggables()
+{
+	AraKiriHotPlug = TRUE;
 
 	return 0;
 }
