@@ -3,9 +3,9 @@
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
 	Title  : debuglog.c
 	Package: pcsc lite
-	Author : David Corcoran
-	Date   : 7/27/99
-	License: Copyright (C) 1999 David Corcoran
+	Author : David Corcoran, Ludovic Rousseau
+	Date   : 7/27/99, update 11 Aug, 2002
+	License: Copyright (C) 1999,2002 David Corcoran
 			<corcoran@linuxnet.com>
 	Purpose: This handles debugging. 
 	            
@@ -37,10 +37,11 @@ $Id$
 
 static char DebugBuffer[DEBUG_BUF_SIZE];
 
-static LONG lSuppress = DEBUGLOG_LOG_ENTRIES;
-static char debug_msg_type = DEBUGLOG_NO_DEBUG;
+static int lSuppress = DEBUGLOG_LOG_ENTRIES;
+static int debug_msg_type = DEBUGLOG_NO_DEBUG;
+static int debug_category = DEBUG_CATEGORY_NOTHING;
 
-void debug_msg(char *fmt, ...)
+void debug_msg(const char *fmt, ...)
 {
 	va_list argptr;
 
@@ -122,17 +123,51 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 	}
 }	/* debug_xxd */
 
-void DebugLogSuppress(LONG lSType)
+void DebugLogSuppress(const int lSType)
 {
 	lSuppress = lSType;
 }
 
-void DebugLogSetLogType(LONG dbgtype)
+void DebugLogSetLogType(const int dbgtype)
 {
 	debug_msg_type |= dbgtype;
 }
 
-LPSTR pcsc_stringify_error(LONG Error)
+int DebugLogSetCategory(const int dbginfo)
+{
+#define DEBUG_INFO_LENGTH 80
+	char text[DEBUG_INFO_LENGTH];
+
+	// use a negative number to UNset
+	// typically use ~DEBUG_CATEGORY_APDU
+	if (dbginfo < 0)
+		debug_category &= dbginfo;
+	else
+		debug_category |= dbginfo;
+
+	// set to empty string
+	text[0] = '\0';
+
+	if (debug_category & DEBUG_CATEGORY_APDU)
+		strncat(text, " APDU", DEBUG_INFO_LENGTH-1-strlen(text));
+
+	DebugLogB("Debug options:%s", text);
+
+	return debug_category;
+}
+
+void DebugLogCategory(const int category, const char *buffer, const int len)
+{
+	if ((category & DEBUG_CATEGORY_APDU)
+		&& (debug_category & DEBUG_CATEGORY_APDU))
+		debug_xxd("APDU: ", buffer, len);
+
+	if ((category & DEBUG_CATEGORY_SW)
+		&& (debug_category & DEBUG_CATEGORY_APDU))
+		debug_xxd("SW: ", buffer, len);
+}
+
+LPSTR pcsc_stringify_error(const LONG Error)
 {
 
 	static char strError[75];
@@ -255,3 +290,4 @@ LPSTR pcsc_stringify_error(LONG Error)
 
 	return strError;
 }
+

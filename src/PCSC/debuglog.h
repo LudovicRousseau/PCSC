@@ -1,14 +1,15 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : debuglog.h
-	    Package: pcsc lite
-            Author : David Corcoran
-                     Ludovic Rousseau
-            Date   : 7/27/99, updated 9 Jan, 2002
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles debugging. 
+    Title  : debuglog.h
+    Package: pcsc lite
+	Authors: David Corcoran, Ludovic Rousseau
+	Date   : 7/27/99, updated 11 Aug, 2002
+	License: Copyright (C) 1999,2002 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This handles debugging. 
+
+$Id$
 
 ********************************************************************/
 
@@ -44,6 +45,10 @@ extern "C"
 #define DEBUGLOG_STDERR_DEBUG   2
 #define DEBUGLOG_STDOUT_DEBUG   4
 
+#define DEBUG_CATEGORY_NOTHING  0
+#define DEBUG_CATEGORY_APDU     1 
+#define DEBUG_CATEGORY_SW       2 
+
 #ifdef PCSC_DEBUG
 #define DebugLogA(fmt) debug_msg("%s:%d " fmt, __FILE__, __LINE__)
 #define DebugLogB(fmt, data) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data)
@@ -56,17 +61,20 @@ extern "C"
 #define DebugXxd(msg, buffer, size)
 #endif
 
-	void debug_msg(char *fmt, ...);
+	void debug_msg(const char *fmt, ...);
 	void debug_xxd(const char *msg, const unsigned char *buffer,
 		const int size);
 
-	void DebugLogSuppress(long);
-	void DebugLogSetLogType(long);
+	void DebugLogSuppress(const int);
+	void DebugLogSetLogType(const int);
+	int DebugLogSetCategory(const int);
+	void DebugLogCategory(const int, const char *, const int);
 
-	char *pcsc_stringify_error(long);
+	char *pcsc_stringify_error(const long);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif							/* __debuglog_h__ */
+
