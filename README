@@ -10,12 +10,12 @@ Requires: C compiler (gcc)
 
 
 Tested Platforms: 
-	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2)
+	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2, Debian 3.0)
 	Solaris Solaris 2.8
 	Mac OS X 10.1
 	HP-UX 11
 	True 64 Unix
-	OpenBSD 2.9, 3.0 (with libc.so.28.2)
+	OpenBSD 2.9, 3.0 (with libc.so.28.2), 3.2
 
 Welcome to PCSC Lite.  The purpose of PCSC Lite is to
 provide a Windows(R) SCard interface in a very small form factor for
