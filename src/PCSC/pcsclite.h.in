@@ -177,10 +177,19 @@ extern "C"
 #define PCSCLITE_STATUS_POLL_RATE       400000	/* Status polling rate */
 #define PCSCLITE_MSG_KEY_LEN            16	/* App ID key length */
 #define PCSCLITE_RW_ATTEMPTS            100	/* Attempts to rd/wrt */
-#define PCSCLITE_MAX_CHANNELS           16	/* Maximum channels */
-#define PCSCLITE_MAX_APPLICATIONS       16	/* Maximum applications */
-#define PCSCLITE_MAX_READERS            16  /* Maximum readers */
-#define PCSCLITE_MAX_CONTEXTS           PCSCLITE_MAX_READERS
+
+#define PCSCLITE_MAX_APPLICATIONS         16    /* Maximum applications */
+#define PCSCLITE_MAX_APPLICATION_CONTEXTS 16    /* Maximum contexts by application */
+#define PCSCLITE_MAX_APPLICATIONS_CONTEXTS PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
+        /* Maximum of applications contexts that PC/SC Ressources Manager can accept */
+
+#define PCSCLITE_MAX_READER_CONTEXT_CHANNELS      16    /* Maximum channels on a reader context */
+#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS 16    /* Maximum channels on an application context */
+
+#define PCSCLITE_MAX_READERS_CONTEXTS   16     /* Maximum readers context (a slot is count as a reader) */
+
+#define PCSCLITE_MAX_CONTEXTS           16    /* Only here because it is used in winscard_scf.c */
+
 #define PCSCLITE_MAX_THREADS            16	/* Stat change threads */
 #define PCSCLITE_MAX_COMSIZE            64	/* Maximum arg size */
 #define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
