@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	SCARDHANDLE hCard;
 	DWORD dwActiveProtocol, dwReaderLen, dwState, dwProt, dwAtrLen;
 	BYTE pbAtr[MAX_ATR_SIZE] = "";
-	BYTE pbReader[MAX_READERNAME] = "";
+	char pbReader[MAX_READERNAME] = "";
 	int reader_nb;
 	int i;
 
@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
 	if (rv != SCARD_S_SUCCESS)
 	{
 		printf("SCardListReader: %lX\n", rv);
+		return EXIT_FAILURE;
 	}
 
 	mszReaders = malloc(sizeof(char)*dwReaders);
@@ -201,6 +202,6 @@ end:
 	free(mszReaders);
 	free(readers);
 
-	return 0;
+	return EXIT_SUCCESS;
 } /* main */
 
