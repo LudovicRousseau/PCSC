@@ -442,7 +442,7 @@ int main(int argc, char **argv)
 		rv = DBUpdateReaders(newReaderConfig);
 		if (rv != 0)
 		{
-			DebugLogB("main: invalid file %s\n", newReaderConfig);
+			DebugLogB("main: invalid file %s", newReaderConfig);
 			at_exit();
 			return 1;
 		}
@@ -452,7 +452,7 @@ int main(int argc, char **argv)
 
 		if (rv == 1)
 		{
-			DebugLogA("main: warning: no reader.conf found\n");
+			DebugLogA("main: warning: no reader.conf found");
 			/*
 			 * Token error in file 
 			 */
