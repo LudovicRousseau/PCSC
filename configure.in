@@ -200,9 +200,9 @@ AC_ARG_ENABLE(debug,
 
 AC_MSG_RESULT([enable debug messages         : $debug])
 
-if test x${debug} = xtrue ; then
-  AC_DEFINE(PCSC_DEBUG, 1, [enable full PCSC debug messaging.])
-  AC_DEFINE(MSC_DEBUG, 1, [enable full MuscleCard debug messaging.])
+if test x${debug} = xfalse ; then
+  AC_DEFINE(NO_PCSC_DEBUG, 1, [disable PCSC debug messaging.])
+  AC_DEFINE(NO_MSC_DEBUG, 1, [disable MuscleCard debug messaging.])
 fi
 
 dnl --enable-debugatr
