@@ -18,7 +18,7 @@
 extern "C"
 {
 #endif
-	LONG ContextsInitialize();
+	LONG ContextsInitialize(void);
 	LONG CreateContextThread(PDWORD);
 #ifdef __cplusplus
 }

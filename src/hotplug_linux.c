@@ -61,7 +61,7 @@ __attribute__ ((packed));
 
 LONG HPAddHotPluggable(int, unsigned long);
 LONG HPRemoveHotPluggable(int, unsigned long);
-LONG HPReadBundleValues();
+LONG HPReadBundleValues(void);
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int AraKiriHotPlug = FALSE;
@@ -87,7 +87,7 @@ static struct _bundleTracker
 }
 bundleTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
-LONG HPReadBundleValues()
+LONG HPReadBundleValues(void)
 {
 
 	LONG rv;
@@ -176,7 +176,7 @@ LONG HPReadBundleValues()
 	return 0;
 }
 
-void HPEstablishUSBNotifications()
+void HPEstablishUSBNotifications(void)
 {
 
 	int i, j, usbDeviceStatus;
@@ -356,7 +356,7 @@ void HPEstablishUSBNotifications()
 	}	/* End of while loop */
 }
 
-LONG HPSearchHotPluggables()
+LONG HPSearchHotPluggables(void)
 {
 	int i, j;
 
@@ -372,7 +372,7 @@ LONG HPSearchHotPluggables()
 	HPReadBundleValues();
 
 	SYS_ThreadCreate(&usbNotifyThread, NULL,
-		(LPVOID) HPEstablishUSBNotifications, 0);
+		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
 
 	return 0;
 }

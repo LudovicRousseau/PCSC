@@ -47,7 +47,7 @@ LONG MSGCleanupClient(DWORD);
 
 static void ContextThread(DWORD* pdwIndex);
 
-LONG ContextsInitialize()
+LONG ContextsInitialize(void)
 {
 	memset(psContext, 0, sizeof(struct _psContext)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
 	return 1;

@@ -28,7 +28,7 @@
 #include "sys_generic.h"
 #include "PCSC/debuglog.h"
 
-int SYS_Initialize()
+int SYS_Initialize(void)
 {
 	/*
 	 * Nothing special
@@ -41,7 +41,7 @@ int SYS_Mkdir(char *path, int perms)
 	return mkdir(path, perms);
 }
 
-int SYS_GetPID()
+int SYS_GetPID(void)
 {
 	return getpid();
 }
@@ -108,12 +108,12 @@ int SYS_Mknod(const char *path, int mode, int dev)
 	return mknod(path, mode, dev);
 }
 
-int SYS_GetUID()
+int SYS_GetUID(void)
 {
 	return getuid();
 }
 
-int SYS_GetGID()
+int SYS_GetGID(void)
 {
 	return getgid();
 }
@@ -237,7 +237,7 @@ int SYS_MMapSynchronize(void *begin, int length)
 	return msync(begin, length, MS_SYNC | flags);
 }
 
-int SYS_Fork()
+int SYS_Fork(void)
 {
 	return fork();
 }
@@ -307,7 +307,7 @@ int SYS_Random(int iSeed, float fStart, float fEnd)
 	return iRandNum;
 }
 
-int SYS_GetSeed()
+int SYS_GetSeed(void)
 {
 	struct timeval tv;
 	struct timezone tz;

@@ -44,7 +44,7 @@ void tperrorCheck (char *pcToken_error);
 %%
 
 
-int yywrap()
+int yywrap(void)
 {
 	return 1;
 }

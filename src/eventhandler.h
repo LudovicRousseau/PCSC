@@ -37,7 +37,7 @@ extern "C"
 	}
 	READER_STATES, *PREADER_STATES;
 
-	LONG EHInitializeEventStructures();
+	LONG EHInitializeEventStructures(void);
 	LONG EHSpawnEventHandler(PREADER_CONTEXT);
 	LONG EHDestroyEventHandler(PREADER_CONTEXT);
 	void EHSetSharingEvent(PREADER_CONTEXT, DWORD);

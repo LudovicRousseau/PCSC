@@ -19,11 +19,11 @@ extern "C"
 
 #include <sys/stat.h>
 
-	int SYS_Initialize();
+	int SYS_Initialize(void);
 
 	int SYS_Mkdir(char *, int);
 
-	int SYS_GetPID();
+	int SYS_GetPID(void);
 
 	int SYS_Sleep(int);
 
@@ -43,9 +43,9 @@ extern "C"
 
 	int SYS_Mknod(const char *, int, int);
 
-	int SYS_GetUID();
+	int SYS_GetUID(void);
 
-	int SYS_GetGID();
+	int SYS_GetGID(void);
 
 	int SYS_Chown(const char *, int, int);
 
@@ -71,7 +71,7 @@ extern "C"
 
 	int SYS_MMapSynchronize(void *, int);
 
-	int SYS_Fork();
+	int SYS_Fork(void);
 
 	int SYS_Daemon(int, int);
 
@@ -83,7 +83,7 @@ extern "C"
 
 	int SYS_Random(int, float, float);
 
-	int SYS_GetSeed();
+	int SYS_GetSeed(void);
 
 	void SYS_Exit(int);
 

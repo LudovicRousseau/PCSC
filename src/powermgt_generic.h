@@ -22,7 +22,7 @@ extern "C"
  * Registers for Power Management callbacks 
  */
 
-ULONG PMRegisterForPowerEvents();
+ULONG PMRegisterForPowerEvents(void);
 
 
 #ifdef __cplusplus

@@ -79,7 +79,7 @@ int SYS_ThreadExit(LPVOID pvRetVal)
 	return 1;
 }
 
-PCSCLITE_THREAD_T SYS_ThreadSelf()
+PCSCLITE_THREAD_T SYS_ThreadSelf(void)
 {
 	return pthread_self();
 }

@@ -47,7 +47,7 @@ static char Init = TRUE;
 /*
  * Some internal functions 
  */
-void SVCServiceRunLoop();
+void SVCServiceRunLoop(void);
 void SVCClientCleanup(psharedSegmentMsg);
 void at_exit(void);
 void clean_temp_files(void);
@@ -70,7 +70,7 @@ void SVCClientCleanup(psharedSegmentMsg msgStruct)
 /*
  * The Message Queue Listener function 
  */
-void SVCServiceRunLoop()
+void SVCServiceRunLoop(void)
 {
 	int rsp;
 	LONG rv;

@@ -92,12 +92,12 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 static PCSCLITE_MUTEX EventMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
-static LONG isOCFServerRunning();
-LONG SCardLockThread();
-LONG SCardUnlockThread();
-LONG SCardEventLock();
-LONG SCardEventUnlock();
-static LONG PCSC_SCF_Initialize();
+static LONG isOCFServerRunning(void);
+LONG SCardLockThread(void);
+LONG SCardUnlockThread(void);
+LONG SCardEventLock(void);
+LONG SCardEventUnlock(void);
+static LONG PCSC_SCF_Initialize(void);
 static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 			  void * cbdata);
 static LONG PCSC_SCF_getATR(SCF_Card_t hCard, LPBYTE pcbAtr, 
@@ -1575,7 +1575,7 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 }
 
 
-static LONG isOCFServerRunning()
+static LONG isOCFServerRunning(void)
 {
   static int isRunning = TRUE;
   SCF_Status_t   status;

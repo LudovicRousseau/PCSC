@@ -21,7 +21,7 @@
 
 #if !defined(__APPLE__)
 
-ULONG PMRegisterForPowerEvents()
+ULONG PMRegisterForPowerEvents(void)
 {
   return 0;
 }

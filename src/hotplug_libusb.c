@@ -204,7 +204,7 @@ LONG HPReadBundleValues(void)
 	return 0;
 }
 
-void HPEstablishUSBNotifications()
+void HPEstablishUSBNotifications(void)
 {
 	int i, j;
 	struct usb_bus *bus;

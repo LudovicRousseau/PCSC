@@ -35,7 +35,7 @@ static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 void EHStatusHandlerThread(PREADER_CONTEXT);
 
-LONG EHInitializeEventStructures()
+LONG EHInitializeEventStructures(void)
 {
 	int fd, i, pageSize;
 
