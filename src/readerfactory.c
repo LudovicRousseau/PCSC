@@ -42,7 +42,7 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 {
 
 	int i;   					/* Counter */
-	LONG rv;       				/* Return tester */
+	LONG rv; 					/* Return tester */
 
 	/*
 	 * Zero out everything 
@@ -171,8 +171,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	/*
 	 * If a clone to this reader exists take some values from that clone 
 	 */
-	if (parentNode != -1 && parentNode < PCSCLITE_MAX_CONTEXTS
-		&& parentNode >= 0)
+	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_CONTEXTS)
 	{
 		(sContexts[dwContext])->dwFeeds = 
 		  (sContexts[parentNode])->dwFeeds;
@@ -183,7 +182,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		  (sContexts[parentNode])->mMutex;
 	}
 
-	if ((sContexts[dwContext])->dwFeeds == NULL)
+	if ((sContexts[dwContext])->dwFeeds == 0)
 	{
 		(sContexts[dwContext])->dwFeeds = 
 		  (DWORD *)malloc(sizeof(DWORD));
@@ -196,10 +195,10 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		*(sContexts[dwContext])->dwFeeds = 1;
 	}
 
-	if ((sContexts[dwContext])->mMutex == NULL)
+	if ((sContexts[dwContext])->mMutex == 0)
 	{
 		(sContexts[dwContext])->mMutex =
-			(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
+		  (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
 		SYS_MutexInit((sContexts[dwContext])->mMutex);
 	}
 
@@ -478,8 +477,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	LPSTR libraryName, DWORD dwPort, DWORD dwSlot)
 {
 
-	LONG rv;					/* rv is the reader number of the parent
-						 * of the clone */
+	LONG rv;	/* rv is the reader number of the parent of the clone */
 	LONG ret;
 	DWORD valueLength;
 	UCHAR tagValue;
