@@ -10,6 +10,7 @@ StartService ()
 {
     if ! pid=$(GetPID pcscd); then
 	ConsoleMessage "Starting Smartcard Services"
+	rm -rf /tmp/pcsc
 	/usr/sbin/pcscd
     fi
 }

@@ -7,7 +7,7 @@
 #define PACKAGE "PCSC Framework"
 
 /* Version number of package */
-#define VERSION "1.1.2beta1"
+#define VERSION "1.1.2"
 
 /* OSX */
 #define PCSC_TARGET_OSX 1
@@ -17,10 +17,10 @@
 #define HAVE_PTHREAD 1
 
 /* enable full PCSC debug messaging. */
-/* #define PCSC_DEBUG */
+  #define PCSC_DEBUG 1
 
 /* enable full musclecard debug messaging. */
-/* #define MSC_DEBUG */
+  #define MSC_DEBUG 1
 
 /* display ATR parsing debug messages. */
 /* #define ATR_DEBUG */
@@ -34,6 +34,5 @@
 /* enable client side thread safety. */
 #define USE_THREAD_SAFETY 1
 
-/* file containing pcscd pid */
+/* enable run pid */
 #define USE_RUN_PID "/var/run/pcscd.pid"
-
