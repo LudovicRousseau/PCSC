@@ -1199,7 +1199,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 			}
 		}
-	} else if (cReaders > PCSCLITE_MAX_CONTEXTS)
+	} else if (cReaders >= PCSCLITE_MAX_CONTEXTS)
 	{
 		return SCARD_E_INVALID_VALUE;
 	}
