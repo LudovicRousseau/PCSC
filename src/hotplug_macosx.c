@@ -4,6 +4,7 @@
 	Title  : hotplug_macosx.c
 	Package: pcsc lite
 	Author : Stephen M. Webb <stephenw@cryptocard.com>
+			Ludovic Rousseau <ludovic.rousseau@free.fr>
 	Date   : 03 Dec 2002
 	License: Copyright (C) 2002 David Corcoran <corcoran@linuxnet.com>
 
@@ -32,6 +33,8 @@ $Id$
 #define PCSCLITE_HP_PRODKEY_NAME   "ifdProductID"
 #define PCSCLITE_HP_NAMEKEY_NAME   "ifdFriendlyName"
 #define PCSCLITE_HP_BASE_PORT       0x200000
+
+#define DEBUG_MACOS_HOTPLUG
 
 /*
  * An aggregation of useful information on a driver bundle in the
@@ -104,6 +107,12 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
  */
 static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 {
+	int i;
+#ifdef DEBUG_MACOS_HOTPLUG
+	DebugLogB("Entering HPDriversGetFromDirectory: %s", driverBundlePath);
+#endif
+
+	int readersNumber = 0;
 	HPDriverVector bundleVector = NULL;
 	CFArrayRef bundleArray;
 	CFStringRef driverBundlePathString =
@@ -131,16 +140,46 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 	size_t bundleArraySize = CFArrayGetCount(bundleArray);
 
-	bundleVector = (HPDriver *) calloc(bundleArraySize + 1, sizeof(HPDriver));
+	/* get the number of readers (including aliases) */
+	for (i = 0; i < bundleArraySize; i++)
+	{
+		CFBundleRef currBundle =
+			(CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
+		CFDictionaryRef dict = CFBundleGetInfoDictionary(currBundle);
+
+		const void * blobValue = CFDictionaryGetValue(dict,
+			CFSTR(PCSCLITE_HP_MANUKEY_NAME));
+
+		if (!blobValue)
+		{
+			DebugLogA("error getting vendor ID from bundle");
+			return bundleVector;
+		}
+
+		if (CFGetTypeID(blobValue) == CFArrayGetTypeID())
+		{
+			/* alias found, each reader count as 1 */
+			CFArrayRef propertyArray = blobValue;
+			readersNumber += CFArrayGetCount(propertyArray);
+		}
+		else
+			/* No alias, only one reader supported */
+			readersNumber++;
+	}
+#ifdef DEBUG_MACOS_HOTPLUG
+	DebugLogB("Total of %d readers supported", readersNumber);
+#endif
+
+	bundleVector = (HPDriver *) calloc(readersNumber, sizeof(HPDriver));
 	if (!bundleVector)
 	{
 		DebugLogA("memory allocation failure");
 		return bundleVector;
 	}
 
-	for (int i = 0; i < bundleArraySize; i++)
+	HPDriver *driverBundle = bundleVector;
+	for (i = 0; i < bundleArraySize; i++)
 	{
-		HPDriver *driverBundle = bundleVector + i;
 		CFBundleRef currBundle =
 			(CFBundleRef) CFArrayGetValueAtIndex(bundleArray, i);
 		CFDictionaryRef dict = CFBundleGetInfoDictionary(currBundle);
@@ -151,40 +190,134 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 		driverBundle->m_libPath = strdup(CFStringGetCStringPtr(bundlePath,
 				CFStringGetSystemEncoding()));
 
-		CFStringRef strValue = (CFStringRef) CFDictionaryGetValue(dict,
+		const void * blobValue = CFDictionaryGetValue(dict,
 			CFSTR(PCSCLITE_HP_MANUKEY_NAME));
 
-		if (!strValue)
+		if (!blobValue)
 		{
 			DebugLogA("error getting vendor ID from bundle");
 			return bundleVector;
 		}
-		driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
-				CFStringGetSystemEncoding()), NULL, 16);
 
-		strValue = (CFStringRef) CFDictionaryGetValue(dict,
-			CFSTR(PCSCLITE_HP_PRODKEY_NAME));
-		if (!strValue)
+		if (CFGetTypeID(blobValue) == CFArrayGetTypeID())
 		{
-			DebugLogA("error getting product ID from bundle");
-			return bundleVector;
-		}
-		driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
-				CFStringGetSystemEncoding()), NULL, 16);
+			CFArrayRef vendorArray = blobValue;
+			CFArrayRef productArray;
+			CFArrayRef friendlyNameArray;
+			char *libPath = driverBundle->m_libPath;
 
-		strValue = (CFStringRef) CFDictionaryGetValue(dict,
-			CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
-		if (!strValue)
-		{
-			DebugLogA("error getting product friendly name from bundle");
-			driverBundle->m_friendlyName = strdup("unnamed device");
+#ifdef DEBUG_MACOS_HOTPLUG
+			DebugLogB("Driver with aliases: %s", libPath);
+#endif
+			/* get list of ProductID */
+			productArray = CFDictionaryGetValue(dict,
+				 CFSTR(PCSCLITE_HP_PRODKEY_NAME));
+			if (!productArray)
+			{
+				DebugLogA("error getting product ID from bundle");
+				return bundleVector;
+			}
+
+			/* get list of FriendlyName */
+			friendlyNameArray = CFDictionaryGetValue(dict,
+				 CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
+			if (!friendlyNameArray)
+			{
+				DebugLogA("error getting product ID from bundle");
+				return bundleVector;
+			}
+
+			int reader_nb = CFArrayGetCount(vendorArray);
+
+			if (reader_nb != CFArrayGetCount(productArray))
+			{
+				DebugLogC("Malformed Info.plist: %d vendors and %d products",
+					reader_nb, CFArrayGetCount(productArray));
+				return bundleVector;
+			}
+
+			if (reader_nb != CFArrayGetCount(friendlyNameArray))
+			{
+				DebugLogC("Malformed Info.plist: %d vendors and %d friendlynames",
+					reader_nb, CFArrayGetCount(friendlyNameArray));
+				return bundleVector;
+			}
+
+			int j;
+			for (j=0; j<reader_nb; j++)
+			{
+				CFStringRef strValue = CFArrayGetValueAtIndex(vendorArray, j);
+				
+				driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
+					CFStringGetSystemEncoding()), NULL, 16);
+
+				strValue = CFArrayGetValueAtIndex(productArray, j);
+				driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
+					CFStringGetSystemEncoding()), NULL, 16);
+
+				strValue = CFArrayGetValueAtIndex(friendlyNameArray, j);
+				const char *cstr = CFStringGetCStringPtr(strValue,
+					CFStringGetSystemEncoding());
+
+				driverBundle->m_friendlyName = strdup(cstr);
+				if (!driverBundle->m_libPath)
+					driverBundle->m_libPath = strdup(libPath);
+
+#ifdef DEBUG_MACOS_HOTPLUG
+				DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
+				DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
+				DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);
+				DebugLogB("Driver: %s", driverBundle->m_libPath);
+#endif
+
+				/* go to next bundle in the vector */
+				driverBundle++;
+			}
 		}
 		else
 		{
-			const char *cstr = CFStringGetCStringPtr(strValue,
-				CFStringGetSystemEncoding());
+			CFStringRef strValue = blobValue;
 
-			driverBundle->m_friendlyName = strdup(cstr);
+#ifdef DEBUG_MACOS_HOTPLUG
+			DebugLogC("Driver without alias: %s", driverBundle, driverBundle->m_libPath);
+#endif
+
+			driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
+					CFStringGetSystemEncoding()), NULL, 16);
+
+			strValue = (CFStringRef) CFDictionaryGetValue(dict,
+				CFSTR(PCSCLITE_HP_PRODKEY_NAME));
+			if (!strValue)
+			{
+				DebugLogA("error getting product ID from bundle");
+				return bundleVector;
+			}
+			driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
+				CFStringGetSystemEncoding()), NULL, 16);
+
+			strValue = (CFStringRef) CFDictionaryGetValue(dict,
+				CFSTR(PCSCLITE_HP_NAMEKEY_NAME));
+			if (!strValue)
+			{
+				DebugLogA("error getting product friendly name from bundle");
+				driverBundle->m_friendlyName = strdup("unnamed device");
+			}
+			else
+			{
+				const char *cstr = CFStringGetCStringPtr(strValue,
+					CFStringGetSystemEncoding());
+
+				driverBundle->m_friendlyName = strdup(cstr);
+			}
+#ifdef DEBUG_MACOS_HOTPLUG
+			DebugLogB("VendorID: 0x%04X", driverBundle->m_vendorId);
+			DebugLogB("ProductID: 0x%04X", driverBundle->m_productId);
+			DebugLogB("Friendly name: %s", driverBundle->m_friendlyName);
+			DebugLogB("Driver: %s", driverBundle->m_libPath);
+#endif
+
+			/* go to next bundle in the vector */
+			driverBundle++;
 		}
 	}
 	CFRelease(bundleArray);
