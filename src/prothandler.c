@@ -10,6 +10,8 @@
 
 ********************************************************************/
 
+#include <string.h>
+
 #include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"

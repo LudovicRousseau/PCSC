@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <sys/time.h>
+#include <string.h>
 
 #include "config.h"
 #include "wintypes.h"
