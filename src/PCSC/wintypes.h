@@ -25,9 +25,11 @@ extern "C" {
   typedef unsigned char*                PUCHAR;
   typedef unsigned short                USHORT;
 
+#ifndef __COREFOUNDATION_CFPLUGINCOM__
   typedef unsigned long                 ULONG;
   typedef void *                        LPVOID;
   typedef short                         BOOL;
+#endif
 
   typedef unsigned long*                PULONG;
   typedef const void *                  LPCVOID;

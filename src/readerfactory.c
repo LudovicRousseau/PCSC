@@ -163,7 +163,7 @@ LONG RFAddReader( LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary ) {
   }
 
   /* If a clone to this reader exists take some values from that clone */
-  if ( parentNode != -1 ) {
+  if ( parentNode >= 0 ) {
     (sContexts[dwContext])->dwFeeds  = (sContexts[parentNode])->dwFeeds;
    *(sContexts[dwContext])->dwFeeds += 1;
     (sContexts[dwContext])->vHandle  = (sContexts[parentNode])->vHandle;
@@ -197,7 +197,7 @@ LONG RFAddReader( LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary ) {
     (sContexts[dwContext])->dwPublicID      = 0;
     (sContexts[dwContext])->dwIdentity      = 0;
    
-    if ( parentNode != -1 ) {
+    if ( parentNode >= 0 ) {
       *(sContexts[dwContext])->dwFeeds     -= 1;
     }
    
@@ -460,9 +460,9 @@ LONG RFSetReaderName( PREADER_CONTEXT rContext, LPSTR readerName,
       }
       
       if ( i == PCSCLITE_MAX_CONTEXTS ) {
-	return SCARD_E_INSUFFICIENT_BUFFER;
+	return -1;
       } else if ( i > supportedChannels ) {
-	return SCARD_E_INSUFFICIENT_BUFFER;
+	return -1;
       }
       
       if ( i <= 9 ) {
