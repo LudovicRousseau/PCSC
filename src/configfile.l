@@ -50,7 +50,7 @@ int evaluatetoken( char *pcToken ) {
   DWORD dwChannelId = 0;
   int p             = 0;
   int n             = 0;
-
+  
   if ( pcPrevious == 0 ) {       /* This is the key */
     pcPrevious = strdup( pcToken );
   } else {
@@ -69,13 +69,23 @@ int evaluatetoken( char *pcToken ) {
        }
     } else if ( strcmp( pcPrevious, "DEVICENAME" ) == 0 ) {
        if ( pcDevicename == 0 ) {
+         struct stat fStatBuf;
          pcDevicename = strdup( pcCurrent );
+         if (SYS_Stat(pcDevicename, &fStatBuf) != 0) {
+           DebugLogB("The device %s doesn't exist", pcDevicename);
+           badError = 1;
+         }
        } else {
          tok_error( pcPrevious ); return 1;
        }
     } else if ( strcmp( pcPrevious, "LIBPATH" ) == 0 ) {
        if ( pcLibpath == 0 ) {
+         struct stat fStatBuf;
          pcLibpath = strdup( pcCurrent );
+         if (SYS_Stat(pcLibpath, &fStatBuf) != 0) {
+           DebugLogB("The library %s doesn't exist", pcLibpath);
+           badError = 1;
+         }
        } else {
          tok_error( pcPrevious ); return 1;
        }
@@ -93,10 +103,11 @@ int evaluatetoken( char *pcToken ) {
   }
 
   if ( pcFriendlyname != 0 && pcDevicename != 0 &&
-       pcLibpath      != 0 && pcChannelid != 0 ) {
+       pcLibpath      != 0 && pcChannelid != 0 &&
+       badError != 1) {
      
        dwChannelId = strtoul( pcChannelid, 0, 16 );
-       RFAddReader( pcFriendlyname, dwChannelId, pcLibpath );
+       RFAddReader( pcFriendlyname, dwChannelId, pcLibpath, pcDevicename );
 
        free( pcFriendlyname ); free( pcDevicename );
        free( pcLibpath);       free( pcChannelid );
