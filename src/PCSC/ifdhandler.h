@@ -145,8 +145,8 @@ extern "C"
 	 */
 
 	RESPONSECODE IFDHCreateChannelByName(DWORD, LPSTR);
-	RESPONSECODE IFDHControl(DWORD, DWORD, PUCHAR, DWORD, PUCHAR, DWORD,
-		PDWORD);
+	RESPONSECODE IFDHControl(DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD,
+		LPDWORD);
 
 	/*
 	 * List of Defined Functions Available to IFD_Handler 2.0 
