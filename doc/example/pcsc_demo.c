@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	SCARDCONTEXT hContext;
 	DWORD dwReaders;
 	LPSTR mszReaders;
-	char *ptr, **readers;
+	char *ptr, **readers = NULL;
 	int nbReaders;
 	SCARDHANDLE hCard;
 	DWORD dwActiveProtocol, dwReaderLen, dwState, dwProt, dwAtrLen;
