@@ -90,6 +90,8 @@ CC="$PTHREAD_CC"
 AC_CHECK_FUNCS(daemon)
 AC_CHECK_FUNCS(getopt_long)
 
+AC_CHECK_HEADERS(getopt.h)
+
 dnl Add libtool support.
 AM_PROG_LIBTOOL
 dnl Automatically update the libtool script if it becomes out-of-date.

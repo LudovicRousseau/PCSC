@@ -12,6 +12,8 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
+
 #include <time.h>
 #include <syslog.h>
 #include <signal.h>
@@ -23,11 +25,10 @@ $Id$
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef  HAVE_GETOPT_LONG
+#ifdef  HAVE_GETOPT_H
 #include <getopt.h>
 #endif
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "winscard_msg.h"
