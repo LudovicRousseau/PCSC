@@ -27,10 +27,10 @@
 
 #ifndef WIN32
 #ifndef MSC_SVC_DROPDIR
-#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
+#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services"
 #endif
 #else
-#define MSC_SVC_DROPDIR                     "C:\\Program Files\\Muscle\\Services\\"
+#define MSC_SVC_DROPDIR                     "C:\\Program Files\\Muscle\\Services"
 #endif
 
 #define MSC_MANUMSC_KEY_NAME                "spVendorName"
@@ -182,11 +182,11 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 			 * vendor and product ID's for this particular bundle 
 			 */
 #ifndef WIN32
-			sprintf(fullPath, "%s%s%s", MSC_SVC_DROPDIR, currFP->d_name,
-				"/Contents/Info.plist");
+			sprintf(fullPath, "%s/%s/Contents/Info.plist", MSC_SVC_DROPDIR,
+				currFP->d_name);
 #else
-			sprintf(fullPath, "%s%s%s", MSC_SVC_DROPDIR, findData.cFileName,
-				"\\Contents\\Info.plist");
+			sprintf(fullPath, "%s\\%s\\Contents\\Info.plist", MSC_SVC_DROPDIR,
+				findData.cFileName);
 #endif
 
 			atrIndex = 0;
@@ -265,13 +265,13 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					}
 				}
 #if defined(WIN32)
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					findData.cFileName, "\\Contents\\Win32\\", keyValue);
+				sprintf(fullLibPath, "%s\\%s\Contents\\Win32\\%s",
+					MSC_SVC_DROPDIR, findData.cFileName, keyValue);
 #elif defined(__APPLE__)
 				sprintf(fullLibPath, "%s%s", MSC_SVC_DROPDIR,
 					currFP->d_name);
 #else
-				sprintf(fullLibPath, "%s%s/Contents/%s%s", MSC_SVC_DROPDIR,
+				sprintf(fullLibPath, "%s/%s/Contents/%s/%s", MSC_SVC_DROPDIR,
 					currFP->d_name, PCSC_ARCH, keyValue);
 #endif
 
