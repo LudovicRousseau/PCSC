@@ -1,3 +1,42 @@
+pcsc-lite-1.1.2beta4: Ludovic Rousseau
+13 Apr, 2003
+- src/debuglog.c:
+  . DebugLogSetLogType() set flags and not just _or_ them (allow unset)
+  . use strncpy to avoid a possible buffer overflow
+- src/hotplug_linux.c:
+  . code cleanup
+  . support for driver aliases in Info.plist. The syntax is:
+        <key>ifdProductString</key>
+        <string>GemPC430</string>
+
+        <key>ifdVendorID</key>
+        <string>0x08E6</string>
+        <string>0x08E6</string>
+        <string>0x08E6</string>
+
+        <key>ifdProductID</key>
+        <string>0x0430</string>
+        <string>0x0432</string>
+        <string>0x0435</string>
+
+        <key>ifdFriendlyName</key>
+        <string>GemPC430</string>
+        <string>GemPC432</string>
+        <string>GemPC435</string>
+    So this driver will be used by the three possible readers.
+- src/Makefile.am:
+  . support for driver aliases in Info.plist (use tokenparser.l instead of
+    driverparser.l)
+  . support for xBSD back
+- src/pcsclite.h:
+  . rename "pcsc.pub" and "pcsc.comm" in "pcscd.pub" and "pcscd.comm"
+- src/tokenparser.l:
+  . code reindentation
+  . use DebugLogB()/DebugLogC with correct number of arguments
+- src/tokenparser.l:
+  . regenerated from src/tokenparser.l
+
+
 pcsc-lite-1.1.2beta3: Ludovic Rousseau, David Corcoran
 7 Nov, 2002
 - Support for Sun Microsystems' SCF
