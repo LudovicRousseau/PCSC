@@ -45,6 +45,10 @@ extern "C"
 	typedef DWORD *LPDWORD;
 	typedef char *LPTSTR;
 
+	/* this type is deprecated but still used by old drivers and applications
+	 * You should use LPTSTR instead */
+	typedef char *LPSTR __attribute__ ((deprecated));
+
 #else
 #include <windows.h>
 #endif
