@@ -23,6 +23,7 @@
 #include "debuglog.h"
 #include "dyn_generic.h"
 #include "tokenfactory.h"
+#include "parser.h"
 
 #ifndef WIN32
 #ifndef MSC_SVC_DROPDIR
@@ -123,7 +124,6 @@ int stringToBytes(char *inStr, MSCPUChar8 Buffer, MSCPULong32 Length)
 MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 	MSCLPTokenInfo tokenInfo)
 {
-
 	MSCLong32 rv;
 
 #ifndef WIN32
@@ -135,10 +135,10 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 	char findPath[200];
 #endif
 
-	char atrString[100];
+	char atrString[MAX_ATR_SIZE];
 	char fullPath[200];
 	char fullLibPath[250];
-	char keyValue[200];
+	char keyValue[TOKEN_MAX_VALUE_SIZE];
 	int atrIndex;
 
 	rv = 0;
@@ -150,17 +150,21 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 	hpDir = opendir(MSC_SVC_DROPDIR);
 
 	if (hpDir == 0)
+	{
+		DebugLogB("Cannot open PC/SC token drivers directory: %s",
+			MSC_SVC_DROPDIR);
+		return -1;
+	}
 #else
 	sprintf(findPath, "%s\\*.bundle", MSC_SVC_DROPDIR);
 	hFind = FindFirstFile(findPath, &findData);
 
 	if (hFind == INVALID_HANDLE_VALUE)
-#endif
 	{
-		DebugLogA("Cannot open PC/SC token drivers directory.");
-
+		DebugLogB("Cannot open PC/SC token drivers directory: %s", findPath);
 		return -1;
 	}
+#endif
 
 #ifndef WIN32
 	while ((currFP = readdir(hpDir)) != 0)
