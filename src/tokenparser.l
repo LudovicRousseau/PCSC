@@ -1,15 +1,14 @@
-/*****************************************************************
-
-  File   :   tokenparser.l
-  Author :   David Corcoran
-  Date   :   February 12, 1999, modified August 2003
-  Purpose:   Reads lexical config files and updates database.
-             See http://www.linuxnet.com for more information.
-  License:   Copyright (C) 1999-2003 David Corcoran <corcoran@linuxnet.com>
-             Ludovic Rousseau <ludovic.rousseau@free.fr>
-$Id$
-
-******************************************************************/
+/*
+ * Reads lexical config files and updates database.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2001-2003
+ *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ *
+ * $Id$
+ */
 
 %{
 

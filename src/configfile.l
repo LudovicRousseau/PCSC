@@ -1,14 +1,13 @@
-/*****************************************************************
-
-  File   :   configfile.ll
-  Author :   David Corcoran
-  Date   :   February 12, 1999 modified 7/28/99
-  Purpose:   Reads lexical config files and updates database.
-             See http://www.linuxnet.com for more information.
-  License:   Copyright (C) 1999 David Corcoran
-             <corcoran@linuxnet.com>
-
-******************************************************************/
+/*
+ * Reads lexical config files and updates database.
+ *
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 1999
+ *  David Corcoran <corcoran@linuxnet.com>
+ *
+ * $Id$
+ */
 
 %{
 int evaluatetoken( char *pcToken );
