@@ -13,6 +13,7 @@
 #include "config.h"
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "wintypes.h"
 #include "pcsclite.h"
@@ -21,24 +22,149 @@
 #include "winscard_svc.h"
 #include "debuglog.h"
 #include "sys_generic.h"
+#include "thread_generic.h"
 
-static struct _psContext
+struct _psContext
 {
 	SCARDCONTEXT hContext;
 	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 	DWORD dwClientID;
-	DWORD dwHandleID;
-}
-psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
+	//	DWORD dwHandleID;
+	PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
+	sharedSegmentMsg msgStruct;
+};
 
-LONG MSGCheckHandleAssociation(DWORD, SCARDHANDLE);
+typedef struct _psContext CONTEXT, *PCONTEXT;
+
+static CONTEXT psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
+
+static DWORD dwNextContextIndex;
+
+LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
+LONG MSGFunctionDemarshall(psharedSegmentMsg, DWORD);
+LONG MSGAddContext(SCARDCONTEXT, DWORD);
+LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
+LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, DWORD);
+LONG MSGRemoveHandle(SCARDHANDLE, DWORD);
+LONG MSGCleanupClient(DWORD);
+
+static void ContextThread(DWORD* pdwIndex);
+
+LONG ContextsInitialize()
+{
+
+	memset(psContext, 0, sizeof(CONTEXT)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
+	return 1;
+}
+
+LONG CreateContextThread(PDWORD pdwClientID)
+{
+
+	int i;
+	LONG rv;
+
+	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+	{
+		if (psContext[i].dwClientID == 0)
+		{
+			psContext[i].dwClientID = *pdwClientID;
+			*pdwClientID = 0;
+			break;
+		}
+	}
+
+	if (i == PCSCLITE_MAX_APPLICATIONS_CONTEXTS)
+	{
+		SYS_CloseFile(psContext[i].dwClientID);
+		psContext[i].dwClientID = 0; 
+		return SCARD_F_INTERNAL_ERROR;
+	}
+	
+	dwNextContextIndex = i;
+
+	rv = SYS_ThreadCreate(&psContext[i].pthThread, NULL,
+				(LPVOID) ContextThread, (LPVOID) &dwNextContextIndex);
+	if (rv == 1)
+	{
+		return SCARD_S_SUCCESS;
+	}
+	else
+	{
+		SYS_CloseFile(psContext[i].dwClientID);
+		psContext[i].dwClientID = 0; 
+		return SCARD_E_NO_MEMORY;
+	}
+
+}
 
 /*
  * A list of local functions used to keep track of clients and their
  * connections 
  */
 
-LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
+static void ContextThread(DWORD* pdwIndex)
+{
+	LONG rv;
+	sharedSegmentMsg msgStruct;
+	DWORD dwContextIndex = *pdwIndex;
+
+
+	DebugLogB("ContextThread: Thread is started: %d", psContext[dwContextIndex].dwClientID);
+	
+	while (1)
+	{
+		
+		switch (rv = SHMProcessEventsContext(&psContext[dwContextIndex].dwClientID, &msgStruct, 0))
+		{
+		case 0:
+			if (msgStruct.mtype == CMD_CLIENT_DIED)
+			{
+				/*
+				 * Clean up the dead client
+				 */
+				DebugLogB("ContextThread: Client die: %d", psContext[dwContextIndex].dwClientID);
+				MSGCleanupClient(dwContextIndex);
+				SYS_ThreadExit((LPVOID) NULL);
+			} 
+			break;
+
+		case 1:
+			if (msgStruct.mtype == CMD_FUNCTION)
+			{
+				/*
+				 * Command must be found
+				 */
+				MSGFunctionDemarshall(&msgStruct, dwContextIndex);
+				rv = SHMMessageSend(&msgStruct, psContext[dwContextIndex].dwClientID,
+						    PCSCLITE_SERVER_ATTEMPTS);
+			} else
+			{
+				continue;
+			}
+
+			break;
+
+		case 2:
+			/*
+			 * timeout in SHMProcessEventsContext(): do nothing
+			 * this is used to catch the Ctrl-C signal at some time when
+			 * nothing else happens
+			 */
+			break;
+			
+		case -1:
+			DebugLogA("ContextThread: Error in SHMProcessEventsContext");
+			break;
+			
+		default:
+			DebugLogB("ContextThread: SHMProcessEventsContext unknown retval: %d",
+				  rv);
+			break;
+		}
+	}
+}
+
+LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 {
 
 	LONG rv;
@@ -68,8 +194,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 		if (esStr->rv == SCARD_S_SUCCESS)
 			esStr->rv =
-				MSGAddContext(esStr->phContext, msgStruct->request_id);
-
+				MSGAddContext(esStr->phContext, dwContextIndex);
 		break;
 
 	case SCARD_RELEASE_CONTEXT:
@@ -78,7 +203,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 		if (reStr->rv == SCARD_S_SUCCESS)
 			reStr->rv =
-				MSGRemoveContext(reStr->hContext, msgStruct->request_id);
+				MSGRemoveContext(reStr->hContext, dwContextIndex);
 
 		break;
 
@@ -90,14 +215,13 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 		if (coStr->rv == SCARD_S_SUCCESS)
 			coStr->rv =
-				MSGAddHandle(coStr->hContext, msgStruct->request_id,
-				coStr->phCard);
+				MSGAddHandle(coStr->hContext, coStr->phCard, dwContextIndex);
 
 		break;
 
 	case SCARD_RECONNECT:
 		rcStr = ((reconnect_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, rcStr->hCard);
+		rv = MSGCheckHandleAssociation(rcStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 
 		rcStr->rv = SCardReconnect(rcStr->hCard, rcStr->dwShareMode,
@@ -107,25 +231,25 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_DISCONNECT:
 		diStr = ((disconnect_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, diStr->hCard);
+		rv = MSGCheckHandleAssociation(diStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		diStr->rv = SCardDisconnect(diStr->hCard, diStr->dwDisposition);
 
 		if (diStr->rv == SCARD_S_SUCCESS)
 			diStr->rv =
-				MSGRemoveHandle(0, msgStruct->request_id, diStr->hCard);
+				MSGRemoveHandle(diStr->hCard, dwContextIndex);
 		break;
 
 	case SCARD_BEGIN_TRANSACTION:
 		beStr = ((begin_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, beStr->hCard);
+		rv = MSGCheckHandleAssociation(beStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		beStr->rv = SCardBeginTransaction(beStr->hCard);
 		break;
 
 	case SCARD_END_TRANSACTION:
 		enStr = ((end_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, enStr->hCard);
+		rv = MSGCheckHandleAssociation(enStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		enStr->rv =
 			SCardEndTransaction(enStr->hCard, enStr->dwDisposition);
@@ -133,14 +257,14 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_CANCEL_TRANSACTION:
 		caStr = ((cancel_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, caStr->hCard);
+		rv = MSGCheckHandleAssociation(caStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		caStr->rv = SCardCancelTransaction(caStr->hCard);
 		break;
 
 	case SCARD_STATUS:
 		stStr = ((status_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, stStr->hCard);
+		rv = MSGCheckHandleAssociation(stStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		stStr->rv = SCardStatus(stStr->hCard, stStr->mszReaderNames,
 			&stStr->pcchReaderLen, &stStr->pdwState,
@@ -149,7 +273,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 
 	case SCARD_TRANSMIT:
 		trStr = ((transmit_struct *) msgStruct->data);
-		rv = MSGCheckHandleAssociation(msgStruct->request_id, trStr->hCard);
+		rv = MSGCheckHandleAssociation(trStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 		trStr->rv = SCardTransmit(trStr->hCard, &trStr->pioSendPci,
 			trStr->pbSendBuffer, trStr->cbSendLength,
@@ -164,80 +288,103 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 	return 0;
 }
 
-LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
+LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+{
+
+	psContext[dwContextIndex].hContext = hContext;
+	return SCARD_S_SUCCESS;
+}
+
+LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+{
+
+	int i;
+	LONG rv;
+
+	if (psContext[dwContextIndex].hContext == hContext)
+	{
+
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+		{
+			/*
+			 * Disconnect each of these just in case 
+			 */
+			
+			if (psContext[dwContextIndex].hCard[i] != 0)
+			{
+				
+				/*
+				 * We will use SCardStatus to see if the card has been 
+				 * reset there is no need to reset each time
+				 * Disconnect is called 
+				 */
+				
+				rv = SCardStatus(psContext[dwContextIndex].hCard[i], 0, 0, 0, 0, 0, 0);
+				
+				if (rv == SCARD_W_RESET_CARD
+				    || rv == SCARD_W_REMOVED_CARD)
+				{
+					SCardDisconnect(psContext[dwContextIndex].hCard[i], SCARD_LEAVE_CARD);
+				} else
+				{
+					SCardDisconnect(psContext[dwContextIndex].hCard[i], SCARD_RESET_CARD);
+				}
+
+				psContext[dwContextIndex].hCard[i] = 0;
+			}
+
+		}
+
+		psContext[dwContextIndex].hContext = 0;
+		return SCARD_S_SUCCESS;
+	} 
+
+	return SCARD_E_INVALID_VALUE;
+}
+
+LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD dwContextIndex)
 {
 
 	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+	if (psContext[dwContextIndex].hContext == hContext)
 	{
-		if (psContext[i].dwClientID == 0)
+		
+		/*
+		 * Find an empty spot to put the hCard value 
+		 */
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 		{
-			psContext[i].hContext = hContext;
-			psContext[i].dwClientID = dwClientID;
-			break;
+			if (psContext[dwContextIndex].hCard[i] == 0)
+			{
+				psContext[dwContextIndex].hCard[i] = hCard;
+				break;
+			}
 		}
-	}
+		
+		if (i == PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS)
+		{
+			return SCARD_F_INTERNAL_ERROR;
+		} else
+		{
+			return SCARD_S_SUCCESS;
+		}
 
-	if (i == PCSCLITE_MAX_APPLICATIONS_CONTEXTS)
-	{
-		return SCARD_F_INTERNAL_ERROR;
-	} else
-	{
-		return SCARD_S_SUCCESS;
 	}
-
+	
+	return SCARD_E_INVALID_VALUE;
 }
 
-LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
+LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
 
-	int i, j;
-	LONG rv;
+	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
-		if (psContext[i].hContext == hContext &&
-			psContext[i].dwClientID == dwClientID)
+		if (psContext[dwContextIndex].hCard[i] == hCard)
 		{
-
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				/*
-				 * Disconnect each of these just in case 
-				 */
-
-				if (psContext[i].hCard[j] != 0)
-				{
-
-					/*
-					 * We will use SCardStatus to see if the card has been 
-					 * reset there is no need to reset each time
-					 * Disconnect is called 
-					 */
-
-					rv = SCardStatus(psContext[i].hCard[j], 0, 0, 0, 0,
-						0, 0);
-
-					if (rv == SCARD_W_RESET_CARD
-						|| rv == SCARD_W_REMOVED_CARD)
-					{
-						SCardDisconnect(psContext[i].hCard[j],
-							SCARD_LEAVE_CARD);
-					} else
-					{
-						SCardDisconnect(psContext[i].hCard[j],
-							SCARD_RESET_CARD);
-					}
-
-					psContext[i].hCard[j] = 0;
-				}
-
-			}
-
-			psContext[i].hContext = 0;
-			psContext[i].dwClientID = 0;
-			SCardReleaseContext(hContext);
+			psContext[dwContextIndex].hCard[i] = 0;
 			return SCARD_S_SUCCESS;
 		}
 	}
@@ -245,97 +392,21 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
-	SCARDHANDLE hCard)
+
+LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
 
-	int i, j;
+	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
-		if (psContext[i].hContext == hContext &&
-			psContext[i].dwClientID == dwClientID)
+		if (psContext[dwContextIndex].hCard[i] == hCard)
 		{
-
-			/*
-			 * Find an empty spot to put the hCard value 
-			 */
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				if (psContext[i].hCard[j] == 0)
-				{
-					psContext[i].hCard[j] = hCard;
-					break;
-				}
-			}
-
-			if (j == PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS)
-			{
-				return SCARD_F_INTERNAL_ERROR;
-			} else
-			{
-				return SCARD_S_SUCCESS;
-			}
-
-		}
-
-	}	/* End of for */
-
-	return SCARD_E_INVALID_VALUE;
-
-}
-
-LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
-	SCARDHANDLE hCard)
-{
-
-	int i, j;
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
-	{
-		/*
-		 * I have introduced this verification but it generates a bug
-		 * when SCardDisconnect is called.
-		 * Perhaps a modification to do in the future. (D. Sauveron)
-		 */
-		/* if (psContext[i].hContext == hContext && */
-		/* 	psContext[i].dwClientID == dwClientID) */
-		if (psContext[i].dwClientID == dwClientID)
-		{
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				if (psContext[i].hCard[j] == hCard)
-				{
-					psContext[i].hCard[j] = 0;
-					return SCARD_S_SUCCESS;
-				}
-			}
+			return 0;
 		}
 	}
-
-	return SCARD_E_INVALID_VALUE;
-}
-
-
-LONG MSGCheckHandleAssociation(DWORD dwClientID, SCARDHANDLE hCard)
-{
-
-	int i, j;
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
-	{
-		if (psContext[i].dwClientID == dwClientID)
-		{
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				if (psContext[i].hCard[j] == hCard)
-				{
-				  return 0;
-				}
-			}
-		}
-	}
-
+	
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
 	DebugLogA("MSGCheckHandleAssociation: Client failed to authenticate\n");
 	SYS_Sleep(2);
@@ -343,18 +414,16 @@ LONG MSGCheckHandleAssociation(DWORD dwClientID, SCARDHANDLE hCard)
 	return -1;
 }
 
-LONG MSGCleanupClient(psharedSegmentMsg msgStruct)
+LONG MSGCleanupClient(DWORD dwContextIndex)
 {
 
-	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
-	{
-		if (psContext[i].dwClientID == msgStruct->request_id)
-		{
-			MSGRemoveContext(psContext[i].hContext,
-				msgStruct->request_id);
-		}
-	}
+	if (psContext[dwContextIndex].hContext == 0)
+		return 0;
+
+	SCardReleaseContext(psContext[dwContextIndex].hContext);	
+	MSGRemoveContext(psContext[dwContextIndex].hContext, dwContextIndex);
+	psContext[dwContextIndex].dwClientID = 0;
+	
 	return 0;
 }
