@@ -97,7 +97,8 @@ extern "C"
 		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
 						   capabilities */
 		PROT_OPTIONS psProtOptions;	/* Structure of protocol options */
-		RDR_CLIHANDLES psHandles[16];	/* Structure of connected handles */
+		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_CONTEXTS];	
+                                         /* Structure of connected handles */
 		FCT_MAP psFunctions;	/* Structure of function pointers */
 		UCHAR ucAtr[MAX_ATR_SIZE];	/* Atr for inserted card */
 		DWORD dwAtrLen;			/* Size of the ATR */
