@@ -107,7 +107,7 @@ int evaluatetoken( char *pcToken ) {
        badError != 1) {
      
        dwChannelId = strtoul( pcChannelid, 0, 16 );
-       RFAddReader( pcFriendlyname, dwChannelId, pcLibpath, pcDevicename );
+       RFAddReader( pcFriendlyname, dwChannelId, pcLibpath );
 
        free( pcFriendlyname ); free( pcDevicename );
        free( pcLibpath);       free( pcChannelid );
