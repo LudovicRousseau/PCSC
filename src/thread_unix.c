@@ -15,9 +15,6 @@
 #include "wintypes.h"
 #include "thread_generic.h"
 
-#define PCSC_MUTEX_LOCKED    1
-#define PCSC_MUTEX_UNLOCKED  0
-
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0
