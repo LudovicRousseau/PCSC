@@ -11,7 +11,12 @@
 	            
 ********************************************************************/
 
+#ifndef WIN32
 #include "config.h"
+#else
+#include "../win32/win32_config.h"
+#endif
+
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "thread_generic.h"
@@ -99,6 +104,8 @@ int SYS_ThreadExit(LPVOID pvRetVal)
 	int retval;
 
 	pthread_exit(pvRetVal);
+
+	retval = *(int *)pvRetVal;
 
 	if (retval == 0)
 	{

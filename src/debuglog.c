@@ -13,13 +13,21 @@ $Id$
 
 ********************************************************************/
 
+#ifndef WIN32
 #include <syslog.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
+#ifndef WIN32
 #include "config.h"
+#else
+#include "../win32/win32_config.h"
+#endif
+
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "debuglog.h"
@@ -40,7 +48,11 @@ void debug_msg(char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
+#ifndef WIN32
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+#else
+	vsprintf(DebugBuffer, fmt, argptr);
+#endif
 	va_end(argptr);
 
 	if (debug_msg_type == DEBUGLOG_NO_DEBUG)
@@ -51,7 +63,11 @@ void debug_msg(char *fmt, ...)
 
 	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG)
 	{
+#ifndef WIN32
 		syslog(LOG_INFO, "%s", DebugBuffer);
+#else
+		fprintf(stderr, "%s\n", DebugBuffer);
+#endif
 
 	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG)
 	{
@@ -90,7 +106,11 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 
 	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG)
 	{
+#ifndef WIN32
 		syslog(LOG_INFO, "%s", DebugBuffer);
+#else
+		fprintf(stderr, "%s\n", DebugBuffer);
+#endif
 
 	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG)
 	{

@@ -1,3 +1,8 @@
+#ifdef WIN32
+#include <malloc.h>
+#include <stdlib.h>
+#endif
+
 #define yy_create_buffer tp_create_buffer
 #define yy_delete_buffer tp_delete_buffer
 #define yy_scan_buffer tp_scan_buffer
@@ -1658,7 +1663,12 @@ int main()
 #include <stdio.h>
 #include <string.h>
 #include "debuglog.h"
+
+#ifndef WIN32
 #include "config.h"
+#else
+#include "../win32/win32_config.h"
+#endif
 
 int yywrap()
 {

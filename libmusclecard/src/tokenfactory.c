@@ -13,13 +13,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+
+#ifndef WIN32
 #include <dirent.h>
 #include "config.h"
+#else
+#include "../win32/win32_config.h"
+#endif
+
 #include "debuglog.h"
 #include "dyn_generic.h"
 #include "tokenfactory.h"
 
+#ifndef WIN32
 #define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
+#else
+#define MSC_SVC_DROPDIR                     "c:\\pcsc\\"
+#endif
+
 #define MSC_MANUMSC_KEY_NAME                "spVendorName"
 #define MSC_PRODMSC_KEY_NAME                "spProductName"
 #define MSC_ATRMSC_KEY_NAME                 "spAtrValue"
@@ -113,40 +124,65 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 {
 
 	MSCLong32 rv;
-	DIR *hpDir;
+
+#ifndef WIN32
+	DIR *hpDir = 0;
 	struct dirent *currFP = 0;
+#else
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	char findPath[200];
+#endif
+
 	char atrString[100];
 	char fullPath[200];
 	char fullLibPath[250];
 	char keyValue[200];
 	int atrIndex;
 
-	hpDir = 0;
 	rv = 0;
 	atrIndex = 0;
 
 	atrToString(Atr, Length, atrString);
 
+#ifndef WIN32
 	hpDir = opendir(MSC_SVC_DROPDIR);
 
 	if (hpDir == 0)
+#else
+	sprintf(findPath, "%s\\*.bundle", MSC_SVC_DROPDIR);
+	hFind = FindFirstFile(findPath, &findData);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+#endif
 	{
 		DebugLogA("Cannot open PC/SC token drivers directory.\n");
 
 		return -1;
 	}
 
+#ifndef WIN32
 	while ((currFP = readdir(hpDir)) != 0)
 	{
 		if (strstr(currFP->d_name, ".bundle") != 0)
+#else
+	do
+	{
+		if (strstr(findData.cFileName, ".bundle") != 0)
+#endif
 		{
 
 			/*
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle 
 			 */
+#ifndef WIN32
 			sprintf(fullPath, "%s%s%s", MSC_SVC_DROPDIR, currFP->d_name,
 				"/Contents/Info.plist");
+#else
+			sprintf(fullPath, "%s%s%s", MSC_SVC_DROPDIR, findData.cFileName,
+				"\\Contents\\Info.plist");
+#endif
 
 			atrIndex = 0;
 
@@ -193,7 +229,9 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					{
 						DebugLogA
 							("Match found, failed due to no product name.\n");
+#ifndef WIN32
 						closedir(hpDir);
+#endif
 						return -1;
 					}
 				}
@@ -215,10 +253,16 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					{
 						DebugLogA
 							("Match found, failed due to no library path.\n");
+#ifndef WIN32
 						closedir(hpDir);
+#endif
 						return -1;
 					}
 				}
+#ifdef WIN32
+				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
+					findData.cFileName, "\\Contents\\Win32\\", keyValue);
+#else
 #ifdef MSC_TARGET_LINUX
 				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
 					currFP->d_name, "/Contents/Linux/", keyValue);
@@ -251,6 +295,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 #ifdef MSC_TARGET_CYGWIN
 				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
 					currFP->d_name, "/Contents/CygWin/", keyValue);
+#endif
 #endif
 #endif
 #endif
@@ -292,7 +337,9 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					{
 						DebugLogA
 							("Match found, failed due to malformed aid string.\n");
+#ifndef WIN32
 						closedir(hpDir);
+#endif
 						return -1;
 					}
 
@@ -302,14 +349,22 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					tokenInfo->tokenAppLen = 0;
 				}
 
+#ifndef WIN32
 				closedir(hpDir);
+#endif
 				return 0;
 
 			}	/* do ... while */
 		}	/* if .bundle */
 	}	/* while readdir */
+#ifdef WIN32
+	// This is part of a Do..While loop (see above)
+	while (FindNextFile(hFind, &findData) != 0);
+#endif
 
+#ifndef WIN32
 	closedir(hpDir);
+#endif
 	return -1;
 }
 

@@ -23,6 +23,10 @@ extern "C"
 {
 #endif
 
+#ifdef WIN32
+#include "../win32/win32_pcsclite.h"
+#endif
+
 #ifndef __APPLE__
 #include <winscard.h>
 #else

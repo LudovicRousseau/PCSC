@@ -15,13 +15,20 @@
   
 ********************************************************************/
 
+#ifndef WIN32
 #include "config.h"
+#else
+#include "../win32/win32_config.h"
+#endif
+
 #include "musclecard.h"
 #include "tokenfactory.h"
 #include "debuglog.h"
 
 #ifdef USE_THREAD_SAFETY
+#ifndef WIN32
 #include "wintypes.h"
+#endif
 #include "thread_generic.h"
 #include "sys_generic.h"
 #endif
@@ -265,7 +272,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	tokenList = 0;
 	tokenSize = 0;
 	selectedIFD = -1;
-	tokenIdLength = 0;
+	tokenIdLength = sizeof(tokenId);
 	slotState = 0;
 	slotProtocol = 0;
 	slotNameSize = sizeof(slotName);
@@ -327,7 +334,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	mscUnLockThread();
 
 	rv = SCardConnect(pConnection->hContext, tokenStruct->slotName,
-		sharingMode, SCARD_PROTOCOL_ANY,
+		sharingMode, SCARD_PROTOCOL_T0, // | SCARD_PROTOCOL_T1,
 		&pConnection->hCard, &dwActiveProtocol);
 
 #ifdef MSC_DEBUG
