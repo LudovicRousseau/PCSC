@@ -258,7 +258,7 @@ extern "C"
 
 	typedef struct
 	{
-		MSCPUChar8 transportKey[MAX_BUFFER_SIZE];
+		MSCUChar8 transportKey[MAX_BUFFER_SIZE];
 		MSCULong32 transportKeyLen;
 		MSCUChar8  transportBehavior;
 		MSCULong32 objectMemory;
