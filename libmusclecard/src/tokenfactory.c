@@ -270,7 +270,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					currFP->d_name);
 #else
 				sprintf(fullLibPath, "%s/%s/Contents/%s/%s", MSC_SVC_DROPDIR,
-					currFP->d_name, PCSC_ARCH, keyValue);
+					currFP->d_name, MSC_ARCH, keyValue);
 #endif
 
 				if (fullLibPath == NULL)
