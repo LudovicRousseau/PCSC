@@ -15,7 +15,7 @@ $Id$
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#ifdef HAVE_DLFCN_H
+#if defined(HAVE_DLFCN_H) && !defined(HAVE_DL_H) && !defined(__APPLE__)
 #include <dlfcn.h>
 #include <stdlib.h>
 
@@ -84,4 +84,4 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	return rv;
 }
 
-#endif	/* HAVE_DLFCN_H */
+#endif	/* HAVE_DLFCN_H && !HAVE_DL_H && !__APPLE__ */
