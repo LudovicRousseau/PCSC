@@ -74,8 +74,11 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the `strncpy' function. */
-#define HAVE_STRNCPY 1
+/* Define to 1 if you have the `strlcat' function. */
+#define HAVE_STRLCAT 1
+
+/* Define to 1 if you have the `strlcpy' function. */
+#define HAVE_STRLCPY 1
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #define HAVE_SYSLOG_H 1
@@ -111,11 +114,8 @@
    slash. */
 /* #undef LSTAT_FOLLOWS_SLASHED_SYMLINK */
 
-/* enable full musclecard debug messaging. */
-#define MSC_DEBUG 1
-
-/* directory containing MuscleCard bundles */
-#define MSC_SVC_DROPDIR "/usr/libexec/SmartCardServices/services"
+/* disable PCSC debug messaging. */
+/* #undef NO_PCSC_DEBUG */
 
 /* Name of package */
 #define PACKAGE "PCSC Framework"
@@ -141,9 +141,6 @@
 /* PC/SC target architecture */
 #define PCSC_ARCH "MacOS"
 
-/* enable full PCSC debug messaging. */
-#define PCSC_DEBUG 1
-
 /* Define to the necessary symbol if this constant uses a non-standard name on
    your system. */
 /* #undef PTHREAD_CREATE_JOINABLE */
@@ -157,9 +154,6 @@
 /* directory containing IPC files (default /var/run) */
 /* #undef USE_IPCDIR */
 
-/* directory containing reader.conf (default /etc) */
-/* #undef USE_READER_CONF */
-
 /* file containing pcscd pid */
 #define USE_RUN_PID "/var/run/pcscd.pid"
 
@@ -167,7 +161,7 @@
 #define USE_THREAD_SAFETY 1
 
 /* Version number of package */
-#define VERSION "1.2.0"
+#define VERSION "1.2.9-beta7"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
@@ -183,9 +177,11 @@
 /* Define to `int' if <sys/types.h> doesn't define. */
 /* #undef gid_t */
 
-/* Define as `__inline' if that's what the C compiler calls it, or to nothing
-   if it is not supported. */
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
 /* #undef inline */
+#endif
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
