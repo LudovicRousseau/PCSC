@@ -1,3 +1,7 @@
+pcsc-lite-1.2.0: Ludovic Rousseau
+27 october, 2003
+- the 1.2.0 version is the same as 1.2.0-rc3 version
+
 pcsc-lite-1.2.0-rc3: Ludovic Rousseau
 15 october, 2003
 - src/winscard_msg.c: perform a round-robbin among clients to avoid starvation
