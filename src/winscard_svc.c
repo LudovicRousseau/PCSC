@@ -114,7 +114,6 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct)
 		if (diStr->rv == SCARD_S_SUCCESS)
 			diStr->rv =
 				MSGRemoveHandle(0, msgStruct->request_id, diStr->hCard);
-
 		break;
 
 	case SCARD_BEGIN_TRANSACTION:
@@ -294,8 +293,14 @@ LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].hContext == hContext &&
-			psChannelMap[i].dwClientID == dwClientID)
+		/*
+		 * I have introduced this verification but it generates a bug
+		 * when SCardDisconnect is called.
+		 * Perhaps a modification to do in the future. (D. Sauveron)
+		 */
+		/* if (psChannelMap[i].hContext == hContext && */
+		/* 	psChannelMap[i].dwClientID == dwClientID) */
+		if (psChannelMap[i].dwClientID == dwClientID)
 		{
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
