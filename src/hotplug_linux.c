@@ -35,6 +35,9 @@
 
 #define PCSCLITE_USB_PATH		"/proc/bus/usb"
 
+#define FALSE			0
+#define TRUE			1
+
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
 struct usb_device_descriptor
@@ -61,6 +64,7 @@ LONG HPRemoveHotPluggable(int, unsigned long);
 LONG HPReadBundleValues();
 
 static PCSCLITE_THREAD_T usbNotifyThread;
+static int AraKiriHotPlug = FALSE;
 static int bundleSize = 0;
 
 /*
@@ -341,6 +345,13 @@ void HPEstablishUSBNotifications()
 		}	/* End of for..loop */
 
 		SYS_Sleep(1);
+		if (AraKiriHotPlug)
+		{
+			int retval;
+
+			DebugLogA("Hotplug stopped");
+			pthread_exit(&retval);
+		}
 
 	}	/* End of while loop */
 }
@@ -362,6 +373,13 @@ LONG HPSearchHotPluggables()
 
 	SYS_ThreadCreate(&usbNotifyThread, NULL,
 		(LPVOID) HPEstablishUSBNotifications, 0);
+
+	return 0;
+}
+
+LONG HPStopHotPluggables(void)
+{
+	AraKiriHotPlug = TRUE;
 
 	return 0;
 }
