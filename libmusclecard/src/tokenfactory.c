@@ -28,8 +28,9 @@
 #include "tokenfactory.h"
 
 #ifndef WIN32
-// now defined using ./configure --enable-muscledropdir=DIR
-//#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
+#ifndef MSC_SVC_DROPDIR
+#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
+#endif
 #else
 #define MSC_SVC_DROPDIR                     "C:\\Program Files\\Muscle\\Services\\"
 #endif
