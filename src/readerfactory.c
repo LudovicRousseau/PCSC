@@ -73,7 +73,6 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 
 LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 {
-
 	DWORD dwContext, dwContextB, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
 	char lpcStripReader[MAX_READERNAME];
@@ -86,7 +85,6 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	 */
 	dwContext = 0;
 	dwContextB = 0;
-	dwGetSize = 0;
 	rv = 0;
 	i = 0;
 	j = 0;
@@ -185,11 +183,13 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		/*
 		 * Call on the driver to see if it is thread safe 
 		 */
+		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sContexts[parentNode]),
 		       TAG_IFD_THREAD_SAFE, &dwGetSize, ucThread);
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
+			DebugLogA("Driver is thread safe");
 			(sContexts[dwContext])->mMutex = 0;
 		}
 	}
@@ -250,6 +250,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	 * Call on the driver to see if there are multiple slots 
 	 */
 
+	dwGetSize = sizeof(ucGetData);
 	rv = IFDGetCapabilities((sContexts[dwContext]),
 		TAG_IFD_SLOTS_NUMBER, &dwGetSize, ucGetData);
 
@@ -350,6 +351,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			/*
 			 * Call on the driver to see if the slots are thread safe 
 			 */
+
+			dwGetSize = sizeof(ucThread);
 			rv = IFDGetCapabilities((sContexts[dwContext]),
 		                  TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
 
@@ -526,6 +529,8 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 							(tagValue > 1))
 						{
 							supportedChannels = tagValue;
+							DebugLogB("Support %d simultaneous readers",
+								tagValue);
 						} else
 						{
 							supportedChannels = -1;
