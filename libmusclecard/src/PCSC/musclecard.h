@@ -479,12 +479,6 @@ extern "C"
 #define MSC_SUPPORT_LISTOBJECTS       0x00008000
 #define MSC_SUPPORT_LOGOUTALL         0x00010000
 #define MSC_SUPPORT_GETCHALLENGE      0x00020000
-#define MSC_SUPPORT_ISOVERIFY         0x00040000
-#define MSC_SUPPORT_ISOGETRESPONSE    0x00080000
-#define MSC_SUPPORT_IMPORTCERT        0x00100000
-#define MSC_SUPPORT_EXPORTCERT        0x00200000
-#define MSC_SUPPORT_DELETECERT        0x00400000
-#define MSC_SUPPORT_LISTCERTS         0x00800000
 
 	/*
 	 * Bitmask for MSC_TAG_SUPPORT_CRYPTOALG 
@@ -803,41 +797,28 @@ extern "C"
 		MSCPUChar8 pOutputData, MSCPULong32 outputDataSize);
 
 	MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
-		MSCUChar8 keyNum,
-		MSCUChar8 cipherMode,
-		MSCUChar8 cipherDirection, MSCPUChar8 pData, MSCULong32 dataSize);
+				  MSCUChar8 keyNum,
+				  MSCUChar8 cipherMode,
+				  MSCUChar8 cipherDirection, 
+				  MSCPUChar8 pData, 
+				  MSCULong32 dataSize);
 
 	MSC_RV MSCListKeys(MSCLPTokenConnection pConnection,
-		MSCUChar8 seqOption, MSCLPKeyInfo pKeyInfo);
-
-	MSC_RV MSCImportCertificate(MSCLPTokenConnection pConnection,
-		MSCULong32 certNumber,
-		MSCLPCertInfo certInfo,
-		MSCPUChar8 certBlob,
-		MSCULong32 certBlobSize,
-		MSCPVoid32 pAddParams, MSCULong32 addParamsSize);
-
-	MSC_RV MSCExportCertificate(MSCLPTokenConnection pConnection,
-		MSCULong32 certNumber,
-		MSCPUChar8 certBlob,
-		MSCPULong32 certBlobSize,
-		MSCPVoid32 pAddParams, MSCULong32 addParamsSize);
-
-	MSC_RV MSCDeleteCertificate(MSCLPTokenConnection pConnection,
-		MSCULong32 certNumber);
-
-	MSC_RV MSCListCertificates(MSCLPTokenConnection pConnection,
-		MSCUChar8 seqOption, MSCLPCertInfo pCertInfo);
+			   MSCUChar8 seqOption, 
+			   MSCLPKeyInfo pKeyInfo);
 
 	MSC_RV MSCCreatePIN(MSCLPTokenConnection pConnection,
-		MSCUChar8 pinNum,
-		MSCUChar8 pinAttempts,
-		MSCPUChar8 pPinCode,
-		MSCULong32 pinCodeSize,
-		MSCPUChar8 pUnblockCode, MSCUChar8 unblockCodeSize);
+			    MSCUChar8 pinNum,
+			    MSCUChar8 pinAttempts,
+			    MSCPUChar8 pPinCode,
+			    MSCULong32 pinCodeSize,
+			    MSCPUChar8 pUnblockCode, 
+			    MSCUChar8 unblockCodeSize);
 
 	MSC_RV MSCVerifyPIN(MSCLPTokenConnection pConnection,
-		MSCUChar8 pinNum, MSCPUChar8 pPinCode, MSCULong32 pinCodeSize);
+			    MSCUChar8 pinNum, 
+			    MSCPUChar8 pPinCode, 
+			    MSCULong32 pinCodeSize);
 
 	MSC_RV MSCChangePIN(MSCLPTokenConnection pConnection,
 		MSCUChar8 pinNum,
@@ -897,10 +878,12 @@ extern "C"
 	/*****************************************************************/
 
 	MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
-		MSCUChar8 keyNumber, MSCLPKeyInfo pKeyInfo);
+				   MSCUChar8 keyNumber, 
+				   MSCLPKeyInfo pKeyInfo);
 
 	MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
-		MSCString objectID, MSCLPObjectInfo pObjectInfo);
+				      MSCString objectID, 
+				      MSCLPObjectInfo pObjectInfo);
 
 	char *msc_error(MSC_RV errorCode);
 
