@@ -22,17 +22,18 @@ extern "C"
 	struct FctMap
 	{
 		LPVOID pvfCreateChannel;
+		LPVOID pvfCreateChannelByName;	/* MUSCLE IFD 3.0 Compliance */
 		LPVOID pvfCloseChannel;
 		LPVOID pvfGetCapabilities;
 		LPVOID pvfSetCapabilities;
 		LPVOID pvfSetProtocol;
 		LPVOID pvfPowerICC;
-		LPVOID pvfSwallowICC;	/* Deprecated in 2.0 */
+		LPVOID pvfSwallowICC;		/* Deprecated in 2.0 */
 		LPVOID pvfEjectICC;		/* Deprecated in 2.0 */
 		LPVOID pvfConfiscateICC;	/* Deprecated in 2.0 */
 		LPVOID pvfTransmitICC;
 		LPVOID pvfICCPresent;
-		LPVOID pvfICCAbsent;	/* Deprecated in 2.0 */
+		LPVOID pvfICCAbsent;		/* Deprecated in 2.0 */
 		LPVOID pvfControl;		/* MUSCLE IFD 2.0 Compliance */
 	};
 
