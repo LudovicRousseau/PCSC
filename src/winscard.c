@@ -1310,8 +1310,11 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			cbSendLength, pbRecvBuffer, &dwRxLength, &sRecvPci);
 	}
 
-	pioRecvPci->dwProtocol = sRecvPci.Protocol;
-	pioRecvPci->cbPciLength = sRecvPci.Length;
+	if (pioRecvPci)
+	{
+		pioRecvPci->dwProtocol = sRecvPci.Protocol;
+		pioRecvPci->cbPciLength = sRecvPci.Length;
+	}
 
 	/*
 	 * Check for any errors that might have occurred 
