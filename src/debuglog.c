@@ -29,6 +29,7 @@
 static char DebugBuffer[DEBUG_BUF_SIZE];
 
 static LONG lSuppress = DEBUGLOG_LOG_ENTRIES;
+static char debug_msg_type = DEBUGLOG_NO_DEBUG;
 
 void debug_msg(char *fmt, ...)
 {
@@ -41,11 +42,19 @@ void debug_msg(char *fmt, ...)
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
 	va_end(argptr);
 
-#ifdef USE_SYSLOG
-	syslog(LOG_INFO, "%s", DebugBuffer);
-#else
-	fprintf(stderr, "%s\n", DebugBuffer);
-#endif
+
+	if (debug_msg_type == DEBUGLOG_NO_DEBUG) {
+	  /* Do nothing, it hasn't been set */
+
+	} else if (debug_msg_type & DEBUGLOG_SYSLOG_DEBUG) {
+	  syslog(LOG_INFO, "%s", DebugBuffer);
+
+	} else if (debug_msg_type & DEBUGLOG_STDERR_DEBUG) {
+	  fprintf(stderr, "%s\n", DebugBuffer);
+
+	} else if (debug_msg_type & DEBUGLOG_STDOUT_DEBUG) {
+	  fprintf(stdout, "%s\n", DebugBuffer);
+	}
 } /* debug_msg */
 
 void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
@@ -76,6 +85,10 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 
 void DebugLogSuppress( LONG lSType ) {
   lSuppress = lSType;
+}
+
+void DebugLogSetLogType( LONG dbgtype ) {
+  debug_msg_type |= dbgtype;
 }
 
 LPSTR pcsc_stringify_error ( LONG Error ) {

@@ -174,6 +174,7 @@ char * pcsc_stringify_error( long );
 #define PCSCLITE_MAX_APPLICATIONS       16      /* Maximum applications */
 #define PCSCLITE_MAX_CONTEXTS           16      /* Maximum readers      */
 #define PCSCLITE_MAX_THREADS            16      /* Stat change threads  */
+#define PCSCLITE_MAX_COMSIZE            64      /* Maximum arg size     */
 #define PCSCLITE_STATUS_WAIT		200000  /* Status Change Sleep  */
 #define PCSCLITE_TRANSACTION_TIMEOUT    40      /* Transaction timeout  */
 #define MAX_ATR_SIZE                    33      /* Maximum ATR size     */

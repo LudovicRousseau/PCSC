@@ -38,6 +38,11 @@ extern "C" {
 #define DEBUGLOG_LOG_ENTRIES    1
 #define DEBUGLOG_IGNORE_ENTRIES 2
 
+#define DEBUGLOG_NO_DEBUG       0
+#define DEBUGLOG_SYSLOG_DEBUG   1
+#define DEBUGLOG_STDERR_DEBUG   2
+#define DEBUGLOG_STDOUT_DEBUG   4
+
 #ifdef PCSC_DEBUG
 #define DebugLogA(fmt) debug_msg("%s:%d " fmt, __FILE__, __LINE__)
 #define DebugLogB(fmt, data) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data)
@@ -54,6 +59,7 @@ void debug_msg(char *fmt, ...);
 void debug_xxd(const char *msg, const unsigned char *buffer, const int size);
 
 void DebugLogSuppress( long );
+void DebugLogSetLogType( long );
 
 char* pcsc_stringify_error ( long );
 

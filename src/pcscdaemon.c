@@ -135,10 +135,13 @@ void SVCServiceRunLoop() {
 
 int main(int argc, char **argv) {
   
-  int rv;
+  int rv; int i;
+  char setToForeground;
   char *newReaderConfig;
+  struct stat fStatBuf;
+	
 
-  rv = 0; newReaderConfig=0;
+  rv = 0; newReaderConfig=0; setToForeground = 0;
 
   /* test the version */
   if (strcmp(PCSCLITE_VERSION_NUMBER, VERSION) != 0)
@@ -158,34 +161,53 @@ int main(int argc, char **argv) {
   } else if ( argc == 2 && (strcmp(argv[1], "-help") == 0) ) {
     printf("pcscd -v       - Display version and exit\n");
     printf("pcscd -c file  - New path to reader.conf\n");
+    printf("pcscd -fg      - Run in foreground (no daemon)\n");
+    printf("pcscd -d0      - Debugging messages go to syslog\n");
+    printf("pcscd -d1      - Debugging messages go to stderr\n");
+    printf("pcscd -d2      - Debugging messages go to stdout\n");
     printf("pcscd -help    - This help menu\n");
     return 0;
-  } else if ( argc == 3 && (strcmp(argv[1], "-c") == 0) ) {
-    DebugLogB("main: Using new config file: %s", argv[2]);
-    newReaderConfig = argv[2];
-  } else if ( argc == 1 ) {
-    /* All OK Here */
-  } else {
-    printf("pcsc-lite: Invalid arguments, try -help \n");
+  }
+
+  /* Time to look for arguments */
+  if ( argc > 1 ) {
+    /* Check for each argument */
+    for (i=1; i < argc; i++) {
+      if (strncmp(argv[i], "-d0", PCSCLITE_MAX_COMSIZE) == 0) {
+	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
+      } else if (strncmp(argv[i], "-d1", PCSCLITE_MAX_COMSIZE) == 0) {
+	DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+      } else if (strncmp(argv[i], "-d2", PCSCLITE_MAX_COMSIZE) == 0) {
+	DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
+	DebugLogA("main: debug messages to stdout\n" );
+      }	else if (strncmp(argv[i], "-fg", PCSCLITE_MAX_COMSIZE) == 0) {
+	DebugLogA("main: pcscd set to foreground\n" );
+	setToForeground = 1;
+      } else if (strncmp(argv[i], "-c", PCSCLITE_MAX_COMSIZE) == 0) {
+	DebugLogB("main: using new config file: %s", argv[2]);
+	newReaderConfig = argv[i+1];
+      } else {
+	printf("pcsc-lite: invalid arguments, try -help \n");
+	return 1;
+      }
+      
+    }
+  }
+  
+  /* test the presence of /tmp/pcsc */
+
+  rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
+
+  if (rv == 0) {
+    DebugLogA("main: directory " PCSCLITE_IPC_DIR " already exists."
+	      " Maybe another pcscd is running?");
     return 1;
   }
+  
+  /* If this is set to one the user has 
+     asked it not to fork */
 
-  /* test the presence of /tmp/pcsc */
-  {
-	struct stat buf;
-
-    rv = SYS_Stat(PCSCLITE_IPC_DIR, &buf);
-	if (rv == 0)
-	{
-    	DebugLogA("main: directory " PCSCLITE_IPC_DIR " already exists."
-			" Maybe another pcscd is running?");
-		return 1;
-	}
-
-  }
-
-#ifdef USE_DAEMON
-  /* standard daemonizing actions */
+  if ( setToForeground == 0 ) {
 #ifndef HAVE_DAEMON
   switch (SYS_Fork()) {
     case -1:
@@ -202,7 +224,7 @@ int main(int argc, char **argv) {
 #else
   daemon( 0, 0 );
 #endif
-#endif
+  }
 
   /* cleanly remove /tmp/pcsc when exiting */
   signal(SIGQUIT, signal_trap);
@@ -211,21 +233,21 @@ int main(int argc, char **argv) {
   signal(SIGHUP, signal_trap);
 
 #ifdef USE_RUN_PID
-	/*
-	 * Record our pid to make it easier
-	 * to kill the correct pcscd
-	 */
-	{
-		FILE * f;
-	   
-		if ((f = fopen(USE_RUN_PID, "wb")) != NULL)
-		{
-			fprintf(f, "%u\n", (unsigned) getpid());
-			fclose(f);
-		}
-	}
+  /*
+   * Record our pid to make it easier
+   * to kill the correct pcscd
+   */
+  {
+    FILE * f;
+    
+    if ((f = fopen(USE_RUN_PID, "wb")) != NULL)
+      {
+	fprintf(f, "%u\n", (unsigned) getpid());
+	fclose(f);
+      }
+  }
 #endif
-
+  
   /* Create the /tmp/pcsc directory and chmod it */
   rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU );
   if ( rv != 0 ) {
