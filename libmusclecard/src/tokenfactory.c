@@ -24,6 +24,7 @@
 #include "parser.h"
 #include "dyn_generic.h"
 #include "tokenfactory.h"
+#include "strlcpycat.h"
 
 #ifndef WIN32
 #ifndef MSC_SVC_DROPDIR
@@ -239,7 +240,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 #ifndef NO_MSC_DEBUG
 				DebugLogB("Product name: %s", keyValue);
 #endif
-				strcpy(tokenInfo->tokenName, keyValue);
+				strlcpy(tokenInfo->tokenName, keyValue,
+					sizeof(tokenInfo->tokenName));
 
 				/*
 				 * See if this bundle has a special driver for this card 
@@ -280,7 +282,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 				/*
 				 * Copy the library path and return successfully 
 				 */
-				strcpy(tokenInfo->svProvider, fullLibPath);
+				strlcpy(tokenInfo->svProvider, fullLibPath,
+					sizeof(tokenInfo->svProvider));
 
 				/*
 				 * See if this bundle has a default AID 

@@ -31,6 +31,7 @@
 #include "eventhandler.h"
 #include "ifdwrapper.h"
 #include "hotplug.h"
+#include "strlcpycat.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -124,8 +125,10 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], lpcReader,
 		lpcLibrary, dwPort, 0);
 
-	strcpy((sReadersContexts[dwContext])->lpcLibrary, lpcLibrary);
-	strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
+	strlcpy((sReadersContexts[dwContext])->lpcLibrary, lpcLibrary,
+		sizeof((sReadersContexts[dwContext])->lpcLibrary));
+	strlcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice,
+		sizeof((sReadersContexts[dwContext])->lpcDevice));
 	(sReadersContexts[dwContext])->dwVersion = 0;
 	(sReadersContexts[dwContext])->dwPort = dwPort;
 	(sReadersContexts[dwContext])->mMutex = 0;
@@ -316,11 +319,14 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		 * Copy the previous reader name and increment the slot number
 		 */
 		tmpReader = sReadersContexts[dwContextB]->lpcReader;
-		strcpy(tmpReader, sReadersContexts[dwContext]->lpcReader);
+		strlcpy(tmpReader, sReadersContexts[dwContext]->lpcReader,
+			sizeof(sReadersContexts[dwContextB]->lpcReader));
 		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
-		strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
-		strcpy((sReadersContexts[dwContextB])->lpcDevice, lpcDevice);
+		strlcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary,
+			sizeof((sReadersContexts[dwContextB])->lpcLibrary));
+		strlcpy((sReadersContexts[dwContextB])->lpcDevice, lpcDevice,
+			sizeof((sReadersContexts[dwContextB])->lpcDevice));
 		(sReadersContexts[dwContextB])->dwVersion =
 		  (sReadersContexts[dwContext])->dwVersion;
 		(sReadersContexts[dwContextB])->dwPort =

@@ -30,6 +30,7 @@
 #include "sys_generic.h"
 #include "ifdwrapper.h"
 #include "prothandler.h"
+#include "strlcpycat.h"
 
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
@@ -178,7 +179,8 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	 * Set all the attributes to this reader 
 	 */
 	rContext->readerState = readerStates[i];
-	strcpy(rContext->readerState->readerName, rContext->lpcReader);
+	strlcpy(rContext->readerState->readerName, rContext->lpcReader,
+		sizeof(rContext->readerState->readerName));
 	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
 	rContext->readerState->readerID = i + 100;
 	rContext->readerState->readerState = dwStatus;
