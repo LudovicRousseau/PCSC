@@ -334,6 +334,9 @@ AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
 AC_SUBST(extended_apdu)
+AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
+AS_AC_EXPAND(sbindir_exp,$sbindir)
+AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
 dnl Write Makefiles
 AC_OUTPUT([
@@ -345,6 +348,7 @@ doc/pcscd.8
 doc/reader.conf.5
 doc/example/Makefile
 etc/Makefile
+etc/pcscd.init
 etc/reader.conf
 src/Makefile
 src/libmusclecard.pc
