@@ -149,9 +149,6 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb=PATH    enable USB hotplug using libusb
 		esac
 	]
 )
-if test x$use_libusb = xtrue; then
-	LIBS="${LIBS} -lusb"
-fi
 
 AC_MSG_RESULT([enable libusb support         : $use_libusb])
 

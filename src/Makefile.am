@@ -5,7 +5,7 @@ pcdir= $(libdir)/pkgconfig
 pc_DATA = libpcsclite.pc
 
 SUBDIRS = . utils
-lib_LTLIBRARIES = libpcsclite.la
+lib_LTLIBRARIES = libpcsclite.la libmusclecard.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 sbin_PROGRAMS = pcscd
 include_HEADERS = mscdefines.h musclecard.h pcsclite.h winscard.h \
@@ -17,17 +17,18 @@ if PCSC_ARCH_LINUX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl -ldl
 PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
-if PCSC_LINUX_USB
-PCSC_HOTPLUG_SOURCE = hotplug_linux.c
-else
 if PCSC_USE_LIBUSB
-PCSC_HOTPLUG_SOURCE = hotplug_libusb.c
+PCSC_HOTPLUG_SOURCE = hotplug_libusb.c hotplug.h
+PCSCD_EXTRA_LIB      = -lusb
 else
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
+if PCSC_LINUX_USB
+PCSC_HOTPLUG_SOURCE = hotplug_linux.c hotplug.h
+else
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
 endif
 endif
 endif
@@ -36,14 +37,14 @@ if PCSC_ARCH_BSD
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
 PCSCD_INCLUDE_LIBS  = -lfl -pthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_bsd.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_bsd.c dyn_generic.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 if PCSC_USE_LIBUSB
-PCSC_HOTPLUG_SOURCE = hotplug_libusb.c
+PCSC_HOTPLUG_SOURCE = hotplug_libusb.c hotplug.h
 else
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
 endif
 endif
 
@@ -51,10 +52,11 @@ if PCSC_ARCH_OSX
 PCSC_MYLDFLAGS      = -framework CoreFoundation
 PCSC_INCLUDE_LIBS   = -ll -lIOKit
 PCSCD_INCLUDE_LIBS  = -ll -lIOKit
-PCSC_THREAD_SOURCE  = thread_macosx.c
-PCSC_DYNLOAD_SOURCE = dyn_macosx.c
-PCSC_HOTPLUG_SOURCE = hotplug_macosx.c powermgt_macosx.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_THREAD_SOURCE  = thread_macosx.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_macosx.c dyn_generic.h
+PCSC_HOTPLUG_SOURCE = hotplug_macosx.c hotplug.h powermgt_macosx.c \
+					  powermgt_generic.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 INCLUDES  = -I/System/Library/Frameworks/IOKit.framework/Headers/usb \
             -I/System/Library/Frameworks/IOKit.framework/Headers
@@ -73,20 +75,20 @@ PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 
 PCSCD_INCLUDE_LIBS  = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
-PCSC_SYSTEM_SOURCE  = sys_solaris.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
+PCSC_SYSTEM_SOURCE  = sys_solaris.c sys_generic.h
 endif
 
 if PCSC_ARCH_HPUX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
 PCSCD_INCLUDE_LIBS  = -ll -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_hpux.c
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
-PCSC_SYSTEM_SOURCE  = sys_hpux.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_hpux.c dyn_generic.h
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
+PCSC_SYSTEM_SOURCE  = sys_hpux.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 
@@ -94,10 +96,10 @@ if PCSC_ARCH_TRU64
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
 PCSCD_INCLUDE_LIBS  = -ll -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
 
@@ -105,17 +107,11 @@ if PCSC_ARCH_AIX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll -lbsd
 PCSCD_INCLUDE_LIBS  = -ll -lpthread
-PCSC_THREAD_SOURCE  = thread_unix.c
-PCSC_DYNLOAD_SOURCE = dyn_unix.c
-PCSC_HOTPLUG_SOURCE = hotplug_generic.c
-PCSC_SYSTEM_SOURCE  = sys_unix.c
+PCSC_THREAD_SOURCE  = thread_unix.c thread_generic.h
+PCSC_DYNLOAD_SOURCE = dyn_unix.c dyn_generic.h
+PCSC_HOTPLUG_SOURCE = hotplug_generic.c hotplug.h
+PCSC_SYSTEM_SOURCE  = sys_unix.c sys_generic.h
 PCSC_CLIENT_SRC     = winscard_clnt.c
-endif
-
-if MCARD_ENABLED
-MCARD_CLIENT = musclecard.c tokenparser.l tokenfactory.c $(PCSC_DYNLOAD_SOURCE)
-else
-MCARD_CLIENT =
 endif
 
 if PCSC_THR_SAFE
@@ -124,26 +120,33 @@ else
 PCSC_CLIENT = 
 endif
 
-libpcsclite_core_la_SOURCES = configfile.l tokenparser.l \
-	winscard.c eventhandler.c ifdwrapper.c atrhandler.c prothandler.c \
-	readerfactory.c winscard_msg.c debuglog.c $(PCSC_SYSTEM_SOURCE) \
-	$(PCSC_THREAD_SOURCE) $(PCSC_HOTPLUG_SOURCE) $(PCSC_DYNLOAD_SOURCE)
-
+libpcsclite_core_la_SOURCES = atrhandler.c atrhandler.h \
+	configfile.l configfile.h \
+	debuglog.c debuglog.h \
+	eventhandler.c eventhandler.h \
+	ifdhandler.h \
+	ifdwrapper.c ifdwrapper.h \
+	prothandler.c prothandler.h \
+	readerfactory.c readerfactory.h \
+	tokenparser.l parser.h \
+	winscard.c winscard.h \
+	winscard_msg.c winscard_msg.h \
+	$(PCSC_SYSTEM_SOURCE) $(PCSC_THREAD_SOURCE) $(PCSC_HOTPLUG_SOURCE) \
+	$(PCSC_DYNLOAD_SOURCE)
 libpcsclite_core_la_LDFLAGS = -version-info 0:2:0 $(PCSC_INCLUDE_LIBS)
 
 libpcsclite_la_SOURCES = $(PCSC_CLIENT_SRC) debuglog.c $(PCSC_SYSTEM_SOURCE) \
-			 winscard_msg.c $(PCSC_CLIENT) $(MCARD_CLIENT)
+	winscard_msg.c $(PCSC_CLIENT)
+libpcsclite_la_LDFLAGS = -version-info 0:1:0 $(PCSC_INCLUDE_LIBS)
 
-libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
+libmusclecard_la_SOURCES = musclecard.c tokenparser.l tokenfactory.c \
+	tokenfactory.h $(PCSC_DYNLOAD_SOURCE)
+libmusclecard_la_LDFLAGS = -lpcsclite 
 
-pcscd_SOURCES = pcscdaemon.c winscard_svc.c \
-	thread_generic.h readerfactory.h \
-	atrhandler.h configfile.h dyn_generic.h eventhandler.h hotplug.h \
-	ifdhandler.h ifdwrapper.h parser.h powermgt_generic.h prothandler.h \
-	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h \
-	winscard_svc.h
+pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_svc.h
 pcscd_LDADD   = libpcsclite-core.la
-pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic $(PCSCD_INCLUDE_LIBS)
+pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic $(PCSCD_INCLUDE_LIBS) \
+	$(PCSCD_EXTRA_LIB)
 
 AM_CFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
 
@@ -151,13 +154,13 @@ testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
 muscletest_SOURCES = muscletest.c
-muscletest_LDADD = libpcsclite.la
+muscletest_LDADD = libmusclecard.la
 
-EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
-	hotplug_generic.c hotplug_linux.c hotplug_libusb.c hotplug_macosx.c \
-	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
-	sys_solaris.c sys_hpux.c powermgt_macosx.c \
-	winscard_scf.c
+# EXTRA_DIST = dyn_unix.c dyn_macosx.c \
+# 	hotplug_generic.c hotplug_linux.c hotplug_libusb.c hotplug_macosx.c \
+# 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
+# 	sys_solaris.c sys_hpux.c powermgt_macosx.c \
+# 	winscard_scf.c
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
