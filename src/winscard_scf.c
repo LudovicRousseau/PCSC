@@ -23,11 +23,7 @@
 #include "winscard.h"
 #include "debuglog.h"
 
-#ifdef USE_THREAD_SAFETY
 #include "thread_generic.h"
-#else
-#error "client side thread safety required"
-#endif
 
 #include "readerfactory.h"
 #include "eventhandler.h"
@@ -81,7 +77,6 @@ static struct _psReaderMap {
   SCF_ListenerHandle_t lHandle;
 } psReaderMap[PCSCLITE_MAX_READERS_CONTEXTS];
 
-#ifdef USE_THREAD_SAFETY
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*
@@ -90,7 +85,6 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
  * so to get lock on the clientMutex may affect the performance of the ocf server.
  */
 static PCSCLITE_MUTEX EventMutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
 static LONG isOCFServerRunning(void);
 LONG SCardLockThread(void);
@@ -1449,45 +1443,28 @@ static SCF_Session_t getSessionForContext(SCARDCONTEXT hContext ) {
     must wait to use this function
 */
 
-LONG SCardLockThread() {
-
-#ifdef USE_THREAD_SAFETY
+LONG SCardLockThread()
+{
   return SYS_MutexLock( &clientMutex );
-#else
-  return 0;
-#endif
-
 }
 
 LONG SCardEventLock() 
 {
-#ifdef USE_THREAD_SAFETY
   return SYS_MutexLock( &EventMutex );
-#else
-  return 0;
-#endif
 }
 
 /*  This function unlocks a mutex so another thread
     may use the client library 
 */
 
-LONG SCardUnlockThread() {
-
-#ifdef USE_THREAD_SAFETY
+LONG SCardUnlockThread()
+{
   return SYS_MutexUnLock( &clientMutex );
-#else
-  return 0;
-#endif 
-
 }
+
 LONG SCardEventUnlock() 
 {
-#ifdef USE_THREAD_SAFETY
   return SYS_MutexUnLock( &EventMutex );
-#else
-  return 0;
-#endif
 }
 
 static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
