@@ -1,3 +1,11 @@
+pcsc-lite-1.1.2beta2: Ludovic Rousseau, David Corcoran, Jean-Luc Giraud
+12 Oct, 2002
+- OpenBSD 3.1 and FreeBSD 4.7RC2 debug and testing
+- MacOSX debug and improvement
+- support multiple identical USB readers under GNU/Linux
+- more debug
+
+
 pcsc-lite-1.1.2beta1: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 6 Sep, 2002
 - src/tokenfactory.c, configure.in and bundleTool.c:
