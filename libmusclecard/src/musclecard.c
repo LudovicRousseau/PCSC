@@ -43,7 +43,9 @@ static PCSCLITE_MUTEX mcardMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static SCARDCONTEXT localHContext = 0;
 static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
+#ifdef USE_THREAD_SAFETY
 static PCSCLITE_THREAD_T callbackThread;
+#endif
 
 /*
  * internal function 
