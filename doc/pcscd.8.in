@@ -86,7 +86,7 @@ web site \fIhttp://www.musclecard.com/\fR.
 
 @HAVE_RUNPID@.I @runpid@
 @HAVE_RUNPID@: process id of the running pcscd
-
+@HAVE_RUNPID@
 .I @usbdropdir@
 : directory containing bundles for USB
 drivers
