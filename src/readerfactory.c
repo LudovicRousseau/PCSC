@@ -66,7 +66,6 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 {
 	DWORD dwContext, dwContextB, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
-	char lpcStripReader[MAX_READERNAME];
 	LONG rv, parentNode;
 
 	int i, j, tmplen, psize;
@@ -95,10 +94,14 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		{
 			if ((sReadersContexts[i])->vHandle != 0)
 			{
+				char lpcStripReader[MAX_READERNAME];
+
+				/* get the reader name without the reader and slot numbers */
 				strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
+
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
 					(dwPort == (sReadersContexts[i])->dwPort))
 				{
