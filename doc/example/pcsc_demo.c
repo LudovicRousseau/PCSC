@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	 * number of readers */
 	nbReaders = 0;
 	ptr = mszReaders;
-	while ((*ptr != '\0') && (nbReaders < PCSCLITE_MAX_READERS_CONTEXTS))
+	while (*ptr != '\0')
 	{
 		ptr += strlen(ptr)+1;
 		nbReaders++;
