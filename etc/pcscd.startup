@@ -4,7 +4,10 @@
 #
 #
 # chkconfig: 2345 12 88
-
+# description: PCSC Smart Card Daemon
+#
+# processname: pcscd
+# config: /etc/reader.conf
 
 . /etc/init.d/functions
 
