@@ -90,7 +90,7 @@ noinst_HEADERS = \
 	winscard_msg.h winscard_svc.h
 
 pcdir= $(libdir)/pkgconfig
-pc_DATA = libpcsclite.pc
+pc_DATA = libpcsclite.pc libmusclecard.pc
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle

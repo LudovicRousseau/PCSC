@@ -327,6 +327,7 @@ doc/example/Makefile
 etc/Makefile
 etc/reader.conf
 src/Makefile
+src/libmusclecard.pc
 src/libpcsclite.pc
 src/utils/Makefile
 win32/Makefile

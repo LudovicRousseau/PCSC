@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: MuscleCard
+Description: MuscleCard interface (uses PC/SC smart card interface)
+Version: @VERSION@
+Libs: -L${libdir} -lpcsclite -lmusclecard
+Cflags: -I${includedir}
