@@ -864,6 +864,7 @@ MSC_RV MSCCallbackCancelEvent()
 	{  
                 blockingContext = MSC_BLOCKSTATUS_CANCELLING;
 	        rv = MSCCancelEventWait();
+		pthread_join(callbackThread,0);
 
 		SYS_ThreadJoin(&callbackThread, 0);
 
