@@ -17,13 +17,14 @@
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "atrhandler.h"
+#include "debuglog.h"
 
 /*
  * Uncomment the following for ATR debugging 
  */
-/*
- * #define ATR_DEBUG 1 
- */
+
+#define ATR_DEBUG 1 
+
 
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
@@ -38,6 +39,10 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	 * Zero out everything 
 	 */
 	p = K = TCK = Y1i = T = TAi = TBi = TCi = TDi = 0;
+
+#ifdef ATR_DEBUG
+	DebugXxd("ATR: ", pucAtr, dwLength);
+#endif
 
 	if (dwLength < 2)
 	{
@@ -81,7 +86,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	p = 2;
 
 #ifdef ATR_DEBUG
-	debug_msg("Conv %02X, Y1 %02X, K %02X",
+	debug_msg("Conv: %02X, Y1: %02X, K: %02X",
 		psExtension->CardCapabilities.Convention, Y1i, K);
 #endif
 
