@@ -232,8 +232,12 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 
 	*pdwActiveProtocol = rContext->dwProtocol;
 
-	DebugLogB("Active Protocol: T=%d",
-		*pdwActiveProtocol == SCARD_PROTOCOL_T0 ? 0 : 1);
+	if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
+		&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
+		DebugLogB("Active Protocol: unknown %d", *pdwActiveProtocol);
+	else
+		DebugLogB("Active Protocol: T=%d",
+			*pdwActiveProtocol == SCARD_PROTOCOL_T0 ? 0 : 1);
 
 	/*
 	 * Prepare the SCARDHANDLE identity
