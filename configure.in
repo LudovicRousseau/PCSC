@@ -98,7 +98,7 @@ dnl Automatically update the libtool script if it becomes out-of-date
 dnl Checks for header files
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([dirent.h dl.h dlfcn.h errno.h fcntl.h getopt.h malloc.h stdlib.h string.h strings.h sys/filio.h sys/time.h syslog.h unistd.h])
+AC_CHECK_HEADERS([dirent.h dl.h dlfcn.h errno.h fcntl.h getopt.h malloc.h stdlib.h string.h strings.h sys/filio.h sys/time.h syslog.h unistd.h smartcard/scf.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics
 AC_C_CONST
@@ -224,11 +224,13 @@ AC_ARG_ENABLE(scf,
 esac], [scf=false])
 
 AC_SUBST(LIBSMARTCARD)
-# FIXME
-LIBSMARTCARD=""
+if test x$scf = xtrue -a x$ac_cv_header_smartcard_scf_h = xyes; then
+  AC_CHECK_LIB(smartcard, SCF_strerror, [LIBSMARTCARD="$LIBSMARTCARD -lsmartcard" scf=true], scf=false)
+else
+  scf=false
+fi
 AC_MSG_RESULT([enable SCF reader support     : $scf])
-
-AM_CONDITIONAL(MSC_ENABLE_SCF, test x$scf = xtrue)
+AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
 
 dnl --disable-musclecard
 AC_ARG_ENABLE(musclecard,
