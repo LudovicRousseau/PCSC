@@ -39,6 +39,7 @@ $Id$
 #define PCSCLITE_NAMEKEY_NAME                   "ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME                   "CFBundleExecutable"
 #define PCSCLITE_HP_MAX_IDENTICAL_READERS 	16
+#define PCSCLITE_HP_MAX_SIMUL_READERS           04
 #define PCSCLITE_HP_MAX_DRIVERS			20
 
 extern int LCFBundleFindValueWithKey(char *, char *, char *);
@@ -76,9 +77,14 @@ static int bundleSize = 0;
 
 static struct _bundleTracker
 {
-	long manuID;
-	long productID;
-	int plugStatus;
+	long  manuID;
+	long  productID;
+
+        struct _deviceNumber {   
+	  int  id;
+	  char status;
+	} deviceNumber[PCSCLITE_HP_MAX_SIMUL_READERS];
+
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
@@ -168,8 +174,6 @@ LONG HPReadBundleValues()
 		DebugLogA("Disabling USB support for pcscd");
 	}
 
-	closedir(hpDir);
-
 	return 0;
 }
 
@@ -177,30 +181,31 @@ void HPEstablishUSBNotifications()
 {
 
 	LONG rv;
-	int i, usbDeviceStatus;
+	int i, j, usbDeviceStatus;
 	DIR *dir, *dirB;
 	struct dirent *entry, *entryB;
+	int deviceNumber;
+	int suspectDeviceNumber;
 	char dirpath[150];
 	char filename[150];
 	int fd, ret;
 	struct usb_device_descriptor usbDescriptor;
 
-	rv = 0;
-	i = 0;
-	fd = 0;
-	ret = 0;
-	usbDeviceStatus = 0;
-	dir = 0;
-	dirB = 0;
-	entry = 0;
-	entryB = 0;
+	rv = 0; i = 0; j = 0; fd = 0; ret = 0; usbDeviceStatus = 0; 
+	j = 0; dir = 0; dirB = 0; entry = 0; entryB = 0; suspectDeviceNumber = 0;
 
 	while (1)
 	{
 
 		for (i = 0; i < bundleSize; i++)
 		{
-			usbDeviceStatus = 0;
+			usbDeviceStatus     = 0;
+			suspectDeviceNumber = 0;
+			
+			for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+			{
+			        bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
+			}			 
 
 			dir = 0;
 			dir = opendir(PCSCLITE_USB_PATH);
@@ -249,7 +254,11 @@ void HPEstablishUSBNotifications()
 					if (entryB->d_name[0] == '.')
 						continue;
 
+					/* Get the device number so we can distinguish 
+					   multiple readers */
 					sprintf(filename, "%s/%s", dirpath, entryB->d_name);
+					sscanf(entryB->d_name, "%d", &deviceNumber);
+
 					fd = open(filename, O_RDONLY);
 					if (fd < 0)
 					{
@@ -270,55 +279,74 @@ void HPEstablishUSBNotifications()
 					/*
 					 * Device is found and we don't know about it 
 					 */
-					if (usbDescriptor.idVendor == bundleTracker[i].manuID
-						&& usbDescriptor.idProduct ==
-						bundleTracker[i].productID
-						&& bundleTracker[i].plugStatus == 0)
+					  
+					if (usbDescriptor.idVendor == bundleTracker[i].manuID &&
+					    usbDescriptor.idProduct == bundleTracker[i].productID &&
+					    usbDescriptor.idVendor !=0 && usbDescriptor.idProduct != 0)
 					{
-						usbDeviceStatus = 1;
-						/*
-						 * Device is found but we already know about it 
-						 */
-					} else if (usbDescriptor.idVendor ==
-						bundleTracker[i].manuID
-						&& usbDescriptor.idProduct ==
-						bundleTracker[i].productID
-						&& bundleTracker[i].plugStatus == 1)
-					{
-						usbDeviceStatus = 2;
+
+					  for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+					    {
+					      if (bundleTracker[i].deviceNumber[j].id == deviceNumber &&
+						  bundleTracker[i].deviceNumber[j].id != 0)
+					      {
+					              bundleTracker[i].deviceNumber[j].status = 1; /* i'm here */
+					              break;
+					      }
+					    }
+						 
+					    if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
+					    {
+					            usbDeviceStatus = 1;
+						    suspectDeviceNumber = deviceNumber;
+					    } 
 					}
 
-				}
+				} /* End of while */
 
 				closedir(dirB);
 
-			}	/* End of while */
+			} /* End of while */
 
-			/*
-			 * Device is not found but it was plugged in before 
-			 */
-			if (usbDeviceStatus == 0 && bundleTracker[i].plugStatus == 1)
-			{
-				usbDeviceStatus = 3;
-			}
 
 			if (usbDeviceStatus == 1)
 			{
-				SYS_MutexLock(&usbNotifierMutex);
-				HPAddHotPluggable(i, 0x0001);
-				bundleTracker[i].plugStatus = 1;
+			        SYS_MutexLock(&usbNotifierMutex);
+
+				for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++) 
+				{
+				        if (bundleTracker[i].deviceNumber[j].id == 0)
+				                break;
+				}
+	
+				if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
+				{
+                                        DebugLogA("Too many identical readers plugged in");
+				} else 
+                                {
+				        HPAddHotPluggable(i, j+1);
+				        bundleTracker[i].deviceNumber[j].id = suspectDeviceNumber;
+				}
+
 				SYS_MutexUnLock(&usbNotifierMutex);
-			} else if (usbDeviceStatus == 2)
+
+			} else if (usbDeviceStatus == 0)
 			{
-				/*
-				 * Do nothing we know about this one 
-				 */
-			} else if (usbDeviceStatus == 3)
-			{
-				SYS_MutexLock(&usbNotifierMutex);
-				HPRemoveHotPluggable(i, 0x0001);
-				bundleTracker[i].plugStatus = 0;
-				SYS_MutexUnLock(&usbNotifierMutex);
+
+			        for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+			        {
+			                if (bundleTracker[i].deviceNumber[j].id != 0 &&
+					    bundleTracker[i].deviceNumber[j].status == 0) 
+					{
+					        SYS_MutexLock(&usbNotifierMutex);
+					        HPRemoveHotPluggable(i, j+1);
+					        bundleTracker[i].deviceNumber[j].id = 0;
+						SYS_MutexUnLock(&usbNotifierMutex);
+
+					}
+			        }
+
+
 			} else
 			{
 				/*
@@ -343,16 +371,20 @@ LONG HPSearchHotPluggables()
 {
 
 	LONG rv;
-	int i;
+	int i, j;
 
-	rv = 0;
-	i = 0;
+	rv = 0; i = 0; j = 0;
 
 	for (i = 0; i < PCSCLITE_HP_MAX_DRIVERS; i++)
 	{
-		bundleTracker[i].plugStatus = 0;
-		bundleTracker[i].productID = 0;
-		bundleTracker[i].manuID = 0;
+		bundleTracker[i].productID  = 0;
+		bundleTracker[i].manuID     = 0;
+		
+		for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
+		{
+		        bundleTracker[i].deviceNumber[j].id = 0;
+		}
+
 	}
 
 	rv = HPReadBundleValues();
@@ -366,7 +398,7 @@ LONG HPSearchHotPluggables()
 LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 {
 
-	RFAddReader(bundleTracker[i].readerName, 0x200000 + i,
+	RFAddReader(bundleTracker[i].readerName, 0x200000 + usbAddr,
 		bundleTracker[i].libraryPath);
 
 	return 1;
@@ -375,7 +407,7 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 {
 
-	RFRemoveReader(bundleTracker[i].readerName, 0x200000 + i);
+	RFRemoveReader(bundleTracker[i].readerName, 0x200000 + usbAddr);
 
 	return 1;
 }	/* End of function */
