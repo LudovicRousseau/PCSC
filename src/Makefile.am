@@ -29,6 +29,14 @@ else
 PCSC_CLIENT_SRC  = winscard_clnt.c
 endif
 
+if NEED_STRLCPY
+STRLCPY=strlcpy.c
+endif
+
+if NEED_STRLCAT
+STRLCAT=strlcat.c
+endif
+
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
 	configfile.l \
@@ -44,7 +52,9 @@ libpcsclite_core_la_SOURCES = \
 	$(PCSC_THREAD_SRC) \
 	$(PCSC_DYNLOAD_SRC) \
 	$(PCSC_HOTPLUG_SRC) \
-	$(PCSC_POWERMGT_SRC)
+	$(PCSC_POWERMGT_SRC) \
+	$(STRLCPY) \
+	$(STRLCAT)
 libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
 
 libpcsclite_la_SOURCES = \
@@ -52,7 +62,9 @@ libpcsclite_la_SOURCES = \
 	winscard_msg.c \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
-	$(PCSC_THREAD_SRC)
+	$(PCSC_THREAD_SRC) \
+	$(STRLCPY) \
+	$(STRLCAT)
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@
 
@@ -84,6 +96,7 @@ noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
 	hotplug.h ifdwrapper.h PCSC/pcsclite.h.in \
 	powermgt_generic.h prothandler.h readerfactory.h \
+	strlcpycat.h \
 	sys_generic.h thread_generic.h tokenfactory.h \
 	winscard_msg.h winscard_svc.h
 
