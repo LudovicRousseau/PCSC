@@ -4,7 +4,7 @@
 
 FRIENDLYNAME     "Generic Reader"
 DEVICENAME       GEN_SMART_RDR
-LIBPATH          /usr/lib/readers/libgen_ifd.so
+LIBPATH          @usbdropdir@/libgen_ifd.so
 CHANNELID        0x0103F8
 
 
