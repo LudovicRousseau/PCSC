@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* use the local pcsclite.h instead of the (old) one already installed */
+#include "pcsclite.h"
+
 #include <winscard.h>
 #include <mscdefines.h>
 #include <musclecard.h>
