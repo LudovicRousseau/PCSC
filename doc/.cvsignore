@@ -1,4 +1,9 @@
 bundleTool.8
+ifdhandler-3.aux
+ifdhandler-3.log
+ifdhandler-3.out
+ifdhandler-3.pdf
+ifdhandler-3.toc
 Makefile
 Makefile.in
 pcscd.8
