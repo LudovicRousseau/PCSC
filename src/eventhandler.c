@@ -384,9 +384,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					/*
 					 * Notify the card has been reset 
 					 */
-					/*
-					 * RFSetReaderEventState( rContext, SCARD_RESET ); 
-					 */
+					RFSetReaderEventState(rContext, SCARD_RESET); 
 				}
 				else
 				{
