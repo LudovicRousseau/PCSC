@@ -28,6 +28,8 @@
 #include "sys_generic.h"
 #include "eventhandler.h"
 
+#define SCARD_PROTOCOL_ANY_OLD	0x1000  /* used for backward compatibility */
+
 /*
  * Some defines for context stack
  */
@@ -110,7 +112,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
+			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 		return SCARD_E_PROTO_MISMATCH;
 
 	if (dwShareMode != SCARD_SHARE_EXCLUSIVE &&
@@ -118,7 +120,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
 
-	DebugLogB("Attempting Connect to %s", szReader);
+	DebugLogC("Attempting Connect to %s %d", szReader, dwPreferredProtocols);
 
 	rv = RFReaderInfo((LPTSTR) szReader, &rContext);
 
@@ -193,7 +195,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 				/*
 				 * If it is set to ANY let it do any of the protocols
 				 */
-				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY)
+				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
 				rContext->readerState->cardProtocol =
@@ -313,7 +315,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
+			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 		return SCARD_E_PROTO_MISMATCH;
 
 	if (pdwActiveProtocol == 0)
@@ -490,7 +492,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 							rContext->readerState->cardAtrLength);
 
 				/* If it is set to ANY let it do any of the protocols */
-				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY)
+				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
 				rContext->readerState->cardProtocol =
@@ -1307,7 +1309,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	if (pioSendPci->dwProtocol != SCARD_PROTOCOL_RAW)
 	{
-		if (pioSendPci->dwProtocol != SCARD_PROTOCOL_ANY)
+		if (pioSendPci->dwProtocol != SCARD_PROTOCOL_ANY_OLD)
 		{
 			if (pioSendPci->dwProtocol != rContext->readerState->cardProtocol)
 			{
@@ -1343,7 +1345,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		 * This is temporary ......
 		 */
 		sSendPci.Protocol = SCARD_PROTOCOL_RAW;
-	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_ANY)
+	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_ANY_OLD)
 	{
 	  /* Fix by Amira (Athena) */
 		unsigned long i;

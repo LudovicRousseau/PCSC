@@ -32,6 +32,8 @@
 
 #include "winscard_msg.h"
 
+#define SCARD_PROTOCOL_ANY_OLD	0x1000  /* used for backward compatibility */
+
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -393,7 +395,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
+		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 	{
 		return SCARD_E_INVALID_VALUE;
 	}
@@ -479,7 +481,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY))
+		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 	{
 		return SCARD_E_INVALID_VALUE;
 	}
