@@ -467,7 +467,8 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_power_icc) (dwAction);
-	} else
+	}
+	else
 	{
 		rv = (*IFDH_power_icc) (rContext->dwSlot, dwAction,
 			pucAtr, pdwAtrLen);
@@ -639,7 +640,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 				*pdwAtrLen = 0;
 			else
 				*pdwAtrLen = sSmartCard.ATR.Length;
-		} else
+		}
+		else
 		{
 			/*
 			 * No card is inserted - Atr length is 0 
@@ -685,6 +687,9 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	vFunction = 0;
 	ucValue[0] = 0;
 
+	if (rContext->dwVersion != IFD_HVERSION_1_0)
+		rv = SCARD_E_UNSUPPORTED_FEATURE;
+
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
@@ -704,17 +709,11 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion != IFD_HVERSION_1_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
-	else
-		rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
-			RxBuffer, RxLength);
+	rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
+		RxBuffer, RxLength);
 #else
-	if (rContext->dwVersion != IFD_HVERSION_1_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
-	else
-		rv = IFDHControl_v2(rContext->dwSlot, TxBuffer, TxLength,
-			RxBuffer, RxLength);
+	rv = IFDHControl_v2(rContext->dwSlot, TxBuffer, TxLength,
+		RxBuffer, RxLength);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 	/*
@@ -756,6 +755,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	vFunction = 0;
 	ucValue[0] = 0;
 
+	if (rContext->dwVersion < IFD_HVERSION_3_0)
+		rv = SCARD_E_UNSUPPORTED_FEATURE;
+
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
@@ -776,17 +778,11 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion < IFD_HVERSION_3_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
-	else
-		rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
-			TxLength, RxBuffer, RxLength, BytesReturned);
+	rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
+		TxLength, RxBuffer, RxLength, BytesReturned);
 #else
-	if (rContext->dwVersion < IFD_HVERSION_3_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
-	else
-		rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
-			TxLength, RxBuffer, RxLength, BytesReturned);
+	rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
+		TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 
