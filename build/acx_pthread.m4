@@ -34,7 +34,6 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id$
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [
@@ -43,7 +42,18 @@ acx_pthread_ok=no
 
 # First, check if the POSIX threads header, pthread.h, is available.
 # If it isn't, don't bother looking for the threads libraries.
-AC_CHECK_HEADER(pthread.h, , acx_pthread_ok=noheader)
+
+# Latest Tru64's require that you always use -pthread,
+# just assume pthread.h exists
+
+case "${host_cpu}-${host_os}" in
+ alpha*-osf*) acx_pthread_check_header=no ;;
+ *) acx_pthread_check_header=yes ;;
+esac
+
+if test "x$acx_pthread_check_header" = xyes; then
+  AC_CHECK_HEADER(pthread.h, , acx_pthread_ok=noheader)
+fi
 
 # We must check for the threads library under a number of different
 # names; the ordering is very important because some systems
@@ -73,7 +83,7 @@ fi
 # C compiler flags, and other items are library names, except for "none"
 # which indicates that we try without any flags at all.
 
-acx_pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads -mt pthread --thread-safe"
+acx_pthread_flags="pthreads none -Kthread -kthread lthread pthread -pthread -pthreads -mthreads --thread-safe -mt"
 
 # The ordering *is* (sometimes) important.  Some notes on the
 # individual items follow:
@@ -84,11 +94,13 @@ acx_pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -m
 # -Kthread: Sequent (threads in libc, but -Kthread needed for pthread.h)
 # -kthread: FreeBSD kernel threads (preferred to -pthread since SMP-able)
 # lthread: LinuxThreads port on FreeBSD (also preferred to -pthread)
+# pthread: Linux, etcetera
 # -pthread: Linux/gcc (kernel threads), BSD/gcc (userland threads)
 # -pthreads: Solaris/gcc
 # -mthreads: Mingw32/gcc, Lynx/gcc
-# -mt: Sun Workshop C (may only link SunOS threads, but doesn't hurt to check)
-# pthread: Linux, etcetera
+# -mt: Sun Workshop C (may only link SunOS threads [-lthread], but it
+#      doesn't hurt to check since this sometimes defines pthreads too;
+#      also defines -D_REENTRANT)
 # --thread-safe: KAI C++
 
 case "${host_cpu}-${host_os}" in
@@ -102,7 +114,7 @@ case "${host_cpu}-${host_os}" in
         # who knows whether they'll stub that too in a future libc.)  So,
         # we'll just look for -pthreads and -lpthread first:
 
-        acx_pthread_flags="-pthread -pthreads -mt pthread $acx_pthread_flags"
+        acx_pthread_flags="-pthread -pthreads pthread -mt $acx_pthread_flags"
         ;;
 esac
 
@@ -201,7 +213,11 @@ if test "x$acx_pthread_ok" = xyes; then
         CFLAGS="$save_CFLAGS"
 
         # More AIX lossage: must compile with cc_r
-        AC_CHECK_PROG(PTHREAD_CC, cc_r, cc_r, ${CC})
+	if test "$GCC" != "yes"; then
+                AC_CHECK_PROG(PTHREAD_CC, cc_r, cc_r, ${CC})
+	else
+                PTHREAD_CC="$CC"
+	fi
 else
         PTHREAD_CC="$CC"
 fi
