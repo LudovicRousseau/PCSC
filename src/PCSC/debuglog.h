@@ -73,8 +73,8 @@ enum {
 #define DebugLogB(a, b) Log2(PCSC_LOG_INFO, a, b)
 #define DebugLogC(a, b,c) Log3(PCSC_LOG_INFO, a, b, c)
 
-void log_msg(int priority, const char *fmt, ...);
-void log_xxd(int priority, const char *msg, const unsigned char *buffer,
+void log_msg(const int priority, const char *fmt, ...);
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	const int size);
 
 void DebugLogSuppress(const int);
