@@ -31,19 +31,16 @@ extern "C"
 		RESPONSECODE (*pvfSetProtocolParameters)(DWORD, UCHAR, UCHAR, UCHAR,
 			UCHAR);
 		RESPONSECODE (*pvfPowerICC)(DWORD);
-		LPVOID pvfSwallowICC;		/* Deprecated in 2.0 */
-		LPVOID pvfEjectICC;		/* Deprecated in 2.0 */
-		LPVOID pvfConfiscateICC;	/* Deprecated in 2.0 */
 		RESPONSECODE (*pvfTransmitToICC)(SCARD_IO_HEADER, PUCHAR, DWORD,
 			PUCHAR, PDWORD, PSCARD_IO_HEADER);
 		RESPONSECODE (*pvfICCPresence)(void);
-		LPVOID pvfICCAbsent;		/* Deprecated in 2.0 */
 	};
 
 	typedef struct FctMap_V1 FCT_MAP_V1, *PFCT_MAP_V1;
 
 	struct FctMap_V2
 	{
+		/* shared with API 3.0 */
 		RESPONSECODE (*pvfCreateChannel)(DWORD, DWORD);
 		RESPONSECODE (*pvfCloseChannel)(DWORD);
 		RESPONSECODE (*pvfGetCapabilities)(DWORD, DWORD, PDWORD, PUCHAR);

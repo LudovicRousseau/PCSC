@@ -872,11 +872,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		GET_ADDRESSv1(TransmitToICC, Transmit_to_ICC)
 		GET_ADDRESSv1(ICCPresence, Is_ICC_Present)
 
-		GET_ADDRESS_OPTIONALv1(SwallowICC, Swallow_ICC, )
-		GET_ADDRESS_OPTIONALv1(EjectICC, Eject_ICC, )
-		GET_ADDRESS_OPTIONALv1(ConfiscateICC, Confiscate_ICC, )
 		GET_ADDRESS_OPTIONALv1(SetProtocolParameters, Set_Protocol_Parameters, )
-		GET_ADDRESS_OPTIONALv1(ICCAbsent, Is_ICC_Absent, )
 	}
 	else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
