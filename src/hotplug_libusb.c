@@ -39,7 +39,7 @@
 #define PCSCLITE_NAMEKEY_NAME			"ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME			"CFBundleExecutable"
 
-/* PCSCLITE_MAX_READERS is defined in pcsclite.h */
+/* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
 #define PCSCLITE_MAX_DRIVERS			16
 #define BUS_DEVICE_STRSIZE			256
 #define PCSCLITE_HP_BASE_PORT			0x200000
@@ -73,7 +73,7 @@ static struct _driverTracker
 } driverTracker[PCSCLITE_MAX_DRIVERS];
 
 /*
- * keep track of PCSCLITE_MAX_READERS simultaneous readers
+ * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
  */
 static struct _readerTracker
 {
@@ -81,7 +81,7 @@ static struct _readerTracker
 	char bus_device[BUS_DEVICE_STRSIZE];	/* device name */
 
 	struct _driverTracker *driver;	/* driver for this reader */
-} readerTracker[PCSCLITE_MAX_READERS];
+} readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 LONG HPReadBundleValues(void);
 LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
@@ -194,7 +194,7 @@ void HPEstablishUSBNotifications()
 		usb_find_busses();
 		usb_find_devices();
 
-		for (i=0; i < PCSCLITE_MAX_READERS; i++)
+		for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			/* clear rollcall */
 			readerTracker[i].status = READER_ABSENT;
 
@@ -223,7 +223,7 @@ void HPEstablishUSBNotifications()
 						newreader = TRUE;
 
 						/* Check if the reader is a new one */
-						for (j=0; j<PCSCLITE_MAX_READERS; j++)
+						for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
 						{
 							if (strncmp(readerTracker[j].bus_device,
 								bus_device, BUS_DEVICE_STRSIZE) == 0)
@@ -250,7 +250,7 @@ void HPEstablishUSBNotifications()
 		/*
 		 * check if all the previously found readers are still present
 		 */
-		for (i=0; i<PCSCLITE_MAX_READERS; i++)
+		for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 			int fd;
@@ -317,7 +317,7 @@ LONG HPSearchHotPluggables(void)
 		driverTracker[i].readerName = NULL;
 	}
 
-	for (i=0; i<PCSCLITE_MAX_READERS; i++)
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		readerTracker[i].driver = NULL;
 		readerTracker[i].status = READER_ABSENT;
@@ -342,13 +342,13 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	DebugLogB("Adding USB device: %s", bus_device);
 
 	/* find a free entry */
-	for (i=0; i<PCSCLITE_MAX_READERS; i++)
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (readerTracker[i].driver == NULL)
 			break;
 	}
 	
-	if (i==PCSCLITE_MAX_READERS)
+	if (i==PCSCLITE_MAX_READERS_CONTEXTS)
 	{
 		DebugLogB("Not enough reader entries. Already found %d readers", i);
 		return 0;

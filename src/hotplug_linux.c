@@ -39,7 +39,7 @@
 #define PCSCLITE_NAMEKEY_NAME                   "ifdFriendlyName"
 #define PCSCLITE_LIBRKEY_NAME                   "CFBundleExecutable"
 
-/* PCSCLITE_MAX_READERS is defined in pcsclite.h */
+/* PCSCLITE_MAX_READERS_CONTEXTS is defined in pcsclite.h */
 #define PCSCLITE_HP_MAX_IDENTICAL_READERS	16
 #define PCSCLITE_HP_MAX_SIMUL_READERS		04
 #define PCSCLITE_HP_MAX_DRIVERS			20
