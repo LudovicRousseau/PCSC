@@ -170,6 +170,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 					currentToken = &tokenArray[tokensFound - 1];
 					currentToken->addParams = 0;
 					currentToken->addParamsSize = 0;
+					currentToken->tokenType = 0;
 
 					if (rgReaderStates.dwEventState & SCARD_STATE_EMPTY)
 					{
