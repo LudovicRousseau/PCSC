@@ -630,8 +630,9 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	}
 
 	/*
-	 * Now lets get the ATR and process it if IFD Handler version 1.0 2.0
-	 * does this immediately after reset/power up to conserve resources 
+	 * Now lets get the ATR and process it if IFD Handler version 1.0.
+	 * IFD Handler version 2.0 does this immediately after reset/power up
+	 * to conserve resources 
 	 */
 
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
