@@ -9,8 +9,6 @@ AC_CONFIG_SRCDIR(src/pcscdaemon.c)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
-AC_PREFIX_DEFAULT(/usr/local)
-
 AC_CANONICAL_HOST
 AC_PROG_CC
 AC_C_BIGENDIAN
@@ -216,7 +214,6 @@ AC_MSG_RESULT([enable debug messages         : $debug])
 
 if test x${debug} = xfalse ; then
   AC_DEFINE(NO_PCSC_DEBUG, 1, [disable PCSC debug messaging.])
-  AC_DEFINE(NO_MSC_DEBUG, 1, [disable MuscleCard debug messaging.])
 fi
 
 dnl --enable-debugatr
@@ -251,34 +248,6 @@ else
 fi
 AC_MSG_RESULT([enable SCF reader support     : $scf])
 AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
-
-dnl --disable-musclecard
-AC_ARG_ENABLE(musclecard,
-  AC_HELP_STRING([--disable-musclecard],[MuscleCard framework disabled]),
-[case "${enableval}" in
-  yes)	musclecard=true ;;
-  no)	musclecard=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --disable-musclecard]) ;;
- esac], [musclecard=true])
-
-AC_MSG_RESULT([enable MuscleCard             : $musclecard])
-
-AM_CONDITIONAL(HAVE_MUSCLECARD, test x$musclecard = xtrue)
-
-dnl --enable-muscledropdir=DIR
-AC_ARG_ENABLE(muscledropdir,
-  AC_HELP_STRING([--enable-muscledropdir=DIR],[directory containing
-				  MuscleCard bundles (default /usr/local/pcsc/services)]),
-[muscledropdir="${enableval}"], [muscledropdir=false])
-if test x${muscledropdir} = xfalse ; then
-	if test "x$prefix" != xNONE; then
-		muscledropdir="$prefix/pcsc/services"
-	else
-		muscledropdir="$ac_default_prefix/pcsc/services"
-	fi
-fi
-AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
-AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing MuscleCard bundles])
 
 dnl --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
@@ -352,7 +321,6 @@ fi
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 dnl Setup dist stuff
-AC_SUBST(muscledropdir)
 AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
@@ -367,7 +335,6 @@ AC_OUTPUT([
 Makefile
 aclocal/Makefile
 doc/Makefile
-doc/bundleTool.8
 doc/pcscd.8
 doc/reader.conf.5
 doc/example/Makefile
@@ -376,7 +343,6 @@ etc/pcscd.init
 etc/reader.conf
 etc/update-reader.conf
 src/Makefile
-src/libmusclecard.pc
 src/libpcsclite.pc
 src/PCSC/pcsclite.h
 src/utils/Makefile

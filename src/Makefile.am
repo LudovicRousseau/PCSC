@@ -3,17 +3,11 @@
 SUBDIRS = . utils
 AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC
 
-if HAVE_MUSCLECARD
-MC_LIBS = libmusclecard.la
-MC_BIN = muscletest
-MC_HDR = PCSC/mscdefines.h PCSC/musclecard.h
-endif
-
-lib_LTLIBRARIES = libpcsclite.la $(MC_LIBS)
+lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 
 sbin_PROGRAMS = pcscd
-noinst_PROGRAMS = testpcsc $(MC_BIN)
+noinst_PROGRAMS = testpcsc
 
 PCSC_DYNLOAD_SRC = dyn_unix.c dyn_hpux.c dyn_macosx.c
 PCSC_SYSTEM_SRC  = sys_unix.c
@@ -60,21 +54,15 @@ libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
 libpcsclite_la_SOURCES = \
 	debuglog.c \
 	winscard_msg.c \
+	tokenparser.l \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_THREAD_SRC) \
+	$(PCSC_DYNLOAD_SRC) \
 	$(STRLCPY) \
 	$(STRLCAT)
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
-libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@
-
-libmusclecard_la_SOURCES = \
-	musclecard.c \
-	tokenparser.l \
-	tokenfactory.c \
-	$(PCSC_DYNLOAD_SRC)
-libmusclecard_la_LDFLAGS = -version-info 1:0:0
-libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
+libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
@@ -86,22 +74,19 @@ pcscd_LDADD = libpcsclite-core.la \
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
-muscletest_SOURCES = muscletest.c
-muscletest_LDADD = libmusclecard.la
-
 nobase_include_HEADERS = \
-	PCSC/debuglog.h PCSC/ifdhandler.h PCSC/pcsclite.h PCSC/winscard.h \
-	PCSC/wintypes.h PCSC/parser.h $(MC_HDR)
+	PCSC/debuglog.h PCSC/dyn_generic.h PCSC/ifdhandler.h PCSC/pcsclite.h \
+	PCSC/winscard.h PCSC/wintypes.h PCSC/parser.h \
+	PCSC/sys_generic.h PCSC/thread_generic.h
 noinst_HEADERS = \
-	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
+	atrhandler.h configfile.h eventhandler.h \
 	hotplug.h ifdwrapper.h PCSC/pcsclite.h.in \
 	powermgt_generic.h prothandler.h readerfactory.h \
 	strlcpycat.h \
-	sys_generic.h thread_generic.h tokenfactory.h \
 	winscard_msg.h winscard_svc.h
 
 pcdir= $(libdir)/pkgconfig
-pc_DATA = libpcsclite.pc libmusclecard.pc
+pc_DATA = libpcsclite.pc
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
