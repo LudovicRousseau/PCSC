@@ -134,7 +134,8 @@ void SVCServiceRunLoop()
 				 */
 				SYS_MutexLock(&usbNotifierMutex);
 				MSGFunctionDemarshall(&msgStruct);
-				rsp = SHMMessageSend(&msgStruct, msgStruct.request_id, 0);
+				rsp = SHMMessageSend(&msgStruct, msgStruct.request_id,
+					PCSCLITE_SERVER_ATTEMPTS);
 				SYS_MutexUnLock(&usbNotifierMutex);
 			} else
 			{

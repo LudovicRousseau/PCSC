@@ -1,13 +1,15 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : pcsclite.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This keeps a list of defines for pcsc lite.            
+	Title  : pcsclite.h
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 7/27/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This keeps a list of defines for pcsc lite.            
+
+$Id$
 
 ********************************************************************/
 
@@ -169,10 +171,8 @@ extern "C"
 #define PCSCLITE_INFINITE_TIMEOUT    4320000	/* 50 day infinite t/o */
 
 #define PCSCLITE_VERSION_NUMBER		"1.0.2.cvs"	/* Current version */
-#define PCSCLITE_MAX_MESSAGE_SIZE       2048	/* Transport msg len */
 #define PCSCLITE_CLIENT_ATTEMPTS        120	/* Attempts to reach sv */
 #define PCSCLITE_MCLIENT_ATTEMPTS       20	/* Attempts to reach sv */
-#define PCSCLITE_SERVER_ATTEMPTS        5	/* Attempts to reach cl */
 #define PCSCLITE_STATUS_POLL_RATE       400000	/* Status polling rate */
 #define PCSCLITE_MSG_KEY_LEN            16	/* App ID key length */
 #define PCSCLITE_RW_ATTEMPTS            100	/* Attempts to rd/wrt */
@@ -184,14 +184,34 @@ extern "C"
 #define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
 #define PCSCLITE_TRANSACTION_TIMEOUT    40	/* Transaction timeout */
 #define MAX_ATR_SIZE                    33	/* Maximum ATR size */
-#define MAX_BUFFER_SIZE                 264	/* Maximum Tx/Rx Buffer */
 #define MAX_READERNAME			50	/* 50 char Reader Name */
 #define MAX_LIBNAME			100	/* 100 char Lib Name */
 
 #define SCARD_ATR_LENGTH           MAX_ATR_SIZE	/* Maximum ATR size */
+
+/*
+ * Enhanced messaging has been added to accomodate newer devices which have
+ * more advanced capabilites, such as dedicated secure co-processors which
+ * can stream and encrypt data over USB.  In order to used enhanced messaging
+ * you must define PCSCLITE_ENHANCED_MESSAGING in the framework(library), 
+ * the daemon, and your application
+ */
+#ifndef PCSCLITE_ENHANCED_MESSAGING
+#define PCSCLITE_MAX_MESSAGE_SIZE        2048    /* Transport msg len */
+#define MAX_BUFFER_SIZE                  264     /* Maximum Tx/Rx Buffer */
+#define PCSCLITE_SERVER_ATTEMPTS         5       /* Attempts to reach cl */
+#else
+	/* Note: The message and buffer sizes must be multiples of 16 */
+	/* Note2: The max message size must be at least large enough
+	 * to accomodate the transmit_struct */
+#define PCSCLITE_MAX_MESSAGE_SIZE       (1<<17)  /* enhanced (128K) msg len */
+#define MAX_BUFFER_SIZE                 (1<<15)  /* enhanced (32K) Tx/Rx Buffer */
+#define PCSCLITE_SERVER_ATTEMPTS         200     /* To allow larger data reads/writes */
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

@@ -1,14 +1,16 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : readerfactory.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 7/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This keeps track of a list of currently 
-	             available reader structures.
+	Title  : readerfactory.c
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 7/27/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This keeps track of a list of currently 
+	available reader structures.
+
+$Id$
 
 ********************************************************************/
 
@@ -213,7 +215,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	/*
 	 * If a clone to this reader exists take some values from that clone 
 	 */
-	if (parentNode >= 0)
+	if (parentNode != -1 && parentNode < PCSCLITE_MAX_CONTEXTS
+		&& parentNode > 0)
 	{
 		(sContexts[dwContext])->dwFeeds = (sContexts[parentNode])->dwFeeds;
 		*(sContexts[dwContext])->dwFeeds += 1;
@@ -224,7 +227,10 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	if ((sContexts[dwContext])->dwFeeds == 0)
 	{
 		(sContexts[dwContext])->dwFeeds = (DWORD *) malloc(sizeof(DWORD));
-		*(sContexts[dwContext])->dwFeeds = 0;
+		/* Initialize dwFeeds to 1, otherwise multiple cloned readers will
+		 * cause pcscd to crash when RFUnloadReader unloads the driver library
+		 * and there are still devices attached using it --mikeg*/
+		*(sContexts[dwContext])->dwFeeds = 1;
 	}
 
 	if ((sContexts[dwContext])->mMutex == 0)
