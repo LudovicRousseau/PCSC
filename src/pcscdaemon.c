@@ -139,7 +139,7 @@ void SVCServiceRunLoop()
  			if (rv != SCARD_S_SUCCESS)
 			{
 				DebugLogA("SVCServiceRunLoop: Problem during the context thread creation");
-				AraKiri = 1;
+				AraKiri = TRUE;
 			}
 
 			break;
