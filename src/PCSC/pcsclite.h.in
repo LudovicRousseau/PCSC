@@ -159,9 +159,13 @@ extern "C"
 #define PCSCLITE_CONFIG_DIR		USE_READER_CONF
 #endif
 #define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
-#define PCSCLITE_IPC_DIR		"/tmp/pcsc"
-#define PCSCLITE_PUBSHM_FILE            PCSCLITE_IPC_DIR "/.pcscpub"
-#define PCSCLITE_CSOCK_NAME             PCSCLITE_IPC_DIR "/.pcscomm"
+#ifndef USE_IPCDIR
+#define PCSCLITE_IPC_DIR		"/var/run/"
+#else
+#define PCSCLITE_IPC_DIR		USE_IPCDIR
+#endif
+#define PCSCLITE_PUBSHM_FILE            PCSCLITE_IPC_DIR "/pcsc.pub"
+#define PCSCLITE_CSOCK_NAME             PCSCLITE_IPC_DIR "/pcsc.omm"
 
 #define PCSCLITE_SVC_IDENTITY	     0x01030000	/* Service ID */
 

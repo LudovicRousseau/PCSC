@@ -298,10 +298,10 @@ int main(int argc, char **argv)
 	}
 	
 	/*
-	 * test the presence of /tmp/pcsc 
+	 * test the presence of /var/run/pcsc.pub
 	 */
 
-	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
+	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &fStatBuf);
 
 	if (rv == 0)
 	{
@@ -326,8 +326,8 @@ int main(int argc, char **argv)
 
 			if (kill(pid, 0) == 0)
 			{
-				DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
-				DebugLogA("Another pcscd seems to be running");
+				DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
+				DebugLogB("Another pcscd (pid: %d) seems to be running.", pid);
 				return 1;
 			}
 			else
@@ -336,18 +336,18 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
+			DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
 			DebugLogA("Maybe another pcscd is running?");
-			DebugLogA("Can't read process pid from " USE_RUN_PID);
-			DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
-			DebugLogA("to clear this message.");
+			DebugLogA("I can't read process pid from " USE_RUN_PID);
+			DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
+			DebugLogA("if pcscd is not running to clear this message.");
 			return 1;
 		}
 #else
-		DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
+		DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
 		DebugLogA("Maybe another pcscd is running?");
-		DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
-		DebugLogA("to clear this message.");
+		DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
+		DebugLogA("if pcscd is not running to clear this message.");
 		return 1;
 #endif
 	}
@@ -410,26 +410,7 @@ int main(int argc, char **argv)
 	}
 #endif
 
-	/*
-	 * Create the /tmp/pcsc directory and chmod it 
-	 */
-	rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
-	if (rv != 0)
-	{
-		DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s",
-			strerror(errno));
-		return 1;
-	}
-
-	rv = SYS_Chmod(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
-	if (rv != 0)
-	{
-		DebugLogB("main: cannot chmod " PCSCLITE_IPC_DIR ": %s",
-			strerror(errno));
-		return 1;
-	}
-
-	/* cleanly remove /tmp/pcsc when exiting */
+	/* cleanly remove /var/run/pcsc.* files when exiting */
 	if (atexit(at_exit))
 		DebugLogB("main: atexit() failed: %s", strerror(errno));
 
@@ -516,11 +497,6 @@ void clean_temp_files(void)
 	rv = SYS_Unlink(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
 		DebugLogB("main: Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
-			strerror(errno));
-
-	rv = SYS_Rmdir(PCSCLITE_IPC_DIR);
-	if (rv != 0)
-		DebugLogB("main: Cannot rmdir " PCSCLITE_IPC_DIR ": %s",
 			strerror(errno));
 
 #ifdef USE_RUN_PID
