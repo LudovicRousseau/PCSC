@@ -153,3 +153,19 @@ SYS_ThreadExit(void* arg)
 
     return 0;
 }
+
+int MSC_MutexInit(PCSCLITE_MUTEX_T theMutex) {
+  return SYS_MutexInit(theMutex);
+}
+
+int MSC_MutexDestroy(PCSCLITE_MUTEX_T theMutex) {
+  return SYS_MutexDestroy(theMutex);
+}
+
+int MSC_MutexLock(PCSCLITE_MUTEX_T theMutex) {
+  return SYS_MutexLock(theMutex);
+}
+
+int MSC_MutexUnLock(PCSCLITE_MUTEX_T theMutex) {
+  return SYS_MutexUnLock(theMutex);
+}
