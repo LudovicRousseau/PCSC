@@ -45,7 +45,6 @@ Options:
           --enable-libusb=PATH   Enable USB libusb support
                                  (on Linux, *BSD, etc.).
           --enable-usb           Enable USB on Linux 2.4 platforms (deprecated)
-          --enable-syslog        Use syslog for error output.
           --enable-daemon        Run as a daemon.
           --enable-debug         Enable full debugging messages
           --enable-threadsafe    Enable a thread safe client (reqs pthread)
