@@ -40,10 +40,19 @@ int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
 	return pthread_mutex_unlock(mMutex);
 }
 
-int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, LPVOID pthAttr,
+int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
-	if (0 == pthread_create(pthThread, NULL, pvFunction, pvArg))
+	pthread_attr_t attr;
+	
+	if (0 != pthread_attr_init(&attr))
+		return FALSE;
+	
+	if (0 != pthread_attr_setdetachstate(&attr,
+		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE))
+		return FALSE;
+	
+	if (0 == pthread_create(pthThread, &attr, pvFunction, pvArg))
 		return TRUE;
 	else
 		return FALSE;
