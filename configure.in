@@ -70,15 +70,6 @@ ACX_PTHREAD(
  AC_MSG_ERROR([POSIX thread support required])
 ])
 
-dnl --enable-threadsafe
-AC_ARG_ENABLE(threadsafe,
-  AC_HELP_STRING([--enable-threadsafe],[enable client side thread safety]),
-[case "${enableval}" in
-  yes)	threadsafe=true ;;
-  no)	threadsafe=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-threadsafe]) ;;
- esac], [threadsafe=true])
-
 LIBS="$PTHREAD_LIBS $LIBS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
@@ -269,8 +260,6 @@ else
 	AC_MSG_RESULT([enable ipcdir                 : /var/run (default)])
 fi
 
-AC_MSG_RESULT([enable threadsafe client      : $threadsafe])
-
 dnl --enable-extendedapdu
 AC_ARG_ENABLE(extendedapdu,
 	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 32KB)]),
@@ -286,11 +275,6 @@ if test x${extendedapdu} = xtrue ; then
   extended_apdu="#define PCSCLITE_ENHANCED_MESSAGING"
 else
   extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
-fi
-
-dnl warning about pthread
-if test x${threadsafe} = xtrue ; then
-  AC_DEFINE(USE_THREAD_SAFETY, 1, [enable client side thread safety.])
 fi
 
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
