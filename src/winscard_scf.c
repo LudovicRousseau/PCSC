@@ -1694,6 +1694,9 @@ static LONG ConvertStatus(SCF_Status_t status)
      
 }
 
+/*
+ * Note that this function is not used
+ */
 LONG SCardCheckReaderAvailability( LPTSTR readerName, LONG errorCode ) {
 
   LONG retIndice;
@@ -1735,6 +1738,9 @@ void SCardUnload(void)
 #endif
 }
 
+/*
+ * Note that this function is not used
+ */
 LONG SCardCheckDaemonAvailability() {
 
   LONG rv = 1;	/* assume it exists */
