@@ -33,11 +33,13 @@ $Id$
 #include <fcntl.h>
 #include <stdlib.h>
 
+#include "config.h"
+
 /*
  * The following defines personalize this for different tokens 
  */
 
-#define BUNDLE_DIR            "/usr/local/pcsc/services/"
+#define BUNDLE_DIR MSC_SVC_DROPDIR
 
 /*
  * End of personalization 
