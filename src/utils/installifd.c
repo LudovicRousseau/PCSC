@@ -7,59 +7,56 @@
             Date   : 5/16/00
             License: Copyright (C) 2000 David Corcoran
                      <corcoran@linuxnet.com>
+                     2003 Ludovic Rousseau
+                     <ludovic.rousseau@free.fr>
             Purpose: This is a reader installer for pcsc-lite.
  
+$Id$
+
 ********************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include "config.h"
+#include "pcsclite.h"
 
-int main(int argc, char **argv)
+#define CONFFILE "/etc/reader.conf"
+
+int main(int argc, char *argv[])
 {
 
 	struct stat statbuf;
-	char lpcReader[50];
-	char lpcLibrary[95];
-	char *lpcPortID;
+	char lpcReader[MAX_READERNAME];
+	char lpcLibrary[FILENAME_MAX];
+	char *lpcPortID = NULL;
 	int iPort;
 	int iStat;
 	FILE *fd;
 
-	printf("Please enter a friendly name for your reader (50 char max)\n");
+	printf("Please enter a friendly name for your reader (%d char max)\n",
+		sizeof(lpcReader));
 	printf("-----> ");
 
-	gets(lpcReader);
+	fgets(lpcReader, sizeof(lpcReader), stdin);
 
-	/*
-	 * Possible memory corruption 
-	 */
-	if (strlen(lpcReader) + 1 > 50)
-	{
-		printf("Reader name too long: exiting\n");
-		return 1;
-	}
+	/* remove trailing \n */
+	lpcReader[strlen(lpcReader)-1] = '\0';
 
   retrylib:
 
-	printf
-		("Please enter the full path of the readers driver (75 char max)\n");
+	printf("Please enter the full path of the readers driver (%d char max)\n",
+		sizeof(lpcLibrary));
 	printf("Example: %s/librdr_generic.so\n", PCSCLITE_HP_DROPDIR);
 	printf("-----> ");
 
-	gets(lpcLibrary);
+	fgets(lpcLibrary, sizeof(lpcLibrary), stdin);
 
-	/*
-	 * Possible memory corruption 
-	 */
-	if (strlen(lpcLibrary) + 1 > 95)
-	{
-		printf("Library name too long: exiting\n");
-		return 1;
-	}
+	/* remove trailing \n */
+	lpcLibrary[strlen(lpcLibrary)-1] = '\0';
 
 	iStat = stat(lpcLibrary, &statbuf);
 
@@ -68,7 +65,7 @@ int main(int argc, char **argv)
 		/*
 		 * Library does not exist 
 		 */
-		printf("Library path does not exist.\n\n");
+		printf("Library path %s does not exist.\n\n", lpcLibrary);
 		goto retrylib;
 	}
 
@@ -87,46 +84,44 @@ int main(int argc, char **argv)
 	printf("\n");
 	printf("Enter number (1-6): ");
 
-	scanf("%d", &iPort);
-
-	if (iPort < 1 || iPort > 6)
+	if ((scanf("%d", &iPort) != 1) || iPort < 1 || iPort > 6)
 	{
-		printf("Invalid input please choose (1-5)\n");
+		printf("Invalid input (%d) please choose (1-5)\n", iPort);
+		/* eat the \n */
+		getchar();
 		goto retryport;
 	}
 
 	switch (iPort)
 	{
-
-	case 1:
-		lpcPortID = strdup("0x0103F8");
-		break;
-	case 2:
-		lpcPortID = strdup("0x0102F8");
-		break;
-	case 3:
-		lpcPortID = strdup("0x0103E8");
-		break;
-	case 4:
-		lpcPortID = strdup("0x0102E8");
-		break;
-	case 5:
-		lpcPortID = strdup("0x020378");
-		break;
-	case 6:
-		lpcPortID = strdup("0x000001");
-		break;
-
+		case 1:
+			lpcPortID = "0x0103F8";
+			break;
+		case 2:
+			lpcPortID = "0x0102F8";
+			break;
+		case 3:
+			lpcPortID = "0x0103E8";
+			break;
+		case 4:
+			lpcPortID = "0x0102E8";
+			break;
+		case 5:
+			lpcPortID = "0x020378";
+			break;
+		case 6:
+			lpcPortID = "0x000001";
+			break;
 	}
 
 	printf("\n\n");
-	printf("Now creating new /etc/reader.conf: \n");
+	printf("Now creating new " CONFFILE "\n");
 
-	fd = fopen("/etc/reader.conf", "w");
+	fd = fopen(CONFFILE, "w");
 
-	if (fd == 0)
+	if (fd == NULL)
 	{
-		printf("Cannot open file /etc/reader.conf (are you root ?)\n");
+		printf("Cannot open file %s: %s\n", CONFFILE, strerror(errno));
 		free(lpcPortID);
 		return 1;
 	}
@@ -144,7 +139,6 @@ int main(int argc, char **argv)
 	fprintf(fd, "%s", "\n\n");
 
 	fprintf(fd, "%s", "# End of file\n");
-
-	free(lpcPortID);
 	return 0;
 }
+
