@@ -408,7 +408,8 @@ int main(int argc, char **argv)
 		rv = DBUpdateReaders(newReaderConfig);
 		if (rv != 0)
 		{
-			DebugLogB("main: invalid file %s", newReaderConfig);
+			DebugLogC("main: invalid file %s: %s", newReaderConfig,
+				strerror(errno));
 			at_exit();
 		}
 	}
