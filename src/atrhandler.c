@@ -21,8 +21,9 @@
 
 /*
  * Uncomment the following for ATR debugging 
+ * or use ./configure --enable-debugatr
  */
-#undef ATR_DEBUG
+/* #define ATR_DEBUG */
 
 #define SCARD_PROTOCOL_UNSET 0x00
 
