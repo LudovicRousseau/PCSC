@@ -52,7 +52,7 @@ static PCSCLITE_THREAD_T callbackThread;
 #include <stdio.h>
 
 static SCARDCONTEXT localHContext = 0;
-static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
+static ULONG blockingContext = MSC_BLOCKSTATUS_RESUME;
 
 /*
  * internal function 
@@ -77,9 +77,8 @@ static void mscUnLockThread(void)
 /**************** MSC Connection Functions **************************/
 
 MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
-		     MSCPULong32 arrayLength)
+	MSCPULong32 arrayLength)
 {
-
 	MSCLong32 rv;
 	SCARD_READERSTATE_A rgReaderStates;
 	MSCTokenInfo tokenInfo;
@@ -106,8 +105,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 	mscLockThread();
 	if (localHContext == 0)
 	{
-		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0,
-			&localHContext);
+		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &localHContext);
 		if (pcscToMSC(rv) != MSC_SUCCESS)
 		{
 			localHContext = 0;
@@ -123,16 +121,12 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 	rv = SCardListReaders(localHContext, 0, readerList, &readerLength);
 
 	if (pcscToMSC(rv) != MSC_SUCCESS)
-	{
 		return pcscToMSC(rv);
-	}
 
 	readerList = (char *) malloc(sizeof(char) * readerLength);
 
 	if (readerList == 0)
-	{
 		return MSC_INTERNAL_ERROR;
-	}
 
 	rv = SCardListReaders(localHContext, 0, readerList, &readerLength);
 
@@ -144,9 +138,8 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 		rgReaderStates.szReader = &readerList[i];
 		rgReaderStates.dwCurrentState = SCARD_STATE_UNAWARE;
 
-		rv = SCardGetStatusChange(localHContext, INFINITE, 
-					  &rgReaderStates,
-					  1);
+		rv = SCardGetStatusChange(localHContext, INFINITE,
+			&rgReaderStates, 1);
 
 		if (pcscToMSC(rv) != MSC_SUCCESS)
 		{
@@ -186,7 +179,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 				if ((tokensFound <= *arrayLength) && (tokenArray != 0))
 				{
 					currentToken = &tokenArray[tokensFound - 1];
-					currentToken->addParams     = 0;
+					currentToken->addParams = 0;
 					currentToken->addParamsSize = 0;
 
 					if (rgReaderStates.dwEventState & SCARD_STATE_EMPTY)
@@ -194,12 +187,14 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 						currentToken->tokenType |= MSC_TOKEN_TYPE_REMOVED;
 						strncpy(currentToken->tokenName,
 							MSC_TOKEN_EMPTY_STR, MSC_MAXSIZE_TOKENAME);
-					} else if (rv == 0)
+					}
+					else if (rv == 0)
 					{
 						currentToken->tokenType |= MSC_TOKEN_TYPE_KNOWN;
 						strncpy(currentToken->tokenName,
 							tokenInfo.tokenName, MSC_MAXSIZE_TOKENAME);
-					} else
+					}
+					else
 					{
 						currentToken->tokenType |= MSC_TOKEN_TYPE_UNKNOWN;
 						strncpy(currentToken->tokenName,
@@ -214,7 +209,8 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 						memcpy(currentToken->tokenId,
 							rgReaderStates.rgbAtr, rgReaderStates.cbAtr);
 						currentToken->tokenIdLength = rgReaderStates.cbAtr;
-					} else
+					}
+					else
 					{
 						memset(currentToken->tokenId, 0x00, MAX_ATR_SIZE);
 						currentToken->tokenIdLength = 0x00;
@@ -231,7 +227,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 		/*
 		 * End of if token present 
 		 */
-		while (readerList[++i] != 0) ;
+		while (readerList[++i] != 0);
 	}	/* End of for .. readers */
 
 	if (readerList)
@@ -260,16 +256,16 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 }
 
 MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
-			      MSCULong32 sharingMode,
-			      MSCPUChar8 applicationName,
-			      MSCULong32 nameSize, 
-			      MSCLPTokenConnection pConnection)
+	MSCULong32 sharingMode,
+	MSCPUChar8 applicationName,
+	MSCULong32 nameSize, MSCLPTokenConnection pConnection)
 {
 	MSCLong32 rv;
 	MSCULong32 tokenSize;
 	MSCLPTokenInfo tokenList;
 	MSCPVoid32 vInitFunction;
 	MSCPVoid32 vIdFunction;
+
 	MSCLong32(*libPL_MSCInitializePlugin) (MSCLPTokenConnection);
 	MSCLong32(*libPL_MSCIdentifyToken) (MSCLPTokenConnection);
 	MSCULong32 dwActiveProtocol;
@@ -308,13 +304,10 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	if (sharingMode != MSC_SHARE_DIRECT)
 	{
 		if (strcmp(tokenStruct->tokenName, MSC_TOKEN_EMPTY_STR) == 0)
-		{
 			return MSC_TOKEN_REMOVED;
-		} else if (strcmp(tokenStruct->tokenName,
-				MSC_TOKEN_UNKNOWN_STR) == 0)
-		{
-			return MSC_UNRECOGNIZED_TOKEN;
-		}
+		else
+			if (strcmp(tokenStruct->tokenName, MSC_TOKEN_UNKNOWN_STR) == 0)
+				return MSC_UNRECOGNIZED_TOKEN;
 	}
 
 	/*
@@ -324,8 +317,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	mscLockThread();
 	if (localHContext == 0)
 	{
-		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0,
-			&localHContext);
+		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &localHContext);
 #ifdef MSC_DEBUG
 		DebugLogB("SCardEstablishContext returns %s\n",
 			pcsc_stringify_error(rv));
@@ -338,10 +330,10 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		}
 
 		pConnection->hContext = localHContext;
-	} else
-	{
-		pConnection->hContext = localHContext;
 	}
+	else
+		pConnection->hContext = localHContext;
+
 	mscUnLockThread();
 
 #ifdef WIN32
@@ -368,15 +360,15 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	 */
 	switch (dwActiveProtocol)
 	{
-	case SCARD_PROTOCOL_T0:
-		pConnection->ioType = SCARD_PCI_T0;
-		break;
-	case SCARD_PROTOCOL_T1:
-		pConnection->ioType = SCARD_PCI_T1;
-		break;
-	default:
-		pConnection->ioType = SCARD_PCI_RAW;
-		break;
+		case SCARD_PROTOCOL_T0:
+			pConnection->ioType = SCARD_PCI_T0;
+			break;
+		case SCARD_PROTOCOL_T1:
+			pConnection->ioType = SCARD_PCI_T1;
+			break;
+		default:
+			pConnection->ioType = SCARD_PCI_RAW;
+			break;
 	}
 
 	/*
@@ -411,7 +403,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		(strcmp(slotName, tokenStruct->slotName) != 0) ||
 		(memcmp(tokenId, tokenStruct->tokenId, tokenIdLength) != 0))
 	{
-	        DebugLogA("Internal inconsistent values, ID, slotName\n");
+		DebugLogA("Internal inconsistent values, ID, slotName\n");
 		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
 		pConnection->hCard = 0;
 		return MSC_INCONSISTENT_STATUS;
@@ -467,42 +459,42 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	libPL_MSCInitializePlugin = (MSCLong32(*)(MSCLPTokenConnection))
 		vInitFunction;
 
-	libPL_MSCIdentifyToken = (MSCLong32(*)(MSCLPTokenConnection))
-		vIdFunction;
+	libPL_MSCIdentifyToken = (MSCLong32(*)(MSCLPTokenConnection)) vIdFunction;
 
 	rv = (*libPL_MSCInitializePlugin) (pConnection);
 
 	if (rv != MSC_SUCCESS)
 	{
-	        SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
-	        if (pConnection->tokenLibHandle != 0)
-	        {
-		       TPUnloadToken(pConnection);
-		       pConnection->tokenLibHandle = 0;
-	        }
-	        pConnection->hCard = 0;
+		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
+		if (pConnection->tokenLibHandle != 0)
+		{
+			TPUnloadToken(pConnection);
+			pConnection->tokenLibHandle = 0;
+		}
+		pConnection->hCard = 0;
 	}
 
 	if (sharingMode != MSC_SHARE_DIRECT)
 	{
 
-	        if ((applicationName == 0) || (nameSize == 0))
-	        {
-		        /*
-		         * Use the default AID given by the Info.plist 
-		         */
+		if ((applicationName == 0) || (nameSize == 0))
+		{
+			/*
+			 * Use the default AID given by the Info.plist 
+			 */
 
-		         rv = (*libPL_MSCIdentifyToken) (pConnection);
-  	        } else
-	        {
-		        pConnection->tokenInfo.tokenAppLen = nameSize;
-		        memcpy(pConnection->tokenInfo.tokenApp, 
-			       applicationName, nameSize);
-		        rv = (*libPL_MSCIdentifyToken) (pConnection);
-	        }
+			rv = (*libPL_MSCIdentifyToken) (pConnection);
+		}
+		else
+		{
+			pConnection->tokenInfo.tokenAppLen = nameSize;
+			memcpy(pConnection->tokenInfo.tokenApp,
+				applicationName, nameSize);
+			rv = (*libPL_MSCIdentifyToken) (pConnection);
+		}
 
 #ifdef MSC_DEBUG
-	DebugLogB("MSCIdentifyToken returns %s\n", msc_error(rv));
+		DebugLogB("MSCIdentifyToken returns %s\n", msc_error(rv));
 #endif
 
 		if (rv != MSC_SUCCESS)
@@ -526,10 +518,10 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 }
 
 MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
-			    MSCULong32 endAction)
+	MSCULong32 endAction)
 {
-
 	MSCLong32 rv = SCARD_S_SUCCESS;
+
 	MSCLong32(*libPL_MSCFinalizePlugin) (MSCLPTokenConnection);
 	MSCPVoid32 vFunction;
 
@@ -537,6 +529,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
+
 	if (pConnection->tokenLibHandle == 0 ||
 		pConnection->hContext == 0 || pConnection->hCard == 0)
 	{
@@ -555,8 +548,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 		return MSC_INTERNAL_ERROR;
 	}
 
-	libPL_MSCFinalizePlugin = (MSCLong32(*)(MSCLPTokenConnection))
-		vFunction;
+	libPL_MSCFinalizePlugin = (MSCLong32(*)(MSCLPTokenConnection)) vFunction;
 
 	/*
 	 * Stop and clean up the plugin 
@@ -570,9 +562,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 	{
 		rv = SCardDisconnect(pConnection->hCard, endAction);
 		if (pcscToMSC(rv) != MSC_SUCCESS)
-		{
 			return pcscToMSC(rv);
-		}
 	}
 
 	/*
@@ -593,10 +583,8 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
-			    MSCULong32 arraySize, 
-			    MSCULong32 timeoutValue)
+	MSCULong32 arraySize, MSCULong32 timeoutValue)
 {
-
 	MSCLong32 rv, rt;
 	LPSCARD_READERSTATE_A rgReaderStates;
 	MSCTokenInfo tokenInfo;
@@ -611,12 +599,10 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 	 */
 
 	if (arraySize == 0)
-	{
 		return MSC_SUCCESS;
-	} else if (arraySize > MSC_MAXSIZE_TOKENARRAY)
-	{
-		return MSC_INSUFFICIENT_BUFFER;
-	}
+	else
+		if (arraySize > MSC_MAXSIZE_TOKENARRAY)
+			return MSC_INSUFFICIENT_BUFFER;
 
 	/*
 	 * Set up the initial connection to the resource manager 
@@ -625,8 +611,7 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 	mscLockThread();
 	if (localHContext == 0)
 	{
-		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0,
-			&localHContext);
+		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &localHContext);
 		if (pcscToMSC(rv) != MSC_SUCCESS)
 		{
 			localHContext = 0;
@@ -640,9 +625,7 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 		malloc(sizeof(SCARD_READERSTATE_A) * arraySize);
 
 	if (rgReaderStates == 0)
-	{
 		return MSC_INTERNAL_ERROR;
-	}
 
 	for (i = 0; i < arraySize; i++)
 	{
@@ -672,16 +655,13 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 	for (i = 0; i < arraySize; i++)
 	{
 		if (tokenArray[i].tokenState == 0)
-		{
-			rgReaderStates[i].dwCurrentState =
-				rgReaderStates[i].dwEventState;
-		} else if (tokenArray[i].tokenState == MSC_STATE_UNAWARE)
-		{
-			rgReaderStates[i].dwCurrentState = SCARD_STATE_UNAWARE;
-		} else
-		{
-			rgReaderStates[i].dwCurrentState = tokenArray[i].tokenState;
-		}
+			rgReaderStates[i].dwCurrentState = rgReaderStates[i].dwEventState;
+		else
+			if (tokenArray[i].tokenState == MSC_STATE_UNAWARE)
+				rgReaderStates[i].dwCurrentState = SCARD_STATE_UNAWARE;
+			else
+				rgReaderStates[i].dwCurrentState = tokenArray[i].tokenState;
+
 		rgReaderStates[i].dwEventState = 0;
 	}
 
@@ -704,7 +684,8 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 				tokenArray[i].tokenType = MSC_TOKEN_TYPE_REMOVED;
 				strncpy(tokenArray[i].tokenName, MSC_TOKEN_EMPTY_STR,
 					MSC_MAXSIZE_TOKENAME);
-			} else if (tokenArray[i].tokenState & MSC_STATE_PRESENT)
+			}
+			else if (tokenArray[i].tokenState & MSC_STATE_PRESENT)
 			{
 				memcpy(tokenArray[i].tokenId, rgReaderStates[i].rgbAtr,
 					rgReaderStates[i].cbAtr);
@@ -720,7 +701,8 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 					tokenArray[i].tokenType = MSC_TOKEN_TYPE_KNOWN;
 					strncpy(tokenArray[i].tokenName, tokenInfo.tokenName,
 						MSC_MAXSIZE_TOKENAME);
-				} else
+				}
+				else
 				{
 					tokenArray[i].tokenType = MSC_TOKEN_TYPE_UNKNOWN;
 					strncpy(tokenArray[i].tokenName, MSC_TOKEN_UNKNOWN_STR,
@@ -736,7 +718,6 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 
 MSC_RV MSCCancelEventWait(void)
 {
-
 	MSCLong32 rv;
 
 	rv = SCardCancel(localHContext);
@@ -748,49 +729,36 @@ MSC_RV MSCCancelEventWait(void)
 #ifdef USE_THREAD_SAFETY
 void *_MSCEventThread(void *arg)
 {
-
 	MSCLong32 rv;
 	MSCLPEventWaitInfo evlist;
 	MSCLong32 curToken;
 
 	if (arg == NULL)
-	{
 		SYS_ThreadExit(NULL);
-	}
 
 	evlist = (MSCLPEventWaitInfo) arg;
 	blockingContext = MSC_BLOCKSTATUS_BLOCKING;
 
 	while (1)
 	{
-		rv = MSCWaitForTokenEvent(evlist->tokenArray, 
-					  evlist->arraySize,
-					  MSC_NO_TIMEOUT);
+		rv = MSCWaitForTokenEvent(evlist->tokenArray,
+			evlist->arraySize, MSC_NO_TIMEOUT);
 
 		if (rv == MSC_SUCCESS)
-		{
-		       (evlist->callBack) (evlist->tokenArray, 
-					   evlist->arraySize,
-					   evlist->appData);
-		} else {
-		       break;
+			(evlist->callBack) (evlist->tokenArray, evlist->arraySize, evlist->appData);
+		else
+			break;
 
-		}
-		
 		if (blockingContext == MSC_BLOCKSTATUS_CANCELLING)
-		{
-		        break;
-		}
+			break;
 	}
 
 	for (curToken = 0; curToken < evlist->arraySize; curToken++)
 	{
-	        if (evlist->tokenArray[curToken].addParams)
-	        {
-		        free(evlist->tokenArray[curToken].addParams);
-	        }
+		if (evlist->tokenArray[curToken].addParams)
+			free(evlist->tokenArray[curToken].addParams);
 	}
-	
+
 	free(evlist->tokenArray);
 	free(evlist);
 	blockingContext = MSC_BLOCKSTATUS_RESUME;
@@ -800,9 +768,7 @@ void *_MSCEventThread(void *arg)
 }
 
 MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
-				MSCULong32 arraySize, 
-				MSCCallBack callBack, 
-				MSCPVoid32 appData)
+	MSCULong32 arraySize, MSCCallBack callBack, MSCPVoid32 appData)
 {
 	MSCLPEventWaitInfo evlist;
 	MSCULong32 curToken;
@@ -813,9 +779,7 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	evlist = (MSCLPEventWaitInfo) malloc(sizeof(MSCEventWaitInfo));
 
 	if (evlist == NULL)
-	{
 		return MSC_INTERNAL_ERROR;
-	}
 
 	evlist->arraySize = arraySize;
 	evlist->tokenArray = malloc(sizeof(MSCTokenInfo) * arraySize);
@@ -829,8 +793,7 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	}
 
 	mscLockThread();
-	memcpy(evlist->tokenArray, tokenArray,
-		sizeof(MSCTokenInfo) * arraySize);
+	memcpy(evlist->tokenArray, tokenArray, sizeof(MSCTokenInfo) * arraySize);
 
 	/*
 	 * Copy the "extra" data 
@@ -849,31 +812,28 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	}
 	mscUnLockThread();
 
-	if (SYS_ThreadCreate(&callbackThread, NULL, _MSCEventThread, 
-			     (void *) evlist) == 0)
-	{
+	if (SYS_ThreadCreate(&callbackThread, NULL, _MSCEventThread,
+			(void *) evlist) == 0)
 		return MSC_INTERNAL_ERROR;
-	}
 
 	return MSC_SUCCESS;
 }
 
 MSC_RV MSCCallbackCancelEvent(void)
 {
+	LONG rv;
 
-        LONG rv;
-
-        /* Release the thread and stop the GetStatusChange */
-        if (blockingContext == MSC_BLOCKSTATUS_BLOCKING)
-	{  
-                blockingContext = MSC_BLOCKSTATUS_CANCELLING;
-	        rv = MSCCancelEventWait();
+	/* Release the thread and stop the GetStatusChange */
+	if (blockingContext == MSC_BLOCKSTATUS_BLOCKING)
+	{
+		blockingContext = MSC_BLOCKSTATUS_CANCELLING;
+		rv = MSCCancelEventWait();
 
 		SYS_ThreadJoin(&callbackThread, 0);
 
-	} 
+	}
 
-      return MSC_SUCCESS;
+	return MSC_SUCCESS;
 }
 
 #endif
@@ -881,7 +841,6 @@ MSC_RV MSCCallbackCancelEvent(void)
 
 MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 {
-
 	MSCLong32 rv;
 	MSCLong32 ret;
 
@@ -893,38 +852,21 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 		rv = SCardBeginTransaction(pConnection->hCard);
 		ret = pcscToMSC(rv);
 
-/* Changes made by Jamie Nicolson
-		if (ret == MSC_SUCCESS)
-			break;
-*/
 		if (ret == MSC_TOKEN_RESET)
 		{
-		        pConnection->tokenInfo.tokenType |= 
-			  MSC_TOKEN_TYPE_RESET;
+			pConnection->tokenInfo.tokenType |= MSC_TOKEN_TYPE_RESET;
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
-
-/*  Changes by Jamie Nicolson
-			continue;
-*/
-
-		} else if (ret == MSC_TOKEN_REMOVED)
+		}
+		else if (ret == MSC_TOKEN_REMOVED)
 		{
-		        pConnection->tokenInfo.tokenType = 
-			  MSC_TOKEN_TYPE_REMOVED;
+			pConnection->tokenInfo.tokenType = MSC_TOKEN_TYPE_REMOVED;
 
-/* Changes by Jamie Nicolson
-				return ret;
-         }
-*/
-		    break;
-		} else {
 			break;
 		}
-/* End of additions by Jamie */
-
-
+		else
+			break;
 	}
 
 	return ret;
@@ -933,7 +875,6 @@ MSC_RV MSCBeginTransaction(MSCLPTokenConnection pConnection)
 MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 	MSCULong32 endAction)
 {
-
 	MSCLong32 rv;
 	MSCLong32 ret;
 
@@ -945,35 +886,20 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 		rv = SCardEndTransaction(pConnection->hCard, endAction);
 		ret = pcscToMSC(rv);
 
-/* Changes by Jamie Nicolson
-		if (ret == MSC_SUCCESS)
-			break;
-*/
-
 		if (ret == MSC_TOKEN_RESET)
 		{
-		        pConnection->tokenInfo.tokenType |= 
-			  MSC_TOKEN_TYPE_RESET;
+			pConnection->tokenInfo.tokenType |= MSC_TOKEN_TYPE_RESET;
 			ret = MSCReEstablishConnection(pConnection);
 			if (ret != MSC_SUCCESS)
 				break;
-/* Changes by Jamie Nicolson
-			continue;
-*/
-		} else if (ret == MSC_TOKEN_REMOVED)
+		}
+		else if (ret == MSC_TOKEN_REMOVED)
 		{
-		        pConnection->tokenInfo.tokenType = 
-			  MSC_TOKEN_TYPE_REMOVED;
-/* Changes by Jamie Nicolson
-			return ret;
-		}
-*/
-			break;
-		} else {
+			pConnection->tokenInfo.tokenType = MSC_TOKEN_TYPE_REMOVED;
 			break;
 		}
-/* End of Jamie's changes */
-
+		else
+			break;
 	}
 
 	return ret;
@@ -982,9 +908,9 @@ MSC_RV MSCEndTransaction(MSCLPTokenConnection pConnection,
 MSC_RV MSCWriteFramework(MSCLPTokenConnection pConnection,
 	MSCLPInitTokenParams pInitParams)
 {
-
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCWriteFramework) (MSCLPTokenConnection,
 		MSCLPInitTokenParams);
 
@@ -1001,10 +927,9 @@ MSC_RV MSCWriteFramework(MSCLPTokenConnection pConnection,
 				MSCLPInitTokenParams)) vFunction;
 		rv = (*libMSCWriteFramework) (pConnection, pInitParams);
 
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1018,6 +943,7 @@ MSC_RV MSCGetStatus(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCGetStatus) (MSCLPTokenConnection, MSCLPStatusInfo);
 
 	if (pConnection == NULL)
@@ -1033,10 +959,9 @@ MSC_RV MSCGetStatus(MSCLPTokenConnection pConnection,
 				MSCLPStatusInfo)) vFunction;
 		rv = (*libMSCGetStatus) (pConnection, pStatusInfo);
 
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1046,6 +971,7 @@ MSC_RV MSCGetCapabilities(MSCLPTokenConnection pConnection, MSCULong32 Tag,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCGetCapabilities) (MSCLPTokenConnection, MSCULong32,
 		MSCPUChar8, MSCPULong32);
 
@@ -1062,11 +988,9 @@ MSC_RV MSCGetCapabilities(MSCLPTokenConnection pConnection, MSCULong32 Tag,
 			(MSCLong32(*)(MSCLPTokenConnection, MSCULong32, MSCPUChar8,
 				MSCPULong32)) vFunction;
 		rv = (*libMSCGetCapabilities) (pConnection, Tag, Value, Length);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1077,6 +1001,7 @@ MSC_RV MSCExtendedFeature(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCExtendedFeature) (MSCLPTokenConnection, MSCULong32,
 		MSCPUChar8, MSCULong32, MSCPUChar8, MSCPULong32);
 
@@ -1094,11 +1019,9 @@ MSC_RV MSCExtendedFeature(MSCLPTokenConnection pConnection,
 				MSCULong32, MSCPUChar8, MSCPULong32)) vFunction;
 		rv = (*libMSCExtendedFeature) (pConnection, extFeature, outData,
 			outLength, inData, inLength);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1108,6 +1031,7 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCGenerateKeys) (MSCLPTokenConnection, MSCUChar8,
 		MSCUChar8, MSCLPGenKeyParams);
 
@@ -1121,31 +1045,26 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCGenerateKeys = (MSCLong32(*)(MSCLPTokenConnection,
-						   MSCUChar8, MSCUChar8, 
-						   MSCLPGenKeyParams)) 
-		  vFunction;
+				MSCUChar8, MSCUChar8, MSCLPGenKeyParams)) vFunction;
 		rv = (*libMSCGenerateKeys) (pConnection, prvKeyNum, pubKeyNum,
-					    pParams);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
+			pParams);
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
-                    MSCLPKeyACL pKeyACL, MSCPUChar8 pKeyBlob,MSCULong32 keyBlobSize, 
-		    MSCLPKeyPolicy keyPolicy, MSCPVoid32 pAddParams, 
-		    MSCUChar8 addParamsSize)
+	MSCLPKeyACL pKeyACL, MSCPUChar8 pKeyBlob, MSCULong32 keyBlobSize,
+	MSCLPKeyPolicy keyPolicy, MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
-	MSCLong32(*libMSCImportKey) (MSCLPTokenConnection, MSCUChar8, 
-                                     MSCLPKeyACL, MSCPUChar8, 
-				     MSCULong32, MSCLPKeyPolicy, MSCPVoid32,
-				     MSCUChar8);
+
+	MSCLong32(*libMSCImportKey) (MSCLPTokenConnection, MSCUChar8,
+		MSCLPKeyACL, MSCPUChar8,
+		MSCULong32, MSCLPKeyPolicy, MSCPVoid32, MSCUChar8);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1156,31 +1075,28 @@ MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	if (vFunction != 0)
 	{
-		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection, 
-						MSCUChar8, 
-						MSCLPKeyACL, MSCPUChar8, 
-						MSCULong32, MSCLPKeyPolicy, 
-						MSCPVoid32, MSCUChar8)) 
-		  vFunction;
+		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection,
+				MSCUChar8,
+				MSCLPKeyACL, MSCPUChar8,
+				MSCULong32, MSCLPKeyPolicy, MSCPVoid32, MSCUChar8)) vFunction;
 
-		rv = (*libMSCImportKey) (pConnection, keyNum,  
-					 pKeyACL, pKeyBlob, keyBlobSize, 
-					 keyPolicy, pAddParams, addParamsSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
+		rv = (*libMSCImportKey) (pConnection, keyNum,
+			pKeyACL, pKeyBlob, keyBlobSize,
+			keyPolicy, pAddParams, addParamsSize);
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
-		    MSCPUChar8 pKeyBlob, MSCPULong32 keyBlobSize,
-		    MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
+	MSCPUChar8 pKeyBlob, MSCPULong32 keyBlobSize,
+	MSCPVoid32 pAddParams, MSCUChar8 addParamsSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCExportKey) (MSCLPTokenConnection, MSCUChar8,
 		MSCPUChar8, MSCPULong32, MSCPVoid32, MSCUChar8);
 
@@ -1193,32 +1109,29 @@ MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	if (vFunction != 0)
 	{
-		libMSCExportKey = (MSCLong32(*)(MSCLPTokenConnection, 
-						MSCUChar8, MSCPUChar8, 
-						MSCPULong32, MSCPVoid32, 
-						MSCUChar8)) vFunction;
+		libMSCExportKey = (MSCLong32(*)(MSCLPTokenConnection,
+				MSCUChar8, MSCPUChar8,
+				MSCPULong32, MSCPVoid32, MSCUChar8)) vFunction;
 
 		rv = (*libMSCExportKey) (pConnection, keyNum, pKeyBlob,
 			keyBlobSize, pAddParams, addParamsSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
-		       MSCLPCryptInit cryptInit, MSCPUChar8 pInputData,
-		       MSCULong32 inputDataSize, MSCPUChar8 pOutputData,
-		       MSCPULong32 outputDataSize)
+	MSCLPCryptInit cryptInit, MSCPUChar8 pInputData,
+	MSCULong32 inputDataSize, MSCPUChar8 pOutputData,
+	MSCPULong32 outputDataSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCComputeCrypt) (MSCLPTokenConnection, MSCLPCryptInit,
-					MSCPUChar8, MSCULong32, MSCPUChar8, 
-					MSCPULong32);
+		MSCPUChar8, MSCULong32, MSCPUChar8, MSCPULong32);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1230,31 +1143,26 @@ MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCComputeCrypt =
-			(MSCLong32(*)(MSCLPTokenConnection, MSCLPCryptInit, 
-				      MSCPUChar8, MSCULong32, MSCPUChar8, 
-				      MSCPULong32)) vFunction;
+			(MSCLong32(*)(MSCLPTokenConnection, MSCLPCryptInit,
+				MSCPUChar8, MSCULong32, MSCPUChar8, MSCPULong32)) vFunction;
 		rv = (*libMSCComputeCrypt) (pConnection, cryptInit, pInputData,
-					    inputDataSize, pOutputData, 
-					    outputDataSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
+			inputDataSize, pOutputData, outputDataSize);
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
-			  MSCUChar8 keyNum, MSCUChar8 cipherMode, 
-			  MSCUChar8 cipherDirection,
-			  MSCPUChar8 pData, MSCULong32 dataSize)
+	MSCUChar8 keyNum, MSCUChar8 cipherMode,
+	MSCUChar8 cipherDirection, MSCPUChar8 pData, MSCULong32 dataSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCExtAuthenticate) (MSCLPTokenConnection, MSCUChar8,
-					   MSCUChar8, MSCUChar8, MSCPUChar8, 
-					   MSCULong32);
+		MSCUChar8, MSCUChar8, MSCPUChar8, MSCULong32);
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -1266,24 +1174,23 @@ MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
 	if (vFunction != 0)
 	{
 		libMSCExtAuthenticate =
-			(MSCLong32(*)(MSCLPTokenConnection, MSCUChar8, 
-				      MSCUChar8, MSCUChar8, MSCPUChar8, 
-				      MSCULong32)) vFunction;
+			(MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
+				MSCUChar8, MSCUChar8, MSCPUChar8, MSCULong32)) vFunction;
 		rv = (*libMSCExtAuthenticate) (pConnection, keyNum, cipherMode,
 			cipherDirection, pData, dataSize);
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
-		   MSCLPKeyInfo pKeyInfo)
+	MSCLPKeyInfo pKeyInfo)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCListKeys) (MSCLPTokenConnection, MSCUChar8,
 		MSCLPKeyInfo);
 
@@ -1297,13 +1204,11 @@ MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
 	if (vFunction != 0)
 	{
 		libMSCListKeys = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
-					       MSCLPKeyInfo)) vFunction;
+				MSCLPKeyInfo)) vFunction;
 		rv = (*libMSCListKeys) (pConnection, seqOption, pKeyInfo);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1315,6 +1220,7 @@ MSC_RV MSCCreatePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCCreatePIN) (MSCLPTokenConnection, MSCUChar8,
 		MSCUChar8, MSCPUChar8, MSCULong32, MSCPUChar8, MSCUChar8);
 
@@ -1332,11 +1238,9 @@ MSC_RV MSCCreatePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 				MSCULong32, MSCPUChar8, MSCUChar8)) vFunction;
 		rv = (*libMSCCreatePIN) (pConnection, pinNum, pinAttempts,
 			pPinCode, pinCodeSize, pUnblockCode, unblockCodeSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1346,6 +1250,7 @@ MSC_RV MSCVerifyPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCVerifyPIN) (MSCLPTokenConnection, MSCUChar8,
 		MSCPUChar8, MSCULong32);
 
@@ -1360,13 +1265,10 @@ MSC_RV MSCVerifyPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 	{
 		libMSCVerifyPIN = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCPUChar8, MSCULong32)) vFunction;
-		rv = (*libMSCVerifyPIN) (pConnection, pinNum, pPinCode,
-			pinCodeSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
+		rv = (*libMSCVerifyPIN) (pConnection, pinNum, pPinCode, pinCodeSize);
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1377,6 +1279,7 @@ MSC_RV MSCChangePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCChangePIN) (MSCLPTokenConnection, MSCUChar8,
 		MSCPUChar8, MSCUChar8, MSCPUChar8, MSCUChar8);
 
@@ -1393,11 +1296,9 @@ MSC_RV MSCChangePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 				MSCPUChar8, MSCUChar8, MSCPUChar8, MSCUChar8)) vFunction;
 		rv = (*libMSCChangePIN) (pConnection, pinNum, pOldPinCode,
 			oldPinCodeSize, pNewPinCode, newPinCodeSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1407,6 +1308,7 @@ MSC_RV MSCUnblockPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCUnblockPIN) (MSCLPTokenConnection, MSCUChar8,
 		MSCPUChar8, MSCULong32);
 
@@ -1423,20 +1325,18 @@ MSC_RV MSCUnblockPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 				MSCUChar8, MSCPUChar8, MSCULong32)) vFunction;
 		rv = (*libMSCUnblockPIN) (pConnection, pinNum, pUnblockCode,
 			unblockCodeSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
-MSC_RV MSCListPINs(MSCLPTokenConnection pConnection,
-	MSCPUShort16 pPinBitMask)
+MSC_RV MSCListPINs(MSCLPTokenConnection pConnection, MSCPUShort16 pPinBitMask)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCListPINs) (MSCLPTokenConnection, MSCPUShort16);
 
 	if (pConnection == NULL)
@@ -1451,11 +1351,9 @@ MSC_RV MSCListPINs(MSCLPTokenConnection pConnection,
 		libMSCListPINs = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCPUShort16)) vFunction;
 		rv = (*libMSCListPINs) (pConnection, pPinBitMask);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1465,6 +1363,7 @@ MSC_RV MSCCreateObject(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCCreateObject) (MSCLPTokenConnection, MSCString,
 		MSCULong32, MSCLPObjectACL);
 
@@ -1481,10 +1380,9 @@ MSC_RV MSCCreateObject(MSCLPTokenConnection pConnection,
 				MSCULong32, MSCLPObjectACL)) vFunction;
 		rv = (*libMSCCreateObject) (pConnection, objectID, objectSize,
 			pObjectACL);
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
@@ -1494,6 +1392,7 @@ MSC_RV MSCDeleteObject(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCDeleteObject) (MSCLPTokenConnection, MSCString,
 		MSCUChar8);
 
@@ -1509,25 +1408,25 @@ MSC_RV MSCDeleteObject(MSCLPTokenConnection pConnection,
 		libMSCDeleteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
 				MSCUChar8)) vFunction;
 		rv = (*libMSCDeleteObject) (pConnection, objectID, zeroFlag);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
-		      MSCString objectID, MSCULong32 offSet,
-		      MSCPUChar8 pInputData, MSCULong32 dataSize,
-		      LPRWEventCallback rwCallback, MSCPVoid32 addParams)
+	MSCString objectID, MSCULong32 offSet,
+	MSCPUChar8 pInputData, MSCULong32 dataSize,
+	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
 {
 	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
 	MSCULong32 objectSize;
 	int totalSteps, stepInterval;
+
 	MSC_RV(*callBackFunction) (void *, int);
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCWriteObject) (MSCLPTokenConnection, MSCString,
 		MSCULong32, MSCPUChar8, MSCUChar8);
 	int i;
@@ -1537,18 +1436,15 @@ MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
 	if (localHContext == 0)
 		return MSC_INTERNAL_ERROR;
 
-	vFunction        = pConnection->libPointers.pvfWriteObject;
+	vFunction = pConnection->libPointers.pvfWriteObject;
 	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize       = dataSize;
+	objectSize = dataSize;
 
 	if (vFunction == 0)
-	{
-	        return MSC_UNSUPPORTED_FEATURE;
-        }
+		return MSC_UNSUPPORTED_FEATURE;
 
 	libMSCWriteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
-					  MSCULong32, MSCPUChar8, MSCUChar8)) 
-	  vFunction;
+			MSCULong32, MSCPUChar8, MSCUChar8)) vFunction;
 
 	/*
 	 * Figure out the number of steps total and present this in a percent
@@ -1560,59 +1456,49 @@ MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
 
 	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
 	{
-	  rv = (*libMSCWriteObject) (pConnection, objectID, 
-				     i * MSC_SIZEOF_KEYPACKET + offSet,
-				     &pInputData[i * MSC_SIZEOF_KEYPACKET], 
-				     MSC_SIZEOF_KEYPACKET);				     
+		rv = (*libMSCWriteObject) (pConnection, objectID,
+			i * MSC_SIZEOF_KEYPACKET + offSet,
+			&pInputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
 		if (rv != MSC_SUCCESS)
-		{
 			return rv;
-		}
 
 		if (rwCallback)
 		{
 			if ((*callBackFunction) (addParams,
-			      stepInterval * i) == MSC_CANCELLED)
-			{
+					stepInterval * i) == MSC_CANCELLED)
 				return MSC_CANCELLED;
-			}
 		}
 	}
 
 	if (objectSize % MSC_SIZEOF_KEYPACKET)
 	{
-
-	  rv = (*libMSCWriteObject) (pConnection, objectID, 
-				     i * MSC_SIZEOF_KEYPACKET + offSet,
-				     &pInputData[i * MSC_SIZEOF_KEYPACKET], 
-				     objectSize % MSC_SIZEOF_KEYPACKET);
+		rv = (*libMSCWriteObject) (pConnection, objectID,
+			i * MSC_SIZEOF_KEYPACKET + offSet,
+			&pInputData[i * MSC_SIZEOF_KEYPACKET],
+			objectSize % MSC_SIZEOF_KEYPACKET);
 
 		if (rv != MSC_SUCCESS)
-		{
 			return rv;
-		}
 	}
 
 	if (rwCallback)
-	{
 		(*callBackFunction) (addParams, MSC_PERCENT_STEPSIZE);
-	}
 
 	return rv;
 }
 
 MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
-		     MSCString objectID, MSCULong32 offSet,
-		     MSCPUChar8 pOutputData, MSCULong32 dataSize,
-		     LPRWEventCallback rwCallback, 
-		     MSCPVoid32 addParams)
+	MSCString objectID, MSCULong32 offSet,
+	MSCPUChar8 pOutputData, MSCULong32 dataSize,
+	LPRWEventCallback rwCallback, MSCPVoid32 addParams)
 {
-
-        MSC_RV rv = MSC_UNSPECIFIED_ERROR;
+	MSC_RV rv = MSC_UNSPECIFIED_ERROR;
 	MSCULong32 objectSize;
 	int totalSteps, stepInterval;
+
 	MSC_RV(*callBackFunction) (void *, int);
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCReadObject) (MSCLPTokenConnection, MSCString,
 		MSCULong32, MSCPUChar8, MSCUChar8);
 	int i;
@@ -1622,19 +1508,15 @@ MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
 	if (localHContext == 0)
 		return MSC_INTERNAL_ERROR;
 
-	vFunction        = pConnection->libPointers.pvfReadObject;
+	vFunction = pConnection->libPointers.pvfReadObject;
 	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
-	objectSize       = dataSize;
+	objectSize = dataSize;
 
 	if (vFunction == 0)
-	{
 		return MSC_UNSUPPORTED_FEATURE;
-	}
 
-	libMSCReadObject = (MSCLong32(*)(MSCLPTokenConnection, 
-					 MSCString, MSCULong32, 
-					 MSCPUChar8, MSCUChar8)) 
-	  vFunction;
+	libMSCReadObject = (MSCLong32(*)(MSCLPTokenConnection,
+			MSCString, MSCULong32, MSCPUChar8, MSCUChar8)) vFunction;
 
 	/*
 	 * Figure out the number of steps total and present this in a percent
@@ -1646,37 +1528,30 @@ MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
 
 	for (i = 0; i < objectSize / MSC_SIZEOF_KEYPACKET; i++)
 	{
-	        rv = (*libMSCReadObject) (pConnection, objectID, 
-				    i * MSC_SIZEOF_KEYPACKET + offSet,
-				    &pOutputData[i * MSC_SIZEOF_KEYPACKET], 
-				    MSC_SIZEOF_KEYPACKET);
+		rv = (*libMSCReadObject) (pConnection, objectID,
+			i * MSC_SIZEOF_KEYPACKET + offSet,
+			&pOutputData[i * MSC_SIZEOF_KEYPACKET], MSC_SIZEOF_KEYPACKET);
 
 		if (rv != MSC_SUCCESS)
-		{
 			return rv;
-		}
 
 		if (rwCallback)
 		{
 			if ((*callBackFunction) (addParams,
 					stepInterval * i) == MSC_CANCELLED)
-			{
 				return MSC_CANCELLED;
-			}
 		}
 	}
 
 	if (objectSize % MSC_SIZEOF_KEYPACKET)
 	{
-	        rv = (*libMSCReadObject) (pConnection, objectID, 
-				    i * MSC_SIZEOF_KEYPACKET + offSet,
-				    &pOutputData[i * MSC_SIZEOF_KEYPACKET], 
-				    objectSize % MSC_SIZEOF_KEYPACKET);
+		rv = (*libMSCReadObject) (pConnection, objectID,
+			i * MSC_SIZEOF_KEYPACKET + offSet,
+			&pOutputData[i * MSC_SIZEOF_KEYPACKET],
+			objectSize % MSC_SIZEOF_KEYPACKET);
 
 		if (rv != MSC_SUCCESS)
-		{
 			return rv;
-		}
 	}
 
 	if (rwCallback)
@@ -1692,6 +1567,7 @@ MSC_RV MSCListObjects(MSCLPTokenConnection pConnection,
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCListObjects) (MSCLPTokenConnection, MSCUChar8,
 		MSCLPObjectInfo);
 
@@ -1707,20 +1583,18 @@ MSC_RV MSCListObjects(MSCLPTokenConnection pConnection,
 		libMSCListObjects = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCLPObjectInfo)) vFunction;
 		rv = (*libMSCListObjects) (pConnection, seqOption, pObjectInfo);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCLogoutAll(MSCLPTokenConnection pConnection)
 {
-
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCLogoutAll) (MSCLPTokenConnection);
 
 	if (pConnection == NULL)
@@ -1734,21 +1608,19 @@ MSC_RV MSCLogoutAll(MSCLPTokenConnection pConnection)
 	{
 		libMSCLogoutAll = (MSCLong32(*)(MSCLPTokenConnection)) vFunction;
 		rv = (*libMSCLogoutAll) (pConnection);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCGetChallenge(MSCLPTokenConnection pConnection, MSCPUChar8 pSeed,
-	MSCUShort16 seedSize, MSCPUChar8 pRandomData,
-	MSCUShort16 randomDataSize)
+	MSCUShort16 seedSize, MSCPUChar8 pRandomData, MSCUShort16 randomDataSize)
 {
 	MSCLong32 rv;
 	MSCPVoid32 vFunction;
+
 	MSCLong32(*libMSCGetChallenge) (MSCLPTokenConnection, MSCPUChar8,
 		MSCUShort16, MSCPUChar8, MSCUShort16);
 
@@ -1762,23 +1634,19 @@ MSC_RV MSCGetChallenge(MSCLPTokenConnection pConnection, MSCPUChar8 pSeed,
 	if (vFunction != 0)
 	{
 		libMSCGetChallenge = (MSCLong32(*)(MSCLPTokenConnection,
-				MSCPUChar8, MSCUShort16,
-				MSCPUChar8, MSCUShort16)) vFunction;
+				MSCPUChar8, MSCUShort16, MSCPUChar8, MSCUShort16)) vFunction;
 		rv = (*libMSCGetChallenge) (pConnection, pSeed, seedSize,
 			pRandomData, randomDataSize);
-
-	} else
-	{
-		return MSC_UNSUPPORTED_FEATURE;
 	}
+	else
+		return MSC_UNSUPPORTED_FEATURE;
 
 	return rv;
 }
 
 MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
-			   MSCUChar8 keyNumber, MSCLPKeyInfo pKeyInfo)
+	MSCUChar8 keyNumber, MSCLPKeyInfo pKeyInfo)
 {
-
 	MSC_RV rv;
 	MSCKeyInfo keyInfo;
 
@@ -1790,14 +1658,10 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 	rv = MSCListKeys(pConnection, MSC_SEQUENCE_RESET, &keyInfo);
 
 	if (rv != MSC_SEQUENCE_END && rv != MSC_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (rv == MSC_SEQUENCE_END)
-	{
 		return MSC_INVALID_PARAMETER;
-	}
 
 	if (keyNumber == keyInfo.keyNum)
 	{
@@ -1809,12 +1673,9 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 		pKeyInfo->keyPolicy.cipherDirection =
 			keyInfo.keyPolicy.cipherDirection;
 
-		pKeyInfo->keyACL.readPermission = 
-		  keyInfo.keyACL.readPermission;
-		pKeyInfo->keyACL.writePermission = 
-		  keyInfo.keyACL.writePermission;
-		pKeyInfo->keyACL.usePermission = 
-		  keyInfo.keyACL.usePermission;
+		pKeyInfo->keyACL.readPermission = keyInfo.keyACL.readPermission;
+		pKeyInfo->keyACL.writePermission = keyInfo.keyACL.writePermission;
+		pKeyInfo->keyACL.usePermission = keyInfo.keyACL.usePermission;
 
 		return MSC_SUCCESS;
 	}
@@ -1828,22 +1689,17 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 	while (rv == MSC_SUCCESS);
 
 	if (rv != MSC_SEQUENCE_END && rv != MSC_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (rv == MSC_SEQUENCE_END)
-	{
 		return MSC_INVALID_PARAMETER;
-	}
 
 	pKeyInfo->keyNum = keyInfo.keyNum;
 	pKeyInfo->keyType = keyInfo.keyType;
 	pKeyInfo->keySize = keyInfo.keySize;
 
 	pKeyInfo->keyPolicy.cipherMode = keyInfo.keyPolicy.cipherMode;
-	pKeyInfo->keyPolicy.cipherDirection =
-		keyInfo.keyPolicy.cipherDirection;
+	pKeyInfo->keyPolicy.cipherDirection = keyInfo.keyPolicy.cipherDirection;
 
 	pKeyInfo->keyACL.readPermission = keyInfo.keyACL.readPermission;
 	pKeyInfo->keyACL.writePermission = keyInfo.keyACL.writePermission;
@@ -1855,7 +1711,6 @@ MSC_RV MSCGetKeyAttributes(MSCLPTokenConnection pConnection,
 MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 	MSCString objectID, MSCLPObjectInfo pObjectInfo)
 {
-
 	MSC_RV rv;
 	MSCObjectInfo objInfo;
 
@@ -1867,14 +1722,10 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 	rv = MSCListObjects(pConnection, MSC_SEQUENCE_RESET, &objInfo);
 
 	if (rv != MSC_SEQUENCE_END && rv != MSC_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (rv == MSC_SEQUENCE_END)
-	{
 		return MSC_OBJECT_NOT_FOUND;
-	}
 
 	if (strncmp(objectID, objInfo.objectID, MSC_MAXSIZE_OBJID) == 0)
 	{
@@ -1898,18 +1749,13 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 	while (rv == MSC_SUCCESS);
 
 	if (rv != MSC_SEQUENCE_END && rv != MSC_SUCCESS)
-	{
 		return rv;
-	}
 
 	if (rv == MSC_SEQUENCE_END)
-	{
 		return MSC_OBJECT_NOT_FOUND;
-	}
 
 	pObjectInfo->objectSize = objInfo.objectSize;
-	pObjectInfo->objectACL.readPermission =
-		objInfo.objectACL.readPermission;
+	pObjectInfo->objectACL.readPermission = objInfo.objectACL.readPermission;
 	pObjectInfo->objectACL.writePermission =
 		objInfo.objectACL.writePermission;
 	pObjectInfo->objectACL.deletePermission =
@@ -1920,10 +1766,8 @@ MSC_RV MSCGetObjectAttributes(MSCLPTokenConnection pConnection,
 }
 
 MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
-			     MSCString objectID, MSCPUChar8 * pOutputData,
-			     MSCPULong32 dataSize, 
-			     LPRWEventCallback rwCallback, 
-			     MSCPVoid32 addParams)
+	MSCString objectID, MSCPUChar8 * pOutputData,
+	MSCPULong32 dataSize, LPRWEventCallback rwCallback, MSCPVoid32 addParams)
 {
 	MSC_RV rv;
 	MSCObjectInfo objInfo;
@@ -1935,9 +1779,7 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 		return MSC_INTERNAL_ERROR;
 
 	if (pOutputData == 0)
-	{
 		return MSC_INVALID_PARAMETER;
-	}
 
 	rv = MSCGetObjectAttributes(pConnection, objectID, &objInfo);
 
@@ -1953,147 +1795,145 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 	*pOutputData = (MSCPUChar8) malloc(sizeof(MSCUChar8) * objectSize);
 
 	return MSCReadObject(pConnection, objectID, 0, *pOutputData,
-			     objectSize, rwCallback, addParams);
+		objectSize, rwCallback, addParams);
 
 }
 
 
 MSC_RV pcscToMSC(MSCLong32 pcscCode)
 {
-
 	switch (pcscCode)
 	{
-	case SCARD_S_SUCCESS:
-		return MSC_SUCCESS;
-	case SCARD_E_INVALID_HANDLE:
-		return MSC_INVALID_HANDLE;
-	case SCARD_E_SHARING_VIOLATION:
-		return MSC_SHARING_VIOLATION;
-	case SCARD_W_REMOVED_CARD:
-		return MSC_TOKEN_REMOVED;
-	case SCARD_E_NO_SMARTCARD:
-		return MSC_TOKEN_REMOVED;
-	case SCARD_W_RESET_CARD:
-		return MSC_TOKEN_RESET;
-	case SCARD_W_INSERTED_CARD:
-		return MSC_TOKEN_INSERTED;
-	case SCARD_E_NO_SERVICE:
-		return MSC_SERVICE_UNRESPONSIVE;
-	case SCARD_E_UNKNOWN_CARD:
-	case SCARD_W_UNSUPPORTED_CARD:
-	case SCARD_E_CARD_UNSUPPORTED:
-		return MSC_UNRECOGNIZED_TOKEN;
-	case SCARD_E_INVALID_PARAMETER:
-	case SCARD_E_INVALID_VALUE:
-	case SCARD_E_UNKNOWN_READER:
-	case SCARD_E_PROTO_MISMATCH:
-	case SCARD_E_READER_UNAVAILABLE:
-		return MSC_INVALID_PARAMETER;
-	case SCARD_E_CANCELLED:
-		return MSC_CANCELLED;
-	case SCARD_E_TIMEOUT:
-		return MSC_TIMEOUT_OCCURRED;
+		case SCARD_S_SUCCESS:
+			return MSC_SUCCESS;
+		case SCARD_E_INVALID_HANDLE:
+			return MSC_INVALID_HANDLE;
+		case SCARD_E_SHARING_VIOLATION:
+			return MSC_SHARING_VIOLATION;
+		case SCARD_W_REMOVED_CARD:
+			return MSC_TOKEN_REMOVED;
+		case SCARD_E_NO_SMARTCARD:
+			return MSC_TOKEN_REMOVED;
+		case SCARD_W_RESET_CARD:
+			return MSC_TOKEN_RESET;
+		case SCARD_W_INSERTED_CARD:
+			return MSC_TOKEN_INSERTED;
+		case SCARD_E_NO_SERVICE:
+			return MSC_SERVICE_UNRESPONSIVE;
+		case SCARD_E_UNKNOWN_CARD:
+		case SCARD_W_UNSUPPORTED_CARD:
+		case SCARD_E_CARD_UNSUPPORTED:
+			return MSC_UNRECOGNIZED_TOKEN;
+		case SCARD_E_INVALID_PARAMETER:
+		case SCARD_E_INVALID_VALUE:
+		case SCARD_E_UNKNOWN_READER:
+		case SCARD_E_PROTO_MISMATCH:
+		case SCARD_E_READER_UNAVAILABLE:
+			return MSC_INVALID_PARAMETER;
+		case SCARD_E_CANCELLED:
+			return MSC_CANCELLED;
+		case SCARD_E_TIMEOUT:
+			return MSC_TIMEOUT_OCCURRED;
 
-	default:
-		return MSC_INTERNAL_ERROR;
+		default:
+			return MSC_INTERNAL_ERROR;
 	}
 }
 
 char *msc_error(MSC_RV errorCode)
 {
-
 	static char message[500];
 
 	switch (errorCode)
 	{
-	case MSC_SUCCESS:
-		strncpy(message, "Successful", sizeof(message));
-		break;
-	case MSC_NO_MEMORY_LEFT:
-		strncpy(message, "No more memory", sizeof(message));
-		break;
-	case MSC_AUTH_FAILED:
-		strncpy(message, "Authentication failed", sizeof(message));
-		break;
-	case MSC_OPERATION_NOT_ALLOWED:
-		strncpy(message, "Operation not allowed", sizeof(message));
-		break;
-	case MSC_INCONSISTENT_STATUS:
-		strncpy(message, "Inconsistent status", sizeof(message));
-		break;
-	case MSC_UNSUPPORTED_FEATURE:
-		strncpy(message, "Feature unsupported", sizeof(message));
-		break;
-	case MSC_UNAUTHORIZED:
-		strncpy(message, "Unauthorized usage", sizeof(message));
-		break;
-	case MSC_OBJECT_NOT_FOUND:
-		strncpy(message, "Object not found", sizeof(message));
-		break;
-	case MSC_OBJECT_EXISTS:
-		strncpy(message, "Object already exists", sizeof(message));
-		break;
-	case MSC_INCORRECT_ALG:
-		strncpy(message, "Incorrect algorithm", sizeof(message));
-		break;
-	case MSC_SIGNATURE_INVALID:
-		strncpy(message, "Invalid signature", sizeof(message));
-		break;
-	case MSC_IDENTITY_BLOCKED:
-		strncpy(message, "Identity is blocked", sizeof(message));
-		break;
-	case MSC_UNSPECIFIED_ERROR:
-		strncpy(message, "Unspecified error", sizeof(message));
-		break;
-	case MSC_TRANSPORT_ERROR:
-		strncpy(message, "Transport error", sizeof(message));
-		break;
-	case MSC_INVALID_PARAMETER:
-		strncpy(message, "Invalid parameter", sizeof(message));
-		break;
-	case MSC_SEQUENCE_END:
-		strncpy(message, "End of sequence", sizeof(message));
-		break;
-	case MSC_INTERNAL_ERROR:
-		strncpy(message, "Internal Error", sizeof(message));
-		break;
-	case MSC_CANCELLED:
-		strncpy(message, "Operation Cancelled", sizeof(message));
-		break;
-	case MSC_INSUFFICIENT_BUFFER:
-		strncpy(message, "Buffer is too small", sizeof(message));
-		break;
-	case MSC_UNRECOGNIZED_TOKEN:
-		strncpy(message, "Token is unsupported", sizeof(message));
-		break;
-	case MSC_SERVICE_UNRESPONSIVE:
-		strncpy(message, "Service is not running", sizeof(message));
-		break;
-	case MSC_TIMEOUT_OCCURRED:
-		strncpy(message, "Timeout has occurred", sizeof(message));
-		break;
-	case MSC_TOKEN_REMOVED:
-		strncpy(message, "Token was removed", sizeof(message));
-		break;
-	case MSC_TOKEN_RESET:
-		strncpy(message, "Token was reset", sizeof(message));
-		break;
-	case MSC_TOKEN_INSERTED:
-		strncpy(message, "Token was inserted", sizeof(message));
-		break;
-	case MSC_TOKEN_UNRESPONSIVE:
-		strncpy(message, "Token is unresponsive", sizeof(message));
-		break;
-	case MSC_INVALID_HANDLE:
-		strncpy(message, "Handle is invalid", sizeof(message));
-		break;
-	case MSC_SHARING_VIOLATION:
-		strncpy(message, "Sharing violation", sizeof(message));
-		break;
+		case MSC_SUCCESS:
+			strncpy(message, "Successful", sizeof(message));
+			break;
+		case MSC_NO_MEMORY_LEFT:
+			strncpy(message, "No more memory", sizeof(message));
+			break;
+		case MSC_AUTH_FAILED:
+			strncpy(message, "Authentication failed", sizeof(message));
+			break;
+		case MSC_OPERATION_NOT_ALLOWED:
+			strncpy(message, "Operation not allowed", sizeof(message));
+			break;
+		case MSC_INCONSISTENT_STATUS:
+			strncpy(message, "Inconsistent status", sizeof(message));
+			break;
+		case MSC_UNSUPPORTED_FEATURE:
+			strncpy(message, "Feature unsupported", sizeof(message));
+			break;
+		case MSC_UNAUTHORIZED:
+			strncpy(message, "Unauthorized usage", sizeof(message));
+			break;
+		case MSC_OBJECT_NOT_FOUND:
+			strncpy(message, "Object not found", sizeof(message));
+			break;
+		case MSC_OBJECT_EXISTS:
+			strncpy(message, "Object already exists", sizeof(message));
+			break;
+		case MSC_INCORRECT_ALG:
+			strncpy(message, "Incorrect algorithm", sizeof(message));
+			break;
+		case MSC_SIGNATURE_INVALID:
+			strncpy(message, "Invalid signature", sizeof(message));
+			break;
+		case MSC_IDENTITY_BLOCKED:
+			strncpy(message, "Identity is blocked", sizeof(message));
+			break;
+		case MSC_UNSPECIFIED_ERROR:
+			strncpy(message, "Unspecified error", sizeof(message));
+			break;
+		case MSC_TRANSPORT_ERROR:
+			strncpy(message, "Transport error", sizeof(message));
+			break;
+		case MSC_INVALID_PARAMETER:
+			strncpy(message, "Invalid parameter", sizeof(message));
+			break;
+		case MSC_SEQUENCE_END:
+			strncpy(message, "End of sequence", sizeof(message));
+			break;
+		case MSC_INTERNAL_ERROR:
+			strncpy(message, "Internal Error", sizeof(message));
+			break;
+		case MSC_CANCELLED:
+			strncpy(message, "Operation Cancelled", sizeof(message));
+			break;
+		case MSC_INSUFFICIENT_BUFFER:
+			strncpy(message, "Buffer is too small", sizeof(message));
+			break;
+		case MSC_UNRECOGNIZED_TOKEN:
+			strncpy(message, "Token is unsupported", sizeof(message));
+			break;
+		case MSC_SERVICE_UNRESPONSIVE:
+			strncpy(message, "Service is not running", sizeof(message));
+			break;
+		case MSC_TIMEOUT_OCCURRED:
+			strncpy(message, "Timeout has occurred", sizeof(message));
+			break;
+		case MSC_TOKEN_REMOVED:
+			strncpy(message, "Token was removed", sizeof(message));
+			break;
+		case MSC_TOKEN_RESET:
+			strncpy(message, "Token was reset", sizeof(message));
+			break;
+		case MSC_TOKEN_INSERTED:
+			strncpy(message, "Token was inserted", sizeof(message));
+			break;
+		case MSC_TOKEN_UNRESPONSIVE:
+			strncpy(message, "Token is unresponsive", sizeof(message));
+			break;
+		case MSC_INVALID_HANDLE:
+			strncpy(message, "Handle is invalid", sizeof(message));
+			break;
+		case MSC_SHARING_VIOLATION:
+			strncpy(message, "Sharing violation", sizeof(message));
+			break;
 
-	default:
-		sprintf(message, "Unknown SW: %04ld", errorCode);
-		break;
+		default:
+			sprintf(message, "Unknown SW: %04ld", errorCode);
+			break;
 	}
 
 	return message;
@@ -2101,24 +1941,24 @@ char *msc_error(MSC_RV errorCode)
 
 MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 {
-
 	MSC_RV rv;
 	MSCPVoid32 vInitFunction, vFinFunction, vIdFunction;
 	MSCULong32 dwActiveProtocol;
+
 	MSCLong32(*libPL_MSCInitializePlugin) (MSCLPTokenConnection);
 	MSCLong32(*libPL_MSCFinalizePlugin) (MSCLPTokenConnection);
-        MSCLong32 (*libPL_MSCIdentifyToken)(MSCLPTokenConnection);
+	MSCLong32(*libPL_MSCIdentifyToken) (MSCLPTokenConnection);
 
 	vInitFunction = 0;
-	vFinFunction  = 0;
-	vIdFunction   = 0;
+	vFinFunction = 0;
+	vIdFunction = 0;
 
 	/*
 	 * Select the AID or initialization routine for the card 
 	 */
 	vInitFunction = pConnection->libPointers.pvfInitializePlugin;
-	vFinFunction  = pConnection->libPointers.pvfFinalizePlugin;
-	vIdFunction   = pConnection->libPointers.pvfIdentifyToken;
+	vFinFunction = pConnection->libPointers.pvfFinalizePlugin;
+	vIdFunction = pConnection->libPointers.pvfIdentifyToken;
 
 	if (vInitFunction == 0)
 	{
@@ -2134,10 +1974,10 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 		return MSC_INTERNAL_ERROR;
 	}
 
-	if ( vIdFunction == 0 ) 
+	if (vIdFunction == 0)
 	{
-	        DebugLogB("Error: Card service failure: %s\n", 
-			  "IdentifyToken function missing");
+		DebugLogB("Error: Card service failure: %s\n",
+			"IdentifyToken function missing");
 		return MSC_INTERNAL_ERROR;
 	}
 
@@ -2147,8 +1987,7 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 	libPL_MSCFinalizePlugin = (MSCLong32(*)(MSCLPTokenConnection))
 		vFinFunction;
 
-	libPL_MSCIdentifyToken = (MSCLong32 (*)(MSCLPTokenConnection))
-	        vIdFunction;
+	libPL_MSCIdentifyToken = (MSCLong32(*)(MSCLPTokenConnection)) vIdFunction;
 
 	rv = SCardReconnect(pConnection->hCard, pConnection->shareMode,
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
@@ -2170,7 +2009,7 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 	/* 
 	 * Use the default AID given by the Info.plist 
 	 */
-	rv = (*libPL_MSCIdentifyToken)(pConnection);
+	rv = (*libPL_MSCIdentifyToken) (pConnection);
 
 	if (rv != MSC_SUCCESS)
 		return rv;
@@ -2180,7 +2019,7 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 
 MSCUChar8 MSCIsTokenReset(MSCLPTokenConnection pConnection)
 {
-        MSCULong32 rv;
+	MSCULong32 rv;
 	char slotName[MAX_READERNAME];
 	MSCULong32 slotNameSize, slotState, slotProtocol;
 	MSCUChar8 tokenId[MAX_ATR_SIZE];
@@ -2190,8 +2029,7 @@ MSCUChar8 MSCIsTokenReset(MSCLPTokenConnection pConnection)
 	tokenIdLength = sizeof(tokenId);
 
 	rv = SCardStatus(pConnection->hCard, slotName,
-			 &slotNameSize, &slotState, &slotProtocol, 
-			 tokenId, &tokenIdLength);
+		&slotNameSize, &slotState, &slotProtocol, tokenId, &tokenIdLength);
 
 	if (rv == SCARD_W_RESET_CARD)
 		return 1;
@@ -2210,23 +2048,20 @@ MSCUChar8 MSCClearReset(MSCLPTokenConnection pConnection)
 
 MSCUChar8 MSCIsTokenMoved(MSCLPTokenConnection pConnection)
 {
-        MSCULong32 rv;
+	MSCULong32 rv;
 	char slotName[MAX_READERNAME];
-	MSCULong32 slotNameSize=MAX_READERNAME, slotState, slotProtocol;
+	MSCULong32 slotNameSize = MAX_READERNAME, slotState, slotProtocol;
 	MSCUChar8 tokenId[MAX_ATR_SIZE];
-	MSCULong32 tokenIdLength=MAX_ATR_SIZE;
+	MSCULong32 tokenIdLength = MAX_ATR_SIZE;
 
 	if (pConnection->tokenInfo.tokenType & MSC_TOKEN_TYPE_REMOVED)
 		return 1;
 
 	rv = SCardStatus(pConnection->hCard, slotName,
-		&slotNameSize, &slotState, &slotProtocol,
-		tokenId, &tokenIdLength);
+		&slotNameSize, &slotState, &slotProtocol, tokenId, &tokenIdLength);
 
-	if (rv != SCARD_S_SUCCESS || (slotState & SCARD_ABSENT) ) {
+	if (rv != SCARD_S_SUCCESS || (slotState & SCARD_ABSENT))
 		return 1;
-	}
-
 
 	return 0;
 }
@@ -2236,7 +2071,7 @@ MSCUChar8 MSCIsTokenChanged(MSCLPTokenConnection pConnection)
 	if (MSCIsTokenMoved(pConnection))
 		return 1;
 	else
-		if (MSCIsTokenReset(pConnection)) 
+		if (MSCIsTokenReset(pConnection))
 			return 1;
 		else
 			return 0;
