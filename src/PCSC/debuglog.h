@@ -57,7 +57,7 @@ typedef enum {
 #define __FUNCTION__ ""
 #endif
 
-#ifdef PCSC_DEBUG
+#ifndef NO_PCSC_DEBUG
 #define DebugLogA(fmt) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__)
 #define DebugLogB(fmt, data) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data)
 #define DebugLogC(fmt, data1, data2) debug_msg("%s:%d:%s " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
