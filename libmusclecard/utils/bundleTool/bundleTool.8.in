@@ -3,11 +3,11 @@
 .\"
 .TH BUNDLETOOL 8 "March 2002" Linux "User Manual"
 .SH NAME
-bundleTool
+bundleTool - adds a card ATR to a selected card service bundle
 .SH SYNOPSIS
 .B bundleTool
-.SH DESCRPTION
-BundleTool introduces new smart cards to pcsc-lite and assigns a 
+.SH DESCRIPTION
+bundleTool introduces new smart cards to pcsc-lite and assigns a 
 plugin to service the card.
 .SH OPTIONS 
 None
