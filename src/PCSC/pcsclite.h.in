@@ -110,6 +110,8 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_PROTOCOL_RAW		0x0004	/* Raw active protocol. */
 #define SCARD_PROTOCOL_T15		0x0008	/* T=15 protocol. */
 
+#define SCARD_PROTOCOL_ANY		(SCARD_PROTOCOL_T0|SCARD_PROTOCOL_T1)	/* IFD determines prot. */
+
 #define SCARD_SHARE_EXCLUSIVE		0x0001	/* Exclusive mode only */
 #define SCARD_SHARE_SHARED		0x0002	/* Shared mode only */
 #define SCARD_SHARE_DIRECT		0x0003	/* Raw mode only */
@@ -220,8 +222,6 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F
 
 #define SCARD_SCOPE_GLOBAL		0x0003	/* Scope is global */
-
-#define SCARD_PROTOCOL_ANY		0x1000	/* IFD determines prot. */
 
 #define SCARD_RESET			0x0001	/* Card was reset */
 #define SCARD_INSERTED			0x0002	/* Card was inserted */
