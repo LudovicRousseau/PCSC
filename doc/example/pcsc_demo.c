@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
 	char pbReader[MAX_READERNAME] = "";
 	int reader_nb;
 	int i;
+	SCARD_IO_REQUEST pioRecvPci;
+	BYTE pbRecvBuffer[10];
+	BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
+	DWORD dwSendLength, dwRecvLength;
 
 	printf("PC/SC sample code\n");
 	printf("V 1.1 2003-2004, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
@@ -166,9 +170,34 @@ int main(int argc, char *argv[])
 	printf("\n");
 	PCSC_ERROR(rv, "SCardStatus")
 
+	/* exchange APDU */
+	dwSendLength = sizeof(pbSendBuffer);
+	dwRecvLength = sizeof(pbRecvBuffer);
+	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	PCSC_ERROR(rv, "SCardTransmit")
+
+	/* card disconnect */
+	rv = SCardDisconnect(hCard, SCARD_LEAVE_CARD);
+	PCSC_ERROR(rv, "SCardDisconnect")
+
+	/* connect to a card */
+	dwActiveProtocol = -1;
+	rv = SCardConnect(hContext, readers[reader_nb], SCARD_SHARE_EXCLUSIVE,
+		SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+	printf(" Protocol: %ld\n", dwActiveProtocol);
+	PCSC_ERROR(rv, "SCardConnect")
+
+	/* exchange APDU */
+	dwSendLength = sizeof(pbSendBuffer);
+	dwRecvLength = sizeof(pbRecvBuffer);
+	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	PCSC_ERROR(rv, "SCardTransmit")
+
 	/* card reconnect */
 	rv = SCardReconnect(hCard, SCARD_SHARE_EXCLUSIVE,
-		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD,
+		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_LEAVE_CARD,
 		&dwActiveProtocol);
 	PCSC_ERROR(rv, "SCardReconnect")
 
@@ -185,6 +214,13 @@ int main(int argc, char *argv[])
 		printf(" %02X", pbAtr[i]);
 	printf("\n");
 	PCSC_ERROR(rv, "SCardStatus")
+
+	/* exchange APDU */
+	dwSendLength = sizeof(pbSendBuffer);
+	dwRecvLength = sizeof(pbRecvBuffer);
+	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	PCSC_ERROR(rv, "SCardTransmit")
 
 	/* card disconnect */
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
