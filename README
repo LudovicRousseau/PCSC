@@ -1,6 +1,6 @@
 Title   : PCSC Lite
-Author  : David Corcoran
-Version : 1.1.1
+Authors : David Corcoran, Ludovic Rousseau
+Version : 1.2.0
 License : See file COPYING
 Document: docs/pcsc-lite-0.8.7.pdf
           docs/muscle-api-1.3.0.pdf
@@ -12,7 +12,7 @@ Requires: C compiler (gcc)
 Tested Platforms: 
 	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2, Debian 3.0)
 	Solaris Solaris 2.8
-	Mac OS X 10.1
+	Mac OS X 10.2
 	HP-UX 11
 	True 64 Unix
 	OpenBSD 2.9, 3.0 (with libc.so.28.2), 3.2
@@ -42,9 +42,9 @@ Options:
 
    ./configure 
 
-          --enable-libusb=PATH   Enable libusb support
-                                 (experimental, see below).
-          --enable-usb           Enable USB on Linux 2.4 platforms
+          --enable-libusb=PATH   Enable USB libusb support
+                                 (on Linux, *BSD, etc.).
+          --enable-usb           Enable USB on Linux 2.4 platforms (deprecated)
           --enable-syslog        Use syslog for error output.
           --enable-daemon        Run as a daemon.
           --enable-debug         Enable full debugging messages
@@ -101,16 +101,18 @@ OCF users should compile in --threadsafe so the OCF->PC/SC bridge behaves
 correctly.
 
 LIBUSB SUPPORT:
-Versions after 1.1.2beta5 feature experimental support for libusb.
+Versions after 1.2.0 support libusb. Available on GNU/Linux and *BSD.
 In order to use it, you should call ./configure with
 
-	--enable-libusb=PATH --enable-usb=no
+	--enable-libusb (if libusb is installed in standard directory /usr)
+	or
+	--enable-libusb=PATH
 
 where PATH is the base directory containing the libusb include
 file and library. For example, "--enable-libusb=/usr/local" looks
 for /usr/local/include/usb.h and /usr/local/lib/libusb.[so|a]
 
-Please note that you shouldn't specify "--enable-libusb" and
+Please note that you can't specify "--enable-libusb" and
 "--enable-usb" at the same time.
 
 In order to use dynamic driver loading, you need to supply a directory
@@ -129,4 +131,6 @@ QUESTIONS:
 The API documentation is provided in PDF format under the docs 
 directory.  For questions, please email me at: 
 <David Corcoran> corcoran@linuxnet.com
+
+ $Id$
 
