@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#ifndef WIN32
+#ifdef HAVE_STDINT_H
 #include <stdint.h>  /* May break IA64 test-noansi-r */
 #endif
 
