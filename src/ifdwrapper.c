@@ -626,7 +626,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #endif
 
 	if (rContext->dwVersion != IFD_HVERSION_1_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
+		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
@@ -686,7 +686,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 #endif
 
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
-		rv = SCARD_E_UNSUPPORTED_FEATURE;
+		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
