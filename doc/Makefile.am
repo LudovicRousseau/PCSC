@@ -35,5 +35,5 @@ LATEX2HTML = latex2html
 # create a HTML document
 %.html: %.tex
 	rm -rf $*
-	$(LATEX2HTML) -split +2 $*
+	$(LATEX2HTML) -local_icons -split +2 $*
 
