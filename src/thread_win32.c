@@ -93,7 +93,7 @@ SYS_MutexUnLock(CRITICAL_SECTION *mutex)
  * Returns: nonzero for success, 0 for failure.
  */
 int
-SYS_ThreadCreate(HANDLE *thread, void* thread_attr,
+SYS_ThreadCreate(HANDLE *thread, int attributes,
     void* start_routine, void* arg)
 {
 
