@@ -88,7 +88,7 @@ LONG EHInitializeEventStructures(void)
 		(readerStates[i])->lockState = 0;
 		(readerStates[i])->readerSharing = 0;
 		(readerStates[i])->cardAtrLength = 0;
-		(readerStates[i])->cardProtocol = 0;
+		(readerStates[i])->cardProtocol = SCARD_PROTOCOL_UNSET;
 	}
 
 	return SCARD_S_SUCCESS;
@@ -131,7 +131,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	rContext->readerState->lockState = 0;
 	rContext->readerState->readerSharing = 0;
 	rContext->readerState->cardAtrLength = 0;
-	rContext->readerState->cardProtocol = 0;
+	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 
 	/* Zero the thread */
 	rContext->pthThread = 0;
@@ -178,7 +178,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	rContext->readerState->readerState = dwStatus;
 	rContext->readerState->readerSharing = rContext->dwContexts;
 	rContext->readerState->cardAtrLength = dwAtrLen;
-	rContext->readerState->cardProtocol = 0;
+	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 
 	rv = SYS_ThreadCreate(&rContext->pthThread, NULL,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
@@ -262,7 +262,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		dwStatus &= ~SCARD_SWALLOWED;
 		dwStatus &= ~SCARD_UNKNOWN;
 		rContext->readerState->cardAtrLength = 0;
-		rContext->readerState->cardProtocol = 0;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 
 		dwCurrentState = SCARD_ABSENT;
 	}
@@ -300,7 +300,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
 			rContext->readerState->readerState |= SCARD_UNKNOWN;
 			rContext->readerState->cardAtrLength = 0;
-			rContext->readerState->cardProtocol = 0;
+			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 
 			dwCurrentState = SCARD_UNKNOWN;
 
@@ -342,7 +342,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				RFSetReaderEventState(rContext, SCARD_REMOVED);
 
 				rContext->readerState->cardAtrLength = 0;
-				rContext->readerState->cardProtocol = 0;
+				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 				rContext->readerState->readerState |= SCARD_ABSENT;
 				rContext->readerState->readerState &= ~SCARD_UNKNOWN;
 				rContext->readerState->readerState &= ~SCARD_PRESENT;
@@ -399,7 +399,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
 					rContext->readerState->cardAtrLength = 0;
-					rContext->readerState->cardProtocol = 0;
+					rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
 				}
 
 				dwCurrentState = SCARD_PRESENT;
