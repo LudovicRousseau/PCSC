@@ -25,7 +25,7 @@ extern "C"
 	 * application gets instant notification of changes in state. 
 	 */
 
-	typedef struct
+	typedef struct pubReaderStatesList
 	{
 		LONG readerID;
 		char readerName[MAX_READERNAME];
