@@ -132,7 +132,11 @@ AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 
 dnl Probe for a proper flex library
 AC_SUBST(LIBFL)
-AC_CHECK_LIB(l, yywrap, [LIBFL="$LIBFL -ll"], AC_CHECK_LIB(fl, yywrap, [LIBFL="$LIBFL -lfl"]))
+AC_CHECK_LIB(l, yywrap,
+	[ LIBFL="$LIBFL -ll" ],
+	AC_CHECK_LIB(fl, yywrap,
+		[ LIBFL="$LIBFL -lfl" ],
+		[ AC_MSG_ERROR([lex library required]) ] ))
 
 AC_SUBST(LIBUSB)
 dnl --enable-libusb=DIR
