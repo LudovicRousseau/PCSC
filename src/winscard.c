@@ -391,12 +391,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	};
 
 	/*
-	 * Thread handles powering so just reset instead 
-	 */
-	if (dwInitialization == SCARD_UNPOWER_CARD)
-		dwAction = IFD_RESET;
-
-	/*
 	 * RFUnblockReader( rContext ); FIX - this doesn't work 
 	 */
 
