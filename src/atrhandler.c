@@ -4,8 +4,9 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999
+ * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -22,7 +23,9 @@
 /*
  * Uncomment the following for ATR debugging 
  */
-#define ATR_DEBUG 1 
+/* #define ATR_DEBUG 1 */
+
+#define SCARD_PROTOCOL_UNSET 0x00
 
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
@@ -31,6 +34,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	UCHAR K, TCK;				/* MSN of T0/Check Sum */
 	UCHAR Y1i, T;				/* MSN/LSN of TDi */
 	short TAi, TBi, TCi, TDi;	/* Interface characters */
+	int i = 1;						/* value of the index in TAi, TBi, etc. */
 
 	/*
 	 * Zero out everything 
@@ -47,8 +51,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	/*
 	 * Zero out the bitmasks 
 	 */
-	psExtension->CardCapabilities.AvailableProtocols = 0x00;
-	psExtension->CardCapabilities.CurrentProtocol = 0x00;
+	psExtension->CardCapabilities.AvailableProtocols = SCARD_PROTOCOL_UNSET;
+	psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_UNSET;
 
 	/*
 	 * Decode the TS byte 
@@ -96,8 +100,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
 #ifdef ATR_DEBUG
-		debug_msg("T's: %02X %02X %02X %02X", TAi, TBi, TCi, TDi);
-		debug_msg("P: %02X", p);
+		debug_msg("TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
+			i, TAi, i, TBi, i, TCi, i, TDi);
 #endif
 
 		/*
@@ -109,22 +113,22 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			T = TDi & 0x0F;	/* Get the LSN in K */
 
 			/*
-			 * Set the current protocol TD1 
+			 * Set the current protocol TD1 (first TD only)
 			 */
-			if (psExtension->CardCapabilities.CurrentProtocol == 0x00)
+			if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNSET)
 			{
 				switch (T)
 				{
-				case 0:
-					psExtension->CardCapabilities.CurrentProtocol =
-						SCARD_PROTOCOL_T0;
-					break;
-				case 1:
-					psExtension->CardCapabilities.CurrentProtocol =
-						SCARD_PROTOCOL_T1;
-					break;
-				default:
-					return 0;
+					case 0:
+						psExtension->CardCapabilities.CurrentProtocol =
+							SCARD_PROTOCOL_T0;
+						break;
+					case 1:
+						psExtension->CardCapabilities.CurrentProtocol =
+							SCARD_PROTOCOL_T1;
+						break;
+					default:
+						return 0;
 				}
 			}
 
@@ -163,6 +167,28 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 					 * supported at this time 
 					 */
 				}
+
+			/* test presence of TA2 */
+			if ((2 == i) && (TAi >= 0))
+			{
+				T = TAi & 0x0F;
+#ifdef ATR_DEBUG
+				DebugLogB("Specific mode: T=%d", T);
+#endif
+				switch (T)
+				{
+					case 0:
+						psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T0;
+						break;
+
+					case 1:
+						psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T1;
+						break;
+
+					default:
+						return 0;
+				}
+			}
 		} else
 			Y1i = 0;
 
@@ -171,13 +197,16 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			memset(psExtension, 0x00, sizeof(SMARTCARD_EXTENSION));
 			return 0;
 		}
+
+		/* next interface characters index */
+		i++;
 	}
 	while (Y1i != 0);
 
 	/*
 	 * If TDx is not set then the current must be T0 
 	 */
-	if (psExtension->CardCapabilities.CurrentProtocol == 0x00)
+	if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNSET)
 	{
 		psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T0;
 		psExtension->CardCapabilities.AvailableProtocols |= SCARD_PROTOCOL_T0;
@@ -186,7 +215,6 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	/*
 	 * Take care of the historical characters 
 	 */
-
 	psExtension->ATR.HistoryLength = K;
 	memcpy(psExtension->ATR.HistoryValue, &pucAtr[p], K);
 
@@ -196,12 +224,17 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	 * Check to see if TCK character is included It will be included if
 	 * more than T=0 is supported 
 	 */
-
 	if (psExtension->CardCapabilities.AvailableProtocols & SCARD_PROTOCOL_T1)
 		TCK = pucAtr[p++];
 
 	memcpy(psExtension->ATR.Value, pucAtr, p);
 	psExtension->ATR.Length = p;	/* modified from p-1 */
+
+#ifdef ATR_DEBUG
+	DebugLogC("CurrentProtocol: %d, AvailableProtocols: %d",
+		psExtension->CardCapabilities.CurrentProtocol,
+		psExtension->CardCapabilities.AvailableProtocols);
+#endif
 
 	return 1;
 }
