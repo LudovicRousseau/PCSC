@@ -147,16 +147,16 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 
 #define SCARD_ATTR_VALUE(Class, Tag) ((((ULONG)(Class)) << 16) | ((ULONG)(Tag)))
 
-#define SCARD_CLASS_VENDOR_INFO     1   // Vendor information definitions
-#define SCARD_CLASS_COMMUNICATIONS  2   // Communication definitions
-#define SCARD_CLASS_PROTOCOL        3   // Protocol definitions
-#define SCARD_CLASS_POWER_MGMT      4   // Power Management definitions
-#define SCARD_CLASS_SECURITY        5   // Security Assurance definitions
-#define SCARD_CLASS_MECHANICAL      6   // Mechanical characteristic definitions
-#define SCARD_CLASS_VENDOR_DEFINED  7   // Vendor specific definitions
-#define SCARD_CLASS_IFD_PROTOCOL    8   // Interface Device Protocol options
-#define SCARD_CLASS_ICC_STATE       9   // ICC State specific definitions
-#define SCARD_CLASS_SYSTEM     0x7fff   // System-specific definitions
+#define SCARD_CLASS_VENDOR_INFO     1   /* Vendor information definitions */
+#define SCARD_CLASS_COMMUNICATIONS  2   /* Communication definitions */
+#define SCARD_CLASS_PROTOCOL        3   /* Protocol definitions */
+#define SCARD_CLASS_POWER_MGMT      4   /* Power Management definitions */
+#define SCARD_CLASS_SECURITY        5   /* Security Assurance definitions */
+#define SCARD_CLASS_MECHANICAL      6   /* Mechanical characteristic definitions */
+#define SCARD_CLASS_VENDOR_DEFINED  7   /* Vendor specific definitions */
+#define SCARD_CLASS_IFD_PROTOCOL    8   /* Interface Device Protocol options */
+#define SCARD_CLASS_ICC_STATE       9   /* ICC State specific definitions */
+#define SCARD_CLASS_SYSTEM     0x7fff   /* System-specific definitions */
 
 #define SCARD_ATTR_VENDOR_NAME SCARD_ATTR_VALUE(SCARD_CLASS_VENDOR_INFO, 0x0100)
 #define SCARD_ATTR_VENDOR_IFD_TYPE SCARD_ATTR_VALUE(SCARD_CLASS_VENDOR_INFO, 0x0101)
