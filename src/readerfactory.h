@@ -114,6 +114,7 @@ extern "C"
 		DWORD dwContexts;		/* Number of open contexts */
 		DWORD dwPublicID;		/* Public id of public state struct */
 		PDWORD dwFeeds;			/* Number of shared client to lib */
+		PDWORD dwMutex;			/* Number of client to mutex */
 	};
 
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
