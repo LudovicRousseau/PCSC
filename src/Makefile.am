@@ -12,6 +12,7 @@ if PCSC_ARCH_LINUX
 if PCSC_LINUX_USB
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl -ldl
+PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_linux.c
@@ -19,6 +20,7 @@ PCSC_SYSTEM_SOURCE  = sys_unix.c
 else
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl -ldl
+PCSCD_INCLUDE_LIBS  = -lfl -ldl -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -28,6 +30,7 @@ else
 if PCSC_ARCH_BSD
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
+PCSCD_INCLUDE_LIBS  = -lfl -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_bsd.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -36,6 +39,7 @@ else
 if PCSC_ARCH_OSX
 PCSC_MYLDFLAGS      = -framework CoreFoundation
 PCSC_INCLUDE_LIBS   = -ll -lIOKit
+PCSCD_INCLUDE_LIBS  = -ll -lIOKit
 PCSC_THREAD_SOURCE  = thread_macosx.c
 PCSC_DYNLOAD_SOURCE = dyn_macosx.c
 PCSC_HOTPLUG_SOURCE = hotplug_macosx.c
@@ -46,6 +50,7 @@ else
 if PCSC_ARCH_SOLARIS
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll -ldl -lnsl -lsocket -lposix4
+PCSCD_INCLUDE_LIBS  = -ll -ldl -lnsl -lsocket -lposix4 -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -54,6 +59,7 @@ else
 if PCSC_ARCH_HPUX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
+PCSCD_INCLUDE_LIBS  = -ll -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_hpux.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -62,6 +68,7 @@ else
 if PCSC_ARCH_TRU64
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
+PCSCD_INCLUDE_LIBS  = -ll -lpthread
 PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
@@ -99,7 +106,7 @@ libpcsclite_la_SOURCES = winscard_clnt.c debuglog.c $(PCSC_SYSTEM_SOURCE) \
 libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c
-pcscd_LDADD   = libpcsclite-core.la $(PCSC_INCLUDE_LIBS)
+pcscd_LDADD   = libpcsclite-core.la $(PCSCD_INCLUDE_LIBS)
 pcscd_LDFLAGS = $(PCSC_MYLDFLAGS)
 
 testpcsc_SOURCES = testpcsc.c
