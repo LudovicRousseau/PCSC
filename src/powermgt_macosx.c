@@ -50,8 +50,7 @@ PCSCLITE_THREAD_T       pmgmtThread;
 extern PCSCLITE_MUTEX   usbNotifierMutex;
 
 void PMPowerRegistrationThread();
-extern LONG HPRemoveAllHotPluggables();
-extern LONG HPSetupHotPlugDevice();
+
 
 void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * messageArgument)
 {
@@ -61,17 +60,15 @@ void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * m
     case kIOMessageSystemWillSleep:
         DebugLogA("PMPowerEventCallback: system going into sleep");
         SYS_MutexLock(&usbNotifierMutex);
-        HPRemoveAllHotPluggables();
-        IOAllowPowerChange(root_port,(long)messageArgument);
+        RFSuspendAllReaders();
         IOAllowPowerChange(root_port,(long)messageArgument);
         DebugLogA("PMPowerEventCallback: system allowed to sleep");
         break;
     case kIOMessageSystemHasPoweredOn: 
-        DebugLogA("PMPowerEventCallback: system coming out of sleep");   
+        DebugLogA("PMPowerEventCallback: system coming out of sleep");
+        /* HPSetupHotPlugDevice(); */        
+        RFAwakeAllReaders();
         SYS_MutexUnLock(&usbNotifierMutex);
-   
-        /* Look again for hotpluggable devices */
-        HPSetupHotPlugDevice();            
         break;
     }
     

@@ -360,7 +360,9 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	/*
 	 * Try to destroy the thread 
 	 */
+         printf("I'm destroying\n");
 	rv = EHDestroyEventHandler(sContext);
+        printf("I'm just destroyed\n");
 
 	rv = RFUnInitializeReader(sContext);
 	if (rv != SCARD_S_SUCCESS)
@@ -1588,4 +1590,65 @@ void RFCleanupReaders(int shouldExit)
         {
                 exit(0);
         }
+}
+
+void RFSuspendAllReaders() 
+{
+        int i;
+
+	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	{
+		if ((sContexts[i])->vHandle != 0)
+		{
+                        EHDestroyEventHandler(sContexts[i]);
+                        IFDCloseIFD(sContexts[i]);
+		}
+	}
+
+}
+
+void RFAwakeAllReaders() 
+{
+        LONG rv;
+        int i, j;
+        int initFlag;
+        
+        initFlag = 0;
+
+	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
+	{
+		if ((sContexts[i])->vHandle != 0)
+		{
+                
+                        for (j=0; j < i; j++)
+                        {
+                                if (((sContexts[j])->vHandle == (sContexts[i])->vHandle)&&
+                                    ((sContexts[j])->dwPort   == (sContexts[i])->dwPort)) 
+                                    {
+                                            initFlag = 1;
+                                    }
+                        }
+                        
+                        if (initFlag == 0)
+                        {
+                                rv = IFDOpenIFD(sContexts[i], (sContexts[i])->dwPort);
+
+                        } else {
+                                initFlag = 0;
+                        }
+                        
+
+                                if (rv != IFD_SUCCESS)
+                                {
+                                        DebugLogB("RFInitializeReader: Open Port %X Failed",
+                                                    (sContexts[i])->dwPort);
+                                }
+
+
+                        EHSpawnEventHandler(sContexts[i]);
+                        RFSetReaderEventState(sContexts[i], SCARD_RESET);
+                        
+		}
+	}
+
 }

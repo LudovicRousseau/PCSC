@@ -326,6 +326,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	UCHAR pucAtr[MAX_ATR_SIZE], ucAvailable;
 	DWORD dwAtrLength, dwAction = 0;
 
+        DebugLogA("SCardReconnect: Attempting reconnect to token.");
+
 	if (hCard == 0)
 	{
 		return SCARD_E_INVALID_HANDLE;

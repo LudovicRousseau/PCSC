@@ -146,6 +146,8 @@ extern "C"
 	LONG RFClearReaderEventState(PREADER_CONTEXT, SCARDHANDLE);
 	LONG RFCheckReaderStatus(PREADER_CONTEXT);
 	void RFCleanupReaders(int);
+        void RFSuspendAllReaders(); 
+        void RFAwakeAllReaders(); 
 
 #ifdef __cplusplus
 }

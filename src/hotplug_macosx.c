@@ -82,7 +82,9 @@ void RawDeviceAdded(void *refCon, io_iterator_t iterator)
 
 		if (refCon == NULL)
 		{	/* Dont do this on (void *)1 */  
+                        //SYS_MutexLock(&usbNotifierMutex); 
                 	HPSetupHotPlugDevice();
+                        //SYS_MutexUnLock(&usbNotifierMutex); 
 		}
 
 		kr = IOObjectRelease(obj);
@@ -100,7 +102,9 @@ void RawDeviceRemoved(void *refCon, io_iterator_t iterator)
 
 		if (refCon == NULL)
 		{ 
+                        //SYS_MutexLock(&usbNotifierMutex); 
                         HPSetupHotPlugDevice();
+                        //SYS_MutexUnLock(&usbNotifierMutex); 
 		}
 
 		kr = IOObjectRelease(obj);
@@ -260,7 +264,9 @@ LONG HPSearchHotPluggables()
 	/*
 	 * Look for initial USB devices 
 	 */
-	HPSetupHotPlugDevice();
+        //SYS_MutexLock(&usbNotifierMutex); 
+        HPSetupHotPlugDevice();
+        //SYS_MutexUnLock(&usbNotifierMutex); 
 
 	rv = SYS_ThreadCreate(&usbNotifyThread, NULL,
 		(LPVOID) HPEstablishUSBNotifications, 0);
@@ -432,9 +438,9 @@ LONG HPSetupHotPlugDevice()
 				 * Here we will add the reader, since it is not in the
 				 * address list 
 				 */
-                                SYS_MutexLock(&usbNotifierMutex);
+                                SYS_MutexLock(&usbNotifierMutex); 
 				HPAddHotPluggable(i, addrHolder[k]);
-                                SYS_MutexUnLock(&usbNotifierMutex);                                
+                                SYS_MutexUnLock(&usbNotifierMutex); 
 			} else
                         {
 				DebugLogA("HPSearchHotPluggables: Warning - reader already in list.");
@@ -464,11 +470,10 @@ LONG HPSetupHotPlugDevice()
 					 * Here we will remove the reader, since it is not in
 					 * the device address list 
 					 */
-                                        SYS_MutexLock(&usbNotifierMutex); 
+                                        SYS_MutexLock(&usbNotifierMutex);  
                                         HPRemoveHotPluggable(i, bundleTracker[i].addrList[x]);
-                                        SYS_MutexUnLock(&usbNotifierMutex);
-
-				}
+                                        SYS_MutexUnLock(&usbNotifierMutex); 
+                                }
 			}
 		}
 

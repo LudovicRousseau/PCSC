@@ -100,6 +100,14 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 
 	i = 0;
 	rv = 0;
+        
+        
+	i = rContext->dwPublicID;
+        if ((readerStates[i])->readerName[0] == 0)
+        {
+                DebugLogA("EHDestroyEventHandler: Thread already stomped.");
+                return SCARD_S_SUCCESS;
+        }
 
 	/*
 	 * Set the thread to 0 to exit thread 
@@ -114,6 +122,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 		 * Wait 0.05 seconds for the child to respond 
 		 */
 		SYS_USleep(50000);
+                printf("Waiting\n");
 	}
 	while (rContext->dwLockId == 0xFFFF);
 
@@ -122,7 +131,6 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	 * used again 
 	 */
 
-	i = rContext->dwPublicID;
 	memset((readerStates[i])->readerName, 0, MAX_READERNAME);
 	memset((readerStates[i])->cardAtr, 0, MAX_ATR_SIZE);
 	(readerStates[i])->readerID = 0;
