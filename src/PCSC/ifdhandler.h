@@ -91,8 +91,9 @@ extern "C"
 	 * meantime 
 	 */
 
-#define TAG_IFD_ATR			0x0303
+#define TAG_IFD_ATR                     0x0303
 #define TAG_IFD_SLOTNUM                 0x0180
+#define TAG_IFD_THREAD_SAFE             0x0FAD
 #define TAG_IFD_SLOTS_NUMBER            0x0FAE
 #define TAG_IFD_SIMULTANEOUS_ACCESS     0x0FAF
 
