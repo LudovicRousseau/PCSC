@@ -1,15 +1,17 @@
-.TH "formaticc" "1" "1.1.2" "Debian GNU/Linux" "PC/SC Lite"
+.TH "formaticc" "1" "1.2.9" "Debian GNU/Linux" "PC/SC Lite"
 .SH "NAME"
 .LP 
 formaticc \- An APDU robot for pcsc\-lite
 .SH "SYNTAX"
 .LP 
-formaticc
+.B formaticc
 .SH "DESCRIPTION"
 .LP 
-Sends one or more request APDU's to a smart card and get responses.
+.B formaticc
+sends one or more request APDU's to a smart card and get responses.
 .LP 
-formaticc takes a set of APDU's from an input file
+.B formaticc
+takes a set of APDU's from an input file
 and generates an output file with the data returned by the card.
 .LP 
 The input and output file names and the identification of the reader
@@ -20,22 +22,23 @@ bytes of the APDU and the APDU octets in hexadecimal notation, separated by
 space characters. The generated output file contains response APDU's
 following the same format.
 .SH "FILES"
-.LP 
-\fI/usr/share/doc/libpcsclite0/examples/sample.in\fP:
+.TP 
+\fI/usr/share/doc/libpcsclite1/examples/sample.in
 .br 
 sample input file.
-.br 
-\fI/usr/share/doc/libpcsclite0/examples/sample.ibm\fP:
+.TP 
+\fI/usr/share/doc/libpcsclite1/examples/sample.ibm
 .br 
 sample input file for an IBM MFC smart card.
-\fI/usr/share/doc/libpcsclite0/examples/sample.out\fP:
+.TP 
+\fI/usr/share/doc/libpcsclite1/examples/sample.out
 .br 
 sample output file.
 .SH "EXAMPLES"
 .LP 
 To run this program the standard way type:
 .LP 
-formaticc
+.B formaticc
 .SH "AUTHORS"
 This manual page was written by Carlos Prados <cprados@debian.org>,
 for the Debian GNU/Linux system (but may be used by others).
