@@ -38,7 +38,7 @@ static int debug_category = DEBUG_CATEGORY_NOTHING;
 /* default level is a bit verbose to be backward compatible */
 static int log_level = PCSC_LOG_INFO;
 
-void log_msg(int priority, const char *fmt, ...)
+void log_msg(const int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
@@ -91,7 +91,8 @@ void log_msg(int priority, const char *fmt, ...)
 	}
 } /* log_msg */
 
-void log_xxd(int priority, const char *msg, const unsigned char *buffer, const int len)
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
+	const int len)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
