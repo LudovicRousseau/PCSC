@@ -1656,7 +1656,7 @@ void RFSuspendAllReaders()
 
 void RFAwakeAllReaders() 
 {
-        LONG rv;
+        LONG rv = IFD_SUCCESS;
         int i, j;
         int initFlag;
         
