@@ -1,3 +1,21 @@
+pcsc-lite-1.1.2beta5: Ludovic Rousseau
+30 May, 2003
+- src/winscard.c: SCardStatus(): do not return before filling buffers
+- src/winscard_clnt.c: SCardStatusTH(): simplify code and return correct
+  results when buffers are too short or NULL is used
+- src/libpcsclite.pc.in: used to generated a pkg-config ".pc" file (thanks to
+  Andreas Jellinghaus for the idea and the patch)
+- configure.in, src/Makefile.am, src/utils/installifd.c, doc/bundleTool.8.in,
+  doc/pcscd.8.in, etc/reader.conf.in:
+  . correct typos and include path configured by ./configure appear in the
+  docs (thanks to Ville Skyttä)
+- src/utils/installifd.c:
+  . replace gets() by fgets() to avoid buffer overflow.
+  . Use sizeof() instead of constants.
+  . do not use strdup() since it is useless.
+  . print error messages when needed.
+
+
 pcsc-lite-1.1.2beta4: Ludovic Rousseau
 13 Apr, 2003
 - src/debuglog.c:
