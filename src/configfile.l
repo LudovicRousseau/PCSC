@@ -41,8 +41,8 @@ void tok_error(char *pcToken_error);
 #include <string.h>
 #include <errno.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "config.h"
 #include "sys_generic.h"
 #include "readerfactory.h"
