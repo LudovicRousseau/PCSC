@@ -19,7 +19,7 @@ extern "C"
 
 	UCHAR PHGetDefaultProtocol(PUCHAR, DWORD);
 	UCHAR PHGetAvailableProtocols(PUCHAR, DWORD);
-	DWORD PHSetProtocol(struct ReaderContext *, DWORD, UCHAR);
+	DWORD PHSetProtocol(struct ReaderContext *, DWORD, UCHAR, UCHAR);
 
 #ifdef __cplusplus
 }

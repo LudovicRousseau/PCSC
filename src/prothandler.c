@@ -74,88 +74,62 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
  */
 
 DWORD PHSetProtocol(struct ReaderContext * rContext,
-	DWORD dwPreferred, UCHAR ucAvailable)
+	DWORD dwPreferred, UCHAR ucAvailable, UCHAR ucDefault)
 {
+	DWORD protocol;
 	LONG rv;
-	DWORD protocol = rContext->readerState->cardProtocol;
+	UCHAR ucChosen;
 
+	/* App has specified no protocol */
 	if (dwPreferred == 0)
+		return -1;
+
+	/* requested protocol is not available */
+	if (! (dwPreferred & ucAvailable))
 	{
-		/*
-		 * App has specified no protocol 
+		/* Note:
+		 * dwPreferred must be either SCARD_PROTOCOL_T0 or SCARD_PROTOCOL_T1
+		 * if dwPreferred == SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 the test
+		 * (SCARD_PROTOCOL_T0 == dwPreferred) will not work as expected
+		 * and the debug message will not be correct.
+		 *
+		 * This case may only occur if
+		 * dwPreferred == SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1
+		 * and ucAvailable == 0 since we have (dwPreferred & ucAvailable) == 0
+		 * and the case ucAvailable == 0 should never occur (the card is at
+		 * least T=0 or T=1)
 		 */
+		DebugLogB("Protocol T=%d requested but unsupported by the card",
+			(SCARD_PROTOCOL_T0 == dwPreferred) ? 0 : 1);
 		return -1;
 	}
 
-	if ((protocol == SCARD_PROTOCOL_T1) &&
-		((dwPreferred & SCARD_PROTOCOL_T1) == 0) &&
-		(dwPreferred & SCARD_PROTOCOL_T0))
-	{
-		if (SCARD_PROTOCOL_T0 & ucAvailable)
-		{
-			DebugLogA("Attempting PTS to T=0");
+	/* set default value */
+	protocol = ucDefault;
 
-			/*
-			 * Case 1: T1 is default but is not preferred 
-			 *
-			 * Action: Change to T=0 protocol.  
-			 */
-			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T0, 0x00, 0x00, 0x00, 0x00);
-
-			if (rv != IFD_SUCCESS)
-				protocol = SCARD_PROTOCOL_T1;
-			else
-				protocol = SCARD_PROTOCOL_T0;
-		}
-		else
-		{
-			/*
-			 * App wants an unsupported protocol 
-			 */
-			DebugLogA("Protocol T=0 requested but unsupported by the card");
-
-			return -1;
-		}
-
-	} else if ((protocol == SCARD_PROTOCOL_T0) &&
-		((dwPreferred & SCARD_PROTOCOL_T0) == 0) &&
-		(dwPreferred & SCARD_PROTOCOL_T1))
-	{
-		if (ucAvailable & SCARD_PROTOCOL_T1)
-		{
-			DebugLogA("Attempting PTS to T=1");
-
-			/*
-			 * Case 2: T=0 is default but T=1 is preferred 
-			 *
-			 * Action: Change to T=1 only if supported 
-			 */
-			rv = IFDSetPTS(rContext, SCARD_PROTOCOL_T1, 0x00,
-				0x00, 0x00, 0x00);
-
-			if (rv != SCARD_S_SUCCESS)
-				protocol = SCARD_PROTOCOL_T0;
-			else
-				protocol = SCARD_PROTOCOL_T1;
-		}
-		else
-		{
-			/*
-			 * App wants unsupported protocol 
-			 */
-			DebugLogA("Protocol T=1 requested but unsupported by the card");
-
-			return -1;
-		}
-	}
+	/* we try to use T=1 first */
+	if (dwPreferred & SCARD_PROTOCOL_T1)
+		ucChosen = SCARD_PROTOCOL_T1;
 	else
-	{
-		/*
-		 * Case 3: Default protocol is preferred 
-		 *
-		 * Action: No need to change protocols 
-		 */
-	}
+		if (dwPreferred & SCARD_PROTOCOL_T0)
+			ucChosen = SCARD_PROTOCOL_T0;
+		else
+			/* App wants unsupported protocol */
+			return -1;
+
+	DebugLogB("Attempting PTS to T=%d",
+		(SCARD_PROTOCOL_T0 == ucChosen ? 0 : 1));
+	rv = IFDSetPTS(rContext, ucChosen, 0x00, 0x00, 0x00, 0x00);
+
+	if (IFD_SUCCESS == rv)
+		protocol = ucChosen;
+	else
+		if (IFD_NOT_SUPPORTED == rv)
+			DebugLogB("PTS not supported by driver, using T=%d",
+				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+		else
+			DebugLogB("PTS failed, using T=%d",
+				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 
 	return protocol;
 }
