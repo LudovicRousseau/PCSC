@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
 	SCARD_IO_REQUEST sRecvPci;
 	SCARD_READERSTATE_A rgReaderStates[1];
 	DWORD dwSendLength, dwRecvLength, dwPref, dwReaders;
-	LPSTR mszReaders;
+	LPTSTR mszReaders;
 	BYTE s[MAX_BUFFER_SIZE], r[MAX_BUFFER_SIZE];
-	LPCSTR mszGroups;
+	LPCTSTR mszGroups;
 	LONG rv;
 	FILE *fp;
 	FILE *fo;
