@@ -483,7 +483,7 @@ void signal_trap(int sig)
 void print_version (void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
-	printf("Copyright (C) 2000 by David Corcoran <corcoran@linuxnet.com>.\n");
+	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@linuxnet.com>.\n");
 	printf("Report bugs to <sclinux@linuxnet.com>.\n");
 }
 

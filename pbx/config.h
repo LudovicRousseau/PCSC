@@ -7,7 +7,7 @@
 #define PACKAGE "PCSC Framework"
 
 /* Version number of package */
-#define VERSION "1.0.2.cvs"
+#define VERSION "1.1.0"
 
 /* OSX */
 #define PCSC_TARGET_OSX 1
