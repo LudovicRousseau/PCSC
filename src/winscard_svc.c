@@ -52,16 +52,13 @@ static void ContextThread(DWORD* pdwIndex);
 
 LONG ContextsInitialize()
 {
-
 	memset(psContext, 0, sizeof(CONTEXT)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
 	return 1;
 }
 
 LONG CreateContextThread(PDWORD pdwClientID)
 {
-
 	int i;
-	LONG rv;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
@@ -82,19 +79,15 @@ LONG CreateContextThread(PDWORD pdwClientID)
 	
 	dwNextContextIndex = i;
 
-	rv = SYS_ThreadCreate(&psContext[i].pthThread, NULL,
-				(LPVOID) ContextThread, (LPVOID) &dwNextContextIndex);
-	if (rv == 1)
-	{
-		return SCARD_S_SUCCESS;
-	}
-	else
+	if (SYS_ThreadCreate(&psContext[i].pthThread, NULL,
+		(LPVOID) ContextThread, (LPVOID) &dwNextContextIndex) != 1)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0; 
 		return SCARD_E_NO_MEMORY;
 	}
 
+	return SCARD_S_SUCCESS;
 }
 
 /*
