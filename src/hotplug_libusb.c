@@ -374,7 +374,7 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 }	/* End of function */
 
 /*
- * Sets up callsbacks for device hotplug events.  Not currently implemented
+ * Sets up callbacks for device hotplug events. Not currently implemented
  * for Linux.
  */
 ULONG HPRegisterForHotplugEvents(void)
