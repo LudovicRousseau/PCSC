@@ -5,6 +5,7 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -417,6 +418,7 @@ int main(int argc, char **argv)
 	{
 		rv = DBUpdateReaders(PCSCLITE_READER_CONFIG);
 
+#if 0
 		if (rv == 1)
 		{
 			DebugLogA("main: warning: no " PCSCLITE_READER_CONFIG " found");
@@ -424,8 +426,10 @@ int main(int argc, char **argv)
 			 * Token error in file 
 			 */
 		}
-		else if (rv == -1)
-			at_exit();
+		else
+#endif
+			if (rv == -1)
+				at_exit();
 	}
 
 	/*
