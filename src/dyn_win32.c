@@ -13,9 +13,9 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <string.h>
 
-#include "../win32/win32_config.h"
 #include "windows.h"
 #include <winscard.h>
 #include "dyn_generic.h"

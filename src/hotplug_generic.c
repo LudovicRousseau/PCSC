@@ -12,10 +12,9 @@
 $Id$
 ********************************************************************/
 
+#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
-
-#include "config.h"
 
 LONG HPSearchHotPluggables(void)
 {

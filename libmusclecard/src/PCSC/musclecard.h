@@ -26,10 +26,10 @@ extern "C"
 #include "PCSC.h"
 #endif
 
-#ifndef __APPLE__
-#include "mscdefines.h"
-#else
+#if defined(__APPLE__)
 #include <PCSC/mscdefines.h>
+#else
+#include <mscdefines.h>
 #endif
 
 /*

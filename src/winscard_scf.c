@@ -12,41 +12,40 @@
                      Copy this file to pcsc-lite../src/winscard_clnt.c
 ********************************************************************/
 
-#include <wintypes.h>
-#include <pcsclite.h>
-#include <winscard.h>
-
-#define USE_THREAD_SAFETY
-
-#ifdef USE_THREAD_SAFETY
-#include <thread_generic.h>
-#endif
+#include "config.h"
 #include <stdlib.h>
 #include <string.h>
-#include <readerfactory.h>
-#include <eventhandler.h>
-#include <sys_generic.h>
 #include <sys/types.h>
-
-//#include <winscard_msg.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/un.h>
+#include <smartcard/scf.h>
 
+#include "wintypes.h"
+#include "pcsclite.h"
+#include "winscard.h"
+#include "debuglog.h"
 
-/*scf includes*/
-#include <scf.h>
+#define USE_THREAD_SAFETY
+#ifdef USE_THREAD_SAFETY
+#include "thread_generic.h"
+#endif
+
+#include "readerfactory.h"
+#include "eventhandler.h"
+#include "sys_generic.h"
+
 #define TRUE 1
 #define FALSE 0
+
 #define PCSC_SCF_MAX_READERS 2
 #define PCSC_SCF_MAX_ATR_BUFFER_LENGTH 32
 #define PCSC_SCF_MAX_RECV_LEN 265
 
-
 //Global session to manage Readers, Card events.
 static SCF_Session_t  g_hSession = NULL;
 
-//Hvae to deifne this because they are defined in pcsclite.h as externs
+//Have to define this because they are defined in pcsclite.h as externs
 SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 
 static struct _psTransmitMap {

@@ -18,20 +18,17 @@ $Id$
   
 ********************************************************************/
 
-#ifndef WIN32
 #include "config.h"
-#else
-#include "../win32/win32_config.h"
-#endif
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "musclecard.h"
 #include "tokenfactory.h"
 #include "debuglog.h"
 
 #ifdef USE_THREAD_SAFETY
-#ifndef WIN32
 #include "wintypes.h"
-#endif
 #include "thread_generic.h"
 #include "sys_generic.h"
 #endif
@@ -46,10 +43,6 @@ PCSCLITE_MUTEX PCSC_MCARD_mutex;
 #endif
 static PCSCLITE_THREAD_T callbackThread;
 #endif
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 static SCARDCONTEXT localHContext = 0;
 static ULONG blockingContext = MSC_BLOCKSTATUS_RESUME;

@@ -14,6 +14,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +24,6 @@ $Id$
 #include <sys/errno.h>
 #include <fcntl.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "thread_generic.h"
@@ -33,9 +33,6 @@ $Id$
 #include "eventhandler.h"
 #include "ifdhandler.h"
 #include "ifdwrapper.h"
-/*
- * FIX :: This should go 
- */
 #include "debuglog.h"
 
 static PREADER_CONTEXT sContexts[PCSCLITE_MAX_CONTEXTS];

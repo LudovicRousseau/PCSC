@@ -13,6 +13,11 @@ $Id$
 
 %{
 
+#include "config.h"
+#include <stdio.h>
+#include <string.h>
+
+#include "debuglog.h"
 #include "parser.h"
 
 void tpevalToken(char *pcToken, int tokType);
@@ -38,10 +43,6 @@ void tperrorCheck (char *pcToken_error);
 .                                               { tperrorCheck( yytext ); }
 %%
 
-#include <stdio.h>
-#include <string.h>
-#include "debuglog.h"
-#include "config.h"
 
 int yywrap()
 {

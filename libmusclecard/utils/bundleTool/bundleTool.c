@@ -16,14 +16,7 @@ $Id$
  
 ********************************************************************/
 
-#ifdef MSC_TARGET_OSX
-#include <PCSC/wintypes.h>
-#include <PCSC/winscard.h>
-#else
-#include <wintypes.h>
-#include <winscard.h>
-#endif
-
+#include "config.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,8 +25,11 @@ $Id$
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-
-#include "config.h"
+#if defined(__APPLE__)
+#include <PCSC/winscard.h>
+#else
+#include <winscard.h>
+#endif
 
 /*
  * The following defines personalize this for different tokens 

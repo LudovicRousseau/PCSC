@@ -10,9 +10,9 @@
 
 ********************************************************************/
 
+#include "config.h"
 #include <string.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "readerfactory.h"

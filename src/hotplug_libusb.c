@@ -15,6 +15,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <string.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -26,7 +27,6 @@ $Id$
 #include <errno.h>
 #include <usb.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "readerfactory.h"

@@ -12,11 +12,11 @@
 
 ********************************************************************/
 
+#include "config.h"
 #include <CoreFoundation/CFBundle.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFURL.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "dyn_generic.h"

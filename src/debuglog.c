@@ -13,11 +13,11 @@ $Id$
 
 ********************************************************************/
 
-#ifndef WIN32
+#include "config.h"
+#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#include <unistd.h>
 #endif
-
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,19 +25,8 @@ $Id$
 #include <assert.h>
 #include <sys/types.h>
 
-#ifndef WIN32
-#include "config.h"
 #include "wintypes.h"
-#else
-#include "../win32/win32_config.h"
-#endif
-
-#ifdef WIN32
-#include "../win32/win32_pcsclite.h"
-#else
 #include "pcsclite.h"
-#endif
-
 #include "debuglog.h"
 
 // Max string size when dumping a 256 bytes longs APDU
@@ -334,13 +323,8 @@ char* pcsc_stringify_error(long pcscError)
 }
 
 #ifdef WIN32
-static DWORD getPID() {
+static DWORD SYS_GetPID() {
 	return GetCurrentProcessId();
-}
-
-#else
-static pid_t getPID() {
-	return getpid();
 }
 #endif
 
@@ -359,7 +343,7 @@ void DebugLogSetupLogFile(const char* filename_base) {
 	  debug_file = NULL;
   }
 
-  sprintf(filename, "%s.%20d", filename_base, getPID());
+  sprintf(filename, "%s.%20d", filename_base, SYS_GetPID());
   debug_file = fopen(filename, "a");
 
   /* In debug mode, catch the case where we couldn't open the file */
@@ -369,4 +353,3 @@ finish:
   free(filename);
 
 }
-

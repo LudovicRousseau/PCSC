@@ -18,11 +18,11 @@ $Id$
 #ifndef __winscard_h__
 #define __winscard_h__
 
-//#ifndef __APPLE__
+#if defined(__APPLE__)
+#include <PCSC/pcsclite.h>
+#else
 #include <pcsclite.h>
-//#else
-//#include <PCSC/pcsclite.h>
-//#endif
+#endif
 
 #ifdef __cplusplus
 extern "C"

@@ -13,6 +13,7 @@
 $Id$
 ********************************************************************/
 
+#include "config.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/IOKitLib.h>
@@ -20,7 +21,6 @@ $Id$
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "debuglog.h"

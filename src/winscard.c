@@ -16,11 +16,11 @@
 
 ********************************************************************/
 
+#include "config.h"
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "winscard.h"

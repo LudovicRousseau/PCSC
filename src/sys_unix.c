@@ -13,6 +13,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <sys_generic.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -27,8 +28,6 @@ $Id$
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
-
-#include "config.h"
 
 int SYS_Initialize()
 {

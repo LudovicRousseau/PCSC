@@ -23,7 +23,7 @@
 #define MY_OBJECT_ID    "c1"
 #define MY_OBJECT_SIZE  50
 
-#ifdef MSC_ARCH_WIN32
+#ifdef WIN32
 MSCString pcsc_stringify_error(MSCLong32 Error);
 #endif
 
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#ifdef MSC_ARCH_WIN32
+#ifdef WIN32
 MSCString pcsc_stringify_error(MSCLong32 Error)
 {
 

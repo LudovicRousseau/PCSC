@@ -11,10 +11,10 @@
  
 ********************************************************************/
 
+#include "config.h"
 #include <syslog.h>
 #include <string.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "atrhandler.h"

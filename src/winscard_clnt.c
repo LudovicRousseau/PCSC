@@ -14,6 +14,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -22,7 +23,6 @@ $Id$
 #include <sys/un.h>
 #include <errno.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "winscard.h"

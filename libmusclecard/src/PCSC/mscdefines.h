@@ -23,17 +23,13 @@ extern "C"
 {
 #endif
 
-#ifdef WIN32
-#include "../win32/win32_pcsclite.h"
-#endif
-
-#ifndef __APPLE__
-#include <winscard.h>
-#else
+#if defined(__APPLE__)
 #include <PCSC/winscard.h>
+#else
+#include <winscard.h>
 #endif
 
-#ifdef MSC_ARCH_WIN32
+#ifndef MAX_BUFFER_SIZE
 #define MAX_BUFFER_SIZE		265
 #endif
 

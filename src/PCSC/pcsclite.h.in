@@ -18,13 +18,11 @@ $Id$
 #ifndef __pcsclite_h__
 #define __pcsclite_h__
 
-//#ifndef __APPLE__
-#ifdef WIN32
-#include <windows.h>
+#if defined(__APPLE__)
+#include <PCSC/wintypes.h>
 #else
 #include <wintypes.h>
 #endif
-//#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -223,4 +221,3 @@ extern "C"
 #endif
 
 #endif
-

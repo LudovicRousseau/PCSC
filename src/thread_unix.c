@@ -11,12 +11,7 @@
 	            
 ********************************************************************/
 
-#ifndef WIN32
 #include "config.h"
-#else
-#include "../win32/win32_config.h"
-#endif
-
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "thread_generic.h"

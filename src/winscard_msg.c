@@ -12,6 +12,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -25,9 +26,6 @@ $Id$
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-
-#include "config.h"
-
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif

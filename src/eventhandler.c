@@ -14,6 +14,7 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -21,7 +22,6 @@ $Id$
 #include <string.h>
 #include <stdlib.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "thread_generic.h"

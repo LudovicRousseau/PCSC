@@ -17,7 +17,6 @@
 #ifdef WIN32
 #include <windows.h>
 #include "PCSC.h"
-
 #else
 #include <pthread.h>
 #define PCSC_API
@@ -32,7 +31,6 @@ extern "C"
 #define PCSCLITE_THREAD_T                HANDLE
 #define PCSCLITE_MUTEX                   CRITICAL_SECTION
 #define PCSCLITE_MUTEX_T                 CRITICAL_SECTION*
-
 #else
 #define PCSCLITE_THREAD_T                pthread_t
 #define PCSCLITE_MUTEX                   pthread_mutex_t

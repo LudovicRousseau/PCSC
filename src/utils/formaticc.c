@@ -16,10 +16,11 @@ $Id$
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <wintypes.h>
+#if defined(__APPLE__)
+#include <PCSC/winscard.h>
+#else
 #include <winscard.h>
-
+#endif
 #include "configfile.h"
 
 #ifndef MAXHOSTNAMELEN

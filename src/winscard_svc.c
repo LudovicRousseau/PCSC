@@ -13,10 +13,10 @@
 
 ********************************************************************/
 
+#include "config.h"
 #include <time.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "winscard.h"

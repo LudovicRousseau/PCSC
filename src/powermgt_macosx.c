@@ -19,10 +19,8 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
-cc test2.c -o pm_callback -Wall -Wno-four-char-constants -framework IOKit -framework CoreFoundation
-*/
 
+#include "config.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,7 +32,6 @@ cc test2.c -o pm_callback -Wall -Wno-four-char-constants -framework IOKit -frame
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include <IOKit/IOMessage.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "debuglog.h"

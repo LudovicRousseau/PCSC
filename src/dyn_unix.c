@@ -12,11 +12,11 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <string.h>
 #include <dlfcn.h>
 #include <stdlib.h>
 
-#include "config.h"
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "dyn_generic.h"

@@ -15,16 +15,21 @@ $Id$
 
 ********************************************************************/
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
+#if defined(__APPLE__)
+#include <PCSC/winscard.h>
+#else
+#include <winscard.h>
+#endif
 
-#include "config.h"
-#include "pcsclite.h"
-
-#define CONFFILE "/etc/reader.conf"
+#ifndef PCSCLITE_READER_CONFIG
+#define PCSCLITE_READER_CONFIG "/etc/reader.conf"
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -115,13 +120,13 @@ int main(int argc, char *argv[])
 	}
 
 	printf("\n\n");
-	printf("Now creating new " CONFFILE "\n");
+	printf("Now creating new " PCSCLITE_READER_CONFIG "\n");
 
-	fd = fopen(CONFFILE, "w");
+	fd = fopen(PCSCLITE_READER_CONFIG, "w");
 
 	if (fd == NULL)
 	{
-		printf("Cannot open file %s: %s\n", CONFFILE, strerror(errno));
+		printf("Cannot open file %s: %s\n", PCSCLITE_READER_CONFIG, strerror(errno));
 		free(lpcPortID);
 		return 1;
 	}

@@ -94,4 +94,4 @@ extern "C"
 }
 #endif
 
-#endif							/* __smclib_h__ */
+#endif							/* __atrhandler_h__ */

@@ -20,6 +20,8 @@ extern "C"
 {
 #endif
 
+#if !defined(WIN32)
+
 #ifndef BYTE
 	typedef unsigned char BYTE;
 #endif
@@ -37,7 +39,7 @@ extern "C"
 	typedef const void *LPCVOID;
 	typedef unsigned long DWORD;
 	typedef unsigned long *PDWORD;
-	typedef unsigned short WORD;       /* H. Bragstad Schlumberger */
+	typedef unsigned short WORD;
 	typedef long LONG;
 	typedef long RESPONSECODE;
 	typedef const char *LPCSTR;
@@ -45,9 +47,10 @@ extern "C"
 	typedef BYTE *LPBYTE;
 	typedef DWORD *LPDWORD;
 	typedef char *LPSTR;
-	//typedef unsigned short WCHAR;
-	//typedef WCHAR * LPTSTR;
-	//typedef const WCHAR * LPCWSTR;
+
+#else
+#include <windows.h>
+#endif
 
 #ifdef __cplusplus
 }
