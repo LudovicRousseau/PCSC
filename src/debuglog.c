@@ -33,8 +33,6 @@ $Id$
 /* Max string size when dumping a 256 bytes longs APDU */
 #define DEBUG_BUF_SIZE (256*3+30)
 
-static char DebugBuffer[DEBUG_BUF_SIZE];
-
 static int lSuppress = DEBUGLOG_LOG_ENTRIES;
 static int debug_msg_type = DEBUGLOG_NO_DEBUG;
 static int debug_category = DEBUG_CATEGORY_NOTHING;
@@ -42,6 +40,7 @@ static FILE *debug_file = NULL;
 
 void debug_msg(const char *fmt, ...)
 {
+	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
 	if (lSuppress != DEBUGLOG_LOG_ENTRIES)
@@ -100,6 +99,7 @@ void debug_msg(const char *fmt, ...)
 
 void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 {
+	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
 	unsigned char *c, *debug_buf_end;
 
