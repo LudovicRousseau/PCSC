@@ -210,7 +210,7 @@ int main(int argc, char **argv)
 	printf("%s\n", pcsc_stringify_error(rv));
 
 	printf("Current Reader Name              : %s\n", pcReaders);
-	printf("Current Reader State             : %lx\n", dwState);
+	printf("Current Reader State             : 0x%.4lx\n", dwState);
 	printf("Current Reader Protocol          : %lx\n", dwProt - 1);
 	printf("Current Reader ATR Size          : %lx\n", dwAtrLen);
 	printf("Current Reader ATR Value         : ");
