@@ -164,7 +164,7 @@ extern "C"
 #endif
 #define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
 #ifndef USE_IPCDIR
-#define PCSCLITE_IPC_DIR		"/var/run/"
+#define PCSCLITE_IPC_DIR		"/var/run"
 #else
 #define PCSCLITE_IPC_DIR		USE_IPCDIR
 #endif

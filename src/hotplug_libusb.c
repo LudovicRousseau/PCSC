@@ -119,9 +119,9 @@ LONG HPReadBundleValues(void)
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle
 			 */
-			snprintf(fullPath, FILENAME_MAX, "%s%s%s", PCSCLITE_HP_DROPDIR,
-				currFP->d_name, "/Contents/Info.plist");
-			fullPath[FILENAME_MAX - 1] = '\0';
+			snprintf(fullPath, sizeof(fullPath), "%s/%s/Contents/Info.plist",
+				PCSCLITE_HP_DROPDIR, currFP->d_name);
+			fullPath[sizeof(fullPath) - 1] = '\0';
 
 			/* while we find a nth ifdVendorID in Info.plist */
 			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
@@ -153,9 +153,10 @@ LONG HPReadBundleValues(void)
 					keyValue, 0);
 				if (rv == 0)
 				{
-					snprintf(fullLibPath, FILENAME_MAX, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
-						currFP->d_name, "/Contents/Linux/", keyValue);
-					fullLibPath[FILENAME_MAX - 1] = '\0';
+					snprintf(fullLibPath, sizeof(fullLibPath),
+						"%s/%s/Contents/Linux/%s",
+						PCSCLITE_HP_DROPDIR, currFP->d_name, keyValue);
+					fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 					driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
