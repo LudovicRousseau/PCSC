@@ -51,12 +51,6 @@
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
-/* Have socket */
-#undef HAVE_SOCKET
-
-/* Have socketpair */
-#undef HAVE_SOCKETPAIR
-
 /* Define to 1 if `stat' has the bug that it succeeds when given the
    zero-length file name argument. */
 #undef HAVE_STAT_EMPTY_STRING_BUG
