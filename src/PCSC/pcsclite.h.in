@@ -7,6 +7,8 @@
 	Date   : 7/27/99
 	License: Copyright (C) 1999 David Corcoran
 			<corcoran@linuxnet.com>
+		2003 Ludovic Rousseau
+			<ludovic.rousseau@free.fr>
 	Purpose: This keeps a list of defines for pcsc lite.            
 
 $Id$
@@ -16,13 +18,13 @@ $Id$
 #ifndef __pcsclite_h__
 #define __pcsclite_h__
 
-#ifndef __APPLE__
+//#ifndef __APPLE__
 #ifdef WIN32
 #include <windows.h>
 #else
 #include <wintypes.h>
 #endif
-#endif
+//#endif
 
 #ifdef __cplusplus
 extern "C"
