@@ -149,7 +149,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 	if (hpDir == 0)
 	{
-		DebugLogB("Cannot open PC/SC token drivers directory: %s",
+		Log2(PCSC_LOG_ERROR, "Cannot open PC/SC token drivers directory: %s",
 			MSC_SVC_DROPDIR);
 		return -1;
 	}
@@ -159,7 +159,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
-		DebugLogB("Cannot open PC/SC token drivers directory: %s", findPath);
+		Log2(PCSC_LOG_ERROR, "Cannot open PC/SC token drivers directory: %s",
+			findPath);
 		return -1;
 	}
 #endif
@@ -190,8 +191,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 			atrIndex = 0;
 
 #ifndef NO_MSC_DEBUG
-			DebugLogB("ATR comparison: FILE: %s", fullPath);
-			DebugLogB("ATR comparison: Target Match: %s", atrString);
+			Log2(PCSC_LOG_DEBUG, "ATR comparison: FILE: %s", fullPath);
+			Log2(PCSC_LOG_DEBUG, "ATR comparison: Target Match: %s", atrString);
 #endif
 
 			while (1)
@@ -204,7 +205,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 							 * aliases loop */
 				}
 #ifndef NO_MSC_DEBUG
-				DebugLogB("ATR comparison: Source: %s", keyValue);
+				Log2(PCSC_LOG_DEBUG, "ATR comparison: Source: %s", keyValue);
 #endif
 
 				if (strcmp(keyValue, atrString) != 0)
@@ -216,7 +217,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					continue;
 				}
 #ifndef NO_MSC_DEBUG
-				DebugLogB("Match found at ATR alias %d", atrIndex);
+				Log2(PCSC_LOG_DEBUG, "Match found at ATR alias %d", atrIndex);
 #endif
 
 				/*
@@ -230,8 +231,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 						MSC_PRODMSC_KEY_NAME, keyValue, 0);
 					if (rv != 0)
 					{
-						DebugLogA
-							("Match found, failed due to no product name.");
+						Log1(PCSC_LOG_ERROR,
+							"Match found, failed due to no product name.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -239,7 +240,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					}
 				}
 #ifndef NO_MSC_DEBUG
-				DebugLogB("Product name: %s", keyValue);
+				Log2(PCSC_LOG_DEBUG, "Product name: %s", keyValue);
 #endif
 				strlcpy(tokenInfo->tokenName, keyValue,
 					sizeof(tokenInfo->tokenName));
@@ -255,8 +256,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 						MSC_LIBRMSC_KEY_NAME, keyValue, 0);
 					if (rv != 0)
 					{
-						DebugLogA
-							("Match found, failed due to no library path.");
+						Log1(PCSC_LOG_ERROR,
+							"Match found, failed due to no library path.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -276,7 +277,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 				if (fullLibPath == NULL)
 				{
-					DebugLogA("No path to bundle library found !");
+					Log1(PCSC_LOG_ERROR, "No path to bundle library found !");
 					return -1;
 				}
 
@@ -300,14 +301,14 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 				if (rv == 0)
 				{
 #ifndef NO_MSC_DEBUG
-					DebugLogB("Default AID name: %s", keyValue);
+					Log2(PCSC_LOG_DEBUG, "Default AID name: %s", keyValue);
 #endif
 					rv = stringToBytes(keyValue, tokenInfo->tokenApp,
 						&tokenInfo->tokenAppLen);
 					if (rv != 0)
 					{
-						DebugLogA
-							("Match found, failed due to malformed aid string.");
+						Log1(PCSC_LOG_ERROR,
+							"Match found, failed due to malformed aid string.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -316,7 +317,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 				} else
 				{
-					DebugLogA("No AID specified in bundle");
+					Log1(PCSC_LOG_ERROR, "No AID specified in bundle");
 					tokenInfo->tokenAppLen = 0;
 				}
 
@@ -377,8 +378,8 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 
 	if (rv != 0)
 	{
-		DebugLogA("Error: Matching Token ATR Not Found.");
-		DebugXxd("ATR: ", pConnection->tokenInfo.tokenId,
+		Log1(PCSC_LOG_ERROR, "Error: Matching Token ATR Not Found.");
+		LogXxd(PCSC_LOG_ERROR, "ATR: ", pConnection->tokenInfo.tokenId,
 			pConnection->tokenInfo.tokenIdLength);
 
 		return SCARD_E_CARD_UNSUPPORTED;
@@ -394,12 +395,12 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogA("Error: Could not load service library");
-		DebugLogB("->> %s", pConnection->tokenInfo.svProvider);
+		Log2(PCSC_LOG_ERROR, "Error: Could not load service library %s",
+			pConnection->tokenInfo.svProvider);
 		return SCARD_E_INVALID_TARGET;
 	} else
 	{
-		DebugLogB("Loading service library %s",
+		Log2(PCSC_LOG_INFO, "Loading service library %s",
 			pConnection->tokenInfo.svProvider);
 	}
 
@@ -444,7 +445,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfWriteFramework = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		/*
 		 * No big deal - this feature is just not supported 
 		 */
@@ -456,7 +457,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfIdentifyToken = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -467,7 +468,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfInitializePlugin = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -478,7 +479,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfFinalizePlugin = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -488,7 +489,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetStatus = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -499,7 +500,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetCapabilities = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -510,7 +511,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExtendedFeature = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		/*
 		 * No big deal - there are no extended features 
 		 */
@@ -522,7 +523,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGenerateKeys = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -532,7 +533,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfImportKey = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -542,7 +543,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExportKey = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -552,7 +553,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfComputeCrypt = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -563,7 +564,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfExtAuthenticate = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -573,7 +574,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListKeys = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -583,7 +584,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfCreatePIN = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -593,7 +594,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfVerifyPIN = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -603,7 +604,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfChangePIN = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -613,7 +614,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfUnblockPIN = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -623,7 +624,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListPINs = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -633,7 +634,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfCreateObject = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -643,7 +644,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfDeleteObject = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -653,7 +654,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfWriteObject = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -663,7 +664,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfReadObject = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -673,7 +674,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfListObjects = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -683,7 +684,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfLogoutAll = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
@@ -693,7 +694,7 @@ MSCLong32 TPBindFunctions(MSCLPTokenConnection pConnection)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		pConnection->libPointers.pvfGetChallenge = 0;
-		DebugLogA("Missing functions");
+		Log1(PCSC_LOG_ERROR, "Missing functions");
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
