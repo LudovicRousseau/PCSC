@@ -13,12 +13,14 @@ $Id$
 
 %{
 
+#include "parser.h"
+
 void tpevalToken(char *pcToken, int tokType);
 
 static char *pcDesiredKey = 0;
-static char pcKey[200];
-static char pcValue[200];
-static char pcFinValue[200];
+static char pcKey[TOKEN_MAX_KEY_SIZE];
+static char pcValue[TOKEN_MAX_VALUE_SIZE];
+static char pcFinValue[TOKEN_MAX_VALUE_SIZE];
 static int valueIndex = 0;
 static int desiredIndex = 0;
 
@@ -30,9 +32,9 @@ void tperrorCheck (char *pcToken_error);
 
 #.*                                             {}
 "\n"                                            {}
-\<key\>([A-Z]|[a-z]|[0-9]|[ \t])+\<\/key\>      { valueIndex = 0; tpevalToken(yytext, 1); }
+\<key\>([A-Z]|[a-z]|[0-9]|[ \t])+\<\/key\>      { valueIndex = 0; tpevalToken(yytext, TOKEN_TYPE_KEY); }
 [ \t]                     		        {}
-\<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'"])+\<\/string\> {tpevalToken(yytext, 2); valueIndex += 1;}
+\<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'"])+\<\/string\> {tpevalToken(yytext, TOKEN_TYPE_STRING); valueIndex += 1;}
 .                                               { tperrorCheck( yytext ); }
 %%
 
@@ -52,23 +54,42 @@ void tpevalToken(char *pcToken, int tokType)
 	int len;
 	len = 0;
 
-	if (tokType == 1)
+	if (tokType == TOKEN_TYPE_KEY)
 	{
 		for (len=5; pcToken[len] != '<'; len++)
 			;
-		strncpy(pcKey, &pcToken[5], len - 5);
-		pcKey[len-5] = 0;
+		if (len - 5 > TOKEN_MAX_KEY_SIZE)
+		{
+			strncpy(pcKey, &pcToken[5], TOKEN_MAX_KEY_SIZE);
+			pcKey[TOKEN_MAX_KEY_SIZE - 1] = '\0';
+		}
+		else
+		{
+			strncpy(pcKey, &pcToken[5], len - 5);
+			pcKey[len-5] = 0;
+		}
 	}
 
-	if (tokType == 2)
+	if (tokType == TOKEN_TYPE_STRING)
 	{
 		for (len=8; pcToken[len] != '<'; len++)
 			;
-		strncpy(pcValue, &pcToken[8], len - 8);
-		pcValue[len-8] = 0;
+		if (len - 8 > TOKEN_MAX_VALUE_SIZE)
+		{
+			strncpy(pcValue, &pcToken[8], TOKEN_MAX_VALUE_SIZE);
+			pcValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+		}
+		else
+		{
+			strncpy(pcValue, &pcToken[8], len - 8);
+			pcValue[len-8] = 0;
+		}
 		if (strcmp(pcKey, pcDesiredKey) == 0)
 			if (desiredIndex == valueIndex)
-				strcpy(pcFinValue, pcValue);
+			{
+				strncpy(pcFinValue, pcValue, TOKEN_MAX_VALUE_SIZE);
+				pcFinValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+			}
 	}
 }
 
@@ -112,7 +133,10 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		ret = -1;
 	}
 	else
-		strcpy(tokenValue, pcFinValue);
+	{
+		strncpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
+		tokenValue[TOKEN_MAX_VALUE_SIZE - 1] = '\0';
+	}
 
 	fclose(file);
 	return ret;
