@@ -109,14 +109,7 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(daemon flock getopt_long nanosleep strerror vsnprintf)
 
 dnl strlcpy, strlcat from OpenBSD
-AC_CHECK_FUNC(strlcpy,
-	need_strlcpy=false; AC_DEFINE(HAVE_STRLCPY, 1, [have strlcpy])
-	, need_strlcpy=true)
-AM_CONDITIONAL(NEED_STRLCPY, test x$need_strlcpy=xtrue)
-AC_CHECK_FUNC(strlcat,
-	need_strlcat=false; AC_DEFINE(HAVE_STRLCAT, 1, [have strlcat])
-	, need_strlcat=true)
-AM_CONDITIONAL(NEED_STRLCAT, test x$need_strlcat=xtrue)
+AC_CHECK_FUNCS(strlcpy strlcat)
 
 dnl C Compiler features
 AC_C_INLINE
@@ -310,9 +303,6 @@ if test x${extendedapdu} = xtrue ; then
 else
   extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
 fi
-
-AC_MSG_RESULT([use internal strlcpy          : $need_strlcpy])
-AC_MSG_RESULT([use internal strlcat          : $need_strlcat])
 
 dnl warning about pthread
 if test x${threadsafe} = xtrue ; then
