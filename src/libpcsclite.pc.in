@@ -8,4 +8,4 @@ Name: PCSC Lite
 Description: PC/SC smart card interface 
 Version: @VERSION@
 Libs: -L${libdir} -lpcsclite
-Cflags: -I${includedir}
+Cflags: -I${includedir}/PCSC
