@@ -66,7 +66,7 @@ static int mapAddr = 0;
 
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
-static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, 8 };
 SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, 8 };
@@ -168,8 +168,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		 */
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			readerStates[i] = (PREADER_STATES)
-				SYS_PublicMemoryMap(sizeof(READER_STATES),
+			readerStates[i] = (PREADER_STATE)
+				SYS_PublicMemoryMap(sizeof(READER_STATE),
 				mapAddr, (i * pageSize));
 			if (readerStates[i] == NULL)
 			{
@@ -1067,7 +1067,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 {
 	LONG rv;
 	PSCARD_READERSTATE_A currReader;
-	PREADER_STATES rContext;
+	PREADER_STATE rContext;
 	LPTSTR lpcReaderName;
 	DWORD dwTime;
 	DWORD dwState;

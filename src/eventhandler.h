@@ -6,6 +6,8 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -23,7 +25,7 @@ extern "C"
 	 * application gets instant notification of changes in state. 
 	 */
 
-	typedef struct pubReaderStatesList
+	typedef struct
 	{
 		LONG readerID;
 		char readerName[MAX_READERNAME];
@@ -35,7 +37,7 @@ extern "C"
 		DWORD cardAtrLength;
 		DWORD cardProtocol;
 	}
-	READER_STATES, *PREADER_STATES;
+	READER_STATE, *PREADER_STATE;
 
 	LONG EHInitializeEventStructures(void);
 	LONG EHSpawnEventHandler(PREADER_CONTEXT);

@@ -31,7 +31,7 @@
 #include "ifdwrapper.h"
 #include "prothandler.h"
 
-static PREADER_STATES readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
 void EHStatusHandlerThread(PREADER_CONTEXT);
 
@@ -69,8 +69,8 @@ LONG EHInitializeEventStructures(void)
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		readerStates[i] = (PREADER_STATES)
-			SYS_MemoryMap(sizeof(READER_STATES), fd, (i * pageSize));
+		readerStates[i] = (PREADER_STATE)
+			SYS_MemoryMap(sizeof(READER_STATE), fd, (i * pageSize));
 		if (readerStates[i] == 0)
 		{
 			DebugLogC("Cannot memory map public shared file %s: %s",
