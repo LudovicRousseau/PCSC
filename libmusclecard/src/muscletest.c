@@ -17,6 +17,7 @@
 #include "winscard.h"
 #include "mscdefines.h"
 #include "musclecard.h"
+#include "strlcpycat.h"
 
 #define MY_OBJECT_ID    "c1"
 #define MY_OBJECT_SIZE  50
@@ -153,7 +154,7 @@ int main(int argc, char **argv)
 	printf("Please enter the PIN value: ");
 	fgets((char *)defaultPIN, sizeof(defaultPIN), stdin);
 	if (defaultPIN[0] == '\n')
-		strcpy((char *)defaultPIN, "Muscle00\n");
+		strlcpy((char *)defaultPIN, "Muscle00\n", sizeof(defaultPIN));
 
 	rv = MSCVerifyPIN(&pConnection, 0, defaultPIN,
 		strlen((char *)defaultPIN) - 1);
@@ -261,109 +262,109 @@ MSCString pcsc_stringify_error(MSCLong32 Error)
 	switch (Error)
 	{
 	case SCARD_S_SUCCESS:
-		strcpy(strError, "Command successful.");
+		strlcpy(strError, "Command successful.", sizeof(strError));
 		break;
 	case SCARD_E_CANCELLED:
-		strcpy(strError, "Command cancelled.");
+		strlcpy(strError, "Command cancelled.", sizeof(strError));
 		break;
 	case SCARD_E_CANT_DISPOSE:
-		strcpy(strError, "Cannot dispose handle.");
+		strlcpy(strError, "Cannot dispose handle.", sizeof(strError));
 		break;
 	case SCARD_E_INSUFFICIENT_BUFFER:
-		strcpy(strError, "Insufficient buffer.");
+		strlcpy(strError, "Insufficient buffer.", sizeof(strError));
 		break;
 	case SCARD_E_INVALID_ATR:
-		strcpy(strError, "Invalid ATR.");
+		strlcpy(strError, "Invalid ATR.", sizeof(strError));
 		break;
 	case SCARD_E_INVALID_HANDLE:
-		strcpy(strError, "Invalid handle.");
+		strlcpy(strError, "Invalid handle.", sizeof(strError));
 		break;
 	case SCARD_E_INVALID_PARAMETER:
-		strcpy(strError, "Invalid parameter given.");
+		strlcpy(strError, "Invalid parameter given.", sizeof(strError));
 		break;
 	case SCARD_E_INVALID_TARGET:
-		strcpy(strError, "Invalid target given.");
+		strlcpy(strError, "Invalid target given.", sizeof(strError));
 		break;
 	case SCARD_E_INVALID_VALUE:
-		strcpy(strError, "Invalid value given.");
+		strlcpy(strError, "Invalid value given.", sizeof(strError));
 		break;
 	case SCARD_E_NO_MEMORY:
-		strcpy(strError, "Not enough memory.");
+		strlcpy(strError, "Not enough memory.", sizeof(strError));
 		break;
 	case SCARD_F_COMM_ERROR:
-		strcpy(strError, "RPC transport error.");
+		strlcpy(strError, "RPC transport error.", sizeof(strError));
 		break;
 	case SCARD_F_INTERNAL_ERROR:
-		strcpy(strError, "Unknown internal error.");
+		strlcpy(strError, "Unknown internal error.", sizeof(strError));
 		break;
 	case SCARD_F_UNKNOWN_ERROR:
-		strcpy(strError, "Unknown internal error.");
+		strlcpy(strError, "Unknown internal error.", sizeof(strError));
 		break;
 	case SCARD_F_WAITED_TOO_MSCLong32:
-		strcpy(strError, "Waited too long.");
+		strlcpy(strError, "Waited too long.", sizeof(strError));
 		break;
 	case SCARD_E_UNKNOWN_READER:
-		strcpy(strError, "Unknown reader specified.");
+		strlcpy(strError, "Unknown reader specified.", sizeof(strError));
 		break;
 	case SCARD_E_TIMEOUT:
-		strcpy(strError, "Command timeout.");
+		strlcpy(strError, "Command timeout.", sizeof(strError));
 		break;
 	case SCARD_E_SHARING_VIOLATION:
-		strcpy(strError, "Sharing violation.");
+		strlcpy(strError, "Sharing violation.", sizeof(strError));
 		break;
 	case SCARD_E_NO_SMARTCARD:
-		strcpy(strError, "No smart card inserted.");
+		strlcpy(strError, "No smart card inserted.", sizeof(strError));
 		break;
 	case SCARD_E_UNKNOWN_CARD:
-		strcpy(strError, "Unknown card.");
+		strlcpy(strError, "Unknown card.", sizeof(strError));
 		break;
 	case SCARD_E_PROTO_MISMATCH:
-		strcpy(strError, "Card protocol mismatch.");
+		strlcpy(strError, "Card protocol mismatch.", sizeof(strError));
 		break;
 	case SCARD_E_NOT_READY:
-		strcpy(strError, "Subsystem not ready.");
+		strlcpy(strError, "Subsystem not ready.", sizeof(strError));
 		break;
 	case SCARD_E_SYSTEM_CANCELLED:
-		strcpy(strError, "System cancelled.");
+		strlcpy(strError, "System cancelled.", sizeof(strError));
 		break;
 	case SCARD_E_NOT_TRANSACTED:
-		strcpy(strError, "Transaction failed.");
+		strlcpy(strError, "Transaction failed.", sizeof(strError));
 		break;
 	case SCARD_E_READER_UNAVAILABLE:
-		strcpy(strError, "Reader/s is unavailable.");
+		strlcpy(strError, "Reader/s is unavailable.", sizeof(strError));
 		break;
 	case SCARD_W_UNSUPPORTED_CARD:
-		strcpy(strError, "Card is not supported.");
+		strlcpy(strError, "Card is not supported.", sizeof(strError));
 		break;
 	case SCARD_W_UNRESPONSIVE_CARD:
-		strcpy(strError, "Card is unresponsive.");
+		strlcpy(strError, "Card is unresponsive.", sizeof(strError));
 		break;
 	case SCARD_W_UNPOWERED_CARD:
-		strcpy(strError, "Card is unpowered.");
+		strlcpy(strError, "Card is unpowered.", sizeof(strError));
 		break;
 	case SCARD_W_RESET_CARD:
-		strcpy(strError, "Card was reset.");
+		strlcpy(strError, "Card was reset.", sizeof(strError));
 		break;
 	case SCARD_W_REMOVED_CARD:
-		strcpy(strError, "Card was removed.");
+		strlcpy(strError, "Card was removed.", sizeof(strError));
 		break;
 	case SCARD_E_PCI_TOO_SMALL:
-		strcpy(strError, "PCI struct too small.");
+		strlcpy(strError, "PCI struct too small.", sizeof(strError));
 		break;
 	case SCARD_E_READER_UNSUPPORTED:
-		strcpy(strError, "Reader is unsupported.");
+		strlcpy(strError, "Reader is unsupported.", sizeof(strError));
 		break;
 	case SCARD_E_DUPLICATE_READER:
-		strcpy(strError, "Reader already exists.");
+		strlcpy(strError, "Reader already exists.", sizeof(strError));
 		break;
 	case SCARD_E_CARD_UNSUPPORTED:
-		strcpy(strError, "Card is unsupported.");
+		strlcpy(strError, "Card is unsupported.", sizeof(strError));
 		break;
 	case SCARD_E_NO_SERVICE:
-		strcpy(strError, "Service not available.");
+		strlcpy(strError, "Service not available.", sizeof(strError));
 		break;
 	case SCARD_E_SERVICE_STOPPED:
-		strcpy(strError, "Service was stopped.");
+		strlcpy(strError, "Service was stopped.", sizeof(strError));
 		break;
 
 	};
