@@ -122,7 +122,7 @@ extern "C"
 
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
 
-	LONG RFAllocateReaderSpace(DWORD);
+	LONG RFAllocateReaderSpace(void);
 	LONG RFAddReader(LPTSTR, DWORD, LPTSTR, LPTSTR);
 	LONG RFRemoveReader(LPTSTR, DWORD);
 	LONG RFSetReaderName(PREADER_CONTEXT, LPTSTR, LPTSTR, DWORD, DWORD);

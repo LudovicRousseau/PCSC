@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 	/*
 	 * Allocate memory for reader structures 
 	 */
-	RFAllocateReaderSpace(PCSCLITE_MAX_READERS_CONTEXTS);
+	RFAllocateReaderSpace();
 
 	/*
 	 * Grab the information from the reader.conf 

@@ -40,15 +40,14 @@
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static DWORD dwNumReadersContexts = 0;
 
-LONG RFAllocateReaderSpace(DWORD dwAllocNum)
+LONG RFAllocateReaderSpace(void)
 {
 	int i;   					/* Counter */
-	LONG rv; 					/* Return tester */
 
 	/*
 	 * Allocate each reader structure 
 	 */
-	for (i = 0; i < dwAllocNum; i++)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		sReadersContexts[i] = (PREADER_CONTEXT) malloc(sizeof(READER_CONTEXT));
 		(sReadersContexts[i])->vHandle = NULL;
@@ -57,9 +56,7 @@ LONG RFAllocateReaderSpace(DWORD dwAllocNum)
 	/*
 	 * Create public event structures 
 	 */
-	rv = EHInitializeEventStructures();
-
-	return rv;
+	return EHInitializeEventStructures();
 }
 
 LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDevice)
