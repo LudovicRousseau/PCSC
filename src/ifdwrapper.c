@@ -120,15 +120,17 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
  * channel to the IFD. 
  */
 
-LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
+LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 {
 
 	RESPONSECODE rv;
 	LPVOID vFunction;
+	LPVOID vFunction1;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IO_create_channel) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
+	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPSTR) = NULL;
 #endif
 
 	/*
@@ -136,12 +138,14 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 	 */
 	rv = 0;
 	vFunction = 0;
+	vFunction1 = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
 	vFunction = rContext->psFunctions.pvfCreateChannel;
+	vFunction1 = rContext->psFunctions.pvfCreateChannelByName;
 
 	if (vFunction == 0)
 	{
@@ -151,9 +155,14 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IO_create_channel = (RESPONSECODE(*)(DWORD)) vFunction;
-	} else
+	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
 		IFDH_create_channel = (RESPONSECODE(*)(DWORD, DWORD)) vFunction;
+	}
+	else
+	{
+		IFDH_create_channel = (RESPONSECODE(*)(DWORD, DWORD)) vFunction;
+		IFDH_create_channel_by_name = (RESPONSECODE(*)(DWORD, LPSTR)) vFunction1;
 	}
 #endif
 
@@ -165,18 +174,24 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		rv = (*IO_create_channel) (dwChannelId);
+		rv = (*IO_create_channel) (rContext->dwPort);
+	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
+	{
+		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	} else
 	{
-		rv = (*IFDH_create_channel) (rContext->dwSlot, dwChannelId);
+		rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
 	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		rv = IO_Create_Channel(dwChannelId);
+		rv = IO_Create_Channel(rContext->dwPort);
+	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
+	{ 
+		rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	} else
 	{
-		rv = IFDHCreateChannel(rContext->dwSlot, dwChannelId);
+		rv = IFDHCreateChannelByName(rContext->dwSlot, rContext->lpcDevice);
 	}
 #endif
 	SYS_MutexUnLock(rContext->mMutex);

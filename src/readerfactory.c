@@ -944,34 +944,36 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 LONG RFBindFunctions(PREADER_CONTEXT rContext)
 {
 
-	LONG rv, ret;
-	LPVOID pvTestA, pvTestB;
+	LONG rv, rv1, rv2, rv3;
 
 	/*
 	 * Zero out everything 
 	 */
 	rv = 0;
-	ret = 0;
-	pvTestA = 0;
-	pvTestB = 0;
+	rv1 = 0;
+	rv2 = 0;
+	rv3 = 0;
 
 	/*
 	 * Use this function as a dummy to determine the IFD Handler version
-	 * type.  1.0/2.0.  Suppress error messaging since it can't be 1.0 and 
-	 * 2.0. 
+	 * type  1.0/2.0/3.0.  Suppress error messaging since it can't be 1.0,
+	 * 2.0 and 3.0. 
 	 */
 
 	DebugLogSuppress(DEBUGLOG_IGNORE_ENTRIES);
 
-	rv = DYN_GetAddress(rContext->vHandle,
+	rv1 = DYN_GetAddress(rContext->vHandle,
 		&rContext->psFunctions.pvfCreateChannel, "IO_Create_Channel");
 
-	ret = DYN_GetAddress(rContext->vHandle,
+	rv2 = DYN_GetAddress(rContext->vHandle,
 		&rContext->psFunctions.pvfCreateChannel, "IFDHCreateChannel");
+
+	rv3 = DYN_GetAddress(rContext->vHandle,
+		&rContext->psFunctions.pvfCreateChannelByName, "IFDHCreateChannelByName");
 
 	DebugLogSuppress(DEBUGLOG_LOG_ENTRIES);
 
-	if (rv != SCARD_S_SUCCESS && ret != SCARD_S_SUCCESS)
+	if (rv1 != SCARD_S_SUCCESS && rv2 != SCARD_S_SUCCESS && rv3 != SCARD_S_SUCCESS)
 	{
 		/*
 		 * Neither version of the IFD Handler was found - exit 
@@ -981,23 +983,30 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		DebugLogA("RFBindFunctions: IFDHandler functions missing");
 
 		exit(1);
-	} else if (rv == SCARD_S_SUCCESS)
+	} else if (rv1 == SCARD_S_SUCCESS)
 	{
 		/*
 		 * Ifd Handler 1.0 found 
 		 */
+		rContext->dwVersion = IFD_HVERSION_1_0;
 		/*
 		 * Re bind the function since it was lost in the second 
 		 */
-		rContext->dwVersion |= IFD_HVERSION_1_0;
 		DYN_GetAddress(rContext->vHandle,
 			&rContext->psFunctions.pvfCreateChannel, "IO_Create_Channel");
-	} else
+	} else if (rv3 == SCARD_S_SUCCESS)
+	{
+		/*
+		 * Ifd Handler 3.0 found 
+		 */
+		rContext->dwVersion = IFD_HVERSION_3_0;
+	}
+	else
 	{
 		/*
 		 * Ifd Handler 2.0 found 
 		 */
-		rContext->dwVersion |= IFD_HVERSION_2_0;
+		rContext->dwVersion = IFD_HVERSION_2_0;
 	}
 
 	/*
@@ -1128,13 +1137,14 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		}
 
 		/*
-		 * The following binds version 2.0 of the IFD Handler specs 
+		 * The following binds version 2.0/3.0 of the IFD Handler specs 
 		 */
-
-	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
+	} else if ((rContext->dwVersion == IFD_HVERSION_2_0) || (rContext->dwVersion == IFD_HVERSION_3_0))
 	{
-
-		DebugLogA("RFBindFunctions: Loading IFD Handler 2.0");
+		if (rContext->dwVersion == IFD_HVERSION_2_0)
+			DebugLogA("RFBindFunctions: Loading IFD Handler 2.0");
+		else
+			DebugLogA("RFBindFunctions: Loading IFD Handler 3.0");
 
 		rv = DYN_GetAddress(rContext->vHandle,
 			&rContext->psFunctions.pvfCloseChannel, "IFDHCloseChannel");
@@ -1225,7 +1235,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Who knows what could have happenned for it to get here. 
 		 */
-		DebugLogA("RFBindFunctions: IFD Handler not 1.0/2.0");
+		DebugLogA("RFBindFunctions: IFD Handler not 1.0/2.0/3.0");
 		exit(1);
 	}
 
@@ -1240,6 +1250,7 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 	 */
 
 	rContext->psFunctions.pvfCreateChannel = 0;
+	rContext->psFunctions.pvfCreateChannelByName = 0;
 	rContext->psFunctions.pvfCloseChannel = 0;
 	rContext->psFunctions.pvfGetCapabilities = 0;
 	rContext->psFunctions.pvfSetCapabilities = 0;
@@ -1424,7 +1435,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	 */
   /*******************************************/
 
-	rv = IFDOpenIFD(rContext, rContext->dwPort);
+	rv = IFDOpenIFD(rContext);
 
 	if (rv != IFD_SUCCESS)
 	{
@@ -1757,7 +1768,7 @@ void RFAwakeAllReaders()
                         
                         if (initFlag == 0)
                         {
-                                rv = IFDOpenIFD(sReadersContexts[i], (sReadersContexts[i])->dwPort);
+                                rv = IFDOpenIFD(sReadersContexts[i]);
 
                         } else {
                                 initFlag = 0;
