@@ -217,6 +217,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		sharedSegmentMsg msgStruct;
 		version_struct *veStr;
 
+		memset(&msgStruct, 0, sizeof(msgStruct));
 		msgStruct.mtype = CMD_VERSION;
 		msgStruct.user_id = SYS_GetUID();
 		msgStruct.group_id = SYS_GetGID();
