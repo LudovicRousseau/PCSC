@@ -1023,11 +1023,14 @@ LONG SCardStatus(SCARDHANDLE hCard,
 This function returns the current status of the reader connected to by
 \texttt{hCard}.  It's friendly name will be stored in
 \texttt{szReaderName}.  \texttt{pcchReaderLen} will be the size of the
-allocated buffer for \texttt{szReaderName}.  If this is too small the
-function will return with the necessary size in \texttt{pcchReaderLen}.
-The current state, and protocol will be stored in \texttt{pdwState} and
-\texttt{pdwProtocol} respectively.  \texttt{pdwState} is a
-\texttt{DWORD} possibly OR'd with the following values:
+allocated buffer for \texttt{szReaderName}, while \texttt{pcbAtrLen}
+will be the size of the allocated buffer for \texttt{pbAtr}. If either
+of these is too small, the function will return with
+\texttt{SCARD\_E\_INSUFFICIENT\_BUFFER} and the necessary size in
+\texttt{pcchReaderLen} and \texttt{pcbAtrLen}.  The current state, and
+protocol will be stored in \texttt{pdwState} and \texttt{pdwProtocol}
+respectively.  \texttt{pdwState} is a \texttt{DWORD} possibly OR'd with
+the following values:
 
 
 \begin{tabular}{|l|p{12cm}|}
