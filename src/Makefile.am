@@ -159,7 +159,7 @@ EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
 # sources into one library, until we find a way to make automake handle
 # this automagically.  This breaks if lex is not flex!!
 tokenparser.c: tokenparser.l
-	$(SHELL) $(YLWRAP) "$(LEX)" $< lex.tp.c $@ -- -Ptp $(AM_LFLAGS) $(LFLAGS)
+	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
 EXTRA_DIST = README_INTERNALS.txt dyn_win32.c
 
