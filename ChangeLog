@@ -1,3 +1,13 @@
+pcsc-lite-1.2.9-beta4: Ludovic Rousseau
+3 July 2004
+- src/libmusclecard.pc.in and src/libpcsclite.pc.in
+  . includedir is now @includedir@/PCSC
+  . add pthread flags for compilation and link
+  . thanks to Ville Skyttä for these patches.
+    They are small but are mandatory to (re)compile muscleTools (and
+    others) without modification to their Makefile.
+
+
 pcsc-lite-1.2.9-beta3: Ludovic Rousseau
 30 June 2004
 - src/hotplug_libusb.c:
