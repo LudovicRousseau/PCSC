@@ -89,6 +89,7 @@ extern "C"
 	{
 		char lpcReader[MAX_READERNAME];	/* Reader Name */
 		char lpcLibrary[MAX_LIBNAME];	/* Library Path */
+		char lpcDevice[MAX_DEVICENAME];	/* Device Name */
 		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
 		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
