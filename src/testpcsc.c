@@ -16,10 +16,6 @@
 #include "pcsclite.h"
 #include "winscard.h"
 
-/*
- * #define REPEAT_TEST 1 
- */
-
 int main(int argc, char **argv)
 {
 	SCARDHANDLE hCard;
@@ -34,9 +30,6 @@ int main(int argc, char **argv)
 	long rv;
 	int i, p, iReader;
 	int iList[16];
-#ifdef REPEAT_TEST
-	int t = 0;
-#endif
 
 	printf("\nMUSCLE PC/SC Lite Test Program\n\n");
 
@@ -129,28 +122,18 @@ int main(int argc, char **argv)
 		while (mszReaders[++i] != 0) ;
 	}
 
-#ifdef REPEAT_TEST
-	if (t == 0)
+	do
 	{
-#endif
+		printf("Enter the reader number          : ");
+		scanf("%d", &iReader);
+		printf("\n");
 
-		do
+		if (iReader > p || iReader <= 0)
 		{
-			printf("Enter the reader number          : ");
-			scanf("%d", &iReader);
-			printf("\n");
-
-			if (iReader > p || iReader <= 0)
-			{
-				printf("Invalid Value - try again\n");
-			}
+			printf("Invalid Value - try again\n");
 		}
-		while (iReader > p || iReader <= 0);
-
-#ifdef REPEAT_TEST
-		t = 1;
 	}
-#endif
+	while (iReader > p || iReader <= 0);
 
 	rgReaderStates[0].szReader = &mszReaders[iList[iReader]];
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
