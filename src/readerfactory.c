@@ -7,6 +7,8 @@
 	Date   : 7/27/99
 	License: Copyright (C) 1999 David Corcoran
 			<corcoran@linuxnet.com>
+	         Copyright (C) 2003 Damien Sauveron
+			<damien.sauveron@labri.fr>
 	Purpose: This keeps track of a list of currently 
 	available reader structures.
 
@@ -467,11 +469,6 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 
 		*dwNumContexts -= 1;
 
-	}
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		return rv;
 	}
 
 	return SCARD_S_SUCCESS;
