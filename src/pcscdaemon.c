@@ -505,7 +505,7 @@ void print_version (void)
 
 void print_usage (char const * const progname)
 {
-	printf("Usage: %s [-c file] [-f] [-d output] [-v] [-h]\n", progname);
+	printf("Usage: %s [-a] [-c file] [-f] [-d output] [-v] [-h]\n", progname);
 	printf("Options:\n");
 #ifdef HAVE_GETOPT_LONG
 	printf("  -a, --apdu		log APDU commands and results\n");
