@@ -1112,10 +1112,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if (0 == hCard)
 		return SCARD_E_INVALID_HANDLE;
 
-	if (IFD_HVERSION_2_0 == rContext->dwVersion)
-		if (NULL == pbSendBuffer || 0 == cbSendLength)
-			return SCARD_E_INVALID_PARAMETER;
-
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
@@ -1125,6 +1121,10 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	rv = RFReaderInfoById(hCard, &rContext);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
+
+	if (IFD_HVERSION_2_0 == rContext->dwVersion)
+		if (NULL == pbSendBuffer || 0 == cbSendLength)
+			return SCARD_E_INVALID_PARAMETER;
 
 	/*
 	 * Make sure the reader is working properly
