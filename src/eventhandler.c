@@ -50,7 +50,8 @@ LONG EHInitializeEventStructures()
 	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, 00644);
 	if (fd < 0)
 	{
-		DebugLogA("Error: Cannot open public shared file");
+		DebugLogC("Error: Cannot create public shared file %s: %s",
+			PCSCLITE_PUBSHM_FILE, strerror(errno));
 		exit(1);
 	}
 
@@ -74,7 +75,8 @@ LONG EHInitializeEventStructures()
 			SYS_MemoryMap(sizeof(READER_STATES), fd, (i * pageSize));
 		if (readerStates[i] == 0)
 		{
-			DebugLogA("Error: Cannot public memory map");
+			DebugLogC("Error: Cannot memory map public shared file %s: %s",
+				PCSCLITE_PUBSHM_FILE, strerror(errno));
 			exit(1);
 		}
 
