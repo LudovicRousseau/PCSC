@@ -154,8 +154,8 @@ LONG HPReadBundleValues(void)
 				if (rv == 0)
 				{
 					snprintf(fullLibPath, sizeof(fullLibPath),
-						"%s/%s/Contents/Linux/%s",
-						PCSCLITE_HP_DROPDIR, currFP->d_name, keyValue);
+						"%s/%s/Contents/%s/%s",
+						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH, keyValue);
 					fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 					driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
@@ -389,8 +389,7 @@ LONG HPRemoveHotPluggable(int index)
 }	/* End of function */
 
 /*
- * Sets up callbacks for device hotplug events. Not currently implemented
- * for Linux.
+ * Sets up callbacks for device hotplug events.
  */
 ULONG HPRegisterForHotplugEvents(void)
 {

@@ -159,9 +159,10 @@ LONG HPReadBundleValues()
 					keyValue, 0);
 				if (rv == 0)
 				{
-					snprintf(fullLibPath, FILENAME_MAX, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
-						currFP->d_name, "/Contents/Linux/", keyValue);
-					fullLibPath[FILENAME_MAX - 1] = '\0';
+					snprintf(fullLibPath, sizeof(fullLibPath),
+						"%s/%s/Contents/%s/%s",
+						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH, keyValue);
+					fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 					bundleTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
@@ -393,8 +394,7 @@ LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 }	/* End of function */
 
 /*
- * Sets up callbacks for device hotplug events. Not currently implemented
- * for Linux.
+ * Sets up callbacks for device hotplug events.
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
