@@ -21,11 +21,8 @@ $Id$
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined(__APPLE__)
-#include <PCSC/winscard.h>
-#else
+#include <wintypes.h>
 #include <winscard.h>
-#endif
 
 #ifndef PCSCLITE_READER_CONFIG
 #define PCSCLITE_READER_CONFIG "/etc/reader.conf"

@@ -24,7 +24,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <wintypes.h>
 #include <winscard.h>
 
 #ifndef TRUE

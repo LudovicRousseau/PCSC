@@ -25,11 +25,8 @@ $Id$
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#if defined(__APPLE__)
-#include <PCSC/winscard.h>
-#else
+#include <wintypes.h>
 #include <winscard.h>
-#endif
 
 /*
  * The following defines personalize this for different tokens 
