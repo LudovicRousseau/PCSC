@@ -15,4 +15,3 @@ ChangeLog.cvs:
 	s/sauveron-guest /Damien Sauveron /; \
 	s+/cvsroot/pcsclite/PCSC/++g;' > $@
 
-.PHONY: ChangeLog.cvs
