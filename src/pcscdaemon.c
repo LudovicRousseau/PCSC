@@ -15,7 +15,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/errno.h>
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -38,7 +38,6 @@
 
 static char AraKiri = 0;
 static char Init = 1;
-extern int errno;
 
 /*
  * Some internal functions 
