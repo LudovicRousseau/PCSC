@@ -91,15 +91,8 @@ static LONG SCardCheckDaemonAvailability();
 static LONG SCardLockThread();
 static LONG SCardUnlockThread();
 
-/*
- * by najam
- */
-static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
-	LPSCARDCONTEXT);
+static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
-/*
- * By najam
- */
 LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
