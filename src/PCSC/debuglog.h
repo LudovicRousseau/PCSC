@@ -52,12 +52,12 @@ extern "C"
 #ifdef PCSC_DEBUG
 #define DebugLogA(fmt) debug_msg("%s:%d " fmt, __FILE__, __LINE__)
 #define DebugLogB(fmt, data) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data)
-#define DebugLogC(fmt, data) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data)
+#define DebugLogC(fmt, data1, data2) debug_msg("%s:%d " fmt, __FILE__, __LINE__, data1, data2)
 #define DebugXxd(msg, buffer, size) debug_xxd(msg, buffer, size)
 #else
 #define DebugLogA(fmt)
 #define DebugLogB(fmt, data)
-#define DebugLogC(fmt, data1)
+#define DebugLogC(fmt, data1, data2)
 #define DebugXxd(msg, buffer, size)
 #endif
 
