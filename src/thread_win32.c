@@ -10,6 +10,7 @@
 
 ********************************************************************/
 
+#include "config.h"
 #include "thread_generic.h"
 #include <assert.h>
 
