@@ -9,31 +9,24 @@
 #              cryptographic tokens that are connected to the system.
 #
 # processname: pcscd
-# config:      /etc/reader.conf
+# config:      @confdir@/reader.conf
 #
 # Note!  pcscd should be started after pcmcia, and shut down before it
 # for smooth experience with PCMCIA readers.
 
-. /etc/init.d/functions
+. @sysconfdir_exp@/init.d/functions
 
 umask 077
 
-exec=/usr/local/sbin/pcscd
+exec=@sbindir_exp@/pcscd
 prog=$(basename $exec)
-lockfile=/var/lock/subsys/$prog
+lockfile=@localstatedir_exp@/lock/subsys/$prog
+PCSCD_OPTIONS=
 
 # Source config
-if [ -f /etc/sysconfig/pscsd ] ; then
-    . /etc/sysconfig/pcscd
-else
-    PCSCD_OPTIONS=""
+if [ -f @sysconfdir_exp@/sysconfig/pscsd ] ; then
+    . @sysconfdir_exp@/sysconfig/pcscd
 fi
-
-[ -x $exec ] || exit 0
-
-# Source config
-PATH=/sbin:/bin:/usr/local/sbin:/usr/bin:/usr/sbin
-LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
 
 start() {
     echo -n $"Starting PC/SC smart card daemon ($prog): "
