@@ -237,7 +237,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 		DebugLogB("Active Protocol: unknown %d", *pdwActiveProtocol);
 	else
 		DebugLogB("Active Protocol: T=%d",
-			*pdwActiveProtocol == SCARD_PROTOCOL_T0 ? 0 : 1);
+			(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
 
 	/*
 	 * Prepare the SCARDHANDLE identity
@@ -1398,7 +1398,12 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	sSendPci.Length = pioSendPci->cbPciLength;
 
-	DebugLogB("Send Protocol: %d", sSendPci.Protocol);
+	if ((sSendPci.Protocol != SCARD_PROTOCOL_T0)
+		&& (sSendPci.Protocol != SCARD_PROTOCOL_T1))
+		DebugLogB("Send Protocol: unknown %d", sSendPci.Protocol);
+	else
+		DebugLogB("Send Protocol: T=%d",
+			(sSendPci.Protocol == SCARD_PROTOCOL_T0) ? 0 : 1);
 
 	tempRxLength = dwRxLength;
 
