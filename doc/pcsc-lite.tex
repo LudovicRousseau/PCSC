@@ -1479,6 +1479,34 @@ if (rv != SCARD_S_SUCCESS)
 \end{verbatim}
 
 
+%---------%---------%---------%---------%---------%---------%---------
+\section{Multithreading and contexts}
+
+From version 1.2.0 pcsc-lite is much more multithreading friendly.
+
+You have to follow some rules:
+
+\begin{itemize}
+\item For security reasons, a context can only be released (using
+\texttt{SCardReleaseContext()}) by the thread that created it.
+
+\item To access different readers (\emph{i.e.} cards) in different
+threads, each thread must use a different context (not necessarily
+created by this thread itself).
+
+\end{itemize}
+
+Each thread should create his own context with
+\texttt{SCardEstablishContext()} and should release it with
+\texttt{SCardReleaseContext()} when the context is not necessary any
+more.
+
+If different threads share a same context, the calls to different
+functions of the pcsc-lite API are stored in a queue and the executions
+serialised for this context because there is a mutex shared for all the
+(critical) operations of this context.
+
+
 %---------%---------%---------%---------%---------%---------
 \bibliographystyle{plain}
 \bibliography{pcsc-lite}
