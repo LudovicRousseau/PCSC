@@ -168,6 +168,8 @@ LONG HPReadBundleValues()
 		DebugLogA("Disabling USB support for pcscd");
 	}
 
+	closedir(hpDir);
+
 	return 0;
 }
 
