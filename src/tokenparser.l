@@ -129,8 +129,8 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 		if (tokenIndice == 0)
 		{
 			/* Not defined at all */
-			DebugLogC("Value/Key not defined for: %s, indice: %d",
-				tokenKey, tokenIndice);
+			DebugLogC("Value/Key not defined for: %s in %s",
+				tokenKey, fileName);
 		}
 		ret = -1;
 	}
