@@ -197,6 +197,10 @@ end:
 	/* Free allocated resources */
 	SCardUnload();
 
+	/* free allocated memory */
+	free(mszReaders);
+	free(readers);
+
 	return 0;
 } /* main */
 
