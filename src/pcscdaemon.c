@@ -37,6 +37,7 @@ $Id$
 
 static char AraKiri = 0;
 static char Init = 1;
+extern int errno;
 
 /*
  * Some internal functions 
