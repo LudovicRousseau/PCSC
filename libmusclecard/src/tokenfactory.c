@@ -140,6 +140,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 	rv = 0;
 	atrIndex = 0;
+	memset(tokenInfo, 0, sizeof(*tokenInfo));
 
 	atrToString(Atr, Length, atrString);
 
