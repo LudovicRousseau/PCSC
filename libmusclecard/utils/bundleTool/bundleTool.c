@@ -3,8 +3,9 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2001-2002
+ * Copyright (C) 2001-2003
  *  David Corcoran <corcoran@linuxnet.com>
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
  */
@@ -13,12 +14,20 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
+#ifdef HAVE_DIRENT_H
 #include <dirent.h>
+#endif
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <wintypes.h>
+#include "wintypes.h"
+#ifdef SCARD_MS
+#include "win32_pcsclite.h"
+#endif
 #include <winscard.h>
 
 /*
@@ -26,6 +35,16 @@
  */
 
 #define BUNDLE_DIR MSC_SVC_DROPDIR
+
+/* redefine MSC_SVC_DROPDIR only if not yet defined */
+#ifndef MSC_SVC_DROPDIR
+#ifndef WIN32
+#define MSC_SVC_DROPDIR      "/usr/local/pcsc/services"
+#else
+#define MSC_SVC_DROPDIR      "C:\\Program Files\\Muscle\\Services"
+#endif
+#endif
+
 
 /*
  * End of personalization 
@@ -36,7 +55,6 @@
 
 int main(int argc, char **argv)
 {
-
 	LONG rv;
 	SCARDCONTEXT hContext;
 	SCARD_READERSTATE_A rgReaderStates;
@@ -48,8 +66,15 @@ int main(int argc, char **argv)
 	char *restFile;
 	char atrInsertion[256];
 	FILE *fp;
+#ifndef WIN32
 	DIR *bundleDir;
 	struct dirent *currBundle;
+#else
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	char findPath[200];
+	int find;
+#endif
 	int i, p;
 	int userChoice;
 	int totalBundles;
@@ -64,25 +89,50 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	currBundle = 0;
-
+#ifndef WIN32
+	currBundle = NULL;
 	bundleDir = opendir(BUNDLE_DIR);
-	CHECK_ERR(bundleDir == 0, "Opendir failed");
+	if (bundleDir == NULL)
+	{
+		printf("Opendir failed %s: %s\n", BUNDLE_DIR, strerror(errno));
+		return -1;
+	}
+#else
+	sprintf(findPath, "%s\\*.bundle", BUNDLE_DIR);
+	hFind = FindFirstFile(findPath, &findData);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		printf("Cannot open PC/SC token drivers directory: %s", findPath);
+		return -1;
+	}
+#endif
 
 	printf("Select the approprate token driver:\n");
 	printf("-----------------------------------\n");
 
 	i = 1;
 	totalBundles = 0;
-
-	while ((currBundle = readdir(bundleDir)) != 0)
+#ifndef WIN32
+	while ((currBundle = readdir(bundleDir)) != NULL)
 	{
-		if (strstr(currBundle->d_name, ".bundle") != 0)
+		if (strstr(currBundle->d_name, ".bundle") != NULL)
 		{
 			printf("  %d.     %s\n", i++, currBundle->d_name);
 			totalBundles += 1;
 		}
 	}
+#else
+	do
+	{
+		if (strstr(findData.cFileName, ".bundle") != NULL)
+		{
+			printf("  %d.     %s\n", i++, findData.cFileName);
+			totalBundles += 1;
+		}
+	} while (FindNextFile(hFind, &findData) != 0);
+#endif
+
 	printf("-----------------------------------\n");
 
 	if (totalBundles == 0)
@@ -98,45 +148,76 @@ int main(int argc, char **argv)
 	}
 	while (userChoice < 1 && userChoice > totalBundles);
 
+#ifndef WIN32
 	closedir(bundleDir);
+#endif
 
+#ifndef WIN32
 	bundleDir = opendir(BUNDLE_DIR);
-	CHECK_ERR(bundleDir == 0, "Opendir failed");
+	CHECK_ERR(bundleDir == NULL, "Opendir failed");
+#else
+	sprintf(findPath, "%s\\*.bundle", BUNDLE_DIR);
+	hFind = FindFirstFile(findPath, &findData);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		printf("Cannot open PC/SC token drivers directory: %s", findPath);
+		return -1;
+	}
+	else
+		find = 1;
+#endif
 
 	do
 	{
-		if ((currBundle = readdir(bundleDir)) != 0)
+#ifndef WIN32
+		if ((currBundle = readdir(bundleDir)) != NULL)
 		{
-			if (strstr(currBundle->d_name, ".bundle") != 0)
-			{
+			if (strstr(currBundle->d_name, ".bundle") != NULL)
 				userChoice -= 1;
-			}
 		}
-	}
-	while (userChoice != 0);
+#else
+		if (find)
+		{
+			if (strstr(findData.cFileName, ".bundle") != NULL)
+				userChoice -= 1;
+		}
 
+		if (userChoice)
+			find = (FindNextFile(hFind, &findData) != 0);
+#endif
+	} while (userChoice != 0);
+
+
+#ifndef WIN32
 #if HAVE_SNPRINTF
 	snprintf(chosenInfoPlist, sizeof(chosenInfoPlist),
-		"%s%s/Contents/Info.plist", BUNDLE_DIR, currBundle->d_name);
+		"%s/%s/Contents/Info.plist", BUNDLE_DIR, currBundle->d_name);
 #else
-        sprintf(chosenInfoPlist, "%s%s/Contents/Info.plist", BUNDLE_DIR, 
-                currBundle->d_name);
+	sprintf(chosenInfoPlist, "%s/%s/Contents/Info.plist", BUNDLE_DIR, 
+		currBundle->d_name);
+#endif
+#else
+	sprintf(chosenInfoPlist, "%s\\%s\\Contents\\Info.plist", BUNDLE_DIR,
+		findData.cFileName);
 #endif
 
+#ifndef WIN32
 	closedir(bundleDir);
+#endif
 	printf("\n");
 
-	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &hContext);
+	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 	CHECK_ERR(rv != SCARD_S_SUCCESS, "EstablishContext Failed");
 
 	readerListSize = 0;
-	rv = SCardListReaders(hContext, 0, 0, &readerListSize);
+	rv = SCardListReaders(hContext, NULL, NULL, &readerListSize);
 	CHECK_ERR(rv != SCARD_S_SUCCESS, "ListReaders Failed");
 
 	readerList = (char *) malloc(sizeof(char) * readerListSize);
-	CHECK_ERR(readerList == 0, "Malloc Failed");
+	CHECK_ERR(readerList == NULL, "Malloc Failed");
 
-	rv = SCardListReaders(hContext, 0, readerList, &readerListSize);
+	rv = SCardListReaders(hContext, NULL, readerList, &readerListSize);
 	CHECK_ERR(rv != SCARD_S_SUCCESS, "ListReaders Alloc Failed");
 
 	printf("Insert your token in: %s\n", readerList);
@@ -159,23 +240,22 @@ int main(int argc, char **argv)
 	snprintf(atrInsertion, sizeof(atrInsertion),
 		"        <string>%s</string>\n", spAtrValue);
 #else 
-        sprintf(atrInsertion, "        <string>%s</string>\n", 
-                spAtrValue);
+	sprintf(atrInsertion, "        <string>%s</string>\n", spAtrValue);
 #endif
 
 	fp = fopen(chosenInfoPlist, "r+");
-	if (fp == 0)
+	if (fp == NULL)
 	{
-		printf("Couldn't open %s\n", chosenInfoPlist);
+		printf("Couldn't open %s: %s\n", chosenInfoPlist, strerror(errno));
+		return -1;
 	}
-	CHECK_ERR(fp == 0, "Opening of Info.plist failed.");
 
 	rv = stat(chosenInfoPlist, &statBuffer);
-	CHECK_ERR(rv != 0, "Stat failed\n");
+	CHECK_ERR(rv != 0, "Stat failed");
 
 	restFileSize = statBuffer.st_size + strlen(atrInsertion);
 	restFile = (char *) malloc(sizeof(char) * restFileSize);
-	CHECK_ERR(restFile == 0, "Malloc failed");
+	CHECK_ERR(restFile == NULL, "Malloc failed");
 
 	filePosition = 0;
 	restOffset = 0;
@@ -183,15 +263,11 @@ int main(int argc, char **argv)
 
 	do
 	{
-		if (fgets(&restFile[restOffset], restFileSize, fp) == 0)
-		{
+		if (fgets(&restFile[restOffset], restFileSize, fp) == NULL)
 			break;
-		}
 
 		if (strstr(&restFile[restOffset], "<key>spAtrValue</key>"))
-		{
 			filePosition = ftell(fp);
-		}
 
 		getsSize = strlen(&restFile[restOffset]);
 		restOffset += getsSize;
@@ -201,8 +277,7 @@ int main(int argc, char **argv)
 	rewind(fp);
 	fwrite(restFile, 1, filePosition, fp);
 	fwrite(atrInsertion, 1, strlen(atrInsertion), fp);
-	fwrite(&restFile[filePosition], 1,
-		statBuffer.st_size - filePosition, fp);
+	fwrite(&restFile[filePosition], 1, statBuffer.st_size - filePosition, fp);
 
 	fclose(fp);
 
