@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2001-2003
+ * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -79,7 +79,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 
 	readerLength = 0;
 	tokensFound = 0;
-	readerList = 0;
+	readerList = NULL;
 	strLoc = 0;
 	i = 0;
 
@@ -107,17 +107,17 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 	/*
 	 * Get the reader list size 
 	 */
-	rv = SCardListReaders(localHContext, 0, readerList, &readerLength);
+	rv = SCardListReaders(localHContext, NULL, readerList, &readerLength);
 
 	if (pcscToMSC(rv) != MSC_SUCCESS)
 		return pcscToMSC(rv);
 
 	readerList = (char *) malloc(sizeof(char) * readerLength);
 
-	if (readerList == 0)
+	if (readerList == NULL)
 		return MSC_INTERNAL_ERROR;
 
-	rv = SCardListReaders(localHContext, 0, readerList, &readerLength);
+	rv = SCardListReaders(localHContext, NULL, readerList, &readerLength);
 
 	/*
 	 * Now that we have the readers, lets check their status 
@@ -165,7 +165,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 				 */
 				tokensFound += 1;
 
-				if ((tokensFound <= *arrayLength) && (tokenArray != 0))
+				if ((tokensFound <= *arrayLength) && (tokenArray != NULL))
 				{
 					currentToken = &tokenArray[tokensFound - 1];
 					currentToken->addParams = 0;
@@ -225,7 +225,7 @@ MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
 	/*
 	 * Application provides null requesting length 
 	 */
-	if (tokenArray == 0)
+	if (tokenArray == NULL)
 	{
 		*arrayLength = tokensFound;
 		return MSC_SUCCESS;
@@ -265,15 +265,15 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	MSCULong32 tokenIdLength;
 
 	tokenSize = 0;
-	tokenList = 0;
+	tokenList = NULL;
 	tokenSize = 0;
 	selectedIFD = -1;
 	tokenIdLength = sizeof(tokenId);
 	slotState = 0;
 	slotProtocol = 0;
 	slotNameSize = sizeof(slotName);
-	vIdFunction = 0;
-	vInitFunction = 0;
+	vIdFunction = NULL;
+	vInitFunction = NULL;
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -427,7 +427,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	vInitFunction = pConnection->libPointers.pvfInitializePlugin;
 	vIdFunction = pConnection->libPointers.pvfIdentifyToken;
 
-	if (vInitFunction == 0)
+	if (vInitFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"InitializePlugin function missing");
@@ -436,7 +436,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		return MSC_UNSUPPORTED_FEATURE;
 	}
 
-	if (vIdFunction == 0)
+	if (vIdFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"IdentifyToken function missing");
@@ -514,7 +514,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 	MSCLong32(*libPL_MSCFinalizePlugin) (MSCLPTokenConnection);
 	MSCPVoid32 vFunction;
 
-	vFunction = 0;
+	vFunction = NULL;
 
 	if (pConnection == NULL)
 		return MSC_INVALID_PARAMETER;
@@ -530,7 +530,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 	 */
 	vFunction = pConnection->libPointers.pvfFinalizePlugin;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"FinalizePlugin function missing");
@@ -579,7 +579,7 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 	MSCTokenInfo tokenInfo;
 	int i;
 
-	rgReaderStates = 0;
+	rgReaderStates = NULL;
 
 	/*
 	 * Allocate array of SCARD_READERSTATE_A structures, set UNAWARE on
@@ -613,7 +613,7 @@ MSC_RV MSCWaitForTokenEvent(MSCLPTokenInfo tokenArray,
 	rgReaderStates = (LPSCARD_READERSTATE_A)
 		malloc(sizeof(SCARD_READERSTATE_A) * arraySize);
 
-	if (rgReaderStates == 0)
+	if (rgReaderStates == NULL)
 		return MSC_INTERNAL_ERROR;
 
 	for (i = 0; i < arraySize; i++)
@@ -796,7 +796,6 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 			memcpy((void *) (evlist->tokenArray[curToken].addParams),
 				&tokenArray[curToken],
 				evlist->tokenArray[curToken].addParamsSize);
-
 		}
 	}
 	mscUnLockThread();
@@ -910,7 +909,7 @@ MSC_RV MSCWriteFramework(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfWriteFramework;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCWriteFramework = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCLPInitTokenParams)) vFunction;
@@ -942,7 +941,7 @@ MSC_RV MSCGetStatus(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfGetStatus;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCGetStatus = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCLPStatusInfo)) vFunction;
@@ -971,7 +970,7 @@ MSC_RV MSCGetCapabilities(MSCLPTokenConnection pConnection, MSCULong32 Tag,
 
 	vFunction = pConnection->libPointers.pvfGetCapabilities;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCGetCapabilities =
 			(MSCLong32(*)(MSCLPTokenConnection, MSCULong32, MSCPUChar8,
@@ -1001,7 +1000,7 @@ MSC_RV MSCExtendedFeature(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfExtendedFeature;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCExtendedFeature =
 			(MSCLong32(*)(MSCLPTokenConnection, MSCULong32, MSCPUChar8,
@@ -1031,7 +1030,7 @@ MSC_RV MSCGenerateKeys(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfGenerateKeys;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCGenerateKeys = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCUChar8, MSCUChar8, MSCLPGenKeyParams)) vFunction;
@@ -1062,7 +1061,7 @@ MSC_RV MSCImportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	vFunction = pConnection->libPointers.pvfImportKey;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCImportKey = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCUChar8,
@@ -1096,7 +1095,7 @@ MSC_RV MSCExportKey(MSCLPTokenConnection pConnection, MSCUChar8 keyNum,
 
 	vFunction = pConnection->libPointers.pvfExportKey;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCExportKey = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCUChar8, MSCPUChar8,
@@ -1129,7 +1128,7 @@ MSC_RV MSCComputeCrypt(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfComputeCrypt;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCComputeCrypt =
 			(MSCLong32(*)(MSCLPTokenConnection, MSCLPCryptInit,
@@ -1160,7 +1159,7 @@ MSC_RV MSCExtAuthenticate(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfExtAuthenticate;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCExtAuthenticate =
 			(MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
@@ -1190,7 +1189,7 @@ MSC_RV MSCListKeys(MSCLPTokenConnection pConnection, MSCUChar8 seqOption,
 
 	vFunction = pConnection->libPointers.pvfListKeys;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCListKeys = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCLPKeyInfo)) vFunction;
@@ -1220,7 +1219,7 @@ MSC_RV MSCCreatePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 
 	vFunction = pConnection->libPointers.pvfCreatePIN;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCCreatePIN = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCUChar8, MSCPUChar8,
@@ -1250,7 +1249,7 @@ MSC_RV MSCVerifyPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 
 	vFunction = pConnection->libPointers.pvfVerifyPIN;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCVerifyPIN = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCPUChar8, MSCULong32)) vFunction;
@@ -1279,7 +1278,7 @@ MSC_RV MSCChangePIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 
 	vFunction = pConnection->libPointers.pvfChangePIN;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCChangePIN = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCPUChar8, MSCUChar8, MSCPUChar8, MSCUChar8)) vFunction;
@@ -1308,7 +1307,7 @@ MSC_RV MSCUnblockPIN(MSCLPTokenConnection pConnection, MSCUChar8 pinNum,
 
 	vFunction = pConnection->libPointers.pvfUnblockPIN;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCUnblockPIN = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCUChar8, MSCPUChar8, MSCULong32)) vFunction;
@@ -1335,7 +1334,7 @@ MSC_RV MSCListPINs(MSCLPTokenConnection pConnection, MSCPUShort16 pPinBitMask)
 
 	vFunction = pConnection->libPointers.pvfListPINs;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCListPINs = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCPUShort16)) vFunction;
@@ -1363,7 +1362,7 @@ MSC_RV MSCCreateObject(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfCreateObject;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCCreateObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
 				MSCULong32, MSCLPObjectACL)) vFunction;
@@ -1392,7 +1391,7 @@ MSC_RV MSCDeleteObject(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfDeleteObject;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCDeleteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
 				MSCUChar8)) vFunction;
@@ -1429,7 +1428,7 @@ MSC_RV MSCWriteObject(MSCLPTokenConnection pConnection,
 	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
 	objectSize = dataSize;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return MSC_UNSUPPORTED_FEATURE;
 
 	libMSCWriteObject = (MSCLong32(*)(MSCLPTokenConnection, MSCString,
@@ -1501,7 +1500,7 @@ MSC_RV MSCReadObject(MSCLPTokenConnection pConnection,
 	callBackFunction = (MSC_RV(*)(void *, int)) rwCallback;
 	objectSize = dataSize;
 
-	if (vFunction == 0)
+	if (vFunction == NULL)
 		return MSC_UNSUPPORTED_FEATURE;
 
 	libMSCReadObject = (MSCLong32(*)(MSCLPTokenConnection,
@@ -1567,7 +1566,7 @@ MSC_RV MSCListObjects(MSCLPTokenConnection pConnection,
 
 	vFunction = pConnection->libPointers.pvfListObjects;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCListObjects = (MSCLong32(*)(MSCLPTokenConnection, MSCUChar8,
 				MSCLPObjectInfo)) vFunction;
@@ -1593,7 +1592,7 @@ MSC_RV MSCLogoutAll(MSCLPTokenConnection pConnection)
 
 	vFunction = pConnection->libPointers.pvfLogoutAll;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCLogoutAll = (MSCLong32(*)(MSCLPTokenConnection)) vFunction;
 		rv = (*libMSCLogoutAll) (pConnection);
@@ -1620,7 +1619,7 @@ MSC_RV MSCGetChallenge(MSCLPTokenConnection pConnection, MSCPUChar8 pSeed,
 
 	vFunction = pConnection->libPointers.pvfGetChallenge;
 
-	if (vFunction != 0)
+	if (vFunction != NULL)
 	{
 		libMSCGetChallenge = (MSCLong32(*)(MSCLPTokenConnection,
 				MSCPUChar8, MSCUShort16, MSCPUChar8, MSCUShort16)) vFunction;
@@ -1767,7 +1766,7 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 	if (localHContext == 0)
 		return MSC_INTERNAL_ERROR;
 
-	if (pOutputData == 0)
+	if (pOutputData == NULL)
 		return MSC_INVALID_PARAMETER;
 
 	rv = MSCGetObjectAttributes(pConnection, objectID, &objInfo);
@@ -1775,7 +1774,7 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 	if (rv != MSC_SUCCESS)
 	{
 		*dataSize = 0;
-		*pOutputData = 0;
+		*pOutputData = '\0';
 		return rv;
 	}
 
@@ -1785,7 +1784,6 @@ MSC_RV MSCReadAllocateObject(MSCLPTokenConnection pConnection,
 
 	return MSCReadObject(pConnection, objectID, 0, *pOutputData,
 		objectSize, rwCallback, addParams);
-
 }
 
 
@@ -1938,9 +1936,9 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 	MSCLong32(*libPL_MSCFinalizePlugin) (MSCLPTokenConnection);
 	MSCLong32(*libPL_MSCIdentifyToken) (MSCLPTokenConnection);
 
-	vInitFunction = 0;
-	vFinFunction = 0;
-	vIdFunction = 0;
+	vInitFunction = NULL;
+	vFinFunction = NULL;
+	vIdFunction = NULL;
 
 	/*
 	 * Select the AID or initialization routine for the card 
@@ -1949,21 +1947,21 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 	vFinFunction = pConnection->libPointers.pvfFinalizePlugin;
 	vIdFunction = pConnection->libPointers.pvfIdentifyToken;
 
-	if (vInitFunction == 0)
+	if (vInitFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"InitializePlugin function missing");
 		return MSC_INTERNAL_ERROR;
 	}
 
-	if (vFinFunction == 0)
+	if (vFinFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"FinalizePlugin function missing");
 		return MSC_INTERNAL_ERROR;
 	}
 
-	if (vIdFunction == 0)
+	if (vIdFunction == NULL)
 	{
 		DebugLogB("Error: Card service failure: %s",
 			"IdentifyToken function missing");
