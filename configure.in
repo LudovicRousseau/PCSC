@@ -108,7 +108,6 @@ dnl Checks for library functions.
 #AC_TYPE_SIGNAL
 #AC_CHECK_FUNCS(gettimeofday strdup strtoul)
 
-
 dnl Setup dist stuff
 AC_SUBST(ac_aux_dir)
 
@@ -135,18 +134,18 @@ AC_ARG_ENABLE(usb,
    esac
 ])
 
-AC_MSG_RESULT([enable linux usb capability: $usb])
+AC_MSG_RESULT([enable linux usb capability   : $usb])
 
 AM_CONDITIONAL(PCSC_LINUX_USB, test x$usb = xtrue)
 
 dnl --enable-usbdropdir
 AC_ARG_ENABLE(usbdropdir,
-[  --enable-usbdropdir=DIR directory containing USB drivers (default /usr/local/pcsc/drivers/)],
+[  --enable-usbdropdir=DIR directory containing USB drivers                                                (default /usr/local/pcsc/drivers/)],
 [usbdropdir="${enableval}"], [usbdropdir=false])
 if test x${usbdropdir} == xfalse ; then
 	usbdropdir="/usr/local/pcsc/drivers/"
 fi
-AC_MSG_RESULT([enable USB drop directory  : $usbdropdir])
+AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
 AC_ARG_ENABLE(threadsafe,
@@ -157,7 +156,7 @@ AC_ARG_ENABLE(threadsafe,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-threadsafe]) ;;
  esac], [threadsafe=true])
 
-AC_MSG_RESULT([enable threadsafe client   : $threadsafe])
+AC_MSG_RESULT([enable threadsafe client      : $threadsafe])
 
 AM_CONDITIONAL(PCSC_THR_SAFE, test x$threadsafe = xtrue)
 
@@ -172,7 +171,7 @@ AC_ARG_ENABLE(debug,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
  esac], [debug=true])
 
-AC_MSG_RESULT([enable debug messages      : $debug])
+AC_MSG_RESULT([enable debug messages         : $debug])
 
 if test x${debug} = xtrue ; then
   AC_DEFINE(PCSC_DEBUG, 1, [enable full PCSC debug messaging.])
@@ -188,7 +187,7 @@ AC_ARG_ENABLE(debugatr,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-debugatr]) ;;
 esac], [debugatr=false])
 
-AC_MSG_RESULT([enable ATR parsing messages: $debugatr])
+AC_MSG_RESULT([enable ATR parsing messages   : $debugatr])
 
 if test x${debugatr} = xtrue ; then
   AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
@@ -202,7 +201,7 @@ AC_ARG_ENABLE(scf,
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-scf]) ;;
 esac], [scf=false])
 
-AC_MSG_RESULT([enable SCF reader support  : $scf])
+AC_MSG_RESULT([enable SCF reader support     : $scf])
 
 AM_CONDITIONAL(MSC_ENABLE_SCF, test x$scf = xtrue)
 
@@ -214,23 +213,32 @@ AC_ARG_ENABLE(musclecard,
   *) AC_MSG_ERROR([bad value ${enableval} for --disable-musclecard]) ;;
  esac], [musclecard=false])
 
-AC_MSG_RESULT([disable musclecard         : $musclecard])
+AC_MSG_RESULT([disable musclecard            : $musclecard])
 
 if test x${musclecard} = xfalse ; then
   AM_CONDITIONAL(MCARD_ENABLED, test x$musclecard = xfalse)
 fi
 
+dnl --enable-muscledropdir
+AC_ARG_ENABLE(muscledropdir,
+[  --enable-muscledropdir=DIR directory containing MuscleCard bundles                                      (default /usr/local/pcsc/services/)],
+[muscledropdir="${enableval}"], [muscledropdir=false])
+if test x${muscledropdir} == xfalse ; then
+	muscledropdir="/usr/local/pcsc/services/"
+fi
+AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
+AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing MuscleCard bundles])
 
 AC_ARG_ENABLE(confdir,
 [  --enable-confdir=DIR    directory containing reader.conf (default /etc)],
 [confdir="${enableval}"], [confdir=false])
 
 if test x${confdir} != xfalse ; then
-	AC_MSG_RESULT([enable confdir             : $confdir])
+	AC_MSG_RESULT([enable confdir                : $confdir])
 
 	AC_DEFINE_UNQUOTED(USE_READER_CONF, "$confdir", [directory containing reader.conf (default /etc)])
 else
-	AC_MSG_RESULT([enable confdir             : /etc (default)])
+	AC_MSG_RESULT([enable confdir                : /etc (default)])
 fi
 
 
@@ -238,7 +246,7 @@ AC_ARG_ENABLE(runpid,
 [  --enable-runpid=FILE    file containing pcscd pid],
 [runpid="${enableval}"], [runpid=false])
 
-AC_MSG_RESULT([enable runpid              : $runpid])
+AC_MSG_RESULT([enable runpid                 : $runpid])
 
 if test x${runpid} != xfalse ; then
 	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])

@@ -1,12 +1,14 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : cardfactory.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 01/01/00
-            Purpose: This handles card abstraction attachment. 
-	            
+		Title  : cardfactory.c
+		Package: pcsc lite
+		Author : David Corcoran
+		Date   : 01/01/00
+		Purpose: This handles card abstraction attachment. 
+
+ $Id$
+
 *******************************************************************/
 
 #include <stdio.h>
@@ -26,7 +28,8 @@
 #include "tokenfactory.h"
 
 #ifndef WIN32
-#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
+// now defined using ./configure --enable-muscledropdir=DIR
+//#define MSC_SVC_DROPDIR                     "/usr/local/pcsc/services/"
 #else
 #define MSC_SVC_DROPDIR                     "C:\\Program Files\\Muscle\\Services\\"
 #endif
