@@ -136,11 +136,7 @@ dnl Probe for a proper flex library
 AC_SUBST(LIBFL)
 AC_CHECK_LIB(l, yywrap, [LIBFL="$LIBFL -ll"], AC_CHECK_LIB(fl, yywrap, [LIBFL="$LIBFL -lfl"]))
 
-dnl check if libusb is available
 AC_SUBST(LIBUSB)
-AC_CHECK_LIB(usb, usb_init, [LIBUSB="$LIBUSB -lusb" use_libusb=true ], [ use_libusb=false ])
-AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
-
 dnl --enable-libusb=DIR
 AC_ARG_ENABLE(libusb,
   AC_HELP_STRING([--enable-libusb=PATH],[enable USB hotplug using libusb]),
@@ -164,6 +160,13 @@ AC_ARG_ENABLE(libusb,
 		esac
 	]
 )
+
+dnl if use_libusb is not yet defined
+if test x$use_libusb = x; then
+	dnl check if libusb is available
+	AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
+	AC_CHECK_LIB(usb, usb_init, [LIBUSB="$LIBUSB -lusb" use_libusb=true ], [ use_libusb=false ])
+fi
 
 AC_MSG_RESULT([enable libusb support         : $use_libusb])
 
