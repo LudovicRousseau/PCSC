@@ -251,7 +251,9 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		return rv;
 	}
 
-	EHSpawnEventHandler(sReadersContexts[dwContext]);
+	rv = EHSpawnEventHandler(sReadersContexts[dwContext]);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Call on the driver to see if there are multiple slots 
