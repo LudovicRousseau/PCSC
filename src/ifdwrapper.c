@@ -60,8 +60,10 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
-		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, UCHAR,
-				UCHAR, UCHAR)) vFunction;
+		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, 
+							       UCHAR, UCHAR, 
+							       UCHAR)) 
+		  vFunction;
 	} else
 	{
 		IFDH_set_protocol_parameters =
@@ -76,21 +78,26 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	SYS_MutexLock(rContext->mMutex);
 
 	ucValue[0] = rContext->dwSlot;
-	IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
-		rv = (*IFD_set_protocol_parameters) (dwProtocol,
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+	        rv = (*IFD_set_protocol_parameters) (dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	} else
 	{
-		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot, dwProtocol,
-			ucFlags, ucPTS1, ucPTS2, ucPTS3);
+		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot, 
+						      dwProtocol,
+						      ucFlags, ucPTS1, 
+						      ucPTS2, ucPTS3);
 	}
 #else
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
 	} else
@@ -260,7 +267,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
  */
 
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
-	DWORD dwLength, PUCHAR pucValue)
+			DWORD dwLength, PUCHAR pucValue)
 {
 
 	LONG rv;
@@ -291,7 +298,8 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
-		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) vFunction;
+		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
+		  vFunction;
 	} else
 	{
 		IFDH_set_capabilities = (RESPONSECODE(*)(DWORD, DWORD, DWORD,
@@ -365,7 +373,8 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
-		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) vFunction;
+		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
+		  vFunction;
 	} else
 	{
 		IFDH_get_capabilities = (RESPONSECODE(*)(DWORD, DWORD, PDWORD,
@@ -473,12 +482,11 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 
 	SYS_MutexLock(rContext->mMutex);
 
-	ucValue[0] = rContext->dwSlot;
-	IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
-
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_power_icc) (dwAction);
 	} else
 	{
@@ -490,6 +498,8 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #else
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
 	} else
 	{
@@ -566,7 +576,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
 		IFD_is_icc_present = (RESPONSECODE(*)())vFunctionA;
-		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) vFunctionB;
+		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
+		  vFunctionB;
 	} else
 	{
 		IFDH_icc_presence = (RESPONSECODE(*)(DWORD)) vFunctionA;
@@ -579,12 +590,11 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 
 	SYS_MutexLock(rContext->mMutex);
 
-	ucValue[0] = rContext->dwSlot;
-	IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
-
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_is_icc_present) ();
 	} else
 	{
@@ -593,6 +603,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #else
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
 	} else
 	{
@@ -728,9 +740,6 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 
 	SYS_MutexLock(rContext->mMutex);
 
-	ucValue[0] = rContext->dwSlot;
-	IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
-
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
@@ -807,12 +816,15 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
 		IFD_transmit_to_icc = (RESPONSECODE(*)(SCARD_IO_HEADER, PUCHAR,
-				DWORD, PUCHAR, DWORD *, PSCARD_IO_HEADER)) vFunction;
+						       DWORD, PUCHAR, DWORD *,
+						       PSCARD_IO_HEADER)) 
+		  vFunction;
 	} else
 	{
 		IFDH_transmit_to_icc =
-			(RESPONSECODE(*)(DWORD, SCARD_IO_HEADER, PUCHAR, DWORD, PUCHAR,
-				DWORD *, PSCARD_IO_HEADER)) vFunction;
+			(RESPONSECODE(*)(DWORD, SCARD_IO_HEADER, PUCHAR, 
+					 DWORD, PUCHAR, DWORD *, 
+					 PSCARD_IO_HEADER)) vFunction;
 	}
 #endif
 
@@ -822,12 +834,12 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 
 	SYS_MutexLock(rContext->mMutex);
 
-	ucValue[0] = rContext->dwSlot;
-	IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_transmit_to_icc) (pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	} else
@@ -839,6 +851,8 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #else
 	if (rContext->dwVersion & IFD_HVERSION_1_0)
 	{
+	        ucValue[0] = rContext->dwSlot;
+	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Transmit_to_ICC(pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	} else
