@@ -1254,6 +1254,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				if (dwState & SCARD_PRESENT)
 				{
+					/* card present but not yet powered up */
+					if (0 == rContext->cardAtrLength)
+						/* Allow the status thread to convey information */
+						SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+
 					currReader->cbAtr = rContext->cardAtrLength;
 					memcpy(currReader->rgbAtr, rContext->cardAtr,
 						currReader->cbAtr);
