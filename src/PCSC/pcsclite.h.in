@@ -13,11 +13,7 @@
 #ifndef __pcsclite_h__
 #define __pcsclite_h__
 
-#if defined(__APPLE__)
 #include <PCSC/wintypes.h>
-#else
-#include <wintypes.h>
-#endif
 
 #ifdef __cplusplus
 extern "C"

@@ -20,11 +20,7 @@ extern "C"
 {
 #endif
 
-#if defined(__APPLE__)
 #include <PCSC/winscard.h>
-#else
-#include <winscard.h>
-#endif
 
 #ifndef MAX_BUFFER_SIZE
 #define MAX_BUFFER_SIZE		265

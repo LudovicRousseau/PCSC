@@ -24,11 +24,7 @@ extern "C"
 #include "PCSC.h"
 #endif
 
-#if defined(__APPLE__)
 #include <PCSC/mscdefines.h>
-#else
-#include <mscdefines.h>
-#endif
 
 /*
  * PCSC_API is defined for Windows but is a no-op on other

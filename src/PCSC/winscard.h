@@ -13,11 +13,7 @@
 #ifndef __winscard_h__
 #define __winscard_h__
 
-#if defined(__APPLE__)
 #include <PCSC/pcsclite.h>
-#else
-#include <pcsclite.h>
-#endif
 
 #ifdef __cplusplus
 extern "C"
