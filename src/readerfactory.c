@@ -176,18 +176,25 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	if (parentNode != -1 && parentNode < PCSCLITE_MAX_CONTEXTS
 		&& parentNode > 0)
 	{
-		(sContexts[dwContext])->dwFeeds = (sContexts[parentNode])->dwFeeds;
+		(sContexts[dwContext])->dwFeeds = 
+		  (sContexts[parentNode])->dwFeeds;
 		*(sContexts[dwContext])->dwFeeds += 1;
-		(sContexts[dwContext])->vHandle = (sContexts[parentNode])->vHandle;
-		(sContexts[dwContext])->mMutex = (sContexts[parentNode])->mMutex;
+		(sContexts[dwContext])->vHandle = 
+		  (sContexts[parentNode])->vHandle;
+		(sContexts[dwContext])->mMutex = 
+		  (sContexts[parentNode])->mMutex;
 	}
 
 	if ((sContexts[dwContext])->dwFeeds == 0)
 	{
-		(sContexts[dwContext])->dwFeeds = (DWORD *) malloc(sizeof(DWORD));
-		/* Initialize dwFeeds to 1, otherwise multiple cloned readers will
-		 * cause pcscd to crash when RFUnloadReader unloads the driver library
-		 * and there are still devices attached using it --mikeg*/
+		(sContexts[dwContext])->dwFeeds = 
+		  (DWORD *)malloc(sizeof(DWORD));
+
+		/* Initialize dwFeeds to 1, otherwise multiple 
+		   cloned readers will cause pcscd to crash when 
+		   RFUnloadReader unloads the driver library
+		   and there are still devices attached using it --mikeg*/
+
 		*(sContexts[dwContext])->dwFeeds = 1;
 	}
 
@@ -257,8 +264,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	} else
 	{
 		/*
-		 * Check the number of slots and create a different structure for 
-		 * each one accordingly 
+		 * Check the number of slots and create a different 
+		 * structure for each one accordingly 
 		 */
 
 		/*
@@ -269,7 +276,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		{
 
 			/*
-			 * We must find an empty spot to put the reader structure 
+			 * We must find an empty spot to put the 
+			 * reader structure 
 			 */
 			for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
 			{
@@ -300,15 +308,24 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			rv = RFSetReaderName(sContexts[dwContextB], lpcReader,
 				lpcLibrary, dwPort, j);
 
+			printf("Init %s\n", (sContexts[dwContextB])->lpcReader);
 			strcpy((sContexts[dwContextB])->lpcLibrary, lpcLibrary);
 			(sContexts[dwContextB])->dwVersion =
-				(sContexts[dwContext])->dwVersion;
+			  (sContexts[dwContext])->dwVersion;
 			(sContexts[dwContextB])->dwPort =
-				(sContexts[dwContext])->dwPort;
+			  (sContexts[dwContext])->dwPort;
 			(sContexts[dwContextB])->mMutex =
-				(sContexts[dwContext])->mMutex;
+			  (sContexts[dwContext])->mMutex;
 			(sContexts[dwContextB])->vHandle =
-				(sContexts[dwContext])->vHandle;
+			  (sContexts[dwContext])->vHandle;
+
+			/* Added by Dave - slots did not have a dwFeeds
+			   parameter so it was by luck they were working
+			*/
+
+			(sContexts[dwContextB])->dwFeeds =
+			  (sContexts[dwContext])->dwFeeds;
+
 			(sContexts[dwContextB])->dwStatus = 0;
 			(sContexts[dwContextB])->dwBlockStatus = 0;
 			(sContexts[dwContextB])->dwContexts = 0;
@@ -324,6 +341,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				(sContexts[dwContextB])->psHandles[i].hCard = 0;
 			}
 
+			/* Added by Dave for multiple slots */
+			*(sContexts[dwContextB])->dwFeeds += 1;
 			*dwNumContexts += 1;
 
 			EHSpawnEventHandler(sContexts[dwContextB]);
@@ -378,7 +397,13 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	}
 
 	*sContext->dwFeeds -= 1;
-	sContext->dwFeeds = 0;
+
+	/* Added by Dave to free the dwFeeds variable */
+	if (*sContext->dwFeeds == 0) {
+	  free(sContext->dwFeeds);
+	  sContext->dwFeeds = 0;
+	}
+
 	sContext->dwVersion = 0;
 	sContext->dwPort = 0;
 	sContext->mMutex = 0;
@@ -403,6 +428,30 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	{
 
 		EHDestroyEventHandler(sContext);
+
+		rv = RFUnInitializeReader(sContext);
+		if (rv != SCARD_S_SUCCESS)
+		  {
+		    return rv;
+		  }
+		
+		/*
+		 * Destroy and free the mutex 
+		 */
+		if (*sContext->dwFeeds == 1)
+		  {
+		    SYS_MutexDestroy(sContext->mMutex);
+		    free(sContext->mMutex);
+		  }
+
+		*sContext->dwFeeds -= 1;
+
+		/* Added by Dave to free the dwFeeds variable */
+
+		if (*sContext->dwFeeds == 0) {
+		  free(sContext->dwFeeds);
+		  sContext->dwFeeds = 0;
+		}
 
 		sContext->dwVersion = 0;
 		sContext->dwPort = 0;
@@ -1139,6 +1188,7 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 
 	if (*rContext->dwFeeds == 1)
 	{
+	  DebugLogA("RFUnloadReader: Unloading reader driver.");
 		DYN_CloseLibrary(&rContext->vHandle);
 	}
 
