@@ -58,7 +58,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, 
 							       UCHAR, UCHAR, 
@@ -80,7 +80,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	ucValue[0] = rContext->dwSlot;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -94,7 +94,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 						      ucPTS2, ucPTS3);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -148,7 +148,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IO_create_channel = (RESPONSECODE(*)(DWORD)) vFunction;
 	} else
@@ -163,7 +163,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 
 	SYS_MutexLock(rContext->mMutex);
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = (*IO_create_channel) (dwChannelId);
 	} else
@@ -171,7 +171,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext, DWORD dwChannelId)
 		rv = (*IFDH_create_channel) (rContext->dwSlot, dwChannelId);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = IO_Create_Channel(dwChannelId);
 	} else
@@ -221,7 +221,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IO_close_channel = (RESPONSECODE(*)())vFunction;
 	} else
@@ -236,7 +236,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 
 	SYS_MutexLock(rContext->mMutex);
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = (*IO_close_channel) ();
 	} else
@@ -244,7 +244,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 		rv = (*IFDH_close_channel) (rContext->dwSlot);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = IO_Close_Channel();
 	} else
@@ -296,7 +296,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
 		  vFunction;
@@ -313,7 +313,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	 */
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = (*IFD_set_capabilities) (dwTag, pucValue);
 	} else
@@ -322,7 +322,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			dwLength, pucValue);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = IFD_Set_Capabilities(dwTag, pucValue);
 	} else
@@ -371,7 +371,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
 		  vFunction;
@@ -389,7 +389,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = (*IFD_get_capabilities) (dwTag, pucValue);
 	} else
@@ -398,7 +398,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			pdwLength, pucValue);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = IFD_Get_Capabilities(dwTag, pucValue);
 	} else
@@ -466,7 +466,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_power_icc = (RESPONSECODE(*)(DWORD)) vFunction;
 	} else
@@ -483,7 +483,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -496,7 +496,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		ret = ATRDecodeAtr(&sSmartCard, pucAtr, *pdwAtrLen);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -515,7 +515,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	/*
 	 * Get the ATR and it's length 
 	 */
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFDStatusICC(rContext, &dwStatus, &dwProtocol, pucAtr, pdwAtrLen);
 	}
@@ -568,12 +568,12 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (vFunctionB == 0 && rContext->dwVersion & IFD_HVERSION_1_0)
+	if ((vFunctionB == 0) && (rContext->dwVersion == IFD_HVERSION_1_0))
 	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_is_icc_present = (RESPONSECODE(*)())vFunctionA;
 		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
@@ -591,7 +591,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -601,7 +601,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		rv = (*IFDH_icc_presence) (rContext->dwSlot);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -634,7 +634,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	 * to conserve resources 
 	 */
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		{
@@ -742,7 +742,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	} else
@@ -751,7 +751,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 			RxBuffer, RxLength);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		rv = SCARD_E_UNSUPPORTED_FEATURE;
 	} else
@@ -817,7 +817,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		IFD_transmit_to_icc = (RESPONSECODE(*)(SCARD_IO_HEADER, PUCHAR,
 						       DWORD, PUCHAR, DWORD *,
@@ -840,7 +840,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -853,7 +853,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 			pucRxBuffer, pdwRxLength, pioRxPci);
 	}
 #else
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
 	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);

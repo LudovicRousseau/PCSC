@@ -1001,7 +1001,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	 * The following binds version 1.0 of the IFD Handler specs 
 	 */
 
-	if (rContext->dwVersion & IFD_HVERSION_1_0)
+	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 
 		DebugLogA("RFBindFunctions: Loading IFD Handler 1.0");
@@ -1128,7 +1128,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		 * The following binds version 2.0 of the IFD Handler specs 
 		 */
 
-	} else if (rContext->dwVersion & IFD_HVERSION_2_0)
+	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
 
 		DebugLogA("RFBindFunctions: Loading IFD Handler 2.0");
