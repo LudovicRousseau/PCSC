@@ -157,7 +157,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 	if (hFind == INVALID_HANDLE_VALUE)
 #endif
 	{
-		DebugLogA("Cannot open PC/SC token drivers directory.\n");
+		DebugLogA("Cannot open PC/SC token drivers directory.");
 
 		return -1;
 	}
@@ -188,8 +188,8 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 			atrIndex = 0;
 
 #ifdef MSC_DEBUG
-			DebugLogB("ATR comparison: FILE: %s\n", fullPath);
-			DebugLogB("ATR comparison: Target Match: %s\n", atrString);
+			DebugLogB("ATR comparison: FILE: %s", fullPath);
+			DebugLogB("ATR comparison: Target Match: %s", atrString);
 #endif
 
 			while (1)
@@ -202,7 +202,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 							 * aliases loop */
 				}
 #ifdef MSC_DEBUG
-				DebugLogB("ATR comparison: Source: %s\n", keyValue);
+				DebugLogB("ATR comparison: Source: %s", keyValue);
 #endif
 
 				if (strcmp(keyValue, atrString) != 0)
@@ -214,7 +214,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					continue;
 				}
 #ifdef MSC_DEBUG
-				DebugLogB("Match found at ATR alias %d\n", atrIndex);
+				DebugLogB("Match found at ATR alias %d", atrIndex);
 #endif
 
 				/*
@@ -229,7 +229,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					if (rv != 0)
 					{
 						DebugLogA
-							("Match found, failed due to no product name.\n");
+							("Match found, failed due to no product name.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -237,7 +237,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					}
 				}
 #ifdef MSC_DEBUG
-				DebugLogB("Product name: %s\n", keyValue);
+				DebugLogB("Product name: %s", keyValue);
 #endif
 				strcpy(tokenInfo->tokenName, keyValue);
 
@@ -253,7 +253,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					if (rv != 0)
 					{
 						DebugLogA
-							("Match found, failed due to no library path.\n");
+							("Match found, failed due to no library path.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -273,7 +273,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 				if (fullLibPath == NULL)
 				{
-					DebugLogA("No path to bundle library found !\n");
+					DebugLogA("No path to bundle library found !");
 					return -1;
 				}
 
@@ -296,14 +296,14 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 				if (rv == 0)
 				{
 #ifdef MSC_DEBUG
-					DebugLogB("Default AID name: %s\n", keyValue);
+					DebugLogB("Default AID name: %s", keyValue);
 #endif
 					rv = stringToBytes(keyValue, tokenInfo->tokenApp,
 						&tokenInfo->tokenAppLen);
 					if (rv != 0)
 					{
 						DebugLogA
-							("Match found, failed due to malformed aid string.\n");
+							("Match found, failed due to malformed aid string.");
 #ifndef WIN32
 						closedir(hpDir);
 #endif
@@ -312,7 +312,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 
 				} else
 				{
-					DebugLogA("No AID specified in bundle\n");
+					DebugLogA("No AID specified in bundle");
 					tokenInfo->tokenAppLen = 0;
 				}
 
@@ -374,7 +374,7 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 
 	if (rv != 0)
 	{
-		DebugLogA("Error: Matching Token ATR Not Found.\n");
+		DebugLogA("Error: Matching Token ATR Not Found.");
 		DebugXxd("ATR  : ", pConnection->tokenInfo.tokenId,
 			pConnection->tokenInfo.tokenIdLength);
 
@@ -391,12 +391,12 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		DebugLogA("Error: Could not load service library\n");
-		DebugLogB("->> %s\n", pConnection->tokenInfo.svProvider);
+		DebugLogA("Error: Could not load service library");
+		DebugLogB("->> %s", pConnection->tokenInfo.svProvider);
 		return SCARD_E_INVALID_TARGET;
 	} else
 	{
-		DebugLogB("Loading service library %s\n",
+		DebugLogB("Loading service library %s",
 			pConnection->tokenInfo.svProvider);
 	}
 

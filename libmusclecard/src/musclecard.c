@@ -312,7 +312,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	{
 		rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, 0, 0, &localHContext);
 #ifdef MSC_DEBUG
-		DebugLogB("SCardEstablishContext returns %s\n",
+		DebugLogB("SCardEstablishContext returns %s",
 			pcsc_stringify_error(rv));
 #endif
 		if (pcscToMSC(rv) != MSC_SUCCESS)
@@ -340,7 +340,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 #endif
 
 #ifdef MSC_DEBUG
-	DebugLogB("SCardConnect returns %s\n", pcsc_stringify_error(rv));
+	DebugLogB("SCardConnect returns %s", pcsc_stringify_error(rv));
 #endif
 
 	if (pcscToMSC(rv) != MSC_SUCCESS)
@@ -373,7 +373,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		&slotNameSize, &slotState, &slotProtocol, tokenId, &tokenIdLength);
 
 #ifdef MSC_DEBUG
-	DebugLogB("SCardStatus returns %s\n", pcsc_stringify_error(rv));
+	DebugLogB("SCardStatus returns %s", pcsc_stringify_error(rv));
 #endif
 
 	if (pcscToMSC(rv) != MSC_SUCCESS)
@@ -396,7 +396,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		(strcmp(slotName, tokenStruct->slotName) != 0) ||
 		(memcmp(tokenId, tokenStruct->tokenId, tokenIdLength) != 0))
 	{
-		DebugLogA("Internal inconsistent values, ID, slotName\n");
+		DebugLogA("Internal inconsistent values, ID, slotName");
 		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
 		pConnection->hCard = 0;
 		return MSC_INCONSISTENT_STATUS;
@@ -415,7 +415,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 	rv = TPLoadToken(pConnection);
 
 #ifdef MSC_DEBUG
-	DebugLogB("TPLoadToken returns %s\n", pcsc_stringify_error(rv));
+	DebugLogB("TPLoadToken returns %s", pcsc_stringify_error(rv));
 #endif
 
 	if (rv != SCARD_S_SUCCESS)
@@ -433,7 +433,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 
 	if (vInitFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"InitializePlugin function missing");
 		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
 		pConnection->hCard = 0;
@@ -442,7 +442,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 
 	if (vIdFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"IdentifyToken function missing");
 		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
 		pConnection->hCard = 0;
@@ -487,7 +487,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		}
 
 #ifdef MSC_DEBUG
-		DebugLogB("MSCIdentifyToken returns %s\n", msc_error(rv));
+		DebugLogB("MSCIdentifyToken returns %s", msc_error(rv));
 #endif
 
 		if (rv != MSC_SUCCESS)
@@ -536,7 +536,7 @@ MSC_RV MSCReleaseConnection(MSCLPTokenConnection pConnection,
 
 	if (vFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"FinalizePlugin function missing");
 		return MSC_INTERNAL_ERROR;
 	}
@@ -1955,21 +1955,21 @@ MSC_RV MSCReEstablishConnection(MSCLPTokenConnection pConnection)
 
 	if (vInitFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"InitializePlugin function missing");
 		return MSC_INTERNAL_ERROR;
 	}
 
 	if (vFinFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"FinalizePlugin function missing");
 		return MSC_INTERNAL_ERROR;
 	}
 
 	if (vIdFunction == 0)
 	{
-		DebugLogB("Error: Card service failure: %s\n",
+		DebugLogB("Error: Card service failure: %s",
 			"IdentifyToken function missing");
 		return MSC_INTERNAL_ERROR;
 	}
