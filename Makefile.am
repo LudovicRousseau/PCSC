@@ -31,7 +31,8 @@ WIN32 = \
 EXTRA_DIST = DRIVERS SECURITY reconf bootstrap HELP ChangeLog.cvs \
 	$(AUX_DIST) $(ac_aux_dir)/acx_pthread.m4 $(WIN32)
 
-MAINTAINERCLEANFILES = ChangeLog.cvs $(AUX_DIST)
+MAINTAINERCLEANFILES = $(AUX_DIST)
+DISTCLEANFILES = ChangeLog.cvs
 
 # Automatically update the libtool script if it becomes out-of-date.
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
