@@ -36,5 +36,5 @@ autoconf --include=$ac_aux_dir #--warnings=all #--verbose
 automake --add-missing --copy #--verbose
 
 # remove now useless file
-rm $ac_aux_dir/aclocal.m4
+#rm $ac_aux_dir/aclocal.m4
 
