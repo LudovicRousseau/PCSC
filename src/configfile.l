@@ -93,6 +93,7 @@ int evaluatetoken(char *pcToken)
 				{
 					DebugLogC("Error with device %s: %s",
 						pcDevicename, strerror(errno));
+					DebugLogA("You should use 'DEVICENAME /dev/null' if your driver does not use this field");
 					badError = 1;
 				}
 			}
