@@ -81,10 +81,6 @@ void log_msg(const int priority, const char *fmt, ...)
 			fprintf(stderr, "%s\n", DebugBuffer);
 			break;
 
-		case DEBUGLOG_STDOUT_DEBUG:
-			fprintf(stdout, "%s\n", DebugBuffer);
-			break;
-
 		default:
 			/* Unknown type. Do nothing. */
 			assert(0);
@@ -134,10 +130,6 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 
 		case DEBUGLOG_STDERR_DEBUG:
 		fprintf(stderr, "%s\n", DebugBuffer);
-		break;
-
-		case DEBUGLOG_STDOUT_DEBUG:
-		fprintf(stdout, "%s\n", DebugBuffer);
 		break;
 
 		default:
@@ -387,10 +379,6 @@ void debug_msg(const char *fmt, ...)
 
 		case DEBUGLOG_STDERR_DEBUG:
 			fprintf(stderr, "%s\n", DebugBuffer);
-			break;
-
-		case DEBUGLOG_STDOUT_DEBUG:
-			fprintf(stdout, "%s\n", DebugBuffer);
 			break;
 
 		default:
