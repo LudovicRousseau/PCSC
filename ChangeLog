@@ -1,3 +1,54 @@
+pcsc-lite-1.2.9-beta3: Ludovic Rousseau
+30 June 2004
+- src/hotplug_libusb.c:
+  . use a dynamic array for available USB drivers:
+   - avoid a buffer overflow (argh!)
+   - allow to use more than 16 drivers/supported readers
+- src/Makefile.am:
+  . install mscdefines.h, winscard.h, musclecard.h, pcsclite.h and wintypes.h
+    in /usr/include/PCSC/ to not pollute /usr/include/
+  . install ifdhandler.h, debuglog.h and parser.h in /usr/include/PCSC/ so
+    drivers can use them for compilation.
+  Modify your source code or add -I/usr/include/PCSC to CFLAGS in your
+  Makefile or, better, use CFLAGS=`pkg-config libpcsclite --cflags`
+- doc/pcsc-lite.tex:
+  . dwPreferredProtocols is a bit mask of acceptable protocols
+  . SCARD_SHARE_DIRECT can be used to talk to the reader without a card
+    inserted
+  . add "Some SCardControl commands" section (IFD_EXCHANGE and VERIFY_PIN)
+  . add documentation for LTPBundleFindValueWithKey(), debug_msg() and
+    debug_xxd()
+- src/configfile.l: (/etc/reader.conf parser):
+  . allow ':' in DEVICENAME. use ':' to indicate a non-real device (pcscd does
+    not test for its existence as a file).  You can use this in something like
+    "net://1.2.3.4/foobar" to indicate a reader on a remote machine like an
+    X11 terminal.
+- src/PCSC/wintypes.h:
+  . Change the names of the types LPCSTR to LPCTSTR and LPSTR to LPTSTR to be
+    compliant with the Microsoft SCard API. You will have to update your
+    source codes.
+- src/readerfactory.c:
+  . rework RFSetReaderName() to simply the code and always start with the
+    lowest number available (like in previous pcsc-lite version)
+- src/prothandler.c:
+  . completely redesign the function so that IFDSetPTS() is always called to
+    tell the driver which protocol to use and to initialise its internal
+    state. The driver now knows which protocol (T=0 or T=1) the application
+    wants to use even if the card only support only one protocol.
+- src/atrhandler.c:
+  . add support of specific mode by the presence of TA2 (protocol not
+    negociable)
+- src/utils/Makefile.am:
+  . install bundleTool and installifd in [...]/sbin/ instead of [...]/bin/
+- doc/example/Makefile.am:
+  . do not install pcsc_demo since it is just a sample code for developpers
+    that is not supposed (the code) to do anything useful
+- doc/example/pcsc_demo.c:
+  . replace SCARD_PROTOCOL_ANY by SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 since
+    SCARD_PROTOCOL_ANY is _not_ defined by Microsoft PC/SC and is not equals
+    to SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 in pcsc-lite
+- and lots of other minor and/or internal only changes
+
 pcsc-lite-1.2.9-beta2: Ludovic Rousseau
 11 May 2004
 - change libmusclecard current version to 1 so that old libmusclecard0 and new
@@ -45,7 +96,7 @@ pcsc-lite-1.2.9-beta1: Ludovic Rousseau
   . do not ask for reader number if only one reader is present
   . some more debug
 - pcscd and libpcsclite now exchange a protocol version to know what API to
-  use. This will be usefull if/when the API change again
+  use. This will be useful if/when the API change again
 - change library version to 1:0:0 since the interface changed
 - hotplug: the daemon pcscd do not try to restart drivers anymore when it is
   exiting
@@ -335,7 +386,7 @@ pcsc-lite-1.0.2beta5: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 - src/pcscdaemon.c:
    . move the pid file creation earlier (before drivers loading)
    . allow to properly kill pcscd before or during driver loading
-     this is usefull when the driver init is buggy
+     this is useful when the driver init is buggy
 - src/pcsclite.h: change PCSCLITE_VERSION_NUMBER to 1.0.2.beta5
 - configure.in: change version number to 1.0.2.beta5
 
