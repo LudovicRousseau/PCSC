@@ -914,6 +914,17 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
     if ( ( dwBreakFlag == 1 ) && ( j == 0 ) ) {
       break;
     }
+
+    /*
+     * Solve the problem of never exiting the loop when a smartcard is
+     * already inserted in the reader, thus blocking the application
+     * (patch proposed by Serge Koganovitsch)
+     */
+    if ((dwTimeout == 0) && (j == 0))
+    {
+	    break;
+    }
+
   } while ( 1 ); /* end of do */
 
   if ( psContextMap[retIndice].contextBlockStatus == 
