@@ -271,6 +271,7 @@ if test x${confdir} != xfalse ; then
 
 	AC_DEFINE_UNQUOTED(USE_READER_CONF, "$confdir", [directory containing reader.conf (default /etc)])
 else
+	confdir="/etc"
 	AC_MSG_RESULT([enable confdir                : /etc (default)])
 fi
 
@@ -323,6 +324,7 @@ aclocal/Makefile
 doc/Makefile
 doc/bundleTool.8
 doc/pcscd.8
+doc/reader.conf.5
 doc/example/Makefile
 etc/Makefile
 etc/reader.conf

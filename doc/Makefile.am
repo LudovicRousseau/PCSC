@@ -5,7 +5,7 @@ SUBDIRS = . example
 datadir = $(prefix)/doc
 data_DATA = pcsc-lite-0.8.7.pdf muscle-api-1.3.0.pdf README.DAEMON
 
-man_MANS = pcscd.8 bundleTool.8 formaticc.1
-man_in = pcscd.8.in bundleTool.8.in formaticc.1
+man_MANS = pcscd.8 bundleTool.8 formaticc.1 reader.conf.5
+man_in = pcscd.8.in bundleTool.8.in formaticc.1 reader.conf.5.in
 
 EXTRA_DIST = $(data_DATA) $(man_in)
