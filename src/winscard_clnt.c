@@ -36,13 +36,6 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-/*
- * This is hack to allow a change of ATR at Reconnect without physically
- * changing the card. This should not happen in real life so should not be
- * problematic and so is active by default.
- */
-#define ATR_CHANGE_AT_RECONNECT
-
 struct _psChannelMap
 {
 	SCARDHANDLE hCard;
@@ -979,11 +972,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	 */
 
 	*pcchReaderLen = strlen(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName) + 1;
-#ifdef ATR_CHANGE_AT_RECONNECT
-	*pcbAtrLen = scStatusStruct.pcbAtrLen;
-#else
 	*pcbAtrLen = (readerStates[i])->cardAtrLength;
-#endif
 
 	*pdwState = (readerStates[i])->readerState;
 	*pdwProtocol = (readerStates[i])->cardProtocol;
@@ -1004,13 +993,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 		if (*pcbAtrLen > dwAtrLen)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
-#ifdef ATR_CHANGE_AT_RECONNECT
-		memcpy(pbAtr, scStatusStruct.pbAtr,
-			min(*pcbAtrLen, dwAtrLen));
-#else
 		memcpy(pbAtr, (readerStates[i])->cardAtr,
 			min(*pcbAtrLen, dwAtrLen));
-#endif
 	}
 	
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
