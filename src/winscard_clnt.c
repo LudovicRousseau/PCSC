@@ -183,7 +183,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		mapAddr = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDONLY, 0);
 		if (mapAddr < 0)
 		{
-			DebugLogA("ERROR: Cannot open public shared file");
+			DebugLogB("ERROR: Cannot open public shared file: %s",
+				PCSCLITE_PUBSHM_FILE);
 			return SCARD_F_INTERNAL_ERROR;
 		}
 
