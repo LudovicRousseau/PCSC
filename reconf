@@ -2,7 +2,7 @@
 
 # $Id$
 
-# restat from a clean base
+# restart from a clean base
 if test -f Makefile
 then
   make distclean
