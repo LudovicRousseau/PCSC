@@ -379,7 +379,7 @@ MSCLong32 TPLoadToken(MSCLPTokenConnection pConnection)
 	if (rv != 0)
 	{
 		DebugLogA("Error: Matching Token ATR Not Found.");
-		DebugXxd("ATR  : ", pConnection->tokenInfo.tokenId,
+		DebugXxd("ATR: ", pConnection->tokenInfo.tokenId,
 			pConnection->tokenInfo.tokenIdLength);
 
 		return SCARD_E_CARD_UNSUPPORTED;
