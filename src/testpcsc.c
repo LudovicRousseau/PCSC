@@ -199,6 +199,17 @@ int main(int argc, char **argv)
 #endif
 	printf("%s\n", pcsc_stringify_error(rv));
 
+	printf("Testing SCardGetAttrib           : ");
+	dwAtrLen = sizeof(pbAtr);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+	printf("%s\n", pcsc_stringify_error(rv));
+	if (rv == SCARD_S_SUCCESS)
+	{
+		for (i = 0; i < dwAtrLen; i++)
+			printf("%02X ", pbAtr[i]);
+		printf("\n");
+	}
+
 	printf("Testing SCardStatus              : ");
 
 	dwReaderLen = 50;
