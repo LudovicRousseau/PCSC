@@ -448,11 +448,12 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 
 LONG MSGCleanupClient(DWORD dwContextIndex)
 {
-	if (psContext[dwContextIndex].hContext == 0)
-		return 0;
+	if (psContext[dwContextIndex].hContext != 0)
+	{
+		SCardReleaseContext(psContext[dwContextIndex].hContext);	
+		MSGRemoveContext(psContext[dwContextIndex].hContext, dwContextIndex);
+	}
 
-	SCardReleaseContext(psContext[dwContextIndex].hContext);	
-	MSGRemoveContext(psContext[dwContextIndex].hContext, dwContextIndex);
 	psContext[dwContextIndex].dwClientID = 0;
 	psContext[dwContextIndex].protocol_major = 0;
 	psContext[dwContextIndex].protocol_minor = 0;
