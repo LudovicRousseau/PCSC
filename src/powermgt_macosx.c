@@ -38,6 +38,7 @@
 #include "debuglog.h"
 #include "readerfactory.h"
 #include "thread_generic.h"
+#include "hotplug.h"
 
 static io_connect_t		root_port;
 static IONotificationPortRef	notify;
