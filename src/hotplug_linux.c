@@ -105,12 +105,12 @@ LONG HPReadBundleValues()
 	char keyValue[200];
 	int listCount = 0;
 
-	hpDir = 0;
+	hpDir = NULL;
 	rv = 0;
 
 	hpDir = opendir(PCSCLITE_HP_DROPDIR);
 
-	if (hpDir == 0)
+	if (hpDir == NULL)
 	{
 		DebugLogA("Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
 		DebugLogA("Disabling USB support for pcscd.");
@@ -174,13 +174,13 @@ LONG HPReadBundleValues()
 		DebugLogA("Disabling USB support for pcscd");
 	}
 
+	closedir(hpDir);
 	return 0;
 }
 
 void HPEstablishUSBNotifications()
 {
 
-	LONG rv;
 	int i, j, usbDeviceStatus;
 	DIR *dir, *dirB;
 	struct dirent *entry, *entryB;
@@ -191,12 +191,11 @@ void HPEstablishUSBNotifications()
 	int fd, ret;
 	struct usb_device_descriptor usbDescriptor;
 
-	rv = 0; i = 0; j = 0; fd = 0; ret = 0; usbDeviceStatus = 0; 
-	j = 0; dir = 0; dirB = 0; entry = 0; entryB = 0; suspectDeviceNumber = 0;
+	usbDeviceStatus = 0; 
+	suspectDeviceNumber = 0;
 
 	while (1)
 	{
-
 		for (i = 0; i < bundleSize; i++)
 		{
 			usbDeviceStatus     = 0;
@@ -207,15 +206,15 @@ void HPEstablishUSBNotifications()
 			        bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
 			}			 
 
-			dir = 0;
+			dir = NULL;
 			dir = opendir(PCSCLITE_USB_PATH);
-			if (dir == 0)
+			if (dir == NULL)
 			{
-				DebugLogA("Cannot open USB path directory");
+				DebugLogA("Cannot open USB path directory: " PCSCLITE_USB_PATH);
 				return;
 			}
 
-			entry = 0;
+			entry = NULL;
 			while ((entry = readdir(dir)) != 0)
 			{
 
@@ -230,13 +229,11 @@ void HPEstablishUSBNotifications()
 					continue;
 				}
 
-				sprintf(dirpath, "%s/%s", PCSCLITE_USB_PATH,
-					entry->d_name);
+				sprintf(dirpath, "%s/%s", PCSCLITE_USB_PATH, entry->d_name);
 
-				dirB = 0;
 				dirB = opendir(dirpath);
 
-				if (!dirB)
+				if (dirB == NULL)
 				{
 					DebugLogB("USB path seems to have disappeared %s",
 						dirpath);
@@ -244,10 +241,8 @@ void HPEstablishUSBNotifications()
 					return;
 				}
 
-				entryB = 0;
-				while ((entryB = readdir(dirB)) != 0)
+				while ((entryB = readdir(dirB)) != NULL)
 				{
-
 					/*
 					 * Skip anything starting with a . 
 					 */
@@ -261,20 +256,15 @@ void HPEstablishUSBNotifications()
 
 					fd = open(filename, O_RDONLY);
 					if (fd < 0)
-					{
 						continue;
-					}
 
-					ret =
-						read(fd, (void *) &usbDescriptor,
+					ret = read(fd, (void *) &usbDescriptor,
 						sizeof(usbDescriptor));
 
 					close(fd);
 
 					if (ret < 0)
-					{
 						continue;
-					}
 
 					/*
 					 * Device is found and we don't know about it 
@@ -282,9 +272,9 @@ void HPEstablishUSBNotifications()
 					  
 					if (usbDescriptor.idVendor == bundleTracker[i].manuID &&
 					    usbDescriptor.idProduct == bundleTracker[i].productID &&
-					    usbDescriptor.idVendor !=0 && usbDescriptor.idProduct != 0)
+					    usbDescriptor.idVendor !=0 &&
+						usbDescriptor.idProduct != 0)
 					{
-
 					  for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
 					    {
 					      if (bundleTracker[i].deviceNumber[j].id == deviceNumber &&
@@ -345,8 +335,6 @@ void HPEstablishUSBNotifications()
 
 					}
 			        }
-
-
 			} else
 			{
 				/*
@@ -355,9 +343,7 @@ void HPEstablishUSBNotifications()
 			}
 
 			if (dir)
-			{
 				closedir(dir);
-			}
 
 		}	/* End of for..loop */
 
@@ -369,11 +355,7 @@ void HPEstablishUSBNotifications()
 
 LONG HPSearchHotPluggables()
 {
-
-	LONG rv;
 	int i, j;
-
-	rv = 0; i = 0; j = 0;
 
 	for (i = 0; i < PCSCLITE_HP_MAX_DRIVERS; i++)
 	{
@@ -387,9 +369,9 @@ LONG HPSearchHotPluggables()
 
 	}
 
-	rv = HPReadBundleValues();
+	HPReadBundleValues();
 
-	rv = SYS_ThreadCreate(&usbNotifyThread, NULL,
+	SYS_ThreadCreate(&usbNotifyThread, NULL,
 		(LPVOID) HPEstablishUSBNotifications, 0);
 
 	return 0;
