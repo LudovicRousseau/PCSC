@@ -301,11 +301,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				/*
 				 * No more spots left return 
 				 */
-				(sContexts[dwContext])->mMutex = 0;
-				(sContexts[dwContext])->vHandle = 0;
-				(sContexts[dwContext])->dwPublicID = 0;
-				(sContexts[dwContext])->dwIdentity = 0;
-
+				rv = RFRemoveReader(lpcReader, dwPort);
 				return SCARD_E_NO_MEMORY;
 			}
 
