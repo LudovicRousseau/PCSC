@@ -118,7 +118,7 @@ extern "C"
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(DWORD);
-	LONG RFAddReader(LPSTR, DWORD, LPSTR);
+	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
 	LONG RFRemoveReader(LPSTR, DWORD);
 	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
 	LONG RFListReaders(LPSTR, LPDWORD);
