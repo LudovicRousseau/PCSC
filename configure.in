@@ -88,7 +88,7 @@ CFLAGS="$CFLAGS -Wall -fno-common $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
 
 AC_CHECK_FUNCS(daemon)
-
+AC_CHECK_FUNCS(getopt_long)
 
 dnl Add libtool support.
 AM_PROG_LIBTOOL
