@@ -39,6 +39,8 @@ static char LogCategory = DEBUG_CATEGORY_NOTHING;
 /* default level is a bit verbose to be backward compatible */
 static char LogLevel = PCSC_LOG_INFO;
 
+static char LogDoColor = -1;	/* not initialised */
+
 void log_msg(const int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
@@ -48,6 +50,40 @@ void log_msg(const int priority, const char *fmt, ...)
 		|| (priority < LogLevel) /* log priority lower than threshold? */
 		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
+
+	/* color not yet initialised? */
+	if (-1 == LogDoColor)
+	{
+		LogDoColor = 0;	/* no color by default */
+
+		/* no color under Windows */
+#ifndef WIN32
+
+		/* log to stderr and stderr is a tty? */
+		if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
+		{
+			const char *terms[] = { "linux", "xterm", "Eterm", "rxvt" };
+			char *term;
+
+			term = getenv("TERM");
+			if (term)
+			{
+				int i;
+
+				/* for each known color terminal */
+				for (i = 0; i < sizeof(terms) / sizeof(terms[0]); i++)
+				{
+					/* we found a supported term? */
+					if (0 == strcmp(terms[i], term))
+					{
+						LogDoColor = 1;
+						break;
+					}
+				}
+			}
+		}
+#endif
+	}
 
 	va_start(argptr, fmt);
 #ifndef WIN32
@@ -65,8 +101,38 @@ void log_msg(const int priority, const char *fmt, ...)
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
+	{
+		if (LogDoColor)
+		{
+			const char *color_pfx = "", *color_sfx = "\33[0m";
+
+			switch (priority)
+			{
+				case PCSC_LOG_CRITICAL:
+					color_pfx = "\33[01;31m"; /* bright + Red */
+					break;
+
+				case PCSC_LOG_ERROR:
+					color_pfx = "\33[35m"; /* Magenta */
+					break;
+
+				case PCSC_LOG_INFO:
+					color_pfx = "\33[34m"; /* Blue */
+					break;
+
+				case PCSC_LOG_DEBUG:
+					color_pfx = ""; /* normal (black) */
+					color_sfx = "";
+					break;
+			}
+			fprintf(stderr, "%s%s%s\n", color_pfx, DebugBuffer, color_sfx);
+		}
+		else
+			fprintf(stderr, "%s\n", DebugBuffer);
+	}
+#else
+	fprintf(stderr, "%s\n", DebugBuffer);
 #endif
-		fprintf(stderr, "%s\n", DebugBuffer);
 } /* log_msg */
 
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
