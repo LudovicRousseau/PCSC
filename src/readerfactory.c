@@ -789,13 +789,16 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	DebugLogSuppress(DEBUGLOG_IGNORE_ENTRIES);
 
 	rv1 = DYN_GetAddress(rContext->vHandle,
-		&rContext->psFunctions.pvfCreateChannel, "IO_Create_Channel");
+		(void **)&rContext->psFunctions.psFunctions_v1.pvfCreateChannel,
+		"IO_Create_Channel");
 
 	rv2 = DYN_GetAddress(rContext->vHandle,
-		&rContext->psFunctions.pvfCreateChannel, "IFDHCreateChannel");
+		(void **)&rContext->psFunctions.psFunctions_v2.pvfCreateChannel,
+		"IFDHCreateChannel");
 
 	rv3 = DYN_GetAddress(rContext->vHandle,
-		&rContext->psFunctions.pvfCreateChannelByName, "IFDHCreateChannelByName");
+		(void **)&rContext->psFunctions.psFunctions_v3.pvfCreateChannelByName,
+		"IFDHCreateChannelByName");
 
 	DebugLogSuppress(DEBUGLOG_LOG_ENTRIES);
 
@@ -804,8 +807,6 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/*
 		 * Neither version of the IFD Handler was found - exit 
 		 */
-		rContext->psFunctions.pvfCreateChannel = NULL;
-
 		DebugLogA("IFDHandler functions missing");
 
 		exit(1);
@@ -815,11 +816,6 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		 * Ifd Handler 1.0 found 
 		 */
 		rContext->dwVersion = IFD_HVERSION_1_0;
-		/*
-		 * Re bind the function since it was lost in the second 
-		 */
-		DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfCreateChannel, "IO_Create_Channel");
 	} else if (rv3 == SCARD_S_SUCCESS)
 	{
 		/*
@@ -845,9 +841,9 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &rContext->psFunctions.pvf ## field, "IFD_" #function)) \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v1.pvf ## field, "IFD_" #function)) \
 	{ \
-		rContext->psFunctions.pvf ## field = NULL; \
+		rContext->psFunctions.psFunctions_v1.pvf ## field = NULL; \
 		code \
 	} \
 }
@@ -857,10 +853,15 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		DebugLogA("IFDHandler functions missing: " #function ); \
 		exit(1); )
 
+		DYN_GetAddress(rContext->vHandle,
+			(void **)&rContext->psFunctions.psFunctions_v1.pvfCreateChannel,
+			"IO_Create_Channel");
+
 		if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle,
-			&rContext->psFunctions.pvfCloseChannel, "IO_Close_Channel"))
+			(void **)&rContext->psFunctions.psFunctions_v1.pvfCloseChannel,
+			"IO_Close_Channel"))
 		{
-			rContext->psFunctions.pvfCloseChannel = NULL;
+			rContext->psFunctions.psFunctions_v1.pvfCloseChannel = NULL;
 			DebugLogA("IFDHandler functions missing");
 			exit(1);
 		}
@@ -877,17 +878,49 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		GET_ADDRESS_OPTIONALv1(SetProtocolParameters, Set_Protocol_Parameters, )
 		GET_ADDRESS_OPTIONALv1(ICCAbsent, Is_ICC_Absent, )
 	}
-	else if ((rContext->dwVersion == IFD_HVERSION_2_0) || (rContext->dwVersion == IFD_HVERSION_3_0))
+	else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
 		/*
-		 * The following binds version 2.0/3.0 of the IFD Handler specs 
+		 * The following binds version 2.0 of the IFD Handler specs 
+		 */
+
+#define GET_ADDRESS_OPTIONALv2(s, code) \
+{ \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v2.pvf ## s, "IFDH" #s)) \
+	{ \
+		rContext->psFunctions.psFunctions_v2.pvf ## s = NULL; \
+		code \
+	} \
+}
+
+#define GET_ADDRESSv2(s) \
+	GET_ADDRESS_OPTIONALv2(s, \
+		DebugLogA("IFDHandler functions missing: " #s ); \
+		exit(1); )
+
+		DebugLogA("Loading IFD Handler 2.0");
+
+		GET_ADDRESSv2(CloseChannel)
+		GET_ADDRESSv2(GetCapabilities)
+		GET_ADDRESSv2(SetCapabilities)
+		GET_ADDRESSv2(PowerICC)
+		GET_ADDRESSv2(TransmitToICC)
+		GET_ADDRESSv2(ICCPresence)
+		GET_ADDRESS_OPTIONALv2(SetProtocolParameters, )
+
+		GET_ADDRESSv2(Control)
+	}
+	else if (rContext->dwVersion == IFD_HVERSION_3_0)
+	{
+		/*
+		 * The following binds version 3.0 of the IFD Handler specs 
 		 */
 
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &rContext->psFunctions.pvf ## s, "IFDH" #s)) \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v3.pvf ## s, "IFDH" #s)) \
 	{ \
-		rContext->psFunctions.pvf ## s = NULL; \
+		rContext->psFunctions.psFunctions_v3.pvf ## s = NULL; \
 		code \
 	} \
 }
@@ -897,20 +930,17 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		DebugLogA("IFDHandler functions missing: " #s ); \
 		exit(1); )
 
-		if (rContext->dwVersion == IFD_HVERSION_2_0)
-			DebugLogA("Loading IFD Handler 2.0");
-		else
-			DebugLogA("Loading IFD Handler 3.0");
+		DebugLogA("Loading IFD Handler 3.0");
 
-		GET_ADDRESSv3(CloseChannel)
-		GET_ADDRESSv3(GetCapabilities)
-		GET_ADDRESSv3(SetCapabilities)
-		GET_ADDRESSv3(PowerICC)
-		GET_ADDRESSv3(TransmitToICC)
+		GET_ADDRESSv2(CloseChannel)
+		GET_ADDRESSv2(GetCapabilities)
+		GET_ADDRESSv2(SetCapabilities)
+		GET_ADDRESSv2(PowerICC)
+		GET_ADDRESSv2(TransmitToICC)
+		GET_ADDRESSv2(ICCPresence)
+		GET_ADDRESS_OPTIONALv2(SetProtocolParameters, )
+
 		GET_ADDRESSv3(Control)
-		GET_ADDRESSv3(ICCPresence)
-
-		GET_ADDRESS_OPTIONALv3(SetProtocolParameters, )
 	}
 	else
 	{
@@ -930,19 +960,7 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 	 * Zero out everything 
 	 */
 
-	rContext->psFunctions.pvfCreateChannel = NULL;
-	rContext->psFunctions.pvfCreateChannelByName = NULL;
-	rContext->psFunctions.pvfCloseChannel = NULL;
-	rContext->psFunctions.pvfGetCapabilities = NULL;
-	rContext->psFunctions.pvfSetCapabilities = NULL;
-	rContext->psFunctions.pvfSetProtocolParameters = NULL;
-	rContext->psFunctions.pvfPowerICC = NULL;
-	rContext->psFunctions.pvfSwallowICC = NULL;
-	rContext->psFunctions.pvfEjectICC = NULL;
-	rContext->psFunctions.pvfConfiscateICC = NULL;
-	rContext->psFunctions.pvfTransmitToICC = NULL;
-	rContext->psFunctions.pvfICCPresence = NULL;
-	rContext->psFunctions.pvfICCAbsent = NULL;
+	memset(&rContext->psFunctions, 0, sizeof(rContext->psFunctions));
 
 	return SCARD_S_SUCCESS;
 }

@@ -35,31 +35,27 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFD_set_protocol_parameters) (DWORD, UCHAR, UCHAR,
 		UCHAR, UCHAR) = NULL;
 	RESPONSECODE(*IFDH_set_protocol_parameters) (DWORD, DWORD, UCHAR,
 		UCHAR, UCHAR, UCHAR) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfSetProtocolParameters;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, 
-							       UCHAR, UCHAR, 
-							       UCHAR)) 
-		  vFunction;
-	} else
+		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, UCHAR,
+			UCHAR, UCHAR)) rContext->psFunctions.psFunctions_v1.pvfSetProtocolParameters;
+
+		if (NULL == IFD_set_protocol_parameters)
+			return SCARD_E_UNSUPPORTED_FEATURE;
+	}
+	else
 	{
-		IFDH_set_protocol_parameters =
-			(RESPONSECODE(*)(DWORD, DWORD, UCHAR, UCHAR, UCHAR,
-				UCHAR)) vFunction;
+		IFDH_set_protocol_parameters = (RESPONSECODE(*)(DWORD, DWORD, UCHAR,
+			UCHAR, UCHAR, UCHAR))
+			rContext->psFunctions.psFunctions_v2.pvfSetProtocolParameters;
+
+		if (NULL == IFDH_set_protocol_parameters)
+			return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 #endif
 
@@ -118,33 +114,24 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
-	LPVOID vFunction1;
 	RESPONSECODE(*IO_create_channel) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPTSTR) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfCreateChannel;
-	vFunction1 = rContext->psFunctions.pvfCreateChannelByName;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
-		IO_create_channel = (RESPONSECODE(*)(DWORD)) vFunction;
-	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
-	{
-		IFDH_create_channel = (RESPONSECODE(*)(DWORD, DWORD)) vFunction;
-	}
+		IO_create_channel =
+			rContext->psFunctions.psFunctions_v1.pvfCreateChannel;
 	else
-	{
-		IFDH_create_channel = (RESPONSECODE(*)(DWORD, DWORD)) vFunction;
-		IFDH_create_channel_by_name = (RESPONSECODE(*)(DWORD, LPTSTR)) vFunction1;
-	}
+		if (rContext->dwVersion == IFD_HVERSION_2_0)
+			IFDH_create_channel =
+				rContext->psFunctions.psFunctions_v2.pvfCreateChannel;
+		else
+		{
+			IFDH_create_channel =
+				rContext->psFunctions.psFunctions_v3.pvfCreateChannel;
+			IFDH_create_channel_by_name =
+				rContext->psFunctions.psFunctions_v3.pvfCreateChannelByName;
+		}
 #endif
 
 	/*
@@ -161,11 +148,13 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	} else
 	{
+	DebugLogA("POUET");
 		/* use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
 			rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
 		else
 			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
+	DebugLogA("POUET");
 	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -202,22 +191,13 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IO_close_channel) () = NULL;
 	RESPONSECODE(*IFDH_close_channel) (DWORD) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfCloseChannel;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IO_close_channel = (RESPONSECODE(*)())vFunction;
+		IO_close_channel = rContext->psFunctions.psFunctions_v1.pvfCloseChannel;
 	else
-		IFDH_close_channel = (RESPONSECODE(*)(DWORD)) vFunction;
+		IFDH_close_channel = rContext->psFunctions.psFunctions_v2.pvfCloseChannel;
 #endif
 
 	/*
@@ -257,23 +237,13 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	LONG rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFD_set_capabilities) (DWORD, PUCHAR) = NULL;
 	RESPONSECODE(*IFDH_set_capabilities) (DWORD, DWORD, DWORD, PUCHAR) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfSetCapabilities;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFD_set_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) vFunction;
+		IFD_set_capabilities = rContext->psFunctions.psFunctions_v1.pvfSetCapabilities;
 	else
-		IFDH_set_capabilities = (RESPONSECODE(*)(DWORD, DWORD, DWORD,
-			PUCHAR)) vFunction;
+		IFDH_set_capabilities = rContext->psFunctions.psFunctions_v2.pvfSetCapabilities;
 #endif
 
 	/*
@@ -310,24 +280,15 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	LONG rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
 	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, PUCHAR) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfGetCapabilities;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
-			vFunction;
+		IFD_get_capabilities =
+			rContext->psFunctions.psFunctions_v1.pvfGetCapabilities;
 	else
-		IFDH_get_capabilities = (RESPONSECODE(*)(DWORD, DWORD, PDWORD,
-			PUCHAR)) vFunction;
+		IFDH_get_capabilities =
+			rContext->psFunctions.psFunctions_v2.pvfGetCapabilities;
 #endif
 
 	/*
@@ -373,7 +334,6 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFD_power_icc) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_power_icc) (DWORD, DWORD, PUCHAR, PDWORD) = NULL;
 #endif
@@ -393,19 +353,10 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	if (dwStatus & SCARD_ABSENT)
 		return SCARD_W_REMOVED_CARD;
 #ifndef PCSCLITE_STATIC_DRIVER
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfPowerICC;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFD_power_icc = (RESPONSECODE(*)(DWORD)) vFunction;
+		IFD_power_icc = rContext->psFunctions.psFunctions_v1.pvfPowerICC;
 	else
-		IFDH_power_icc = (RESPONSECODE(*)(DWORD, DWORD, PUCHAR,
-			PDWORD)) vFunction;
+		IFDH_power_icc = rContext->psFunctions.psFunctions_v2.pvfPowerICC;
 #endif
 
 	/*
@@ -475,31 +426,19 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunctionA, vFunctionB;
 	RESPONSECODE(*IFD_is_icc_present) () = NULL;
 	RESPONSECODE(*IFDH_icc_presence) (DWORD) = NULL;
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
 
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunctionA = rContext->psFunctions.pvfICCPresence;
-	vFunctionB = rContext->psFunctions.pvfGetCapabilities;
-
-	if (vFunctionA == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
-	if ((vFunctionB == NULL) && (rContext->dwVersion == IFD_HVERSION_1_0))
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		IFD_is_icc_present = (RESPONSECODE(*)())vFunctionA;
-		IFD_get_capabilities = (RESPONSECODE(*)(DWORD, PUCHAR)) 
-		  vFunctionB;
+		IFD_is_icc_present =
+			rContext->psFunctions.psFunctions_v1.pvfICCPresence;
+		IFD_get_capabilities =
+			rContext->psFunctions.psFunctions_v1.pvfGetCapabilities;
 	}
 	else
-		IFDH_icc_presence = (RESPONSECODE(*)(DWORD)) vFunctionA;
+		IFDH_icc_presence = rContext->psFunctions.psFunctions_v2.pvfICCPresence;
 #endif
 
 	/*
@@ -621,24 +560,15 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 #endif
 
+	DebugLogA("POUET");
 	if (rContext->dwVersion != IFD_HVERSION_2_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfControl;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
-	IFDH_control_v2 = (RESPONSECODE(*)(DWORD, PUCHAR, DWORD,
-			PUCHAR, PDWORD)) vFunction;
+	IFDH_control_v2 = rContext->psFunctions.psFunctions_v2.pvfControl;
 #endif
 
 	/*
@@ -681,24 +611,15 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	RESPONSECODE rv = 0;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD, LPDWORD);
 #endif
 
+	DebugLogA("POUET");
 	if (rContext->dwVersion < IFD_HVERSION_3_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfControl;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
-	IFDH_control = (RESPONSECODE(*)(DWORD, DWORD, LPCVOID, DWORD,
-			LPVOID, DWORD, LPDWORD)) vFunction;
+	IFDH_control = rContext->psFunctions.psFunctions_v3.pvfControl;
 #endif
 
 	/*
@@ -739,9 +660,8 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	LPVOID vFunction;
 	RESPONSECODE(*IFD_transmit_to_icc) (SCARD_IO_HEADER, PUCHAR, DWORD,
-		PUCHAR, DWORD *, PSCARD_IO_HEADER) = NULL;
+		PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 	RESPONSECODE(*IFDH_transmit_to_icc) (DWORD, SCARD_IO_HEADER, PUCHAR,
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 #endif
@@ -750,23 +670,12 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	DebugLogCategory(DEBUG_CATEGORY_APDU, pucTxBuffer, dwTxLength);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	/*
-	 * Make sure the symbol exists in the driver 
-	 */
-	vFunction = rContext->psFunctions.pvfTransmitToICC;
-
-	if (vFunction == NULL)
-		return SCARD_E_UNSUPPORTED_FEATURE;
-
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFD_transmit_to_icc = (RESPONSECODE(*)(SCARD_IO_HEADER, PUCHAR,
-						       DWORD, PUCHAR, DWORD *,
-						       PSCARD_IO_HEADER)) vFunction;
+		IFD_transmit_to_icc =
+			rContext->psFunctions.psFunctions_v1.pvfTransmitToICC;
 	else
 		IFDH_transmit_to_icc =
-			(RESPONSECODE(*)(DWORD, SCARD_IO_HEADER, PUCHAR, 
-					 DWORD, PUCHAR, DWORD *, 
-					 PSCARD_IO_HEADER)) vFunction;
+			rContext->psFunctions.psFunctions_v2.pvfTransmitToICC;
 #endif
 
 	/*
