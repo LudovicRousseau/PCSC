@@ -27,5 +27,7 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 ChangeLog.cvs:
-	rcs2log > ChangeLog
+	rcs2log > $@
+
+.PHONY: ChangeLog.cvs
 
