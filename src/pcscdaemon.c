@@ -36,8 +36,13 @@
 #include "configfile.h"
 #include "powermgt_generic.h"
 
-static char AraKiri = 0;
-static char Init = 1;
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
+static char AraKiri = FALSE;
+static char Init = TRUE;
 
 /*
  * Some internal functions 
@@ -108,7 +113,7 @@ void SVCServiceRunLoop()
 	 */
 	PMRegisterForPowerEvents();
 
-	while (1)
+	while (TRUE)
 	{
 
 		switch (rsp = SHMProcessEvents(&msgStruct, 0))
@@ -195,7 +200,7 @@ int main(int argc, char **argv)
 	
 	rv = 0;
 	newReaderConfig = 0;
-	setToForeground = 0;
+	setToForeground = FALSE;
 
 	/*
 	 * test the version 
@@ -207,13 +212,14 @@ int main(int argc, char **argv)
 			PCSCLITE_VERSION_NUMBER);
 		printf("  generated in config.h (%s) (see configure.in).\n", VERSION);
 
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	/*
-	 * log to stderr by default
+	 * By default we create a daemon (not connected to any output)
+	 * so log to syslog to have error messages.
 	 */
-	DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
 
 	/*
 	 * Handle any command line arguments 
@@ -230,38 +236,48 @@ int main(int argc, char **argv)
 				break;
 
 			case 'f':
-				DebugLogA("main: pcscd set to foreground");
-				setToForeground = 1;
+				setToForeground = TRUE;
+				/* debug to stderr instead of default syslog */
+				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+				DebugLogA("pcscd set to foreground with debug send to stderr");
 				break;
 
 			case 'd':
-				if (strncmp(optarg, "syslog", PCSCLITE_MAX_COMSIZE) == 0) 
+				if (strcmp(optarg, "syslog") == 0) 
 					DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
-				else if (strncmp(optarg, "stderr", PCSCLITE_MAX_COMSIZE) == 0) {
-					DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
-					DebugLogA("main: debug messages to stderr");
-					setToForeground = 1;
-				} 
-				else if (strncmp(optarg, "stdout", PCSCLITE_MAX_COMSIZE) == 0) {
-					DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
-					DebugLogA("main: debug messages to stdout");
-					setToForeground = 1;
-				}
 				else
 				{
-					DebugLogB("unknown debug argument: %s", optarg);
-					print_usage (argv[0]);
-					return 1;
+					if (strcmp(optarg, "stderr") == 0)
+					{
+						DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+						DebugLogA("debug messages send to stderr");
+						setToForeground = TRUE;
+					} 
+					else
+					{
+						if (strcmp(optarg, "stdout") == 0)
+						{
+							DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
+							DebugLogA("debug messages send to stdout");
+							setToForeground = TRUE;
+						}
+						else
+						{
+							printf("unknown --debug argument: %s\n", optarg);
+							print_usage (argv[0]);
+							return EXIT_FAILURE;
+						}
+					}
 				}
 				break;
 
 			case 'h':
 				print_usage (argv[0]);
-				return 0;
+				return EXIT_SUCCESS;
 
 			case 'v':
 				print_version ();
-				return 0;
+				return EXIT_SUCCESS;
 
 			case 'a':
 				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
@@ -269,7 +285,7 @@ int main(int argc, char **argv)
 
 			default:
 				print_usage (argv[0]);
-				return 1;
+				return EXIT_FAILURE;
 		}
 
 	}
@@ -306,7 +322,7 @@ int main(int argc, char **argv)
 			{
 				DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
 				DebugLogB("Another pcscd (pid: %d) seems to be running.", pid);
-				return 1;
+				return EXIT_FAILURE;
 			}
 			else
 				/* the old pcscd is dead. make some cleanup */
@@ -319,22 +335,21 @@ int main(int argc, char **argv)
 			DebugLogA("I can't read process pid from " USE_RUN_PID);
 			DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 			DebugLogA("if pcscd is not running to clear this message.");
-			return 1;
+			return EXIT_FAILURE;
 		}
 #else
 		DebugLogA("main: file " PCSCLITE_PUBSHM_FILE " already exists.");
 		DebugLogA("Maybe another pcscd is running?");
 		DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 		DebugLogA("if pcscd is not running to clear this message.");
-		return 1;
+		return EXIT_FAILURE;
 #endif
 	}
 
 	/*
 	 * If this is set to one the user has asked it not to fork 
 	 */
-
-	if (setToForeground == 0)
+	if (!setToForeground)
 	{
 		if (SYS_Daemon(0, 0))
 			DebugLogB("main: SYS_Daemon() failed: %s", strerror(errno));
@@ -375,7 +390,7 @@ int main(int argc, char **argv)
 		{
 			DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s",
 				strerror(errno));
-			return 1;
+			return EXIT_FAILURE;
 		}
 	}
 
@@ -398,9 +413,9 @@ int main(int argc, char **argv)
 		{
 			DebugLogB("main: invalid file %s", newReaderConfig);
 			at_exit();
-			return 1;
 		}
-	} else
+	}
+	else
 	{
 		rv = DBUpdateReaders(PCSCLITE_READER_CONFIG);
 
@@ -410,11 +425,9 @@ int main(int argc, char **argv)
 			/*
 			 * Token error in file 
 			 */
-		} else if (rv == -1)
-		{
-			at_exit();
-			return 1;
 		}
+		else if (rv == -1)
+			at_exit();
 	}
 
 	/*
@@ -429,7 +442,7 @@ int main(int argc, char **argv)
 	/*
 	 * post initialistion 
 	 */
-	Init = 0;
+	Init = FALSE;
 
 	/*
 	 * signal_trap() does just set a global variable used by the main loop 
@@ -442,7 +455,7 @@ int main(int argc, char **argv)
 	SVCServiceRunLoop();
 
 	DebugLogA("pcscdaemon.c: main: SVCServiceRunLoop returned");
-	return 1;
+	return EXIT_FAILURE;
 }
 
 void at_exit(void)
@@ -451,7 +464,7 @@ void at_exit(void)
 
 	clean_temp_files();
 
-	SYS_Exit(1);
+	SYS_Exit(EXIT_SUCCESS);
 }
 
 void clean_temp_files(void)
@@ -479,10 +492,10 @@ void clean_temp_files(void)
 void signal_trap(int sig)
 {
 	/* the signal handler is called several times for the same Ctrl-C */
-	if (AraKiri == 0)
+	if (AraKiri == FALSE)
 	{
 		DebugLogA("Preparing for suicide");
-		AraKiri = 1;
+		AraKiri = TRUE;
 
 		/* if still in the init/loading phase the AraKiri will not be
 		 * seen by the main event loop
@@ -527,3 +540,4 @@ void print_usage (char const * const progname)
 	printf("  -v 	display the program version number\n");
 #endif
 }
+
