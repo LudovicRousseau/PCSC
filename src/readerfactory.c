@@ -164,7 +164,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		  (sReadersContexts[parentNode])->mMutex;
 		(sReadersContexts[dwContext])->dwMutex = 
 		  (sReadersContexts[parentNode])->dwMutex;
-		
+
 		/*
 		 * Call on the driver to see if it is thread safe 
 		 */
@@ -275,166 +275,161 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		 * reader so we can just return SCARD_S_SUCCESS. 
 		 */
 		return SCARD_S_SUCCESS;
-	
+
 	if (rv == IFD_SUCCESS && dwGetSize == 1 && ucGetData[0] == 1)
 		/*
 		 * Reader has this defined and it only has one slot 
 		 */
 		return SCARD_S_SUCCESS;
 
+	/*
+	 * Check the number of slots and create a different 
+	 * structure for each one accordingly 
+	 */
+
+	/*
+	 * Initialize the rest of the slots 
+	 */
+
+	for (j = 1; j < ucGetData[0]; j++)
 	{
-		/*
-		 * Check the number of slots and create a different 
-		 * structure for each one accordingly 
-		 */
 
 		/*
-		 * Initialize the rest of the slots 
+		 * We must find an empty spot to put the 
+		 * reader structure 
 		 */
-
-		for (j = 1; j < ucGetData[0]; j++)
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-
-			/*
-			 * We must find an empty spot to put the 
-			 * reader structure 
-			 */
-			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+			if ((sReadersContexts[i])->vHandle == 0)
 			{
-				if ((sReadersContexts[i])->vHandle == 0)
-				{
-					dwContextB = i;
-					break;
-				}
+				dwContextB = i;
+				break;
 			}
-
-			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-			{
-				/*
-				 * No more spots left return 
-				 */
-				rv = RFRemoveReader(lpcReader, dwPort);
-				return SCARD_E_NO_MEMORY;
-			}
-
-			/*
-			 * Check and set the readername to see if it must be
-			 * enumerated 
-			 */
-			rv = RFSetReaderName(sReadersContexts[dwContextB], lpcReader,
-				lpcLibrary, dwPort, j);
-
-			strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
-			strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
-			(sReadersContexts[dwContextB])->dwVersion =
-			  (sReadersContexts[dwContext])->dwVersion;
-			(sReadersContexts[dwContextB])->dwPort =
-			  (sReadersContexts[dwContext])->dwPort;
-			(sReadersContexts[dwContextB])->vHandle =
-			  (sReadersContexts[dwContext])->vHandle;
-			(sReadersContexts[dwContextB])->mMutex =
-			   (sReadersContexts[dwContext])->mMutex;
-			(sReadersContexts[dwContextB])->dwMutex =
-			   (sReadersContexts[dwContext])->dwMutex;
-
-			/* 
-			 * Added by Dave - slots did not have a dwFeeds
-			 * parameter so it was by luck they were working
-			 */
-
-			(sReadersContexts[dwContextB])->dwFeeds =
-			  (sReadersContexts[dwContext])->dwFeeds;
-
-			/* Added by Dave for multiple slots */
-			*(sReadersContexts[dwContextB])->dwFeeds += 1;
-
-			(sReadersContexts[dwContextB])->dwStatus = 0;
-			(sReadersContexts[dwContextB])->dwBlockStatus = 0;
-			(sReadersContexts[dwContextB])->dwContexts = 0;
-			(sReadersContexts[dwContextB])->dwLockId = 0;
-			(sReadersContexts[dwContextB])->dwPublicID = 0;
-			(sReadersContexts[dwContextB])->dwIdentity =
-				(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
-
-			for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
-			{
-				(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
-			}
-
-			/*
-			 * Call on the driver to see if the slots are thread safe 
-			 */
-
-			dwGetSize = sizeof(ucThread);
-			rv = IFDGetCapabilities((sReadersContexts[dwContext]),
-		                  TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
-
-			if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
-			{
-				(sReadersContexts[dwContextB])->mMutex =
-					(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
-				SYS_MutexInit((sReadersContexts[dwContextB])->mMutex);
-				
-				(sReadersContexts[dwContextB])->dwMutex = 
-					(DWORD *)malloc(sizeof(DWORD));
-				*(sReadersContexts[dwContextB])->dwMutex = 1;
-			}
-			else
-				*(sReadersContexts[dwContextB])->dwMutex += 1;
-
-			dwNumReadersContexts += 1;
-
-			rv = RFInitializeReader(sReadersContexts[dwContextB]);
-			if (rv != SCARD_S_SUCCESS)
-			{
-				/*
-				 * Cannot connect to slot exit gracefully 
-				 */
-				/*
-				 * Clean up so it is not using needed space 
-				 */
-				DebugLogB("RFAddReader: %s init failed.", lpcReader);
-				
-				(sReadersContexts[dwContextB])->dwVersion = 0;
-				(sReadersContexts[dwContextB])->dwPort = 0;
-				(sReadersContexts[dwContextB])->vHandle = 0;
-				(sReadersContexts[dwContextB])->dwPublicID = 0;
-				(sReadersContexts[dwContextB])->dwIdentity = 0;
-				
-
-				/*
-				 * Destroy and free the mutex 
-				 */
-				if (*(sReadersContexts[dwContextB])->dwMutex == 1)
-				{
-					SYS_MutexDestroy((sReadersContexts[dwContextB])->mMutex);
-					free((sReadersContexts[dwContextB])->mMutex);
-				}
-
-				*(sReadersContexts[dwContextB])->dwMutex -= 1;
-
-				if (*(sReadersContexts[dwContextB])->dwMutex == 0)
-				{
-					free((sReadersContexts[dwContextB])->dwMutex);
-					(sReadersContexts[dwContextB])->dwMutex = 0;
-				}
-
-				*(sReadersContexts[dwContextB])->dwFeeds -= 1;
-
-				if (*(sReadersContexts[dwContextB])->dwFeeds == 0)
-				{
-					free((sReadersContexts[dwContextB])->dwFeeds);
-					(sReadersContexts[dwContextB])->dwFeeds = 0;
-				}
-
-				dwNumReadersContexts -= 1;
-
-				return rv;
-			}
-
-			EHSpawnEventHandler(sReadersContexts[dwContextB]);
 		}
 
+		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		{
+			/*
+			 * No more spots left return 
+			 */
+			rv = RFRemoveReader(lpcReader, dwPort);
+			return SCARD_E_NO_MEMORY;
+		}
+
+		/*
+		 * Check and set the readername to see if it must be
+		 * enumerated 
+		 */
+		rv = RFSetReaderName(sReadersContexts[dwContextB], lpcReader,
+			lpcLibrary, dwPort, j);
+
+		strcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary);
+		strcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice);
+		(sReadersContexts[dwContextB])->dwVersion =
+		  (sReadersContexts[dwContext])->dwVersion;
+		(sReadersContexts[dwContextB])->dwPort =
+		  (sReadersContexts[dwContext])->dwPort;
+		(sReadersContexts[dwContextB])->vHandle =
+		  (sReadersContexts[dwContext])->vHandle;
+		(sReadersContexts[dwContextB])->mMutex =
+		   (sReadersContexts[dwContext])->mMutex;
+		(sReadersContexts[dwContextB])->dwMutex =
+		   (sReadersContexts[dwContext])->dwMutex;
+
+		/* 
+		 * Added by Dave - slots did not have a dwFeeds
+		 * parameter so it was by luck they were working
+		 */
+
+		(sReadersContexts[dwContextB])->dwFeeds =
+		  (sReadersContexts[dwContext])->dwFeeds;
+
+		/* Added by Dave for multiple slots */
+		*(sReadersContexts[dwContextB])->dwFeeds += 1;
+
+		(sReadersContexts[dwContextB])->dwStatus = 0;
+		(sReadersContexts[dwContextB])->dwBlockStatus = 0;
+		(sReadersContexts[dwContextB])->dwContexts = 0;
+		(sReadersContexts[dwContextB])->dwLockId = 0;
+		(sReadersContexts[dwContextB])->dwPublicID = 0;
+		(sReadersContexts[dwContextB])->dwIdentity =
+			(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
+
+		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
+			(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
+
+		/*
+		 * Call on the driver to see if the slots are thread safe 
+		 */
+
+		dwGetSize = sizeof(ucThread);
+		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
+					  TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
+
+		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
+		{
+			(sReadersContexts[dwContextB])->mMutex =
+				(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
+			SYS_MutexInit((sReadersContexts[dwContextB])->mMutex);
+
+			(sReadersContexts[dwContextB])->dwMutex = 
+				(DWORD *)malloc(sizeof(DWORD));
+			*(sReadersContexts[dwContextB])->dwMutex = 1;
+		}
+		else
+			*(sReadersContexts[dwContextB])->dwMutex += 1;
+
+		dwNumReadersContexts += 1;
+
+		rv = RFInitializeReader(sReadersContexts[dwContextB]);
+		if (rv != SCARD_S_SUCCESS)
+		{
+			/*
+			 * Cannot connect to slot exit gracefully 
+			 */
+			/*
+			 * Clean up so it is not using needed space 
+			 */
+			DebugLogB("RFAddReader: %s init failed.", lpcReader);
+
+			(sReadersContexts[dwContextB])->dwVersion = 0;
+			(sReadersContexts[dwContextB])->dwPort = 0;
+			(sReadersContexts[dwContextB])->vHandle = 0;
+			(sReadersContexts[dwContextB])->dwPublicID = 0;
+			(sReadersContexts[dwContextB])->dwIdentity = 0;
+
+
+			/*
+			 * Destroy and free the mutex 
+			 */
+			if (*(sReadersContexts[dwContextB])->dwMutex == 1)
+			{
+				SYS_MutexDestroy((sReadersContexts[dwContextB])->mMutex);
+				free((sReadersContexts[dwContextB])->mMutex);
+			}
+
+			*(sReadersContexts[dwContextB])->dwMutex -= 1;
+
+			if (*(sReadersContexts[dwContextB])->dwMutex == 0)
+			{
+				free((sReadersContexts[dwContextB])->dwMutex);
+				(sReadersContexts[dwContextB])->dwMutex = 0;
+			}
+
+			*(sReadersContexts[dwContextB])->dwFeeds -= 1;
+
+			if (*(sReadersContexts[dwContextB])->dwFeeds == 0)
+			{
+				free((sReadersContexts[dwContextB])->dwFeeds);
+				(sReadersContexts[dwContextB])->dwFeeds = 0;
+			}
+
+			dwNumReadersContexts -= 1;
+
+			return rv;
+		}
+
+		EHSpawnEventHandler(sReadersContexts[dwContextB]);
 	}
 
 	return SCARD_S_SUCCESS;
@@ -466,7 +461,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		rv = RFUnInitializeReader(sContext);
 		if (rv != SCARD_S_SUCCESS)
 			return rv;
-		
+
 		/*
 		 * Destroy and free the mutex 
 		 */
@@ -682,14 +677,14 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	else
 		ucLowLastDigit = 'A' + ((int) lowLastDigit % 10);
 
-	
+
 	sprintf(rContext->lpcReader, "%s %c%c %c%c", readerName, ucHighLastDigit, ucLowLastDigit, ucHighSlot, ucLowSlot);
-	
+
 	/*
 	 * Set the slot in 0xDDDDCCCC 
 	 */
 	rContext->dwSlot = (0x00010000 * lastDigit) + dwSlot;
-	
+
 	return rv;
 }
 
