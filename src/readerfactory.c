@@ -1721,22 +1721,22 @@ void RFCleanupReaders(int shouldExit)
 	 * exit() will call at_exit() 
 	 */
 
-        if (shouldExit) 
-        {
-                exit(0);
-        }
+	if (shouldExit) 
+	{
+		exit(0);
+	}
 }
 
 void RFSuspendAllReaders() 
 {
-        int i;
+	int i;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
-                        EHDestroyEventHandler(sReadersContexts[i]);
-                        IFDCloseIFD(sReadersContexts[i]);
+			EHDestroyEventHandler(sReadersContexts[i]);
+			IFDCloseIFD(sReadersContexts[i]);
 		}
 	}
 
@@ -1744,48 +1744,46 @@ void RFSuspendAllReaders()
 
 void RFAwakeAllReaders() 
 {
-        LONG rv = IFD_SUCCESS;
-        int i, j;
-        int initFlag;
+	LONG rv = IFD_SUCCESS;
+	int i, j;
+	int initFlag;
         
-        initFlag = 0;
+	initFlag = 0;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-                /* If the library is loaded and the event handler is not running */
-	        if ( ((sReadersContexts[i])->vHandle   != 0) &&
-                     ((sReadersContexts[i])->pthThread == 0) )
+		/* If the library is loaded and the event handler is not running */
+		if ( ((sReadersContexts[i])->vHandle   != 0) &&
+		     ((sReadersContexts[i])->pthThread == 0) )
 		{
-                
-                        for (j=0; j < i; j++)
-                        {
-                                if (((sReadersContexts[j])->vHandle == (sReadersContexts[i])->vHandle)&&
-                                    ((sReadersContexts[j])->dwPort   == (sReadersContexts[i])->dwPort)) 
-                                    {
-                                            initFlag = 1;
-                                    }
-                        }
+
+			for (j=0; j < i; j++)
+			{
+				if (((sReadersContexts[j])->vHandle == (sReadersContexts[i])->vHandle)&&
+				    ((sReadersContexts[j])->dwPort   == (sReadersContexts[i])->dwPort)) 
+				{
+					initFlag = 1;
+				}
+			}
                         
-                        if (initFlag == 0)
-                        {
-                                rv = IFDOpenIFD(sReadersContexts[i]);
+			if (initFlag == 0)
+			{
+				rv = IFDOpenIFD(sReadersContexts[i]);
 
-                        } else {
-                                initFlag = 0;
-                        }
+			} else {
+				initFlag = 0;
+			}
                         
 
-                                if (rv != IFD_SUCCESS)
-                                {
-                                        DebugLogB("RFInitializeReader: Open Port %X Failed",
-                                                    (sReadersContexts[i])->dwPort);
-                                }
+			if (rv != IFD_SUCCESS)
+			{
+				DebugLogC("RFInitializeReader: Open Port %X Failed (%s)",
+					  (sReadersContexts[i])->dwPort, (sReadersContexts[i])->lpcDevice);
+			}
 
 
-                        EHSpawnEventHandler(sReadersContexts[i]);
-                        RFSetReaderEventState(sReadersContexts[i], SCARD_RESET);
-                        
+			EHSpawnEventHandler(sReadersContexts[i]);
+			RFSetReaderEventState(sReadersContexts[i], SCARD_RESET);
 		}
 	}
-
 }
