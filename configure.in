@@ -183,7 +183,11 @@ AC_ARG_ENABLE(usbdropdir,
 				  drivers (default /usr/local/pcsc/drivers)]),
 [usbdropdir="${enableval}"], [usbdropdir=false])
 if test x${usbdropdir} = xfalse ; then
-	usbdropdir="/usr/local/pcsc/drivers"
+	if test "x$prefix" != xNONE; then
+		usbdropdir="$prefix/pcsc/drivers"
+	else
+		usbdropdir="$ac_default_prefix/pcsc/drivers"
+	fi
 fi
 AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
@@ -257,7 +261,11 @@ AC_ARG_ENABLE(muscledropdir,
 				  MuscleCard bundles (default /usr/local/pcsc/services)]),
 [muscledropdir="${enableval}"], [muscledropdir=false])
 if test x${muscledropdir} = xfalse ; then
-	muscledropdir="/usr/local/pcsc/services"
+	if test "x$prefix" != xNONE; then
+		muscledropdir="$prefix/pcsc/services"
+	else
+		muscledropdir="$ac_default_prefix/pcsc/services"
+	fi
 fi
 AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
 AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing MuscleCard bundles])
