@@ -53,7 +53,7 @@ static int driverSize = -1;
 static int AraKiriHotPlug = FALSE;
 
 /*
- * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous drivers
+ * keep track of drivers in a dynamically allocated array
  */
 static struct _driverTracker
 {
@@ -63,7 +63,8 @@ static struct _driverTracker
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
-} driverTracker[PCSCLITE_MAX_READERS_CONTEXTS];
+} *driverTracker = NULL;
+#define DRIVER_TRACKER_SIZE_STEP 8
 
 /*
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
@@ -99,6 +100,15 @@ LONG HPReadBundleValues(void)
 		DebugLogA("Disabling USB support for pcscd.");
 		return -1;
 	}
+
+	/* allocate a first array */
+	driverTracker = calloc(DRIVER_TRACKER_SIZE_STEP, sizeof(*driverTracker));
+	if (NULL == driverTracker)
+	{
+		DebugLogA("Not enough memory");
+		return -1;
+	}
+	driverSize = DRIVER_TRACKER_SIZE_STEP;
 
 	while ((currFP = readdir(hpDir)) != 0)
 	{
@@ -158,6 +168,23 @@ LONG HPReadBundleValues(void)
 
 				listCount++;
 				alias++;
+
+				if (listCount >= driverSize)
+				{
+					/* increase the array size */
+					driverSize += DRIVER_TRACKER_SIZE_STEP;
+#ifdef DEBUG_HOTPLUG
+					DebugLogB("Increase driverTracker to %d entries",
+						driverSize);
+#endif
+					driverTracker = realloc(driverTracker,
+						driverSize * sizeof(*driverTracker));
+					if (NULL == driverTracker)
+					{
+						DebugLogA("Not enough memory");
+						return -1;
+					}
+				}
 			}
 		}
 	}
@@ -170,6 +197,10 @@ LONG HPReadBundleValues(void)
 		DebugLogA("No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
 		DebugLogA("Disabling USB support for pcscd");
 	}
+#ifdef DEBUG_HOTPLUG
+	else
+		DebugLogB("Found drivers for %d readers", listCount);
+#endif
 
 	return 0;
 }
@@ -198,7 +229,7 @@ void HPEstablishUSBNotifications()
 			for (dev = bus->devices; dev; dev = dev->next)
 			{
 				/* check if the device is supported by one driver */
-				for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+				for (i=0; i<driverSize; i++)
 				{
 					if (driverTracker[i].libraryPath != NULL &&
 						dev->descriptor.idVendor == driverTracker[i].manuID &&
@@ -307,15 +338,6 @@ void HPEstablishUSBNotifications()
 LONG HPSearchHotPluggables(void)
 {
 	int i;
-
-	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		driverTracker[i].productID  = 0;
-		driverTracker[i].manuID     = 0;
-		driverTracker[i].bundleName = NULL;
-		driverTracker[i].libraryPath = NULL;
-		driverTracker[i].readerName = NULL;
-	}
 
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
