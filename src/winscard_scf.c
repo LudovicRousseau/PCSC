@@ -24,21 +24,21 @@
 #include "winscard.h"
 #include "debuglog.h"
 
-#define USE_THREAD_SAFETY
 #ifdef USE_THREAD_SAFETY
 #include "thread_generic.h"
+#else
+#error "client side thread safety required"
 #endif
 
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "sys_generic.h"
 
-#define TRUE 1
-#define FALSE 0
+#define TRUE	1
+#define FALSE	0
 
-#define PCSC_SCF_MAX_READERS 2
-#define PCSC_SCF_MAX_ATR_BUFFER_LENGTH 32
-#define PCSC_SCF_MAX_RECV_LEN 265
+#undef PCSCLITE_MAX_READERS_CONTEXTS
+#define PCSCLITE_MAX_READERS_CONTEXTS	2
 
 /* Global session to manage Readers, Card events. */
 static SCF_Session_t  g_hSession = NULL;
@@ -50,8 +50,7 @@ static struct _psTransmitMap {
   BYTE Buffer[266];
   int isResponseCached;
   BYTE bufferLength;
-} psTransmitMap[PCSCLITE_MAX_CONTEXTS];
-
+} psTransmitMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 /* Channel Map to manage Card Connections. */
 static struct _psChannelMap {
@@ -63,14 +62,14 @@ static struct _psChannelMap {
   short haveLock;
   short isReset;
   int ReaderIndice;
-} psChannelMap[PCSCLITE_MAX_CONTEXTS];
+} psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 /* Context Map to manage contexts and sessions. */
 static struct _psContextMap {
   SCARDCONTEXT hContext;
   SCF_Session_t  hSession;
   DWORD        contextBlockStatus;
-} psContextMap[PCSCLITE_MAX_CONTEXTS];
+} psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
 /* Reader Map to handle Status and GetStatusChange. */
 static struct _psReaderMap {
@@ -78,11 +77,10 @@ static struct _psReaderMap {
   LPSTR ReaderName;
   short SharedRefCount;
   DWORD dwCurrentState;
-  BYTE bAtr[PCSC_SCF_MAX_ATR_BUFFER_LENGTH];
+  BYTE bAtr[MAX_ATR_SIZE];
   DWORD dwAtrLength;
   SCF_ListenerHandle_t lHandle;
-} psReaderMap[PCSC_SCF_MAX_READERS];
-
+} psReaderMap[PCSCLITE_MAX_READERS_CONTEXTS];
 
 #ifdef USE_THREAD_SAFETY
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -219,7 +217,7 @@ static LONG SCardListReadersTH( SCARDCONTEXT hContext, LPCSTR mszGroups,
   /*Calculate the the buffer length reuired only once.
   */
   if(first_time) {
-    for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
+    for(i=0;i<PCSCLITE_MAX_READERS_CONTEXTS;i++) {
       if(NULL != psReaderMap[i].ReaderName) 
 	dwReadersLen += strlen(psReaderMap[i].ReaderName) +1;
     }
@@ -243,7 +241,7 @@ static LONG SCardListReadersTH( SCARDCONTEXT hContext, LPCSTR mszGroups,
   }
   
   tempPtr = mszReaders;
-  for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
+  for(i=0;i<PCSCLITE_MAX_READERS_CONTEXTS;i++) {
     if(NULL != psReaderMap[i].ReaderName) {
       memcpy(tempPtr, psReaderMap[i].ReaderName, 
 	     strlen(psReaderMap[i].ReaderName)+1);
@@ -702,12 +700,12 @@ LONG SCardGetStatusChange( SCARDCONTEXT hContext, DWORD dwTimeout,
      return the first available reader 
   */
   if ( cReaders == 0 ) {
-      for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
+      for(i=0;i<PCSCLITE_MAX_READERS_CONTEXTS;i++) {
 	if(psReaderMap[i].ReaderName) 
 	  return SCARD_S_SUCCESS;
       }
       return SCARD_E_READER_UNAVAILABLE;
-  } else if(cReaders >PCSC_SCF_MAX_READERS) {
+  } else if(cReaders >PCSCLITE_MAX_READERS_CONTEXTS) {
     return SCARD_E_INVALID_VALUE;
   }
    /* Check the integrity of the reader states structures */
@@ -946,12 +944,12 @@ static LONG SCardTransmitTH( SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		      LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer, 
 		      LPDWORD pcbRecvLength ) {
  
-  BYTE Buffer[256];
+  BYTE Buffer[MAX_BUFFER_SIZE];
   LONG  rv = 0;
   SCF_Card_t SCF_hCard;
   SCF_Status_t status;
   LONG retIndice;
-  LONG localRecvLen =PCSC_SCF_MAX_RECV_LEN ;
+  LONG localRecvLen =MAX_BUFFER_SIZE ;
    if(SCARD_S_SUCCESS != isOCFServerRunning())
     return SCARD_E_NO_SERVICE;
    if ( pbSendBuffer == 0 || pbRecvBuffer == 0 ||
@@ -1125,7 +1123,7 @@ static LONG SCardGetHandleIndice(SCARDHANDLE hCard)
     return LastIndex;
   }
   
-  for ( i=0; i<PCSCLITE_MAX_CONTEXTS; i++ ) {
+  for ( i=0; i<PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
     if(hCard == psChannelMap[i].PCSC_hCard)
       return i;
   }
@@ -1139,7 +1137,7 @@ static LONG SCardGetReaderIndice(LPCSTR ReaderName)
   if(NULL == ReaderName)
     return -1;
   
-  for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
+  for(i=0;i<PCSCLITE_MAX_READERS_CONTEXTS;i++) {
     if((NULL!=psReaderMap[i].ReaderName) &&
        (strncmp(psReaderMap[i].ReaderName, ReaderName, 
 		strlen(psReaderMap[i].ReaderName)) == 0)) {
@@ -1159,7 +1157,7 @@ static LONG SCardAddHandle(SCARDHANDLE PCSC_hCard, SCARDCONTEXT hContext,
 {
   int i=0;
   
-  for( i=0; i < PCSCLITE_MAX_CONTEXTS; i++ ) {
+  for( i=0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
     if(psChannelMap[i].PCSC_hCard == 0) {
       psChannelMap[i].PCSC_hCard = PCSC_hCard;
       psChannelMap[i].hContext = hContext;
@@ -1197,7 +1195,7 @@ static LONG PCSC_SCF_getATR(SCF_Card_t hCard, LPBYTE pcbAtr,
     return SCARD_F_COMM_ERROR;
   
   if((NULL == pcbAtr) || (NULL == pcbAtrLen) ||
-     (PCSC_SCF_MAX_ATR_BUFFER_LENGTH < pAtr->length)) {
+     (MAX_ATR_SIZE < pAtr->length)) {
     if(NULL != pcbAtrLen)
       *pcbAtrLen = pAtr->length;
     SCF_Card_freeInfo(hCard, pAtr);
@@ -1381,7 +1379,7 @@ static LONG SCardAddContext ( SCARDCONTEXT hContext,
   i=0;
   
 
-  for ( i=0; i < PCSCLITE_MAX_CONTEXTS; i++ ) {
+  for ( i=0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
     if ( psContextMap[i].hContext == 0 ) {
       psContextMap[i].hContext           = hContext;
       psContextMap[i].hSession = hSession;
@@ -1400,7 +1398,7 @@ static LONG SCardGetContextIndice ( SCARDCONTEXT hContext ) {
   
 
   /* Find this context and return it's spot in the array */
-  for ( i=0; i<PCSCLITE_MAX_CONTEXTS; i++ ) {
+  for ( i=0; i<PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
     if (( hContext == psContextMap[i].hContext) && (hContext != 0) ) {
       return i;
     }
@@ -1421,7 +1419,7 @@ static LONG SCardRemoveContext ( SCARDCONTEXT hContext ) {
     return SCARD_E_INVALID_HANDLE;
   } else {
     /* Free all handles for this context. */
-    for(i=0;i<PCSCLITE_MAX_CONTEXTS;i++) {
+    for(i=0;i<PCSCLITE_MAX_APPLICATION_CONTEXTS;i++) {
       if(psChannelMap[i].hContext == hContext) {
 	SCardRemoveHandle(psChannelMap[i].PCSC_hCard);
       }
@@ -1550,7 +1548,7 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
     psReaderMap[ReaderIndice].dwCurrentState |= SCARD_STATE_EMPTY;
     psReaderMap[ReaderIndice].SharedRefCount = 0;
     psReaderMap[ReaderIndice].dwAtrLength = 0;
-    for(i=0;i<PCSCLITE_MAX_CONTEXTS;i++) {
+    for(i=0;i<PCSCLITE_MAX_APPLICATION_CONTEXTS;i++) {
      if((0 != psChannelMap[i].PCSC_hCard ) &&
 	 (psChannelMap[i].ReaderIndice == ReaderIndice)) {
        psChannelMap[i].haveLock = FALSE;
@@ -1564,7 +1562,7 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
     /* TODO .... */
     break;
   case SCF_EVENT_CARDRESET:
-    for(i=0;i<PCSCLITE_MAX_CONTEXTS;i++) {
+    for(i=0;i<PCSCLITE_MAX_APPLICATION_CONTEXTS;i++) {
       if((0 != psChannelMap[i].PCSC_hCard ) &&
 	 (psChannelMap[i].ReaderIndice == ReaderIndice)) {
 	psChannelMap[i].isReset = TRUE;
@@ -1608,7 +1606,7 @@ static LONG PCSC_SCF_Initialize()
 
   if(!first_time) 
     return SCARD_S_SUCCESS;
-  for ( i=0; i < PCSCLITE_MAX_CONTEXTS; i++ ) {
+  for ( i=0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
     psContextMap[i].hContext=0;
     psContextMap[i].hSession = 0;
     psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
@@ -1623,13 +1621,13 @@ static LONG PCSC_SCF_Initialize()
     psTransmitMap[i].isResponseCached = 0;
     psTransmitMap[i].bufferLength = 0;
   }
-  for ( i=0; i <PCSC_SCF_MAX_READERS ; i++ ) {
+  for ( i=0; i <PCSCLITE_MAX_READERS_CONTEXTS ; i++ ) {
     psReaderMap[i].ReaderName = NULL;
     psReaderMap[i].hTerminal = 0;
     psReaderMap[i].SharedRefCount = 0;
     psReaderMap[i].dwCurrentState |= SCARD_STATE_UNAVAILABLE;
     psReaderMap[i].dwAtrLength =0;
-    memset(psReaderMap[i].bAtr, 0, PCSC_SCF_MAX_ATR_BUFFER_LENGTH);
+    memset(psReaderMap[i].bAtr, 0, MAX_ATR_SIZE);
     psReaderMap[i].lHandle = NULL;
   }
      
@@ -1638,7 +1636,7 @@ static LONG PCSC_SCF_Initialize()
   status = SCF_Session_getInfo(g_hSession, "terminalnames", &tList);
   if (status != SCF_STATUS_SUCCESS) return SCARD_E_NO_SERVICE;
       
-  for(i=0;i<PCSC_SCF_MAX_READERS;i++) {
+  for(i=0;i<PCSCLITE_MAX_READERS_CONTEXTS;i++) {
     if(NULL == tList[i]) 
       break;
     psReaderMap[i].ReaderName = strdup(tList[i]);
@@ -1704,7 +1702,7 @@ LONG SCardCheckReaderAvailability( LPSTR readerName, LONG errorCode ) {
   retIndice=0; i=0;
 #if 0
   if ( errorCode != SCARD_S_SUCCESS ) {
-    for ( i=0; i < PCSCLITE_MAX_CONTEXTS; i++ ) {
+    for ( i=0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++ ) {
       if ( strcmp(psChannelMap[i].readerName, readerName) == 0 ) {
 	return errorCode;
       }
