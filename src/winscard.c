@@ -314,7 +314,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	LONG rv;
 	PREADER_CONTEXT rContext;
 	UCHAR pucAtr[MAX_ATR_SIZE], ucAvailable;
-	DWORD dwAtrLength, dwAction = 0;
+	DWORD dwAtrLength;
 
 	DebugLogA("Attempting reconnect to token.");
 
@@ -374,19 +374,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 * Handle the dwInitialization 
 	 */
 
-	switch (dwInitialization)
-	{
-		case SCARD_LEAVE_CARD:	/* Do nothing here */
-			break;
-		case SCARD_UNPOWER_CARD:
-			dwAction = IFD_POWER_DOWN;
-			break;
-		case SCARD_RESET_CARD:
-			dwAction = IFD_RESET;
-			break;
-		default:
-			return SCARD_E_INVALID_VALUE;
-	};
+	if ((dwInitialization != SCARD_LEAVE_CARD)
+		&& (dwInitialization != SCARD_UNPOWER_CARD)
+		&& (dwInitialization != SCARD_RESET_CARD))
+		return SCARD_E_INVALID_VALUE;
 
 	/*
 	 * RFUnblockReader( rContext ); FIX - this doesn't work 
@@ -398,8 +389,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly 
 		 */
-		rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
-			&rContext->dwAtrLen);
+		if (SCARD_RESET_CARD == dwInitialization)
+			rv = IFDPowerICC(rContext, IFD_RESET, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		else
+		{
+			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, rContext->ucAtr,
+				&rContext->dwAtrLen);
+			rv = IFDPowerICC(rContext, IFD_POWER_UP, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		}
 
 		/*
 		 * Notify the card has been reset 
@@ -595,14 +594,13 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	UCHAR controlBuffer[5];
 	UCHAR receiveBuffer[MAX_BUFFER_SIZE];
 	PREADER_CONTEXT rContext;
-	DWORD dwAction, dwAtrLen, receiveLength;
+	DWORD dwAtrLen, receiveLength;
 
 	/*
 	 * Zero out everything 
 	 */
 	rv = 0;
 	rContext = 0;
-	dwAction = 0;
 	dwAtrLen = 0;
 	receiveLength = 0;
 
@@ -617,27 +615,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	switch (dwDisposition)
-	{
-		case SCARD_LEAVE_CARD:	/* Do nothing here */
-			break;
-		case SCARD_UNPOWER_CARD:
-			dwAction = IFD_POWER_DOWN;
-			break;
-		case SCARD_RESET_CARD:
-			dwAction = IFD_RESET;
-			break;
-		case SCARD_EJECT_CARD:
-			break;
-		default:
-			return SCARD_E_INVALID_VALUE;
-	};
-
-	/*
-	 * Thread handles powering so just reset instead 
-	 */
-	if (dwDisposition == SCARD_UNPOWER_CARD)
-		dwAction = IFD_RESET;
+	if ((dwDisposition != SCARD_LEAVE_CARD)
+		&& (dwDisposition != SCARD_UNPOWER_CARD)
+		&& (dwDisposition != SCARD_RESET_CARD)
+		&& (dwDisposition != SCARD_EJECT_CARD))
+		return SCARD_E_INVALID_VALUE;
 
 	/*
 	 * Unlock any blocks on this context 
@@ -646,20 +628,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	DebugLogB("Active Contexts: %d", rContext->dwContexts);
 
-	/*
-	 * RFUnblockReader( rContext ); FIX - this doesn't work 
-	 */
-
-	/*
-	 * Allow RESET only if no other application holds a lock 
-	 */
-
-	/*
-	 * Deprecated - any app can reset according to M$ 
-	 */
-	/*
-	 * if ( RFCheckSharing( hCard ) == SCARD_S_SUCCESS ) { 
-	 */
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
@@ -667,8 +635,16 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly 
 		 */
-		rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
-			&rContext->dwAtrLen);
+		if (SCARD_RESET_CARD == dwDisposition)
+			rv = IFDPowerICC(rContext, IFD_RESET, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		else
+		{
+			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, rContext->ucAtr,
+				&rContext->dwAtrLen);
+			rv = IFDPowerICC(rContext, IFD_POWER_UP, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		}
 
 		/*
 		 * Notify the card has been reset 
@@ -709,7 +685,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 			DebugLogA("Error resetting card.");
 
-	} else if (dwDisposition == SCARD_EJECT_CARD)
+	}
+	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
 		/*
 		 * Set up the CTBCS command for Eject ICC 
@@ -731,16 +708,15 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 				/*
 				 * Successful 
 				 */
-			} else
-			{
-				DebugLogA("Error ejecting card.");
 			}
-		} else
-		{
-			DebugLogA("Error ejecting card.");
+			else
+				DebugLogA("Error ejecting card.");
 		}
+		else
+			DebugLogA("Error ejecting card.");
 
-	} else if (dwDisposition == SCARD_LEAVE_CARD)
+	}
+	else if (dwDisposition == SCARD_LEAVE_CARD)
 	{
 		/*
 		 * Do nothing 
@@ -768,9 +744,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	rContext->dwContexts -= 1;
 
 	if (rContext->dwContexts < 0)
-	{
 		rContext->dwContexts = 0;
-	}
 
 	/*
 	 * Allow the status thread to convey information 
@@ -831,14 +805,13 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	PREADER_CONTEXT rContext;
 	UCHAR controlBuffer[5];
 	UCHAR receiveBuffer[MAX_BUFFER_SIZE];
-	DWORD dwAction, receiveLength;
+	DWORD receiveLength;
 
 	/*
 	 * Zero out everything 
 	 */
 	rContext = 0;
 	rv = 0;
-	dwAction = 0;
 	receiveLength = 0;
 
 	/*
@@ -847,21 +820,11 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	switch (dwDisposition)
-	{
-		case SCARD_LEAVE_CARD:	/* Do nothing here */
-			break;
-		case SCARD_UNPOWER_CARD:
-			dwAction = IFD_POWER_DOWN;
-			break;
-		case SCARD_RESET_CARD:
-			dwAction = IFD_RESET;
-			break;
-		case SCARD_EJECT_CARD:
-			break;
-		default:
-			return SCARD_E_INVALID_VALUE;
-	};
+	if ((dwDisposition != SCARD_LEAVE_CARD)
+		&& (dwDisposition != SCARD_UNPOWER_CARD)
+		&& (dwDisposition != SCARD_RESET_CARD)
+		&& (dwDisposition != SCARD_EJECT_CARD))
+	return SCARD_E_INVALID_VALUE;
 
 	rv = RFReaderInfoById(hCard, &rContext);
 
@@ -881,20 +844,22 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
 		return rv;
 
-	/*
-	 * Thread handles powering so just reset instead 
-	 */
-	if (dwDisposition == SCARD_UNPOWER_CARD)
-		dwAction = IFD_RESET;
-
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
 		/*
 		 * Currently pcsc-lite keeps the card always powered 
 		 */
-		rv = IFDPowerICC(rContext, dwAction, rContext->ucAtr,
-			&rContext->dwAtrLen);
+		if (SCARD_RESET_CARD == dwDisposition)
+			rv = IFDPowerICC(rContext, IFD_RESET, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		else
+		{
+			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, rContext->ucAtr,
+				&rContext->dwAtrLen);
+			rv = IFDPowerICC(rContext, IFD_POWER_UP, rContext->ucAtr,
+				&rContext->dwAtrLen);
+		}
 
 		/*
 		 * Notify the card has been reset 
@@ -935,7 +900,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 			DebugLogA("Error resetting card.");
 
-	} else if (dwDisposition == SCARD_EJECT_CARD)
+	}
+	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
 		/*
 		 * Set up the CTBCS command for Eject ICC 
@@ -957,16 +923,15 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 				/*
 				 * Successful 
 				 */
-			} else
-			{
-				DebugLogA("Error ejecting card.");
 			}
-		} else
-		{
-			DebugLogA("Error ejecting card.");
+			else
+				DebugLogA("Error ejecting card.");
 		}
+		else
+			DebugLogA("Error ejecting card.");
 
-	} else if (dwDisposition == SCARD_LEAVE_CARD)
+	}
+	else if (dwDisposition == SCARD_LEAVE_CARD)
 	{
 		/*
 		 * Do nothing 
