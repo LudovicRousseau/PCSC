@@ -96,7 +96,13 @@ LONG EHInitializeEventStructures(void)
 
 LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
-	if (rContext->readerState && rContext->readerState->readerName[0] == '\0')
+	if (NULL == rContext->readerState)
+	{
+		DebugLogA("Thread never started (reader init failed?)");
+		return SCARD_S_SUCCESS;
+	}
+
+	if ('\0' == rContext->readerState->readerName[0])
 	{
 		DebugLogA("Thread already stomped.");
 		return SCARD_S_SUCCESS;
