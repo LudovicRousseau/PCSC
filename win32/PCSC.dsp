@@ -159,7 +159,7 @@ SOURCE=..\win32\config.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\win32\win32_pcsclite.h
+SOURCE=..\src\pcsclite.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
