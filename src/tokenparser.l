@@ -111,7 +111,8 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 
 	if (!file)
 	{
-		DebugLogB("Could not open bundle file : %s", fileName);
+		DebugLogC("Could not open bundle file %s: %s", fileName,
+			strerror(errno));
 		return 1;
 	}
 
