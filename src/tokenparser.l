@@ -79,12 +79,12 @@ void tperrorCheck (char *token_error)
 int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
                               char *tokenValue, int tokenIndice)
 {
-	FILE *file;
-	file = 0;
+	FILE *file = NULL;
+	ret = 0;
 
 	desiredIndex  = tokenIndice;
 	pcDesiredKey  = tokenKey;
-	pcFinValue[0] = 0;
+	pcFinValue[0] = '\0';
 
 	file = fopen(fileName, "r");
 
@@ -109,17 +109,12 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
 			DebugLogC("Value/Key not defined for: %s, indice: %d",
 				tokenKey, tokenIndice);
 		}
-		fclose(file);
-		return -1;
+		ret = -1;
 	}
 	else
-	{
 		strcpy(tokenValue, pcFinValue);
-		fclose(file);
-		return 0;
-	}
 
 	fclose(file);
-	return 0;
+	return ret;
 }
 
