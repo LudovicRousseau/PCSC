@@ -181,6 +181,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		  (sContexts[parentNode])->vHandle;
 		(sContexts[dwContext])->mMutex = 
 		  (sContexts[parentNode])->mMutex;
+		(sContexts[dwContext])->dwMutex = 
+		  (sContexts[parentNode])->dwMutex;
 		
 		/*
 		 * Call on the driver to see if it is thread safe 
@@ -193,6 +195,11 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		{
 			DebugLogA("Driver is thread safe");
 			(sContexts[dwContext])->mMutex = 0;
+			(sContexts[dwContext])->dwMutex = 0;
+		}
+		else
+		{
+			*(sContexts[dwContext])->dwMutex += 1;
 		}
 	}
 
@@ -214,6 +221,14 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 		(sContexts[dwContext])->mMutex =
 		  (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
 		SYS_MutexInit((sContexts[dwContext])->mMutex);
+	}
+
+	if ((sContexts[dwContext])->dwMutex == 0)
+	{
+		(sContexts[dwContext])->dwMutex = 
+		  (DWORD *)malloc(sizeof(DWORD));
+
+		*(sContexts[dwContext])->dwMutex = 1;
 	}
 
 	*dwNumContexts += 1;
@@ -325,6 +340,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 			  (sContexts[dwContext])->vHandle;
 			(sContexts[dwContextB])->mMutex =
 			   (sContexts[dwContext])->mMutex;
+			(sContexts[dwContextB])->dwMutex =
+			   (sContexts[dwContext])->dwMutex;
 
 			/* 
 			 * Added by Dave - slots did not have a dwFeeds
@@ -363,7 +380,15 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 				(sContexts[dwContextB])->mMutex =
 					(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
 				SYS_MutexInit((sContexts[dwContextB])->mMutex);
-			} 
+				
+				(sContexts[dwContextB])->dwMutex = 
+					(DWORD *)malloc(sizeof(DWORD));
+				*(sContexts[dwContextB])->dwMutex = 1;
+			}
+			else
+			{
+				*(sContexts[dwContextB])->dwMutex += 1;
+			}
 
 			*dwNumContexts += 1;
 
@@ -434,10 +459,18 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		/*
 		 * Destroy and free the mutex 
 		 */
-		if (*sContext->dwFeeds == 1)
+		if (*sContext->dwMutex == 1)
 		{
 			SYS_MutexDestroy(sContext->mMutex);
 			free(sContext->mMutex);
+		}
+
+		*sContext->dwMutex -= 1;
+
+		if (*sContext->dwMutex == 0)
+		{
+			free(sContext->dwMutex);
+			sContext->dwMutex = 0;
 		}
 
 		*sContext->dwFeeds -= 1;
