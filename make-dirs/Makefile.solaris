@@ -1,6 +1,6 @@
 CC  = /usr/local/bin/gcc
 LD  = /usr/local/bin/ld
-INC = -I../SUNWPCSC -I. -I/usr/include/smartcard
+INC = -I../make-dirs -I. -I/usr/include/smartcard
 LIBS = -ll -ldl -lnsl -lsocket -lposix4 -lsmartcard
 CFLAGS = -DSOLARIS
 
