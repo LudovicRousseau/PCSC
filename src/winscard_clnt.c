@@ -87,13 +87,13 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
-static LONG SCardCheckDaemonAvailability();
+static LONG SCardCheckDaemonAvailability(void);
 
 /*
  * Thread safety functions
  */
-static LONG SCardLockThread();
-static LONG SCardUnlockThread();
+static LONG SCardLockThread(void);
+static LONG SCardUnlockThread(void);
 
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
@@ -1646,7 +1646,7 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 		&cbAttrLen);
 }
 
-LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
+static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen)
 {
 	LONG rv;
@@ -2115,7 +2115,8 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
  * Functions for managing hCard values returned from SCardConnect.
  */
 
-LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex, LPSTR readerName)
+static LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex,
+	LPSTR readerName)
 {
 	int i;
 
@@ -2132,7 +2133,7 @@ LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex, LPSTR readerName)
 	return SCARD_E_NO_MEMORY;
 }
 
-LONG SCardRemoveHandle(SCARDHANDLE hCard)
+static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 {
 	DWORD dwContextIndice, dwChannelIndice;
 	LONG rv;
@@ -2193,7 +2194,7 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndi
  * function
  */
 
-LONG SCardLockThread()
+inline static LONG SCardLockThread(void)
 {
 	return SYS_MutexLock(&clientMutex);
 }
@@ -2203,12 +2204,12 @@ LONG SCardLockThread()
  * library
  */
 
-LONG SCardUnlockThread()
+inline static LONG SCardUnlockThread(void)
 {
 	return SYS_MutexUnLock(&clientMutex);
 }
 
-LONG SCardCheckDaemonAvailability()
+static LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
