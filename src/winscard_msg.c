@@ -196,9 +196,9 @@ int SHMProcessCommonChannelRequest()
 
 int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 {
-
+	static int last_client = 0;
 	static fd_set read_fd;
-	int i, selret, largeSock, rv;
+	int i, j, selret, largeSock, rv;
 	struct timeval tv;
 
 	largeSock = 0;
@@ -257,8 +257,11 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 		}
 	}
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS; i++)
+	/* Start each time with the last client and go round, else
+	 * in case of much traffic only two clients will be serviced */
+	for (j = 0; j < PCSCLITE_MAX_APPLICATIONS; j++)
 	{
+		i = (j+last_client) % PCSCLITE_MAX_APPLICATIONS;
 		if (clientSockets[i].sd != -1)
 		{
 			if (FD_ISSET(clientSockets[i].sd, &read_fd))
@@ -282,6 +285,9 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 				/*
 				 * Set the identifier handle 
 				 */
+				last_client = i;
+				DebugLogB("SHMProcessEvents: correctly processed client: %d",
+					last_client);
 				msgStruct->request_id = clientSockets[i].sd;
 				return 1;
 			}
