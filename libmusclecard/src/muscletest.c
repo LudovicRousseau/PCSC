@@ -76,7 +76,16 @@ int main(int argc, char **argv)
 		printf("\n");
 
 		printf("Token state    : %04lX\n", tokenList[i].tokenState);
-		printf("\n");
+		printf("Token type     : %04lX ", tokenList[i].tokenType);
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_REMOVED)
+			printf("token removed ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_UNKNOWN)
+			printf("token unkown ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_KNOWN)
+			printf("token known ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_RESET)
+			printf("token reset ");
+		printf("\n\n");
 
 		tokenList[i].tokenState = MSC_STATE_EMPTY;
 	}
@@ -98,7 +107,16 @@ int main(int argc, char **argv)
 		printf("\n");
 
 		printf("Token state    : %04lX\n", tokenList[i].tokenState);
-		printf("\n");
+		printf("Token type     : %04lX ", tokenList[i].tokenType);
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_REMOVED)
+			printf("token removed ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_UNKNOWN)
+			printf("token unkown ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_KNOWN)
+			printf("token known ");
+		if (tokenList[i].tokenType & MSC_TOKEN_TYPE_RESET)
+			printf("token reset ");
+		printf("\n\n");
 
 		if (tokenList[i].tokenState & SCARD_STATE_PRESENT)
 			reader_to_use = i;
