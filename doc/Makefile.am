@@ -12,6 +12,12 @@ man_in = pcscd.8.in bundleTool.8.in formaticc.1 reader.conf.5.in
 
 EXTRA_DIST = $(data_DATA) $(man_in)
 
+CLEANFILES = ifdhandler-3.aux ifdhandler-3.bbl ifdhandler-3.blg \
+	ifdhandler-3.dvi ifdhandler-3.log ifdhandler-3.out ifdhandler-3.pdf \
+	ifdhandler-3.toc \
+	pcsc-lite.aux pcsc-lite.bbl pcsc-lite.blg pcsc-lite.log \
+	pcsc-lite.out pcsc-lite.pdf pcsc-lite.toc
+
 # name of commands
 LATEX = latex
 PDFLATEX = pdflatex
