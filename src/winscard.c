@@ -1259,7 +1259,17 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		sSendPci.Protocol = SCARD_PROTOCOL_RAW;
 	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_ANY)
 	{
-		sSendPci.Protocol = rContext->dwProtocol;
+	  /* Fix by Amira (Athena) */
+	  if ( rContext->dwProtocol == SCARD_PROTOCOL_T0 ) 
+	  {
+	        sSendPci.Protocol = 0;
+	  } else if ( rContext->dwProtocol == SCARD_PROTOCOL_T1 ) 
+	  {
+		sSendPci.Protocol = 1;
+	  } else 
+	  {
+	        sSendPci.Protocol = rContext->dwProtocol;
+	  }
 	}
 
 	sSendPci.Length = pioSendPci->cbPciLength;
