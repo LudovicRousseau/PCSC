@@ -1,15 +1,16 @@
-
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : sys_generic.h
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 11/8/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles abstract system level calls. 
-	            
+	Title  : sys_generic.h
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 11/8/99
+	License: Copyright (C) 1999 David Corcoran
+		<corcoran@linuxnet.com>
+	Purpose: This handles abstract system level calls. 
+
+$Id$
+
 ********************************************************************/
 
 #ifndef __sys_generic_h__
@@ -39,6 +40,8 @@ extern "C"
 	int SYS_RemoveFile(char *);
 
 	int SYS_Chmod(const char *, int);
+
+	int SYS_Chdir(const char *);
 
 	int SYS_Mkfifo(const char *, int);
 
@@ -73,6 +76,10 @@ extern "C"
 	int SYS_MMapSynchronize(void *, int);
 
 	int SYS_Fork();
+
+#ifdef HAVE_DAEMON
+	int SYS_Daemon(int, int);
+#endif
 
 	int SYS_Wait(int, int);
 

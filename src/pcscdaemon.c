@@ -286,12 +286,21 @@ int main(int argc, char **argv)
 		default:
 			return (0);
 		}
-		close(0);
-		close(1);
-		close(2);
-		chdir("/");
+
+		if (SYS_CloseFile(0))
+			DebugLogB("main: SYS_CloseFile(0) failed: %s", strerror(errno));
+
+		if (SYS_CloseFile(1))
+			DebugLogB("main: SYS_CloseFile(1) failed: %s", strerror(errno));
+
+		if (SYS_CloseFile(2))
+			DebugLogB("main: SYS_CloseFile(2) failed: %s", strerror(errno));
+
+		if (SYS_Chdir("/"))
+			DebugLogB("main: SYS_Chdir() failed: %s", strerror(errno));
 #else
-		daemon(0, 0);
+		if (SYS_Daemon(0, 0))
+			DebugLogB("main: SYS_Daemon() failed: %s", strerror(errno));
 #endif
 	}
 
@@ -339,7 +348,8 @@ int main(int argc, char **argv)
 	}
 
 	/* cleanly remove /tmp/pcsc when exiting */
-	atexit(at_exit);
+	if (atexit(at_exit))
+		DebugLogB("main: atexit() failed: %s", strerror(errno));
 
 	/*
 	 * Allocate memory for reader structures 

@@ -1,14 +1,16 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : winscard_clnt.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 10/27/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This handles smartcard reader communications. 
-	             This file forwards requests over message queues.
+	Title  : winscard_clnt.c
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 10/27/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This handles smartcard reader communications. 
+	This file forwards requests over message queues.
+
+$Id$
 
 ********************************************************************/
 
@@ -18,6 +20,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/un.h>
+#include <errno.h>
 
 #include "config.h"
 #include "wintypes.h"
@@ -201,18 +204,23 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			if (readerStates[i] == 0)
 			{
 				DebugLogA("ERROR: Cannot public memory map");
-				close(mapAddr);	/* Close the memory map file */
+				SYS_CloseFile(mapAddr);	/* Close the memory map file */
 				return SCARD_F_INTERNAL_ERROR;
 			}
 		}
 
 		if (SHMClientSetupSession(parentPID) != 0)
 		{
-			close(mapAddr);
+			SYS_CloseFile(mapAddr);
 			return SCARD_E_NO_SERVICE;
 		}
 
-		atexit((void *) &SCardCleanupClient);
+		if (atexit((void *) &SCardCleanupClient))
+		{
+			DebugLogB("ERROR: Cannot atexit(): %s", strerror(errno));
+			SYS_CloseFile(mapAddr);
+			return SCARD_F_INTERNAL_ERROR;
+		}
 
 		isExecuted = 1;
 	}
@@ -2086,10 +2094,11 @@ LONG SCardCheckDaemonAvailability()
 	LONG rv;
 	int fd;
 
-	fd = open(PCSCLITE_SHM_FILE, O_RDWR);
+	fd = SYS_OpenFile(PCSCLITE_SHM_FILE, O_RDWR, 0);
 	if (fd < 0)
 	{
 		DebugLogA("Error: Cannot open shared file " PCSCLITE_SHM_FILE);
+		return SCARD_E_NO_SERVICE;
 	}
 
 	/*
@@ -2097,7 +2106,7 @@ LONG SCardCheckDaemonAvailability()
 	 */
 	rv = SYS_LockFile(fd);
 
-	close(fd);
+	SYS_CloseFile(fd);
 
 	/*
 	 * If the lock succeeds then the daemon is not there, otherwise if an 
@@ -2105,12 +2114,9 @@ LONG SCardCheckDaemonAvailability()
 	 */
 
 	if (rv == 0)
-	{
 		return SCARD_E_NO_SERVICE;
-	} else
-	{
+	else
 		return SCARD_S_SUCCESS;
-	}
 }
 
 /*
@@ -2149,10 +2155,9 @@ LONG SCardCheckReaderAvailability(LPSTR readerName, LONG errorCode)
 
 void SCardCleanupClient()
 {
-
 	/*
 	 * Close down the client socket 
 	 */
 	SHMClientCloseSession();
-
 }
+

@@ -1,14 +1,16 @@
 /******************************************************************
 
 	MUSCLE SmartCard Development ( http://www.linuxnet.com )
-	    Title  : sys_unix.c
-	    Package: pcsc lite
-            Author : David Corcoran
-            Date   : 11/8/99
-	    License: Copyright (C) 1999 David Corcoran
-                     <corcoran@linuxnet.com>
-            Purpose: This handles abstract system level calls. 
-	            
+	Title  : sys_unix.c
+	Package: pcsc lite
+	Author : David Corcoran
+	Date   : 11/8/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This handles abstract system level calls. 
+
+$Id$
+
 ********************************************************************/
 
 #include <sys_generic.h>
@@ -75,6 +77,11 @@ int SYS_RemoveFile(char *pcFile)
 int SYS_Chmod(const char *path, int mode)
 {
 	return chmod(path, mode);
+}
+
+int SYS_Chdir(const char *path)
+{
+	return chdir(path);
 }
 
 int SYS_Mkfifo(const char *path, int mode)
@@ -183,6 +190,13 @@ int SYS_Fork()
 	return fork();
 }
 
+#ifdef HAVE_DAEMON
+int SYS_Daemon(int nochdir, int noclose)
+{
+	return daemon(nochdir, noclose);
+}
+#endif
+
 int SYS_Wait(int iPid, int iWait)
 {
 	return waitpid(-1, 0, WNOHANG);
@@ -247,3 +261,4 @@ int SYS_Unlink(char *pcFile)
 {
 	return unlink(pcFile);
 }
+

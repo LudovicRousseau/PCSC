@@ -82,7 +82,7 @@ int SHMClientSetupSession(int processID)
 			("SHMInitializeSharedSegment: Error: connect to client socket: %s",
 			strerror(errno));
 
-		close(appSocket);
+		SYS_CloseFile(appSocket);
 		return -1;
 	}
 
@@ -91,7 +91,7 @@ int SHMClientSetupSession(int processID)
 	{
 		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket "
 			"nonblocking: %s", strerror(errno));
-		close(appSocket);
+		SYS_CloseFile(appSocket);
 		return -1;
 	}
 
@@ -100,7 +100,7 @@ int SHMClientSetupSession(int processID)
 
 int SHMClientCloseSession()
 {
-	close(appSocket);
+	SYS_CloseFile(appSocket);
 	return 0;
 }
 
@@ -188,7 +188,7 @@ int SHMProcessCommonChannelRequest()
 
 	if (i == PCSCLITE_MAX_APPLICATIONS)
 	{
-		close(new_sock);
+		SYS_CloseFile(new_sock);
 		return -1;
 	}
 
@@ -199,7 +199,7 @@ int SHMProcessCommonChannelRequest()
 	{
 		DebugLogB("SHMInitializeSharedSegment: Error: cannot set socket "
 			"nonblocking: %s", strerror(errno));
-		close(clientSockets[i].sd);
+		SYS_CloseFile(clientSockets[i].sd);
 		clientSockets[i].sd = -1;
 		return -1;
 	}
@@ -288,7 +288,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 					msgStruct->mtype = CMD_CLIENT_DIED;
 					msgStruct->request_id = clientSockets[i].sd;
 					msgStruct->command = 0;
-					close(clientSockets[i].sd);
+					SYS_CloseFile(clientSockets[i].sd);
 					clientSockets[i].sd = -1;
 					return 0;
 				}
@@ -556,6 +556,7 @@ int WrapSHMWrite(unsigned int command, unsigned int pid,
 
 void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
 {
-	close(sockValue);
-	unlink(pcFilePath);
+	SYS_CloseFile(sockValue);
+	SYS_Unlink(pcFilePath);
 }
+
