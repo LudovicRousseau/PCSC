@@ -150,6 +150,10 @@
 			settings = {
 			};
 		};
+		F520A5F60257B49C01D97E8A = {
+			isa = PBXTargetDependency;
+			target = F52A93D402541D8C01B94B21;
+		};
 		F520E3A001F6204201B94B28 = {
 			isa = PBXTargetDependency;
 			target = F5294A800090C73501CD285A;
@@ -180,7 +184,6 @@
 		F5294A500090C4CA01CD285A = {
 			children = (
 				F5294A520090C5DF01CD285A,
-				F52A944E0254224301B94B21,
 				F52A94510254232701B94B21,
 				F52A948F0254242101B94B21,
 				F52A94900254242101B94B21,
@@ -226,6 +229,7 @@
 				F503CADB025428F601B94B21,
 				F503CADC025428F601B94B21,
 				F503CADF0254294101B94B21,
+				F58F21310257B6E001ABCE6C,
 			);
 			isa = PBXGroup;
 			refType = 4;
@@ -242,6 +246,7 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
+				F520A5F60257B49C01D97E8A,
 				F520E3A001F6204201B94B28,
 				F520E3A301F6204201B94B28,
 			);
@@ -276,7 +281,7 @@
 				F5294A840090C73501CD285A,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/corcoran/sources/PCSC/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "/System/Library/Frameworks/CoreFoundation.framework/Headers /System/Library/Frameworks/IOKit.framework/Headers/usb /System/Library/Frameworks/IOKit.framework/Headers";
 				INSTALL_PATH = /usr/sbin;
 				LIBRARY_SEARCH_PATHS = "\"\" \"\" \"\"";
@@ -374,6 +379,7 @@
 				F5294AD80090CAE601CD285A,
 			);
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -410,7 +416,7 @@
 		F5294AD70090CAE601CD285A = {
 			buildActionMask = 2147483647;
 			files = (
-				F52A944F0254224301B94B21,
+				F58F21330257B6E001ABCE6C,
 			);
 			isa = PBXFrameworksBuildPhase;
 			name = "Frameworks & Libraries";
@@ -448,6 +454,7 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = "";
 				FRAMEWORK_VERSION = A;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
@@ -561,6 +568,7 @@
 				F52A93DE02541D8C01B94B21,
 			);
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -597,7 +605,7 @@
 		F52A93DD02541D8C01B94B21 = {
 			buildActionMask = 2147483647;
 			files = (
-				F52A94500254224301B94B21,
+				F58F21340257B6E001ABCE6C,
 			);
 			isa = PBXFrameworksBuildPhase;
 			name = "Frameworks & Libraries";
@@ -618,6 +626,7 @@
 				F52A93E402541D8C01B94B21,
 			);
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bundle -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -689,6 +698,7 @@
 		F52A93E302541D8C01B94B21 = {
 			buildActionMask = 2147483647;
 			files = (
+				F58F21350257B6E101ABCE6C,
 			);
 			isa = PBXFrameworksBuildPhase;
 			name = "Frameworks & Libraries";
@@ -714,6 +724,7 @@
 				F52A93EB02541DC601B94B21,
 			);
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bundle -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -785,6 +796,7 @@
 		F52A93EA02541DC601B94B21 = {
 			buildActionMask = 2147483647;
 			files = (
+				F58F21360257B6E101ABCE6C,
 			);
 			isa = PBXFrameworksBuildPhase;
 			name = "Frameworks & Libraries";
@@ -795,24 +807,6 @@
 			);
 			isa = PBXRezBuildPhase;
 			name = "ResourceManager Resources";
-		};
-		F52A944E0254224301B94B21 = {
-			isa = PBXFrameworkReference;
-			name = PCSC.framework;
-			path = ../../../../../../../System/Library/Frameworks/PCSC.framework;
-			refType = 3;
-		};
-		F52A944F0254224301B94B21 = {
-			fileRef = F52A944E0254224301B94B21;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52A94500254224301B94B21 = {
-			fileRef = F52A944E0254224301B94B21;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F52A94510254232701B94B21 = {
 			isa = PBXFileReference;
@@ -1358,6 +1352,36 @@
 		};
 		F52A94E7025424F101B94B21 = {
 			fileRef = F52A94A40254242101B94B21;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F58F21310257B6E001ABCE6C = {
+			isa = PBXFrameworkReference;
+			name = PCSC.framework;
+			path = build/PCSC.framework;
+			refType = 2;
+		};
+		F58F21330257B6E001ABCE6C = {
+			fileRef = F58F21310257B6E001ABCE6C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F58F21340257B6E001ABCE6C = {
+			fileRef = F58F21310257B6E001ABCE6C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F58F21350257B6E101ABCE6C = {
+			fileRef = F58F21310257B6E001ABCE6C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F58F21360257B6E101ABCE6C = {
+			fileRef = F58F21310257B6E001ABCE6C;
 			isa = PBXBuildFile;
 			settings = {
 			};

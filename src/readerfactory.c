@@ -386,7 +386,7 @@ LONG RFSetReaderName( PREADER_CONTEXT rContext, LPSTR readerName,
   int usedDigits[PCSCLITE_MAX_CONTEXTS];
   int i;
 
-  currentDigit=-1; i=0; rv=-1; supportedChannels=0; valueLength=0;
+  currentDigit=-1; i=0; rv=-1; supportedChannels=0; valueLength=sizeof(tagValue);
   tagValue=0;
 
   /* Clear the taken list */
