@@ -32,4 +32,9 @@ ULONG HPRegisterForHotplugEvents(void)
 	return 0;
 }
 
+LONG HPStopHotPluggables(void)
+{
+	return 0;
+}
+
 #endif
