@@ -43,6 +43,8 @@ static PCSCLITE_MUTEX mcardMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static SCARDCONTEXT localHContext = 0;
 static ULONG blockingContext      = MSC_BLOCKSTATUS_RESUME;
+static pthread_t callbackThread;
+
 /*
  * internal function 
  */
@@ -396,7 +398,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 		(strcmp(slotName, tokenStruct->slotName) != 0) ||
 		(memcmp(tokenId, tokenStruct->tokenId, tokenIdLength) != 0))
 	{
-
+	        DebugLogA("Internal inconsistent values, ID, slotName\n");
 		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
 		pConnection->hCard = 0;
 		return MSC_INCONSISTENT_STATUS;
@@ -459,34 +461,37 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 
 	if (rv != MSC_SUCCESS)
 	{
-		SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
-		if (pConnection->tokenLibHandle != 0)
-		{
-			TPUnloadToken(pConnection);
-			pConnection->tokenLibHandle = 0;
-		}
-		pConnection->hCard = 0;
+	        SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
+	        if (pConnection->tokenLibHandle != 0)
+	        {
+		       TPUnloadToken(pConnection);
+		       pConnection->tokenLibHandle = 0;
+	        }
+	        pConnection->hCard = 0;
 	}
 
-	if ((applicationName == 0) || (nameSize == 0))
+	if (sharingMode != MSC_SHARE_DIRECT)
 	{
-		/*
-		 * Use the default AID given by the Info.plist 
-		 */
-		rv = (*libPL_MSCIdentifyToken) (pConnection);
-	} else
-	{
-		pConnection->tokenInfo.tokenAppLen = nameSize;
-		memcpy(pConnection->tokenInfo.tokenApp, applicationName, nameSize);
-		rv = (*libPL_MSCIdentifyToken) (pConnection);
-	}
+
+	        if ((applicationName == 0) || (nameSize == 0))
+	        {
+		        /*
+		         * Use the default AID given by the Info.plist 
+		         */
+
+		         rv = (*libPL_MSCIdentifyToken) (pConnection);
+  	        } else
+	        {
+		        pConnection->tokenInfo.tokenAppLen = nameSize;
+		        memcpy(pConnection->tokenInfo.tokenApp, 
+			       applicationName, nameSize);
+		        rv = (*libPL_MSCIdentifyToken) (pConnection);
+	        }
 
 #ifdef MSC_DEBUG
 	DebugLogC("MSCIdentifyToken returns %s\n", msc_error(rv));
 #endif
 
-	if (sharingMode != MSC_SHARE_DIRECT)
-	{
 		if (rv != MSC_SUCCESS)
 		{
 			SCardDisconnect(pConnection->hCard, SCARD_LEAVE_CARD);
@@ -791,7 +796,6 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 {
 	MSCLPEventWaitInfo evlist;
 	MSCULong32 curToken;
-	pthread_t newThread;
 
 	/*
 	 * Create the event wait list 
@@ -835,7 +839,8 @@ MSC_RV MSCCallbackForTokenEvent(MSCLPTokenInfo tokenArray,
 	}
 	mscUnLockThread();
 
-	if (pthread_create(&newThread, NULL, _MSCEventThread, (void *) evlist))
+	if (pthread_create(&callbackThread, NULL, _MSCEventThread, 
+			   (void *) evlist))
 	{
 		return MSC_INTERNAL_ERROR;
 	}
@@ -854,12 +859,16 @@ MSC_RV MSCCallbackCancelEvent()
                 blockingContext = MSC_BLOCKSTATUS_CANCELLING;
 	        rv = MSCCancelEventWait();
 
+		pthread_join(&callbackThread, 0);
+
+		/*
                 while (1) {
 		        if (blockingContext == MSC_BLOCKSTATUS_RESUME) 
 		        {
 		                break;
 		        }
 		}
+		*/
 	} 
 
       return MSC_SUCCESS;
