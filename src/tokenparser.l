@@ -80,7 +80,7 @@ int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
                               char *tokenValue, int tokenIndice)
 {
 	FILE *file = NULL;
-	ret = 0;
+	int ret = 0;
 
 	desiredIndex  = tokenIndice;
 	pcDesiredKey  = tokenKey;
