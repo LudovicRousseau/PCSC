@@ -1,3 +1,21 @@
+pcsc-lite-1.2.9-beta2: Ludovic Rousseau
+11 May 2004
+- change libmusclecard current version to 1 so that old libmusclecard0 and new
+  libmusclecard1 can cohabitate on the same system and will not break existing
+  programs during upgrades.
+
+  This is because libmusclecard is provided in the same distrib/package as
+  libpcsclite. If we want two libpcsclite to cohabitate we must also ensure
+  that the two libmusclecard can also cohabitate.
+- src/pcscdaemon.c: print pcsc-lite version number during startup
+- src/winscard.c: in SCardReconnect(), SCardDisconnect() and
+  SCardEndTransaction() SCARD_UNPOWER_CARD is "Power down the card and reset
+  it (Cold Reset)" so we really power down _and_ then power up the card.
+- doc/pcsc-lite.tex: add the chapter "Multithreading and contexts"
+- doc/ifdhandler-3.tex: IFD Handler API in LaTeX format
+- correct some minor typos in documentation and output texts
+
+
 pcsc-lite-1.2.9-beta1: Ludovic Rousseau
 6 May 2004
 - configure: add support of --enable-extendedapdu argument to allow the use of
