@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999-2004
+ * Copyright (C) 1999-2005
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -86,7 +86,7 @@ void SVCServiceRunLoop(void)
 
 	if (rsp == -1)
 	{
-		DebugLogA("Error initializing pcscd.");
+		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
 		exit(-1);
 	}
 
@@ -97,7 +97,7 @@ void SVCServiceRunLoop(void)
 
 	if (rv == -1)
 	{
-		DebugLogA("Error initializing pcscd.");
+		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
 		exit(-1);
 	}
 
@@ -133,12 +133,12 @@ void SVCServiceRunLoop(void)
 		{
 
 		case 0:
-			DebugLogB("A new context thread creation is requested: %d", dwClientID);
+			Log2(PCSC_LOG_DEBUG, "A new context thread creation is requested: %d", dwClientID);
 			rv = CreateContextThread(&dwClientID);
 
  			if (rv != SCARD_S_SUCCESS)
 			{
-				DebugLogA("Problem during the context thread creation");
+				Log1(PCSC_LOG_ERROR, "Problem during the context thread creation");
 				AraKiri = TRUE;
 			}
 
@@ -153,11 +153,11 @@ void SVCServiceRunLoop(void)
 			break;
 
 		case -1:
-			DebugLogA("Error in SHMProcessEventsServer");
+			Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
 			break;
 
 		default:
-			DebugLogB("SHMProcessEventsServer unknown retval: %d",
+			Log2(PCSC_LOG_ERROR, "SHMProcessEventsServer unknown retval: %d",
 				rsp);
 			break;
 		}
@@ -182,14 +182,17 @@ int main(int argc, char **argv)
 	struct stat fStatBuf;
 	int opt;
 #ifdef HAVE_GETOPT_LONG
-	int option_index;
+	int option_index = 0;
 	static struct option long_options[] = {
 		{"config", 1, 0, 'c'},
 		{"foreground", 0, 0, 'f'},
-		{"debug", 1, 0, 'd'},
 		{"help", 0, 0, 'h'},
 		{"version", 0, 0, 'v'},
 		{"apdu", 0, 0, 'a'},
+		{"debug", 0, 0, 'd'},
+		{"info", 0, 0, 0},
+		{"error", 0, 0, 0},
+		{"critical", 0, 0, 0},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -221,13 +224,13 @@ int main(int argc, char **argv)
 	 * Handle any command line arguments 
 	 */
 #ifdef  HAVE_GETOPT_LONG
-	while ((opt = getopt_long (argc, argv, "c:fd:hva", long_options, &option_index)) != -1) {
+	while ((opt = getopt_long (argc, argv, "c:fdhva", long_options, &option_index)) != -1) {
 #else
-	while ((opt = getopt (argc, argv, "c:fd:hva")) != -1) {
+	while ((opt = getopt (argc, argv, "c:fdhva")) != -1) {
 #endif
 		switch (opt) {
 			case 'c':
-				DebugLogB("using new config file: %s", optarg);
+				Log2(PCSC_LOG_INFO, "using new config file: %s", optarg);
 				newReaderConfig = optarg;
 				break;
 
@@ -235,36 +238,12 @@ int main(int argc, char **argv)
 				setToForeground = TRUE;
 				/* debug to stderr instead of default syslog */
 				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
-				DebugLogA("pcscd set to foreground with debug send to stderr");
+				Log1(PCSC_LOG_INFO,
+					"pcscd set to foreground with debug send to stderr");
 				break;
 
 			case 'd':
-				if (strcmp(optarg, "syslog") == 0) 
-					DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
-				else
-				{
-					if (strcmp(optarg, "stderr") == 0)
-					{
-						DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
-						DebugLogA("debug messages send to stderr");
-						setToForeground = TRUE;
-					} 
-					else
-					{
-						if (strcmp(optarg, "stdout") == 0)
-						{
-							DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
-							DebugLogA("debug messages send to stdout");
-							setToForeground = TRUE;
-						}
-						else
-						{
-							printf("unknown --debug argument: %s\n", optarg);
-							print_usage (argv[0]);
-							return EXIT_FAILURE;
-						}
-					}
-				}
+				DebugLogSetLevel(PCSC_LOG_DEBUG);
 				break;
 
 			case 'h':
@@ -280,8 +259,22 @@ int main(int argc, char **argv)
 				break;
 
 			default:
-				print_usage (argv[0]);
-				return EXIT_FAILURE;
+				if (0 == option_index)
+				{
+					print_usage (argv[0]);
+					return EXIT_FAILURE;
+				}
+
+				if (0 == strcmp(long_options[option_index].name, "critical"))
+					DebugLogSetLevel(PCSC_LOG_CRITICAL);
+
+				if (0 == strcmp(long_options[option_index].name, "error"))
+					DebugLogSetLevel(PCSC_LOG_ERROR);
+
+				/*
+				 * --notice is the default level
+				 * --debug is already treated by the short option -d
+				 */
 		}
 
 	}
@@ -316,8 +309,10 @@ int main(int argc, char **argv)
 
 			if (kill(pid, 0) == 0)
 			{
-				DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
-				DebugLogB("Another pcscd (pid: %d) seems to be running.", pid);
+				Log1(PCSC_LOG_CRITICAL,
+					"file " PCSCLITE_PUBSHM_FILE " already exists.");
+				Log2(PCSC_LOG_CRITICAL,
+					"Another pcscd (pid: %d) seems to be running.", pid);
 				return EXIT_FAILURE;
 			}
 			else
@@ -326,18 +321,27 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
-			DebugLogA("Maybe another pcscd is running?");
-			DebugLogA("I can't read process pid from " USE_RUN_PID);
-			DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
-			DebugLogA("if pcscd is not running to clear this message.");
+			Log1(PCSC_LOG_CRITICAL,
+				"file " PCSCLITE_PUBSHM_FILE " already exists.");
+			Log1(PCSC_LOG_CRITICAL,
+				"Maybe another pcscd is running?");
+			Log1(PCSC_LOG_CRITICAL, 
+				"I can't read process pid from " USE_RUN_PID);
+			Log1(PCSC_LOG_CRITICAL,
+				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
+			Log1(PCSC_LOG_CRITICAL,
+				"if pcscd is not running to clear this message.");
 			return EXIT_FAILURE;
 		}
 #else
-		DebugLogA("file " PCSCLITE_PUBSHM_FILE " already exists.");
-		DebugLogA("Maybe another pcscd is running?");
-		DebugLogA("Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
-		DebugLogA("if pcscd is not running to clear this message.");
+		Log1(PCSC_LOG_CRITICAL,
+			"file " PCSCLITE_PUBSHM_FILE " already exists.");
+		Log1(PCSC_LOG_CRITICAL,
+			"Maybe another pcscd is running?");
+		Log1(PCSC_LOG_CRITICAL,
+			"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
+		Log1(PCSC_LOG_CRITICAL,
+			"if pcscd is not running to clear this message.");
 		return EXIT_FAILURE;
 #endif
 	}
@@ -348,7 +352,8 @@ int main(int argc, char **argv)
 	if (!setToForeground)
 	{
 		if (SYS_Daemon(0, 0))
-			DebugLogB("SYS_Daemon() failed: %s", strerror(errno));
+			Log2(PCSC_LOG_CRITICAL, "SYS_Daemon() failed: %s",
+				strerror(errno));
 	}
 
 	/*
@@ -384,15 +389,15 @@ int main(int argc, char **argv)
 		rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
 		if (rv != 0)
 		{
-			DebugLogB("cannot create " PCSCLITE_IPC_DIR ": %s",
-				strerror(errno));
+			Log2(PCSC_LOG_CRITICAL,
+				"cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
 			return EXIT_FAILURE;
 		}
 	}
 
 	/* cleanly remove /var/run/pcsc.* files when exiting */
 	if (atexit(at_exit))
-		DebugLogB("atexit() failed: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "atexit() failed: %s", strerror(errno));
 
 	/*
 	 * Allocate memory for reader structures 
@@ -407,7 +412,7 @@ int main(int argc, char **argv)
 		rv = DBUpdateReaders(newReaderConfig);
 		if (rv != 0)
 		{
-			DebugLogC("invalid file %s: %s", newReaderConfig,
+			Log3(PCSC_LOG_CRITICAL, "invalid file %s: %s", newReaderConfig,
 				strerror(errno));
 			at_exit();
 		}
@@ -419,7 +424,8 @@ int main(int argc, char **argv)
 #if 0
 		if (rv == 1)
 		{
-			DebugLogA("warning: no " PCSCLITE_READER_CONFIG " found");
+			Log1(PCSC_LOG_INFO,
+				"warning: no " PCSCLITE_READER_CONFIG " found");
 			/*
 			 * Token error in file 
 			 */
@@ -437,7 +443,7 @@ int main(int argc, char **argv)
 	g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
 	g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
 
-	DebugLogA("pcsc-lite " VERSION " daemon ready.");
+	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
 	/*
 	 * post initialistion 
@@ -454,13 +460,13 @@ int main(int argc, char **argv)
 
 	SVCServiceRunLoop();
 
-	DebugLogA("SVCServiceRunLoop returned");
+	Log1(PCSC_LOG_ERROR, "SVCServiceRunLoop returned");
 	return EXIT_FAILURE;
 }
 
 void at_exit(void)
 {
-	DebugLogA("cleaning " PCSCLITE_IPC_DIR);
+	Log1(PCSC_LOG_INFO, "cleaning " PCSCLITE_IPC_DIR);
 
 	clean_temp_files();
 
@@ -473,18 +479,18 @@ void clean_temp_files(void)
 
 	rv = SYS_Unlink(PCSCLITE_PUBSHM_FILE);
 	if (rv != 0)
-		DebugLogB("Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",
 			strerror(errno));
 
 	rv = SYS_Unlink(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
-		DebugLogB("Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
 #ifdef USE_RUN_PID
 	rv = SYS_Unlink(USE_RUN_PID);
 	if (rv != 0)
-		DebugLogB("Cannot unlink " USE_RUN_PID ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot unlink " USE_RUN_PID ": %s",
 			strerror(errno));
 #endif
 }
@@ -494,7 +500,7 @@ void signal_trap(int sig)
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
 	{
-		DebugLogA("Preparing for suicide");
+		Log1(PCSC_LOG_INFO, "Preparing for suicide");
 		AraKiri = TRUE;
 
 		/* if still in the init/loading phase the AraKiri will not be
@@ -502,7 +508,7 @@ void signal_trap(int sig)
 		 */
 		if (Init)
 		{
-			DebugLogA("Suicide during init");
+			Log1(PCSC_LOG_INFO, "Suicide during init");
 			at_exit();
 		}
 	}
@@ -512,31 +518,31 @@ void print_version (void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@linuxnet.com>.\n");
-	printf("Copyright (C) 2001-2004 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
+	printf("Copyright (C) 2001-2005 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
 	printf("Copyright (C) 2003-2004 by Damien Sauveron <sauveron@labri.fr>.\n");
 	printf("Report bugs to <sclinux@linuxnet.com>.\n");
 }
 
 void print_usage (char const * const progname)
 {
-	printf("Usage: %s [-a] [-c file] [-f] [-d output] [-v] [-h]\n", progname);
+	printf("Usage: %s options\n", progname);
 	printf("Options:\n");
 #ifdef HAVE_GETOPT_LONG
 	printf("  -a, --apdu		log APDU commands and results\n");
 	printf("  -c, --config		path to reader.conf\n");
-	printf("  -f, --foreground	run in foreground (no daemon) (imply --debug stderr)\n");
-	printf("  -d, --debug output	display debug messages. Output may be:\n"); 
-	printf("			\"stdout\" (imply -f), \"stderr\" (imply -f),\n");
-	printf("			or \"syslog\"\n");
+	printf("  -f, --foreground	run in foreground (no daemon),\n");
+	printf("			send logs to stderr instead of syslog\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -v, --version		display the program version number\n");
+	printf("  -d, --debug	 	display lower level debug messages\n"); 
+	printf("      --info	 	display info level debug messages (default level)\n"); 
+	printf("      --error	 	display error level debug messages\n"); 
+	printf("      --critical 	display critical only level debug messages\n"); 
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
-	printf("  -f 	run in foreground (no daemon)\n");
+	printf("  -f	run in foreground (no daemon), send logs to stderr instead of syslog\n");
 	printf("  -d 	display debug messages. Output may be:\n"); 
-	printf("	stdout (imply -f), stderr (imply -f),\n");
-	printf("	or syslog\n");
 	printf("  -h 	display usage information\n");
 	printf("  -v 	display the program version number\n");
 #endif
