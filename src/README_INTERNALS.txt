@@ -54,7 +54,7 @@ I (Damien Sauveron) will try to explain the following concepts:
 	/* Maximum of applications contexts that PC/SC Ressources Manager can accept */
 
 #define PCSCLITE_MAX_READER_CONTEXT_CHANNELS      16	/* Maximum channels on a reader context */
-#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS 16	/* Maximum channels on a client context */
+#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS 16	/* Maximum channels on an application context */
 
 #define PCSCLITE_MAX_READERS_CONTEXTS            256	/* Maximum readers context (a slot is count as a reader) */
 
