@@ -22,7 +22,7 @@ PCSC_HOTPLUG_SRC  = \
 	hotplug_linux.c hotplug_macosx.c
 PCSC_POWERMGT_SRC = powermgt_generic.c powermgt_macosx.c
 
-if MSC_ENABLE_SCF
+if HAVE_SCF
 PCSC_CLIENT_SRC  = winscard_scf.c
 else
 PCSC_CLIENT_SRC  = winscard_clnt.c
@@ -97,4 +97,4 @@ pc_DATA = libpcsclite.pc
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
-EXTRA_DIST = README_INTERNALS.txt dyn_win32.c thread_win32.c
+EXTRA_DIST = README_INTERNALS.txt dyn_win32.c thread_win32.c winscard_scf.c
