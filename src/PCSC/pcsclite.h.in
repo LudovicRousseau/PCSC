@@ -231,11 +231,8 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define BLOCK_STATUS_RESUME		0x00FF	/* Normal resume */
 #define BLOCK_STATUS_BLOCKING		0x00FA	/* Function is blocking */
 
-#ifndef USE_READER_CONF
-#define PCSCLITE_CONFIG_DIR		"/etc"
-#else
-#define PCSCLITE_CONFIG_DIR		USE_READER_CONF
-#endif
+#define PCSCLITE_CONFIG_DIR		"@confdir_exp@"
+
 #ifndef USE_IPCDIR
 #define PCSCLITE_IPC_DIR		"/var/run"
 #else
