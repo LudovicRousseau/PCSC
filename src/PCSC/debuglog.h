@@ -20,11 +20,15 @@ $Id$
  * DebugLogA("text");
  *  log "text"
  *
- * DebugLogB("text: %d", 1234)
+ * DebugLogB("text: %d", 1234);
  *  log "text: 1234"
  * the format string can be anything printf() can understand
  *
- * DebugXxd(msg, buffer, size)
+ * DebugLogC("text: %d %d", 1234, 5678);
+ *  log "text: 1234 5678"
+ * the format string can be anything printf() can understand
+ *
+ * DebugXxd(msg, buffer, size);
  *  log "msg" + a hex dump of size bytes of buffer[]
  *
  */
