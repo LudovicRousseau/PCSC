@@ -78,7 +78,7 @@ void PMPowerRegistrationThread() {
     root_port = IORegisterForSystemPower (0,&notify,PMPowerEventCallback,&anIterator);
   
     if ( root_port == NULL ) {
-            printf("IORegisterForSystemPower failed\n");
+            DebugLogA("IORegisterForSystemPower failed");
             return;
     }
     
