@@ -41,7 +41,10 @@ case "$host" in
 	CPPFLAGS="$CPPFLAGS -D_POSIX_PII_SOCKET"
 	;;
 *-*-darwin*)
-	LIBS="$LIBS -lobjc"
+	AC_SUBST(COREFOUNDATION)
+	COREFOUNDATION="-Wl,-framework,CoreFoundation"
+	AC_SUBST(IOKIT)
+	IOKIT="-Wl,-framework,IOKit"
 	if test "$GCC" = "yes"; then
 		CFLAGS="$CFLAGS -no-cpp-precomp"
 	fi

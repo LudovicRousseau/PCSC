@@ -5,6 +5,7 @@ SUBDIRS = . utils
 if HAVE_MUSCLECARD
 MC_LIBS = libmusclecard.la
 MC_BIN = muscletest
+MC_HDR = mscdefines.h musclecard.h
 endif
 
 lib_LTLIBRARIES = libpcsclite.la $(MC_LIBS)
@@ -17,11 +18,9 @@ PCSC_DYNLOAD_SRC = dyn_unix.c dyn_hpux.c dyn_macosx.c
 PCSC_SYSTEM_SRC  = sys_unix.c
 PCSC_THREAD_SRC  = thread_unix.c
 PCSC_HOTPLUG_SRC  = \
-	hotplug_generic.c
-# hotplug_libusb.c \
-#	hotplug_linux.c hotplug_macosx.c
-PCSC_POWERMGT_SRC = powermgt_generic.c
-# powermgt_macosx.c
+	hotplug_generic.c hotplug_libusb.c \
+	hotplug_linux.c hotplug_macosx.c
+PCSC_POWERMGT_SRC = powermgt_generic.c powermgt_macosx.c
 
 if MSC_ENABLE_SCF
 PCSC_CLIENT_SRC  = winscard_scf.c
@@ -32,9 +31,6 @@ endif
 if PCSC_THR_SAFE
 PCSC_CLIENT_THR = $(PCSC_THREAD_SRC)
 endif
-
-#PCSC_INCLUDE_LIBS   = -Wl,-framework,IOKit
-#PCSCD_INCLUDE_LIBS  = -Wl,-framework,IOKit -Wl,-framework,CoreFoundation
 
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
@@ -61,7 +57,7 @@ libpcsclite_la_SOURCES = \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_CLIENT_THR)
 libpcsclite_la_LDFLAGS = -version-info 0:1:0
-libpcsclite_la_LIBADD = @LIBSMARTCARD@
+libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@
 
 libmusclecard_la_SOURCES = \
 	musclecard.c \
@@ -72,7 +68,9 @@ libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
-pcscd_LDADD = libpcsclite-core.la @LIBUSB@ @LIBDL@ @LIBFL@ @PTHREAD_LIBS@
+pcscd_LDADD = libpcsclite-core.la \
+	@PTHREAD_LIBS@ @COREFOUNDATION@ \
+	@LIBUSB@ @LIBDL@ @LIBFL@ @IOKIT@
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
@@ -81,8 +79,8 @@ muscletest_SOURCES = muscletest.c
 muscletest_LDADD = libmusclecard.la
 
 include_HEADERS = \
-	debuglog.h mscdefines.h musclecard.h \
-	pcsclite.h winscard.h wintypes.h
+	debuglog.h pcsclite.h winscard.h wintypes.h \
+	$(MC_HDR)
 noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
 	hotplug.h ifdhandler.h ifdwrapper.h parser.h \
