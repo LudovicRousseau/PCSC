@@ -149,7 +149,8 @@ int main(int argc, char **argv)
 	printf("Testing SCardStatus              : ");
 
 	dwReaderLen = 50;
-	pcReaders = (char *) malloc(sizeof(char) * 50);
+	pcReaders   = (char *) malloc(sizeof(char) * 50);
+	dwAtrLen    = MAX_ATR_SIZE;
 
 	rv = SCardStatus(hCard, pcReaders, &dwReaderLen, &dwState, &dwProt,
 		pbAtr, &dwAtrLen);
