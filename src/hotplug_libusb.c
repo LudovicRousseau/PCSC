@@ -330,7 +330,7 @@ LONG HPSearchHotPluggables(void)
 	return 0;
 }
 
-LONG HPStopHotPluggables()
+LONG HPStopHotPluggables(void)
 {
 	AraKiriHotPlug = TRUE;
 
