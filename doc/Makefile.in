@@ -10,6 +10,8 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+# $Id$
+
 
 SHELL = @SHELL@
 
@@ -72,7 +74,7 @@ RANLIB = @RANLIB@
 ac_aux_dir = @ac_aux_dir@
 
 datadir = $(prefix)/doc
-data_DATA = pcsc-lite-0.8.7.pdf README.DAEMON
+data_DATA = pcsc-lite-0.8.7.pdf README.DAEMON pcscd.startup
 man_MANS = pcscd.8 bundleTool.1
 EXTRA_DIST = $(data_DATA) $(man_MANS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/build/mkinstalldirs

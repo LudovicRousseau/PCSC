@@ -44,7 +44,7 @@ PCSC_INCLUDE_LIBS   = -ll -lIOKit
 PCSCD_INCLUDE_LIBS  = -ll -lIOKit
 PCSC_THREAD_SOURCE  = thread_macosx.c
 PCSC_DYNLOAD_SOURCE = dyn_macosx.c
-PCSC_HOTPLUG_SOURCE = hotplug_macosx.c
+PCSC_HOTPLUG_SOURCE = hotplug_macosx.c powermgt_macosx.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 INCLUDES  = -I/System/Library/Frameworks/IOKit.framework/Headers/usb \
             -I/System/Library/Frameworks/IOKit.framework/Headers
