@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 		dwSendLength = x;
 
 		line_ptr = strchr(line_ptr, ' ') +1;
-		if (line_ptr == NULL+1)
+		if (line_ptr == (char *)(NULL+1))
 			break;
 
 		for (i = 0; i < dwSendLength; i++)
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
 			line_ptr = strchr(line_ptr, ' ') +1;
 
-			if (line_ptr == NULL+1)
+			if (line_ptr == (char *)(NULL+1))
 				break;
 		}
 
