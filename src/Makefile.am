@@ -135,7 +135,7 @@ libpcsclite_la_SOURCES = $(PCSC_CLIENT_SRC) debuglog.c $(PCSC_SYSTEM_SOURCE) \
 
 libpcsclite_la_LDFLAGS = $(PCSC_INCLUDE_LIBS) -version-info 0:1:0
 
-pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c \
+pcscd_SOURCES = pcscdaemon.c winscard_svc.c \
 	thread_generic.h readerfactory.h \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h hotplug.h \
 	ifdhandler.h ifdwrapper.h powermgt_generic.h prothandler.h \
