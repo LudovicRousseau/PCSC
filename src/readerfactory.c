@@ -174,7 +174,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary)
 	 * If a clone to this reader exists take some values from that clone 
 	 */
 	if (parentNode != -1 && parentNode < PCSCLITE_MAX_CONTEXTS
-		&& parentNode > 0)
+		&& parentNode >= 0)
 	{
 		(sContexts[dwContext])->dwFeeds = 
 		  (sContexts[parentNode])->dwFeeds;
