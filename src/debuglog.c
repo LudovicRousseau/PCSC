@@ -32,21 +32,21 @@
  * Should be bigger than 256*3+30 */
 #define DEBUG_BUF_SIZE 2048
 
-static int lSuppress = DEBUGLOG_LOG_ENTRIES;
-static int debug_msg_type = DEBUGLOG_NO_DEBUG;
-static int debug_category = DEBUG_CATEGORY_NOTHING;
+static char LogSuppress = DEBUGLOG_LOG_ENTRIES;
+static char LogMsgType = DEBUGLOG_NO_DEBUG;
+static char LogCategory = DEBUG_CATEGORY_NOTHING;
 
 /* default level is a bit verbose to be backward compatible */
-static int log_level = PCSC_LOG_INFO;
+static char LogLevel = PCSC_LOG_INFO;
 
 void log_msg(const int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (priority < log_level) /* log priority lower than threshold? */
-		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
+	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (priority < LogLevel) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
 	va_start(argptr, fmt);
@@ -62,7 +62,7 @@ void log_msg(const int priority, const char *fmt, ...)
 	va_end(argptr);
 
 #ifndef WIN32
-	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
+	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
 #endif
@@ -77,9 +77,9 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	char *c;
 	char *debug_buf_end;
 
-	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (priority < log_level) /* log priority lower than threshold? */
-		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
+	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (priority < LogLevel) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
 	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
@@ -94,7 +94,7 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	}
 
 #ifndef WIN32
-	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
+	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
 #endif
@@ -103,7 +103,7 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 
 void DebugLogSuppress(const int lSType)
 {
-	lSuppress = lSType;
+	LogSuppress = lSType;
 }
 
 void DebugLogSetLogType(const int dbgtype)
@@ -113,18 +113,18 @@ void DebugLogSetLogType(const int dbgtype)
 		case DEBUGLOG_NO_DEBUG:
 		case DEBUGLOG_SYSLOG_DEBUG:
 		case DEBUGLOG_STDERR_DEBUG:
-			debug_msg_type = dbgtype;
+			LogMsgType = dbgtype;
 			break;
 		default:
 			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stderr",
 				dbgtype);
-			debug_msg_type = DEBUGLOG_STDERR_DEBUG;
+			LogMsgType = DEBUGLOG_STDERR_DEBUG;
 	}
 }
 
 void DebugLogSetLevel(const int level)
 {
-	log_level = level;
+	LogLevel = level;
 	switch (level)
 	{
 		case PCSC_LOG_CRITICAL:
@@ -144,7 +144,7 @@ void DebugLogSetLevel(const int level)
 			break;
 
 		default:
-			log_level = PCSC_LOG_INFO;
+			LogLevel = PCSC_LOG_INFO;
 			Log2(PCSC_LOG_CRITICAL, "unknown level (%d), using level=notice",
 				level);
 	}
@@ -159,30 +159,30 @@ int DebugLogSetCategory(const int dbginfo)
 	 * typically use ~DEBUG_CATEGORY_APDU
 	 */
 	if (dbginfo < 0)
-		debug_category &= dbginfo;
+		LogCategory &= dbginfo;
 	else
-		debug_category |= dbginfo;
+		LogCategory |= dbginfo;
 
 	/* set to empty string */
 	text[0] = '\0';
 
-	if (debug_category & DEBUG_CATEGORY_APDU)
+	if (LogCategory & DEBUG_CATEGORY_APDU)
 		strlcat(text, " APDU", sizeof(text));
 
 	Log2(PCSC_LOG_INFO, "Debug options:%s", text);
 
-	return debug_category;
+	return LogCategory;
 }
 
 void DebugLogCategory(const int category, const unsigned char *buffer,
 	const int len)
 {
 	if ((category & DEBUG_CATEGORY_APDU)
-		&& (debug_category & DEBUG_CATEGORY_APDU))
+		&& (LogCategory & DEBUG_CATEGORY_APDU))
 		log_xxd(PCSC_LOG_INFO, "APDU: ", (const unsigned char *)buffer, len);
 
 	if ((category & DEBUG_CATEGORY_SW)
-		&& (debug_category & DEBUG_CATEGORY_APDU))
+		&& (LogCategory & DEBUG_CATEGORY_APDU))
 		log_xxd(PCSC_LOG_INFO, "SW: ", (const unsigned char *)buffer, len);
 }
 
@@ -322,8 +322,8 @@ void debug_msg(const char *fmt, ...)
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if ((lSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (DEBUGLOG_NO_DEBUG == debug_msg_type))
+	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
 	va_start(argptr, fmt);
@@ -339,7 +339,7 @@ void debug_msg(const char *fmt, ...)
 	va_end(argptr);
 
 #ifndef WIN32
-	if (DEBUGLOG_SYSLOG_DEBUG == debug_msg_type)
+	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
 #endif
