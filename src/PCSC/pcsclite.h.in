@@ -198,6 +198,10 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 /* Maximum readers context (a slot is count as a reader) */
 #define PCSCLITE_MAX_READERS_CONTEXTS			16
 
+/* PCSCLITE_MAX_READERS is deprecated
+ * use PCSCLITE_MAX_READERS_CONTEXTS instead */
+/* extern int PCSCLITE_MAX_READERS __attribute__ ((deprecated)); */
+
 #define PCSCLITE_MAX_THREADS		16	/* Stat change threads */
 #define PCSCLITE_STATUS_WAIT		200000	/* Status Change Sleep */
 #define PCSCLITE_TRANSACTION_TIMEOUT	40	/* Transaction timeout */
