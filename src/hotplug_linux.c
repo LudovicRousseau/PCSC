@@ -105,9 +105,6 @@ LONG HPReadBundleValues()
 	char keyValue[200];
 	int listCount = 0;
 
-	hpDir = NULL;
-	rv = 0;
-
 	hpDir = opendir(PCSCLITE_HP_DROPDIR);
 
 	if (hpDir == NULL)
@@ -121,48 +118,53 @@ LONG HPReadBundleValues()
 	{
 		if (strstr(currFP->d_name, ".bundle") != 0)
 		{
-			bundleTracker[listCount].bundleName = strdup(currFP->d_name);
+			int alias = 0;
 
 			/*
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle
 			 */
-
 			sprintf(fullPath, "%s%s%s", PCSCLITE_HP_DROPDIR,
 				currFP->d_name, "/Contents/Info.plist");
 
-			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
-				keyValue, 0);
-			if (rv == 0)
+			// while we find a nth ifdVendorID in Info.plist
+			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+				keyValue, alias) == 0)
 			{
-				bundleTracker[listCount].manuID = strtol(keyValue, 0, 16);
-			}
+				bundleTracker[listCount].bundleName = strdup(currFP->d_name);
 
-			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
-				keyValue, 0);
-			if (rv == 0)
-			{
-				bundleTracker[listCount].productID =
-					strtol(keyValue, 0, 16);
-			}
+				// Get ifdVendorID
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_MANUKEY_NAME,
+					keyValue, alias);
+				if (rv == 0)
+					bundleTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
-			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
-				keyValue, 0);
-			if (rv == 0)
-			{
-				bundleTracker[listCount].readerName = strdup(keyValue);
-			}
+				// get ifdProductID
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_PRODKEY_NAME,
+					keyValue, alias);
+				if (rv == 0)
+					bundleTracker[listCount].productID =
+						strtol(keyValue, 0, 16);
 
-			rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
-				keyValue, 0);
-			if (rv == 0)
-			{
-				sprintf(fullLibPath, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
-					currFP->d_name, "/Contents/Linux/", keyValue);
-				bundleTracker[listCount].libraryPath = strdup(fullLibPath);
-			}
+				// get ifdFriendlyName
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_NAMEKEY_NAME,
+					keyValue, alias);
+				if (rv == 0)
+					bundleTracker[listCount].readerName = strdup(keyValue);
 
-			listCount += 1;
+				// get CFBundleExecutable
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_LIBRKEY_NAME,
+					keyValue, 0);
+				if (rv == 0)
+				{
+					sprintf(fullLibPath, "%s%s%s%s", PCSCLITE_HP_DROPDIR,
+						currFP->d_name, "/Contents/Linux/", keyValue);
+					bundleTracker[listCount].libraryPath = strdup(fullLibPath);
+				}
+
+				listCount++;
+				alias++;
+			}
 		}
 	}
 
