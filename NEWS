@@ -1,5 +1,4 @@
-This is the 1.1.1 release of pcsc-lite.  
-This version has gone through 9 months of testing and analysis.
+Read the ChangeLog file for news.
 
 Checkout the new Musclecard.  Its an applet for Java Card which
 will run on any 2.1 compliant card.  It has client side API's 
