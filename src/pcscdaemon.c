@@ -54,6 +54,7 @@ extern int errno;
 void SVCServiceRunLoop();
 void SVCClientCleanup(psharedSegmentMsg);
 void at_exit(void);
+void clean_temp_files(void);
 void signal_trap(int);
 void print_version (void);
 void print_usage (char const * const);
@@ -201,6 +202,7 @@ int main(int argc, char **argv)
 		{"debug", 1, 0, 'd'},
 		{"help", 0, 0, 'h'},
 		{"version", 0, 0, 'v'},
+		{"apdu", 0, 0, 'a'},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -229,7 +231,7 @@ int main(int argc, char **argv)
 	 * Handle any command line arguments 
 	 */
 #ifdef  HAVE_GETOPT_LONG
-	while ((opt = getopt_long (argc, argv, "c:fd:hv", long_options, &option_index)) != -1) {
+	while ((opt = getopt_long (argc, argv, "c:fd:hva", long_options, &option_index)) != -1) {
 #else
 	while ((opt = getopt (argc, argv, "c:fd:hv")) != -1) {
 #endif
@@ -266,6 +268,9 @@ int main(int argc, char **argv)
 			case 'v':
 				print_version ();
 				return 0;
+			case 'a':
+				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
+				break;
 			default:
 				print_usage (argv[0]);
 				return 1;
@@ -281,11 +286,51 @@ int main(int argc, char **argv)
 
 	if (rv == 0)
 	{
+#ifdef USE_RUN_PID
+
+		// read the pid file to get the old pid and test if the old pcscd is
+		// still running 
+
+		FILE *f;
+		// pids are only 15 bits but 4294967296 (32 bits in case of a new
+		// system use it) is on 10 bytes
+#define PID_ASCII_SIZE 11
+		char pid_ascii[PID_ASCII_SIZE];
+		int pid;
+
+		if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
+		{
+			fgets(pid_ascii, PID_ASCII_SIZE, f);
+			fclose(f);
+
+			pid = atoi(pid_ascii);
+
+			if (kill(pid, 0) == 0)
+			{
+				DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
+				DebugLogA("Another pcscd seems to be running");
+				return 1;
+			}
+			else
+				// the old pcscd is dead. make some cleanup
+				clean_temp_files();
+		}
+		else
+		{
+			DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
+			DebugLogA("Maybe another pcscd is running?");
+			DebugLogA("Can't read process pid from" USE_RUN_PID);
+			DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
+			DebugLogA("to clear this message.");
+			return 1;
+		}
+#else
 		DebugLogA("main: Directory " PCSCLITE_IPC_DIR " already exists.");
 		DebugLogA("Maybe another pcscd is running?");
 		DebugLogA("Remove " PCSCLITE_IPC_DIR " if pcscd is not running");
-		DebugLogA("to clear this message");
+		DebugLogA("to clear this message.");
 		return 1;
+#endif
 	}
 
 	/*
@@ -433,9 +478,16 @@ int main(int argc, char **argv)
 
 void at_exit(void)
 {
-	int rv;
-
 	DebugLogA("at_exit: cleaning " PCSCLITE_IPC_DIR);
+
+	clean_temp_files();
+
+	SYS_Exit(1);
+}
+
+void clean_temp_files(void)
+{
+	int rv;
 
 	rv = SYS_Unlink(PCSCLITE_PUBSHM_FILE);
 	if (rv != 0)
@@ -458,8 +510,6 @@ void at_exit(void)
 		DebugLogB("main: Cannot unlink " USE_RUN_PID ": %s",
 			strerror(errno));
 #endif
-
-	SYS_Exit(1);
 }
 
 void signal_trap(int sig)
