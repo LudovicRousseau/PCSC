@@ -2,3 +2,11 @@ bundleTool.8
 Makefile
 Makefile.in
 pcscd.8
+pcsc-lite.aux
+pcsc-lite.bbl
+pcsc-lite.blg
+pcsc-lite.log
+pcsc-lite.out
+pcsc-lite.pdf
+pcsc-lite.toc
+reader.conf.5
