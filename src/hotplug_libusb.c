@@ -253,7 +253,7 @@ void HPEstablishUSBNotifications()
 		 */
 		for (i=0; i<PCSCLITE_MAX_READERS; i++)
 		{
-#ifdef MSC_TARGET_BSD
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 			int fd;
 			char filename[BUS_DEVICE_STRSIZE];
 

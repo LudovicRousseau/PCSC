@@ -39,10 +39,7 @@ $Id$
 #include "debuglog.h"
 #include "readerfactory.h"
 #include "configfile.h"
-
-#ifdef PCSC_TARGET_OSX
 #include "powermgt_generic.h"
-#endif
 
 static char AraKiri = 0;
 static char Init = 1;
@@ -115,11 +112,9 @@ void SVCServiceRunLoop()
 	HPRegisterForHotplugEvents();
 
 	/*
-	 * Set up the power management callback routine for OS X
+	 * Set up the power management callback routine
 	 */
-#ifdef PCSC_TARGET_OSX
 	PMRegisterForPowerEvents();
-#endif
 
 	while (1)
 	{

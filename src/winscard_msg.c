@@ -28,7 +28,7 @@ $Id$
 
 #include "config.h"
 
-#ifdef PCSC_TARGET_SOLARIS
+#ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
 

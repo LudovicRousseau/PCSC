@@ -15,42 +15,6 @@
 /* Version number of package */
 #define VERSION "1.0.2.cvs"
 
-/* Linux */
-#define PCSC_TARGET_LINUX 1
-
-/* Linux */
-#define MSC_TARGET_LINUX 1
-
-/* BSD */
-/* #undef PCSC_TARGET_BSD */
-
-/* BSD */
-/* #undef MSC_TARGET_BSD */
-
-/* OSX */
-/* #undef PCSC_TARGET_OSX */
-
-/* OSX */
-/* #undef MSC_TARGET_OSX */
-
-/* Solaris */
-/* #undef PCSC_TARGET_SOLARIS */
-
-/* Solaris */
-/* #undef MSC_TARGET_SOLARIS */
-
-/* HP-UX */
-/* #undef PCSC_TARGET_HPUX */
-
-/* HP-UX */
-/* #undef MSC_TARGET_HPUX */
-
-/* TRU64 */
-/* #undef PCSC_TARGET_TRU64 */
-
-/* TRU64 */
-/* #undef MSC_TARGET_TRU64 */
-
 /* Define to the necessary symbol if this constant
                            uses a non-standard name on your system. */
 /* #undef PTHREAD_CREATE_JOINABLE */

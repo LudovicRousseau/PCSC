@@ -263,49 +263,15 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 						return -1;
 					}
 				}
-#ifdef WIN32
+#if defined(WIN32)
 				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
 					findData.cFileName, "\\Contents\\Win32\\", keyValue);
-#else
-#ifdef MSC_TARGET_LINUX
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/Linux/", keyValue);
-#else
-#ifdef MSC_TARGET_OSX
+#elif defined(__APPLE__)
 				sprintf(fullLibPath, "%s%s", MSC_SVC_DROPDIR,
 					currFP->d_name);
-
 #else
-#ifdef MSC_TARGET_BSD
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/BSD/", keyValue);
-
-#else
-#ifdef MSC_TARGET_SOLARIS
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/Solaris/", keyValue);
-
-#else
-#ifdef MSC_TARGET_HPUX
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/HPUX/", keyValue);
-
-#else
-#ifdef MSC_TARGET_TRU64
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/Tru64/", keyValue);
-
-#else
-#ifdef MSC_TARGET_CYGWIN
-				sprintf(fullLibPath, "%s%s%s%s", MSC_SVC_DROPDIR,
-					currFP->d_name, "/Contents/CygWin/", keyValue);
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
+				sprintf(fullLibPath, "%s%s/Contents/%s%s", MSC_SVC_DROPDIR,
+					currFP->d_name, PCSC_ARCH, keyValue);
 #endif
 
 				if (fullLibPath == NULL)

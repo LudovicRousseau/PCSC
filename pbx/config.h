@@ -9,10 +9,6 @@
 /* Version number of package */
 #define VERSION "1.1.2"
 
-/* OSX */
-#define PCSC_TARGET_OSX 1
-#define MSC_TARGET_OSX 1
-
 /* Define if you have POSIX threads libraries and header files. */
 #define HAVE_PTHREAD 1
 
