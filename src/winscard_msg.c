@@ -488,6 +488,7 @@ int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	 * Set the appropriate packet parameters 
 	 */
 
+	memset(&msgStruct, 0, sizeof(msgStruct));
 	msgStruct.mtype = CMD_FUNCTION;
 	msgStruct.user_id = SYS_GetUID();
 	msgStruct.group_id = SYS_GetGID();
