@@ -1,3 +1,9 @@
+pcsc-lite-1.1.1: (David Corcoran <corcoran@linuxnet.com>)
+- src/readerfactory.c
+  . Fixed multiple slot handling by adding dwFeeds to multiple slots
+- src/winscard_clnt.c
+  . Fixed multi Establish/Release Context problem by removing CleanupClient
+
 pcsc-lite-1.1.0: (David Corcoran <corcoran@linuxnet.com>)
 28, May, 2002
 - src/mscdefines.h added
