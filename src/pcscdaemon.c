@@ -13,7 +13,6 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
-
 #include <time.h>
 #include <syslog.h>
 #include <signal.h>
@@ -24,8 +23,7 @@ $Id$
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef  HAVE_GETOPT_H
+#ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif
 
@@ -98,7 +96,7 @@ void SVCServiceRunLoop()
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
-								 * when the shell is existed */
+					 * when the shell is existed */
 
 	/*
 	 * This function always returns zero 
