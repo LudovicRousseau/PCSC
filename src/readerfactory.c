@@ -434,6 +434,9 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		EHSpawnEventHandler(sReadersContexts[dwContextB]);
 	}
 
+	/* do not return before the card (if any is present) is powered up */
+	SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+
 	return SCARD_S_SUCCESS;
 }
 
