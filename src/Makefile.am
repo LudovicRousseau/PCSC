@@ -64,6 +64,7 @@ libmusclecard_la_SOURCES = \
 	tokenparser.l \
 	tokenfactory.c \
 	$(PCSC_DYNLOAD_SRC)
+libmusclecard_la_LDFLAGS = -version-info 1:0:0
 libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
