@@ -270,8 +270,6 @@ AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
 
 if test x${confdir} != xfalse ; then
 	AC_MSG_RESULT([enable confdir                : $confdir])
-
-	AC_DEFINE_UNQUOTED(USE_READER_CONF, "$confdir", [directory containing reader.conf (default /etc)])
 else
 	confdir="/etc"
 	AC_MSG_RESULT([enable confdir                : /etc (default)])
@@ -338,6 +336,7 @@ AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
 AC_SUBST(extended_apdu)
+AS_AC_EXPAND(confdir_exp,$confdir)
 AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
