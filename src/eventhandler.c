@@ -204,7 +204,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	rContext->dwPublicID = i;
 
 	rv = SYS_ThreadCreate(&rContext->pthThread, NULL,
-		(PCSCLITE_THREAD_FUNCTION())EHStatusHandlerThread, (LPVOID) rContext);
+		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv == 1)
 		return SCARD_S_SUCCESS;
 	else
