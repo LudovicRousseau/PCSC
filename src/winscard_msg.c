@@ -1,12 +1,14 @@
 /******************************************************************
 
-            Title  : winscard_msg.c
-            Package: PC/SC Lite
-            Author : David Corcoran
-            Date   : 04/19/01
-	    License: Copyright (C) 2001 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This is responsible for client/server transport.
+	Title  : winscard_msg.c
+	Package: PC/SC Lite
+	Author : David Corcoran
+	Date   : 04/19/01
+	License: Copyright (C) 2001 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This is responsible for client/server transport.
+
+$Id$
 
 ********************************************************************/
 
@@ -210,8 +212,12 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 
 	static fd_set read_fd;
 	int i, selret, largeSock, rv;
+	struct timeval tv;
 
 	largeSock = 0;
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
 
 	FD_ZERO(&read_fd);
 
@@ -234,7 +240,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 	}
 
 	selret = select(largeSock + 1, &read_fd, (fd_set *) NULL,
-		(fd_set *) NULL, (struct timeval *) NULL);
+		(fd_set *) NULL, &tv);
 
 	if (selret < 0)
 	{
@@ -242,6 +248,10 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 			strerror(errno));
 		return -1;
 	}
+
+	if (selret == 0)
+		// timeout
+		return 2;
 
 	/*
 	 * A common pipe packet has arrived - it could be a new application or 

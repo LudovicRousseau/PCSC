@@ -1,12 +1,14 @@
 /******************************************************************
 
-            Title  : pcscdaemon.c
-            Package: PC/SC Lite
-            Author : David Corcoran
-            Date   : 10/24/99
-	    License: Copyright (C) 1999 David Corcoran
-	             <corcoran@linuxnet.com>
-            Purpose: This is the main pcscd daemon.
+	Title  : pcscdaemon.c
+	Package: PC/SC Lite
+	Author : David Corcoran
+	Date   : 10/24/99
+	License: Copyright (C) 1999 David Corcoran
+			<corcoran@linuxnet.com>
+	Purpose: This is the main pcscd daemon.
+
+$Id$
 
 ********************************************************************/
 
@@ -139,6 +141,12 @@ void SVCServiceRunLoop()
 				continue;
 			}
 
+			break;
+
+		case 2:
+			// timeout in SHMProcessEvents(): do nothing
+			// this is used to catch the Ctrl-C signal at some time when
+			// nothing else happens
 			break;
 
 		case -1:
@@ -312,8 +320,7 @@ int main(int argc, char **argv)
 	/*
 	 * Create the /tmp/pcsc directory and chmod it 
 	 */
-	rv = SYS_Mkdir(PCSCLITE_IPC_DIR,
-		S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
+	rv = SYS_Mkdir(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
 	if (rv != 0)
 	{
 		DebugLogB("main: cannot create " PCSCLITE_IPC_DIR ": %s",
@@ -321,8 +328,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	rv = SYS_Chmod(PCSCLITE_IPC_DIR,
-		S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
+	rv = SYS_Chmod(PCSCLITE_IPC_DIR, S_ISVTX | S_IRWXO | S_IRWXG | S_IRWXU);
 	if (rv != 0)
 	{
 		DebugLogB("main: cannot chmod " PCSCLITE_IPC_DIR ": %s",
@@ -330,7 +336,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	/* cleanly remove /tmp/pcsc when exiting */
 	atexit(at_exit);
+
 	/*
 	 * Allocate memory for reader structures 
 	 */
@@ -382,10 +390,6 @@ int main(int argc, char **argv)
 	/*
 	 * signal_trap() does just set a global variable used by the main loop 
 	 */
-	/*
-	 * cleanly remove /tmp/pcsc when exiting 
-	 */
-
 	signal(SIGQUIT, signal_trap);
 	signal(SIGTERM, signal_trap);
 	signal(SIGINT, signal_trap);
