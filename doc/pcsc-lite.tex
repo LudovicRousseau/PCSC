@@ -46,7 +46,7 @@
 \title{MUSCLE PC/SC Lite API \\ Toolkit API Reference Documentation}
 \author{David Corcoran \& Ludovic Rousseau\\
 \url{corcoran@linuxnet.com}, \url{ludovic.rousseau@free.fr}}
-\date{April 14, 2004}
+\date{May 19, 2004}
 
 
 \begin{document}
@@ -73,7 +73,7 @@ Document history: \\
 \hline
 0.8.7 & March 8, 2001 & latest PDF only version \\
 \hline
-0.9.0 & April 14, 2004 & reformat using \LaTeX{} and correct bugs \\
+0.9.0 & May 19, 2004 & reformat using \LaTeX{} and correct bugs \\
 \hline
 \end{tabular}
 
@@ -475,10 +475,14 @@ Value of \texttt{dwScope} & Meaning\\
 \texttt{SCARD\_SHARE\_EXCLUSIVE} & This application will NOT allow
 others to share the reader \\
 \hline
-\texttt{SCARD\_SHARE\_DIRECT} & not used \\
+\texttt{SCARD\_SHARE\_DIRECT} & Direct control of the reader, even
+without a card \\
 \hline
 \end{tabular}
 
+\texttt{SCARD\_SHARE\_DIRECT} can be used before using
+\texttt{SCardControl()} to send control commands to the reader even if a
+card is not present in the reader.
 
 \begin{tabular}{|l|l|}
 \hline
@@ -493,6 +497,9 @@ Value of \texttt{dwPreferredProtocols} & Meaning \\
 \hline
 \end{tabular}
 
+\texttt{dwPreferredProtocols} is a bit mask of acceptable protocols for
+the connection. You can use \texttt{(SCARD\_PROTOCOL\_T0 |
+SCARD\_PROTOCOL\_T1)} if you do not have a preferred protocol.
 
 \example
 
@@ -582,6 +589,10 @@ Value of \texttt{dwPreferredProtocols} & Meaning \\
 \texttt{SCARD\_PROTOCOL\_RAW} & Use with memory type cards \\
 \hline
 \end{tabular}
+
+\texttt{dwPreferredProtocols} is a bit mask of acceptable protocols for
+the connection. You can use \texttt{(SCARD\_PROTOCOL\_T0 |
+SCARD\_PROTOCOL\_T1)} if you do not have a preferred protocol.
 
 \begin{tabular}{|l|l|}
 \hline
