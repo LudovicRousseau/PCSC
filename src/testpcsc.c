@@ -194,6 +194,10 @@ int main(int argc, char **argv)
 		printf("\n");
 	}
 
+	printf("Testing SCardSetAttrib           : ");
+	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, "", 1);
+	printf("%s\n", pcsc_stringify_error(rv));
+
 	printf("Testing SCardStatus              : ");
 
 	dwReaderLen = 50;
