@@ -44,7 +44,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
-	vFunction = rContext->psFunctions.pvfSetProtocol;
+	vFunction = rContext->psFunctions.pvfSetProtocolParameters;
 
 	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
@@ -483,7 +483,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
-	vFunctionA = rContext->psFunctions.pvfICCPresent;
+	vFunctionA = rContext->psFunctions.pvfICCPresence;
 	vFunctionB = rContext->psFunctions.pvfGetCapabilities;
 
 	if (vFunctionA == NULL)
@@ -753,7 +753,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	/*
 	 * Make sure the symbol exists in the driver 
 	 */
-	vFunction = rContext->psFunctions.pvfTransmitICC;
+	vFunction = rContext->psFunctions.pvfTransmitToICC;
 
 	if (vFunction == NULL)
 		return SCARD_E_UNSUPPORTED_FEATURE;
