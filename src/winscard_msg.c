@@ -271,6 +271,7 @@ int SHMProcessEvents(psharedSegmentMsg msgStruct, int blocktime)
 
 				if (rv == -1)
 				{	/* The client has died */
+					DebugLogB("SHMProcessEvents: Client has disappeared: %d", i);
 					msgStruct->mtype = CMD_CLIENT_DIED;
 					msgStruct->request_id = clientSockets[i].sd;
 					msgStruct->command = 0;
