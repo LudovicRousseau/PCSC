@@ -81,13 +81,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	p = 2;
 
 #ifdef ATR_DEBUG
-#ifdef USE_SYSLOG
-	syslog(LOG_DEBUG, " Conv %02X, Y1 %02X, K %02X",
+	debug_msg("Conv %02X, Y1 %02X, K %02X",
 		psExtension->CardCapabilities.Convention, Y1i, K);
-#else
-	printf(" Conv %02X, Y1 %02X, K %02X\n",
-		psExtension->CardCapabilities.Convention, Y1i, K);
-#endif
 #endif
 
 	/*
@@ -103,13 +98,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
 #ifdef ATR_DEBUG
-#ifdef USE_SYSLOG
-		syslog(LOG_DEBUG, " T's %02X %02X %02X %02X", TAi, TBi, TCi, TDi);
-		syslog(LOG_DEBUG, " P %02X", p);
-#else
-		printf(" T's %02X %02X %02X %02X\n", TAi, TBi, TCi, TDi);
-		printf(" P %02X\n", p);
-#endif
+		debug_msg("T's %02X %02X %02X %02X", TAi, TBi, TCi, TDi);
+		debug_msg("P %02X", p);
 #endif
 
 		/*
@@ -143,11 +133,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			if (T == 0)
 			{
 #ifdef ATR_DEBUG
-#ifdef USE_SYSLOG
-				syslog(LOG_DEBUG, "T=0 Protocol Found");
-#else
-				printf("T=0 Protocol Found\n");
-#endif
+				debug_msg("T=0 Protocol Found");
 #endif
 				psExtension->CardCapabilities.AvailableProtocols |=
 					SCARD_PROTOCOL_T0;
@@ -159,11 +145,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			} else if (T == 1)
 			{
 #ifdef ATR_DEBUG
-#ifdef USE_SYSLOG
-				syslog(LOG_DEBUG, "T=1 Protocol Found");
-#else
-				printf("T=1 Protocol Found\n");
-#endif
+				debug_msg("T=1 Protocol Found");
 #endif
 				psExtension->CardCapabilities.AvailableProtocols |=
 					SCARD_PROTOCOL_T1;
