@@ -32,8 +32,8 @@ void tok_error(char *pcToken_error);
 #.*                                       {}
 "\n"                                      { iLinenumber++; }
 (\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { evaluatetoken( yytext); } 
-[ \t]                     {}
-([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@])+       { evaluatetoken( yytext ); } 
+[ \t]                                     {}
+([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { evaluatetoken( yytext ); } 
 .                                         { tok_error( yytext ); }
 %%
 
@@ -89,7 +89,8 @@ int evaluatetoken(char *pcToken)
 				struct stat fStatBuf;
 
 				pcDevicename = strdup(pcCurrent);
-				if (SYS_Stat(pcDevicename, &fStatBuf) != 0)
+				if ((NULL == strchr(pcDevicename, ':'))
+					&& (SYS_Stat(pcDevicename, &fStatBuf) != 0))
 				{
 					DebugLogC("Error with device %s: %s",
 						pcDevicename, strerror(errno));
