@@ -22,14 +22,14 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 
-static struct _psChannelMap
+static struct _psChannelContext
 {
 	SCARDCONTEXT hContext;
 	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 	DWORD dwClientID;
 	DWORD dwHandleID;
 }
-psChannelMap[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
+psChannelContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
 LONG MSGCheckHandleAssociation(DWORD, SCARDHANDLE);
 
@@ -171,10 +171,10 @@ LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].dwClientID == 0)
+		if (psChannelContext[i].dwClientID == 0)
 		{
-			psChannelMap[i].hContext = hContext;
-			psChannelMap[i].dwClientID = dwClientID;
+			psChannelContext[i].hContext = hContext;
+			psChannelContext[i].dwClientID = dwClientID;
 			break;
 		}
 	}
@@ -197,8 +197,8 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].hContext == hContext &&
-			psChannelMap[i].dwClientID == dwClientID)
+		if (psChannelContext[i].hContext == hContext &&
+			psChannelContext[i].dwClientID == dwClientID)
 		{
 
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
@@ -207,7 +207,7 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 				 * Disconnect each of these just in case 
 				 */
 
-				if (psChannelMap[i].hCard[j] != 0)
+				if (psChannelContext[i].hCard[j] != 0)
 				{
 
 					/*
@@ -216,27 +216,27 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwClientID)
 					 * Disconnect is called 
 					 */
 
-					rv = SCardStatus(psChannelMap[i].hCard[j], 0, 0, 0, 0,
+					rv = SCardStatus(psChannelContext[i].hCard[j], 0, 0, 0, 0,
 						0, 0);
 
 					if (rv == SCARD_W_RESET_CARD
 						|| rv == SCARD_W_REMOVED_CARD)
 					{
-						SCardDisconnect(psChannelMap[i].hCard[j],
+						SCardDisconnect(psChannelContext[i].hCard[j],
 							SCARD_LEAVE_CARD);
 					} else
 					{
-						SCardDisconnect(psChannelMap[i].hCard[j],
+						SCardDisconnect(psChannelContext[i].hCard[j],
 							SCARD_RESET_CARD);
 					}
 
-					psChannelMap[i].hCard[j] = 0;
+					psChannelContext[i].hCard[j] = 0;
 				}
 
 			}
 
-			psChannelMap[i].hContext = 0;
-			psChannelMap[i].dwClientID = 0;
+			psChannelContext[i].hContext = 0;
+			psChannelContext[i].dwClientID = 0;
 			SCardReleaseContext(hContext);
 			return SCARD_S_SUCCESS;
 		}
@@ -253,8 +253,8 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].hContext == hContext &&
-			psChannelMap[i].dwClientID == dwClientID)
+		if (psChannelContext[i].hContext == hContext &&
+			psChannelContext[i].dwClientID == dwClientID)
 		{
 
 			/*
@@ -262,9 +262,9 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 			 */
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
-				if (psChannelMap[i].hCard[j] == 0)
+				if (psChannelContext[i].hCard[j] == 0)
 				{
-					psChannelMap[i].hCard[j] = hCard;
+					psChannelContext[i].hCard[j] = hCard;
 					break;
 				}
 			}
@@ -298,15 +298,15 @@ LONG MSGRemoveHandle(SCARDCONTEXT hContext, DWORD dwClientID,
 		 * when SCardDisconnect is called.
 		 * Perhaps a modification to do in the future. (D. Sauveron)
 		 */
-		/* if (psChannelMap[i].hContext == hContext && */
-		/* 	psChannelMap[i].dwClientID == dwClientID) */
-		if (psChannelMap[i].dwClientID == dwClientID)
+		/* if (psChannelContext[i].hContext == hContext && */
+		/* 	psChannelContext[i].dwClientID == dwClientID) */
+		if (psChannelContext[i].dwClientID == dwClientID)
 		{
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
-				if (psChannelMap[i].hCard[j] == hCard)
+				if (psChannelContext[i].hCard[j] == hCard)
 				{
-					psChannelMap[i].hCard[j] = 0;
+					psChannelContext[i].hCard[j] = 0;
 					return SCARD_S_SUCCESS;
 				}
 			}
@@ -324,11 +324,11 @@ LONG MSGCheckHandleAssociation(DWORD dwClientID, SCARDHANDLE hCard)
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].dwClientID == dwClientID)
+		if (psChannelContext[i].dwClientID == dwClientID)
 		{
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
-				if (psChannelMap[i].hCard[j] == hCard)
+				if (psChannelContext[i].hCard[j] == hCard)
 				{
 				  return 0;
 				}
@@ -350,9 +350,9 @@ LONG MSGCleanupClient(psharedSegmentMsg msgStruct)
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
-		if (psChannelMap[i].dwClientID == msgStruct->request_id)
+		if (psChannelContext[i].dwClientID == msgStruct->request_id)
 		{
-			MSGRemoveContext(psChannelMap[i].hContext,
+			MSGRemoveContext(psChannelContext[i].hContext,
 				msgStruct->request_id);
 		}
 	}
