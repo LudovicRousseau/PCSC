@@ -29,7 +29,10 @@ $Id$
 #include "readerfactory.h"
 #include "thread_generic.h"
 
+#ifndef PCSCLITE_HP_DROPDIR
 #define PCSCLITE_HP_DROPDIR        "/usr/local/pcsc/drivers/"
+#endif
+
 #define PCSCLITE_HP_MANUKEY_NAME   "ifdVendorID"
 #define PCSCLITE_HP_PRODKEY_NAME   "ifdProductID"
 #define PCSCLITE_HP_NAMEKEY_NAME   "ifdFriendlyName"
