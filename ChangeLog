@@ -1,4 +1,16 @@
 pcsc-lite-1.2.0-rc2: Ludovic Rousseau
+15 october, 2003
+- src/winscard_msg.c: perform a round-robbin among clients to avoid starvation
+  under heavy load. Patch from Bettina Martelli.
+- src/winscard_clnt.c: send debug to stdout only if the environment variable
+  MUSCLECARD_DEBUG is defined
+- src/libmusclecard.pc.in: add a new pkg-config file for application using
+  libmusclecard.
+- a lot of code and build clean up by Antti Tapaninen
+- some code clean up and debug by Damien Sauveron
+
+
+pcsc-lite-1.2.0-rc2: Ludovic Rousseau
 4 September, 2003
 - removed a very _stupid_ bug that linked libpcsclite with libusb. Any
   application linked with libpcsclite was also linked with libusb.
