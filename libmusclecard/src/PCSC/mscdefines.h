@@ -130,8 +130,8 @@ extern "C"
 
 	typedef struct
 	{
-		MSCLong32 hContext;	      /* Handle to resource manager */
-		MSCLong32 hCard;	      /* Handle to the connection */
+		SCARDCONTEXT hContext;	      /* Handle to resource manager */
+		SCARDHANDLE hCard;	      /* Handle to the connection */
 		LPSCARD_IO_REQUEST ioType;    /* Type of protocol */
 		MSCUChar8 pMac[MSC_MAXSIZE_MAC];  /* MAC code */
 		MSCULong32 macSize;	      /* Size of the MAC code */
