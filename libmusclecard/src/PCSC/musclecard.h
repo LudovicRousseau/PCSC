@@ -21,7 +21,7 @@
   extern "C" {
 #endif
 
-#ifndef PCSC_TARGET_OSX
+#ifndef __APPLE__
 #include <mscdefines.h>
 #else
 #include <PCSC/mscdefines.h>
