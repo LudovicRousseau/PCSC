@@ -11,7 +11,7 @@ AC_PREFIX_DEFAULT(/usr/local)
 
 dnl Automake boilerplate.
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(pcsc-lite, 1.1.1)
+AM_INIT_AUTOMAKE(pcsc-lite, 1.1.2)
 AM_CONFIG_HEADER(config.h)
 
 dnl Options.
