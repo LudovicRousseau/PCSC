@@ -45,6 +45,9 @@ $Id$
 #define PCSCLITE_HP_MAX_DRIVERS					20
 #define BUS_DEVICE_STRSIZE						256
 
+/* set to 1 if you want to see USB hotplug debug messages */
+#define DEBUG_USB_HOTPLUG 0
+
 extern int LTPBundleFindValueWithKey(char *, char *, char *, int);
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
@@ -191,9 +194,8 @@ void HPEstablishUSBNotifications()
 			usbDeviceStatus     = 0;
 
 			for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
-			{
-				bundleTracker[i].deviceNumber[j].status = 0; /* clear rollcall */
-			}
+				/* clear rollcall */
+				bundleTracker[i].deviceNumber[j].status = 0;
 
 			for (bus = usb_get_busses(); bus; bus = bus->next)
 			{
@@ -208,27 +210,30 @@ void HPEstablishUSBNotifications()
 						snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s",
 							bus->dirname, dev->filename);
 						bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+#if DEBUG_USB_HOTPLUG
 						DebugLogB("Found matching USB device %s", bus_device);
+#endif
 						for (j=0; j < PCSCLITE_HP_MAX_SIMUL_READERS; j++)
 						{
 							if (strncmp(bundleTracker[i].deviceNumber[j].bus_device,
 								bus_device, BUS_DEVICE_STRSIZE) == 0 &&
 								bundleTracker[i].deviceNumber[j].plugged)
 							{
-								bundleTracker[i].deviceNumber[j].status = 1; /* i'm here */
-								DebugLogB("Refresh USB device %s status", bus_device);
+								/* I'm here */
+								bundleTracker[i].deviceNumber[j].status = 1;
+#if DEBUG_USB_HOTPLUG
+								DebugLogB("Refresh USB device %s status",
+									bus_device);
+#endif
 								break;
 							}
 						}
 
 						if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
-						{
 							usbDeviceStatus = 1;
-						}
 					}
 
 				} /* End of for..loop */
-
 
 			} /* End of for..loop */
 
@@ -244,9 +249,7 @@ void HPEstablishUSBNotifications()
 				}
 
 				if (j == PCSCLITE_HP_MAX_SIMUL_READERS)
-				{
 					DebugLogA("Too many identical readers plugged in");
-				}
 				else
 				{
 					DebugLogB("Adding USB device %s", bus_device);
@@ -258,7 +261,6 @@ void HPEstablishUSBNotifications()
 				}
 
 				SYS_MutexUnLock(&usbNotifierMutex);
-
 			}
 			else
 				if (usbDeviceStatus == 0)
@@ -288,10 +290,8 @@ void HPEstablishUSBNotifications()
 									bundleTracker[i].deviceNumber[j].status = 1;
 								}
 								else
-								{
 									DebugLogC("BSD: %s error: %s", filename,
 										strerror(errno));
-								}
 							}
 							else
 							{
@@ -310,7 +310,6 @@ void HPEstablishUSBNotifications()
 							bundleTracker[i].deviceNumber[j].plugged = 0;
 							bundleTracker[i].deviceNumber[j].bus_device[0] = '\0';
 							SYS_MutexUnLock(&usbNotifierMutex);
-
 						}
 					}
 				}
@@ -321,13 +320,11 @@ void HPEstablishUSBNotifications()
 					 */
 				}
 
-
 		}	/* End of for..loop */
 
 		SYS_Sleep(1);
 
 	}	/* End of while loop */
-
 }
 
 LONG HPSearchHotPluggables()
