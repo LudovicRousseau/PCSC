@@ -377,87 +377,38 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	rv = RFReaderInfoNamePort(dwPort, lpcReader, &sContext);
-	if (rv != SCARD_S_SUCCESS)
-	{
-		return rv;
-	}
-
-	/*
-	 * Try to destroy the thread 
-	 */
-	rv = EHDestroyEventHandler(sContext);
-
-	rv = RFUnInitializeReader(sContext);
-	if (rv != SCARD_S_SUCCESS)
-	{
-		return rv;
-	}
-
-	/*
-	 * Destroy and free the mutex 
-	 */
-	if (*sContext->dwFeeds == 1)
-	{
-		SYS_MutexDestroy(sContext->mMutex);
-		free(sContext->mMutex);
-	}
-
-	*sContext->dwFeeds -= 1;
-
-	/* Added by Dave to free the dwFeeds variable */
-	if (*sContext->dwFeeds == 0) {
-	  free(sContext->dwFeeds);
-	  sContext->dwFeeds = 0;
-	}
-
-	sContext->dwVersion = 0;
-	sContext->dwPort = 0;
-	sContext->mMutex = 0;
-	sContext->dwStatus = 0;
-	sContext->dwBlockStatus = 0;
-	sContext->dwContexts = 0;
-	sContext->dwSlot = 0;
-	sContext->dwLockId = 0;
-	sContext->vHandle = 0;
-	sContext->dwIdentity = 0;
-	sContext->dwPublicID = 0;
-
-	for (i = 0; i < PCSCLITE_MAX_CONTEXTS; i++)
-	{
-		sContext->psHandles[i].hCard = 0;
-	}
-
-	*dwNumContexts -= 1;
-
 	while ((rv = RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
 		== SCARD_S_SUCCESS)
 	{
 
-		EHDestroyEventHandler(sContext);
+		/*
+		 * Try to destroy the thread 
+		 */
+		rv = EHDestroyEventHandler(sContext);
 
 		rv = RFUnInitializeReader(sContext);
 		if (rv != SCARD_S_SUCCESS)
-		  {
-		    return rv;
-		  }
+		{
+			return rv;
+		}
 		
 		/*
 		 * Destroy and free the mutex 
 		 */
 		if (*sContext->dwFeeds == 1)
-		  {
-		    SYS_MutexDestroy(sContext->mMutex);
-		    free(sContext->mMutex);
-		  }
+		{
+			SYS_MutexDestroy(sContext->mMutex);
+			free(sContext->mMutex);
+		}
 
 		*sContext->dwFeeds -= 1;
 
 		/* Added by Dave to free the dwFeeds variable */
 
-		if (*sContext->dwFeeds == 0) {
-		  free(sContext->dwFeeds);
-		  sContext->dwFeeds = 0;
+		if (*sContext->dwFeeds == 0)
+		{
+			free(sContext->dwFeeds);
+			sContext->dwFeeds = 0;
 		}
 
 		sContext->dwVersion = 0;
@@ -479,6 +430,11 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 
 		*dwNumContexts -= 1;
 
+	}
+
+	if (rv != SCARD_S_SUCCESS)
+	{
+		return rv;
 	}
 
 	return SCARD_S_SUCCESS;
