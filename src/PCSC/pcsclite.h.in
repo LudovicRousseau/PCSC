@@ -13,7 +13,7 @@
 #ifndef __pcsclite_h__
 #define __pcsclite_h__
 
-#include <PCSC/wintypes.h>
+#include <wintypes.h>
 
 #ifdef __cplusplus
 extern "C"

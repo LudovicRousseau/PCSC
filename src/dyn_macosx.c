@@ -11,8 +11,8 @@
 
 #include "config.h"
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "dyn_generic.h"
 
 #ifdef __APPLE__

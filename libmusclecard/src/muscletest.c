@@ -13,10 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/winscard.h"
-#include "PCSC/mscdefines.h"
-#include "PCSC/musclecard.h"
+#include "pcsclite.h"
+#include "winscard.h"
+#include "mscdefines.h"
+#include "musclecard.h"
 
 #define MY_OBJECT_ID    "c1"
 #define MY_OBJECT_SIZE  50

@@ -13,7 +13,7 @@
 #ifndef __winscard_h__
 #define __winscard_h__
 
-#include <PCSC/pcsclite.h>
+#include <pcsclite.h>
 
 #ifdef __cplusplus
 extern "C"

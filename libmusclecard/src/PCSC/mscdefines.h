@@ -20,7 +20,7 @@ extern "C"
 {
 #endif
 
-#include <PCSC/winscard.h>
+#include <winscard.h>
 
 #ifndef MAX_BUFFER_SIZE
 #define MAX_BUFFER_SIZE		265

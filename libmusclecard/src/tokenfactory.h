@@ -12,7 +12,7 @@
 #ifndef __tokenfactory_h__
 #define __tokenfactory_h__
 
-#include "PCSC/mscdefines.h"
+#include "mscdefines.h"
 
 #ifdef __cplusplus
 extern "C"

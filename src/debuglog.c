@@ -22,8 +22,8 @@
 #include <assert.h>
 #include <sys/types.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "sys_generic.h"
 
 /* Max string size when dumping a 256 bytes longs APDU

@@ -14,8 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <PCSC/wintypes.h>
-#include <PCSC/winscard.h>
+#include <wintypes.h>
+#include <winscard.h>
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 64

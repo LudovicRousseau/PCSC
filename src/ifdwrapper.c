@@ -12,9 +12,9 @@
  */
 
 #include "config.h"
-#include "PCSC/pcsclite.h"
-#include "PCSC/ifdhandler.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "ifdhandler.h"
+#include "debuglog.h"
 #include "readerfactory.h"
 #include "ifdwrapper.h"
 #include "atrhandler.h"

@@ -20,8 +20,8 @@
 #include <dirent.h>
 #endif
 
-#include "PCSC/debuglog.h"
-#include "PCSC/parser.h"
+#include "debuglog.h"
+#include "parser.h"
 #include "dyn_generic.h"
 #include "tokenfactory.h"
 

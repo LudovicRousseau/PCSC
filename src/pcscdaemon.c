@@ -25,8 +25,8 @@
 #include <getopt.h>
 #endif
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"

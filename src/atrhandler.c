@@ -15,8 +15,8 @@
 #include <syslog.h>
 #include <string.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "atrhandler.h"
 
 /*

@@ -24,7 +24,7 @@ extern "C"
 #include "PCSC.h"
 #endif
 
-#include <PCSC/mscdefines.h>
+#include <mscdefines.h>
 
 /*
  * PCSC_API is defined for Windows but is a no-op on other

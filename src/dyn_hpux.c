@@ -17,8 +17,8 @@
 #include <dl.h>
 #include <errno.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "debuglog.h"
 #include "dyn_generic.h"
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)

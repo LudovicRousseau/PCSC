@@ -19,9 +19,9 @@
 #include <sys/un.h>
 #include <smartcard/scf.h>
 
-#include "PCSC/pcsclite.h"
-#include "PCSC/winscard.h"
-#include "PCSC/debuglog.h"
+#include "pcsclite.h"
+#include "winscard.h"
+#include "debuglog.h"
 
 #ifdef USE_THREAD_SAFETY
 #include "thread_generic.h"

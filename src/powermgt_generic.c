@@ -10,7 +10,7 @@
  */
 
 #include "config.h"
-#include "PCSC/pcsclite.h"
+#include "pcsclite.h"
 
 /*
  * Check for platforms that have their own specific support.
