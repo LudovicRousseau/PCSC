@@ -30,9 +30,7 @@ PCSC_CLIENT_SRC  = winscard_clnt.c
 endif
 
 if PCSC_THR_SAFE
-PCSC_CLIENT = $(PCSC_THREAD_SRC)
-else
-PCSC_CLIENT =
+PCSC_CLIENT_THR = $(PCSC_THREAD_SRC)
 endif
 
 #PCSC_INCLUDE_LIBS   = -Wl,-framework,IOKit
@@ -54,13 +52,14 @@ libpcsclite_core_la_SOURCES = \
 	$(PCSC_DYNLOAD_SRC) \
 	$(PCSC_HOTPLUG_SRC) \
 	$(PCSC_POWERMGT_SRC)
+libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
 
 libpcsclite_la_SOURCES = \
 	debuglog.c \
 	winscard_msg.c \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
-	$(PCSC_CLIENT)
+	$(PCSC_CLIENT_THR)
 libpcsclite_la_LDFLAGS = -version-info 0:1:0
 libpcsclite_la_LIBADD = @LIBSMARTCARD@
 
@@ -72,7 +71,8 @@ libmusclecard_la_SOURCES = \
 libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
-pcscd_LDADD = libpcsclite-core.la @LIBUSB@ @LIBDL@ @LIBFL@
+pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
+pcscd_LDADD = libpcsclite-core.la @LIBUSB@ @LIBDL@ @LIBFL@ @PTHREAD_LIBS@
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
