@@ -160,9 +160,10 @@ int SHMInitializeCommonSegment()
 int SHMProcessCommonChannelRequest()
 {
 
-	int i, clnt_len;
+	int i;
 	int new_sock;
 	struct sockaddr_un clnt_addr;
+	socklen_t clnt_len;
 	int one;
 
 	clnt_len = sizeof(clnt_addr);

@@ -14,6 +14,7 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
+#ifdef WIN32
 #include <string.h>
 
 #include "windows.h"
@@ -78,3 +79,4 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	return rv;
 }
 
+#endif	/* WIN32 */

@@ -13,6 +13,7 @@
 ********************************************************************/
 
 #include "config.h"
+#ifdef __APPLE__
 #include <CoreFoundation/CFBundle.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFURL.h>
@@ -114,3 +115,5 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 
 	return SCARD_S_SUCCESS;
 }
+
+#endif	/* __APPLE__ */

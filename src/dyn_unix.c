@@ -13,7 +13,9 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
+#include <stdio.h>
 #include <string.h>
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #include <stdlib.h>
 
@@ -54,27 +56,21 @@ int DYN_CloseLibrary(void **pvLHandle)
 
 int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 {
-	int rv, iSize;
-	char *pcFunctionName;
+	char pcFunctionName[256];
+	int rv;
 
 	/*
 	 * Zero out everything 
 	 */
 	rv = 0;
-	pcFunctionName = NULL;
-	iSize = 0;
 
-	iSize = strlen(pcFunction) + 2;	/* 1-NULL, 2-_ */
-	pcFunctionName = (char *) malloc(iSize * sizeof(char));
-	pcFunctionName[0] = '_';
-	strcpy(&pcFunctionName[1], pcFunction);
+	/* Some platforms might need a leading underscore for the symbol */
+	snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);
 
 	*pvFHandle = NULL;
 	*pvFHandle = dlsym(pvLHandle, pcFunctionName);
 
-	/*
-	 * also try without a leading '_' (needed for FreeBSD) 
-	 */
+	/* Failed? Try again without the leading underscore */
 	if (*pvFHandle == NULL)
 		*pvFHandle = dlsym(pvLHandle, pcFunction);
 
@@ -85,7 +81,7 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	} else
 		rv = SCARD_S_SUCCESS;
 
-	free(pcFunctionName);
-
 	return rv;
 }
+
+#endif	/* HAVE_DLFCN_H */

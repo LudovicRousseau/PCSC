@@ -28,6 +28,7 @@ $Id$
 #include "wintypes.h"
 #include "pcsclite.h"
 #include "debuglog.h"
+#include "sys_generic.h"
 
 // Max string size when dumping a 256 bytes longs APDU
 #define DEBUG_BUF_SIZE (256*3+30)

@@ -16,6 +16,12 @@ noinst_PROGRAMS = testpcsc $(MC_BIN)
 PCSC_DYNLOAD_SRC = dyn_unix.c dyn_hpux.c dyn_macosx.c
 PCSC_SYSTEM_SRC  = sys_unix.c
 PCSC_THREAD_SRC  = thread_unix.c
+PCSC_HOTPLUG_SRC  = \
+	hotplug_generic.c
+# hotplug_libusb.c \
+#	hotplug_linux.c hotplug_macosx.c
+PCSC_POWERMGT_SRC = powermgt_generic.c
+# powermgt_macosx.c
 
 if MSC_ENABLE_SCF
 PCSC_CLIENT_SRC  = winscard_scf.c
@@ -29,21 +35,8 @@ else
 PCSC_CLIENT =
 endif
 
-# <TO BE REMOVED>
-#if PCSC_ARCH_OSX
 #PCSC_INCLUDE_LIBS   = -Wl,-framework,IOKit
 #PCSCD_INCLUDE_LIBS  = -Wl,-framework,IOKit -Wl,-framework,CoreFoundation
-#endif
-#if PCSC_USE_LIBUSB
-#PCSC_HOTPLUG_SRC = hotplug_libusb.c
-#elif PCSC_LINUX_USB
-#PCSC_HOTPLUG_SRC = hotplug_linux.c
-#elif PCSC_ARCH_OSX
-#PCSC_HOTPLUG_SRC = hotplug_macosx.c powermgt_macosx.c
-#else
-#PCSC_HOTPLUG_SRC = hotplug_generic.c
-#endif
-# </TO BE REMOVED>
 
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
@@ -59,9 +52,8 @@ libpcsclite_core_la_SOURCES = \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_THREAD_SRC) \
 	$(PCSC_DYNLOAD_SRC) \
-	$(PCSC_HOTPLUG_SRC)
-libpcsclite_core_la_LDFLAGS = -version-info 0:2:0
-libpcsclite_core_la_LIDADD = @LIBDL@
+	$(PCSC_HOTPLUG_SRC) \
+	$(PCSC_POWERMGT_SRC)
 
 libpcsclite_la_SOURCES = \
 	debuglog.c \
@@ -77,11 +69,10 @@ libmusclecard_la_SOURCES = \
 	tokenparser.l \
 	tokenfactory.c \
 	$(PCSC_DYNLOAD_SRC)
-libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@
+libmusclecard_la_LIBADD = libpcsclite.la @LIBDL@ @LIBFL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c
-pcscd_LDFLAGS = -rdynamic $(PCSCD_INCLUDE_LIBS)
-pcscd_LDADD = libpcsclite-core.la @LIBUSB@ @LIBDL@
+pcscd_LDADD = libpcsclite-core.la @LIBUSB@ @LIBDL@ @LIBFL@
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la

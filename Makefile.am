@@ -1,6 +1,5 @@
 # Process this file with automake to create Makefile.in.
 
-AUTOMAKE_OPTIONS = no-dependencies
 SUBDIRS = src etc doc
 
 AUX_DIST = \
@@ -45,4 +44,3 @@ ChangeLog.cvs:
 	s+/cvsroot/pcsclite/PCSC/++g; print ; }' > $@
 
 .PHONY: ChangeLog.cvs
-

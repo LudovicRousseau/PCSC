@@ -21,6 +21,7 @@
  */
 
 #include "config.h"
+#ifdef __APPLE__
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +39,6 @@
 #include "readerfactory.h"
 #include "thread_generic.h"
 
-
 static io_connect_t		root_port;
 static IONotificationPortRef	notify;
 static io_object_t 		anIterator;
@@ -47,7 +47,6 @@ PCSCLITE_THREAD_T       pmgmtThread;
 extern PCSCLITE_MUTEX   usbNotifierMutex;
 
 void PMPowerRegistrationThread();
-
 
 void PMPowerEventCallback(void * x,io_service_t y,natural_t messageType,void * messageArgument)
 {
@@ -98,5 +97,4 @@ ULONG PMRegisterForPowerEvents() {
   return 0;
 }
 
-
-
+#endif	/* __APPLE__ */

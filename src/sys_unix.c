@@ -14,7 +14,6 @@ $Id$
 ********************************************************************/
 
 #include "config.h"
-#include <sys_generic.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -26,8 +25,12 @@ $Id$
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <signal.h>
 #include <time.h>
+
+#include "sys_generic.h"
+#include "debuglog.h"
 
 int SYS_Initialize()
 {
@@ -272,6 +275,7 @@ int SYS_Daemon(int nochdir, int noclose)
 		if (SYS_Chdir("/"))
 			DebugLogB("main: SYS_Chdir() failed: %s", strerror(errno));
 	}
+	return 0;
 #endif
 }
 

@@ -14,6 +14,7 @@
 
 #include "config.h"
 #include <string.h>
+#ifdef HAVE_DL_H
 #include <dl.h>
 #include <errno.h>
 
@@ -95,3 +96,5 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 
 	return rv;
 }
+
+#endif	/* HAVE_DL_H */
