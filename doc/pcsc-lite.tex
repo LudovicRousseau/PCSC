@@ -1,0 +1,1323 @@
+%
+% MUSCLE SmartCard Development ( http://www.linuxnet.com )
+%
+% Copyright (C) 2004
+%  David Corcoran <corcoran@linuxnet.com>
+%  Ludovic Rousseau <ludovic.rousseau@free.fr>
+%
+% $Id$
+
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{longtable}
+\usepackage{url}
+\usepackage{varioref}
+
+% Détection de pdflatex
+\ifx\pdfcompresslevel\undefined
+% Si on fait un postscript
+\typeout{Postscript version}
+\usepackage[dvips]{graphicx,rotating}
+%\usepackage[dvips,matrix,line,curve,arrow,frame]{xy}
+\DeclareGraphicsExtensions{.eps}
+\else
+% Si on fait un PDF
+\typeout{PDF version}
+\usepackage[pdftex]{graphicx,rotating}
+%\usepackage[matrix,line,curve,arrow,frame]{xy}
+\DeclareGraphicsExtensions{.jpg,.pdf}
+\usepackage[pdftex]{hyperref}
+\usepackage{ae,aeguill}
+\fi
+
+% smaller margins
+\usepackage{fullpage}
+
+% do not number subsubsection
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+\newcommand{\synopsis}{\subsubsection{Synopsis:}}
+\newcommand{\parameters}{\subsubsection{Parameters:}}
+\newcommand{\desc}{\subsubsection{Description:}}
+\newcommand{\example}{\subsubsection{Example:}}
+\newcommand{\returns}{\subsubsection{Returns:}}
+
+\title{MUSCLE PC/SC Lite API \\ Toolkit API Reference Documentation}
+\author{David Corcoran \& Ludovic Rousseau\\
+\url{corcoran@linuxnet.com}, \url{ludovic.rousseau@free.fr}}
+\date{April 14, 2004}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This toolkit and documentation is provided on an \emph{as is} basis.
+The authors shall not be held responsible for any mishaps caused by the
+use of this software.
+
+For more information please visit \url{http://www.musclecard.com/}.
+
+\end{abstract}
+
+% space between paragraphs
+\parskip = 8pt
+
+% remove paragraph indentation
+\addtolength{\parindent}{-\parindent}
+
+Document history: \\
+\begin{tabular}{|l|l|l|}
+\hline
+0.8.7 & March 8, 2001 & latest PDF only version \\
+\hline
+0.9.0 & April 14, 2004 & reformat using \LaTeX{} and correct bugs \\
+\hline
+\end{tabular}
+
+\newpage
+\tableofcontents
+\newpage
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Introduction/Overview}
+
+This document contains the reference API calls for communicating to the
+MUSCLE PC/SC Smartcard Resource Manager. PC/SC is a standard proposed by
+the PC/SC workgroup \cite{pcsc_workgroup} which is a conglomerate of
+representative from major smartcard manufacturers and other companies.
+This specification tries to abstract the smartcard layer into a high
+level API so that smartcards and their readers can be accessed in a
+homogeneous fashion.
+
+This toolkit was written in ANSI C that can be used with most compilers
+and does NOT use complex and large data structures such as vectors,
+\textit{etc}.  The C API emulates the winscard API that is used on the
+Windows platform. It is contained in the library \texttt{libpcsclite.so}
+that is linked to your application.
+
+I would really like to hear from you. If you have any feedback either on
+this documentation or on the MUSCLE project please feel free to email me
+at: \url{corcoran@musclecard.com}.
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{Definitions}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{Defined types}
+
+The following is a list of commonly used type definitions in the
+following API. These definitions and more can be found in the
+\url{include/pcsclite.h} file.
+
+{\tt
+\begin{longtable}{|l|l|}
+\hline
+\textrm{PC/SC type} & \textrm{C type} \\
+\hline
+\hline
+BOOL  &  short \\
+BYTE  &  unsigned char \\
+DWORD  &  unsigned long \\
+LONG  &  long \\
+LPBYTE  &  unsigned char * \\
+LPCBYTE  &  const unsigned char * \\
+LPCSTR  &  const char * \\
+LPCVOID  &  const void * \\
+LPCWSTR  &  char * \\
+LPDWORD  &  unsigned long * \\
+LPSCARDCONTEXT & unsigned long * \\
+LPSCARDHANDLE & unsigned long * \\
+LPSTR  &  char * \\
+LPVOID  &  void * \\
+PSCARDCONTEXT & unsigned long * \\
+PSCARDHANDLE & unsigned long * \\
+RESPONSECODE & long \\
+SCARDCONTEXT & unsigned long \\
+SCARDHANDLE & unsigned long \\
+ULONG  &  unsigned long \\
+USHORT  &  unsigned short \\
+WORD  &  unsigned long \\
+\hline
+\end{longtable}
+}
+
+%---------%---------%---------%---------%---------%---------
+\subsection{Error codes}
+\label{Error codes}
+
+The following is a list of commonly used errors. Since different
+cards produce different errors they must map over to these error
+messages.
+
+{\tt
+\begin{longtable}{|l|}
+\hline
+SCARD\_S\_SUCCESS \\
+\hline
+SCARD\_E\_CANCELLED \\
+SCARD\_E\_CANT\_DISPOSE \\
+SCARD\_E\_CARD\_UNSUPPORTED \\
+SCARD\_E\_DUPLICATE\_READER \\
+SCARD\_E\_INSUFFICIENT\_BUFFER \\
+SCARD\_E\_INVALID\_ATR \\
+SCARD\_E\_INVALID\_HANDLE \\
+SCARD\_E\_INVALID\_PARAMETER \\
+SCARD\_E\_INVALID\_TARGET \\
+SCARD\_E\_INVALID\_VALUE \\
+SCARD\_E\_NO\_MEMORY \\
+SCARD\_E\_NO\_SERVICE \\
+SCARD\_E\_NO\_SMARTCARD \\
+SCARD\_E\_NOT\_READY \\
+SCARD\_E\_NOT\_TRANSACTED \\
+SCARD\_E\_PCI\_TOO\_SMALL \\
+SCARD\_E\_PROTO\_MISMATCH \\
+SCARD\_E\_READER\_UNAVAILABLE \\
+SCARD\_E\_READER\_UNSUPPORTED \\
+SCARD\_E\_SERVICE\_STOPPED \\
+SCARD\_E\_SHARING\_VIOLATION \\
+SCARD\_E\_SYSTEM\_CANCELLED \\
+SCARD\_E\_TIMEOUT \\
+SCARD\_E\_UNKNOWN\_CARD \\
+SCARD\_E\_UNKNOWN\_READER \\
+SCARD\_F\_COMM\_ERROR \\
+SCARD\_F\_INTERNAL\_ERROR \\
+SCARD\_F\_UNKNOWN\_ERROR \\
+SCARD\_F\_WAITED\_TOO\_LONG \\
+\hline
+SCARD\_W\_UNSUPPORTED\_CARD \\
+SCARD\_W\_UNRESPONSIVE\_CARD \\
+SCARD\_W\_UNPOWERED\_CARD \\
+SCARD\_W\_RESET\_CARD \\
+SCARD\_W\_REMOVED\_CARD \\
+\hline
+\end{longtable}
+}
+
+
+%---------%---------%---------%---------%---------%---------%---------
+\section{API Routines}
+
+These routines specified here are winscard routines like those in the
+winscard API provided under Windows{\textregistered}. These are
+compatible with the Microsoft{\textregistered} API calls. This list of
+calls is mainly an abstraction of readers. It gives a common API for
+communication to most readers in a homogeneous fashion.
+
+Since all functions can produce a wide array of errors, please refer to
+\S~\vref{Error codes} for a list of error returns.
+
+For a human readable representation of an error the function
+\url{pcsc_stringify_error()} is declared in \texttt{pcsclite.h}.
+This function is not available on Microsoft{\textregistered} winscard
+API and is pcsc-lite specific.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardEstablishContext}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardEstablishContext(DWORD dwScope,
+    LPCVOID pvReserved1,
+    LPCVOID pvReserved2,
+    LPSCARDCONTEXT phContext);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{dwScope} & IN & Scope of the establishment \\
+ & & This can either be a local or remote connection\\
+
+\texttt{pvReserved1} & IN & Reserved for future use. Can be used for remote
+connection \\
+
+\texttt{pvReserved2} & IN & Reserved for future use \\
+\texttt{phContext} & OUT & Returned reference to this connection \\
+\end{tabular}
+
+\desc
+
+This function creates a communication context to the PC/SC Resource
+Manager. This must be the first function called in a PC/SC application.
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwScope} & Meaning\\
+\hline
+\hline
+\texttt{SCARD\_SCOPE\_USER} & Not used\\
+\hline
+\texttt{SCARD\_SCOPE\_TERMINAL} & Not used\\
+\hline
+\texttt{SCARD\_SCOPE\_GLOBAL} & Not used\\
+\hline
+\texttt{SCARD\_SCOPE\_SYSTEM} & Services on the local machine\\
+\hline
+\end{tabular}
+
+% Note: If \texttt{SCARD\_SCOPE\_GLOBAL} is used then \texttt{pvReserved1}
+% is a string that is the hostname of the machine which the Resource
+% Manager services reside. If \texttt{NULL} is specified then it defaults
+% to the localhost.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} & Successful\\
+\texttt{SCARD\_E\_INVALID\_VALUE} & Invalid scope type passed
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardReleaseContext}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardReleaseContext(SCARDCONTEXT hContext);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to be closed
+\end{tabular}
+
+\desc
+
+This function destroys a communication context to the PC/SC Resource
+Manager. This must be the last function called in a PC/SC application.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardReleaseContext(hContext);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} & Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE} & Invalid \texttt{hContext} handle
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardListReaders}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardListReaders(SCARDCONTEXT hContext,
+    LPCSTR mszGroups,
+    LPSTR mszReaders,
+    LPDWORD pcchReaders);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to the PC/SC Resource Manager\\
+\texttt{mszGroups} & IN & List of groups to list readers (not used)\\
+\texttt{mszReaders} & OUT & Multi-string with list of readers\\
+\texttt{pcchReaders} & INOUT & Size of multi-string buffer including NULL's
+\end{tabular}
+
+\desc
+
+This function returns a list of currently available readers on the
+system. \texttt{mszReaders} is a pointer to a character string that is
+allocated by the application. If the application sends
+\texttt{mszGroups} and \texttt{mszReaders} as \texttt{NULL} then this
+function will return the size of the buffer needed to allocate in
+\texttt{pcchReaders}.
+
+The reader names is a multi-string and separated by a nul character
+(\verb+'\0'+) and ended by a double nul character.
+\verb+"Reader A\0Reader B\0\0"+.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LPSTR mszReaders;
+DWORD dwReaders;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
+mszReaders = (LPSTR)malloc(sizeof(char)*dwReaders);
+rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} & Successful \\
+\texttt{SCARD\_E\_INVALID\_HANDLE} & Invalid Scope Handle\\
+\texttt{SCARD\_E\_INSUFFICIENT\_BUFFER} & Reader buffer not large enough
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardListReaderGroups}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardListReaderGroups(SCARDCONTEXT hContext,
+    LPSTR mszGroups,
+    LPDWORD pcchGroups);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to the PC/SC Resource Manager\\
+\texttt{mszGroups} & OUT & List of groups to list readers\\
+\texttt{pcchGroups} & INOUT & Size of multi-string buffer including NULL's
+\end{tabular}
+
+\desc
+
+This function returns a list of currently available reader groups on the
+system. \texttt{mszGroups} is a pointer to a character string that is
+allocated by the application. If the application sends
+\texttt{mszGroups} as \texttt{NULL} then this function will return the
+size of the buffer needed to allocate in \texttt{pcchGroups}.
+
+The group names is a multi-string and separated by a nul character
+(\verb+'\0'+) and ended by a double nul character.
+\verb+"SCard$DefaultReaders\0Group 2\0\0"+.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LPSTR mszGroups;
+DWORD dwGroups;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
+mszGroups = (LPSTR)malloc(sizeof(char)*dwGroups);
+rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} & Successful \\
+\texttt{SCARD\_E\_INVALID\_HANDLE} & Invalid Scope Handle\\
+\texttt{SCARD\_E\_INSUFFICIENT\_BUFFER} & Reader buffer not large enough
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardConnect}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardConnect(SCARDCONTEXT hContext,
+    LPCSTR szReader,
+    DWORD dwShareMode,
+    DWORD dwPreferredProtocols,
+    LPSCARDHANDLE phCard,
+    LPDWORD pdwActiveProtocol);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to the PC/SC Resource Manager\\
+\texttt{szReader} & IN & Reader name to connect to\\
+\texttt{dwShareMode} & IN & Mode of connection type: exclusive or shared\\
+\texttt{dwPreferredProtocols} & IN & Desired protocol use\\
+\texttt{phCard} & OUT & Handle to this connection\\
+\texttt{pdwActiveProtocol} & OUT & Established protocol to this connection.
+\end{tabular}
+
+\desc
+
+This function establishes a connection to the friendly name of
+the reader specified in \texttt{szReader}. The first connection will
+power up and perform a reset on the card.
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwScope} & Meaning\\
+\hline
+\hline
+\texttt{SCARD\_SHARE\_SHARED} & This application will allow others to share the reader \\
+\hline
+\texttt{SCARD\_SHARE\_EXCLUSIVE} & This application will NOT allow
+others to share the reader \\
+\hline
+\texttt{SCARD\_SHARE\_DIRECT} & not used \\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwPreferredProtocols} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_PROTOCOL\_T0} & Use the T=0 protocol \\
+\hline
+\texttt{SCARD\_PROTOCOL\_T1} & Use the T=1 protocol \\
+\hline
+\texttt{SCARD\_PROTOCOL\_RAW} & Use with memory type cards \\
+\hline
+\end{tabular}
+
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+    SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}  & Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE} & Invalid \texttt{hContext} handle\\
+\texttt{SCARD\_E\_INVALID\_VALUE} & Invalid sharing mode, requested protocol, or reader name\\
+\texttt{SCARD\_E\_NOT\_READY} & Could not allocate the desired port\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} & Could not power up the reader or card\\
+\texttt{SCARD\_E\_SHARING\_VIOLATION} & Someone else has exclusive rights\\
+\texttt{SCARD\_E\_UNSUPPORTED\_FEATURE} & Protocol not supported\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardReconnect}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardReconnect(SCARDHANDLE hCard,
+   DWORD dwShareMode,
+   DWORD dwPreferredProtocols,
+   DWORD dwInitialization,
+   LPDWORD pdwActiveProtocol);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN & Handle to a previous call to connect\\
+\texttt{dwShareMode} & IN & Mode of connection type: exclusive/shared\\
+\texttt{dwPreferredProtocols} & IN & Desired protocol use\\
+\texttt{dwInitialization} & IN & Desired action taken on the card/reader\\
+\texttt{pdwActiveProtocol} & OUT & Established protocol to this connection\\
+\end{tabular}
+
+\desc
+
+This function reestablishes a connection to a reader that was previously
+connected to using \texttt{SCardConnect()}.  In a multi application
+environment it is possible for an application to reset the card in
+shared mode. When this occurs any other application trying to access
+certain commands will be returned the value
+\texttt{SCARD\_W\_RESET\_CARD}. When this occurs
+\texttt{SCardReconnect()} must be called in order to acknowledge that
+the card was reset and allow it to change it's state accordingly.
+
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwShareMode} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_SHARE\_SHARED} & This application will allow others to share the
+reader\\
+\hline
+\texttt{SCARD\_SHARE\_EXCLUSIVE} & This application will NOT allow others to
+share the reader\\
+\hline
+\end{tabular}
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwPreferredProtocols} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_PROTOCOL\_T0} & Use the T=0 protocol \\
+\hline
+\texttt{SCARD\_PROTOCOL\_T1} & Use the T=1 protocol \\
+\hline
+\texttt{SCARD\_PROTOCOL\_RAW} & Use with memory type cards \\
+\hline
+\end{tabular}
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwInitialization} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_LEAVE\_CARD} & Do nothing \\
+\hline
+\texttt{SCARD\_RESET\_CARD} & Reset the card (warm reset) \\
+\hline
+\texttt{SCARD\_UNPOWER\_CARD} & Unpower the card (cold reset) \\
+\hline
+\texttt{SCARD\_EJECT\_CARD} & Eject the card \\
+\hline
+\end{tabular}
+
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+LONG rv;
+BYTE pbRecvBuffer[10];
+BYTE pbSendBuffer = {0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00};
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+    SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+dwSendLength = sizeof(pbSendBuffer);
+rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+    &pioRecvPci, pbRecvBuffer, &pcbRecvLength);
+
+/* Card has been reset by another application */
+if (rv == SCARD_W_RESET_CARD)
+{
+    rv = SCardReconnect(hCard, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0,
+        SCARD_RESET_CARD, &dwActiveProtocol);
+}
+\end{verbatim}
+
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} 			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE} 		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_NOT\_READY} 		& Could not allocate the desired port\\
+\texttt{SCARD\_E\_INVALID\_VALUE} 		& Invalid sharing mode, requested protocol, or reader name\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\texttt{SCARD\_E\_UNSUPPORTED\_FEATURE} 	& Protocol not supported\\
+\texttt{SCARD\_E\_SHARING\_VIOLATION} 	& Someone else has exclusive rights\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardDisconnect}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN	& Connection made from \texttt{SCardConnect} \\
+\texttt{dwDisposition} & IN & Reader function to execute \\
+\end{tabular}
+
+\desc
+
+This function terminates a connection to the connection made through
+SCardConnect.  dwDisposition can have the following values:
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwDisposition} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_LEAVE\_CARD} & Do nothing\\
+\texttt{SCARD\_RESET\_CARD} & Reset the card (warm reset) \\
+\texttt{SCARD\_UNPOWER\_CARD} & Unpower the card (cold reset) \\
+\texttt{SCARD\_EJECT\_CARD} & Eject the card\\
+\hline
+\end{tabular}
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful \\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle \\
+\texttt{SCARD\_E\_INVALID\_VALUE}		& Invalid \texttt{dwDisposition} \\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardBeginTransaction}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardBeginTransaction(SCARDHANDLE hCard);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN & Connection made from \texttt{SCardConnect} \\
+\end{tabular}
+
+\desc
+
+This function establishes a temporary exclusive access mode for doing a
+series of commands or transaction.  You might want to use this when you
+are selecting a few files and then writing a large file so you can make
+sure that another application will not change the current file.  If
+another application has a lock on this reader or this application is in
+\texttt{SCARD\_SHARE\_EXCLUSIVE}  there will be no action taken.
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+rv = SCardBeginTransaction(hCard);
+
+/* Do some transmit commands */
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_SHARING\_VIOLATION}	& Someone else has exclusive rights\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardEndTransaction}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardEndTransaction(SCARDHANDLE hCard,
+    DWORD dwDisposition);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} & IN & Connection made from \texttt{SCardConnect}\\
+\texttt{dwDisposition} & IN & Action to be taken on the reader\\
+\end{tabular}
+
+\desc
+
+This function ends a previously begun transaction.  The calling
+application must be the owner of the previously begun transaction or an
+error will occur.  \texttt{dwDisposition} can have the following values:
+The disposition action is not currently used in this release.
+
+\begin{tabular}{|l|l|}
+\hline
+Value of dwDisposition & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_LEAVE\_CARD} & Do nothing\\
+\texttt{SCARD\_RESET\_CARD} & Reset the card\\
+\texttt{SCARD\_UNPOWER\_CARD} & Unpower the card\\
+\texttt{SCARD\_EJECT\_CARD} & Eject the card\\
+\hline
+\end{tabular}
+
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+rv = SCardBeginTransaction(hCard);
+
+/* Do some transmit commands */
+
+rv = SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_SHARING\_VIOLATION}	& Someone else has exclusive rights\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardTransmit}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardTransmit(SCARDHANDLE hCard,
+    LPCSCARD_IO_REQUEST pioSendPci,
+    LPCBYTE pbSendBuffer,
+    DWORD cbSendLength,
+    LPSCARD_IO_REQUEST pioRecvPci,
+    LPBYTE pbRecvBuffer,
+    LPDWORD pcbRecvLength);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} &		IN &	Connection made from \texttt{SCardConnect} \\
+\texttt{pioSendPci} &		INOUT &  Structure of protocol information\\
+\texttt{pbSendBuffer} &		IN &	APDU to send to the card\\
+\texttt{cbSendLength} &		IN &	Length of the APDU\\
+\texttt{pioRecvPci} &		INOUT &	Structure of protocol information\\
+\texttt{pbRecvBuffer} &		OUT &	Response from the card\\
+\texttt{pcbRecvLength} &	INOUT &	Length of the response\\
+\end{tabular}
+
+\desc
+
+This function sends an APDU  to the smartcard contained in the reader
+connected to by \texttt{SCardConnect()}.  The card responds from the
+APDU and stores this response in \texttt{pbRecvBuffer} and it's length
+in \texttt{SpcbRecvLength}.  \texttt{SSendPci} and \texttt{SRecvPci} are
+structures containing the following:
+
+\begin{verbatim}
+typedef struct {
+    DWORD dwProtocol;    /* SCARD_PROTOCOL_T0 or SCARD_PROTOCOL_T1 */
+    DWORD cbPciLength;   /* Length of this structure - not used   */
+} SCARD_IO_REQUEST;
+\end{verbatim}
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{pioSendPci} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_PCI\_T0} & Pre defined T=0 PCI structure\\
+\texttt{SCARD\_PCI\_T1} & Pre defined T=1 PCI structure\\
+\hline
+\end{tabular}
+
+\example
+
+\begin{verbatim}
+LONG rv;
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol, dwSendLength, pcbRecvLength;
+SCARD_IO_REQUEST pioRecvPci;
+BYTE pbRecvBuffer[10];
+BYTE pbSendBuffer = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
+
+dwSendLength = sizeof(pbSendBuffer);
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+pcbRecvLength = sizeof(pbRecvBuffer);
+rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+         &pioRecvPci, pbRecvBuffer, &pcbRecvLength);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_NOT\_TRANSACTED}		& APDU exchange not successful\\
+\texttt{SCARD\_E\_PROTO\_MISMATCH}		& Connect protocol is different than desired\\
+\texttt{SCARD\_E\_INVALID\_VALUE}		& Invalid Protocol, reader name, etc\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\texttt{SCARD\_W\_RESET\_CARD}		& The card has been reset by another application\\
+\texttt{SCARD\_W\_REMOVED\_CARD}		& The card has been removed from the reader\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardControl}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardControl(SCARDHANDLE hCard,
+    LPCBYTE pbSendBuffer,
+    DWORD cbSendLength,
+    LPBYTE pbRecvBuffer,
+    LPDWORD pcbRecvLength);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} &		IN &	Connection made from \texttt{SCardConnect}\\
+\texttt{pbSendBuffer} &		IN &	Command to send to the reader\\
+\texttt{cbSendLength} &		IN &	Length of the command\\
+\texttt{pbRecvBuffer} &		OUT &	Response from the reader\\
+\texttt{pcbRecvLength} &	INOUT &	Length of the response\\
+\end{tabular}
+
+\desc
+
+This function sends a command directly to the IFD Handler to be
+processed by the reader.  This is useful for creating client side reader
+drivers for functions like PIN pads, biometrics, or other extensions to
+the normal smartcard reader that are not normally handled by PC/SC.
+
+\example
+
+\begin{verbatim}
+LONG rv;
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol, dwSendLength, pcbRecvLength;
+BYTE pbRecvBuffer[10];
+BYTE pbSendBuffer = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10 0x00 };
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+pcbRecvLength = sizeof(pbRecvBuffer);
+rv = SCardControl(hCard, pbSendBuffer, sizeof(pbSendBuffer),
+         pbRecvBuffer, &pcbRecvLength);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_NOT\_TRANSACTED}		& Data exchange not successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_INVALID\_VALUE}		& Invalid value was presented\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\texttt{SCARD\_W\_RESET\_CARD}		& The card has been reset by another application\\
+\texttt{SCARD\_W\_REMOVED\_CARD}		& The card has been removed from the reader\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardStatus}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardStatus(SCARDHANDLE hCard,
+    LPSTR szReaderName,
+    LPDWORD pcchReaderLen,
+    LPDWORD pdwState,
+    LPDWORD pdwProtocol,
+    LPBYTE pbAtr,
+    LPDWORD pcbAtrLen);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hCard} &			IN &	Connection made from \texttt{SCardConnect} \\
+\texttt{szReaderName} &		INOUT &	Friendly name of this reader\\
+\texttt{pcchReaderLen} &		INOUT &	Size of the \texttt{szReaderName} multistring\\
+\texttt{pdwState} &		OUT &	Current state of this reader\\
+\texttt{pdwProtocol} &		OUT &	Current protocol of this reader\\
+\texttt{pbAtr} &			OUT &	Current ATR of a card in this reader\\
+\texttt{pcbAtrLen} &		OUT &	Length of ATR\\
+\end{tabular}
+
+\desc
+
+This function returns the current status of the reader connected to by
+\texttt{hCard}.  It's friendly name will be stored in
+\texttt{szReaderName}.  \texttt{pcchReaderLen} will be the size of the
+allocated buffer for \texttt{szReaderName}.  If this is too small the
+function will return with the necessary size in \texttt{pcchReaderLen}.
+The current state, and protocol will be stored in \texttt{pdwState} and
+\texttt{pdwProtocol} respectively.  \texttt{pdwState} is a
+\texttt{DWORD} possibly OR'd with the following values:
+
+
+\begin{tabular}{|l|p{12cm}|}
+\hline
+Value of \texttt{pdwState} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_ABSENT} & There is no card in the reader\\
+\texttt{SCARD\_PRESENT} & There is a card in the reader, but it has not been moved into position for use\\
+\texttt{SCARD\_SWALLOWED} & There is a card in the reader in position for use. The card is not powered\\
+\texttt{SCARD\_POWERED} & Power is being provided to the card, but the reader driver is unaware of the mode of the card\\
+\texttt{SCARD\_NEGOTIABLE} & The card has been reset and is awaiting PTS negotiation\\
+\texttt{SCARD\_SPECIFIC} & The card has been reset and specific communication protocols have been established\\
+\hline
+\end{tabular}
+
+\begin{tabular}{|l|l|}
+\hline
+Value of \texttt{dwPreferredProtocols} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_PROTOCOL\_T0} & Use the T=0 protocol\\
+\texttt{SCARD\_PROTOCOL\_T1} & Use the T=1 protocol\\
+\hline
+\end{tabular}
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard;
+DWORD dwActiveProtocol, cReaders;
+DWORD dwState, dwProtocol, dwAtrLen, dwReaderLen;
+BYTE pbAtr[MAX_ATR_SIZE]
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+dwAtrLen = sizeof(pbAtr);
+rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol,
+    pbAtr, &dwAtrLen);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hCard} handle\\
+\texttt{SCARD\_E\_INSUFFICIENT\_BUFFER}	& Not enough allocated memory for \texttt{szReaderName}\\
+ & or for \texttt{pbAtr} \\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader has been removed\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardGetStatusChange}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardGetStatusChange(SCARDCONTEXT hContext,
+    DWORD dwTimeout,
+    LPSCARD_READERSTATE rgReaderStates,
+    DWORD cReaders);
+\end{verbatim}
+
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} &	IN &	Connection context to the PC/SC Resource Manager\\
+\texttt{dwTimeout} &	IN &	Maximum block waiting time for status change, zero for infinite\\
+\texttt{rgReaderStates} & INOUT & Structures of readers with current states\\
+\texttt{cReaders} &	IN &	Number of structures\\
+\end{tabular}
+
+\desc
+
+This function receives a structure or list of structures containing
+reader names.  It then blocks for a change in state to occur on any of
+the OR'd values contained in \texttt{dwCurrentState} for a maximum
+blocking time of \texttt{dwTimeout} or forever if \texttt{INFINITE} is
+used.  The new event state will be contained in \texttt{dwEventState}.
+A status change might be a card insertion or removal event, a change in
+ATR, \textit{etc}.
+
+This function will block for reader availability if \texttt{cReaders} is
+equal to zero and \texttt{rgReaderStates} is \texttt{NULL}.
+
+\begin{verbatim}
+typedef struct {
+    LPCTSTR szReader;     /* Reader name                       */
+    LPVOID pvUserData;    /* User defined data                 */
+    DWORD dwCurrentState; /* Current state of reader           */
+    DWORD dwEventState;   /* Reader state after a state change */
+    DWORD cbAtr;          /* ATR Length, usually MAX_ATR_SIZE  */
+    BYTE rgbAtr[MAX_ATR_SIZE]; /* ATR Value                    */
+} SCARD_READERSTATE;
+
+typedef SCARD_READERSTATE *PSCARD_READERSTATE, **LPSCARD_READERSTATE;
+\end{verbatim}
+
+\begin{tabular}{|p{5cm}|p{10.5cm}|}
+\hline
+Value of \texttt{dwCurrentState} and \texttt{dwEventState} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_STATE\_UNAWARE} & The application is unaware of the
+current state, and would like to know. The use of this value results in
+an immediate return from state transition monitoring services.  This is
+represented by all bits set to zero\\
+
+\texttt{SCARD\_STATE\_IGNORE} & This reader should be ignored\\
+\texttt{SCARD\_STATE\_CHANGED} & There is a difference between the state
+believed by the application, and the state known by the resource
+manager. When this bit is set, the application may assume a significant
+state change has occurred on this reader\\
+
+\texttt{SCARD\_STATE\_UNKNOWN} & The given reader name is not recognized
+by the resource manager. If this bit is set, then
+\texttt{SCARD\_STATE\_CHANGED} and \texttt{SCARD\_STATE\_IGNORE} will
+also be set\\
+
+\hline
+\end{tabular}
+
+\begin{tabular}{|p{5cm}|p{10.5cm}|}
+\hline
+Value of \texttt{dwCurrentState} and \texttt{ddwEventState} & Meaning \\
+\hline
+\hline
+\texttt{SCARD\_STATE\_UNAVAILABLE} & The actual state of this reader is
+not available. If this bit is set, then all the following bits are clear\\
+
+\texttt{SCARD\_STATE\_EMPTY} & There is no card in the reader. If this
+bit is set, all the following bits will be clear\\
+
+\texttt{SCARD\_STATE\_PRESENT} & There is a card in the reader\\
+\texttt{SCARD\_STATE\_ATRMATCH} & There is a card in the reader with an
+ATR matching one of the target cards. If this bit is set,
+\texttt{SCARD\_STATE\_PRESENT} will also be set. This bit is only
+returned on the SCardLocateCards function\\
+
+\texttt{SCARD\_STATE\_EXCLUSIVE} & The card in the reader is allocated
+for exclusive use by another application. If this bit is set,
+\texttt{SCARD\_STATE\_PRESENT} will also be set\\
+
+\texttt{SCARD\_STATE\_INUSE} & The card in the reader is in use by one
+or more other applications, but may be connected to in shared mode.  If
+this bit is set, SCARD\_STATE\_PRESENT will also be set\\
+
+\texttt{SCARD\_STATE\_MUTE} & There is an unresponsive card in the reader\\
+\hline
+\end{tabular}
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+SCARDHANDLE hCard
+DWORD dwActiveProtocol, cReaders;
+SCARD_READERSTATE_A rgReaderStates[1];
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+
+rgReaderStates[0].szReader = strdup("Reader X");
+rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
+
+cReaders = 1;
+rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates,  cReaders);
+rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+         SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+\end{verbatim}
+
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_VALUE}		& Invalid States, reader name, etc\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hContext} handle\\
+\texttt{SCARD\_E\_READER\_UNAVAILABLE} 	& The reader is unavailable\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardCancel}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardCancel(SCARDCONTEXT hContext);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} &	IN &	Connection context to the PC/SC Resource Manager\\
+\end{tabular}
+
+\desc
+
+This function cancels all pending blocking requests on the
+\texttt{GetStatusChange()} function.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+DWORD cReaders;
+SCARD_READERSTATE rgReaderStates;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+
+rgReaderStates.szReader = strdup("Reader X");
+rgReaderStates.dwCurrentState = SCARD_STATE_EMPTY;
+
+/* Spawn off thread for following function */
+rv = SCardGetStatusChange(hContext, 0, rgReaderStates, &cReaders);
+
+rv = SCardCancel(hContext);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hContext} handle\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardSetTimeout}
+
+\synopsis
+
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardSetTimeout(SCARDCONTEXT hContext,
+    DWORD dwTimeout);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to the PC/SC Resource Manager\\
+\texttt{dwTimeout} & IN & New timeout value\\
+\end{tabular}
+
+\desc
+
+This function updates the working waiting time that RPC uses when
+waiting for a server function to return.  This needs to be updated when
+a card command is sent that might take more time than usual.
+
+This command is pcsc-lite specific and does not exist in Windows PC/SC.
+
+\example
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardSetTimeout(hContext, 50);   /* 50 second timeout */
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS}			& Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE}		& Invalid \texttt{hContext} handle\\
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{pcsc\_stringify\_error}
+
+\synopsis
+
+\begin{verbatim}
+#include <pcsclite.h>
+
+char *pcsc_stringify_error(long error);
+\end{verbatim}
+
+\desc
+
+This function return a human readable text for the given PC/SC error
+code.
+
+\example
+
+
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD\_SCOPE\_SYSTEM, NULL, NULL, &hContext);
+if (rv != SCARD_S_SUCCESS)
+    printf("SCardReleaseContext: %s (0x%lX)\n", pcsc_stringify_error(rv), rv);
+\end{verbatim}
+
+
+%---------%---------%---------%---------%---------%---------
+\bibliographystyle{plain}
+\bibliography{pcsc-lite}
+
+
+\end{document}
+
