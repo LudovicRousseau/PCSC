@@ -87,6 +87,8 @@ extern "C"
 
 	long SCardCancel(long hContext);
 
+	void SCardUnload(void);
+
 #ifdef __cplusplus
 }
 #endif
