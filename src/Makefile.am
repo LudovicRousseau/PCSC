@@ -30,7 +30,8 @@ PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
 endif
-else
+endif
+
 if PCSC_ARCH_BSD
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -lfl
@@ -40,7 +41,8 @@ PCSC_DYNLOAD_SOURCE = dyn_bsd.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
-else
+endif
+
 if PCSC_ARCH_OSX
 PCSC_MYLDFLAGS      = -framework CoreFoundation
 PCSC_INCLUDE_LIBS   = -ll -lIOKit
@@ -52,7 +54,8 @@ PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
 INCLUDES  = -I/System/Library/Frameworks/IOKit.framework/Headers/usb \
             -I/System/Library/Frameworks/IOKit.framework/Headers
-else
+endif
+
 if PCSC_ARCH_SOLARIS
 PCSC_MYLDFLAGS      =
 
@@ -70,7 +73,8 @@ PCSC_THREAD_SOURCE  = thread_unix.c
 PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_solaris.c
-else
+endif
+
 if PCSC_ARCH_HPUX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
@@ -80,7 +84,8 @@ PCSC_DYNLOAD_SOURCE = dyn_hpux.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_hpux.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
-else
+endif
+
 if PCSC_ARCH_TRU64
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll
@@ -90,7 +95,8 @@ PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
-else
+endif
+
 if PCSC_ARCH_AIX
 PCSC_MYLDFLAGS      =
 PCSC_INCLUDE_LIBS   = -ll -lbsd
@@ -100,12 +106,6 @@ PCSC_DYNLOAD_SOURCE = dyn_unix.c
 PCSC_HOTPLUG_SOURCE = hotplug_generic.c
 PCSC_SYSTEM_SOURCE  = sys_unix.c
 PCSC_CLIENT_SRC     = winscard_clnt.c
-endif
-endif
-endif
-endif
-endif
-endif
 endif
 
 if MCARD_ENABLED
@@ -139,8 +139,8 @@ pcscd_SOURCES = pcscdaemon.c winscard_svc.c winscard_msg.c \
 	ifdhandler.h ifdwrapper.h powermgt_generic.h prothandler.h \
 	readerfactory.h sys_generic.h tokenfactory.h winscard_msg.h \
 	winscard_svc.h
-pcscd_LDADD   = libpcsclite-core.la $(PCSCD_INCLUDE_LIBS)
-pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic #-Wl,--export-dynamic
+pcscd_LDADD   = libpcsclite-core.la #$(PCSCD_INCLUDE_LIBS)
+pcscd_LDFLAGS = $(PCSC_MYLDFLAGS) -rdynamic
 
 CFLAGS = @CFLAGS@ -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\"
 
@@ -150,7 +150,8 @@ testpcsc_LDADD = libpcsclite.la
 EXTRA_libpcsclite_core_la_SOURCES = dyn_unix.c dyn_macosx.c \
 	hotplug_generic.c hotplug_linux.c hotplug_macosx.c \
 	thread_unix.c thread_macosx.c dyn_bsd.c dyn_hpux.c \
-	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c
+	sys_solaris.c sys_hpux.c powermgt_macosx.c muscletest.c \
+	winscard_scf.c
 
 # Hack to be able to use flex -P to enable linking of multiple lexer
 # sources into one library, until we find a way to make automake handle
@@ -161,5 +162,5 @@ driverparser.c: driverparser.l
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) "$(LEX)" $< lex.tp.c $@ -- -Ptp $(AM_LFLAGS) $(LFLAGS)
 
-EXTRA_DIST = README_INTERNALS.txt
+EXTRA_DIST = README_INTERNALS.txt dyn_win32.c
 
