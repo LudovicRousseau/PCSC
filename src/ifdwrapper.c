@@ -181,7 +181,11 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	} else
 	{
-		rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
+		/* use device name only if defined */
+		if (rContext->lpcDevice[0] != '\0')
+			rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
+		else
+			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -192,7 +196,11 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	} else
 	{
-		rv = IFDHCreateChannelByName(rContext->dwSlot, rContext->lpcDevice);
+		/* Use device name only if defined */
+		if (rContext->lpcDevice[0] != '\0')
+			rv = IFDHCreateChannelByName(rContext->dwSlot, rContext->lpcDevice);
+		else
+			rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	}
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
