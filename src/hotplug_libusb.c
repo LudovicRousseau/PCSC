@@ -3,12 +3,10 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2001-2003
+ * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@linuxnet.com>
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
- *
- * The USB code was based partly on Johannes Erdfelt
- * libusb code found at libusb.sourceforge.net
+ *  Toni Andjelkovic <toni@soth.at>
  *
  * $Id$
  */
