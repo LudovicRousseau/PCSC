@@ -1,7 +1,7 @@
 ## Process this file with automake to create Makefile.in.
 # $Id$
 
-pcdir= @libdir@/pkgconfig
+pcdir= $(libdir)/pkgconfig
 pc_DATA = libpcsclite.pc
 
 SUBDIRS = . utils
