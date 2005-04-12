@@ -1,12 +1,15 @@
 /*
- * This handles thread and mutex functions for Windows.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2003
  *  Jamie Nicolson / Netscape Communications Corporation
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles thread and mutex functions for Windows.
  */
 
 #include "config.h"

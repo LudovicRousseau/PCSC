@@ -1,7 +1,4 @@
 /*
- * This keeps track of card insertion/removal events
- * and updates ATR, protocol, and status information.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000
@@ -10,6 +7,12 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This keeps track of card insertion/removal events
+ * and updates ATR, protocol, and status information.
  */
 
 #include "config.h"

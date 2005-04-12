@@ -1,12 +1,15 @@
 /*
- * This handles abstract system level calls.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles abstract system level calls.
  */
 
 #ifndef __sys_generic_h__

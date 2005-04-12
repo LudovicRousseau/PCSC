@@ -1,6 +1,4 @@
 /*
- * This provides PC/SC to SCF shimming.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2002
@@ -10,6 +8,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This provides PC/SC to SCF shimming.
  */
 
 #include "config.h"

@@ -1,6 +1,4 @@
 /*
- * This handles smartcard reader communications.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2003
@@ -8,6 +6,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles smartcard reader communications.
  */
 
 #ifndef __winscard_h__

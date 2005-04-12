@@ -1,6 +1,4 @@
 /*
- * This is the main pcscd daemon.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2005
@@ -8,6 +6,15 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This is the main pcscd daemon.
+ *
+ * The function \c main() starts up the communication environment.\n
+ * Then an endless loop is calld to look for Client connections. For each
+ * Client connection a call to \c CreateContextThread() is done.
  */
 
 #include "config.h"
@@ -67,14 +74,19 @@ void SVCClientCleanup(psharedSegmentMsg msgStruct)
 	 */
 }
 
-/*
- * The Message Queue Listener function 
+/**
+ * @brief The Server's Message Queue Listener function.
+ *
+ * An endless loop calls the function \c SHMProcessEventsServer() to check for
+ * messages sent by clients.
+ * If the message is valid, \c CreateContextThread() is called to serve this 
+ * request.
  */
 void SVCServiceRunLoop(void)
 {
 	int rsp;
 	LONG rv;
-	DWORD dwClientID;
+	DWORD dwClientID;	/* Connection ID used to reference the Client */
 	
 	rsp = 0;
 	rv = 0;

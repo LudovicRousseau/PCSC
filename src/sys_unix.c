@@ -9,6 +9,11 @@
  * $Id$
  */
 
+/**
+ * @file
+ * @brief This handles abstract system level calls.
+ */
+
 #include "config.h"
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -29,6 +34,12 @@
 #include "debuglog.h"
 #include "misc.h"
 
+/**
+ * @brief Make system wide initialization.
+ *
+ * @return Eror code.
+ * @retval 0 Success.
+ */
 INTERNAL int SYS_Initialize(void)
 {
 	/*
@@ -37,16 +48,36 @@ INTERNAL int SYS_Initialize(void)
 	return 0;
 }
 
+/**
+ * @brief Attempts to create a directory with some permissions.
+ *
+ * @param[in] path Path of the directory to be created.
+ * @param[in] perms Permissions to the new directory.
+ *
+ * @return Eror code.
+ * @retval 0 Success.
+ * @retval -1 An error occurred.
+ */
 INTERNAL int SYS_Mkdir(char *path, int perms)
 {
 	return mkdir(path, perms);
 }
 
+/**
+ * @brief Gets the running process's ID.
+ *
+ * @return PID.
+ */
 INTERNAL int SYS_GetPID(void)
 {
 	return getpid();
 }
 
+/**
+ * @brief Makes the current process sleep for some seconds.
+ *
+ * @param[in] iTimeVal Number of seconds to sleep.
+ */
 INTERNAL int SYS_Sleep(int iTimeVal)
 {
 #ifdef HAVE_NANOSLEEP
@@ -60,6 +91,11 @@ INTERNAL int SYS_Sleep(int iTimeVal)
 #endif
 }
 
+/**
+ * @brief Makes the current process sleep for some microseconds.
+ *
+ * @param[in] iTimeVal Number of microseconds to sleep.
+ */
 INTERNAL int SYS_USleep(int iTimeVal)
 {
 #ifdef HAVE_NANOSLEEP
@@ -74,16 +110,45 @@ INTERNAL int SYS_USleep(int iTimeVal)
 #endif
 }
 
+/**
+ * @brief Opens/creates a file.
+ *
+ * @param[in] pcFile path to the file.
+ * @param[in] flags Open and read/write choices.
+ * @param[in] mode Permissions to the file.
+ *
+ * @return File descriptor.
+ * @retval >0 The file descriptor.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_OpenFile(char *pcFile, int flags, int mode)
 {
 	return open(pcFile, flags, mode);
 }
 
+/**
+ * @brief Opens/creates a file.
+ *
+ * @param[in] iHandle File descriptor.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_CloseFile(int iHandle)
 {
 	return close(iHandle);
 }
 
+/**
+ * @brief Removes a file.
+ *
+ * @param[in] pcFile path to the file.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_RemoveFile(char *pcFile)
 {
 	return remove(pcFile);
@@ -129,6 +194,15 @@ INTERNAL int SYS_ChangePermissions(char *pcFile, int mode)
 	return chmod(pcFile, mode);
 }
 
+/**
+ * @brief Makes a non-blocking request to lock a file exclusively.
+ *
+ * @param[in] iHandle File descriptor.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_LockFile(int iHandle)
 {
 #ifdef HAVE_FLOCK
@@ -145,6 +219,15 @@ INTERNAL int SYS_LockFile(int iHandle)
 #endif
 }
 
+/**
+ * @brief Makes a blocking request to lock a file exclusively.
+ *
+ * @param[in] iHandle File descriptor.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_LockAndBlock(int iHandle)
 {
 #ifdef HAVE_FLOCK
@@ -161,6 +244,15 @@ INTERNAL int SYS_LockAndBlock(int iHandle)
 #endif
 }
 
+/**
+ * @brief Unlocks the file.
+ *
+ * @param[in] iHandle File descriptor.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_UnlockFile(int iHandle)
 {
 #ifdef HAVE_FLOCK
@@ -194,11 +286,28 @@ INTERNAL int SYS_WriteFile(int iHandle, char *pcBuffer, int iLength)
 	return write(iHandle, pcBuffer, iLength);
 }
 
+/**
+ * @brief Gets the memory page size.
+ *
+ * The page size is used when calling the \c SYS_MemoryMap() and 
+ * \c SYS_PublicMemoryMap() functions.
+ *
+ * @return Number of bytes per page.
+ */
 INTERNAL int SYS_GetPageSize(void)
 {
 	return getpagesize();
 }
 
+/**
+ * @brief Map the file \p iFid in memory for reading and writing.
+ *
+ * @param[in] iSize Size of the memmory mapped.
+ * @param[in] iFid File which will be mapped in memory.
+ * @param[in] iOffset Start point of the file to be mapped in memory.
+ *
+ * @return Address of the memory map.
+ */
 INTERNAL void *SYS_MemoryMap(int iSize, int iFid, int iOffset)
 {
 
@@ -218,6 +327,15 @@ INTERNAL void *SYS_MemoryMap(int iSize, int iFid, int iOffset)
 	return vAddress;
 }
 
+/**
+ * @brief Map the file \p iFid in memory only for reading.
+ *
+ * @param[in] iSize Size of the memmory mapped.
+ * @param[in] iFid File which will be mapped in memory.
+ * @param[in] iOffset Start point of the file to be mapped in memory.
+ *
+ * @return Address of the memory map.
+ */
 INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 {
 
@@ -228,6 +346,16 @@ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 	return vAddress;
 }
 
+/**
+ * @brief Writes the changes made in a memory map to the disk mapped file.
+ *
+ * @param[in] begin Start of the block to be written
+ * @param[in] lenght Lenght of the block to be written
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 An error ocurred.
+ */
 INTERNAL int SYS_MMapSynchronize(void *begin, int length)
 {
 	int flags = 0;
@@ -243,6 +371,16 @@ INTERNAL int SYS_Fork(void)
 	return fork();
 }
 
+/**
+ * @brief put the process to run in the background.
+ *
+ * @param[in] nochdir if zero, change the current directory to "/".
+ * @param[in] noclose if zero, redirect standard imput/output/error to /dev/nulll.
+ *
+ * @return error code.
+ * @retval 0 success.
+ * @retval -1 an error ocurred.
+ */
 INTERNAL int SYS_Daemon(int nochdir, int noclose)
 {
 #ifdef HAVE_DAEMON

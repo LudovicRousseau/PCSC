@@ -1,6 +1,4 @@
 /*
- * This handles debugging.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -11,24 +9,26 @@
  * $Id$
  */
 
-/*
- * log message is sent to syslog or stderr depending on --foreground
+/**
+ * @file
+ * @brief This handles debugging.
+ *
+ * @note log message is sent to syslog or stderr depending on --foreground
  * command line argument
  *
+ * @test
+ * @code
  * Log1(priority, "text");
  *  log "text" with priority level priority
- *
  * Log2(priority, "text: %d", 1234);
  *  log "text: 1234"
  * the format string can be anything printf() can understand
- *
  * Log3(priority, "text: %d %d", 1234, 5678);
  *  log "text: 1234 5678"
  * the format string can be anything printf() can understand
- *
  * LogXxd(priority, msg, buffer, size);
  *  log "msg" + a hex dump of size bytes of buffer[]
- *
+ * @endcode
  */
 
 #ifndef __debuglog_h__

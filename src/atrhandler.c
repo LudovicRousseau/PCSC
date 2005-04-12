@@ -1,7 +1,4 @@
 /*
- * This keeps track of smartcard protocols, timing issues
- * and ATR handling.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -9,6 +6,16 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ *
+ * @brief This keeps track of smartcard protocols, timing issues
+ * and ATR (Answer-to-Reset) handling.
+ *
+ * @note use ./configure --enable-debugatr to enable debug messages
+ * to be logged.
  */
 
 #include "config.h"
@@ -19,12 +26,19 @@
 #include "debuglog.h"
 #include "atrhandler.h"
 
-/*
- * Uncomment the following for ATR debugging 
+/**
+ * Uncomment the following for ATR debugging
  * or use ./configure --enable-debugatr
  */
 /* #define ATR_DEBUG */
 
+/**
+ * @brief
+ * @param psExtension
+ * @param pucAtr
+ * @param dwLength
+ * @return 
+ */
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
 {
@@ -44,7 +58,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 #endif
 
 	if (dwLength < 2)
-		return 0;	/* Atr must have TS and T0 */
+		return 0;	/** @retval 0 Atr must have TS and T0 */
 
 	/*
 	 * Zero out the bitmasks 
@@ -67,7 +81,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		else
 		{
 			memset(psExtension, 0x00, sizeof(SMARTCARD_EXTENSION));
-			return 0;
+			return 0;	/** @retval 0 Unable to decode TS byte */
 		}
 
 	/*
@@ -129,7 +143,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 							SCARD_PROTOCOL_T1;
 						break;
 					default:
-						return 0;
+						return 0; /** @retval 0 Unable to decode LNS */
 				}
 			}
 
@@ -193,7 +207,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 						break;
 
 					default:
-						return 0;
+						return 0; /** @retval 0 Unable do decode T protocol */
 				}
 			}
 		} else
@@ -202,7 +216,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		if (p > MAX_ATR_SIZE)
 		{
 			memset(psExtension, 0x00, sizeof(SMARTCARD_EXTENSION));
-			return 0;
+			return 0;	/** @retval 0 Maximum attribute size */
 		}
 
 		/* next interface characters index */
@@ -243,6 +257,6 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		psExtension->CardCapabilities.AvailableProtocols);
 #endif
 
-	return 1;
+	return 1; /** @retval 1 Success */
 }
 

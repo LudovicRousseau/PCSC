@@ -1,7 +1,4 @@
 /*
- * This handles card insertion/removal events, updates ATR,
- * protocol, and status information.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
@@ -12,6 +9,12 @@
  * $Id$
  */
 
+/**
+ * @file
+ * @brief This handles card insertion/removal events, updates ATR,
+ * protocol, and status information.
+ */
+
 #ifndef __eventhandler_h__
 #define __eventhandler_h__
 
@@ -20,11 +23,11 @@ extern "C"
 {
 #endif
 
-	/*
+	/** 
+	 * @typedef
 	 * Define an exported public reader state structure so each
 	 * application gets instant notification of changes in state. 
 	 */
-
 	typedef struct pubReaderStatesList
 	{
 		LONG readerID;

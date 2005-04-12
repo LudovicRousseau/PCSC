@@ -1,13 +1,16 @@
 /*
- * This keeps track of smartcard protocols, timing issues
- * and ATR handling.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This keeps track of smartcard protocols, timing issues
+ * and Answer to Reset ATR handling.
  */
 
 #ifndef __atrhandler_h__

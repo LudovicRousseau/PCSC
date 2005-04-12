@@ -1,6 +1,4 @@
 /*
- * This handles protocol defaults, PTS, etc.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles protocol defaults, PTS, etc.
  */
 
 #include "config.h"

@@ -1,7 +1,4 @@
 /*
- * This demarshalls functions over the message queue and
- * keeps track of clients and their handles.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2001-2004
@@ -9,6 +6,12 @@
  *  Damien Sauveron <damien.sauveron@labri.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This demarshalls functions over the message queue and
+ * keeps track of clients and their handles.
  */
 
 #ifndef __winscard_svc_h__

@@ -1,6 +1,4 @@
 /*
- * This keeps a list of defines for pcsc-lite.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -8,6 +6,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This keeps a list of defines for pcsc-lite.
  */
 
 #ifndef __pcsclite_h__

@@ -1,12 +1,15 @@
 /*
- * This handles power management routines.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000-2003
  *  David Corcoran <corcoran@linuxnet.com>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles power management routines.
  */
 
 #include "config.h"

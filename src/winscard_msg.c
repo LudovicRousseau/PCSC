@@ -1,6 +1,4 @@
 /*
- * This is responsible for client/server transport.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2001-2004
@@ -9,6 +7,15 @@
  *  Ludoic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This is responsible for client/server communication.
+ *
+ * A file based socket (\c commonSocket) is used to send/receive only messages 
+ * among clients and server.\n
+ * The messages' data are passed throw a memory mapped file: \c sharedSegmentMsg.
  */
 
 #include "config.h"
@@ -35,13 +42,42 @@
 #include "sys_generic.h"
 #include "misc.h"
 
+/**
+ * Socket to a file, used for clients-server comminication.
+ */
 static int commonSocket = 0;
 
+/**
+ * @brief Wrapper for the \c SHMMessageReceive() function.
+ *
+ * Called by clients to read the server responses.
+ *
+ * @param[out] msgStruct Message read.
+ * @param[in] dwClientID Client socket handle.
+ * @param[in] blockamount Timeout in milliseconds.
+ *
+ * @return Error code.
+ * @retval @see SHMMessageReceive().
+ */
 INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
 {
 	return SHMMessageReceive(msgStruct, dwClientID, blockamount);
 }
 
+/**
+ * @brief Prepares a communication channel for the client to talk to the server.
+ *
+ * This is called by the application to create a socket for local IPC with the
+ * server. The socket is associated to the file \c PCSCLITE_CSOCK_NAME.
+ *
+ * @param[out] pdwClientID Client Connection ID.
+ * 
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 Can not create the socket.
+ * @retval -1 The socket can not open a connection.
+ * @retval -1 Can not set the socket to non-blocking.
+ */
 INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
 {
 	struct sockaddr_un svc_addr;
@@ -79,12 +115,34 @@ INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
 	return 0;
 }
 
+/**
+ * @brief Closes the socket used by the client to communicate with the server.
+ *
+ * @param[in] dwClientID Client socket handle to be closed.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ */
 INTERNAL int SHMClientCloseSession(DWORD dwClientID)
 {
 	SYS_CloseFile(dwClientID);
 	return 0;
 }
 
+/**
+ * @brief Prepares the communication channel used by the server to talk to the
+ * clients.
+ *
+ * This is called by the server to create a socket for local IPC with the
+ * clients. The socket is associated to the file \c PCSCLITE_CSOCK_NAME.
+ * Each client will open a connection to this socket.
+ * 
+ * @return Error code.
+ * @retval 0 Success
+ * @retval -1 Can not create the socket.
+ * @retval -1 Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME.
+ * @retval -1 Can not put the socket in listen mode.
+ */
 INTERNAL int SHMInitializeCommonSegment(void)
 {
 	static struct sockaddr_un serv_adr;
@@ -129,6 +187,18 @@ INTERNAL int SHMInitializeCommonSegment(void)
 	return 0;
 }
 
+/**
+ * @brief Accepts a Client connection.
+ *
+ * Called by \c SHMProcessEventsServer().
+ *
+ * @param[out] pdwClientID Connection ID used to reference the Client.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 Can not establish the connection.
+ * @retval -1 Can not set the connection to non-blocking mode.
+ */
 INTERNAL int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 {
 	socklen_t clnt_len;
@@ -161,6 +231,20 @@ INTERNAL int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 	return 0;
 }
 
+/**
+ * @brief Looks for messages sent by clients.
+ *
+ * This is called by the Server's function \c SVCServiceRunLoop().
+ *
+ * @param[out] pdwClientID Connection ID used to reference the Client.
+ * @param[in] blockTime Timeout (not used).
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 Error accessing the communication channel.
+ * @retval -1 Can not set the connection to non-blocking mode.
+ * @retval 2 Timeout.
+ */
 INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
 	fd_set read_fd;
@@ -212,6 +296,11 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	return -1;
 }
 
+/**
+ * @brief 
+ *
+ * Called by \c ContextThread().
+ */
 INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int blocktime)
 {
 	fd_set read_fd;
@@ -269,6 +358,15 @@ INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgSt
 
 }
 
+/**
+ * @brief Sends a menssage from client to server or vice-versa.
+ *
+ * Writes the message in the shared file \c filedes.
+ *
+ * @param[in] msgStruct Message to be sent.
+ * @param[in] filedes Socket handle.
+ * @param[in] blockAmount Timeout in milliseconds.
+ */
 INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	int blockAmount)
 {
@@ -381,6 +479,21 @@ INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
+/**
+ * @brief Called by the Client to get the reponse from the server or vice-versa.
+ *
+ * Reads the message from the file \c filedes.
+ *
+ * @param[out] msgStruct Message read.
+ * @param[in] filedes Socket handle.
+ * @param[in] blockAmount Timeout in milliseconds.
+ *
+ * @return Error code.
+ * @retval 0 Success.
+ * @retval -1 Timeout.
+ * @retval -1 Socket is closed.
+ * @retval -1 A signal was received.
+ */
 INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	int blockAmount)
 {
@@ -493,6 +606,22 @@ INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
+/**
+ * @brief Wrapper for the \c SHMMessageSend() function.
+ *
+ * Called by clients to send messages to the server.
+ * The parameters \p command and \p data are set in the \c sharedSegmentMsg
+ * struct in order to be sent.
+ *
+ * @param[in] command Command to be sent.
+ * @param[in] dwClientID Client socket handle.
+ * @param[in] size Size of the message (\p data).
+ * @param[in] blockAmount Timeout to the operation in ms.
+ * @param[in] data Data to be sent.
+ *
+ * @return Error code.
+ * @retval @see SHMMessageSend().
+ */
 INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
@@ -513,6 +642,15 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	return SHMMessageSend(&msgStruct, dwClientID, blockAmount);
 }
 
+/**
+ * @brief Closes the communications channel used by the server to talk to the
+ * clients.
+ *
+ * The socket used is closed and the file it is bound to is removed.
+ *
+ * @param[in] sockValue Socket to be closed.
+ * @param[in] pcFilePath File used by the socket.
+ */
 INTERNAL void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
 {
 	SYS_CloseFile(sockValue);

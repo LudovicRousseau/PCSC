@@ -1,6 +1,4 @@
 /*
- * This provides system specific thread calls.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000-2004
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This provides system specific thread calls.
  */
 
 #ifndef __thread_generic_h__

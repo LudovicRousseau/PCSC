@@ -1,7 +1,4 @@
 /*
- * This wraps the dynamic ifdhandler functions. The abstraction will
- * eventually allow multiple card slots in the same terminal.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -9,6 +6,12 @@
  *  Ludovic Rousseau <ludovic.rouseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file 
+ * @brief This wraps the dynamic ifdhandler functions. The abstraction will
+ * eventually allow multiple card slots in the same terminal.
  */
 
 #ifndef __ifdwrapper_h__

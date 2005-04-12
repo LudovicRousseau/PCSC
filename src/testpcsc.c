@@ -1,6 +1,4 @@
 /*
- * This is a test program for pcsc-lite.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This is a test program for pcsc-lite.
  */
 
 #include "config.h"

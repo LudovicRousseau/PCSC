@@ -1,6 +1,4 @@
 /*
- * This provides reader specific low-level calls.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -8,6 +6,11 @@
  *  Damien Sauveron <damien.sauveron@labri.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This provides reader specific low-level calls.
  */
 
 #ifndef _ifd_handler_h_

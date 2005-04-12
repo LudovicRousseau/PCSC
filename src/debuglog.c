@@ -1,6 +1,4 @@
 /*
- * This handles debugging.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2002
@@ -11,6 +9,11 @@
  * $Id$
  */
 
+/**
+ * @file
+ * @brief This handles debugging.
+ */
+ 
 #include "config.h"
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -29,8 +32,10 @@
 #include "strlcpycat.h"
 #include "misc.h"
 
-/* Max string size when dumping a 256 bytes longs APDU
- * Should be bigger than 256*3+30 */
+/** 
+ * Max string size when dumping a 256 bytes longs APDU
+ * Should be bigger than 256*3+30 
+ */
 #define DEBUG_BUF_SIZE 2048
 
 static char LogSuppress = DEBUGLOG_LOG_ENTRIES;
@@ -255,6 +260,23 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
 		log_xxd(PCSC_LOG_INFO, "SW: ", (const unsigned char *)buffer, len);
 }
 
+/**
+ * @brief This function return a human readable text for the given PC/SC error code.
+ *
+ * @param[in] pcscError Error code to be translated to text.
+ *
+ * @return Text representing de error code passed.
+ *
+ * @test
+ * @code
+ * SCARDCONTEXT hContext;
+ * LONG rv;
+ * rv = SCardEstablishContext(SCARD\_SCOPE\_SYSTEM, NULL, NULL, &hContext);
+ * if (rv != SCARD_S_SUCCESS)
+ *     printf("SCardReleaseContext: %s (0x%lX)\n",
+ *         pcsc_stringify_error(rv), rv);
+ * @endcode
+ */
 char* pcsc_stringify_error(long pcscError)
 {
 	static char strError[75];

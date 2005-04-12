@@ -1,6 +1,4 @@
 /*
- * Reads lexical config files and updates database.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2003
@@ -8,6 +6,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief Reads lexical config files and updates database.
  */
 
 #ifndef __parser_h__

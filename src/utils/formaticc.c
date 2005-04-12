@@ -1,6 +1,4 @@
 /*
- * This is an APDU robot for pcsc-lite.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000-2002
@@ -8,6 +6,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This is an APDU robot for pcsc-lite.
  */
 
 #include <stdio.h>

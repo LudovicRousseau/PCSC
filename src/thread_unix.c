@@ -1,6 +1,4 @@
 /*
- * This handles thread function abstraction.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000-2004
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This handles thread function abstraction.
  */
 
 #include "config.h"

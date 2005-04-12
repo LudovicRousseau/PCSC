@@ -1,12 +1,15 @@
 /*
- * This abstracts dynamic library loading functions and timing.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2000
  *  David Corcoran <corcoran@linuxnet.com>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This abstracts dynamic library loading functions and timing.
  */
 
 #include "config.h"

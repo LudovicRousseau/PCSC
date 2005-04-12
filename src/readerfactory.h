@@ -1,6 +1,4 @@
 /*
- * This keeps track of a list of currently available reader structures.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This keeps track of a list of currently available reader structures.
  */
 
 #ifndef __readerfactory_h__

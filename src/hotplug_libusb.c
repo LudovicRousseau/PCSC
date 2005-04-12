@@ -1,6 +1,4 @@
 /*
- * This provides a search API for hot pluggble devices.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2001-2004
@@ -10,6 +8,11 @@
  *  Damien Sauveron <damien.sauveron@labri.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This provides a search API for hot pluggble devices.
  */
 
 #include "config.h"

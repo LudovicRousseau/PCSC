@@ -1,12 +1,15 @@
 /*
- * This keeps a list of Windows(R) types.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This keeps a list of Windows(R) types.
  */
 
 #ifndef __wintypes_h__

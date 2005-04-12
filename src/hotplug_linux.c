@@ -1,6 +1,4 @@
 /*
- * This provides a search API for hot pluggble devices.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2001-2003
@@ -11,6 +9,11 @@
  * libusb code found at libusb.sourceforge.net
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This provides a search API for hot pluggble devices.
  */
 
 #include "config.h"

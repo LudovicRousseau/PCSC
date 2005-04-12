@@ -1,6 +1,4 @@
 /*
- * This wraps the dynamic ifdhandler functions.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 1999-2004
@@ -9,6 +7,11 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This wraps the dynamic ifdhandler functions.
  */
 
 #include "config.h"

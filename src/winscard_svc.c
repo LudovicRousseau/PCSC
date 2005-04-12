@@ -1,7 +1,4 @@
 /*
- * This demarshalls functions over the message queue and keeps
- * track of clients and their handles.
- *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
  * Copyright (C) 2001-2004
@@ -10,6 +7,16 @@
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
+ */
+
+/**
+ * @file
+ * @brief This demarshalls functions over the message queue and keeps
+ * track of clients and their handles.
+ *
+ * Each Client message is deald by creating a thread (\c CreateContextThread).
+ * The thread establishes reands and demarshalls the message and calls the
+ * appropriate function to threat it.
  */
 
 #include "config.h"
@@ -25,16 +32,24 @@
 #include "sys_generic.h"
 #include "thread_generic.h"
 
+/**
+ * @brief Represents the an Application Context on the Server side.
+ *
+ * An Application Context contains Channels (\c hCard).
+ */
 static struct _psContext
 {
 	SCARDCONTEXT hContext;
 	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
-	DWORD dwClientID;
-	PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
-	sharedSegmentMsg msgStruct;
-	int protocol_major, protocol_minor;
+	DWORD dwClientID;			/* Connection ID used to reference the Client. */
+	PCSCLITE_THREAD_T pthThread;		/* Event polling thread's ID */
+	sharedSegmentMsg msgStruct;		/* Msg sent by the Client */
+	int protocol_major, protocol_minor;	/* Protocol number agreed between client and server*/
 } psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
+/**
+ * @brief Index of an avaiable Application Context slot in \c psContext.
+ */
 static DWORD dwNextContextIndex;
 
 LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
@@ -53,6 +68,16 @@ LONG ContextsInitialize(void)
 	return 1;
 }
 
+/**
+ * @brief Creates threads to handle messages received from Clients.
+ *
+ * @param[in] pdwClientID Connection ID used to reference the Client.
+ *
+ * @return Error code.
+ * @retval SCARD_S_SUCCESS Success.
+ * @retval SCARD_F_INTERNAL_ERROR Exceded the maximum number of simultaneous Application Contexts.
+ * @retval SCARD_E_NO_MEMORY Error creating the Context Thread.
+ */
 LONG CreateContextThread(PDWORD pdwClientID)
 {
 	int i;
@@ -93,6 +118,14 @@ LONG CreateContextThread(PDWORD pdwClientID)
  * connections 
  */
 
+/**
+ * @brief Handles messages received from Clients.
+ *
+ * For each Client message a new instance of this thread is created.
+ *
+ * @param[in] pdwIndex Index of an avaiable Application Context slot in 
+ * \c psContext.
+ */
 static void ContextThread(DWORD* pdwIndex)
 {
 	LONG rv;
@@ -179,6 +212,21 @@ static void ContextThread(DWORD* pdwIndex)
 	}
 }
 
+/**
+ * @Find out which message was sent by the Client and execute the right task.
+ *
+ * According to the command type sent by the client (\c pcsc_msg_commands),
+ * cast the message data to the correct struct so that is can be demarshalled.
+ * Then call the appropriate function to handle the request.
+ *
+ * Possible structs are: \c establish_struct \c release_struct 
+ * \c connect_struct \c reconnect_struct \c disconnect_struct \c begin_struct
+ * \c cancel_struct \c end_struct \c status_struct \c transmit_struct
+ * \c control_struct \c getset_struct.
+ *
+ * @param[in] msgStruct Message to be demarshalled and executed.
+ * param[in] dwContextIndex 
+ */
 LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 {
 	LONG rv;
