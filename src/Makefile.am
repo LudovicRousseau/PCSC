@@ -49,7 +49,8 @@ libpcsclite_la_SOURCES = \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_THREAD_SRC) \
 	$(PCSC_DYNLOAD_SRC) \
-	strlcpy.c strlcat.c
+	strlcpy.c strlcat.c \
+	misc.h
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
