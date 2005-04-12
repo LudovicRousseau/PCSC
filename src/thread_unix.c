@@ -14,33 +14,34 @@
 #include "config.h"
 #include "wintypes.h"
 #include "thread_generic.h"
+#include "misc.h"
 
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0
 #endif
 
-int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_init(mMutex, NULL);
 }
 
-int SYS_MutexDestroy(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexDestroy(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_destroy(mMutex);
 }
 
-int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_lock(mMutex);
 }
 
-int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_unlock(mMutex);
 }
 
-int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
+INTERNAL int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 	pthread_attr_t attr;
@@ -58,7 +59,7 @@ int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 		return FALSE;
 }
 
-int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
+INTERNAL int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
 {
 	if (0 == pthread_cancel(*pthThread))
 		return TRUE;
@@ -66,7 +67,7 @@ int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
 		return FALSE;
 }
 
-int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
+INTERNAL int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
 {
 	if (0 == pthread_detach(pthThread))
 		return TRUE;
@@ -74,7 +75,7 @@ int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
 		return FALSE;
 }
 
-int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
+INTERNAL int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
 {
 	if (0 == pthread_join(*pthThread, pvRetVal))
 		return TRUE;
@@ -82,18 +83,18 @@ int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
 		return FALSE;
 }
 
-int SYS_ThreadExit(LPVOID pvRetVal)
+INTERNAL int SYS_ThreadExit(LPVOID pvRetVal)
 {
 	pthread_exit(pvRetVal);
 	return 1;
 }
 
-PCSCLITE_THREAD_T SYS_ThreadSelf(void)
+INTERNAL PCSCLITE_THREAD_T SYS_ThreadSelf(void)
 {
 	return pthread_self();
 }
 
-int SYS_ThreadEqual(PCSCLITE_THREAD_T *pthThread1, PCSCLITE_THREAD_T *pthThread2)
+INTERNAL int SYS_ThreadEqual(PCSCLITE_THREAD_T *pthThread1, PCSCLITE_THREAD_T *pthThread2)
 {
 	return pthread_equal(*pthThread1, *pthThread2);
 }

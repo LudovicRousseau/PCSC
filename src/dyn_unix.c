@@ -21,8 +21,9 @@
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "dyn_generic.h"
+#include "misc.h"
 
-int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
 	*pvLHandle = NULL;
 	*pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
@@ -36,7 +37,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	return SCARD_S_SUCCESS;
 }
 
-int DYN_CloseLibrary(void **pvLHandle)
+INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 {
 	int ret;
 
@@ -52,7 +53,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
+INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 {
 	char pcFunctionName[256];
 	int rv;

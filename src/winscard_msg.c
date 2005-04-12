@@ -33,15 +33,16 @@
 #include "debuglog.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
+#include "misc.h"
 
 static int commonSocket = 0;
 
-int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
+INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
 {
 	return SHMMessageReceive(msgStruct, dwClientID, blockamount);
 }
 
-int SHMClientSetupSession(PDWORD pdwClientID)
+INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
 {
 	struct sockaddr_un svc_addr;
 	int one;
@@ -78,13 +79,13 @@ int SHMClientSetupSession(PDWORD pdwClientID)
 	return 0;
 }
 
-int SHMClientCloseSession(DWORD dwClientID)
+INTERNAL int SHMClientCloseSession(DWORD dwClientID)
 {
 	SYS_CloseFile(dwClientID);
 	return 0;
 }
 
-int SHMInitializeCommonSegment(void)
+INTERNAL int SHMInitializeCommonSegment(void)
 {
 	static struct sockaddr_un serv_adr;
 
@@ -128,7 +129,7 @@ int SHMInitializeCommonSegment(void)
 	return 0;
 }
 
-int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
+INTERNAL int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 {
 	socklen_t clnt_len;
 	int new_sock;
@@ -160,7 +161,7 @@ int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
 	return 0;
 }
 
-int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
+INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
 	fd_set read_fd;
 	int selret;
@@ -211,7 +212,7 @@ int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	return -1;
 }
 
-int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int blocktime)
+INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int blocktime)
 {
 	fd_set read_fd;
 	int selret, rv;
@@ -268,7 +269,7 @@ int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int
 
 }
 
-int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
+INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	int blockAmount)
 {
 	/*
@@ -380,7 +381,7 @@ int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
-int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
+INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	int blockAmount)
 {
 	/*
@@ -492,7 +493,7 @@ int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	return retval;
 }
 
-int WrapSHMWrite(unsigned int command, DWORD dwClientID,
+INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
 	sharedSegmentMsg msgStruct;
@@ -512,7 +513,7 @@ int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	return SHMMessageSend(&msgStruct, dwClientID, blockAmount);
 }
 
-void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
+INTERNAL void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
 {
 	SYS_CloseFile(sockValue);
 	SYS_Unlink(pcFilePath);

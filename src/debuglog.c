@@ -27,6 +27,7 @@
 #include "debuglog.h"
 #include "sys_generic.h"
 #include "strlcpycat.h"
+#include "misc.h"
 
 /* Max string size when dumping a 256 bytes longs APDU
  * Should be bigger than 256*3+30 */
@@ -216,7 +217,7 @@ void DebugLogSetLevel(const int level)
 	}
 }
 
-int DebugLogSetCategory(const int dbginfo)
+INTERNAL int DebugLogSetCategory(const int dbginfo)
 {
 #define DEBUG_INFO_LENGTH 80
 	char text[DEBUG_INFO_LENGTH];
@@ -240,7 +241,7 @@ int DebugLogSetCategory(const int dbginfo)
 	return LogCategory;
 }
 
-void DebugLogCategory(const int category, const unsigned char *buffer,
+INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
 	const int len)
 {
 	if ((category & DEBUG_CATEGORY_APDU)
