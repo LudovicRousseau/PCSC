@@ -26,7 +26,6 @@ endif
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
 	configfile.l \
-	debuglog.c \
 	eventhandler.c \
 	ifdwrapper.c \
 	prothandler.c \
@@ -54,8 +53,8 @@ libpcsclite_la_SOURCES = \
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
-pcscd_SOURCES = pcscdaemon.c winscard_svc.c
-pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
+pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c
+pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
 pcscd_LDFLAGS = @LDFLAGS@ -rdynamic
 pcscd_LDADD = libpcsclite-core.la \
 	@PTHREAD_LIBS@ @COREFOUNDATION@ \
