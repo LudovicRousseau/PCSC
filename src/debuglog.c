@@ -168,10 +168,12 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 		fprintf(stderr, "%s\n", DebugBuffer);
 } /* log_xxd */
 
+#ifdef PCSCD
 void DebugLogSuppress(const int lSType)
 {
 	LogSuppress = lSType;
 }
+#endif
 
 void DebugLogSetLogType(const int dbgtype)
 {
@@ -383,7 +385,9 @@ char* pcsc_stringify_error(long pcscError)
 
 /*
  * old function supported for backward object code compatibility
+ * defined only for pcscd
  */
+#ifdef PCSCD
 void debug_msg(const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
@@ -417,4 +421,5 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 {
 	log_xxd(PCSC_LOG_ERROR, msg, buffer, len);
 } /* debug_xxd */
+#endif
 
