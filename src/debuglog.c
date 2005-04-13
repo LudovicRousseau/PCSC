@@ -45,7 +45,7 @@ static char LogCategory = DEBUG_CATEGORY_NOTHING;
 /* default level is a bit verbose to be backward compatible */
 static char LogLevel = PCSC_LOG_INFO;
 
-static char LogDoColor = -1;	/* not initialised */
+static signed char LogDoColor = -1;	/* not initialised */
 
 void log_msg(const int priority, const char *fmt, ...)
 {
