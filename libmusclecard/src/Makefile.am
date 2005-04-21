@@ -10,7 +10,8 @@ nobase_include_HEADERS = \
 	PCSC/musclecard.h
 noinst_HEADERS = \
 	tokenfactory.h \
-	strlcpycat.h
+	strlcpycat.h \
+	misc.h
 
 if NEED_STRLCPY
 STRLCPY=strlcpy.c
@@ -23,6 +24,9 @@ endif
 libmusclecard_la_SOURCES = \
 	musclecard.c \
 	tokenfactory.c \
+	dyn_hpux.c \
+	dyn_macosx.c \
+	dyn_unix.c \
 	$(STRLCPY) \
 	$(STRLCAT)
 libmusclecard_la_CPPFLAGS = \
@@ -33,7 +37,8 @@ libmusclecard_la_LIBADD = \
 	$(PCSCLITE_LIBS)
 
 muscletest_SOURCES = \
-	muscletest.c
+	muscletest.c \
+	$(STRLCPY)
 muscletest_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(top_srcdir)/src/PCSC \
@@ -44,4 +49,6 @@ muscletest_LDADD = \
 
 pcdir= $(libdir)/pkgconfig
 pc_DATA = libmusclecard.pc
+
+EXTRA_DIST = dyn_win32.c
 
