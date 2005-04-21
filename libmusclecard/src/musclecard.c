@@ -63,6 +63,21 @@ static void mscUnLockThread(void)
 #endif
 }
 
+/* Library constructor and deconstructor function for UNIX */
+#ifndef WIN32
+void __attribute__ ((constructor)) musclecard_init(void)
+{
+}
+	
+void __attribute__ ((destructor)) musclecard_fini(void)
+{
+	if (localHContext != 0)
+		SCardReleaseContext(localHContext);
+
+	localHContext = 0;
+}
+#endif
+
 /**************** MSC Connection Functions **************************/
 
 MSC_RV MSCListTokens(MSCULong32 listScope, MSCLPTokenInfo tokenArray,
