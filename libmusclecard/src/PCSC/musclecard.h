@@ -132,6 +132,10 @@ extern "C"
 	 * Invalid sharing 
 	 */
 #define MSC_SHARING_VIOLATION              0x9C60
+	/*
+	 * New PINs are not identical (happens if PIN is changed with keypad)
+	 */
+#define MSC_PINS_NOT_IDENTICAL             0x9C61
 
 
 #define MSC_BLOCKSTATUS_RESUME             0x0000
@@ -405,6 +409,13 @@ extern "C"
 
 /********************** TAGS for GetStatus ********************************/
 
+#define MSC_TAG_FUNCTIONAL_UNITS	  107	/* Card terminal functional units
+									   (PIN pad, display, fingerprint, ...) */
+
+#define MSC_SUPPORT_PINPAD            0x00000001
+#define MSC_SUPPORT_DISPLAY           0x00000002
+#define MSC_SUPPORT_FINGERPRINT       0x00000004
+
 	/*
 	 * high level tags 
 	 */
@@ -484,6 +495,11 @@ extern "C"
 #define MSC_SUPPORT_LISTOBJECTS       0x00008000
 #define MSC_SUPPORT_LOGOUTALL         0x00010000
 #define MSC_SUPPORT_GETCHALLENGE      0x00020000
+#define MSC_SUPPORT_GETSTATUS         0x00040000
+#define MSC_SUPPORT_ISOVERIFYPIN      0x00080000
+#define MSC_SUPPORT_GSM_CHANGE_CVH    0x00100000
+#define MSC_SUPPORT_GSM_UNBLOCK_CVH   0x00200000
+#define MSC_SUPPORT_GETCAPABILITIES   0x00400000
 
 	/*
 	 * Bitmask for MSC_TAG_SUPPORT_CRYPTOALG 
