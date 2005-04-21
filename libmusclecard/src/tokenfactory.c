@@ -265,7 +265,7 @@ MSCLong32 TPSearchBundlesForAtr(MSCPUChar8 Atr, MSCULong32 Length,
 					}
 				}
 #if defined(WIN32)
-				sprintf(fullLibPath, "%s\\%s\Contents\\Win32\\%s",
+				sprintf(fullLibPath, "%s\\%s\\Contents\\Win32\\%s",
 					MSC_SVC_DROPDIR, findData.cFileName, keyValue);
 #elif defined(__APPLE__)
 				sprintf(fullLibPath, "%s/%s", MSC_SVC_DROPDIR,
