@@ -35,12 +35,7 @@
 
 #ifdef USE_THREAD_SAFETY
 
-#ifndef WIN32
 static PCSCLITE_MUTEX PCSC_MCARD_mutex = PTHREAD_MUTEX_INITIALIZER;
-#else
-/* This is initialized once in PCSC.cpp */
-PCSCLITE_MUTEX PCSC_MCARD_mutex;
-#endif
 
 static PCSCLITE_THREAD_T callbackThread;
 static ULONG blockingContext = MSC_BLOCKSTATUS_RESUME;
