@@ -119,6 +119,7 @@ Darwin)
 	;;
 esac
 AC_DEFINE_UNQUOTED(PCSC_ARCH, "$uname", [PC/SC target architecture])
+AC_DEFINE_UNQUOTED(MSC_ARCH, "$uname", [MuscleCard target architecture])
 
 dnl See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
@@ -277,6 +278,37 @@ else
   extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
 fi
 
+dnl --enable-muscledropdir=DIR
+AC_ARG_ENABLE(muscledropdir,
+	AC_HELP_STRING([--enable-muscledropdir=DIR],[directory containing
+		MuscleCard bundles (default /usr/local/pcsc/services)]),
+	[muscledropdir="${enableval}"], [muscledropdir=false])
+if test x${muscledropdir} = xfalse ; then
+	if test "x$prefix" != xNONE; then
+		muscledropdir="$prefix/services"
+	else
+		muscledropdir=`pkg-config libpcsclite --variable=libdir`
+		muscledropdir="${muscledropdir}/pcsc/services"
+	fi
+fi
+AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
+AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing MuscleCard bundles])
+
+dnl --enable-musclecarddebug
+AC_ARG_ENABLE(musclecarddebug,
+	AC_HELP_STRING([--enable-musclecarddebug],[enable libmusclecard debug messages through pcscd]),
+[ case "${enableval}" in
+  yes)
+    musclecarddebug=true ;;
+  no)
+    musclecarddebug=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-musclecarddebug]) ;;
+ esac], [musclecarddebug=true])
+AC_MSG_RESULT([enable MuscleCard debug       : $musclecarddebug])
+if test x${musclecarddebug} = xfalse ; then
+	AC_DEFINE(NO_MSC_DEBUG, 1, [disable MuscleCard debug messaging.])
+fi
+
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 dnl Setup dist stuff
@@ -284,6 +316,7 @@ AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
 AC_SUBST(extended_apdu)
+AC_SUBST(muscledropdir)
 AS_AC_EXPAND(confdir_exp,$confdir)
 AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
@@ -306,6 +339,13 @@ src/libpcsclite.pc
 src/PCSC/pcsclite.h
 src/utils/Makefile
 win32/Makefile
+libmusclecard/Makefile
+libmusclecard/doc/Makefile
+libmusclecard/src/libmusclecard.pc
+libmusclecard/src/Makefile
+libmusclecard/utils/Makefile
+libmusclecard/utils/bundleTool/bundleTool.8
+libmusclecard/utils/bundleTool/Makefile
 ])
 AC_OUTPUT
 
