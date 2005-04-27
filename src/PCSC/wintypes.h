@@ -50,7 +50,12 @@ extern "C"
 
 	/* this type is deprecated but still used by old drivers and applications
 	 * You should use LPTSTR instead */
-	typedef char *LPSTR __attribute__ ((deprecated));
+	typedef char *LPSTR
+#ifdef __GNUC__
+		/* __attribute__ is a GCC only extension */
+		__attribute__ ((deprecated))
+#endif
+		;
 
 #else
 #include <windows.h>
