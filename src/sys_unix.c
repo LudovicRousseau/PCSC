@@ -398,17 +398,20 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 
 	if (!noclose) {
 		if (SYS_CloseFile(0))
-			Log2("SYS_CloseFile(0) failed: %s", strerror(errno));
+			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(0) failed: %s",
+				strerror(errno));
 
 		if (SYS_CloseFile(1))
-			Log2("SYS_CloseFile(1) failed: %s", strerror(errno));
+			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(1) failed: %s",
+				strerror(errno));
 
 		if (SYS_CloseFile(2))
-			Log2("SYS_CloseFile(2) failed: %s", strerror(errno));
+			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(2) failed: %s",
+				strerror(errno));
 	}
 	if (!nochdir) {
 		if (SYS_Chdir("/"))
-			Log2("SYS_Chdir() failed: %s", strerror(errno));
+			Log2(PCSC_LOG_ERROR, "SYS_Chdir() failed: %s", strerror(errno));
 	}
 	return 0;
 #endif
