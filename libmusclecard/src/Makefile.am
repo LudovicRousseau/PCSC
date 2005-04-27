@@ -9,46 +9,32 @@ nobase_include_HEADERS = \
 	PCSC/mscdefines.h \
 	PCSC/musclecard.h
 noinst_HEADERS = \
-	tokenfactory.h \
-	strlcpycat.h \
-	misc.h
-
-if NEED_STRLCPY
-STRLCPY=strlcpy.c
-endif
-                                                                                                    
-if NEED_STRLCAT
-STRLCAT=strlcat.c
-endif
+	tokenfactory.h
 
 libmusclecard_la_SOURCES = \
 	musclecard.c \
 	tokenfactory.c \
-	dyn_hpux.c \
-	dyn_macosx.c \
-	dyn_unix.c \
-	$(STRLCPY) \
-	$(STRLCAT)
-libmusclecard_la_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
+	$(top_srcdir)/src/dyn_hpux.c \
+	$(top_srcdir)/src/dyn_macosx.c \
+	$(top_srcdir)/src/dyn_unix.c \
+	$(top_srcdir)/src/strlcpy.c \
+	$(top_srcdir)/src/strlcat.c \
+	$(top_srcdir)/src/thread_unix.c
+libmusclecard_la_CFLAGS = \
 	-I$(top_srcdir)/src/PCSC \
-	$(PCSCLITE_CFLAGS)
+	-I$(top_srcdir)/libmusclecard/src/PCSC
 libmusclecard_la_LIBADD = \
-	$(PCSCLITE_LIBS)
+	$(top_builddir)/src/libpcsclite.la
 
 muscletest_SOURCES = \
 	muscletest.c \
-	$(STRLCPY)
-muscletest_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
+	$(top_srcdir)/src/strlcpy.c
+muscletest_CFLAGS = \
 	-I$(top_srcdir)/src/PCSC \
-	$(PCSCLITE_CFLAGS)
+	-I$(top_srcdir)/libmusclecard/src/PCSC
 muscletest_LDADD = \
-	$(top_builddir)/src/libmusclecard.la \
-	$(PCSCLITE_LIBS)
+	$(top_builddir)/libmusclecard/src/libmusclecard.la
 
 pcdir= $(libdir)/pkgconfig
 pc_DATA = libmusclecard.pc
-
-EXTRA_DIST = dyn_win32.c
 
