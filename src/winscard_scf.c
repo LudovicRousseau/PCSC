@@ -1004,8 +1004,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 }
 
 
-LONG SCardControl(SCARDHANDLE hCard, LPCBYTE pbSendBuffer, DWORD cbSendLength,
-	LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
+LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
+	DWORD cbSendLength, LPVOID pbRecvBuffer, DWORD cbRecvLength,
+	LPDWORD lpBytesReturned)
 {
 	/* TODO */
 	return SCARD_S_SUCCESS;
