@@ -6,7 +6,9 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la
 
+if !HAVE_SCF
 sbin_PROGRAMS = pcscd
+endif
 noinst_PROGRAMS = testpcsc
 
 PCSC_DYNLOAD_SRC = dyn_unix.c dyn_hpux.c dyn_macosx.c
