@@ -1187,6 +1187,17 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	return rv;
 }
 
+LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
+	LPDWORD pcbAttrLen)
+{
+	return SCARD_E_NOT_TRANSACTED;
+}
+
+LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
+	DWORD cbAttrLen)
+{
+	return SCARD_E_NOT_TRANSACTED;
+}
 
 static LONG SCardGetHandleIndice(SCARDHANDLE hCard)
 {
