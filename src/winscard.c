@@ -13,33 +13,33 @@
  * 
  * @section Introduction
  *
- * This document contains the reference API calls for communicating to the MUSCLE
- * PC/SC Smart Card Resource Manager. PC/SC is a standard proposed by the PC/SC
- * workgroup [2] which is a conglomerate of representative from major smart card
- * manufacturers and other companies. This specification tries to abstract the
- * smart card layer into a high level API so that smart cards and their readers
- * can be accessed in a homogeneous fashion.
+ * This document contains the reference API calls for communicating to the
+ * MUSCLE PC/SC Smart Card Resource Manager. PC/SC is a standard proposed by
+ * the PC/SC workgroup [2] which is a conglomerate of representative from major
+ * smart card manufacturers and other companies. This specification tries to
+ * abstract the smart card layer into a high level API so that smart cards and
+ * their readers can be accessed in a homogeneous fashion.
  *
- * This toolkit was written in ANSI C that can be used with most compilers and does
- * NOT use complex and large data structures such as vectors, etc. The C API
- * emulates the winscard API that is used on the Windows platform. It is contained
- * in the library libpcsclite.so that is linked to your application.
+ * This toolkit was written in ANSI C that can be used with most compilers and
+ * does NOT use complex and large data structures such as vectors, etc. The C
+ * API emulates the winscard API that is used on the Windows platform. It is
+ * contained in the library libpcsclite.so that is linked to your application.
  *
- * I would really like to hear from you. If you have any feedback either on this
- * documentation or on the MUSCLE project please feel free to email me at:
+ * I would really like to hear from you. If you have any feedback either on
+ * this documentation or on the MUSCLE project please feel free to email me at:
  * corcoran@musclecard.com. 
  *
  *
  * @section API Routines
  *
- * These routines specified here are winscard routines like those in the winscard
- * API provided under Windows(R). These are compatible with the
- * Microsoft(R) API calls. This list of calls is mainly an abstraction
- * of readers. It gives a common API for communication to most readers in a
+ * These routines specified here are winscard routines like those in the
+ * winscard API provided under Windows(R). These are compatible with the
+ * Microsoft(R) API calls. This list of calls is mainly an abstraction of
+ * readers. It gives a common API for communication to most readers in a
  * homogeneous fashion.
  *
- * Since all functions can produce a wide array of errors, please refer to § Error
- * codes for a list of error returns.
+ * Since all functions can produce a wide array of errors, please refer to §
+ * Error codes for a list of error returns.
  *
  * For a human readable representation of an error the function
  * pcsc_stringify_error() is declared in pcsclite.h. This function is not
@@ -50,22 +50,21 @@
  * PC/SC Lite is formed by a server deamon (pcscd) and a client library 
  * (libpcsclite.la) that communicate via IPC.
  *
- * The file \em winscard_clnt.c in the client-side exposes the API for applications.\n
- * The file \em winscard.c has the server-side counterpart functions present in
- * \em winscard_clnt.c.\n
- * The file \em winscard_msg.c is the communication interface between \em winscard_clnt.c
- * and \em winscard.c.\n
- * The file pcscdaemon.c has the main server-side function, including a loop for
- * accepting client requests.\n
- * The file \em winscard_svc.c has the functions called by \em pcscdaemon.c to
- * serve clients requests.
+ * The file \em winscard_clnt.c in the client-side exposes the API for
+ * applications.\n The file \em winscard.c has the server-side counterpart
+ * functions present in \em winscard_clnt.c.\n The file \em winscard_msg.c is
+ * the communication interface between \em winscard_clnt.c and \em
+ * winscard.c.\n The file pcscdaemon.c has the main server-side function,
+ * including a loop for accepting client requests.\n The file \em
+ * winscard_svc.c has the functions called by \em pcscdaemon.c to serve clients
+ * requests.
  *
- * When a function from \em winscard_clnt.c is called by a client application, it 
- * calls a function in \m winscard_msg.c to send the message to \em pcscdaemon.c.
- * When \em pcscdaemon.c a client detects a request arrived, it calls \em winscard_svc.c
- * which identifies what command the message contains and requests \em winscard.c
- * to execute the command.\n
- * Meanwhile winscard_clnt.c waits for the response until a timeout occurs.
+ * When a function from \em winscard_clnt.c is called by a client application,
+ * it calls a function in \m winscard_msg.c to send the message to \em
+ * pcscdaemon.c.  When \em pcscdaemon.c a client detects a request arrived, it
+ * calls \em winscard_svc.c which identifies what command the message contains
+ * and requests \em winscard.c to execute the command.\n Meanwhile
+ * winscard_clnt.c waits for the response until a timeout occurs.
  */
 
 /**
