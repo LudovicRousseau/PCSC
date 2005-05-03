@@ -1466,6 +1466,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
  * ...
  * typedef SCARD_READERSTATE *PSCARD_READERSTATE, **LPSCARD_READERSTATE;
  * ...
+ * @endcode
+ *
  * Value of dwCurrentState and dwEventState:
  * <ul>
  *   <li>SCARD_STATE_UNAWARE The application is unaware of the current 
