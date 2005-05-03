@@ -24,7 +24,6 @@ extern "C"
 #endif
 
 	/** 
-	 * @typedef
 	 * Define an exported public reader state structure so each
 	 * application gets instant notification of changes in state. 
 	 */
