@@ -15,15 +15,17 @@
  *
  * This document contains the reference API calls for communicating to the
  * MUSCLE PC/SC Smart Card Resource Manager. PC/SC is a standard proposed by
- * the PC/SC workgroup [2] which is a conglomerate of representative from major
- * smart card manufacturers and other companies. This specification tries to
- * abstract the smart card layer into a high level API so that smart cards and
- * their readers can be accessed in a homogeneous fashion.
+ * the PC/SC workgroup http://www.pcscworkgroup.com/ which is a conglomerate of
+ * representative from major smart card manufacturers and other companies. This
+ * specification tries to abstract the smart card layer into a high level API
+ * so that smart cards and their readers can be accessed in a homogeneous
+ * fashion.
  *
  * This toolkit was written in ANSI C that can be used with most compilers and
  * does NOT use complex and large data structures such as vectors, etc. The C
  * API emulates the winscard API that is used on the Windows platform. It is
- * contained in the library libpcsclite.so that is linked to your application.
+ * contained in the library <tt>libpcsclite.so</tt> that is linked to your
+ * application.
  *
  * I would really like to hear from you. If you have any feedback either on
  * this documentation or on the MUSCLE project please feel free to email me at:
@@ -47,8 +49,8 @@
  *
  * @section Internals
  * 
- * PC/SC Lite is formed by a server deamon (pcscd) and a client library 
- * (libpcsclite.la) that communicate via IPC.
+ * PC/SC Lite is formed by a server deamon (<tt>pcscd</tt>) and a client
+ * library (<tt>libpcsclite.so</tt>) that communicate via IPC.
  *
  * The file \em winscard_clnt.c in the client-side exposes the API for
  * applications.\n The file \em winscard.c has the server-side counterpart
