@@ -317,6 +317,28 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
  */
 char *pcsc_stringify_error(long);
 
+/*
+ * Provide source compatibility on different platforms
+ */
+#define SCARD_CTL_CODE(code) (0x42000000 + (code))
+
+/*
+ * TeleTrust Class 2 reader tags
+ */
+#define CM_IOCTL_GET_FEATURE_REQUEST SCARD_CTL_CODE(3400)
+
+#define FEATURE_VERIFY_PIN_START  0x01 /* OMNIKEY Proposal */
+#define FEATURE_VERIFY_PIN_FINISH 0x02 /* OMNIKEY Proposal */
+#define FEATURE_MODIFY_PIN_START  0x03 /* OMNIKEY Proposal */
+#define FEATURE_MODIFY_PIN_FINISH 0x04 /* OMNIKEY Proposal */
+#define FEATURE_GET_KEY_PRESSED   0x05 /* OMNIKEY Proposal */
+#define FEATURE_VERIFY_PIN_DIRECT 0x06 /* USB CCID PIN Verify */
+#define FEATURE_MODIFY_PIN_DIRECT 0x07 /* USB CCID PIN Modify */
+#define FEATURE_MCT_READERDIRECT  0x08 /* KOBIL Proposal */
+#define FEATURE_MCT_UNIVERSAL     0x09 /* KOBIL Proposal */
+#define FEATURE_IFD_PIN_PROP      0x0A /* Gemplus Proposal */
+#define FEATURE_ABORT             0x0B /* SCM Proposal */
+
 #ifdef __cplusplus
 }
 #endif
