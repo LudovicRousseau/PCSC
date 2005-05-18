@@ -20,6 +20,7 @@
 
 #include "pcsclite.h"
 #include "winscard.h"
+#include "reader.h"
 
 int main(int argc, char **argv)
 {
@@ -183,11 +184,17 @@ int main(int argc, char **argv)
 	}
 #else
 	{
-		char buffer[1024] = "Foobar";
+		char buffer[1024] = { 0x02 };
 		DWORD cbRecvLength = sizeof(buffer);
 
-		rv = SCardControl(hCard, 0x42000001, buffer, 7, buffer, sizeof(buffer),
-			&cbRecvLength);
+		rv = SCardControl(hCard, SCARD_CTL_CODE(1), buffer, 1, buffer,
+			sizeof(buffer), &cbRecvLength);
+		if (cbRecvLength)
+		{
+			for (i=0; i<cbRecvLength; i++)
+				printf("%c", buffer[i]);
+			printf(" ");
+		}
 	}
 #endif
 	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
