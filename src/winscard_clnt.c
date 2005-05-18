@@ -2045,9 +2045,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
 
-	if (pbSendBuffer == 0)
-		return SCARD_E_INVALID_PARAMETER;
-
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
