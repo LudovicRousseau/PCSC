@@ -56,7 +56,7 @@ libpcsclite_la_SOURCES = \
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
-pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c
+pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
 pcscd_LDFLAGS = @LDFLAGS@ -rdynamic
 pcscd_LDADD = libpcsclite-core.la \
