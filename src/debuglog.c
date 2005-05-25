@@ -45,7 +45,7 @@ static char LogCategory = DEBUG_CATEGORY_NOTHING;
 /* default level is a bit verbose to be backward compatible */
 static char LogLevel = PCSC_LOG_INFO;
 
-static signed char LogDoColor = -1;	/* not initialised */
+static signed char LogDoColor = 0;	/* no color by default */
 
 void log_msg(const int priority, const char *fmt, ...)
 {
@@ -56,40 +56,6 @@ void log_msg(const int priority, const char *fmt, ...)
 		|| (priority < LogLevel) /* log priority lower than threshold? */
 		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
-
-	/* color not yet initialised? */
-	if (-1 == LogDoColor)
-	{
-		LogDoColor = 0;	/* no color by default */
-
-		/* no color under Windows */
-#ifndef WIN32
-
-		/* log to stderr and stderr is a tty? */
-		if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
-		{
-			const char *terms[] = { "linux", "xterm", "Eterm", "rxvt" };
-			char *term;
-
-			term = getenv("TERM");
-			if (term)
-			{
-				int i;
-
-				/* for each known color terminal */
-				for (i = 0; i < sizeof(terms) / sizeof(terms[0]); i++)
-				{
-					/* we found a supported term? */
-					if (0 == strcmp(terms[i], term))
-					{
-						LogDoColor = 1;
-						break;
-					}
-				}
-			}
-		}
-#endif
-	}
 
 	va_start(argptr, fmt);
 #ifndef WIN32
@@ -194,6 +160,33 @@ void DebugLogSetLogType(const int dbgtype)
 				dbgtype);
 			LogMsgType = DEBUGLOG_STDERR_DEBUG;
 	}
+
+	/* no color under Windows */
+#ifndef WIN32
+	/* log to stderr and stderr is a tty? */
+	if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
+	{
+		const char *terms[] = { "linux", "xterm", "Eterm", "rxvt" };
+		char *term;
+
+		term = getenv("TERM");
+		if (term)
+		{
+			int i;
+
+			/* for each known color terminal */
+			for (i = 0; i < sizeof(terms) / sizeof(terms[0]); i++)
+			{
+				/* we found a supported term? */
+				if (0 == strcmp(terms[i], term))
+				{
+					LogDoColor = 1;
+					break;
+				}
+			}
+		}
+	}
+#endif
 }
 
 void DebugLogSetLevel(const int level)
