@@ -195,19 +195,16 @@ void DebugLogSetLevel(const int level)
 	switch (level)
 	{
 		case PCSC_LOG_CRITICAL:
-			Log1(PCSC_LOG_CRITICAL, "debug level=critical");
-			break;
-
 		case PCSC_LOG_ERROR:
-			Log1(PCSC_LOG_CRITICAL, "debug level=error");
+			/* do not log anything */
 			break;
 
 		case PCSC_LOG_INFO:
-			Log1(PCSC_LOG_CRITICAL, "debug level=notice");
+			Log1(PCSC_LOG_INFO, "debug level=notice");
 			break;
 
 		case PCSC_LOG_DEBUG:
-			Log1(PCSC_LOG_CRITICAL, "debug level=debug");
+			Log1(PCSC_LOG_DEBUG, "debug level=debug");
 			break;
 
 		default:
