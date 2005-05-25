@@ -48,7 +48,7 @@
 #define FALSE 0
 #endif
 
-static char AraKiri = FALSE;
+char AraKiri = FALSE;
 static char Init = TRUE;
 
 /*
@@ -165,7 +165,8 @@ void SVCServiceRunLoop(void)
 			break;
 
 		case -1:
-			Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
+			if (!AraKiri)
+				Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
 			break;
 
 		default:

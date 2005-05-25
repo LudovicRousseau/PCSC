@@ -46,6 +46,7 @@
  * Socket to a file, used for clients-server comminication.
  */
 static int commonSocket = 0;
+extern char AraKiri;
 
 /**
  * @brief Accepts a Client connection.
@@ -184,8 +185,9 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 
 	if (selret < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
-			strerror(errno));
+		if (!AraKiri)
+			Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
+				strerror(errno));
 		return -1;
 	}
 
