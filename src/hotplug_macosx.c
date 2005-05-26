@@ -793,7 +793,8 @@ PCSCLITE_THREAD_T sHotplugWatcherThread;
 ULONG HPRegisterForHotplugEvents(void)
 {
 	SYS_ThreadCreate(&sHotplugWatcherThread,
-		NULL, (LPVOID) HPDeviceNotificationThread, NULL);
+		THREAD_ATTR_DEFAULT,
+		(PCSCLITE_THREAD_FUNCTION( )) HPDeviceNotificationThread, NULL);
 
 	return 0;
 }
