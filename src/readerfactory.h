@@ -25,6 +25,14 @@ extern "C"
 {
 #endif
 
+	typedef struct
+	{
+		char *pcFriendlyname;
+		char *pcDevicename;
+		char *pcLibpath;
+		int dwChannelId;
+	} SerialReader;
+
 	struct FctMap_V1
 	{
 		RESPONSECODE (*pvfCreateChannel)(DWORD);
@@ -200,6 +208,8 @@ extern "C"
 	LONG RFClearReaderEventState(PREADER_CONTEXT, SCARDHANDLE);
 	LONG RFCheckReaderStatus(PREADER_CONTEXT);
 	void RFCleanupReaders(int);
+	int RFStartSerialReaders(char *readerconf);
+	void RFReCheckReaderConf(void);
 	void RFSuspendAllReaders(void); 
 	void RFAwakeAllReaders(void); 
 
