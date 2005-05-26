@@ -52,7 +52,8 @@ extern PCSCLITE_MUTEX usbNotifierMutex;
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
-static int AraKiriHotPlug = FALSE;
+static char AraKiriHotPlug = FALSE;
+char ReCheckSerialReaders = FALSE;
 
 /*
  * keep track of drivers in a dynamically allocated array
@@ -334,6 +335,12 @@ void HPEstablishUSBNotifications(void)
 			pthread_exit(&retval);
 		}
 
+		if (ReCheckSerialReaders)
+		{
+			ReCheckSerialReaders = FALSE;
+			RFReCheckReaderConf();
+		}
+
 	}	/* End of while loop */
 }
 
@@ -430,6 +437,12 @@ LONG HPRemoveHotPluggable(int index)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
+	return 0;
+}
+
+void HPReCheckSerialReaders(void)
+{
+	ReCheckSerialReaders = TRUE;
 	return 0;
 }
 
