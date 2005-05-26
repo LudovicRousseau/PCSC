@@ -429,7 +429,7 @@ int main(int argc, char **argv)
 	 */
 	if (newReaderConfig)
 	{
-		rv = DBUpdateReaders(newReaderConfig);
+		rv = RFStartSerialReaders(newReaderConfig);
 		if (rv != 0)
 		{
 			Log3(PCSC_LOG_CRITICAL, "invalid file %s: %s", newReaderConfig,
@@ -439,7 +439,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		rv = DBUpdateReaders(PCSCLITE_READER_CONFIG);
+		rv = RFStartSerialReaders(PCSCLITE_READER_CONFIG);
 
 #if 0
 		if (rv == 1)
