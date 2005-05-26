@@ -12,16 +12,21 @@
  */
 
 %{
+#include "wintypes.h"
+#include "readerfactory.h"
+
 int evaluatetoken(char *pcToken);
 
-static int iLinenumber = 1;
-static char *pcPrevious = NULL;
-static char *pcCurrent = NULL;
-static char *pcFriendlyname = NULL;
-static char *pcDevicename = NULL;                
-static char *pcLibpath = NULL;
-static char *pcChannelid = NULL;
-static int badError = 0;
+static int iLinenumber;
+static char *pcPrevious;
+static char *pcCurrent;
+static char *pcFriendlyname;
+static char *pcDevicename;                
+static char *pcLibpath;
+static char *pcChannelid;
+static int badError;
+static SerialReader *reader_list;
+static int reader_list_size;
 
 void tok_error(char *pcToken_error);
 
@@ -155,14 +160,28 @@ int evaluatetoken(char *pcToken)
 	if (pcFriendlyname != NULL && pcDevicename != NULL &&
 		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
 	{
+		if (0 == reader_list_size)
+		{
+			/* one real reader and one end marker */
+			reader_list_size = 2;
+			reader_list = malloc(reader_list_size * sizeof(SerialReader));
+		}
+		else
+		{
+			reader_list_size++;
+			reader_list = realloc(reader_list, reader_list_size *
+				sizeof(SerialReader));
+		}
+
+		/* end marker */
+		reader_list[reader_list_size-1].pcFriendlyname = NULL;
 
 		dwChannelId = strtoul(pcChannelid, 0, 16);
-		RFAddReader(pcFriendlyname, dwChannelId, pcLibpath, pcDevicename);
+		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);
+		reader_list[reader_list_size-2].pcDevicename = strdup(pcDevicename);
+		reader_list[reader_list_size-2].pcLibpath = strdup(pcLibpath),
+		reader_list[reader_list_size-2].dwChannelId = dwChannelId;
 
-		free(pcFriendlyname);
-		free(pcDevicename);
-		free(pcLibpath);
-		free(pcChannelid);
 		pcFriendlyname = NULL;
 		pcDevicename = NULL;
 		pcLibpath = NULL;
@@ -179,9 +198,8 @@ void tok_error(char *token_error)
 	badError = 1;
 }
 
-int DBUpdateReaders(char *readerconf)
+int DBGetReaderList(char *readerconf, SerialReader **caller_reader_list)
 {
-
 	FILE *configFile = NULL;
 
 	configFile = fopen(readerconf, "r");
@@ -191,6 +209,18 @@ int DBUpdateReaders(char *readerconf)
 
 	yyin = configFile;
 
+	/* (re)start with a clean state */
+	iLinenumber = 1;
+	reader_list = NULL;
+	reader_list_size = 0;
+	pcFriendlyname = NULL;
+	pcDevicename = NULL;
+	pcLibpath = NULL;
+	pcChannelid = NULL;
+	pcPrevious = NULL;
+	pcCurrent = NULL;
+	badError = 0;
+
 	do
 	{
 		yylex();
@@ -198,6 +228,8 @@ int DBUpdateReaders(char *readerconf)
 	while (!feof(configFile));
 
 	fclose(configFile);
+
+	*caller_reader_list = reader_list;
 
 	if (badError == 1)
 		return -1;

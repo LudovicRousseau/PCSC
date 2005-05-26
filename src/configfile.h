@@ -17,7 +17,7 @@ extern "C"
 {
 #endif
 
-	int DBUpdateReaders(char *readerconf);
+	int DBGetReaderList(char *readerconf);
 
 #ifdef __cplusplus
 }
