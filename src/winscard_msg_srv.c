@@ -47,6 +47,7 @@
  */
 static int commonSocket = 0;
 extern char AraKiri;
+extern char ReCheckSerialReaders;
 
 /**
  * @brief Accepts a Client connection.
@@ -185,7 +186,7 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 
 	if (selret < 0)
 	{
-		if (!AraKiri)
+		if ((!AraKiri) && (!ReCheckSerialReaders))
 			Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
 				strerror(errno));
 		return -1;

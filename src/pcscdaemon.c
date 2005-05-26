@@ -50,6 +50,7 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
+extern char ReCheckSerialReaders;
 
 /*
  * Some internal functions 
@@ -166,7 +167,8 @@ void SVCServiceRunLoop(void)
 			break;
 
 		case -1:
-			if (!AraKiri)
+			/* do not display if we are exiting or re-reading the config */
+			if ((!AraKiri) && (!ReCheckSerialReaders))
 				Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
 			break;
 
