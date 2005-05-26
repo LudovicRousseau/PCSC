@@ -34,6 +34,8 @@
 
 #undef DEBUG_HOTPLUG
 
+char ReCheckSerialReaders = FALSE;
+
 /*
  * An aggregation of useful information on a driver bundle in the
  * drop directory.
@@ -799,6 +801,10 @@ ULONG HPRegisterForHotplugEvents(void)
 LONG HPStopHotPluggables(void)
 {
 	return 0;
+}
+
+void HPReCheckSerialReaders(void)
+{
 }
 
 #endif	/* __APPLE__ */
