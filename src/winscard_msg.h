@@ -292,7 +292,6 @@ extern "C"
 	int SHMClientSetupSession(PDWORD);
 	int SHMClientCloseSession(DWORD);
 	int SHMInitializeCommonSegment(void);
-	int SHMProcessCommonChannelRequest(PDWORD);
 	int SHMProcessEventsContext(PDWORD, psharedSegmentMsg, int);
 	int SHMProcessEventsServer(PDWORD, int);
 	int SHMMessageSend(psharedSegmentMsg, int, int);
