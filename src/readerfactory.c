@@ -43,6 +43,8 @@
 
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static DWORD dwNumReadersContexts = 0;
+static char *ConfigFile = NULL;
+static int ConfigFileCRC = 0;
 
 LONG RFAllocateReaderSpace(void)
 {
@@ -1353,6 +1355,138 @@ void RFCleanupReaders(int shouldExit)
 
 	if (shouldExit) 
 		exit(0);
+}
+
+int RFStartSerialReaders(char *readerconf)
+{
+	SerialReader *reader_list;
+	int i, rv;
+
+	/* remember the ocnfiguration filename for RFReCheckReaderConf() */
+	ConfigFile = strdup(readerconf);
+
+	rv = DBGetReaderList(readerconf, &reader_list);
+
+	/* the list is empty */
+	if (NULL == reader_list)
+		return rv;
+
+	for (i=0; reader_list[i].pcFriendlyname; i++)
+	{
+		int j;
+
+		RFAddReader(reader_list[i].pcFriendlyname, reader_list[i].dwChannelId,
+			reader_list[i].pcLibpath, reader_list[i].pcDevicename);
+
+		/* update the ConfigFileCRC (this false "CRC" is very weak) */
+		for (j=0; j<reader_list[i].pcFriendlyname[j]; j++)
+			ConfigFileCRC += reader_list[i].pcFriendlyname[j];
+		for (j=0; j<reader_list[i].pcLibpath[j]; j++)
+			ConfigFileCRC += reader_list[i].pcLibpath[j];
+		for (j=0; j<reader_list[i].pcDevicename[j]; j++)
+			ConfigFileCRC += reader_list[i].pcDevicename[j];
+
+		/* free strings allocated by DBGetReaderList() */
+		free(reader_list[i].pcFriendlyname);
+		free(reader_list[i].pcLibpath);
+		free(reader_list[i].pcDevicename);
+	}
+	free(reader_list);
+
+	return rv;
+}
+
+void RFReCheckReaderConf(void)
+{
+	SerialReader *reader_list;
+	int i, crc;
+
+	DBGetReaderList(ConfigFile, &reader_list);
+
+	/* the list is empty */
+	if (NULL == reader_list)
+		return;
+
+	crc = 0;
+	for (i=0; reader_list[i].pcFriendlyname; i++)
+	{
+		int j;
+
+		/* calculate a local crc */
+		for (j=0; j<reader_list[i].pcFriendlyname[j]; j++)
+			crc += reader_list[i].pcFriendlyname[j];
+		for (j=0; j<reader_list[i].pcLibpath[j]; j++)
+			crc += reader_list[i].pcLibpath[j];
+		for (j=0; j<reader_list[i].pcDevicename[j]; j++)
+			crc += reader_list[i].pcDevicename[j];
+	}
+
+	/* cancel if the configuration file has been modified */
+	if (crc != ConfigFileCRC)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"configuration file: %s has been modified. Recheck canceled",
+			ConfigFile);
+		return;
+	}
+
+	for (i=0; reader_list[i].pcFriendlyname; i++)
+	{
+		int r;
+		char present = FALSE;
+
+		Log2(PCSC_LOG_DEBUG, "refresh reader: %s",
+			reader_list[i].pcFriendlyname);
+
+		/* is the reader already present? */
+		for (r = 0; r < PCSCLITE_MAX_READERS_CONTEXTS; r++)
+		{
+			if (sReadersContexts[r]->vHandle != 0)
+			{
+				char lpcStripReader[MAX_READERNAME];
+				int tmplen;
+
+				/* get the reader name without the reader and slot numbers */
+				strncpy(lpcStripReader, sReadersContexts[i]->lpcReader,
+					sizeof(lpcStripReader));
+				tmplen = strlen(lpcStripReader);
+				lpcStripReader[tmplen - 6] = 0;
+
+				if ((strcmp(reader_list[i].pcFriendlyname, lpcStripReader) == 0)
+					&& (reader_list[r].dwChannelId == sReadersContexts[i]->dwPort))
+				{
+					DWORD dwStatus = 0, dwAtrLen = 0;
+					UCHAR ucAtr[MAX_ATR_SIZE];
+
+					/* the reader was already started */
+					present = TRUE;
+
+					/* verify the reader is still connected */
+					if (IFDStatusICC(sReadersContexts[r], &dwStatus, ucAtr,
+						&dwAtrLen) != SCARD_S_SUCCESS)
+					{
+						Log2(PCSC_LOG_INFO, "Reader %s disappeared",
+							reader_list[i].pcFriendlyname);
+						RFRemoveReader(reader_list[i].pcFriendlyname,
+							reader_list[r].dwChannelId);
+					}
+				}
+			}
+		}
+
+		/* the reader was not present */
+		if (!present)
+			/* we try to add it */
+			RFAddReader(reader_list[i].pcFriendlyname,
+				reader_list[i].dwChannelId, reader_list[i].pcLibpath,
+				reader_list[i].pcDevicename);
+
+		/* free strings allocated by DBGetReaderList() */
+		free(reader_list[i].pcFriendlyname);
+		free(reader_list[i].pcLibpath);
+		free(reader_list[i].pcDevicename);
+	}
+	free(reader_list);
 }
 
 void RFSuspendAllReaders(void) 
