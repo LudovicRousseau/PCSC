@@ -417,4 +417,8 @@ ULONG HPRegisterForHotplugEvents(void)
 	return 0;
 }
 
+void HPReCheckSerialReaders(void)
+{
+}
+
 #endif	/* __linux__ && !HAVE_LIBUSB */
