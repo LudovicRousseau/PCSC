@@ -41,6 +41,7 @@
 #define FALSE			0
 #define TRUE			1
 
+char ReCheckSerialReaders = FALSE;
 extern PCSCLITE_MUTEX usbNotifierMutex;
 
 struct usb_device_descriptor
