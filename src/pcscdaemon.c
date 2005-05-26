@@ -58,6 +58,7 @@ void SVCServiceRunLoop(void);
 void SVCClientCleanup(psharedSegmentMsg);
 void at_exit(void);
 void clean_temp_files(void);
+void signal_reload(int sig);
 void signal_trap(int);
 void print_version (void);
 void print_usage (char const * const);
@@ -478,6 +479,8 @@ int main(int argc, char **argv)
 	signal(SIGINT, signal_trap);
 	signal(SIGHUP, signal_trap);
 
+	signal(SIGUSR1, signal_reload);
+
 	SVCServiceRunLoop();
 
 	Log1(PCSC_LOG_ERROR, "SVCServiceRunLoop returned");
@@ -514,6 +517,12 @@ void clean_temp_files(void)
 			strerror(errno));
 #endif
 }
+
+void signal_reload(int sig)
+{
+	Log1(PCSC_LOG_INFO, "Reload serial configuration");
+	HPReCheckSerialReaders();
+} /* signal_reload */
 
 void signal_trap(int sig)
 {
