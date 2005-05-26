@@ -565,7 +565,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		UInt32 pccAddress = 0;
 		CFTypeRef valueRef =
 			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("VendorID"),
-			kCFAllocatorDefault, NULL);
+			kCFAllocatorDefault, 0);
 
 		if (!valueRef)
 		{
@@ -578,7 +578,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		}
 		valueRef =
 			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("DeviceID"),
-			kCFAllocatorDefault, NULL);
+			kCFAllocatorDefault, 0);
 		if (!valueRef)
 		{
 			Log1(PCSC_LOG_ERROR, "error getting device");
@@ -590,7 +590,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		}
 		valueRef =
 			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("SocketNumber"),
-			kCFAllocatorDefault, NULL);
+			kCFAllocatorDefault, 0);
 		if (!valueRef)
 		{
 			Log1(PCSC_LOG_ERROR, "error getting PC Card socket");
