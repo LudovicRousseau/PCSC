@@ -91,7 +91,6 @@
 #include "prothandler.h"
 #include "ifdwrapper.h"
 #include "atrhandler.h"
-#include "configfile.h"
 #include "sys_generic.h"
 #include "eventhandler.h"
 
