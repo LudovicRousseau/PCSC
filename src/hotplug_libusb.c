@@ -443,7 +443,6 @@ ULONG HPRegisterForHotplugEvents(void)
 void HPReCheckSerialReaders(void)
 {
 	ReCheckSerialReaders = TRUE;
-	return 0;
 }
 
 #endif
