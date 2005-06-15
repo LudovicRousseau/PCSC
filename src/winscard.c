@@ -1436,10 +1436,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	 * just wants 0 or 1
 	 */
 
-	if (pioSendPci->dwProtocol == SCARD_PROTOCOL_T0)
-	{
-		sSendPci.Protocol = 0;
-	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_T1)
+	sSendPci.Protocol = 0; /* protocol T=0 by default */
+
+	if (pioSendPci->dwProtocol == SCARD_PROTOCOL_T1)
 	{
 		sSendPci.Protocol = 1;
 	} else if (pioSendPci->dwProtocol == SCARD_PROTOCOL_RAW)
