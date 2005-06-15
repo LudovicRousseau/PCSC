@@ -14,6 +14,7 @@
 %{
 #include "wintypes.h"
 #include "readerfactory.h"
+#include "configfile.h"
 
 int evaluatetoken(char *pcToken);
 
