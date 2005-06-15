@@ -35,6 +35,7 @@
 #include "ifdwrapper.h"
 #include "hotplug.h"
 #include "strlcpycat.h"
+#include "configfile.h"
 
 #ifndef TRUE
 #define TRUE 1
