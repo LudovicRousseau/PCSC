@@ -203,6 +203,8 @@ int DBGetReaderList(char *readerconf, SerialReader **caller_reader_list)
 {
 	FILE *configFile = NULL;
 
+	*caller_reader_list = NULL;	/* no list by default */
+
 	configFile = fopen(readerconf, "r");
 
 	if (configFile == NULL)
