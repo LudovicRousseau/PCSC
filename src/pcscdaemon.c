@@ -207,8 +207,8 @@ int main(int argc, char **argv)
 		{"apdu", 0, 0, 'a'},
 		{"debug", 0, 0, 'd'},
 		{"info", 0, 0, 0},
-		{"error", 0, 0, 0},
-		{"critical", 0, 0, 0},
+		{"error", 0, 0, 'e'},
+		{"critical", 0, 0, 'C'},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -240,9 +240,9 @@ int main(int argc, char **argv)
 	 * Handle any command line arguments 
 	 */
 #ifdef  HAVE_GETOPT_LONG
-	while ((opt = getopt_long (argc, argv, "c:fdhva", long_options, &option_index)) != -1) {
+	while ((opt = getopt_long (argc, argv, "c:fdhvaeC", long_options, &option_index)) != -1) {
 #else
-	while ((opt = getopt (argc, argv, "c:fdhva")) != -1) {
+	while ((opt = getopt (argc, argv, "c:fdhvaeC")) != -1) {
 #endif
 		switch (opt) {
 			case 'c':
@@ -262,6 +262,14 @@ int main(int argc, char **argv)
 				DebugLogSetLevel(PCSC_LOG_DEBUG);
 				break;
 
+			case 'e':
+				DebugLogSetLevel(PCSC_LOG_ERROR);
+				break;
+
+			case 'C':
+				DebugLogSetLevel(PCSC_LOG_CRITICAL);
+				break;
+
 			case 'h':
 				print_usage (argv[0]);
 				return EXIT_SUCCESS;
@@ -275,22 +283,8 @@ int main(int argc, char **argv)
 				break;
 
 			default:
-				if (0 == option_index)
-				{
-					print_usage (argv[0]);
-					return EXIT_FAILURE;
-				}
-
-				if (0 == strcmp(long_options[option_index].name, "critical"))
-					DebugLogSetLevel(PCSC_LOG_CRITICAL);
-
-				if (0 == strcmp(long_options[option_index].name, "error"))
-					DebugLogSetLevel(PCSC_LOG_ERROR);
-
-				/*
-				 * --notice is the default level
-				 * --debug is already treated by the short option -d
-				 */
+				print_usage (argv[0]);
+				return EXIT_FAILURE;
 		}
 
 	}
@@ -567,8 +561,8 @@ void print_usage (char const * const progname)
 	printf("  -v, --version		display the program version number\n");
 	printf("  -d, --debug	 	display lower level debug messages\n"); 
 	printf("      --info	 	display info level debug messages (default level)\n"); 
-	printf("      --error	 	display error level debug messages\n"); 
-	printf("      --critical 	display critical only level debug messages\n"); 
+	printf("  -e  --error	 	display error level debug messages\n"); 
+	printf("  -C  --critical 	display critical only level debug messages\n"); 
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
