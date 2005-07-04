@@ -112,4 +112,15 @@
 #define FEATURE_IFD_PIN_PROP      0x0A /* Gemplus Proposal */
 #define FEATURE_ABORT             0x0B /* SCM Proposal */
 
+/* structures used (but not defined) in PCSC Part 10 revision 2.01.02:
+ * "IFDs with Secure Pin Entry Capabilities" */
+
+/* the structure must be 6-bytes long */
+typedef struct
+{
+	__int8_t tag __attribute__ ((__packed__));
+	__int8_t length __attribute__ ((__packed__));
+	__int32_t value __attribute__ ((__packed__));
+} PCSC_TLV_STRUCTURE;
+
 #endif
