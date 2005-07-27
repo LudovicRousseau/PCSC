@@ -1154,6 +1154,11 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	return scEndStruct.rv;
 }
 
+/**
+ * @deprecated
+ * This function is not in Microsoft(R) WinSCard API and is deprecated
+ * in pcsc-lite API.
+ */
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
