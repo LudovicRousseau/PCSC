@@ -62,7 +62,7 @@
  * requests.
  *
  * When a function from \em winscard_clnt.c is called by a client application,
- * it calls a function in \m winscard_msg.c to send the message to \em
+ * it calls a function in \em winscard_msg.c to send the message to \em
  * pcscdaemon.c.  When \em pcscdaemon.c a client detects a request arrived, it
  * calls \em winscard_svc.c which identifies what command the message contains
  * and requests \em winscard.c to execute the command.\n Meanwhile

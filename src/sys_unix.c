@@ -350,7 +350,7 @@ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
  * @brief Writes the changes made in a memory map to the disk mapped file.
  *
  * @param[in] begin Start of the block to be written
- * @param[in] lenght Lenght of the block to be written
+ * @param[in] length Lenght of the block to be written
  *
  * @return Error code.
  * @retval 0 Success.
