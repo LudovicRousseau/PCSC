@@ -805,7 +805,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 /**
  * This function terminates a connection to the connection made through 
- * SCardConnect. dwDisposition can have the following values:
+ * SCardConnect(). dwDisposition can have the following values:
  *
  * @param[in] hCard Connection made from SCardConnect.
  * @param[in] dwDisposition Reader function to execute.
@@ -1156,12 +1156,12 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 /**
  * This function cancels all pending blocking requests on the
- * \c GetStatusChange() function.
+ * \c SCardGetStatusChange() function.
  *
  * @param[in] hCard Connection context to the PC/SC Resource Manager.
  *
  * @return Error code.
- * @retval  SCARD_S_SUCCESS Successful.
+ * @retval SCARD_S_SUCCESS Successful.
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle.
  *
  * @test
@@ -2372,17 +2372,17 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * } SCARD_IO_REQUEST;
  * @endcode
  * 
- * param[in] hCard Connection made from SCardConnect.
- * param pioSendPci [inout] Structure of protocol information.
+ * @param[in] hCard Connection made from SCardConnect().
+ * @param pioSendPci [inout] Structure of protocol information.
  * <ul>
  *   <li>SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
  *   <li>SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
  * </ul>
- * param[in] pbSendBuffer APDU to send to the card.
- * param[in] cbSendLength Length of the APDU.
- * param pioRecvPci [inout] Structure of protocol information.
- * param[out] pbRecvBuffer Response from the card.
- * param pcbRecvLength [inout] Length of the response.
+ * @param[in] pbSendBuffer APDU to send to the card.
+ * @param[in] cbSendLength Length of the APDU.
+ * @param pioRecvPci [inout] Structure of protocol information.
+ * @param[out] pbRecvBuffer Response from the card.
+ * @param pcbRecvLength [inout] Length of the response.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful.
