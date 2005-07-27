@@ -174,6 +174,8 @@ LONG HPReadBundleValues(void)
 
 				if (listCount >= driverSize)
 				{
+					int i;
+
 					/* increase the array size */
 					driverSize += DRIVER_TRACKER_SIZE_STEP;
 #ifdef DEBUG_HOTPLUG
@@ -185,7 +187,18 @@ LONG HPReadBundleValues(void)
 					if (NULL == driverTracker)
 					{
 						Log1(PCSC_LOG_CRITICAL, "Not enough memory");
+						driverSize = -1;
 						return -1;
+					}
+
+					/* clean the newly allocated entries */
+					for (i=driverSize-DRIVER_TRACKER_SIZE_STEP; i<driverSize; i++)
+					{
+						driverTracker[i].manuID = 0;
+						driverTracker[i].productID = 0;
+						driverTracker[i].bundleName = NULL;
+						driverTracker[i].libraryPath = NULL;
+						driverTracker[i].readerName = NULL;
 					}
 				}
 			}
