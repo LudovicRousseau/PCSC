@@ -1154,33 +1154,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	return scEndStruct.rv;
 }
 
-/**
- * This function cancels all pending blocking requests on the
- * \c SCardGetStatusChange() function.
- *
- * @param[in] hCard Connection context to the PC/SC Resource Manager.
- *
- * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle.
- *
- * @test
- * @code
- * SCARDCONTEXT hContext;
- * DWORD cReaders;
- * SCARD_READERSTATE rgReaderStates;
- * LONG rv;
- * ...
- * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rgReaderStates.szReader = strdup("Reader X");
- * rgReaderStates.dwCurrentState = SCARD_STATE_EMPTY;
- * ...
- * / * Spawn off thread for following function * /
- * ...
- * rv = SCardGetStatusChange(hContext, 0, rgReaderStates, cReaders);
- * rv = SCardCancel(hContext);
- * @endcode
- */
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
@@ -2702,6 +2675,33 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
 	return rv;
 }
 
+/**
+ * This function cancels all pending blocking requests on the
+ * \c SCardGetStatusChange() function.
+ *
+ * @param[in] hCard Connection context to the PC/SC Resource Manager.
+ *
+ * @return Error code.
+ * @retval SCARD_S_SUCCESS Successful.
+ * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle.
+ *
+ * @test
+ * @code
+ * SCARDCONTEXT hContext;
+ * DWORD cReaders;
+ * SCARD_READERSTATE rgReaderStates;
+ * LONG rv;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * rgReaderStates.szReader = strdup("Reader X");
+ * rgReaderStates.dwCurrentState = SCARD_STATE_EMPTY;
+ * ...
+ * / * Spawn off thread for following function * /
+ * ...
+ * rv = SCardGetStatusChange(hContext, 0, rgReaderStates, cReaders);
+ * rv = SCardCancel(hContext);
+ * @endcode
+ */
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
 	DWORD dwContextIndex;
