@@ -398,6 +398,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
+	/*
+	 * Handle the dwInitialization
+	 */
 	if (dwInitialization != SCARD_LEAVE_CARD &&
 			dwInitialization != SCARD_RESET_CARD &&
 			dwInitialization != SCARD_UNPOWER_CARD)
@@ -437,14 +440,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 */
 	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
 		return rv;
-
-	/*
-	 * Handle the dwInitialization
-	 */
-	if ((dwInitialization != SCARD_LEAVE_CARD)
-		&& (dwInitialization != SCARD_UNPOWER_CARD)
-		&& (dwInitialization != SCARD_RESET_CARD))
-		return SCARD_E_INVALID_VALUE;
 
 	/*
 	 * RFUnblockReader( rContext ); FIX - this doesn't work
