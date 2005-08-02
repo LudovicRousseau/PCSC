@@ -379,10 +379,9 @@ LONG HPSearchHotPluggables(void)
 		readerTracker[i].bus_device[0] = '\0';
 	}
 
-	HPReadBundleValues();
-
-	SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
-		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
+	if (HPReadBundleValues())
+		SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
 
 	return 0;
 }
