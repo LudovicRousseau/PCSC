@@ -344,6 +344,15 @@ void HPEstablishUSBNotifications(void)
 		{
 			int retval;
 
+			for (i=0; i<driverSize; i++)
+			{
+				/* free strings allocated by strdup() */
+				free(driverTracker[i].bundleName);
+				free(driverTracker[i].libraryPath);
+				free(driverTracker[i].readerName);
+			}
+			free(driverTracker);
+
 			Log1(PCSC_LOG_INFO, "Hotplug stopped");
 			pthread_exit(&retval);
 		}
