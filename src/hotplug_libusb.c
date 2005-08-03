@@ -405,7 +405,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 
 	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb:%s",
 		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
-	deviceName[sizeof(deviceName)] = '\0';
+	deviceName[sizeof(deviceName) -1] = '\0';
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
