@@ -421,8 +421,9 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		return 0;
 	}
 
-	strncpy(readerTracker[i].bus_device, bus_device, BUS_DEVICE_STRSIZE);
-	readerTracker[i].bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+	strncpy(readerTracker[i].bus_device, bus_device,
+		sizeof(readerTracker[i].bus_device));
+	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
    
 	readerTracker[i].driver = driver;
 
