@@ -115,7 +115,7 @@
 /* structures used (but not defined) in PCSC Part 10 revision 2.01.02:
  * "IFDs with Secure Pin Entry Capabilities" */
 
-#include <stdint.h>
+#include <inttypes.h>
 /* the structure must be 6-bytes long */
 typedef struct
 {
