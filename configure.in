@@ -168,7 +168,6 @@ fi
 
 AC_MSG_RESULT([enable libusb support         : $use_libusb])
 
-AM_CONDITIONAL(PCSC_USE_LIBUSB, test x$use_libusb = xtrue)
 if test x$use_libusb = xtrue; then
   AC_DEFINE(HAVE_LIBUSB,1, [Libusb is available])
 fi
