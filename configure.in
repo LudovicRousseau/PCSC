@@ -45,6 +45,8 @@ case "$host" in
 	if test "$GCC" = "yes"; then
 		CFLAGS="$CFLAGS -no-cpp-precomp"
 	fi
+	use_libusb=false
+	AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])
 	;;
 esac
 
