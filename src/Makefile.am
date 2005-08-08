@@ -58,7 +58,7 @@ libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
-pcscd_LDFLAGS = @LDFLAGS@ -rdynamic
+pcscd_LDFLAGS = @LDFLAGS@ -export-dynamic
 pcscd_LDADD = libpcsclite-core.la \
 	@PTHREAD_LIBS@ @COREFOUNDATION@ \
 	@LIBUSB@ @LIBDL@ @LIBFL@ @IOKIT@
