@@ -1,60 +1,69 @@
-.\" Process this file with
-.\" groff -man -Tascii pcscd.txt
-.\"
-.TH PCSCD 8 "March 2005" Linux "User Manual"
+.TH PCSCD 8 "August 2005" Muscle "PC/SC Lite"
 .SH NAME
 pcscd \- PC/SC Smart Card Daemon
+.
 .SH SYNOPSIS
-.BI "pcscd [" options "]"
+.B pcscd
+.RI [ options ]
+.
 .SH OPTIONS
 .TP
-\fB\-a\fR, \fB\-\-apdu\fR
-log APDUs and SW using the debug method (see \fB\-d\fR)
+.BR -a ", " \-\-apdu
+log APDUs and SW using the debug method (see
+.BR \-\-debug ).
 .TP
-\fB\-c\fR, \fB\-\-config\fR \fIfile\fR
-Specifies the file \fIfile\fR as an alternate location for
-\fI@confdir@/reader.conf\fR
+.BR \-c ", " \-\-config " \fIfile\fP"
+Specifies the file \fIfile\fP as an alternate location for
+.IR @confdir@/reader.conf .
 .TP
-\fB\-f\fR, \fB\-\-foreground\fR
-Runs pcscd in the foreground and send logs to stderr instead of syslog
+.BR \-f ", " \-\-foreground
+Runs pcscd in the foreground and sends log messages to stderr instead of
+syslog(3).
 .TP
-\fB\-d\fR, \fB\-\-debug\fR
-use lowest log level. Any log message of this level or above will be
-sent to stderr or syslog depending on the use of \fB\-\-foreground\fR
+.BR \-d ", " \-\-debug
+use the lowest log level. Any log message of this level or above will be
+sent to stderr or syslog(3) depending on the use of
+.BR \-\-foreground .
 .TP
-\fB\-\-info\fR
-use info log level
+.B \-\-info
+use info log level. This is the default log level.
 .TP
-\fB\-\-error\fR
-use error log level
+.B \-\-error
+use error log level.
 .TP
-\fB\-\-critical\fR
-use critical log level
+.B \-\-critical
+use critical log level.
+.PP
+The log levels are ordered as: debug < info < error < critical. Use a
+log level l will log this level and all the levels above it.
 .TP
-\fB\-h\fR, \fB\-\-help\fR
+.BR \-h ", " \-\-help
 Displays information about the pcscd command line
 .TP
-\fB\-v\fR, \fB\-\-version\fR
+.BR \-v ", " \-\-version
 Displays the program version number
+.
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is 
 a resource manager that coordinates communications with smart card readers 
 and smart cards and cryptographic tokens that are connected to the system.
-
+.PP
 pcscd is normally started at boot time from 
 .IR @sysconfdir_exp@/init.d/pcscd .
 It allows applications to access smart cards and readers without knowing
 details of the card or reader.  
-
+.PP
 pcscd coordinates the loading of drivers for card readers.
-
+.PP
 The purpose of pcsc-lite is to provide a cross compatible API (called
 winscard) for migrating Windows based PC/SC applications to Unix.
-
+.PP
 At startup, pcscd loads the smart card reader drivers specified in the 
 .I @confdir@/reader.conf 
-file (or specified using \fB-c\fR \fIfile\fR).
-
+file (or specified using
+.B \-\-config 
+.IR file ).
+.
 .SH "SERIAL SMART CARD READER DRIVERS"
 Smart card reader drivers are placed in the 
 .I @usbdropdir@
@@ -65,27 +74,34 @@ file.  pcscd locates the driver using the
 file.  See the
 .BR reader.conf (5)
 manual page for more information.
-Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fR.
-
+Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fP.
+.
+.SH "USB SMART CARD READER DRIVERS"
+USB smart card reader drivers are located in
+.I @usbdropdir@
+directory as a bundle. You shall not add a USB driver in
+.I @confdir@/reader.conf 
+file.
+.
 .SH FILES
 .I @confdir@/reader.conf
 : Reader configuration file
-
+.PP
 .I @sysconfdir_exp@/init.d/pcscd
 : pcscd startup script
-
+.PP
 @HAVE_RUNPID@.I @runpid@
 @HAVE_RUNPID@: process id of the running pcscd
 @HAVE_RUNPID@
 .I @usbdropdir@
-: directory containing bundles for USB
-drivers
-.SH BUGS
-None known.
+: directory containing bundles for USB drivers
+.
 .SH "SEE ALSO"
 .BR bundleTool (8),
 .BR formaticc (1),
-.BR reader.conf (5)
+.BR reader.conf (5),
+.BR syslog (3)
+.
 .SH AUTHORS
 David Corcoran <corcoran@musclecard.com> and Ludovic Rousseau
 <ludovic.rousseau@free.fr>

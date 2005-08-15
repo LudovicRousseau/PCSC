@@ -1,33 +1,32 @@
-.\" Process this file with
-.\" groff -man -Tascii reader_conf.8
-.\"
-.TH READER_CONF 8 "April 2004" Linux "User Manual"
+.TH READER.CONF 5 "August 2005" Muscle "PC/SC Lite"
 .SH NAME
-reader.conf - configuration file for pcscd readers' drivers
+reader.conf \- configuration file for pcscd readers' drivers
+.
 .SH DESCRIPTION
 The
 .I @confdir@/reader.conf
 file contains configuration information for serial and (some) PCMCIA
 smart card readers.
-
+.PP
 USB readers SHALL NOT be configured using this file.
 .B pcscd
 uses another mechanism to automatically load USB drivers.
+.
 .SH SYNTAX
 The
 .I @confdir@/reader.conf
 is a regular text file. Each reader must be defined by four fields:
-
+.PP
  FRIENDLYNAME     TEXT_STRING
  DEVICENAME       FILENAME
  LIBPATH          FILENAME
  CHANNELID        NUMBER
-
+.PP
 The "FRIENDLYNAME" field is an arbitrary text used to identify the
 reader. This text is displayed by commands like
 .BR pcsc_scan (1)
 that prints the names of all the connected and detected readers.
-
+.PP
 The "DEVICENAME" field was not used for old drivers (using the IFD
 handler version 2.0 or earlier). It is now (IFD handler version 3.0) used
 to identify the physical port on which the reader is connected. This
@@ -37,17 +36,17 @@ first serial port device is called
 under Linux and
 .I /dev/cuaa0
 under FreeBSD.
-
+.PP
 The "LIBPATH" field is the filename of the driver code. The driver is
 a dynamically loaded piece of code (generally a 
-.I drivername.so*
-file).
-
+.IR drivername.so* file).
+.PP
 The "CHANNELID" is no more used for recent drivers (IFD handler 3.0) and
 has been superseded by "DEVICENAME". If you have an old driver this
 field is used to indicate the port to use. You should read your driver
 documentation to know what information is needed here. It should be the
 serial port number for a serial reader.
+.
 .SH EXAMPLE
  # Gemplus GemPCTwin reader with serial communication
  # connected to the first serial port
@@ -55,6 +54,7 @@ serial port number for a serial reader.
  DEVICENAME        /dev/ttyS0
  LIBPATH           @usbdropdir@/serial/libccidtwin.so.0.4.1
  CHANNELID         1
+.
 .SH DEBUGGING
 In order to set up your
 .I @confdir@/reader.conf
@@ -62,15 +62,17 @@ file correctly you may want to have debug messages from
 .BR pcscd .
 I recommend you to start
 .B pscsd
-in the foreground using:
- # pcscd --foreground
-
+in the foreground and debug mode using:
+ # pcscd \-\-foreground \-\-debug
+.PP
 If everything seems OK you can use the
 .B pcsc_scan
 command to print the list of correctly detected readers and try to get
 the ATR of your smart cards.
+.
 .SH AUTHOR
 Ludovic Rousseau <ludovic.rousseau@free.fr>
+.
 .SH SEE ALSO
 .BR pcscd (8),
 .BR pcsc_scan (1)
