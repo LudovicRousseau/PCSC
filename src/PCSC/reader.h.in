@@ -140,18 +140,17 @@ typedef struct
 	                         * bit 4 set if system units are bytes, clear if
 	                         * system units are bits,
 	                         * bits 3-0 PIN length position in system units */
-	int16_t wPINMaxExtraDigit __attribute__ ((__packed__));
-	                         /* 0xXXYY where XX is minimum PIN size in digits,
+	int16_t wPINMaxExtraDigit; /* 0xXXYY where XX is minimum PIN size in digits,
 	                            and YY is maximum PIN size in digits */
 	int8_t bEntryValidationCondition; /* Conditions under which PIN entry should
 	                                 * be considered complete */
 	int8_t bNumberMessage; /* Number of messages to display for PIN verification */
-	int16_t wLangId __attribute__ ((__packed__)); /* Language for messages */
+	int16_t wLangId; /* Language for messages */
 	int8_t bMsgIndex; /* Message index (should be 00) */
 	int8_t bTeoPrologue[3]; /* T=1 block prologue field to use (fill with 00) */
 	int8_t ulDataLength; /* length of Data to be sent to the ICC */
 	int8_t abData[1]; /* Data to send to the ICC */
-} PIN_VERIFY_STRUCTURE;
+} __attribute__ ((__packed__)) PIN_VERIFY_STRUCTURE;
 
 typedef struct
 {
@@ -169,21 +168,21 @@ typedef struct
 	                             the current PIN */
 	int8_t bInsertionOffsetNew; /* Insertion position offset in bytes for
 	                             the new PIN */
-	int16_t wPINMaxExtraDigit __attribute__ ((__packed__));
+	int16_t wPINMaxExtraDigit;
 	                         /* 0xXXYY where XX is minimum PIN size in digits,
 	                            and YY is maximum PIN size in digits */
 	int8_t bConfirmPIN; /* Flags governing need for confirmation of new PIN */
 	int8_t bEntryValidationCondition; /* Conditions under which PIN entry should
 	                                 * be considered complete */
 	int8_t bNumberMessage; /* Number of messages to display for PIN verification*/
-	int16_t wLangId __attribute__ ((__packed__)); /* Language for messages */
+	int16_t wLangId; /* Language for messages */
 	int8_t bMsgIndex1; /* index of 1st prompting message */
 	int8_t bMsgIndex2; /* index of 2d prompting message */
 	int8_t bMsgIndex3; /* index of 3d prompting message */
 	int8_t bTeoPrologue[3]; /* T=1 block prologue field to use (fill with 00) */
 	int8_t ulDataLength; /* length of Data to be sent to the ICC */
 	int8_t abData[1]; /* Data to send to the ICC */
-} PIN_MODIFY_STRUCTURE;
+} __attribute__ ((__packed__)) PIN_MODIFY_STRUCTURE;
 
 #endif
 
