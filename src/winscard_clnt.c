@@ -363,6 +363,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	 */
 	scEstablishStruct.dwScope = dwScope;
 	scEstablishStruct.phContext = 0;
+	scEstablishStruct.rv = 0;
 
 	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, dwClientID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
@@ -446,6 +447,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	}
 
 	scReleaseStruct.hContext = hContext;
+	scReleaseStruct.rv = 0;
 
 	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, psContextMap[dwContextIndex].dwClientID,
 			  sizeof(scReleaseStruct),
