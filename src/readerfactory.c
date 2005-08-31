@@ -74,7 +74,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	LONG rv, parentNode;
 	int i, j;
 
-	if (lpcReader == 0 || lpcLibrary == 0)
+	if ((lpcReader == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
 		return SCARD_E_INVALID_VALUE;
 
 	/*
