@@ -2718,15 +2718,11 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
-
 	/*
 	 * Set the block status for this Context so blocking calls will
 	 * complete
 	 */
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_RESUME;
-
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	return SCARD_S_SUCCESS;
 }
