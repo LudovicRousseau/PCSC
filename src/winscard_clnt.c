@@ -280,7 +280,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			psContextMap[i].dwClientID = 0;
 			psContextMap[i].hContext = 0;
 			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
-			psContextMap[i].mMutex = 0;
+			psContextMap[i].mMutex = NULL;
 
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
 			{
@@ -2840,7 +2840,7 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 		SHMClientCloseSession(psContextMap[retIndice].dwClientID);
 		psContextMap[retIndice].dwClientID = 0;
 		free(psContextMap[retIndice].mMutex);
-		psContextMap[retIndice].mMutex = 0;
+		psContextMap[retIndice].mMutex = NULL;
 		psContextMap[retIndice].contextBlockStatus = BLOCK_STATUS_RESUME;
 
 		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
