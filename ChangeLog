@@ -1,3 +1,31 @@
+pcsc-lite-1.2.9-beta8: Ludovic Rousseau
+6 September 2005
+- correct a crash on Fedora Core 4 (off by 1 buffer overflow)
+- do not silently truncate the reader, library or device name if they
+  are too long but display an error message instead
+- reinclude musclecard library in pcsc-lite package since a lot of code
+  is shared. The separation was a mistake
+- add colorization of the logs when sent to stderr. The color depends on
+  the priority level
+- restrict the number of symbols (function names) exported from
+  libpcsclite.so to limit symbol conflicts with other libraries. Only
+  the PC/SC API symbols should be exported
+- add Doxygen documentation. Thanks to Luiz Reuter Silva Torro.
+  HTML pages available at
+  http://pcsclite.alioth.debian.org/doxygen/html/index.html
+- SCardControl(): a 0 byte long pbSendBuffer is no more rejected since
+  the command is in dwControlCode. Thanks to Martin Paljak for the patch
+- provide a reader.h file (by default in /usr/local/include/PCSC/reader.h)
+  that contains definitions shared between an application and a smart
+  card driver (like SCARD_CTL_CODE, CM_IOCTL_GET_FEATURE_REQUEST,
+  FEATURE_* and HOST_TO_CCID)
+- pcscd: allow a serial hotplug by sending a SIGUSR1 signal. The
+  /etc/reader.conf file is re-read and reader presence/abscence is updated
+- musclecard library: small bug fixes
+- pcsc-lite SCF: small bug fixes
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.2.9-beta7: Ludovic Rousseau
 2 March 2005
 - SCARD_PROTOCOL_ANY is defined as (SCARD_PROTOCOL_T0|SCARD_PROTOCOL_T1)
