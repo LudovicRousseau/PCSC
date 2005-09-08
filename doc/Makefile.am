@@ -35,7 +35,7 @@ LATEX2HTML = latex2html
 
 # create a dvi file from a tex file
 %.pdf: %.tex
-	$(PDFLATEX) $*
+	-$(PDFLATEX) $*
 	-@egrep -c 'Citation .* undefined.' $*.log && ($(BIBTEX) $* ; $(PDFLATEX) $*)
 	-@grep 'Rerun' $*.log && $(PDFLATEX) $*
 	-@grep 'Rerun' $*.log && $(PDFLATEX) $*
