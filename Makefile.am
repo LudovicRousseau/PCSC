@@ -9,7 +9,7 @@ EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.cvs
 DISTCLEANFILES = ChangeLog.cvs
 
 ChangeLog.cvs:
-	svn2cl --group-by-day | perl -pe 's/corcoran /David Corcoran /; \
+	-svn2cl --group-by-day | perl -pe 's/corcoran /David Corcoran /; \
 	s/corcoran-guest /David Corcoran /; \
 	s/oznet /Chris Osgood /; s/cprados /Carlos Prados /; \
 	s/mikeg /Michael Gile /; s/rousseau /Ludovic Rousseau /; \
