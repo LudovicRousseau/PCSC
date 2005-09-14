@@ -67,7 +67,7 @@ testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
 nobase_include_HEADERS = \
-	PCSC/debuglog.h PCSC/dyn_generic.h PCSC/ifdhandler.h PCSC/pcsclite.h \
+	PCSC/debuglog.h PCSC/dyn_generic.h PCSC/ifdhandler.h \
 	PCSC/winscard.h PCSC/wintypes.h PCSC/parser.h PCSC/reader.h \
 	PCSC/sys_generic.h PCSC/thread_generic.h
 noinst_HEADERS = \
