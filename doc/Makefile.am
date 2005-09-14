@@ -5,7 +5,7 @@ SUBDIRS = . example
 datadir = $(prefix)/doc
 data_DATA = pcsc-lite.tex pcsc-lite.bib pcsc-lite.pdf \
 			ifdhandler-3.tex ifdhandler-3.pdf \
-			README.DAEMON
+			README.DAEMON muscle-api-1.3.0.pdf
 
 man_MANS = pcscd.8 formaticc.1 reader.conf.5
 man_in = pcscd.8.in formaticc.1 reader.conf.5.in
