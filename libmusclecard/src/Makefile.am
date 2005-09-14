@@ -21,7 +21,7 @@ libmusclecard_la_SOURCES = \
 	$(top_srcdir)/src/strlcat.c \
 	$(top_srcdir)/src/thread_unix.c
 libmusclecard_la_CFLAGS = \
-	-I$(top_srcdir)/src/PCSC \
+	-I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	-I$(top_srcdir)/libmusclecard/src/PCSC
 libmusclecard_la_LIBADD = \
 	$(top_builddir)/src/libpcsclite.la
@@ -30,7 +30,7 @@ muscletest_SOURCES = \
 	muscletest.c \
 	$(top_srcdir)/src/strlcpy.c
 muscletest_CFLAGS = \
-	-I$(top_srcdir)/src/PCSC \
+	-I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	-I$(top_srcdir)/libmusclecard/src/PCSC
 muscletest_LDADD = \
 	$(top_builddir)/libmusclecard/src/libmusclecard.la

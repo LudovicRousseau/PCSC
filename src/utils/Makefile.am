@@ -1,6 +1,6 @@
 # Process this file with automake to create Makefile.in.
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC
+AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC
 
 bin_PROGRAMS = formaticc
 sbin_PROGRAMS = installifd
