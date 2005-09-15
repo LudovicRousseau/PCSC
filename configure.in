@@ -314,10 +314,12 @@ CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 dnl HOST_TO_CCID
 if test "x$ac_cv_c_bigendian" = "xyes"; then
-	AC_SUBST(host_to_ccid, ['((((x) >> 8) & 0xFF) + ((x & 0xFF) << 8))'])
+	AC_SUBST(host_to_ccid_16, ['((((x) >> 8) & 0xFF) + ((x & 0xFF) << 8))'])
+	AC_SUBST(host_to_ccid_32, ['((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + ((x & 0xFF00) << 8) + (((x) & 0xFF) << 24))'])
 	AC_MSG_RESULT([plateform endianess           : big endian])
 else
-	AC_SUBST(host_to_ccid, ['(x)'])
+	AC_SUBST(host_to_ccid_16, ['(x)'])
+	AC_SUBST(host_to_ccid_32, ['(x)'])
 	AC_MSG_RESULT([plateform endianess           : little endian])
 fi
 
@@ -327,7 +329,8 @@ AC_SUBST(confdir)
 AC_SUBST(runpid)
 AC_SUBST(extended_apdu)
 AC_SUBST(muscledropdir)
-AC_SUBST(host_to_ccid)
+AC_SUBST(host_to_ccid_16)
+AC_SUBST(host_to_ccid_32)
 AS_AC_EXPAND(confdir_exp,$confdir)
 AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)

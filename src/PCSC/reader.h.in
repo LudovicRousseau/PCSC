@@ -124,9 +124,10 @@ typedef struct
 	int32_t value __attribute__ ((__packed__));
 } PCSC_TLV_STRUCTURE;
 
-/* the wLangId and wPINMaxExtraDigit are 16 bits so are subject to byte
+/* the wLangId and wPINMaxExtraDigit are 16-bits long so are subject to byte
  * ordering */
-#define HOST_TO_CCID(x) @host_to_ccid@
+#define HOST_TO_CCID_16(x) @host_to_ccid_16@
+#define HOST_TO_CCID_32(x) @host_to_ccid_32@
 
 typedef struct
 {
