@@ -68,13 +68,16 @@ testpcsc_LDADD = libpcsclite.la
 
 nobase_include_HEADERS = \
 	PCSC/debuglog.h PCSC/ifdhandler.h \
-	PCSC/winscard.h PCSC/wintypes.h PCSC/reader.h
+	PCSC/winscard.h PCSC/wintypes.h
 noinst_HEADERS = \
 	atrhandler.h configfile.h dyn_generic.h eventhandler.h \
 	hotplug.h ifdwrapper.h PCSC/pcsclite.h.in \
 	powermgt_generic.h prothandler.h readerfactory.h \
 	strlcpycat.h parser.h sys_generic.h thread_generic.h \
 	winscard_msg.h winscard_svc.h
+
+nodistheaderdir = $(includedir)/PCSC
+nodistheader_DATA = PCSC/reader.h PCSC/pcsclite.h
 
 pcdir= $(libdir)/pkgconfig
 pc_DATA = libpcsclite.pc
