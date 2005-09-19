@@ -24,6 +24,7 @@
 #include "musclecard.h"
 #include "tokenfactory.h"
 #include "strlcpycat.h"
+#include "misc.h"
 
 #define USE_THREAD_SAFETY
 
@@ -65,11 +66,11 @@ static void mscUnLockThread(void)
 
 /* Library constructor and deconstructor function for UNIX */
 #ifndef WIN32
-void __attribute__ ((constructor)) musclecard_init(void)
+void CONSTRUCTOR musclecard_init(void)
 {
 }
 	
-void __attribute__ ((destructor)) musclecard_fini(void)
+void DESTRUCTOR musclecard_fini(void)
 {
 	if (localHContext != 0)
 		SCardReleaseContext(localHContext);
