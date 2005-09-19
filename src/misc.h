@@ -23,7 +23,11 @@ extern "C"
  *
  * see http://gcc.gnu.org/onlinedocs/gcc-3.3.5/gcc/Function-Attributes.html#Function-Attributes
  */
+#ifdef __GCC__
 #define INTERNAL __attribute__ ((visibility("hidden")))
+#else
+#define INTERNAL
+#endif
 
 #ifdef __cplusplus
 }
