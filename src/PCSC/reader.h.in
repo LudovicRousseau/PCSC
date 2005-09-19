@@ -116,12 +116,17 @@
  * "IFDs with Secure Pin Entry Capabilities" */
 
 #include <inttypes.h>
+
+/* Set structure elements aligment on bytes
+ * http://gcc.gnu.org/onlinedocs/gcc/Structure_002dPacking-Pragmas.html */
+#pragma pack(push, 1)
+
 /* the structure must be 6-bytes long */
 typedef struct
 {
-	int8_t tag __attribute__ ((__packed__));
-	int8_t length __attribute__ ((__packed__));
-	int32_t value __attribute__ ((__packed__));
+	int8_t tag;
+	int8_t length;
+	int32_t value;
 } PCSC_TLV_STRUCTURE;
 
 /* the wLangId and wPINMaxExtraDigit are 16-bits long so are subject to byte
@@ -149,9 +154,9 @@ typedef struct
 	int16_t wLangId; /* Language for messages */
 	int8_t bMsgIndex; /* Message index (should be 00) */
 	int8_t bTeoPrologue[3]; /* T=1 block prologue field to use (fill with 00) */
-	int8_t ulDataLength; /* length of Data to be sent to the ICC */
+	int32_t ulDataLength; /* length of Data to be sent to the ICC */
 	int8_t abData[1]; /* Data to send to the ICC */
-} __attribute__ ((__packed__)) PIN_VERIFY_STRUCTURE;
+} PIN_VERIFY_STRUCTURE;
 
 typedef struct
 {
@@ -181,9 +186,12 @@ typedef struct
 	int8_t bMsgIndex2; /* index of 2d prompting message */
 	int8_t bMsgIndex3; /* index of 3d prompting message */
 	int8_t bTeoPrologue[3]; /* T=1 block prologue field to use (fill with 00) */
-	int8_t ulDataLength; /* length of Data to be sent to the ICC */
+	int32_t ulDataLength; /* length of Data to be sent to the ICC */
 	int8_t abData[1]; /* Data to send to the ICC */
-} __attribute__ ((__packed__)) PIN_MODIFY_STRUCTURE;
+} PIN_MODIFY_STRUCTURE;
+
+/* restore default structure elements alignment */
+#pragma pack(pop)
 
 #endif
 
