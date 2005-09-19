@@ -29,6 +29,14 @@ extern "C"
 #define INTERNAL
 #endif
 
+#ifdef __GCC__
+#define CONSTRUCTOR __attribute__ ((constructor))
+#define DESTRUCTOR __attribute__ ((destructor))
+#else
+#define CONSTRUCTOR
+#define DESTRUCTOR
+#endif
+
 #ifdef __cplusplus
 }
 #endif
