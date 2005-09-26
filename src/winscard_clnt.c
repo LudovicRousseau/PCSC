@@ -44,6 +44,11 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 /**
  * Represents an Application Context Channel.
  * A channel belongs to an Application Context (\c _psContextMap).
@@ -1517,6 +1522,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	DWORD dwBreakFlag = 0;
 	int j;
 	DWORD dwContextIndex;
+	int currentReaderCount = 0;
 
 	if (rgReaderStates == 0 && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
@@ -1632,16 +1638,39 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_BLOCKING;
 
+	/* Get the initial reader count on the system */
+	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
+		if ((readerStates[j])->readerID != 0)
+			currentReaderCount++;
+
 	j = 0;
 
 	do
 	{
+		int newReaderCount = 0;
+		char ReaderCountChanged = FALSE;
+
 		if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		{
 			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 			return SCARD_E_NO_SERVICE;
 		}
 
+		if (j == 0)
+		{
+			int i;
+
+			for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+				if ((readerStates[i])->readerID != 0)
+					newReaderCount++;
+
+			if (newReaderCount != currentReaderCount)
+			{
+				Log1(PCSC_LOG_INFO, "Reader list changed");
+				ReaderCountChanged = TRUE;
+				currentReaderCount = newReaderCount;
+			}
+		}
 		currReader = &rgReaderStates[j];
 
 	/************ Look for IGNORED readers ****************************/
@@ -1905,7 +1934,18 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		 */
 		j = j + 1;
 		if (j == cReaders)
+		{
+			if (!dwBreakFlag)
+			{
+				/* break if the reader count changed,
+				 * so that the calling application can update
+				 * the reader list
+				 */
+				if (ReaderCountChanged)
+					break;
+			}
 			j = 0;
+		}
 
 		/*
 		 * Declare all the break conditions
