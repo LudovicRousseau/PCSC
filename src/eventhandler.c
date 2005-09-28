@@ -257,7 +257,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			dwStatus &= ~SCARD_NEGOTIABLE;
 			dwStatus &= ~SCARD_SPECIFIC;
 			dwStatus &= ~SCARD_UNKNOWN;
-			Log1(PCSC_LOG_ERROR, "Error powering up card.");
+			Log2(PCSC_LOG_ERROR, "Error powering up card: %d", rv);
 		}
 
 		dwCurrentState = SCARD_PRESENT;
