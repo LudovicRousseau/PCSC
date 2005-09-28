@@ -222,6 +222,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			&rContext->readerState->cardAtrLength);
 	if (dwStatus & SCARD_PRESENT)
 	{
+		rContext->readerState->cardAtrLength = MAX_ATR_SIZE;
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->readerState->cardAtr,
 			&rContext->readerState->cardAtrLength);
@@ -375,6 +376,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				 * Power and reset the card 
 				 */
 				SYS_USleep(PCSCLITE_STATUS_WAIT);
+				rContext->readerState->cardAtrLength = MAX_ATR_SIZE;
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
 					rContext->readerState->cardAtr,
 					&rContext->readerState->cardAtrLength);
