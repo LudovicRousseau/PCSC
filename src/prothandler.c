@@ -136,16 +136,20 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			Log2(PCSC_LOG_INFO, "PTS not supported by driver, using T=%d",
 				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 		else
-		{
-			Log3(PCSC_LOG_INFO, "PTS failed (%d), using T=%d", rv,
-				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+			if (IFD_PROTOCOL_NOT_SUPPORTED == rv)
+				Log2(PCSC_LOG_INFO, "PTS protocol not supported, using T=%d",
+					(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+			else
+			{
+				Log3(PCSC_LOG_INFO, "PTS failed (%d), using T=%d", rv,
+					(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 
- 			/* ISO 7816-3:1997 ch. 7.2 PPS protocol page 14
- 			 * - If the PPS exchange is unsuccessful, then the interface device
- 			 *   shall either reset or reject the card.
- 			 */
- 			return SET_PROTOCOL_PPS_FAILED;
- 		}
+				/* ISO 7816-3:1997 ch. 7.2 PPS protocol page 14
+				 * - If the PPS exchange is unsuccessful, then the interface device
+				 *   shall either reset or reject the card.
+				 */
+				return SET_PROTOCOL_PPS_FAILED;
+			}
 
 	return protocol;
 }
