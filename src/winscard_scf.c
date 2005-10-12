@@ -684,7 +684,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
 
-	LONG rv, retIndice;
+	LONG rv, retIndice, readerIndice;
 	PSCARD_READERSTATE_A currReader;
 	PREADER_STATE rContext;
 	LPTSTR lpcReaderName;
@@ -706,6 +706,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	i = 0;
 	currReader = 0;
 	retIndice = 0;
+	readerIndice = 0;
 	dwBreakFlag = 0;
 
 	if (rgReaderStates == 0 && cReaders > 0)
@@ -781,9 +782,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			lpcReaderName = (char *) currReader->szReader;
 
-			retIndice = SCardGetReaderIndice(lpcReaderName);
+			readerIndice = SCardGetReaderIndice(lpcReaderName);
 			/* The requested reader name is not recognized */
-			if (0 > retIndice)
+			if (0 > readerIndice)
 			{
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
@@ -811,7 +812,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*****************************************************************/
 				SCardEventLock();
 				/* Now we check all the Reader States */
-				dwState = psReaderMap[retIndice].dwCurrentState;
+				dwState = psReaderMap[readerIndice].dwCurrentState;
 
 	/*********** Check if the reader is in the correct state ********/
 				if (dwState & SCARD_STATE_UNKNOWN)
@@ -844,8 +845,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				if (dwState & SCARD_STATE_PRESENT)
 				{
-					currReader->cbAtr = psReaderMap[retIndice].dwAtrLength;
-					memcpy(currReader->rgbAtr, psReaderMap[retIndice].bAtr,
+					currReader->cbAtr = psReaderMap[readerIndice].dwAtrLength;
+					memcpy(currReader->rgbAtr, psReaderMap[readerIndice].bAtr,
 						currReader->cbAtr);
 				}
 				else
@@ -920,7 +921,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 				}
 
-				if (-1 == psReaderMap[retIndice].SharedRefCount)
+				if (-1 == psReaderMap[readerIndice].SharedRefCount)
 				{
 					currReader->dwEventState |= SCARD_STATE_EXCLUSIVE;
 					currReader->dwEventState &= ~SCARD_STATE_INUSE;
@@ -930,7 +931,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						dwBreakFlag = 1;
 					}
 				}
-				else if (psReaderMap[retIndice].SharedRefCount >= 1)
+				else if (psReaderMap[readerIndice].SharedRefCount >= 1)
 				{
 					/* A card must be inserted for it to be INUSE */
 					if (dwState & SCARD_STATE_PRESENT)
