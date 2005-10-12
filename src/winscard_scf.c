@@ -123,6 +123,7 @@ static LONG SCardAddHandle(SCARDHANDLE PCSC_hCard, SCARDCONTEXT hContext,
 	SCF_Session_t hSession, SCF_Terminal_t hTerminal,
 	SCF_Card_t SCF_hCard, int, DWORD);
 static LONG SCardGetHandleIndice(SCARDHANDLE hCard);
+static LONG isActiveContextPresent(void);
 
 
 static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
@@ -1581,6 +1582,22 @@ LONG SCardUnlockThread(void)
 LONG SCardEventUnlock(void)
 {
 	return SYS_MutexUnLock(&EventMutex);
+}
+
+static LONG isActiveContextPresent(void) 
+{
+	long fActiveContext = FALSE;
+	int i;
+
+	for (i=0; i<PCSCLITE_MAX_APPLICATION_CONTEXTS; i++) 
+	{
+		if (psContextMap[i].hContext != 0) 
+		{
+			fActiveContext = TRUE;
+			break;
+		}
+	}
+	return fActiveContext;
 }
 
 static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
