@@ -94,6 +94,7 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
  * so to get lock on the clientMutex may affect the performance of the ocf server.
  */
 static PCSCLITE_MUTEX EventMutex = PTHREAD_MUTEX_INITIALIZER;
+static char PCSC_Initialized = 0;
 
 static LONG isOCFServerRunning(void);
 LONG SCardLockThread(void);
@@ -1700,10 +1701,9 @@ static LONG PCSC_SCF_Initialize(void)
 {
 	SCF_Status_t status;
 	char **tList = NULL;
-	static int first_time = 1;
 	int i;
 
-	if (!first_time)
+	if (PCSC_Initialized)
 		return SCARD_S_SUCCESS;
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
@@ -1760,7 +1760,7 @@ static LONG PCSC_SCF_Initialize(void)
 		}
 	}
 	SCF_Session_freeInfo(g_hSession, tList);
-	first_time = 0;
+	PCSC_SCF_Initialized = 1;
 	return SCARD_S_SUCCESS;
 }
 
@@ -1840,6 +1840,7 @@ LONG SCardCheckReaderAvailability(LPTSTR readerName, LONG errorCode)
  */
 void SCardUnload(void)
 {
+    int i=0;
 #if 0
 	if (!isExecuted)
 		return;
@@ -1848,6 +1849,37 @@ void SCardUnload(void)
 	SYS_CloseFile(mapAddr);
 	isExecuted = 0;
 #endif
+
+    /*
+	 *	Cleanup only if PCSC has been initialized and there are no active
+	 *	context.  Checking for active context is critical when libpcsclite is
+	 *	linked with multiple modules. for eg. an application links with
+	 *	pcsclite and a PAM module also links with pcsclite, when the PAM is
+	 *	unloaded from memory and if it calls SCardUnload, pcsclite will
+	 *	un-initialize even though there are active references from the
+	 *	application. Now, why dont we add SCardUnload to the array of functions
+	 *	to be called on unload (-zfiniarray=SCUnload), well, that does not seem
+	 *	to solve the problem, SCardUnload is called when PAM is unloaded from
+	 *	memory having the same impact that PCSC is uninitialized enen though
+	 *	there are active references.
+     */
+	if((!PCSC_Initialized) || isActiveContextPresent()) 
+		return;
+
+	for(i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++) 
+		if (psReaderMap[i].hTerminal)
+		{
+			SCF_Terminal_removeEventListener(psReaderMap[i].hTerminal,
+				psReaderMap[i].lHandle);
+
+			SCF_Terminal_close(psReaderMap[i].hTerminal); 
+
+			if (psReaderMap[i].ReaderName)
+				free(psReaderMap[i].ReaderName);
+		}   
+
+	SCF_Session_close(g_hSession);
+	PCSC_Initialized = 0;
 }
 
 /*
