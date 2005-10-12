@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <sys/un.h>
 #include <smartcard/scf.h>
+#include <time.h>
 
 #include "pcsclite.h"
 #include "winscard.h"
@@ -94,6 +95,8 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
  * so to get lock on the clientMutex may affect the performance of the ocf server.
  */
 static PCSCLITE_MUTEX EventMutex = PTHREAD_MUTEX_INITIALIZER;
+static PCSCLITE_MUTEX SCFInitMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t EventCondition = PTHREAD_COND_INITIALIZER;
 static char PCSC_Initialized = 0;
 
 static LONG isOCFServerRunning(void);
@@ -1603,6 +1606,7 @@ static LONG isActiveContextPresent(void)
 static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 	void *cbdata)
 {
+	static char bInitialized = 0;
 	int i = 0;
 	int ReaderIndice = 0;
 	SCF_Card_t hCard;
@@ -1690,6 +1694,23 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 	default:
 		break;
 	}							/* switch */
+	/*
+	 * The OCF Server always calls the registered callback function 
+	 * immediately after the callback function is registered,
+	 * but always with the state of SCF_EVENT_CARDABSENT even if 
+	 * there is a card present in the reader, the OCF server then 
+	 * calls the callback the second time with the correct state,
+	 * that is the reason for the check if (bInitialized == 2).
+	 * If there is no card present in the reader the PCSC_SCF_Initialize's 
+	 * pthread_cond_timedwait times out after 2 secs.
+     */
+	if (bInitialized < 2)
+	{
+		bInitialized++;
+		if (2 == bInitialized)
+			pthread_cond_signal(&EventCondition);
+	} 
+
 	SCardEventUnlock();
 }
 
@@ -1777,6 +1798,23 @@ static LONG PCSC_SCF_Initialize(void)
 		}
 	}
 	SCF_Session_freeInfo(g_hSession, tList);
+
+	SYS_MutexLock(&SCFInitMutex);
+	/* wait for ocfserver to initialize... or 2 secs whichever is earlier */
+	{
+		struct timeval currTime;
+		struct timespec absTime;
+
+		gettimeofday(&currTime, NULL);
+
+		/* Calculate absolute time to time out */
+		absTime.tv_sec = currTime.tv_sec + 2;
+		absTime.tv_nsec = currTime.tv_usec*1000;
+
+		pthread_cond_timedwait(&EventCondition, &SCFInitMutex, &absTime);
+	}
+	SYS_MutexUnLock(&SCFInitMutex);
+
 	PCSC_SCF_Initialized = 1;
 	return SCARD_S_SUCCESS;
 }
