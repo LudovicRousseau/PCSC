@@ -61,7 +61,7 @@ pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
 pcscd_LDFLAGS = @LDFLAGS@ -export-dynamic
 pcscd_LDADD = libpcsclite-core.la \
 	@PTHREAD_LIBS@ @COREFOUNDATION@ \
-	@LIBUSB@ @LIBDL@ @LIBFL@ @IOKIT@
+	@LIBUSB@ @LIBDL@ @IOKIT@
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
