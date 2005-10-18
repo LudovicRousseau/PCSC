@@ -1815,7 +1815,7 @@ static LONG PCSC_SCF_Initialize(void)
 	}
 	SYS_MutexUnLock(&SCFInitMutex);
 
-	PCSC_SCF_Initialized = 1;
+	PCSC_Initialized = 1;
 	return SCARD_S_SUCCESS;
 }
 
