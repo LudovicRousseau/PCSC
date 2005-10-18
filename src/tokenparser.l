@@ -35,6 +35,7 @@ void tperrorCheck (char *pcToken_error);
 %}
 
 %option nounput
+%option noyywrap
 
 %%
 
@@ -45,12 +46,6 @@ void tperrorCheck (char *pcToken_error);
 \<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'"])+\<\/string\> {tpevalToken(yytext, TOKEN_TYPE_STRING); valueIndex += 1;}
 .                                               { tperrorCheck(yytext); }
 %%
-
-
-int yywrap(void)
-{
-	return 1;
-}
 
 
 void tpevalToken(char *pcToken, int tokType)
