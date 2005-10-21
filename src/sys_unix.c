@@ -386,6 +386,38 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #ifdef HAVE_DAEMON
 	return daemon(nochdir, noclose);
 #else
+
+#if defined(__SVR4) && defined(__sun)
+	pid_t pid;
+
+	pid = SYS_Fork();
+	if (-1 == pid)
+	{
+		Log2(PCSC_LOG_CRITICAL, "main: SYS_Fork() failed: %s", strerror(errno));
+		return -1;
+	}
+	else
+	{
+		if (pid != 0)
+			/* the father exits */
+			exit(0);
+	}
+	
+	setsid();
+
+	pid = SYS_Fork();
+	if (-1 == pid)
+	{
+		Log2(PCSC_LOG_CRITICAL, "main: SYS_Fork() failed: %s", strerror(errno));
+		exit(1);
+	}
+	else
+	{
+		if (pid != 0)
+			/* the father exits */
+			exit(0);
+	}
+#else
 	switch (SYS_Fork())
 	{
 	case -1:
@@ -395,6 +427,7 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 	default:
 		return (0);
 	}
+#endif
 
 	if (!noclose) {
 		if (SYS_CloseFile(0))
