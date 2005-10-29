@@ -43,7 +43,7 @@
 #include "misc.h"
 
 /**
- * @brief Wrapper for the \c SHMMessageReceive() function.
+ * @brief Wrapper for the SHMMessageReceive() function.
  *
  * Called by clients to read the server responses.
  *
@@ -51,8 +51,7 @@
  * @param[in] dwClientID Client socket handle.
  * @param[in] blockamount Timeout in milliseconds.
  *
- * @return Error code.
- * @retval @see SHMMessageReceive().
+ * @return Same error codes as SHMMessageReceive().
  */
 INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
 {
@@ -67,7 +66,6 @@ INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int bl
  *
  * @param[out] pdwClientID Client Connection ID.
  * 
- * @return Error code.
  * @retval 0 Success.
  * @retval -1 Can not create the socket.
  * @retval -1 The socket can not open a connection.
@@ -115,7 +113,6 @@ INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
  *
  * @param[in] dwClientID Client socket handle to be closed.
  *
- * @return Error code.
  * @retval 0 Success.
  */
 INTERNAL int SHMClientCloseSession(DWORD dwClientID)
@@ -132,6 +129,11 @@ INTERNAL int SHMClientCloseSession(DWORD dwClientID)
  * @param[in] msgStruct Message to be sent.
  * @param[in] filedes Socket handle.
  * @param[in] blockAmount Timeout in milliseconds.
+ *
+ * @retval 0 Success
+ * @retval -1 Timeout.
+ * @retval -1 Socket is closed.
+ * @retval -1 A signal was received.
  */
 INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	int blockAmount)
@@ -254,7 +256,6 @@ INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
  * @param[in] filedes Socket handle.
  * @param[in] blockAmount Timeout in milliseconds.
  *
- * @return Error code.
  * @retval 0 Success.
  * @retval -1 Timeout.
  * @retval -1 Socket is closed.
@@ -373,7 +374,7 @@ INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 }
 
 /**
- * @brief Wrapper for the \c SHMMessageSend() function.
+ * @brief Wrapper for the SHMMessageSend() function.
  *
  * Called by clients to send messages to the server.
  * The parameters \p command and \p data are set in the \c sharedSegmentMsg
@@ -385,8 +386,7 @@ INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
  * @param[in] blockAmount Timeout to the operation in ms.
  * @param[in] data Data to be sent.
  *
- * @return Error code.
- * @retval @see SHMMessageSend().
+ * @return Same error codes as SHMMessageSend().
  */
 INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)

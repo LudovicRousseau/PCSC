@@ -2726,7 +2726,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
  * This function cancels all pending blocking requests on the
  * \c SCardGetStatusChange() function.
  *
- * @param[in] hCard Connection context to the PC/SC Resource Manager.
+ * @param[in] hContext Connection context to the PC/SC Resource Manager.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful.

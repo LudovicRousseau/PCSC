@@ -157,7 +157,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
  * This is called by the Server's function \c SVCServiceRunLoop().
  *
  * @param[out] pdwClientID Connection ID used to reference the Client.
- * @param[in] blockTime Timeout (not used).
+ * @param[in] blocktime Timeout (not used).
  *
  * @return Error code.
  * @retval 0 Success.

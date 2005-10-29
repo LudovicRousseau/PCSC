@@ -10,6 +10,12 @@
  * $Id$
  */
 
+/**
+ * @file
+ * @brief provides LTPBundleFindValueWithKey() function on non-MacOS X
+ * platforms
+ */
+
 %{
 
 #include "config.h"
@@ -94,6 +100,17 @@ void tperrorCheck (char *token_error)
 {
 }
 
+/**
+ * Find a key in a configuration file
+ *
+ * @param fileName file name
+ * @param tokenKey key value
+ * @param[out] tokenValue token value (if key found)
+ * @param tokenIndice indice of the desired key
+ * @retval -1 configuration file not found
+ * @retval 0 OK
+ * @retval 1 key not found
+ */
 int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
                               char *tokenValue, int tokenIndice)
 {

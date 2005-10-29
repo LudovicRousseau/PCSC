@@ -11,7 +11,7 @@
 
 /**
  * @file
- * @brief This defines some structures and #defines to be used over
+ * @brief This defines some structures and \#defines to be used over
  * the transport layer.
  */
 

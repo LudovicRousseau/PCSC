@@ -213,7 +213,7 @@ static void ContextThread(DWORD* pdwIndex)
 }
 
 /**
- * @Find out which message was sent by the Client and execute the right task.
+ * @brief Find out which message was sent by the Client and execute the right task.
  *
  * According to the command type sent by the client (\c pcsc_msg_commands),
  * cast the message data to the correct struct so that is can be demarshalled.
@@ -225,7 +225,7 @@ static void ContextThread(DWORD* pdwIndex)
  * \c control_struct \c getset_struct.
  *
  * @param[in] msgStruct Message to be demarshalled and executed.
- * param[in] dwContextIndex 
+ * @param[in] dwContextIndex 
  */
 LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 {
