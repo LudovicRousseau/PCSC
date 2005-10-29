@@ -10,7 +10,7 @@ data_DATA = pcsc-lite.tex pcsc-lite.bib pcsc-lite.pdf \
 man_MANS = pcscd.8 formaticc.1 reader.conf.5
 man_in = pcscd.8.in formaticc.1 reader.conf.5.in
 
-EXTRA_DIST = $(data_DATA) $(man_in)
+EXTRA_DIST = $(data_DATA) $(man_in) doxygen.conf.in
 
 CLEANFILES = ifdhandler-3.aux ifdhandler-3.bbl ifdhandler-3.blg \
 	ifdhandler-3.dvi ifdhandler-3.log ifdhandler-3.out \
