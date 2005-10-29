@@ -47,3 +47,4 @@ LATEX2HTML = latex2html
 
 doxygen:
 	rm -r api ; cd .. ; doxygen doc/doxygen.conf
+	cp doxygen.css api/
