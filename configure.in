@@ -280,8 +280,7 @@ if test x${muscledropdir} = xfalse ; then
 	if test "x$prefix" != xNONE; then
 		muscledropdir="$prefix/services"
 	else
-		muscledropdir=`pkg-config libpcsclite --variable=libdir`
-		muscledropdir="${muscledropdir}/pcsc/services"
+		muscledropdir="$ac_default_prefix/pcsc/services"
 	fi
 fi
 AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
