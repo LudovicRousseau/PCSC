@@ -16,5 +16,5 @@ ChangeLog.cvs:
 	s/mikeg /Michael Gile /; s/rousseau /Ludovic Rousseau /; \
 	s/giraud /Jean-Luc Giraud /; s/aet-guest /Antti Tapaninen /; \
 	s/sauveron-guest /Damien Sauveron /; \
-	s+trunk/++g;' > $@
+	s+trunk/PCSC/++g;' > $@
 
