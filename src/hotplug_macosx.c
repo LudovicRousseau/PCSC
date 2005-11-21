@@ -750,10 +750,19 @@ LONG HPSearchHotPluggables(void)
 		}
 		if (!found)
 		{
-			/* NOTE: The deviceName is an empty string "" until someone
-			 * implements the code to get it */
+			char deviceName[MAX_DEVICENAME];
+
+			/* the format should be "usb:%04x/%04x:libusb:%s" but we do not
+			 * know the libusb string. So it is not possible to differentiate
+			 * two identical readers :-( */
+			snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x",
+				(unsigned int)a->m_driver->m_vendorId,
+				(unsigned int)a->m_driver->m_productId);
+			deviceName[sizeof(deviceName)-1] = '\0';
+
 			RFAddReader(a->m_driver->m_friendlyName,
-				PCSCLITE_HP_BASE_PORT + a->m_address, a->m_driver->m_libPath, "");
+				PCSCLITE_HP_BASE_PORT + a->m_address, a->m_driver->m_libPath,
+				deviceName);
 		}
 	}
 
