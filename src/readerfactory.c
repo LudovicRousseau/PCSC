@@ -168,6 +168,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	(sReadersContexts[dwContext])->dwLockId = 0;
 	(sReadersContexts[dwContext])->vHandle = 0;
 	(sReadersContexts[dwContext])->pdwFeeds = 0;
+	(sReadersContexts[dwContext])->pdwMutex = 0;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << (sizeof(DWORD) / 2) * 8;
 	(sReadersContexts[dwContext])->readerState = NULL;
