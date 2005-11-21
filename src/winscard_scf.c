@@ -211,7 +211,7 @@ static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 		return SCARD_E_NO_SERVICE;
 
 /* Check for NULL parameters */
-	if (pcchReaders == 0)
+	if (pcchReaders == NULL)
 	{
 		return SCARD_E_INVALID_PARAMETER;
 	}
@@ -236,7 +236,7 @@ static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 	if (1 >= dwReadersLen)
 		return SCARD_E_READER_UNAVAILABLE;
 
-	if (mszReaders == 0)
+	if (mszReaders == NULL)
 	{
 		*pcchReaders = dwReadersLen;
 		return SCARD_S_SUCCESS;
@@ -298,7 +298,7 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
 	rv = 0;
 
 	/* Check for NULL parameters */
-	if (phCard == 0 || pdwActiveProtocol == 0)
+	if (phCard == NULL || pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 	else
 		*phCard = 0;
@@ -307,7 +307,7 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
 	if (SCardGetContextIndice(hContext) == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	if (szReader == 0)
+	if (szReader == NULL)
 		return SCARD_E_UNKNOWN_READER;
 
 	/* Check for uninitialized strings */
@@ -412,7 +412,7 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	int retIndice = 0;
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
-	if (pdwActiveProtocol == 0)
+	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (dwInitialization != SCARD_LEAVE_CARD &&
@@ -601,8 +601,8 @@ static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	i = 0;
 	/* Check for NULL parameters */
 
-	if (pcchReaderLen == 0 || pdwState == 0 ||
-		pdwProtocol == 0 || pcbAtrLen == 0)
+	if (pcchReaderLen == NULL || pdwState == NULL ||
+		pdwProtocol == NULL || pcbAtrLen == NULL)
 	{
 		return SCARD_E_INVALID_PARAMETER;
 	}
@@ -616,7 +616,7 @@ static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	dwReaderLen =
 		strlen(psReaderMap[psChannelMap[retIndice].ReaderIndice].ReaderName);
 
-	if (mszReaderNames == 0)
+	if (mszReaderNames == NULL)
 	{
 		*pcchReaderLen = dwReaderLen;
 		*pcbAtrLen = 0;
@@ -714,7 +714,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	readerIndice = 0;
 	dwBreakFlag = 0;
 
-	if (rgReaderStates == 0 && cReaders > 0)
+	if (rgReaderStates == NULL && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (cReaders < 0)
@@ -748,7 +748,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	for (j = 0; j < cReaders; j++)
 	{
 		currReader = &rgReaderStates[j];
-		if (currReader->szReader == 0)
+		if (currReader->szReader == NULL)
 		{
 			return SCARD_E_INVALID_VALUE;
 		}
@@ -1030,8 +1030,8 @@ static LONG SCardTransmitTH(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LONG localRecvLen = MAX_BUFFER_SIZE;
 	if (SCARD_S_SUCCESS != isOCFServerRunning())
 		return SCARD_E_NO_SERVICE;
-	if (pbSendBuffer == 0 || pbRecvBuffer == 0 ||
-		pcbRecvLength == 0 || pioSendPci == 0)
+	if (pbSendBuffer == NULL || pbRecvBuffer == NULL ||
+		pcbRecvLength == NULL || pioSendPci == NULL)
 	{
 		return SCARD_E_INVALID_PARAMETER;
 	}

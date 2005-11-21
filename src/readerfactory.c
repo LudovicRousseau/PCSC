@@ -167,8 +167,8 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->dwLockId = 0;
 	(sReadersContexts[dwContext])->vHandle = 0;
-	(sReadersContexts[dwContext])->pdwFeeds = 0;
-	(sReadersContexts[dwContext])->pdwMutex = 0;
+	(sReadersContexts[dwContext])->pdwFeeds = NULL;
+	(sReadersContexts[dwContext])->pdwMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << (sizeof(DWORD) / 2) * 8;
 	(sReadersContexts[dwContext])->readerState = NULL;
@@ -202,13 +202,13 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		{
 			Log1(PCSC_LOG_INFO, "Driver is thread safe");
 			(sReadersContexts[dwContext])->mMutex = 0;
-			(sReadersContexts[dwContext])->pdwMutex = 0;
+			(sReadersContexts[dwContext])->pdwMutex = NULL;
 		}
 		else
 			*(sReadersContexts[dwContext])->pdwMutex += 1;
 	}
 
-	if ((sReadersContexts[dwContext])->pdwFeeds == 0)
+	if ((sReadersContexts[dwContext])->pdwFeeds == NULL)
 	{
 		(sReadersContexts[dwContext])->pdwFeeds = 
 		  (DWORD *)malloc(sizeof(DWORD));
@@ -228,7 +228,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		SYS_MutexInit((sReadersContexts[dwContext])->mMutex);
 	}
 
-	if ((sReadersContexts[dwContext])->pdwMutex == 0)
+	if ((sReadersContexts[dwContext])->pdwMutex == NULL)
 	{
 		(sReadersContexts[dwContext])->pdwMutex = 
 		  (DWORD *)malloc(sizeof(DWORD));
@@ -269,7 +269,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		if (*(sReadersContexts[dwContext])->pdwMutex == 0)
 		{
 			free((sReadersContexts[dwContext])->pdwMutex);
-			(sReadersContexts[dwContext])->pdwMutex = 0;
+			(sReadersContexts[dwContext])->pdwMutex = NULL;
 		}
 
 		*(sReadersContexts[dwContext])->pdwFeeds -= 1;
@@ -277,7 +277,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 		if (*(sReadersContexts[dwContext])->pdwFeeds == 0)
 		{
 			free((sReadersContexts[dwContext])->pdwFeeds);
-			(sReadersContexts[dwContext])->pdwFeeds = 0;
+			(sReadersContexts[dwContext])->pdwFeeds = NULL;
 		}
 
 		dwNumReadersContexts -= 1;
@@ -446,7 +446,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			if (*(sReadersContexts[dwContextB])->pdwMutex == 0)
 			{
 				free((sReadersContexts[dwContextB])->pdwMutex);
-				(sReadersContexts[dwContextB])->pdwMutex = 0;
+				(sReadersContexts[dwContextB])->pdwMutex = NULL;
 			}
 
 			*(sReadersContexts[dwContextB])->pdwFeeds -= 1;
@@ -454,7 +454,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 			if (*(sReadersContexts[dwContextB])->pdwFeeds == 0)
 			{
 				free((sReadersContexts[dwContextB])->pdwFeeds);
-				(sReadersContexts[dwContextB])->pdwFeeds = 0;
+				(sReadersContexts[dwContextB])->pdwFeeds = NULL;
 			}
 
 			dwNumReadersContexts -= 1;

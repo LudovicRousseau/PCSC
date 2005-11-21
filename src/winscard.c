@@ -194,7 +194,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	/*
 	 * Check for NULL parameters
 	 */
-	if (szReader == 0 || phCard == 0 || pdwActiveProtocol == 0)
+	if (szReader == NULL || phCard == NULL || pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 	else
 		*phCard = 0;
@@ -417,7 +417,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 		return SCARD_E_PROTO_MISMATCH;
 
-	if (pdwActiveProtocol == 0)
+	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	rv = RFReaderInfoById(hCard, &rContext);

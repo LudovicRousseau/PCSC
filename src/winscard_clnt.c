@@ -569,12 +569,12 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	/*
 	 * Check for NULL parameters
 	 */
-	if (phCard == 0 || pdwActiveProtocol == 0)
+	if (phCard == NULL || pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 	else
 		*phCard = 0;
 
-	if (szReader == 0)
+	if (szReader == NULL)
 		return SCARD_E_UNKNOWN_READER;
 
 	/*
@@ -742,7 +742,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	if (pdwActiveProtocol == 0)
+	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
@@ -1524,7 +1524,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	DWORD dwContextIndex;
 	int currentReaderCount = 0;
 
-	if (rgReaderStates == 0 && cReaders > 0)
+	if (rgReaderStates == NULL && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (cReaders < 0)
@@ -1610,7 +1610,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	{
 		currReader = &rgReaderStates[j];
 
-		if (currReader->szReader == 0)
+		if (currReader->szReader == NULL)
 		{
 			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 			return SCARD_E_INVALID_VALUE;
@@ -2442,8 +2442,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	if (pbSendBuffer == 0 || pbRecvBuffer == 0 ||
-			pcbRecvLength == 0 || pioSendPci == 0)
+	if (pbSendBuffer == NULL || pbRecvBuffer == NULL ||
+			pcbRecvLength == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
