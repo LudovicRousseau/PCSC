@@ -93,7 +93,7 @@ ULONG PMRegisterForPowerEvents() {
 
   LONG rv; 
     
-  rv = SYS_ThreadCreate(&pmgmtThread, NULL,
+  rv = SYS_ThreadCreate(&pmgmtThread, THREAD_ATTR_DEFAULT,
                         (LPVOID) PMPowerRegistrationThread, NULL);
   return 0;
 }
