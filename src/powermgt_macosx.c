@@ -77,7 +77,7 @@ void PMPowerRegistrationThread() {
 
     root_port = IORegisterForSystemPower (0,&notify,PMPowerEventCallback,&anIterator);
   
-    if ( root_port == NULL ) {
+    if ( root_port == 0 ) {
             Log1(PCSC_LOG_ERROR, "IORegisterForSystemPower failed");
             return;
     }
