@@ -1,5 +1,5 @@
-dnl -*- mode: m4; -*-
-dnl Process this file with autoconf to produce a configure script
+# -*- mode: m4; -*-
+# Process this file with autoconf to produce a configure script
 
 AC_PREREQ(2.58)
 
@@ -14,7 +14,7 @@ AC_CANONICAL_HOST
 AC_PROG_CC
 AC_C_BIGENDIAN
 
-dnl Check for some target-specific stuff
+# Check for some target-specific stuff
 case "$host" in
 *-*-hpux*)
 	CPPFLAGS="$CPPFLAGS -D_HPUX_SOURCE -D_XOPEN_SOURCE_EXTENDED"
@@ -50,10 +50,10 @@ case "$host" in
 	;;
 esac
 
-dnl Options
+# Options
 AM_MAINTAINER_MODE
 
-dnl Checks for programs
+# Checks for programs
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -63,7 +63,7 @@ AC_PATH_PROG(TEST_MINUS_S_SH, bash)
 AC_PATH_PROG(TEST_MINUS_S_SH, ksh)
 AC_PATH_PROG(TEST_MINUS_S_SH, sh)
 
-dnl Special check for pthread support
+# Special check for pthread support
 ACX_PTHREAD(
 [
  AC_DEFINE(HAVE_PTHREAD, 1,
@@ -79,32 +79,32 @@ CC="$PTHREAD_CC"
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
 
-dnl Add libtool support
+# Add libtool support
 AM_PROG_LIBTOOL
-dnl Automatically update the libtool script if it becomes out-of-date
+# Automatically update the libtool script if it becomes out-of-date
 #AC_SUBST(LIBTOOL_DEPS)
 
-dnl Checks for header files
+# Checks for header files
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([dirent.h dl.h dlfcn.h errno.h fcntl.h getopt.h malloc.h stdlib.h string.h strings.h sys/filio.h sys/time.h syslog.h unistd.h smartcard/scf.h])
 
-dnl Checks for typedefs, structures, and compiler characteristics
+# Checks for typedefs, structures, and compiler characteristics
 AC_C_CONST
 AC_TYPE_UID_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
-dnl Checks for library functions
+# Checks for library functions
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(daemon flock getopt_long nanosleep strerror vsnprintf)
 
-dnl strlcpy, strlcat from OpenBSD
+# strlcpy, strlcat from OpenBSD
 AC_CHECK_FUNCS(strlcpy strlcat)
 
-dnl C Compiler features
+# C Compiler features
 AC_C_INLINE
 if test "$GCC" = "yes"; then
 	CFLAGS="-Wall -fno-common $CFLAGS"
@@ -113,7 +113,7 @@ fi
 AC_SUBST(LIBDL)
 AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
 
-dnl Use 'uname' output as an architecture define
+# Use 'uname' output as an architecture define
 uname=`uname`
 case "$uname" in
 Darwin)
@@ -127,11 +127,11 @@ AC_DEFINE_UNQUOTED(MSC_ARCH, "$uname", [MuscleCard target architecture])
 # plateforms
 AM_CONDITIONAL(NEED_TOKENPARSER, test "x$uname" != "xMacOS")
 
-dnl See if socket() is found from libsocket
+# See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 
 AC_SUBST(LIBUSB)
-dnl --enable-libusb=DIR
+# --enable-libusb=DIR
 AC_ARG_ENABLE(libusb,
   AC_HELP_STRING([--enable-libusb=PATH],[enable USB hotplug using libusb]),
 	[
@@ -155,9 +155,9 @@ AC_ARG_ENABLE(libusb,
 	]
 )
 
-dnl if use_libusb is not yet defined
+# if use_libusb is not yet defined
 if test x$use_libusb = x; then
-	dnl check if libusb is available
+	# check if libusb is available
 	AC_CHECK_HEADERS(usb.h, [ use_libusb=true ], [ use_libusb=false ])
 	AC_CHECK_LIB(usb, usb_init, [LIBUSB="$LIBUSB -lusb" use_libusb=true ], [ use_libusb=false ])
 fi
@@ -168,7 +168,7 @@ if test x$use_libusb = xtrue; then
   AC_DEFINE(HAVE_LIBUSB,1, [Libusb is available])
 fi
 
-dnl --enable-usbdropdir=DIR
+# --enable-usbdropdir=DIR
 AC_ARG_ENABLE(usbdropdir,
   AC_HELP_STRING([--enable-usbdropdir=DIR],[directory containing USB
 				  drivers (default /usr/local/pcsc/drivers)]),
@@ -183,7 +183,7 @@ fi
 AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
-dnl --enable-debugatr
+# --enable-debugatr
 AC_ARG_ENABLE(debugatr,
   AC_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
 [ case "${enableval}" in
@@ -198,7 +198,7 @@ if test x${debugatr} = xtrue ; then
   AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
 fi
 
-dnl --enable-scf
+# --enable-scf
 AC_ARG_ENABLE(scf,
   AC_HELP_STRING([--enable-scf],[use SCF for reader support]),
 [ case "${enableval}" in
@@ -216,7 +216,7 @@ fi
 AC_MSG_RESULT([enable SCF reader support     : $scf])
 AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
 
-dnl --enable-confdir=DIR
+# --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
 AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
 				(default /etc)]),
@@ -229,14 +229,14 @@ else
 	AC_MSG_RESULT([enable confdir                : /etc (default)])
 fi
 
-dnl --enable-runpid=FILE
+# --enable-runpid=FILE
 AC_ARG_ENABLE(runpid,
   AC_HELP_STRING([--enable-runpid=FILE],[file containing pcscd pid]),
 [runpid="${enableval}"], [runpid=false])
 
 AC_MSG_RESULT([enable runpid                 : $runpid])
 
-dnl HAVE_RUNPID is for pcscd.8
+# HAVE_RUNPID is for pcscd.8
 if test x${runpid} != xfalse ; then
 	AC_DEFINE_UNQUOTED(USE_RUN_PID, "$runpid", [file containing pcscd pid])
 	AC_SUBST(HAVE_RUNPID,'')
@@ -244,7 +244,7 @@ else
 	AC_SUBST(HAVE_RUNPID,'.\" ')
 fi
 
-dnl --enable-ipcdir=DIR
+# --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
   AC_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
 				  (default /var/run)]),
@@ -258,7 +258,7 @@ else
 	AC_MSG_RESULT([enable ipcdir                 : /var/run (default)])
 fi
 
-dnl --enable-extendedapdu
+# --enable-extendedapdu
 AC_ARG_ENABLE(extendedapdu,
 	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 32KB)]),
 	[ case "${enableval}" in
@@ -275,7 +275,7 @@ else
   extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
 fi
 
-dnl --enable-muscledropdir=DIR
+# --enable-muscledropdir=DIR
 AC_ARG_ENABLE(muscledropdir,
 	AC_HELP_STRING([--enable-muscledropdir=DIR],[directory containing
 		MuscleCard bundles (default /usr/local/pcsc/services)]),
@@ -290,7 +290,7 @@ fi
 AC_MSG_RESULT([enable MuscleCard bundles dir : $muscledropdir])
 AC_DEFINE_UNQUOTED(MSC_SVC_DROPDIR, "$muscledropdir", [directory containing MuscleCard bundles])
 
-dnl --enable-musclecarddebug
+# --enable-musclecarddebug
 AC_ARG_ENABLE(musclecarddebug,
 	AC_HELP_STRING([--enable-musclecarddebug],[enable libmusclecard debug messages through pcscd]),
 [ case "${enableval}" in
@@ -307,7 +307,7 @@ fi
 
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
-dnl HOST_TO_CCID
+# HOST_TO_CCID
 if test "x$ac_cv_c_bigendian" = "xyes"; then
 	AC_SUBST(host_to_ccid_16, ['((((x) >> 8) & 0xFF) + ((x & 0xFF) << 8))'])
 	AC_SUBST(host_to_ccid_32, ['((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + ((x & 0xFF00) << 8) + (((x) & 0xFF) << 24))'])
@@ -318,7 +318,7 @@ else
 	AC_MSG_RESULT([plateform endianess           : little endian])
 fi
 
-dnl Setup dist stuff
+# Setup dist stuff
 AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
@@ -331,7 +331,7 @@ AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
-dnl Write Makefiles
+# Write Makefiles
 AC_CONFIG_FILES([
 Makefile
 m4/Makefile
