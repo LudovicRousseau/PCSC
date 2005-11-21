@@ -166,7 +166,7 @@ void DebugLogSetLogType(const int dbgtype)
 	/* log to stderr and stderr is a tty? */
 	if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
 	{
-		const char *terms[] = { "linux", "xterm", "Eterm", "rxvt", "rxvt-unicode" };
+		const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };
 		char *term;
 
 		term = getenv("TERM");
