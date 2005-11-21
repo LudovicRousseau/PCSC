@@ -123,6 +123,10 @@ esac
 AC_DEFINE_UNQUOTED(PCSC_ARCH, "$uname", [PC/SC target architecture])
 AC_DEFINE_UNQUOTED(MSC_ARCH, "$uname", [MuscleCard target architecture])
 
+# we need tokenparser.l (LTPBundleFindValueWithKey) only on non Mac OS X
+# plateforms
+AM_CONDITIONAL(NEED_TOKENPARSER, test "x$uname" != "xMacOS")
+
 dnl See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 

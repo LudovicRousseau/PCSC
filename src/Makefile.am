@@ -25,6 +25,10 @@ else
 PCSC_CLIENT_SRC  = winscard_clnt.c
 endif
 
+if NEED_TOKENPARSER
+TOKENPARSER = tokenparser.l
+endif
+
 libpcsclite_core_la_SOURCES = \
 	atrhandler.c \
 	configfile.l \
@@ -32,7 +36,7 @@ libpcsclite_core_la_SOURCES = \
 	ifdwrapper.c \
 	prothandler.c \
 	readerfactory.c \
-	tokenparser.l \
+	$(TOKENPARSER) \
 	winscard.c \
 	winscard_msg.c \
 	$(PCSC_SYSTEM_SRC) \
@@ -46,7 +50,7 @@ libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
 libpcsclite_la_SOURCES = \
 	debuglog.c \
 	winscard_msg.c \
-	tokenparser.l \
+	$(TOKENPARSER) \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_THREAD_SRC) \
