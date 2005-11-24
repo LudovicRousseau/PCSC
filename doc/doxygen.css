@@ -81,7 +81,6 @@ A:hover { text-decoration: none; background-color: #e2e2ff }
 DL.el { margin-left: -1cm }
 .fragment {
        font-family: Fixed, monospace;
-       font-size: 95%;
 }
 PRE.fragment {
 	border: 1px solid #CCCCCC;
@@ -202,7 +201,6 @@ SPAN.charliteral   { color: #008080 }
 	border-bottom-style: none;
 	border-left-style: none;
 	background-color: #FAFAFA;
-	font-size: 80%;
 }
 .memItemRight {
 	font-family: monospace;
@@ -221,7 +219,6 @@ SPAN.charliteral   { color: #008080 }
 	border-bottom-style: none;
 	border-left-style: none;
 	background-color: #FAFAFA;
-	font-size: 80%;
 }
 .memTemplItemLeft {
 	padding: 1px 0px 0px 8px;
