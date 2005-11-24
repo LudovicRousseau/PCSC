@@ -32,7 +32,6 @@ libpcsclite_core_la_SOURCES = \
 	ifdwrapper.c \
 	prothandler.c \
 	readerfactory.c \
-	tokenparser.l \
 	winscard.c \
 	winscard_msg.c \
 	$(PCSC_SYSTEM_SRC) \
@@ -46,7 +45,6 @@ libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
 libpcsclite_la_SOURCES = \
 	debuglog.c \
 	winscard_msg.c \
-	tokenparser.l \
 	$(PCSC_CLIENT_SRC) \
 	$(PCSC_SYSTEM_SRC) \
 	$(PCSC_THREAD_SRC) \
@@ -56,7 +54,8 @@ libpcsclite_la_SOURCES = \
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
 
-pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c
+pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c \
+	tokenparser.l
 pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
 pcscd_LDFLAGS = @LDFLAGS@ -export-dynamic
 pcscd_LDADD = libpcsclite-core.la \
