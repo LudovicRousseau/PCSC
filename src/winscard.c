@@ -313,13 +313,18 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 
 	*pdwActiveProtocol = rContext->readerState->cardProtocol;
 
-	if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
-		&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
-		Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
-			*pdwActiveProtocol);
+	if (dwShareMode != SCARD_SHARE_DIRECT)
+	{
+		if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
+			&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
+			Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+				*pdwActiveProtocol);
+		else
+			Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
+				(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+	}
 	else
-		Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
-			(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+		Log1(PCSC_LOG_DEBUG, "Direct access: no protocol selected");
 
 	/*
 	 * Prepare the SCARDHANDLE identity
