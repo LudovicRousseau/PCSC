@@ -14,6 +14,7 @@ noinst_HEADERS = \
 libmusclecard_la_SOURCES = \
 	musclecard.c \
 	tokenfactory.c \
+	$(top_srcdir)/src/tokenparser.l \
 	$(top_srcdir)/src/dyn_hpux.c \
 	$(top_srcdir)/src/dyn_macosx.c \
 	$(top_srcdir)/src/dyn_unix.c \
