@@ -1,3 +1,21 @@
+pcsc-lite-1.2.9-beta9: Ludovic Rousseau
+27 November 2005
+- add/improve support of PIN pad readers
+  . define HOST_TO_CCID_16() and HOST_TO_CCID_32() macro to convert 16 and
+    32-bits data to the CCID format (replace HOST_TO_CCID)
+- add support of SUN C compiler and try to avoid GCC specific features
+  (Heiko Nardmann)
+- SCardGetStatusChange(): 
+  . exists if the list of readers changed (one reader added) so that the
+    application can update its list of readers (Najam Siddiqui)
+  . correct a bug when two contexts where used (Najam Siddiqui)
+- add support of Solaris 10 IFDhandler (Douglas E. Engert)
+- allow pcsc-lite to be compiled without (f)lex installed
+- add a TODO file. Help/money needed here.
+- improve Doxygen documentation
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.2.9-beta8: Ludovic Rousseau
 6 September 2005
 - correct a crash on Fedora Core 4 (off by 1 buffer overflow)
