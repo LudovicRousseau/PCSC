@@ -10,7 +10,7 @@
 - power on the card _only_ if an application requests a connection
   see Alioth bug #301965
 
-- use a callback from IFD handler to pcscd instead of pooling to get the
+- use a callback from IFD handler to pcscd instead of polling to get the
   card status: better performance, possible lower power consumption
 
 Oct 2005
