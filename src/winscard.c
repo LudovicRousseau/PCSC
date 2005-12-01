@@ -97,7 +97,6 @@
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	 0x1000
 
-/* Some defines for context stack. */
 /** Some defines for context stack. */
 #define SCARD_LAST_CONTEXT       1
 /** Some defines for context stack. */
