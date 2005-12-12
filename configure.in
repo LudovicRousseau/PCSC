@@ -278,7 +278,7 @@ AC_ARG_ENABLE(muscledropdir,
 	[muscledropdir="${enableval}"], [muscledropdir=false])
 if test x${muscledropdir} = xfalse ; then
 	if test "x$prefix" != xNONE; then
-		muscledropdir="$prefix/services"
+		muscledropdir="$prefix/pcsc/services"
 	else
 		muscledropdir="$ac_default_prefix/pcsc/services"
 	fi
