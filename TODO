@@ -13,4 +13,8 @@
 - use a callback from IFD handler to pcscd instead of polling to get the
   card status: better performance, possible lower power consumption
 
-Oct 2005
+- allow to have pcscd and libpcsclite on two different machines.
+  That would be needed to support remote PAM login.
+  Maybe use unix2tcp (http://dizzy.roedu.net/unix2tcp/)
+
+Dec 2005
