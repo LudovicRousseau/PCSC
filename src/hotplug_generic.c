@@ -20,7 +20,14 @@
 #include "config.h"
 #include "pcsclite.h"
 
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__)
+
+char ReCheckSerialReaders = FALSE;
 
 LONG HPSearchHotPluggables(void)
 {
@@ -35,6 +42,11 @@ ULONG HPRegisterForHotplugEvents(void)
 LONG HPStopHotPluggables(void)
 {
 	return 0;
+}
+
+void HPReCheckSerialReaders(void)
+{
+	ReCheckSerialReaders = TRUE;
 }
 
 #endif
