@@ -2528,8 +2528,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	if (scTransmitStruct.rv == SCARD_S_SUCCESS)
 	{
-		*pcbRecvLength = scTransmitStruct.pcbRecvLength;
-
 		/*
 		 * Copy and zero it so any secret information is not leaked
 		 */
@@ -2539,20 +2537,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			scTransmitStruct.pcbRecvLength);
 
 		if (pioRecvPci)
-		{
 			memcpy(pioRecvPci, &scTransmitStruct.pioRecvPci,
 				sizeof(SCARD_IO_REQUEST));
-		}
-
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-		
-		return scTransmitStruct.rv;
-	} else
-	{
-		*pcbRecvLength = scTransmitStruct.pcbRecvLength;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-		return scTransmitStruct.rv;
 	}
+
+	*pcbRecvLength = scTransmitStruct.pcbRecvLength;
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+	return scTransmitStruct.rv;
 }
 
 /**
