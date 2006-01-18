@@ -40,7 +40,7 @@ libpcsclite_core_la_SOURCES = \
 	$(PCSC_HOTPLUG_SRC) \
 	$(PCSC_POWERMGT_SRC) \
 	strlcpy.c strlcat.c
-libpcsclite_core_la_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@
+libpcsclite_core_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS)
 
 libpcsclite_la_SOURCES = \
 	debuglog.c \
@@ -52,15 +52,15 @@ libpcsclite_la_SOURCES = \
 	strlcpy.c strlcat.c \
 	misc.h
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
-libpcsclite_la_LIBADD = @COREFOUNDATION@ @LIBSMARTCARD@ @LIBDL@
+libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) $(LIBDL)
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c \
 	tokenparser.l
-pcscd_CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ -DPCSCD
-pcscd_LDFLAGS = @LDFLAGS@ -export-dynamic
+pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DPCSCD
+pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = libpcsclite-core.la \
-	@PTHREAD_LIBS@ @COREFOUNDATION@ \
-	@LIBUSB@ @LIBDL@ @IOKIT@
+	$(PTHREAD_LIBS) $(COREFOUNDATION) \
+	$(LIBUSB) $(LIBDL) $(IOKIT)
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
