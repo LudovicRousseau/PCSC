@@ -77,17 +77,17 @@ enum {
 #define DebugLogB(a, b) Log2(PCSC_LOG_INFO, a, b)
 #define DebugLogC(a, b,c) Log3(PCSC_LOG_INFO, a, b, c)
 
-void log_msg(const int priority, const char *fmt, ...);
-void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
-	const int size);
+PCSC_API void log_msg(const int priority, const char *fmt, ...);
+PCSC_API void log_xxd(const int priority, const char *msg,
+	const unsigned char *buffer, const int size);
 
 void DebugLogSuppress(const int);
 void DebugLogSetLogType(const int);
 int DebugLogSetCategory(const int);
 void DebugLogCategory(const int, const unsigned char *, const int);
-void DebugLogSetLevel(const int level);
+PCSC_API void DebugLogSetLevel(const int level);
 
-char *pcsc_stringify_error(long);
+PCSC_API char *pcsc_stringify_error(long);
 
 #ifdef __cplusplus
 }
