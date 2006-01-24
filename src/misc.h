@@ -22,8 +22,9 @@ extern "C"
  * not exported and can't be used by a program linked to the library
  *
  * see http://gcc.gnu.org/onlinedocs/gcc-3.3.5/gcc/Function-Attributes.html#Function-Attributes
+ * see http://www.nedprod.com/programs/gccvisibility.html
  */
-#if defined __GCC__
+#if defined __GNUC__
 #define INTERNAL __attribute__ ((visibility("hidden")))
 /* http://docs.sun.com/source/817-6697/sun.specific.html#marker-998544 */
 #elif defined __SUNPRO_C
@@ -32,7 +33,7 @@ extern "C"
 #define INTERNAL
 #endif
 
-#if defined __GCC__
+#if defined __GNUC__
 
 /* GNU Compiler Collection (GCC) */
 #define CONSTRUCTOR __attribute__ ((constructor))
