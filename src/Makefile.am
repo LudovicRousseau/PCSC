@@ -1,7 +1,8 @@
 # Process this file with automake to create Makefile.in.
 
 SUBDIRS = . utils
-AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC
+AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
+	-fvisibility=hidden
 
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la

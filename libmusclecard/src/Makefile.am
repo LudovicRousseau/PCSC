@@ -23,7 +23,8 @@ libmusclecard_la_SOURCES = \
 	$(top_srcdir)/src/thread_unix.c
 libmusclecard_la_CFLAGS = \
 	-I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
-	-I$(top_srcdir)/libmusclecard/src/PCSC
+	-I$(top_srcdir)/libmusclecard/src/PCSC \
+	-fvisibility=hidden
 libmusclecard_la_LIBADD = \
 	$(top_builddir)/src/libpcsclite.la
 
