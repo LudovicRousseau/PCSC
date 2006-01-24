@@ -21,10 +21,10 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "dyn_generic.h"
-#include "misc.h"
 
 INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {

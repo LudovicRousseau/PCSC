@@ -15,6 +15,7 @@
  */
 
 #include "config.h"
+#include "misc.h"
 #include "pcsclite.h"
 
 #ifdef __APPLE__

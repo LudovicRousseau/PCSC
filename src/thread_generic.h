@@ -22,7 +22,6 @@
 #include "PCSC.h"
 #else
 #include <pthread.h>
-#define PCSC_API
 #endif
 
 #ifdef __cplusplus

@@ -17,6 +17,7 @@
 #include "config.h"
 #include <string.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "ifdhandler.h"
 #include "debuglog.h"

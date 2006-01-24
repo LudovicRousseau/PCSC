@@ -22,6 +22,7 @@
 #include <syslog.h>
 #include <string.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "atrhandler.h"

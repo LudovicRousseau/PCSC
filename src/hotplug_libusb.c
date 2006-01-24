@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <usb.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "parser.h"

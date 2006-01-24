@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "parser.h"

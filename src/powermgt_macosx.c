@@ -34,6 +34,7 @@
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include <IOKit/IOMessage.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "readerfactory.h"

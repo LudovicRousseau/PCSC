@@ -27,10 +27,10 @@
 #include <sys/types.h>
 
 #include "pcsclite.h"
+#include "misc.h"
 #include "debuglog.h"
 #include "sys_generic.h"
 #include "strlcpycat.h"
-#include "misc.h"
 
 /** 
  * Max string size when dumping a 256 bytes longs APDU

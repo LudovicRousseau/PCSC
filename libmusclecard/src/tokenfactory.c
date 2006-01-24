@@ -20,6 +20,7 @@
 #include <dirent.h>
 #endif
 
+#include "misc.h"
 #include <debuglog.h>
 #include <parser.h>
 #include <dyn_generic.h>

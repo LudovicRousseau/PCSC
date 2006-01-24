@@ -23,6 +23,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "misc.h"
 #include "debuglog.h"
 #include "parser.h"
 #include "strlcpycat.h"

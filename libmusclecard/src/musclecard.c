@@ -18,13 +18,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "misc.h"
 #include <winscard.h>
 #include <debuglog.h>
 
 #include "musclecard.h"
 #include "tokenfactory.h"
 #include "strlcpycat.h"
-#include "misc.h"
 
 #define USE_THREAD_SAFETY
 

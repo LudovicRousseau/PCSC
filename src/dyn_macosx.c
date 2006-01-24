@@ -14,6 +14,7 @@
 
 #include "config.h"
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "dyn_generic.h"

@@ -35,12 +35,12 @@
 #include <sys/filio.h>
 #endif
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "winscard.h"
 #include "debuglog.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
-#include "misc.h"
 
 /**
  * Socket to a file, used for clients-server comminication.

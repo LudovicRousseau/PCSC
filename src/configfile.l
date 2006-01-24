@@ -50,6 +50,7 @@ void tok_error(char *pcToken_error);
 #include <string.h>
 #include <errno.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "config.h"

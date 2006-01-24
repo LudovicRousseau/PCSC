@@ -32,6 +32,7 @@
 #include <getopt.h>
 #endif
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "debuglog.h"
 #include "winscard_msg.h"

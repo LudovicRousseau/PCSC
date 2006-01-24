@@ -30,9 +30,9 @@
 #include <signal.h>
 #include <time.h>
 
+#include "misc.h"
 #include "sys_generic.h"
 #include "debuglog.h"
-#include "misc.h"
 
 /**
  * @brief Make system wide initialization.
