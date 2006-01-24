@@ -26,6 +26,7 @@
 #include <sys/un.h>
 #include <errno.h>
 
+#include "misc.h"
 #include "pcsclite.h"
 #include "winscard.h"
 #include "debuglog.h"
@@ -34,7 +35,6 @@
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "sys_generic.h"
-
 #include "winscard_msg.h"
 
 /** used for backward compatibility */
@@ -175,9 +175,9 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
  */
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
-SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, 8 };
-SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, 8 };
-SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
+PCSC_API SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, 8 };
+PCSC_API SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, 8 };
+PCSC_API SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
 
 
 static LONG SCardAddContext(SCARDCONTEXT, DWORD);
