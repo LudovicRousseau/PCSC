@@ -39,6 +39,10 @@ extern "C"
 {
 #endif
 
+#ifndef PCSC_API
+#define PCSC_API
+#endif
+
 #define DEBUGLOG_LOG_ENTRIES    1
 #define DEBUGLOG_IGNORE_ENTRIES 2
 
