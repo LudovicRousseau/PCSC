@@ -108,6 +108,17 @@ if test "$GCC" = "yes"; then
 	CFLAGS="-Wall -fno-common $CFLAGS"
 fi
 
+# check if the compiler support -fvisibility=hidden (GCC >= 4)
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fvisibility=hidden"
+AC_MSG_CHECKING([for -fvisibility=hidden])
+AC_COMPILE_IFELSE([char foo;],
+	[	AC_MSG_RESULT([yes])
+		SYMBOL_VISIBILITY="-fvisibility=hidden" ],
+	AC_MSG_RESULT([no]))
+CFLAGS="$saved_CFLAGS"
+AC_SUBST(SYMBOL_VISIBILITY)
+
 AC_SUBST(LIBDL)
 AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
 
