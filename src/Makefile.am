@@ -2,7 +2,7 @@
 
 SUBDIRS = . utils
 AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
-	-fvisibility=hidden
+	$(SYMBOL_VISIBILITY)
 
 lib_LTLIBRARIES = libpcsclite.la
 noinst_LTLIBRARIES = libpcsclite-core.la

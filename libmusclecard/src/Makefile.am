@@ -24,7 +24,7 @@ libmusclecard_la_SOURCES = \
 libmusclecard_la_CFLAGS = \
 	-I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	-I$(top_srcdir)/libmusclecard/src/PCSC \
-	-fvisibility=hidden
+	$(SYMBOL_VISIBILITY)
 libmusclecard_la_LIBADD = \
 	$(top_builddir)/src/libpcsclite.la
 
