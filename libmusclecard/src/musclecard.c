@@ -494,6 +494,7 @@ MSC_RV MSCEstablishConnection(MSCLPTokenInfo tokenStruct,
 			pConnection->tokenLibHandle = 0;
 		}
 		pConnection->hCard = 0;
+		return rv;
 	}
 
 	if (sharingMode != MSC_SHARE_DIRECT)
