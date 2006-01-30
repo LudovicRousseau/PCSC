@@ -35,7 +35,7 @@ muscletest_CFLAGS = \
 	-I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	-I$(top_srcdir)/libmusclecard/src/PCSC
 muscletest_LDADD = \
-	$(top_builddir)/libmusclecard/src/libmusclecard.la
+	libmusclecard.la
 
 pcdir= $(libdir)/pkgconfig
 pc_DATA = libmusclecard.pc
