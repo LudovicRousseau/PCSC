@@ -77,6 +77,7 @@ static struct _readerTracker
 {
 	char status;
 	char bus_device[BUS_DEVICE_STRSIZE];	/* device name */
+	char *fullName;	/* full reader name (including serial number) */
 
 	struct _driverTracker *driver;	/* driver for this reader */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
@@ -428,7 +429,25 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
    
 	readerTracker[i].driver = driver;
 
-	if (RFAddReader(driver->readerName, PCSCLITE_HP_BASE_PORT + i,
+	if (dev->descriptor.iSerialNumber)
+	{
+		usb_dev_handle *device;
+		char serialNumber[MAX_READERNAME];
+		char fullname[MAX_READERNAME];
+
+		device = usb_open(dev);
+		usb_get_string_simple(device, dev->descriptor.iSerialNumber,
+			serialNumber, MAX_READERNAME);
+		usb_close(device);
+
+		snprintf(fullname, sizeof(fullname), "%s (%s)",
+			driver->readerName, serialNumber);
+		readerTracker[i].fullName = strdup(fullname);
+	}
+	else
+		readerTracker[i].fullName = strdup(driver->readerName);
+
+	if (RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
 		readerTracker[i].status = READER_PRESENT;
 	else
@@ -446,8 +465,9 @@ LONG HPRemoveHotPluggable(int index)
 	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", index,
 		readerTracker[index].bus_device);
 
-	RFRemoveReader(readerTracker[index].driver->readerName,
+	RFRemoveReader(readerTracker[index].fullName,
 		PCSCLITE_HP_BASE_PORT + index);
+	free(readerTracker[index].fullName);
 	readerTracker[index].status = READER_ABSENT;
 	readerTracker[index].bus_device[0] = '\0';
 	readerTracker[index].driver = NULL;
