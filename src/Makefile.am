@@ -54,7 +54,7 @@ libpcsclite_la_SOURCES = \
 	misc.h
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) $(LIBDL) \
-	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS) $(LIBUSB_LIBS)
+	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 
 pcscd_SOURCES = pcscdaemon.c winscard_svc.c debuglog.c winscard_msg_srv.c \
 	tokenparser.l
