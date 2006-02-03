@@ -4,11 +4,11 @@ SUBDIRS = m4 win32 src etc doc libmusclecard
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.cvs
+EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.svn
 
-DISTCLEANFILES = ChangeLog.cvs
+DISTCLEANFILES = ChangeLog.svn
 
-ChangeLog.cvs:
+ChangeLog.svn:
 	-svn2cl.sh --group-by-day --stdout | perl -pe \
 	's/corcoran /David Corcoran /; \
 	s/corcoran-guest /David Corcoran /; \
