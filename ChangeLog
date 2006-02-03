@@ -1,3 +1,14 @@
+pcsc-lite-1.2.9-beta10: Ludovic Rousseau
+3 February 2006
+- if the USB reader defines a serial number then include it in the
+  reader name (between parenthesis)
+- the library libpcsclite.so.1 only exports the symbols defined by the
+  API (http://pcsclite.alioth.debian.org/pcsc-lite/). This is needed to
+  be able to use the library in an appliation that also uses flex (like
+  muscleTool). The problem only occurs with GCC >= 4.0
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.2.9-beta9: Ludovic Rousseau
 27 November 2005
 - add/improve support of PIN pad readers
