@@ -144,7 +144,6 @@ static struct _psContextMap
 	DWORD dwClientID;				/** Client Connection ID */
 	SCARDCONTEXT hContext;			/** Application Context ID */
 	DWORD contextBlockStatus;
-	PCSCLITE_THREAD_T TID;			/** Thread owner of this context */
 	PCSCLITE_MUTEX_T mMutex;		/** Mutex for this context */
 	CHANNEL_MAP psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 } psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
@@ -501,7 +500,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	release_struct scReleaseStruct;
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex;
-	PCSCLITE_THREAD_T currentTID;
 
 	PROFILE_START
 
@@ -516,19 +514,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
-
-	/*
-	 * Test if the thread that would release the context is the thread owning this context
-	 */
-	currentTID = SYS_ThreadSelf();
-	rv = SYS_ThreadEqual(&psContextMap[dwContextIndex].TID, &currentTID);
-	
-	if (rv == 0)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		/* Perhaps there is a better error code */
-		return SCARD_F_INTERNAL_ERROR;
-	}
 
 	scReleaseStruct.hContext = hContext;
 	scReleaseStruct.rv = 0;
@@ -2945,7 +2930,6 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 		if (psContextMap[i].hContext == 0)
 		{
 			psContextMap[i].hContext = hContext;
-			psContextMap[i].TID = SYS_ThreadSelf();
 			psContextMap[i].dwClientID = dwClientID;
 			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
 			psContextMap[i].mMutex = (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
