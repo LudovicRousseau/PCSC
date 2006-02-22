@@ -1,9 +1,9 @@
 Title   : PCSC Lite
 Authors : David Corcoran, Ludovic Rousseau
-Version : 1.2.0
+Version : 1.2.9-beta10
 License : See file COPYING
-Document: docs/pcsc-lite-0.8.7.pdf
-          docs/muscle-api-1.3.0.pdf
+Document: docs/pcsc-lite.pdf
+          docs/ifdhandler-3.pdf
 Requires: A C compiler
           Make, linker tools
           Lex (Lexical Analyzer).
@@ -42,28 +42,32 @@ Options:
 
    ./configure 
 
-          --enable-libusb=PATH   Enable USB libusb support
+          --enable-libusb        Enable USB libusb support
                                  (on Linux, *BSD, etc.).
-          --enable-usb           Enable USB on Linux 2.4 platforms (deprecated)
-          --enable-daemon        Run as a daemon.
-          --enable-debug         Enable full debugging messages
-          --enable-threadsafe    Enable a thread safe client (reqs pthread)
+          --enable-usbdropdir=DIR directory containing USB drivers
+                                  (default /usr/local/pcsc/drivers)
+          --disable-musclecarddebug Disable MuscleCard debugging messages
           --enable-debugatr      Enable ATR parsing debug output
+          --enable-scf           use SCF for reader support
           --prefix=location      Install to <location>
           --enable-confdir=DIR   Use DIR as the configuration directory
                                  (/etc by default)
           --enable-runpid=FILE   Store the daemon pid in file FILE
+          --enable-ipcdir=DIR    directory containing IPC files
+                                 (default /var/run)
+          --enable-extendedapdu  support of extended APDU
+                                 (for APDU 256B < size < 32KB)
+          --enable-muscledropdir=DIR directory containing MuscleCard
+                                 bundles (default /usr/local/pcsc/services)
 
---enable-daemon, --enable-debug, and --enable-threadsafe are all default.
+
 By running pcscd under a priveledged account you can link to 
 libpcsclite.so and it will act as a client to the pcscd allowing multiple 
 applications to be run under non-priveledged accounts.
 
 Then type make install to copy etc/reader.conf to
 /etc/reader.conf and the libraries to /usr/local/pcsc/lib. If you choose 
-not to have your reader.conf in /etc  then edit the file include/pcsclite.h 
-and edit the PCSC_READER_CONFIG option and change the
-Makefile to make install to your location. 
+not to have your reader.conf in /etc then use --enable-confdir=DIR
 
 You must be root to do make install in the default locations.
 
@@ -76,49 +80,28 @@ for each reader.  Both will have the same information otherwise.
 There is an config file generator in the utils directory.  It is called
 installifd.  You may use this to generate the /etc/reader.conf file.
 
-USB users do not need to use the /etc/reader.conf.  pcscd will give
+USB users shall not use /etc/reader.conf.  pcscd will give
 a warning that the file does not exist or contain anything useful.  
-
-If you try out the test programs included in this package be sure to set your 
-system's LD_LIBRARY_PATH to the locations where the libs are or move the
-libpcsclite.so into a directory that is specified in your LD_LIBRARY_PATH. 
 
 There is a test program with this package:
 
 testpcsc: Linked to libpcsclite.  Must run /usr/local/pcsc/bin/pcscd
           and then ./testpcsc.  pcscd must be run as root or a hardware
           priveledged user.  ./testpcsc can be run under any account.
-          You can create testpcsc by doing the following:
-          gcc -o testpcsc test.c -L/usr/local/pcsc/lib -lpcsclite -I.
-
-THREAD SAFETY:
-If pcsc-lite is compiled with thread safety, each application linked with
-libpcsclite.so must also link with pthread libraries.
-
-OCF users should compile in --threadsafe so the OCF->PC/SC bridge behaves
-correctly.
 
 LIBUSB SUPPORT:
 Versions after 1.2.0 support libusb. Available on GNU/Linux and *BSD.
-In order to use it, you should call ./configure with
 
-	--enable-libusb (if libusb is installed in standard directory /usr)
-	or
-	--enable-libusb=PATH
-
-where PATH is the base directory containing the libusb include
-file and library. For example, "--enable-libusb=/usr/local" looks
-for /usr/local/include/usb.h and /usr/local/lib/libusb.[so|a]
-
-Please note that you can't specify "--enable-libusb" and
-"--enable-usb" at the same time.
+If you do not have libusb (or do not want to use it) on your system you
+should use --disable-libusb. If you use --disable-libusb under Linux the
+old USB code will be used instead.
 
 In order to use dynamic driver loading, you need to supply a directory
 called "XXXX.bundle" in the usb dropdir directory (--enable-usbdropdir=PATH).
 Here, the string "XXXX" stands for an arbitrary driver name, like in
 "ifd-GemPC430.bundle". An example .bundle-directory can be found in the
 source distribution of the ifd-gempc driver
-(http://ludovic.rousseau.free.fr/softwares/ifd-GemPC/ifd-GemPC.html)
+(http://ludovic.rousseau.free.fr/softwares/ifd-GemPC/)
 
 SOLARIS:
 Solaris PC/SC applications must link with -lsocket since
