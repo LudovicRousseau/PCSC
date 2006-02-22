@@ -66,12 +66,17 @@ static void mscUnLockThread(void)
 
 /* Library constructor and deconstructor function for UNIX */
 #ifndef WIN32
-CONSTRUCTOR_DECLARATION(musclecard_init)
+
+/* SUN C compiler */
+#ifdef __SUNPRO_C
+#pragma init (musclecard_init)
+#pragma fini (musclecard_init)
+#endif
+
 void CONSTRUCTOR musclecard_init(void)
 {
 }
-	
-DESTRUCTOR_DECLARATION(musclecard_fini)
+
 void DESTRUCTOR musclecard_fini(void)
 {
 	if (localHContext != 0)

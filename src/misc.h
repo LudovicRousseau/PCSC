@@ -41,24 +41,17 @@ extern "C"
 /* GNU Compiler Collection (GCC) */
 #define CONSTRUCTOR __attribute__ ((constructor))
 #define DESTRUCTOR __attribute__ ((destructor))
-#define CONSTRUCTOR_DECLARATION(x)
-#define DESTRUCTOR_DECLARATION(x)
-	
-#elif defined __SUNPRO_C
-
-/* SUN C compiler */
-#define CONSTRUCTOR
-#define DESTRUCTOR
-#define CONSTRUCTOR_DECLARATION(x) #pragma init (x)
-#define DESTRUCTOR_DECLARATION(x) #pragma fini (x)
 	
 #else
+
+/* SUN C compiler does not use __attribute__ but #pragma init (function)
+ * We can't use a # inside a #define so it is not possible to use 
+ * #define CONSTRUCTOR_DECLARATION(x) #pragma init (x)
+ * The #pragma is used directly where needed */
 
 /* any other */
 #define CONSTRUCTOR
 #define DESTRUCTOR
-#define CONSTRUCTOR_DECLARATION(x)
-#define DESTRUCTOR_DECLARATION(x)
 
 #endif
 
