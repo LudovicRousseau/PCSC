@@ -3160,7 +3160,11 @@ static LONG SCardCheckDaemonAvailability(void)
  * You _shall_ call this function if you use dlopen/dlclose to load/unload the
  * library. Otherwise you will exhaust the ressources available.
  */
-void SCardUnload(void)
+#ifdef __SUNPRO_C
+#pragma fini (SCardUnload)
+#endif
+
+void DESTRUCTOR SCardUnload(void)
 {
 	if (!isExecuted)
 		return;
