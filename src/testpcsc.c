@@ -17,6 +17,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "pcsclite.h"
 #include "winscard.h"
@@ -36,6 +37,11 @@ int main(int argc, char **argv)
 	long rv;
 	int i, p, iReader;
 	int iList[16];
+	SCARD_IO_REQUEST pioRecvPci;
+	SCARD_IO_REQUEST pioSendPci;
+	unsigned char bSendBuffer[MAX_BUFFER_SIZE];
+	unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
+	DWORD send_length, length;
 
 	printf("\nMUSCLE PC/SC Lite unitary test Program\n\n");
 
@@ -173,6 +179,37 @@ int main(int argc, char **argv)
 		SCardReleaseContext(hContext);
 		return -1;
 	}
+
+	switch(dwPref)
+	{
+		case SCARD_PROTOCOL_T0:
+			pioSendPci = *SCARD_PCI_T0;
+			break;
+		case SCARD_PROTOCOL_T1:
+			pioSendPci = *SCARD_PCI_T1;
+			break;
+		default:
+			printf("Unknown protocol\n");
+			return -1;
+	}
+
+	/* APDU select file */
+	printf("Select file: ");
+	send_length = 7;
+	memcpy(bSendBuffer, "\x00\xA4\x00\x00\x02\x3F\x00", send_length);
+	for (i=0; i<send_length; i++)
+		printf(" %02X", bSendBuffer[i]);
+	printf("\n");
+	length = sizeof(bRecvBuffer);
+
+	printf("Testing SCardTransmit            : ");
+	rv = SCardTransmit(hCard, &pioSendPci, bSendBuffer, send_length,
+		&pioRecvPci, bRecvBuffer, &length);
+	printf("%s\n", pcsc_stringify_error(rv));
+	printf(" card response:");
+	for (i=0; i<length; i++)
+		printf(" %02X", bRecvBuffer[i]);
+	printf("\n");
 
 	printf("Testing SCardControl             : ");
 #ifdef PCSC_PRE_120
