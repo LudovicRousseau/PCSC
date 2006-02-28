@@ -1,6 +1,6 @@
 # Process this file with automake to create Makefile.in.
 
-SUBDIRS = m4 win32 src etc doc libmusclecard
+SUBDIRS = m4 win32 src etc doc
 
 ACLOCAL_AMFLAGS = -I m4
 
