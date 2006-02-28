@@ -66,7 +66,7 @@ libpcsclite.so and it will act as a client to the pcscd allowing multiple
 applications to be run under non-priveledged accounts.
 
 Then type make install to copy etc/reader.conf to
-/etc/reader.conf and the libraries to /usr/local/pcsc/lib. If you choose 
+/etc/reader.conf and the libraries to /usr/local/lib. If you choose 
 not to have your reader.conf in /etc then use --enable-confdir=DIR
 
 You must be root to do make install in the default locations.
