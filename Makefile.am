@@ -10,8 +10,8 @@ DISTCLEANFILES = ChangeLog.svn
 
 ChangeLog.svn:
 	-svn2cl.sh --group-by-day --stdout --include-rev | perl -pe \
-	's/  corcoran/  David Corcoran/; \
-	s/  corcoran-guest/  David Corcoran/; \
+	's/  corcoran-guest/  David Corcoran/; \
+	s/  corcoran/  David Corcoran/; \
 	s/  oznet/  Chris Osgood/; \
 	s/  cprados/  Carlos Prados/; \
 	s/  mikeg/  Michael Gile/; \
