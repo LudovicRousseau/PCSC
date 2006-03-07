@@ -57,8 +57,6 @@ Options:
                                  (default /var/run)
           --enable-extendedapdu  support of extended APDU
                                  (for APDU 256B < size < 32KB)
-          --enable-muscledropdir=DIR directory containing MuscleCard
-                                 bundles (default /usr/local/pcsc/services)
 
 
 By running pcscd under a priveledged account you can link to 
