@@ -139,7 +139,7 @@ AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 
 # --enable-libusb
 AC_ARG_ENABLE(libusb,
-	AC_HELP_STRING([--enable-libusb],[use libusb (default=yes)]),
+	AC_HELP_STRING([--disable-libusb],[do not use libusb]),
 	[ use_libusb="${enableval}" ], [ use_libusb=yes ] )
 
 # check if libusb is used
