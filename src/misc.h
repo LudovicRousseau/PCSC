@@ -27,10 +27,6 @@ extern "C"
 #if defined __GNUC__
 #define INTERNAL __attribute__ ((visibility("hidden")))
 #define PCSC_API __attribute__ ((visibility("default")))
-/* http://docs.sun.com/source/817-6697/sun.specific.html#marker-998544 */
-#elif defined __SUNPRO_C
-#define INTERNAL __hidden
-#define PCSC_API
 #else
 #define INTERNAL
 #define PCSC_API
