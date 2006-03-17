@@ -725,9 +725,10 @@ This function should set the Protocol Type Selection (PTS) of a
 particular card/slot using the three PTS parameters sent
 
 \begin{itemize}
-\item \texttt{Protocol} - 0...14
+\item \texttt{Protocol} - \texttt{SCARD\_PROTOCOL\_T0} or
+\texttt{SCARD\_PROTOCOL\_T1}
 
-T=0 to T=14 protocol
+T=0 or T=1 protocol
 
 \item \texttt{Flags} - Logical OR of possible values to determine which PTS
 values to negotiate
