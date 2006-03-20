@@ -1484,6 +1484,23 @@ if (rv != SCARD_S_SUCCESS)
 \end{verbatim}
 
 
+%---------%---------%---------%---------%---------%---------
+\subsection{log\_msg and log\_xxd}
+
+pcsc-lite provides two functions that can be used to log debug messages.
+You \emph{should not} use these functions unless you know what you do.
+You should not use \texttt{log\_msg()} directly but use the macros
+defined in \texttt{/usr/include/PCSC/debuglog.h}.
+
+These logging functions are used by some IFD handlers to benefit from
+the log framework offered by \texttt{pcscd} (the daemon).
+
+These logging functions are also used by \texttt{libmusclecard} to log
+some internal information and errors. You have to define the environment
+variable \texttt{MUSCLECARD\_DEBUG} to activate the debug on the client
+side.
+
+
 %---------%---------%---------%---------%---------%---------%---------
 \section{Multithreading and contexts}
 
