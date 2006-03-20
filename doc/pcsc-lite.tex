@@ -1540,10 +1540,9 @@ reader.
 \example
 
 \begin{verbatim}
-#include <wintypes.h>
 #include <winscard.h>
+#include <reader.h>
 
-#define SCARD_CTL_CODE(code) (0x42000000 + (code))
 #define IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE SCARD_CTL_CODE(1)
 
 SCARDHANDLE hCard;
@@ -1552,7 +1551,7 @@ unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
 DWORD length;
 
 /* get firmware */
-bSendBuffer[0] = 0x02;
+bSendBuffer[0] = 0x02;	/* proprietary code for Gemplus CCID readers */
 rv = SCardControl(hCard, IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
     bSendBuffer, 1, bRecvBuffer, sizeof(bRecvBuffer), &length);
 
