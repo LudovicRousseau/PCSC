@@ -1371,8 +1371,7 @@ void RFCleanupReaders(int shouldExit)
 			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->dwPort);
 
 			if (rv != SCARD_S_SUCCESS)
-				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: %s",
-					pcsc_stringify_error(rv));
+				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08X", rv);
 		}
 	}
 
