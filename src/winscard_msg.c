@@ -38,7 +38,7 @@
 #include "misc.h"
 #include "pcsclite.h"
 #include "winscard.h"
-#include "debuglog.h"
+#include "debug.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
 

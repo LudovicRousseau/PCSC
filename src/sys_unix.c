@@ -32,7 +32,7 @@
 
 #include "misc.h"
 #include "sys_generic.h"
-#include "debuglog.h"
+#include "debug.h"
 
 /**
  * @brief Make system wide initialization.

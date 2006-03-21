@@ -27,7 +27,7 @@
 
 #include "pcsclite.h"
 #include "winscard.h"
-#include "debuglog.h"
+#include "debug.h"
 
 #include "thread_generic.h"
 

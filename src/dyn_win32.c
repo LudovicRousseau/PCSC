@@ -19,7 +19,7 @@
 #include "windows.h"
 #include <winscard.h>
 #include "dyn_generic.h"
-#include "debuglog.h"
+#include "debug.h"
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {

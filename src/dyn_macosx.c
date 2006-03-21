@@ -16,7 +16,7 @@
 
 #include "misc.h"
 #include "pcsclite.h"
-#include "debuglog.h"
+#include "debug.h"
 #include "dyn_generic.h"
 
 #ifdef __APPLE__
