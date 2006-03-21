@@ -29,7 +29,7 @@
 #include "misc.h"
 #include "pcsclite.h"
 #include "winscard.h"
-#include "debuglog.h"
+#include "debug.h"
 #include "thread_generic.h"
 
 #include "readerfactory.h"
@@ -304,15 +304,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	if (isExecuted == 0)
 	{
 		int pageSize;
-
-		/*
-		 * Initialize debug
-		 */
-		if (getenv("MUSCLECARD_DEBUG"))
-		{
-			DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
-			DebugLogSetLevel(PCSC_LOG_DEBUG);
-		}
 
 		/*
 		 * Do any system initilization here
