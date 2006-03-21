@@ -90,8 +90,6 @@ int DebugLogSetCategory(const int);
 void DebugLogCategory(const int, const unsigned char *, const int);
 PCSC_API void DebugLogSetLevel(const int level);
 
-PCSC_API char *pcsc_stringify_error(long);
-
 #ifdef __cplusplus
 }
 #endif
