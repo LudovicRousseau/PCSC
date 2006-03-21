@@ -18,6 +18,7 @@ PCSC_CLIENT_SRC  = winscard_clnt.c
 endif
 
 libpcsclite_la_SOURCES = \
+	debug.c \
 	dyn_hpux.c \
 	dyn_macosx.c \
 	dyn_unix.c \
