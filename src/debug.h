@@ -44,6 +44,13 @@ extern "C"
 {
 #endif
 
+enum {
+	PCSC_LOG_DEBUG = 0,
+	PCSC_LOG_INFO,
+	PCSC_LOG_ERROR,
+	PCSC_LOG_CRITICAL
+};
+
 #include <stdio.h>
 
 /* You can't do #ifndef __FUNCTION__ */
@@ -51,12 +58,15 @@ extern "C"
 #define __FUNCTION__ ""
 #endif
 
-#define Log0(priority) fprintf(stderr, "%s:%d:%s()", __FILE__, __LINE__, __FUNCTION__)
-#define Log1(priority, fmt) fprintf(stderr, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__)
-#define Log2(priority, fmt, data) fprintf(stderr, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data)
-#define Log3(priority, fmt, data1, data2) fprintf(stderr, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
-#define Log4(priority, fmt, data1, data2, data3) fprintf(stderr, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3)
+#define Log0(priority) log_msg(priority, "%s:%d:%s()", __FILE__, __LINE__, __FUNCTION__)
+#define Log1(priority, fmt) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__)
+#define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data)
+#define Log3(priority, fmt, data1, data2) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
+#define LogXxd(priority, msg, buffer, size) log_xxd(priority, msg, buffer, size)
 
+void log_msg(const int priority, const char *fmt, ...);
+void log_xxd(const int priority, const char *msg,
+	const unsigned char *buffer, const int size);
 
 #ifdef __cplusplus
 }
