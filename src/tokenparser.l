@@ -24,7 +24,7 @@
 #include <errno.h>
 
 #include "misc.h"
-#include "debuglog.h"
+#include "debug.h"
 #include "parser.h"
 #include "strlcpycat.h"
 
