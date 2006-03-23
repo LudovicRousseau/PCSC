@@ -39,6 +39,7 @@
 #include "hotplug.h"
 
 #undef DEBUG_HOTPLUG
+#define ADD_SERIAL_NUMBER
 
 #define BUS_DEVICE_STRSIZE	256
 
@@ -429,6 +430,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
    
 	readerTracker[i].driver = driver;
 
+#ifdef ADD_SERIAL_NUMBER
 	if (dev->descriptor.iSerialNumber)
 	{
 		usb_dev_handle *device;
@@ -445,6 +447,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		readerTracker[i].fullName = strdup(fullname);
 	}
 	else
+#endif
 		readerTracker[i].fullName = strdup(driver->readerName);
 
 	if (RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
