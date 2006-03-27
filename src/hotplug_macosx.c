@@ -18,7 +18,7 @@
 #include "misc.h"
 #include "pcsclite.h"
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(HAVE_LIBUSB)
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/IOKitLib.h>
