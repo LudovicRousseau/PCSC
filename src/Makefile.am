@@ -61,7 +61,7 @@ pcscd_SOURCES = \
 	winscard_msg.c \
 	winscard_msg_srv.c \
 	winscard_svc.c
-pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DPCSCD
+pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) -DPCSCD
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
