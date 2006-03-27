@@ -45,7 +45,7 @@ case "$host" in
 	if test "$GCC" = "yes"; then
 		CFLAGS="$CFLAGS -no-cpp-precomp"
 	fi
-	use_libusb=false
+	use_libusb=no
 	AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])
 	;;
 esac
@@ -140,7 +140,7 @@ AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 # --enable-libusb
 AC_ARG_ENABLE(libusb,
 	AC_HELP_STRING([--disable-libusb],[do not use libusb]),
-	[ use_libusb="${enableval}" ], [ use_libusb=yes ] )
+	[ use_libusb="${enableval}" ], [ use_libusb="${use_libusb-yes}" ] )
 
 # check if libusb is used
 if test "x$use_libusb" != xno ; then
