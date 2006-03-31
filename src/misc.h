@@ -9,8 +9,8 @@
  * $Id$
  */
 
-#ifndef __local_h__
-#define __local_h__
+#ifndef __misc_h__
+#define __misc_h__
 
 #ifdef __cplusplus
 extern "C"
@@ -55,4 +55,4 @@ extern "C"
 }
 #endif
 
-#endif /* __lcoal_h__ */
+#endif /* __misc_h__ */
