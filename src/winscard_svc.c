@@ -47,11 +47,6 @@ static struct _psContext
 	int protocol_major, protocol_minor;	/* Protocol number agreed between client and server*/
 } psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
-/**
- * @brief Index of an avaiable Application Context slot in \c psContext.
- */
-static DWORD dwNextContextIndex;
-
 LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
 LONG MSGFunctionDemarshall(psharedSegmentMsg, DWORD);
 LONG MSGAddContext(SCARDCONTEXT, DWORD);
@@ -60,7 +55,7 @@ LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, DWORD);
 LONG MSGRemoveHandle(SCARDHANDLE, DWORD);
 LONG MSGCleanupClient(DWORD);
 
-static void ContextThread(DWORD* pdwIndex);
+static void ContextThread(LPVOID pdwIndex);
 
 LONG ContextsInitialize(void)
 {
@@ -99,11 +94,9 @@ LONG CreateContextThread(PDWORD pdwClientID)
 		return SCARD_F_INTERNAL_ERROR;
 	}
 	
-	dwNextContextIndex = i;
-
 	if (SYS_ThreadCreate(&psContext[i].pthThread, THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( )) ContextThread,
-		(LPVOID) &dwNextContextIndex) != 1)
+		(LPVOID) i) != 1)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0; 
@@ -123,14 +116,14 @@ LONG CreateContextThread(PDWORD pdwClientID)
  *
  * For each Client message a new instance of this thread is created.
  *
- * @param[in] pdwIndex Index of an avaiable Application Context slot in 
+ * @param[in] dwIndex Index of an avaiable Application Context slot in 
  * \c psContext.
  */
-static void ContextThread(DWORD* pdwIndex)
+static void ContextThread(LPVOID dwIndex)
 {
 	LONG rv;
 	sharedSegmentMsg msgStruct;
-	DWORD dwContextIndex = *pdwIndex;
+	DWORD dwContextIndex = (DWORD)dwIndex;
 
 	Log2(PCSC_LOG_DEBUG, "Thread is started: %d",
 		psContext[dwContextIndex].dwClientID);
