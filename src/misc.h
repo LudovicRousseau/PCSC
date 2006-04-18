@@ -31,6 +31,7 @@ extern "C"
 #define INTERNAL
 #define PCSC_API
 #endif
+#define EXTERNAL PCSC_API
 
 #if defined __GNUC__
 
