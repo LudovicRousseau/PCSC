@@ -1042,43 +1042,6 @@ pcsc-lite also provides some API to ease the development of the driver.
 
 
 %---------%---------%---------%---------%---------%---------
-\subsection{LTPBundleFindValueWithKey}
-
-\synopsis
-\begin{verbatim}
-#include <PCSC/parser.h>
-
-int LTPBundleFindValueWithKey(char *fileName,
-    char *tokenKey,
-    char *tokenValue,
-    int tokenIndice);
-\end{verbatim}
-
-\parameters
-
-\begin{tabular}{lll}
-\texttt{fileName} & IN & configuration file name \\
-\texttt{tokenKey} & IN & searched token string \\
-\texttt{tokenValue} & OUT & found token value \\
-\texttt{tokenIndice} & IN & indice of the desired token in an array \\
-\end{tabular}
-
-\desc
-
-This function is used to parse the \texttt{Info.plist} configuration
-file. The \texttt{tokenIndice} field is used to get the n-th element of
-an array.
-
-\returns
-
-\begin{tabular}{ll}
-\texttt{-1} & Error\\
-\texttt{0} & No error \\
-\texttt{1} & Configuration file not found \\
-\end{tabular}
-
-
-%---------%---------%---------%---------%---------%---------
 \subsection{log\_msg}
 
 \synopsis
