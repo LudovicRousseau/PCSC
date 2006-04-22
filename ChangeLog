@@ -1,3 +1,20 @@
+pcsc-lite-1.3.1: Ludovic Rousseau
+22 April 2006
+- improve support of Solaris
+- correct a bug when two clients are connecting at the same time
+- better documentation for ./configure arguments
+- doc/ifdhandler-3.tex: improve IFD handler documentation
+- doc/pcsc-lite.tex: document VERIFY_PIN and MODIFY_PIN commands using
+  PCSCv2 part 10 instead of the "proprietary" mechanism now unsupported
+- doc/pcsc-lite.tex: document log_msg and log_xxd
+- use fprintf(stderr,) instead of syslog(3) to log messages from libpcsclite
+- use PCSCLITE_DEBUG to activate the debug messages in libpcsclite.
+  MUSCLECARD_DEBUG is now used for libmusclecard only
+- add the reader serial number in the reader name only if
+  ADD_SERIAL_NUMBER is defined
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.3.0: Ludovic Rousseau
 3 March 2006
 - new official stable version since 1.2.0 in October 2003. Many thanks
