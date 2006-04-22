@@ -822,6 +822,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 LONG RFBindFunctions(PREADER_CONTEXT rContext)
 {
 	int rv1, rv2, rv3;
+	void *f;
 
 	/*
 	 * Use this function as a dummy to determine the IFD Handler version
@@ -831,17 +832,9 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 	DebugLogSuppress(DEBUGLOG_IGNORE_ENTRIES);
 
-	rv1 = DYN_GetAddress(rContext->vHandle,
-		(void **)&rContext->psFunctions.psFunctions_v1.pvfCreateChannel,
-		"IO_Create_Channel");
-
-	rv2 = DYN_GetAddress(rContext->vHandle,
-		(void **)&rContext->psFunctions.psFunctions_v2.pvfCreateChannel,
-		"IFDHCreateChannel");
-
-	rv3 = DYN_GetAddress(rContext->vHandle,
-		(void **)&rContext->psFunctions.psFunctions_v3.pvfCreateChannelByName,
-		"IFDHCreateChannelByName");
+	rv1 = DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
+	rv2 = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel");
+	rv3 = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName");
 
 	DebugLogSuppress(DEBUGLOG_LOG_ENTRIES);
 
@@ -884,11 +877,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v1.pvf ## field, "IFD_" #function)) \
+	void *f = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFD_" #function)) \
 	{ \
-		rContext->psFunctions.psFunctions_v1.pvf ## field = NULL; \
 		code \
 	} \
+	rContext->psFunctions.psFunctions_v1.pvf ## field = f; \
 }
 
 #define GET_ADDRESSv1(field, function) \
@@ -896,18 +890,16 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #function ); \
 		exit(1); )
 
-		DYN_GetAddress(rContext->vHandle,
-			(void **)&rContext->psFunctions.psFunctions_v1.pvfCreateChannel,
-			"IO_Create_Channel");
+		DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
+		rContext->psFunctions.psFunctions_v1.pvfCreateChannel = f;
 
-		if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle,
-			(void **)&rContext->psFunctions.psFunctions_v1.pvfCloseChannel,
+		if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f,
 			"IO_Close_Channel"))
 		{
-			rContext->psFunctions.psFunctions_v1.pvfCloseChannel = NULL;
 			Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 			exit(1);
 		}
+		rContext->psFunctions.psFunctions_v1.pvfCloseChannel = f;
 
 		GET_ADDRESSv1(GetCapabilities, Get_Capabilities)
 		GET_ADDRESSv1(SetCapabilities, Set_Capabilities)
@@ -925,11 +917,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v2.pvf ## s, "IFDH" #s)) \
+	void *f = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFDH" #s)) \
 	{ \
-		rContext->psFunctions.psFunctions_v2.pvf ## s = NULL; \
 		code \
 	} \
+	rContext->psFunctions.psFunctions_v2.pvf ## s = f; \
 }
 
 #define GET_ADDRESSv2(s) \
@@ -939,6 +932,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		Log1(PCSC_LOG_INFO, "Loading IFD Handler 2.0");
 
+		GET_ADDRESSv2(CreateChannel)
 		GET_ADDRESSv2(CloseChannel)
 		GET_ADDRESSv2(GetCapabilities)
 		GET_ADDRESSv2(SetCapabilities)
@@ -957,11 +951,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, (void **)&rContext->psFunctions.psFunctions_v3.pvf ## s, "IFDH" #s)) \
+	void *f = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFDH" #s)) \
 	{ \
-		rContext->psFunctions.psFunctions_v3.pvf ## s = NULL; \
 		code \
 	} \
+	rContext->psFunctions.psFunctions_v3.pvf ## s = f; \
 }
 
 #define GET_ADDRESSv3(s) \
@@ -971,6 +966,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 		Log1(PCSC_LOG_INFO, "Loading IFD Handler 3.0");
 
+		GET_ADDRESSv2(CreateChannel)
 		GET_ADDRESSv2(CloseChannel)
 		GET_ADDRESSv2(GetCapabilities)
 		GET_ADDRESSv2(SetCapabilities)
@@ -979,6 +975,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		GET_ADDRESSv2(ICCPresence)
 		GET_ADDRESS_OPTIONALv2(SetProtocolParameters, )
 
+		GET_ADDRESSv3(CreateChannelByName)
 		GET_ADDRESSv3(Control)
 	}
 	else
