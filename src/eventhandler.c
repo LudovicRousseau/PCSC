@@ -76,7 +76,7 @@ LONG EHInitializeEventStructures(void)
 	{
 		readerStates[i] = (PREADER_STATE)
 			SYS_MemoryMap(sizeof(READER_STATE), fd, (i * pageSize));
-		if (readerStates[i] == 0)
+		if (readerStates[i] == MAP_FAILED)
 		{
 			Log3(PCSC_LOG_CRITICAL, "Cannot memory map public shared file %s: %s",
 				PCSCLITE_PUBSHM_FILE, strerror(errno));
