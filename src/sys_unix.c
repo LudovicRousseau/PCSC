@@ -307,6 +307,7 @@ INTERNAL int SYS_GetPageSize(void)
  * @param[in] iOffset Start point of the file to be mapped in memory.
  *
  * @return Address of the memory map.
+ * @retval MAP_FAILED in case of error
  */
 INTERNAL void *SYS_MemoryMap(int iSize, int iFid, int iOffset)
 {
