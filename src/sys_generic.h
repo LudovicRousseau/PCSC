@@ -21,6 +21,7 @@ extern "C"
 #endif
 
 #include <sys/stat.h>
+#include <sys/mman.h>
 
 	int SYS_Initialize(void);
 
