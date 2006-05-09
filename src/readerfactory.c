@@ -1092,7 +1092,8 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	/*
 	 * Spawn the event handler thread 
 	 */
-	Log2(PCSC_LOG_INFO, "Attempting startup of %s.", rContext->lpcReader);
+	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
+		rContext->lpcReader, rContext->lpcLibrary);
 
   /******************************************/
 	/*
