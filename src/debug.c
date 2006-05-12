@@ -11,7 +11,7 @@
 
 /**
  * @file
- * @brief This handles debugging.
+ * @brief This handles debugging for libpcsclite.
  */
  
 #include "config.h"
