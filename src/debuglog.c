@@ -128,7 +128,7 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	for (i = 0; (i < len) && (c < debug_buf_end); ++i)
 	{
 		sprintf(c, "%02X ", buffer[i]);
-		c += strlen(c);
+		c += 3;
 	}
 
 	/* the buffer is too small so end it with "..." */
