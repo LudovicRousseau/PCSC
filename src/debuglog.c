@@ -131,6 +131,10 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 		c += strlen(c);
 	}
 
+	/* the buffer is too small so end it with "..." */
+	if ((c >= debug_buf_end) && (i < len))
+		c[-3] = c[-2] = c[-1] = '.';
+
 #ifndef WIN32
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
