@@ -17,31 +17,44 @@ v 1.1, Jun 2004
 compositions:
 -------------
 pcscd (daemon)
- libpcsclite-core.la
- pcscdaemon.c
- winscard_msg.c
- winscard_svc.c
-
-libpcsclite-core.la
  atrhandler.c
- bundleparser.c
- configfile.c
+ configfile.l
  debuglog.c
+ dyn_hpux.c (this file is OS dependant)
+ dyn_macosx.c (this file is OS dependant)
  dyn_unix.c (this file is OS dependant)
  eventhandler.c
  hotplug_generic.c
+ hotplug_libusb.c
+ hotplug_linux.c (this file is OS dependant)
+ hotplug_macosx.c (this file is OS dependant)
  ifdwrapper.c
+ pcscdaemon.c
+ powermgt_generic.c
+ powermgt_macosx.c (this file is OS dependant)
  prothandler.c
  readerfactory.c
+ strlcat.c
+ strlcpy.c
  sys_unix.c (this file is OS dependant)
  thread_unix.c (this file is OS dependant)
+ tokenparser.l
  winscard.c
  winscard_msg.c
+ winscard_msg_srv.c
+ winscard_svc.c
 
 libpcsclite.la (client library)
- debuglog.c
+ debug.c
+ dyn_hpux.c
+ dyn_macosx.c
+ dyn_unix.c
+ error.c
+ strlcat.c
+ strlcpy.c
  sys_unix.c
- winscard_clnt.c
+ thread_unix.c
+ winscard_clnt.c or winscard_scf.c
  winscard_msg.c
 
 
