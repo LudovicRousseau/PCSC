@@ -199,8 +199,8 @@ pcscd side:
 - pcscd open/creates a shared memory segment (EHInitializeEventStructures()
   in eventhandler.c)
 - static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS]; is
-  an array of pointers on READER_STATE.  each entry readerStates[i]
-  point to a memory shared segment It contains the state of each
+  an array of pointers on READER_STATE. Each entry readerStates[i]
+  points to a memory shared segment. It contains the state of each
   readers.
 
 - reader contexts are also created and maintained
@@ -216,7 +216,7 @@ libpcsclite side:
 
 - the library open the shared memory segment (SCardEstablishContextTH()
   in winscard_clnt.c)
-- each entry readerStates[i] get a reference to the memory segment of
+- each entry readerStates[i] gets a reference to the memory segment of
   the server.
   
 The memory is READ ONLY on the library side.
