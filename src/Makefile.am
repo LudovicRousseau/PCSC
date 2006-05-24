@@ -19,6 +19,7 @@ endif
 
 libpcsclite_la_SOURCES = \
 	debug.c \
+	debug.h \
 	dyn_hpux.c \
 	dyn_macosx.c \
 	dyn_unix.c \
@@ -36,31 +37,53 @@ libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) $(LIBDL) \
 
 pcscd_SOURCES = \
 	atrhandler.c \
+	atrhandler.h \
+	configfile.h \
 	configfile.l \
 	debuglog.c \
-	eventhandler.c \
-	ifdwrapper.c \
-	pcscdaemon.c \
-	dyn_unix.c \
+	dyn_generic.h \
 	dyn_hpux.c \
 	dyn_macosx.c \
+	dyn_unix.c \
+	eventhandler.c \
+	eventhandler.h \
 	hotplug_generic.c \
+	hotplug.h \
 	hotplug_libusb.c \
 	hotplug_linux.c \
 	hotplug_macosx.c \
+	ifdwrapper.c \
+	ifdwrapper.h \
+	misc.h \
+	parser.h \
+	pcscdaemon.c \
+	PCSC/debuglog.h \
+	PCSC/ifdhandler.h \
+	PCSC/pcsclite.h \
+	PCSC/pcsclite.h.in \
+	PCSC/winscard.h \
+	PCSC/wintypes.h \
 	powermgt_generic.c \
+	powermgt_generic.h \
 	powermgt_macosx.c \
-	sys_unix.c \
-	thread_unix.c \
 	prothandler.c \
+	prothandler.h \
 	readerfactory.c \
+	readerfactory.h \
 	strlcat.c \
 	strlcpy.c \
+	strlcpycat.h \
+	sys_generic.h \
+	sys_unix.c \
+	thread_generic.h \
+	thread_unix.c \
 	tokenparser.l \
 	winscard.c \
 	winscard_msg.c \
+	winscard_msg.h \
 	winscard_msg_srv.c \
-	winscard_svc.c
+	winscard_svc.c \
+	winscard_svc.h
 pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) -DPCSCD
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
@@ -76,25 +99,6 @@ nobase_include_HEADERS = \
 	PCSC/ifdhandler.h \
 	PCSC/winscard.h \
 	PCSC/wintypes.h
-noinst_HEADERS = \
-	atrhandler.h \
-	configfile.h \
-	debug.h \
-	dyn_generic.h \
-	eventhandler.h \
-	hotplug.h \
-	ifdwrapper.h \
-	misc.h \
-	parser.h \
-	PCSC/pcsclite.h.in \
-	powermgt_generic.h \
-	prothandler.h \
-	readerfactory.h \
-	strlcpycat.h \
-	sys_generic.h \
-	thread_generic.h \
-	winscard_msg.h \
-	winscard_svc.h
 
 nodistheaderdir = $(includedir)/PCSC
 nodistheader_DATA = PCSC/reader.h PCSC/pcsclite.h
