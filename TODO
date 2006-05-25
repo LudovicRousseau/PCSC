@@ -1,10 +1,6 @@
 - improve performances between pcscd and libpcsclite
   see http://archives.neohapsis.com/archives/dev/muscle/2005-q4/0086.html
 
-- allow the use of extended APDU without breaking libpcsclite ABI
-  For now we have either normal APDU (max 256 bytes) or extended APDU
-  (--enable-extendedapdu, max 32K bytes) but not both
-
 - include Apple patches and improvements (if possible/needed)
 
 - power on the card _only_ if an application requests a connection
