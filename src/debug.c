@@ -40,10 +40,7 @@ void log_init(void)
 	e = getenv("MUSCLECARD_DEBUG");
 #endif
 	if (e)
-	{
 		LogLevel = atoi(e);
-		printf("pouet %d\n", LogLevel);
-	}
 
 	/* no color under Windows */
 #ifndef WIN32
