@@ -364,6 +364,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 		break;
 
 	default:
+		Log2(PCSC_LOG_CRITICAL, "Unknown command: %d", msgStruct->command);
 		return -1;
 	}
 
