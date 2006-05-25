@@ -2556,8 +2556,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;
-	transmit_struct scTransmitStruct;
-	sharedSegmentMsg msgStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
@@ -2598,76 +2596,168 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
-	if (cbSendLength > MAX_BUFFER_SIZE)
+	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
+		|| (*pcbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
 	{
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
-	scTransmitStruct.hCard = hCard;
-	scTransmitStruct.cbSendLength = cbSendLength;
-	scTransmitStruct.pcbRecvLength = *pcbRecvLength;
-	memcpy(&scTransmitStruct.pioSendPci, pioSendPci,
-		sizeof(SCARD_IO_REQUEST));
-	memcpy(scTransmitStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
-
-	if (pioRecvPci)
+	if ((cbSendLength > MAX_BUFFER_SIZE) || (*pcbRecvLength > MAX_BUFFER_SIZE))
 	{
-		memcpy(&scTransmitStruct.pioRecvPci, pioRecvPci,
+		/* extended APDU */
+		unsigned char buffer[sizeof(sharedSegmentMsg) + MAX_BUFFER_SIZE_EXTENDED];
+		transmit_struct_extended *scTransmitStructExtended = (transmit_struct_extended *)buffer;
+		sharedSegmentMsg *pmsgStruct = (psharedSegmentMsg)buffer;
+
+		scTransmitStructExtended->hCard = hCard;
+		scTransmitStructExtended->cbSendLength = cbSendLength;
+		scTransmitStructExtended->pcbRecvLength = *pcbRecvLength;
+		scTransmitStructExtended->size = sizeof(*scTransmitStructExtended) + cbSendLength;
+		memcpy(&scTransmitStructExtended->pioSendPci, pioSendPci,
 			sizeof(SCARD_IO_REQUEST));
-	}
-	else
-		scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
-
-	rv = WrapSHMWrite(SCARD_TRANSMIT, psContextMap[dwContextIndex].dwClientID,
-		sizeof(scTransmitStruct),
-		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scTransmitStruct);
-
-	if (rv == -1)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-		return SCARD_E_NO_SERVICE;
-	}
-
-	/*
-	 * Read a message from the server
-	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
-
-	memcpy(&scTransmitStruct, &msgStruct.data, sizeof(scTransmitStruct));
-
-	if (rv == -1)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-		return SCARD_F_COMM_ERROR;
-	}
-
-	/*
-	 * Zero it and free it so any secret information cannot be leaked
-	 */
-	memset(scTransmitStruct.pbSendBuffer, 0x00, cbSendLength);
-
-	if (scTransmitStruct.rv == SCARD_S_SUCCESS)
-	{
-		/*
-		 * Copy and zero it so any secret information is not leaked
-		 */
-		memcpy(pbRecvBuffer, scTransmitStruct.pbRecvBuffer,
-			scTransmitStruct.pcbRecvLength);
-		memset(scTransmitStruct.pbRecvBuffer, 0x00,
-			scTransmitStruct.pcbRecvLength);
+		memcpy(scTransmitStructExtended->data, pbSendBuffer, cbSendLength);
 
 		if (pioRecvPci)
-			memcpy(pioRecvPci, &scTransmitStruct.pioRecvPci,
+		{
+			memcpy(&scTransmitStructExtended->pioRecvPci, pioRecvPci,
 				sizeof(SCARD_IO_REQUEST));
-	}
+		}
+		else
+			scTransmitStructExtended->pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
 
-	*pcbRecvLength = scTransmitStruct.pcbRecvLength;
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		rv = WrapSHMWrite(SCARD_TRANSMIT_EXTENDED,
+			psContextMap[dwContextIndex].dwClientID,
+			scTransmitStructExtended->size,
+			PCSCLITE_CLIENT_ATTEMPTS, buffer);
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			return SCARD_E_NO_SERVICE;
+		}
+
+		/*
+		 * Read a message from the server
+		 */
+		/* read the first block */
+		rv = SHMMessageReceive(buffer, sizeof(sharedSegmentMsg), psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			return SCARD_F_COMM_ERROR;
+		}
+
+		/* we receive a sharedSegmentMsg and not a transmit_struct_extended */
+		scTransmitStructExtended = (transmit_struct_extended *)&(pmsgStruct -> data);
+
+		/* a second block is present */
+		if (scTransmitStructExtended->size > PCSCLITE_MAX_MESSAGE_SIZE)
+		{
+			rv = SHMMessageReceive(buffer + sizeof(sharedSegmentMsg),
+				scTransmitStructExtended->size-PCSCLITE_MAX_MESSAGE_SIZE,
+				psContextMap[dwContextIndex].dwClientID,
+				PCSCLITE_CLIENT_ATTEMPTS);
+			if (rv == -1)
+			{
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				return SCARD_F_COMM_ERROR;
+			}
+		}
+
+		if (scTransmitStructExtended -> rv == SCARD_S_SUCCESS)
+		{
+			/*
+			 * Copy and zero it so any secret information is not leaked
+			 */
+			memcpy(pbRecvBuffer, scTransmitStructExtended -> data,
+				scTransmitStructExtended -> pcbRecvLength);
+			memset(scTransmitStructExtended -> data, 0x00,
+				scTransmitStructExtended -> pcbRecvLength);
+
+			if (pioRecvPci)
+				memcpy(pioRecvPci, &scTransmitStructExtended -> pioRecvPci,
+					sizeof(SCARD_IO_REQUEST));
+		}
+
+		*pcbRecvLength = scTransmitStructExtended -> pcbRecvLength;
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+		rv = scTransmitStructExtended -> rv;
+	}
+	else
+	{
+		/* short APDU */
+		transmit_struct scTransmitStruct;
+		sharedSegmentMsg msgStruct;
+
+		scTransmitStruct.hCard = hCard;
+		scTransmitStruct.cbSendLength = cbSendLength;
+		scTransmitStruct.pcbRecvLength = *pcbRecvLength;
+		memcpy(&scTransmitStruct.pioSendPci, pioSendPci,
+			sizeof(SCARD_IO_REQUEST));
+		memcpy(scTransmitStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
+
+		if (pioRecvPci)
+		{
+			memcpy(&scTransmitStruct.pioRecvPci, pioRecvPci,
+				sizeof(SCARD_IO_REQUEST));
+		}
+		else
+			scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
+
+		rv = WrapSHMWrite(SCARD_TRANSMIT,
+			psContextMap[dwContextIndex].dwClientID, sizeof(scTransmitStruct),
+			PCSCLITE_CLIENT_ATTEMPTS, (void *) &scTransmitStruct);
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			return SCARD_E_NO_SERVICE;
+		}
+
+		/*
+		 * Read a message from the server
+		 */
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+
+		memcpy(&scTransmitStruct, &msgStruct.data, sizeof(scTransmitStruct));
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			return SCARD_F_COMM_ERROR;
+		}
+
+		/*
+		 * Zero it and free it so any secret information cannot be leaked
+		 */
+		memset(scTransmitStruct.pbSendBuffer, 0x00, cbSendLength);
+
+		if (scTransmitStruct.rv == SCARD_S_SUCCESS)
+		{
+			/*
+			 * Copy and zero it so any secret information is not leaked
+			 */
+			memcpy(pbRecvBuffer, scTransmitStruct.pbRecvBuffer,
+				scTransmitStruct.pcbRecvLength);
+			memset(scTransmitStruct.pbRecvBuffer, 0x00,
+				scTransmitStruct.pcbRecvLength);
+
+			if (pioRecvPci)
+				memcpy(pioRecvPci, &scTransmitStruct.pioRecvPci,
+					sizeof(SCARD_IO_REQUEST));
+		}
+
+		*pcbRecvLength = scTransmitStruct.pcbRecvLength;
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+		rv = scTransmitStruct.rv;
+	}
 
 	PROFILE_END
 
-	return scTransmitStruct.rv;
+	return rv;
 }
 
 /**

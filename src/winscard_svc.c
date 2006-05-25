@@ -152,9 +152,13 @@ static void ContextThread(LPVOID dwIndex)
 				 * Command must be found
 				 */
 				MSGFunctionDemarshall(&msgStruct, dwContextIndex);
-				rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
-					psContext[dwContextIndex].dwClientID,
-					PCSCLITE_SERVER_ATTEMPTS);
+
+				/* the SCARD_TRANSMIT_EXTENDED anwser is already sent by
+				 * MSGFunctionDemarshall */
+				if (msgStruct.command != SCARD_TRANSMIT_EXTENDED)
+					rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
+						psContext[dwContextIndex].dwClientID,
+						PCSCLITE_SERVER_ATTEMPTS);
 			}
 			else
 				/* pcsc-lite client/server protocol version */
@@ -362,6 +366,77 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 		if (rv != 0) return rv;
 		gsStr->rv = SCardSetAttrib(gsStr->hCard, gsStr->dwAttrId,
 			gsStr->pbAttr, gsStr->cbAttrLen);
+		break;
+
+	case SCARD_TRANSMIT_EXTENDED:
+		{
+			transmit_struct_extended *treStr;
+			unsigned char pbSendBuffer[MAX_BUFFER_SIZE_EXTENDED];
+			unsigned char pbRecvBuffer[MAX_BUFFER_SIZE_EXTENDED];
+
+			treStr = ((transmit_struct_extended *) msgStruct->data);
+			rv = MSGCheckHandleAssociation(treStr->hCard, dwContextIndex);
+			if (rv != 0) return rv;
+
+			/* on more block to read? */
+			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
+			{
+				/* copy the first APDU part */
+				memcpy(pbSendBuffer, treStr->data,
+					PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*treStr));
+
+				/* receive the second block */
+				rv = SHMMessageReceive(
+					pbSendBuffer+PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*treStr),
+					treStr->size - PCSCLITE_MAX_MESSAGE_SIZE,
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "reception failed");
+			}
+			else
+				memcpy(pbSendBuffer, treStr->data, treStr->cbSendLength);
+
+			Log2(PCSC_LOG_INFO, "%ld", treStr->pcbRecvLength);
+			treStr->rv = SCardTransmit(treStr->hCard, &treStr->pioSendPci,
+				pbSendBuffer, treStr->cbSendLength,
+				&treStr->pioRecvPci, pbRecvBuffer,
+				&treStr->pcbRecvLength);
+
+			Log2(PCSC_LOG_INFO, "%lX", treStr->rv);
+			treStr->size = sizeof(*treStr) + treStr->pcbRecvLength;
+			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
+			{
+				/* two blocks */
+				memcpy(treStr->data, pbRecvBuffer, PCSCLITE_MAX_MESSAGE_SIZE
+					- sizeof(*treStr));
+
+				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+
+				rv = SHMMessageSend(pbRecvBuffer + PCSCLITE_MAX_MESSAGE_SIZE
+					- sizeof(*treStr),
+					treStr->size - PCSCLITE_MAX_MESSAGE_SIZE, 
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+			}
+			else
+			{
+				/* one block only */
+				memcpy(treStr->data, pbRecvBuffer, treStr->pcbRecvLength);
+
+				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+			}
+		}
 		break;
 
 	default:

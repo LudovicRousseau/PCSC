@@ -384,6 +384,7 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	unsigned int size, unsigned int blockAmount, void *data)
 {
 	sharedSegmentMsg msgStruct;
+	int ret;
 
 	/*
 	 * Set the appropriate packet parameters 
@@ -395,10 +396,33 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
 	msgStruct.date = time(NULL);
-	memcpy(msgStruct.data, data, size);
+	if (SCARD_TRANSMIT_EXTENDED == command)
+	{
+		/* first block */
+		memcpy(msgStruct.data, data, PCSCLITE_MAX_MESSAGE_SIZE);
+		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
+			blockAmount);
+		if (ret)
+			return ret;
 
-	return SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
-		blockAmount);
+		/* do not send an empty second block */
+		if (size > PCSCLITE_MAX_MESSAGE_SIZE)
+		{
+			/* second block */
+			ret = SHMMessageSend(data+PCSCLITE_MAX_MESSAGE_SIZE,
+				size-PCSCLITE_MAX_MESSAGE_SIZE, dwClientID, blockAmount);
+			if (ret)
+				return ret;
+		}
+	}
+	else
+	{
+		memcpy(msgStruct.data, data, size);
+
+		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
+			blockAmount);
+	}
+	return ret;
 }
 
 /**
