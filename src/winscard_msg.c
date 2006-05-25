@@ -135,8 +135,8 @@ INTERNAL int SHMClientCloseSession(DWORD dwClientID)
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
-	int blockAmount)
+INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
+	int filedes, int blockAmount)
 {
 	/*
 	 * default is success 
@@ -147,13 +147,9 @@ INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
 	 */
 	time_t start = time(0);
 	/*
-	 * data to be written 
-	 */
-	unsigned char *buffer = (unsigned char *) msgStruct;
-	/*
 	 * how many bytes remains to be written 
 	 */
-	size_t remaining = sizeof(sharedSegmentMsg);
+	size_t remaining = buffer_size;
 
 	/*
 	 * repeat until all data is written 
@@ -261,8 +257,8 @@ INTERNAL int SHMMessageSend(psharedSegmentMsg msgStruct, int filedes,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
-	int blockAmount)
+INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
+	int filedes, int blockAmount)
 {
 	/*
 	 * default is success 
@@ -273,13 +269,9 @@ INTERNAL int SHMMessageReceive(psharedSegmentMsg msgStruct, int filedes,
 	 */
 	time_t start = time(0);
 	/*
-	 * buffer where we place the readed bytes 
-	 */
-	unsigned char *buffer = (unsigned char *) msgStruct;
-	/*
 	 * how many bytes we must read 
 	 */
-	size_t remaining = sizeof(sharedSegmentMsg);
+	size_t remaining = buffer_size;
 
 	/*
 	 * repeate until we get the whole message 

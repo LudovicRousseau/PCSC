@@ -313,10 +313,12 @@ extern "C"
 	int SHMInitializeCommonSegment(void);
 	int SHMProcessEventsContext(PDWORD, psharedSegmentMsg, int);
 	int SHMProcessEventsServer(PDWORD, int);
-	int SHMMessageSend(psharedSegmentMsg, int, int);
-	int SHMMessageReceive(psharedSegmentMsg, int, int);
-	int WrapSHMWrite(unsigned int, DWORD, unsigned int,
-		unsigned int, void *);
+	int SHMMessageSend(void *buffer, size_t buffer_size, int filedes,
+		int blockAmount);
+	int SHMMessageReceive(void *buffer, size_t buffer_size,
+		int filedes, int blockAmount);
+	int WrapSHMWrite(unsigned int command, DWORD dwClientID, unsigned int size,
+		unsigned int blockAmount, void *data);
 	void SHMCleanupSharedSegment(int, char *);
 
 #ifdef __cplusplus
