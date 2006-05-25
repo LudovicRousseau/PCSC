@@ -21,7 +21,7 @@
 /** Major version of the current message protocol */
 #define PROTOCOL_VERSION_MAJOR 2
 /** Minor version of the current message protocol */
-#define PROTOCOL_VERSION_MINOR 0
+#define PROTOCOL_VERSION_MINOR 1
 
 #ifdef __cplusplus
 extern "C"
