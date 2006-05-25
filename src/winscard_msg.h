@@ -87,7 +87,8 @@ extern "C"
 		SCARD_CANCEL = 0x0D,
 		SCARD_CANCEL_TRANSACTION = 0x0E,
 		SCARD_GET_ATTRIB = 0x0F,
-		SCARD_SET_ATTRIB = 0x10
+		SCARD_SET_ATTRIB = 0x10,
+		SCARD_TRANSMIT_EXTENDED = 0x11
 	};
 
 	/**
@@ -250,6 +251,24 @@ extern "C"
 		LONG rv;
 	};
 	typedef struct transmit_struct transmit_struct;
+
+	/**
+	 * @brief contained in \c SCARD_TRANSMIT_EXTENDED Messages.
+	 *
+	 * These data are passed throw the field \c sharedSegmentMsg.data.
+	 */
+	struct transmit_struct_extended
+	{
+		SCARDHANDLE hCard;
+		SCARD_IO_REQUEST pioSendPci;
+		DWORD cbSendLength;
+		SCARD_IO_REQUEST pioRecvPci;
+		DWORD pcbRecvLength;
+		LONG rv;
+		size_t size;
+		BYTE data[0];
+	};
+	typedef struct transmit_struct_extended transmit_struct_extended;
 
 	/**
 	 * @brief contained in \c SCARD_CONTROL Messages.
