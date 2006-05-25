@@ -1420,16 +1420,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		}
 	}
 
-	if (cbSendLength > MAX_BUFFER_SIZE)
-	{
-		return SCARD_E_INSUFFICIENT_BUFFER;
-	}
-
-	/*
-	 * Removed - a user may allocate a larger buffer if ( dwRxLength >
-	 * MAX_BUFFER_SIZE ) { return SCARD_E_INSUFFICIENT_BUFFER; }
-	 */
-
 	/*
 	 * Quick fix: PC/SC starts at 1 for bit masking but the IFD_Handler
 	 * just wants 0 or 1
@@ -1496,12 +1486,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	 * Available is less than received
 	 */
 	if (tempRxLength < dwRxLength)
-	{
-		*pcbRecvLength = 0;
-		return SCARD_E_INSUFFICIENT_BUFFER;
-	}
-
-	if (dwRxLength > MAX_BUFFER_SIZE)
 	{
 		*pcbRecvLength = 0;
 		return SCARD_E_INSUFFICIENT_BUFFER;
