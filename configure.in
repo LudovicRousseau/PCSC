@@ -280,23 +280,6 @@ else
 	AC_MSG_RESULT([enable ipcdir                 : /var/run (default)])
 fi
 
-# --enable-extendedapdu
-AC_ARG_ENABLE(extendedapdu,
-	AC_HELP_STRING([--enable-extendedapdu], [support of extended APDU (for APDU  256B < size < 32KB)]),
-	[ case "${enableval}" in
-		yes) extendedapdu=true ;;
-		no) extendedapdu=false ;;
-		*) AC_MSG_ERROR([bad value ${enableval} for --enable-extendedapdu]) ;;
-	esac], [extendedapdu=false])
-
-AC_MSG_RESULT([enable extended APDU          : $extendedapdu])
-
-if test x${extendedapdu} = xtrue ; then
-  extended_apdu="#define PCSCLITE_ENHANCED_MESSAGING"
-else
-  extended_apdu="#undef PCSCLITE_ENHANCED_MESSAGING"
-fi
-
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 # HOST_TO_CCID
@@ -314,7 +297,6 @@ fi
 AC_SUBST(usbdropdir)
 AC_SUBST(confdir)
 AC_SUBST(runpid)
-AC_SUBST(extended_apdu)
 AC_SUBST(host_to_ccid_16)
 AC_SUBST(host_to_ccid_32)
 AS_AC_EXPAND(confdir_exp,$confdir)
