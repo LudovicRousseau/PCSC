@@ -55,7 +55,7 @@
  */
 INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
 {
-	return SHMMessageReceive(msgStruct, dwClientID, blockamount);
+	return SHMMessageReceive(msgStruct, sizeof(*msgStruct), dwClientID, blockamount);
 }
 
 /**
@@ -397,7 +397,8 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	msgStruct.date = time(NULL);
 	memcpy(msgStruct.data, data, size);
 
-	return SHMMessageSend(&msgStruct, dwClientID, blockAmount);
+	return SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
+		blockAmount);
 }
 
 /**

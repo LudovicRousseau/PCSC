@@ -403,14 +403,14 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		veStr->major = PROTOCOL_VERSION_MAJOR;
 		veStr->minor = PROTOCOL_VERSION_MINOR;
 
-		if (-1 == SHMMessageSend(&msgStruct, dwClientID,
+		if (-1 == SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
 			PCSCLITE_MCLIENT_ATTEMPTS))
 			return SCARD_E_NO_SERVICE;
 
 		/*
 		 * Read a message from the server
 		 */
-		if (-1 == SHMMessageReceive(&msgStruct, dwClientID,
+		if (-1 == SHMMessageReceive(&msgStruct, sizeof(msgStruct), dwClientID,
 			PCSCLITE_CLIENT_ATTEMPTS))
 		{
 			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");

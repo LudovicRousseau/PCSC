@@ -152,8 +152,9 @@ static void ContextThread(LPVOID dwIndex)
 				 * Command must be found
 				 */
 				MSGFunctionDemarshall(&msgStruct, dwContextIndex);
-				rv = SHMMessageSend(&msgStruct, psContext[dwContextIndex].dwClientID,
-						    PCSCLITE_SERVER_ATTEMPTS);
+				rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
 			}
 			else
 				/* pcsc-lite client/server protocol version */
@@ -176,7 +177,7 @@ static void ContextThread(LPVOID dwIndex)
 					veStr->rv = SCARD_S_SUCCESS;
 
 					/* send back the response */
-					rv = SHMMessageSend(&msgStruct,
+					rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
 						psContext[dwContextIndex].dwClientID,
 					    PCSCLITE_SERVER_ATTEMPTS);
 				}

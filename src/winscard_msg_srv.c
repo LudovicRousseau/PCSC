@@ -253,7 +253,7 @@ INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgSt
 		/*
 		 * Return the current handle 
 		 */
-		rv = SHMMessageReceive(msgStruct, *pdwClientID,
+		rv = SHMMessageReceive(msgStruct, sizeof(*msgStruct), *pdwClientID,
 				       PCSCLITE_SERVER_ATTEMPTS);
 		
 		if (rv == -1)
@@ -276,7 +276,5 @@ INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgSt
 	}
 	
 	return -1;
-
 }
-
 
