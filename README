@@ -55,8 +55,6 @@ Options:
           --enable-runpid=FILE   Store the daemon pid in file FILE
           --enable-ipcdir=DIR    directory containing IPC files
                                  (default /var/run)
-          --enable-extendedapdu  support of extended APDU
-                                 (for APDU 256B < size < 32KB)
 
 
 By running pcscd under a priveledged account you can link to 
