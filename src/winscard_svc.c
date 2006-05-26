@@ -397,13 +397,11 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			else
 				memcpy(pbSendBuffer, treStr->data, treStr->cbSendLength);
 
-			Log2(PCSC_LOG_INFO, "%ld", treStr->pcbRecvLength);
 			treStr->rv = SCardTransmit(treStr->hCard, &treStr->pioSendPci,
 				pbSendBuffer, treStr->cbSendLength,
 				&treStr->pioRecvPci, pbRecvBuffer,
 				&treStr->pcbRecvLength);
 
-			Log2(PCSC_LOG_INFO, "%lX", treStr->rv);
 			treStr->size = sizeof(*treStr) + treStr->pcbRecvLength;
 			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
 			{
