@@ -221,8 +221,8 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
  * to accomodate the transmit_struct
  */
 #define PCSCLITE_MAX_MESSAGE_SIZE	2048	/* Transport msg len */
-#define MAX_BUFFER_SIZE			264	/* Maximum Tx/Rx Buffer */
-#define MAX_BUFFER_SIZE_EXTENDED	(1<<15)	/* enhanced (32K) Tx/Rx Buffer */
+#define MAX_BUFFER_SIZE			264	/* Maximum Tx/Rx Buffer for short APDU */
+#define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/* enhanced (64K + APDU + Lc + Le) Tx/Rx Buffer */
 #define PCSCLITE_SERVER_ATTEMPTS	5	/* Attempts to reach cl */
 
 /*
