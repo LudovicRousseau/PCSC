@@ -42,15 +42,21 @@ extern "C"
 	typedef unsigned short WORD;
 	typedef long LONG;
 	typedef long RESPONSECODE;
-	typedef const char *LPCTSTR;
+	typedef const char *LPCSTR;
 	typedef const BYTE *LPCBYTE;
 	typedef BYTE *LPBYTE;
 	typedef DWORD *LPDWORD;
-	typedef char *LPTSTR;
+	typedef char *LPSTR;
 
 	/* this type is deprecated but still used by old drivers and applications
 	 * You should use LPTSTR instead */
-	typedef char *LPSTR
+	typedef char *LPTSTR
+#ifdef __GNUC__
+		/* __attribute__ is a GCC only extension */
+		__attribute__ ((deprecated))
+#endif
+		;
+	typedef const char *LPCTSTR
 #ifdef __GNUC__
 		/* __attribute__ is a GCC only extension */
 		__attribute__ ((deprecated))
