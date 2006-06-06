@@ -211,8 +211,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 	if ((sReadersContexts[dwContext])->pdwFeeds == NULL)
 	{
-		(sReadersContexts[dwContext])->pdwFeeds = 
-		  (DWORD *)malloc(sizeof(DWORD));
+		(sReadersContexts[dwContext])->pdwFeeds = malloc(sizeof(DWORD));
 
 		/* Initialize pdwFeeds to 1, otherwise multiple 
 		   cloned readers will cause pcscd to crash when 
@@ -231,8 +230,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 	if ((sReadersContexts[dwContext])->pdwMutex == NULL)
 	{
-		(sReadersContexts[dwContext])->pdwMutex = 
-		  (DWORD *)malloc(sizeof(DWORD));
+		(sReadersContexts[dwContext])->pdwMutex = malloc(sizeof(DWORD));
 
 		*(sReadersContexts[dwContext])->pdwMutex = 1;
 	}
@@ -407,8 +405,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 				(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
 			SYS_MutexInit((sReadersContexts[dwContextB])->mMutex);
 
-			(sReadersContexts[dwContextB])->pdwMutex = 
-				(DWORD *)malloc(sizeof(DWORD));
+			(sReadersContexts[dwContextB])->pdwMutex = malloc(sizeof(DWORD));
 			*(sReadersContexts[dwContextB])->pdwMutex = 1;
 		}
 		else

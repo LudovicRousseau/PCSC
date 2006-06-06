@@ -2785,7 +2785,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
- * mszReaders = (LPSTR)malloc(sizeof(char)*dwReaders);
+ * mszReaders = malloc(sizeof(char)*dwReaders);
  * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders); 
  * @endcode
  */
@@ -2889,7 +2889,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
- * mszGroups = (LPSTR)malloc(sizeof(char)*dwGroups);
+ * mszGroups = malloc(sizeof(char)*dwGroups);
  * rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
  * @endcode
  */
