@@ -129,7 +129,7 @@ static void profile_end(const char *f)
 struct _psChannelMap
 {
 	SCARDHANDLE hCard;
-	LPTSTR readerName;
+	LPSTR readerName;
 };
 
 typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
@@ -184,7 +184,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT);
 static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
 
-static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPTSTR);
+static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPSTR);
 static LONG SCardGetIndicesFromHandle(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardRemoveHandle(SCARDHANDLE);
@@ -614,7 +614,7 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * @endcode
  */
-LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
+LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -701,7 +701,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 		/*
 		 * Keep track of the handle locally
 		 */
-		rv = SCardAddHandle(*phCard, dwContextIndex, (LPTSTR) szReader);
+		rv = SCardAddHandle(*phCard, dwContextIndex, (LPSTR) szReader);
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
 
 		PROFILE_END
@@ -1374,7 +1374,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol, pbAtr, &dwAtrLen);
  * @endcode
  */
-LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1531,7 +1531,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
  *
  * @code
  * typedef struct {
- *   LPCTSTR szReader;          // Reader name
+ *   LPCSTR szReader;          // Reader name
  *   LPVOID pvUserData;         // User defined data
  *   DWORD dwCurrentState;      // Current state of reader
  *   DWORD dwEventState;        // Reader state after a state change
@@ -1781,7 +1781,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			currReader->dwEventState = SCARD_STATE_IGNORE;
 		} else
 		{
-			LPTSTR lpcReaderName;
+			LPSTR lpcReaderName;
 			int i;
 
 	  /************ Looks for correct readernames *********************/
@@ -2779,18 +2779,18 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * @test
  * @code
  * SCARDCONTEXT hContext;
- * LPTSTR mszReaders;
+ * LPSTR mszReaders;
  * DWORD dwReaders;
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
- * mszReaders = (LPTSTR)malloc(sizeof(char)*dwReaders);
+ * mszReaders = (LPSTR)malloc(sizeof(char)*dwReaders);
  * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders); 
  * @endcode
  */
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
-	LPTSTR mszReaders, LPDWORD pcchReaders)
+LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
+	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	DWORD dwReadersLen;
 	int i, lastChrPtr;
@@ -2883,17 +2883,17 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
  * @test
  * @code
  * SCARDCONTEXT hContext;
- * LPTSTR mszGroups;
+ * LPSTR mszGroups;
  * DWORD dwGroups;
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
- * mszGroups = (LPTSTR)malloc(sizeof(char)*dwGroups);
+ * mszGroups = (LPSTR)malloc(sizeof(char)*dwGroups);
  * rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
  * @endcode
  */
-LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
+LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	LONG rv = SCARD_S_SUCCESS;
@@ -3120,7 +3120,7 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
  */
 
 static LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex,
-	LPTSTR readerName)
+	LPSTR readerName)
 {
 	int i;
 

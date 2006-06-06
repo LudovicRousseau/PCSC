@@ -86,7 +86,7 @@ extern "C"
 		/* API V3.0 only */
 		RESPONSECODE (*pvfControl)(DWORD, DWORD, LPCVOID, DWORD, LPVOID,
 			DWORD, LPDWORD);
-		RESPONSECODE (*pvfCreateChannelByName)(DWORD, LPTSTR);
+		RESPONSECODE (*pvfCreateChannelByName)(DWORD, LPSTR);
 	};
 
 	typedef struct FctMap_V3 FCT_MAP_V3, *PFCT_MAP_V3;
@@ -180,12 +180,12 @@ extern "C"
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(void);
-	LONG RFAddReader(LPTSTR, DWORD, LPTSTR, LPTSTR);
-	LONG RFRemoveReader(LPTSTR, DWORD);
-	LONG RFSetReaderName(PREADER_CONTEXT, LPTSTR, LPTSTR, DWORD, DWORD);
-	LONG RFListReaders(LPTSTR, LPDWORD);
-	LONG RFReaderInfo(LPTSTR, struct ReaderContext **);
-	LONG RFReaderInfoNamePort(DWORD, LPTSTR, struct ReaderContext **);
+	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
+	LONG RFRemoveReader(LPSTR, DWORD);
+	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
+	LONG RFListReaders(LPSTR, LPDWORD);
+	LONG RFReaderInfo(LPSTR, struct ReaderContext **);
+	LONG RFReaderInfoNamePort(DWORD, LPSTR, struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, struct ReaderContext **);
 	LONG RFCheckSharing(DWORD);
 	LONG RFLockSharing(DWORD);

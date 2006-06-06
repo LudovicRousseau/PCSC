@@ -203,7 +203,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
 	LONG rv;
-	LPCTSTR lpcReader;
+	LPCSTR lpcReader;
 	DWORD dwStatus, dwReaderSharing;
 	DWORD dwCurrentState;
 	int pageSize;

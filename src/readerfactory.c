@@ -68,7 +68,7 @@ LONG RFAllocateReaderSpace(void)
 	return EHInitializeEventStructures();
 }
 
-LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDevice)
+LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevice)
 {
 	DWORD dwContext = 0, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
@@ -469,7 +469,7 @@ LONG RFAddReader(LPTSTR lpcReader, DWORD dwPort, LPTSTR lpcLibrary, LPTSTR lpcDe
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
+LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 {
 	LONG rv;
 	PREADER_CONTEXT sContext;
@@ -546,8 +546,8 @@ LONG RFRemoveReader(LPTSTR lpcReader, DWORD dwPort)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFSetReaderName(PREADER_CONTEXT rContext, LPTSTR readerName,
-	LPTSTR libraryName, DWORD dwPort, DWORD dwSlot)
+LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
+	LPSTR libraryName, DWORD dwPort, DWORD dwSlot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
 	DWORD valueLength;
@@ -655,10 +655,10 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPTSTR readerName,
 }
 
 #if 0
-LONG RFListReaders(LPTSTR lpcReaders, LPDWORD pdwReaderNum)
+LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 {
 	DWORD dwCSize;
-	LPTSTR lpcTReaders;
+	LPSTR lpcTReaders;
 	int i, p;
 
 	if (dwNumReadersContexts == 0)
@@ -732,7 +732,7 @@ LONG RFListReaders(LPTSTR lpcReaders, LPDWORD pdwReaderNum)
 }
 #endif
 
-LONG RFReaderInfo(LPTSTR lpcReader, PREADER_CONTEXT * sReader)
+LONG RFReaderInfo(LPSTR lpcReader, PREADER_CONTEXT * sReader)
 {
 	int i;
 
@@ -754,7 +754,7 @@ LONG RFReaderInfo(LPTSTR lpcReader, PREADER_CONTEXT * sReader)
 	return SCARD_E_UNKNOWN_READER;
 }
 
-LONG RFReaderInfoNamePort(DWORD dwPort, LPTSTR lpcReader,
+LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 	PREADER_CONTEXT * sReader)
 {
 	char lpcStripReader[MAX_READERNAME];

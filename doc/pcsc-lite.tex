@@ -127,13 +127,13 @@ DWORD  &  unsigned long \\
 LONG  &  long \\
 LPBYTE  &  unsigned char * \\
 LPCBYTE  &  const unsigned char * \\
-LPCTSTR  &  const char * \\
+LPCSTR  &  const char * \\
 LPCVOID  &  const void * \\
 LPCWSTR  &  char * \\
 LPDWORD  &  unsigned long * \\
 LPSCARDCONTEXT & unsigned long * \\
 LPSCARDHANDLE & unsigned long * \\
-LPTSTR  &  char * \\
+LPSTR  &  char * \\
 LPVOID  &  void * \\
 PSCARDCONTEXT & unsigned long * \\
 PSCARDHANDLE & unsigned long * \\
@@ -331,8 +331,8 @@ rv = SCardReleaseContext(hContext);
 #include <winscard.h>
 
 LONG SCardListReaders(SCARDCONTEXT hContext,
-    LPCTSTR mszGroups,
-    LPTSTR mszReaders,
+    LPCSTR mszGroups,
+    LPSTR mszReaders,
     LPDWORD pcchReaders);
 \end{verbatim}
 
@@ -361,13 +361,13 @@ The reader names is a multi-string and separated by a nul character
 \example
 \begin{verbatim}
 SCARDCONTEXT hContext;
-LPTSTR mszReaders;
+LPSTR mszReaders;
 DWORD dwReaders;
 LONG rv;
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
-mszReaders = (LPTSTR)malloc(sizeof(char)*dwReaders);
+mszReaders = (LPSTR)malloc(sizeof(char)*dwReaders);
 rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
 \end{verbatim}
 
@@ -388,7 +388,7 @@ rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
 #include <winscard.h>
 
 LONG SCardListReaderGroups(SCARDCONTEXT hContext,
-    LPTSTR mszGroups,
+    LPSTR mszGroups,
     LPDWORD pcchGroups);
 \end{verbatim}
 
@@ -415,13 +415,13 @@ The group names is a multi-string and separated by a nul character
 \example
 \begin{verbatim}
 SCARDCONTEXT hContext;
-LPTSTR mszGroups;
+LPSTR mszGroups;
 DWORD dwGroups;
 LONG rv;
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
-mszGroups = (LPTSTR)malloc(sizeof(char)*dwGroups);
+mszGroups = (LPSTR)malloc(sizeof(char)*dwGroups);
 rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
 \end{verbatim}
 
@@ -442,7 +442,7 @@ rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
 #include <winscard.h>
 
 LONG SCardConnect(SCARDCONTEXT hContext,
-    LPCTSTR szReader,
+    LPCSTR szReader,
     DWORD dwShareMode,
     DWORD dwPreferredProtocols,
     LPSCARDHANDLE phCard,
@@ -998,7 +998,7 @@ rv = SCardControl(hCard, 0x42000001, pbSendBuffer, dwSendLength,
 #include <winscard.h>
 
 LONG SCardStatus(SCARDHANDLE hCard,
-    LPTSTR szReaderName,
+    LPSTR szReaderName,
     LPDWORD pcchReaderLen,
     LPDWORD pdwState,
     LPDWORD pdwProtocol,
@@ -1125,7 +1125,7 @@ equal to zero and \texttt{rgReaderStates} is \texttt{NULL}.
 
 \begin{verbatim}
 typedef struct {
-    LPCTSTR szReader;     /* Reader name                       */
+    LPCSTR szReader;     /* Reader name                       */
     LPVOID pvUserData;    /* User defined data                 */
     DWORD dwCurrentState; /* Current state of reader           */
     DWORD dwEventState;   /* Reader state after a state change */

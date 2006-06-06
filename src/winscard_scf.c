@@ -79,7 +79,7 @@ static struct _psContextMap
 static struct _psReaderMap
 {
 	SCF_Terminal_t hTerminal;
-	LPTSTR ReaderName;
+	LPSTR ReaderName;
 	short SharedRefCount;
 	DWORD dwCurrentState;
 	BYTE bAtr[MAX_ATR_SIZE];
@@ -111,14 +111,14 @@ static LONG PCSC_SCF_getATR(SCF_Card_t hCard, LPBYTE pcbAtr,
 	LPDWORD pcbAtrLen);
 
 static LONG ConvertStatus(SCF_Status_t status);
-static LONG SCardGetReaderIndice(LPCTSTR ReaderName);
+static LONG SCardGetReaderIndice(LPCSTR ReaderName);
 static LONG getNewContext(SCARDCONTEXT * phContext);
 static LONG SCardAddContext(SCARDCONTEXT hContext, SCF_Session_t hSession);
 static SCF_Session_t getSessionForContext(SCARDCONTEXT hContext);
 static LONG SCardRemoveContext(SCARDCONTEXT hContext);
 static LONG SCardGetContextIndice(SCARDCONTEXT hContext);
 
-static LONG getNewHandle(SCARDCONTEXT hContext, LPCTSTR szReader,
+static LONG getNewHandle(SCARDCONTEXT hContext, LPCSTR szReader,
 	SCARDHANDLE * phCard, DWORD);
 static LONG getCardForHandle(SCARDHANDLE PSCS_hCard, SCF_Card_t * SCF_hCard);
 static LONG SCardRemoveHandle(SCARDHANDLE hCard);
@@ -198,8 +198,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 }
 
 
-static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
-	LPTSTR mszReaders, LPDWORD pcchReaders)
+static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCSTR mszGroups,
+	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	static int first_time = 1;
 	int i = 0;
@@ -270,8 +270,8 @@ static LONG SCardListReadersTH(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 }
 
 
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
-	LPTSTR mszReaders, LPDWORD pcchReaders)
+LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
+	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	long rv;
 
@@ -285,7 +285,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
 /* by najam */
 
 
-static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
+static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -341,7 +341,7 @@ static LONG SCardConnectTH(SCARDCONTEXT hContext, LPCTSTR szReader,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader, DWORD dwShareMode,
+LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader, DWORD dwShareMode,
 	DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -405,7 +405,7 @@ static LONG SCardReconnectTH(SCARDHANDLE hCard, DWORD dwShareMode,
 	LPDWORD pdwActiveProtocol)
 {
 	SCARDCONTEXT hContext;
-	LPTSTR ReaderName;
+	LPSTR ReaderName;
 	SCARDHANDLE tempHandle;
 	LONG rv;
 
@@ -583,7 +583,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	return rv;
 }
 
-static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
+static LONG SCardStatusTH(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -672,7 +672,7 @@ static LONG SCardStatusTH(SCARDHANDLE hCard, LPTSTR mszReaderNames,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -692,7 +692,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LONG rv, retIndice, readerIndice;
 	PSCARD_READERSTATE_A currReader;
 	PREADER_STATE rContext;
-	LPTSTR lpcReaderName;
+	LPSTR lpcReaderName;
 	DWORD dwTime;
 	DWORD dwState;
 	DWORD dwBreakFlag;
@@ -1123,7 +1123,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 }
 
 
-static LONG SCardListReaderGroupsTH(SCARDCONTEXT hContext, LPTSTR mszGroups,
+static LONG SCardListReaderGroupsTH(SCARDCONTEXT hContext, LPSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	LONG rv = SCARD_S_SUCCESS;
@@ -1153,7 +1153,7 @@ static LONG SCardListReaderGroupsTH(SCARDCONTEXT hContext, LPTSTR mszGroups,
 	return rv;
 }
 
-LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPTSTR mszGroups,
+LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	long rv;
@@ -1223,7 +1223,7 @@ static LONG SCardGetHandleIndice(SCARDHANDLE hCard)
 
 	return -1;
 }
-static LONG SCardGetReaderIndice(LPCTSTR ReaderName)
+static LONG SCardGetReaderIndice(LPCSTR ReaderName)
 {
 	int i = 0;
 
@@ -1373,7 +1373,7 @@ static LONG getCardForHandle(SCARDHANDLE PCSC_hCard, SCF_Card_t * SCF_hCard)
 
 }
 
-static LONG getNewHandle(SCARDCONTEXT hContext, LPCTSTR szReader,
+static LONG getNewHandle(SCARDCONTEXT hContext, LPCSTR szReader,
 	SCARDHANDLE * phCard, DWORD dwShareMode)
 {
 	long rv = 0, ReaderIndice;
@@ -1859,7 +1859,7 @@ static LONG ConvertStatus(SCF_Status_t status)
 /*
  * Note that this function is not used
  */
-LONG SCardCheckReaderAvailability(LPTSTR readerName, LONG errorCode)
+LONG SCardCheckReaderAvailability(LPSTR readerName, LONG errorCode)
 {
 #if 0
 	LONG retIndice;

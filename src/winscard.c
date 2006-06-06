@@ -182,7 +182,7 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 	return SCARD_E_UNSUPPORTED_FEATURE;
 }
 
-LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
+LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -212,7 +212,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCTSTR szReader,
 	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s using protocol: %d",
 		szReader, dwPreferredProtocols);
 
-	rv = RFReaderInfo((LPTSTR) szReader, &rContext);
+	rv = RFReaderInfo((LPSTR) szReader, &rContext);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
@@ -1067,7 +1067,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	return rv;
 }
 
-LONG SCardStatus(SCARDHANDLE hCard, LPTSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1498,8 +1498,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCTSTR mszGroups,
-	LPTSTR mszReaders, LPDWORD pcchReaders)
+LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
+	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	/*
 	 * Client side function

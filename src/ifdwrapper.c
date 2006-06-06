@@ -120,7 +120,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IO_create_channel) (DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
-	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPTSTR) = NULL;
+	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPSTR) = NULL;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 		IO_create_channel =
