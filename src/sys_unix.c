@@ -344,6 +344,13 @@ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 
 	vAddress = 0;
 	vAddress = mmap(0, iSize, PROT_READ, MAP_SHARED, iFid, iOffset);
+	if (vAddress == (void*)-1) // mmap returns -1 on error
+	{
+		Log2(PCSC_LOG_CRITICAL, "SYS_PublicMemoryMap() failed: %s",
+			strerror(errno));
+		vAddress = NULL;
+	}
+
 	return vAddress;
 }
 
