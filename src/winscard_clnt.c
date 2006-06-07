@@ -3247,8 +3247,20 @@ static LONG SCardCheckDaemonAvailability(void)
 
 void DESTRUCTOR SCardUnload(void)
 {
+	int i;
+
 	if (!isExecuted)
 		return;
+
+	// unmap public shared file from memory
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+	{
+		if (readerStates[i] != NULL)
+		{
+			SYS_PublicMemoryUnmap(readerStates[i], sizeof(READER_STATE));
+			readerStates[i] = NULL;
+		}
+	}
 
 	SYS_CloseFile(mapAddr);
 	isExecuted = 0;
