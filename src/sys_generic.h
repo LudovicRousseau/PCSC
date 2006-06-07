@@ -73,6 +73,8 @@ extern "C"
 
 	void *SYS_PublicMemoryMap(int, int, int);
 
+	void SYS_PublicMemoryUnmap(void *, int);
+
 	int SYS_MMapSynchronize(void *, int);
 
 	int SYS_Fork(void);

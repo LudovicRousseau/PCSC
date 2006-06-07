@@ -355,6 +355,17 @@ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 }
 
 /**
+ * @brief Unmap a memory segment
+ *
+ * @param ptr pointer returned by SYS_PublicMemoryMap()
+ * @param iSize size of the memory segment
+ */
+INTERNAL void SYS_PublicMemoryUnmap(void * ptr, int iSize)
+{
+	munmap(ptr, iSize);
+}
+
+/**
  * @brief Writes the changes made in a memory map to the disk mapped file.
  *
  * @param[in] begin Start of the block to be written
