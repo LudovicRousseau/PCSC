@@ -3225,7 +3225,7 @@ static LONG SCardCheckDaemonAvailability(void)
 	LONG rv;
 	struct stat statBuffer;
 
-	rv = SYS_Stat(PCSCLITE_IPC_DIR, &statBuffer);
+	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &statBuffer);
 
 	if (rv != 0)
 	{
