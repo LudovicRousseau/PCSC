@@ -57,7 +57,7 @@ LONG RFAllocateReaderSpace(void)
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		sReadersContexts[i] = (PREADER_CONTEXT) malloc(sizeof(READER_CONTEXT));
+		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
 		(sReadersContexts[i])->vHandle = NULL;
 		(sReadersContexts[i])->readerState = NULL;
 	}
@@ -224,7 +224,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if ((sReadersContexts[dwContext])->mMutex == 0)
 	{
 		(sReadersContexts[dwContext])->mMutex =
-		  (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
+			malloc(sizeof(PCSCLITE_MUTEX));
 		SYS_MutexInit((sReadersContexts[dwContext])->mMutex);
 	}
 
@@ -402,7 +402,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
 			(sReadersContexts[dwContextB])->mMutex =
-				(PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
+				malloc(sizeof(PCSCLITE_MUTEX));
 			SYS_MutexInit((sReadersContexts[dwContextB])->mMutex);
 
 			(sReadersContexts[dwContextB])->pdwMutex = malloc(sizeof(DWORD));

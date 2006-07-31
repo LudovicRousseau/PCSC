@@ -3013,7 +3013,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 			psContextMap[i].hContext = hContext;
 			psContextMap[i].dwClientID = dwClientID;
 			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
-			psContextMap[i].mMutex = (PCSCLITE_MUTEX_T) malloc(sizeof(PCSCLITE_MUTEX));
+			psContextMap[i].mMutex = malloc(sizeof(PCSCLITE_MUTEX));
 			SYS_MutexInit(psContextMap[i].mMutex);
 			return SCARD_S_SUCCESS;
 		}

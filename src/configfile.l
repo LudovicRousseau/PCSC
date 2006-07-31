@@ -75,7 +75,7 @@ int evaluatetoken(char *pcToken)
 		{
 			if (pcFriendlyname == NULL)
 			{
-				pcFriendlyname = (char *) malloc(strlen(pcCurrent) - 1);
+				pcFriendlyname = malloc(strlen(pcCurrent) - 1);
 				for (n = 0; n < strlen(pcCurrent); n++)
 				{
 					if (pcCurrent[n] != '"')
