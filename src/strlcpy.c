@@ -16,6 +16,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"  	 
+#endif
+
+#ifndef HAVE_STRLCPY
+
 #include <sys/types.h>
 #include <string.h>
 
@@ -49,3 +55,5 @@ strlcpy(char *dst, const char *src, size_t siz)
 
 	return(s - src - 1);	/* count does not include NUL */
 }
+
+#endif
