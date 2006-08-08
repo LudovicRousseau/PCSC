@@ -91,6 +91,8 @@ LONG CreateContextThread(PDWORD pdwClientID)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0; 
+		Log2(PCSC_LOG_CRITICAL, "No more context available (max: %d)",
+			PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
 		return SCARD_F_INTERNAL_ERROR;
 	}
 	
@@ -100,6 +102,7 @@ LONG CreateContextThread(PDWORD pdwClientID)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0; 
+		Log1(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed");
 		return SCARD_E_NO_MEMORY;
 	}
 
