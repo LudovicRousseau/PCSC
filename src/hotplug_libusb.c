@@ -454,17 +454,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
 		readerTracker[i].status = READER_PRESENT;
 	else
-	{
-		/* remove it */
-		RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
-
-		/* try a second start */
-		if (RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
-			driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
-			readerTracker[i].status = READER_PRESENT;
-		else
-			readerTracker[i].status = READER_FAILED;
-	}
+		readerTracker[i].status = READER_FAILED;
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
