@@ -46,5 +46,5 @@ LATEX2HTML = latex2html
 	$(LATEX2HTML) -local_icons -split +2 $*
 
 doxygen:
-	rm -r api ; cd .. ; doxygen doc/doxygen.conf
+	rm -fr api ; cd .. ; doxygen doc/doxygen.conf
 	cp doxygen.css api/
