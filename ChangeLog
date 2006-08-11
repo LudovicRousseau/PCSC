@@ -1,3 +1,21 @@
+pcsc-lite-1.3.2: Ludovic Rousseau
+11 August 2006
+- add support of extended APDU in the standard configuration and in a
+  backward compatible way: pcscd 1.3.2 can be used with libpcsclite <=
+  1.3.2
+- define MAX_BUFFER_SIZE_EXTENDED as the maximal size allowed for a
+  extended APDU (64KB)
+- LPCTSTR and LPTSTR types are deprecated. Use LPCSTR and LPSTR instead
+- Dual licence src/error.c so it can be used bu OpenSC. It is now
+  BSD-like, see the COPYING file and GNU Lesser General Licence 2.1 or
+  (at your option) any later version
+- document that the 4 bytes field value in PCSC_TLV_STRUCTURE is always
+  in big endian as documented in PCSC v2 part 10 ch 2.2 page 2. You can
+  use ntohl() to convert the value. Thanks to Ulrich Vogl for the bug
+  report
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.3.1: Ludovic Rousseau
 22 April 2006
 - improve support of Solaris
@@ -143,7 +161,7 @@ pcsc-lite-1.2.9-beta6: Ludovic Rousseau
     SCardDisconnect() but not when SCARD_LEAVE_CARD was used.
 - correctly manage multi-slots readers
 - etc/pcscd.init:
-  . updated to reflect the RPM version. Thanks to Ville Skyttä & Fritz Elfert
+  . updated to reflect the RPM version. Thanks to Ville SkyttÃ¤ & Fritz Elfert
 - doc/example/pcsc_demo.c:
   . add SCardTransmit() code sample
 - src/testpcsc.c:
@@ -185,7 +203,7 @@ pcsc-lite-1.2.9-beta4: Ludovic Rousseau
 - src/libmusclecard.pc.in and src/libpcsclite.pc.in
   . includedir is now @includedir@/PCSC
   . add pthread flags for compilation and link
-  . thanks to Ville Skyttä for these patches.
+  . thanks to Ville SkyttÃ¤ for these patches.
     They are small but are mandatory to (re)compile muscleTools (and
     others) without modification to their Makefile.
 
@@ -341,7 +359,7 @@ pcsc-lite-1.2.9-beta1: Ludovic Rousseau
   . add muscledropdir (in libmusclecard) and usbdropdir (in libpcsclite) so we
     can use `pkg-config libpcsclite --variable=usbdropdir` to find the
     directory to use. Should be used by drivers and plugins installation.
-    Thanks to Ville Skyttä for the patch.
+    Thanks to Ville SkyttÃ¤ for the patch.
 - many other minor patches and corrections. Read ChangeLog.cvs for a complete
   list
 
@@ -439,7 +457,7 @@ pcsc-lite-1.1.2beta5: Ludovic Rousseau
 - configure.in, src/Makefile.am, src/utils/installifd.c, doc/bundleTool.8.in,
   doc/pcscd.8.in, etc/reader.conf.in:
   . correct typos and include path configured by ./configure appear in the
-  docs (thanks to Ville Skyttä)
+  docs (thanks to Ville SkyttÃ¤)
 - src/utils/installifd.c:
   . replace gets() by fgets() to avoid buffer overflow.
   . Use sizeof() instead of constants.
