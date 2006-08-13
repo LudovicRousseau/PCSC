@@ -43,23 +43,11 @@ extern "C"
 
 	int SYS_Chdir(const char *);
 
-	int SYS_Mkfifo(const char *, int);
-
-	int SYS_Mknod(const char *, int, int);
-
 	int SYS_GetUID(void);
 
 	int SYS_GetGID(void);
 
-	int SYS_Chown(const char *, int, int);
-
 	int SYS_ChangePermissions(char *, int);
-
-	int SYS_LockFile(int);
-
-	int SYS_LockAndBlock(int);
-
-	int SYS_UnlockFile(int);
 
 	int SYS_SeekFile(int, int);
 
@@ -81,19 +69,13 @@ extern "C"
 
 	int SYS_Daemon(int, int);
 
-	int SYS_Wait(int, int);
-
 	int SYS_Stat(char *pcFile, struct stat *psStatus);
-
-	int SYS_Fstat(int);
 
 	int SYS_RandomInt(int, int);
 
 	int SYS_GetSeed(void);
 
 	void SYS_Exit(int);
-
-	int SYS_Rmdir(char *pcFile);
 
 	int SYS_Unlink(char *pcFile);
 

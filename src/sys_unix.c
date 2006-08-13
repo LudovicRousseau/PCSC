@@ -164,16 +164,6 @@ INTERNAL int SYS_Chdir(const char *path)
 	return chdir(path);
 }
 
-INTERNAL int SYS_Mkfifo(const char *path, int mode)
-{
-	return mkfifo(path, mode);
-}
-
-INTERNAL int SYS_Mknod(const char *path, int mode, int dev)
-{
-	return mknod(path, mode, dev);
-}
-
 INTERNAL int SYS_GetUID(void)
 {
 	return getuid();
@@ -182,91 +172,6 @@ INTERNAL int SYS_GetUID(void)
 INTERNAL int SYS_GetGID(void)
 {
 	return getgid();
-}
-
-INTERNAL int SYS_Chown(const char *fname, int uid, int gid)
-{
-	return chown(fname, uid, gid);
-}
-
-INTERNAL int SYS_ChangePermissions(char *pcFile, int mode)
-{
-	return chmod(pcFile, mode);
-}
-
-/**
- * @brief Makes a non-blocking request to lock a file exclusively.
- *
- * @param[in] iHandle File descriptor.
- *
- * @return Error code.
- * @retval 0 Success.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_LockFile(int iHandle)
-{
-#ifdef HAVE_FLOCK
-	return flock(iHandle, LOCK_EX | LOCK_NB);
-#else
-	struct flock lock_s;
-
-	lock_s.l_type = F_WRLCK;
-	lock_s.l_whence = 0;
-	lock_s.l_start = 0L;
-	lock_s.l_len = 0L;
-
-	return fcntl(iHandle, F_SETLK, &lock_s);
-#endif
-}
-
-/**
- * @brief Makes a blocking request to lock a file exclusively.
- *
- * @param[in] iHandle File descriptor.
- *
- * @return Error code.
- * @retval 0 Success.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_LockAndBlock(int iHandle)
-{
-#ifdef HAVE_FLOCK
-	return flock(iHandle, LOCK_EX);
-#else
-	struct flock lock_s;
-
-	lock_s.l_type = F_RDLCK;
-	lock_s.l_whence = 0;
-	lock_s.l_start = 0L;
-	lock_s.l_len = 0L;
-
-	return fcntl(iHandle, F_SETLKW, &lock_s);
-#endif
-}
-
-/**
- * @brief Unlocks the file.
- *
- * @param[in] iHandle File descriptor.
- *
- * @return Error code.
- * @retval 0 Success.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_UnlockFile(int iHandle)
-{
-#ifdef HAVE_FLOCK
-	return flock(iHandle, LOCK_UN);
-#else
-	struct flock lock_s;
-
-	lock_s.l_type = F_UNLCK;
-	lock_s.l_whence = 0;
-	lock_s.l_start = 0L;
-	lock_s.l_len = 0L;
-
-	return fcntl(iHandle, F_SETLK, &lock_s);
-#endif
 }
 
 INTERNAL int SYS_SeekFile(int iHandle, int iSeekLength)
@@ -469,20 +374,9 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #endif
 }
 
-INTERNAL int SYS_Wait(int iPid, int iWait)
-{
-	return waitpid(-1, 0, WNOHANG);
-}
-
 INTERNAL int SYS_Stat(char *pcFile, struct stat *psStatus)
 {
 	return stat(pcFile, psStatus);
-}
-
-INTERNAL int SYS_Fstat(int iFd)
-{
-	struct stat sStatus;
-	return fstat(iFd, &sStatus);
 }
 
 INTERNAL int SYS_RandomInt(int fStart, int fEnd)
@@ -522,11 +416,6 @@ INTERNAL int SYS_GetSeed(void)
 INTERNAL void SYS_Exit(int iRetVal)
 {
 	_exit(iRetVal);
-}
-
-INTERNAL int SYS_Rmdir(char *pcFile)
-{
-	return rmdir(pcFile);
 }
 
 INTERNAL int SYS_Unlink(char *pcFile)
