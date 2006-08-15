@@ -13,4 +13,7 @@
   That would be needed to support remote PAM login.
   Maybe use unix2tcp (http://dizzy.roedu.net/unix2tcp/)
 
-Dec 2005
+- manage power suspend/resume (in a laptop for example) and coordinate
+  with the driver (when/if possible)
+
+Aug 2006
