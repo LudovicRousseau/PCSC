@@ -75,13 +75,16 @@ INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
 {
 	struct sockaddr_un svc_addr;
 	int one;
+	int ret;
 
-	if ((*pdwClientID = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+	ret = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (ret < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Error: create on client socket: %s",
 			strerror(errno));
 		return -1;
 	}
+	*pdwClientID = ret;
 
 	svc_addr.sun_family = AF_UNIX;
 	strncpy(svc_addr.sun_path, PCSCLITE_CSOCK_NAME,
