@@ -266,7 +266,7 @@ extern "C"
 		DWORD pcbRecvLength;
 		LONG rv;
 		size_t size;
-		BYTE data[0];
+		BYTE data[1];
 	};
 	typedef struct transmit_struct_extended transmit_struct_extended;
 
