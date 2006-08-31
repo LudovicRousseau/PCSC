@@ -17,6 +17,8 @@
 #ifndef __readerfactory_h__
 #define __readerfactory_h__
 
+#include <inttypes.h>
+
 #include "thread_generic.h"
 #include "ifdhandler.h"
 
@@ -161,7 +163,7 @@ extern "C"
 		DWORD dwBlockStatus;	/* Current blocking status */
 		DWORD dwLockId;			/* Lock Id */
 		DWORD dwIdentity;		/* Shared ID High Nibble */
-		DWORD dwContexts;		/* Number of open contexts */
+		int32_t dwContexts;		/* Number of open contexts */
 		PDWORD pdwFeeds;		/* Number of shared client to lib */
 		PDWORD pdwMutex;		/* Number of client to mutex */
 
