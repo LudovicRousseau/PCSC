@@ -1619,9 +1619,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	if (rgReaderStates == NULL && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
 
-	if (cReaders < 0)
-		return SCARD_E_INVALID_VALUE;
-
 	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		return SCARD_E_NO_SERVICE;
 
