@@ -159,14 +159,6 @@ void SVCServiceRunLoop(void)
 
 			break;
 
-		case 2:
-			/*
-			 * timeout in SHMProcessEventsServer(): do nothing
-			 * this is used to catch the Ctrl-C signal at some time when
-			 * nothing else happens
-			 */
-			break;
-
 		case -1:
 			/* do not display if we are exiting or re-reading the config */
 			if ((!AraKiri) && (!ReCheckSerialReaders))
