@@ -1,3 +1,8 @@
+- do not use an active polling in hotplug_libusb.c (USB devices scanned
+  every 1 second) but use a udev trigger mechanism or something similar
+  (mimic hotplug_macosx.c)
+  See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=205182
+
 - improve performances between pcscd and libpcsclite
   see http://archives.neohapsis.com/archives/dev/muscle/2005-q4/0086.html
 
@@ -16,4 +21,4 @@
 - manage power suspend/resume (in a laptop for example) and coordinate
   with the driver (when/if possible)
 
-Aug 2006
+Sep 2006
