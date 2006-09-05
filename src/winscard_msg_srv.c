@@ -169,11 +169,7 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
 	fd_set read_fd;
 	int selret;
-	struct timeval tv;
 	
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
-
 	FD_ZERO(&read_fd);
 
 	/*
@@ -182,7 +178,7 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	FD_SET(commonSocket, &read_fd);
 
 	selret = select(commonSocket + 1, &read_fd, (fd_set *) NULL,
-		(fd_set *) NULL, &tv);
+		(fd_set *) NULL, NULL);
 
 	if (selret < 0)
 	{
@@ -192,9 +188,6 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 		return -1;
 	}
 
-	if (selret == 0)
-		/* timeout */
-		return 2;
 	/*
 	 * A common pipe packet has arrived - it could be a new application  
 	 */
