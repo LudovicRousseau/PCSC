@@ -102,7 +102,7 @@ static long int time_sub(struct timeval *a, struct timeval *b)
 
 	return r.tv_sec * 1000000 + r.tv_usec;
 } /* time_sub */
-	
+
 
 static void profile_end(const char *f)
 {
@@ -155,7 +155,7 @@ static short isExecuted = 0;
 
 /**
  * Memory mapped address used to read status information about the readers.
- * Each element in the vector \c readerStates makes references to a part of 
+ * Each element in the vector \c readerStates makes references to a part of
  * the memory mapped.
  */
 static int mapAddr = 0;
@@ -169,7 +169,7 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * Pointers to a memory mapped area used to read status information about the
  * readers.
- * Each element in the vector \c readerStates makes references to a part of 
+ * Each element in the vector \c readerStates makes references to a part of
  * the memory mapped \c mapAddr.
  */
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
@@ -204,11 +204,11 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
 /**
  * @brief Creates an Application Context to the PC/SC Resource Manager.
- 
+
  * This must be the first function called in a PC/SC application.
  * This is a thread-safe wrapper to the function \c SCardEstablishContextTH().
  *
- * @param[in] dwScope Scope of the establishment. 
+ * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * <ul>
  *   <li>SCARD_SCOPE_USER - Not used.
@@ -252,13 +252,13 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 }
 
 /**
- * @brief Creates a communication context to the PC/SC Resource 
+ * @brief Creates a communication context to the PC/SC Resource
  * Manager.
  *
  * This function shuld not be called directly. Instead, the thread-safe
  * function \c SCardEstablishContext() should be called.
  *
- * @param[in] dwScope Scope of the establishment. 
+ * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * <ul>
  *   <li>SCARD_SCOPE_USER - Not used.
@@ -482,7 +482,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardReleaseContext(hContext); 
+ * rv = SCardReleaseContext(hContext);
  * @endcode
  */
 LONG SCardReleaseContext(SCARDCONTEXT hContext)
@@ -504,7 +504,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	scReleaseStruct.hContext = hContext;
 	scReleaseStruct.rv = 0;
@@ -515,7 +515,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -527,11 +527,11 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
-	
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	/*
 	 * Remove the local context from the stack
@@ -549,14 +549,14 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
  * @deprecated
  * This function is not in Microsoft(R) WinSCard API and is deprecated
  * in pcsc-lite API.
- * The function does not do anything except returning \c SCARD_S_SUCCESS. 
+ * The function does not do anything except returning \c SCARD_S_SUCCESS.
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout New timeout value.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful.
- */ 
+ */
 LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 {
 	/*
@@ -567,8 +567,8 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 }
 
 /**
- * This function establishes a connection to the friendly name of the reader 
- * specified in szReader. The first connection will power up and perform a 
+ * This function establishes a connection to the friendly name of the reader
+ * specified in szReader. The first connection will power up and perform a
  * reset on the card.
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -588,8 +588,8 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  *   <li>SCARD_PROTOCOL_T1 - Use the T=1 protocol.
  *   <li>SCARD_PROTOCOL_RAW - Use with memory type cards.
  * </ul>
- * dwPreferredProtocols is a bit mask of acceptable protocols for the 
- * connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1) if you 
+ * dwPreferredProtocols is a bit mask of acceptable protocols for the
+ * connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1) if you
  * do not have a preferred protocol.
  * @param[out] phCard Handle to this connection.
  * @param[out] pdwActiveProtocol Established protocol to this connection.
@@ -660,7 +660,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	strncpy(scConnectStruct.szReader, szReader, MAX_READERNAME);
 
@@ -676,7 +676,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -689,7 +689,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
@@ -702,14 +702,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		 * Keep track of the handle locally
 		 */
 		rv = SCardAddHandle(*phCard, dwContextIndex, (LPSTR) szReader);
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 		PROFILE_END
 
 		return rv;
 	}
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -717,12 +717,12 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 }
 
 /**
- * @brief This function reestablishes a connection to a reader that was previously 
+ * @brief This function reestablishes a connection to a reader that was previously
  * connected to using SCardConnect().
  *
  * In a multi application environment it is possible for an application to reset
- * the card in shared mode. When this occurs any other application trying to 
- * access certain commands will be returned the value SCARD_W_RESET_CARD. When 
+ * the card in shared mode. When this occurs any other application trying to
+ * access certain commands will be returned the value SCARD_W_RESET_CARD. When
  * this occurs SCardReconnect() must be called in order to acknowledge that
  * the card was reset and allow it to change it's state accordingly.
  *
@@ -736,9 +736,9 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  * <ul>
  *   <li>SCARD_PROTOCOL_T0 - Use the T=0 protocol.
  *   <li>SCARD_PROTOCOL_T1 - Use the T=1 protocol.
- *   <li>SCARD_PROTOCOL_RAW - Use with memory type cards. 
+ *   <li>SCARD_PROTOCOL_RAW - Use with memory type cards.
  * </ul>
- * \p dwPreferredProtocols is a bit mask of acceptable protocols for 
+ * \p dwPreferredProtocols is a bit mask of acceptable protocols for
  * the connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1)
  * if you do not have a preferred protocol.
  * @param[in] dwInitialization Desired action taken on the card/reader.
@@ -823,7 +823,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -837,7 +837,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
@@ -853,7 +853,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -866,21 +866,21 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
 	*pdwActiveProtocol = scReconnectStruct.pdwActiveProtocol;
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
-	
+
 	return scReconnectStruct.rv;
 }
 
 /**
- * This function terminates a connection to the connection made through 
+ * This function terminates a connection to the connection made through
  * SCardConnect(). dwDisposition can have the following values:
  *
  * @param[in] hCard Connection made from SCardConnect.
@@ -896,7 +896,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
  * @retval SCARD_S_SUCCESS Successful.
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle.
  * @retval SCARD_E_INVALID_VALUE - Invalid \p dwDisposition.
- * 
+ *
  * @test
  * @code
  * SCARDCONTEXT hContext;
@@ -937,7 +937,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	scDisconnectStruct.hCard = hCard;
 	scDisconnectStruct.dwDisposition = dwDisposition;
@@ -948,7 +948,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -962,13 +962,13 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
 	SCardRemoveHandle(hCard);
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -982,7 +982,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * You might want to use this when you are selecting a few files and then
  * writing a large file so you can make sure that another application will
  * not change the current file. If another application has a lock on this
- * reader or this application is in \c SCARD_SHARE_EXCLUSIVE there will be no 
+ * reader or this application is in \c SCARD_SHARE_EXCLUSIVE there will be no
  * action taken.
  *
  * @param[in] hCard Connection made from SCardConnect.
@@ -992,7 +992,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights.
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
- * 
+ *
  * @test
  * @code
  * SCARDCONTEXT hContext;
@@ -1029,7 +1029,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1042,7 +1042,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
@@ -1085,8 +1085,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 		if (rv == -1)
 		{
-			
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_E_NO_SERVICE;
 		}
 
@@ -1100,15 +1100,15 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 		if (rv == -1)
 		{
-			
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_F_COMM_ERROR;
 		}
 
 	}
 	while (scBeginStruct.rv == SCARD_E_SHARING_VIOLATION);
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -1118,7 +1118,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 /**
  * @brief This function ends a previously begun transaction.
  *
- * The calling application must be the owner of the previously begun 
+ * The calling application must be the owner of the previously begun
  * transaction or an error will occur.
  *
  * @param[in] hCard Connection made from SCardConnect.
@@ -1150,7 +1150,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * ...
  * / * Do some transmit commands * /
  * ...
- * rv = SCardEndTransaction(hCard, SCARD_LEAVE_CARD); 
+ * rv = SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
  * @endcode
  */
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
@@ -1187,7 +1187,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1200,7 +1200,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
@@ -1213,7 +1213,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -1226,7 +1226,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
@@ -1236,7 +1236,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	randnum = SYS_RandomInt(1000, 10000);
 	SYS_USleep(randnum);
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -1269,7 +1269,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1282,7 +1282,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
@@ -1294,7 +1294,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -1307,11 +1307,11 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -1339,7 +1339,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  *                       moved into position for use.
  *   <li>SCARD_SWALLOWED - There is a card in the reader in position for use.
  *                         The card is not powered.
- *   <li>SCARD_POWERED - Power is being provided to the card, but the reader 
+ *   <li>SCARD_POWERED - Power is being provided to the card, but the reader
  *                       driver is unaware of the mode of the card.
  *   <li>SCARD_NEGOTIABLE - The card has been reset and is awaiting PTS negotiation.
  *   <li>SCARD_SPECIFIC - The card has been reset and specific communication
@@ -1419,7 +1419,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1432,7 +1432,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
@@ -1450,7 +1450,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -1463,7 +1463,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
@@ -1473,7 +1473,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		/*
 		 * An event must have occurred
 		 */
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return rv;
 	}
 
@@ -1496,8 +1496,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		if (*pcchReaderLen > dwReaderLen)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
-		strncpy(mszReaderNames, 
-			psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName, 
+		strncpy(mszReaderNames,
+			psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
 			dwReaderLen);
 	}
 
@@ -1509,8 +1509,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		memcpy(pbAtr, (readerStates[i])->cardAtr,
 			min(*pcbAtrLen, dwAtrLen));
 	}
-	
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -1520,7 +1520,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 /**
  * @brief This function receives a structure or list of structures containing
  * reader names. It then blocks for a change in state to occur on any of the
- * OR'd values contained in dwCurrentState for a maximum blocking time of 
+ * OR'd values contained in dwCurrentState for a maximum blocking time of
  * dwTimeout or forever if INFINITE is used.
  *
  * The new event state will be contained in dwEventState. A status change might
@@ -1545,7 +1545,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  *
  * Value of dwCurrentState and dwEventState:
  * <ul>
- *   <li>SCARD_STATE_UNAWARE The application is unaware of the current 
+ *   <li>SCARD_STATE_UNAWARE The application is unaware of the current
  *       state, and would like to know. The use of this value results in an
  *       immediate return from state transition monitoring services. This is
  *       represented by all bits set to zero.
@@ -1567,7 +1567,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  *       \c SCARD_STATE_PRESENT will also be set. This bit is only returned on
  *       the \c SCardLocateCards function.
  *   <li>SCARD_STATE_EXCLUSIVE The card in the reader is allocated for
- *       exclusive use by another application. If this bit is set, 
+ *       exclusive use by another application. If this bit is set,
  *       \c SCARD_STATE_PRESENT will also be set.
  *   <li>SCARD_STATE_INUSE The card in the reader is in use by one or more
  *       other applications, but may be connected to in shared mode. If this
@@ -1630,7 +1630,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/*
 	 * Application is waiting for a reader - return the first available
@@ -1645,7 +1645,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 				return SCARD_E_NO_SERVICE;
 			}
 
@@ -1656,7 +1656,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/*
 					 * Reader was found
 					 */
-					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 					PROFILE_END
 
@@ -1669,7 +1669,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/*
 				 * return immediately - no reader available
 				 */
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 				return SCARD_E_READER_UNAVAILABLE;
 			}
 
@@ -1681,7 +1681,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				if (dwTime >= (dwTimeout * 1000))
 				{
-					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 					PROFILE_END
 
@@ -1693,7 +1693,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	else
 		if (cReaders >= PCSCLITE_MAX_READERS_CONTEXTS)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_E_INVALID_VALUE;
 		}
 
@@ -1707,7 +1707,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 		if (currReader->szReader == NULL)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_E_INVALID_VALUE;
 		}
 	}
@@ -1747,8 +1747,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 		if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
-	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+
 			PROFILE_END
 
 			return SCARD_E_NO_SERVICE;
@@ -2073,7 +2073,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			 */
 			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
 			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 				return SCARD_E_TIMEOUT;
 			}
 		}
@@ -2094,11 +2094,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	if (psContextMap[dwContextIndex].contextBlockStatus ==
 			BLOCK_STATUS_RESUME)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_CANCELLED;
 	}
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -2113,13 +2113,13 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
  * PIN pads, biometrics, or other extensions to the normal smart card reader
  * that are not normally handled by PC/SC.
  *
- * @note the API of this function changed. In pcsc-lite 1.2.0 and before the 
+ * @note the API of this function changed. In pcsc-lite 1.2.0 and before the
  * API was not Windows(R) PC/SC compatible. This has been corrected.
  *
  * @param[in] hCard Connection made from SCardConnect.
  * @param[in] dwControlCode Control code for the operation.\n
  * <a href="http://pcsclite.alioth.debian.org/pcsc-lite/node26.html#Some_SCardControl_commands">
- * Click here</a> for a list of supported commands by some drivers. 
+ * Click here</a> for a list of supported commands by some drivers.
  * @param[in] pbSendBuffer Command to send to the reader.
  * @param[in] cbSendLength Length of the command.
  * @param[out] pbRecvBuffer Response from the reader.
@@ -2150,7 +2150,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
  * dwRecvLength = sizeof(pbRecvBuffer);
  * rv = SCardControl(hCard, 0x42000001, pbSendBuffer, dwSendLength, pbRecvBuffer, sizeof(pbRecvBuffer), &dwRecvLength);
  * @endcode
- */ 
+ */
 LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	DWORD cbSendLength, LPVOID pbRecvBuffer, DWORD cbRecvLength,
 	LPDWORD lpBytesReturned)
@@ -2178,7 +2178,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -2191,13 +2191,13 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
 	if (cbSendLength > MAX_BUFFER_SIZE)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
@@ -2212,7 +2212,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -2223,7 +2223,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
@@ -2243,7 +2243,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 			sizeof(scControlStruct.pbRecvBuffer));
 	}
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -2251,7 +2251,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 }
 
 /**
- * This function get an attribute from the IFD Handler. The list of possible 
+ * This function get an attribute from the IFD Handler. The list of possible
  * attributes is available in the file \c pcsclite.h.
  *
  * @param[in] hCard Connection made from \c SCardConnect.
@@ -2302,9 +2302,9 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  *   <li>SCARD_ATTR_VENDOR_IFD_VERSION
  *   <li>SCARD_ATTR_VENDOR_NAME
  * </ul>
- * 
+ *
  * Not all the dwAttrId values listed above may be implemented in the IFD
- * Handler you are using. And some dwAttrId values not listed here may be 
+ * Handler you are using. And some dwAttrId values not listed here may be
  * implemented.
  *
  * @param[out] pbAttr Pointer to a buffer that receives the attribute.
@@ -2329,7 +2329,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  *                           SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
  * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
  * @endcode
- */ 
+ */
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 	LPDWORD pcbAttrLen)
 {
@@ -2359,7 +2359,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * @param[in] dwAttrId Identifier for the attribute to set.
  * @param[in] pbAttr Pointer to a buffer that receives the attribute.
  * @param[in] cbAttrLen Length of the \p pbAttr buffer in bytes.
- * 
+ *
  * @return Error code
  * @retval SCARD_S_SUCCESS Successful.
  * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful.
@@ -2415,7 +2415,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -2428,13 +2428,13 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
 	if (*pcbAttrLen > MAX_BUFFER_SIZE)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
@@ -2451,7 +2451,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_NO_SERVICE;
 	}
 
@@ -2462,7 +2462,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_F_COMM_ERROR;
 	}
 
@@ -2487,7 +2487,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		memset(scGetSetStruct.pbAttr, 0x00, sizeof(scGetSetStruct.pbAttr));
 	}
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -2499,7 +2499,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * connected to by SCardConnect().
  *
  * The card responds from the APDU and stores this response in pbRecvBuffer
- * and it's length in SpcbRecvLength. 
+ * and it's length in SpcbRecvLength.
  * SSendPci and SRecvPci are structures containing the following:
  * @code
  * typedef struct {
@@ -2507,7 +2507,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  *    DWORD cbPciLength;   // Length of this structure - not used
  * } SCARD_IO_REQUEST;
  * @endcode
- * 
+ *
  * @param[in] hCard Connection made from SCardConnect().
  * @param pioSendPci [inout] Structure of protocol information.
  * <ul>
@@ -2576,7 +2576,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -2589,14 +2589,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
 	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
 		|| (*pcbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
@@ -2630,7 +2630,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 		if (rv == -1)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_E_NO_SERVICE;
 		}
 
@@ -2641,7 +2641,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		rv = SHMMessageReceive(buffer, sizeof(sharedSegmentMsg), psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
 		if (rv == -1)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_F_COMM_ERROR;
 		}
 
@@ -2657,7 +2657,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 				PCSCLITE_CLIENT_ATTEMPTS);
 			if (rv == -1)
 			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 				return SCARD_F_COMM_ERROR;
 			}
 		}
@@ -2678,7 +2678,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		}
 
 		*pcbRecvLength = scTransmitStructExtended -> pcbRecvLength;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 		rv = scTransmitStructExtended -> rv;
 	}
@@ -2709,7 +2709,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 		if (rv == -1)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_E_NO_SERVICE;
 		}
 
@@ -2722,7 +2722,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 		if (rv == -1)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 			return SCARD_F_COMM_ERROR;
 		}
 
@@ -2747,7 +2747,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		}
 
 		*pcbRecvLength = scTransmitStruct.pcbRecvLength;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 		rv = scTransmitStruct.rv;
 	}
@@ -2758,9 +2758,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 }
 
 /**
- * This function returns a list of currently available readers on the system. 
- * \p mszReaders is a pointer to a character string that is allocated by the application. 
- * If the application sends mszGroups and mszReaders as NULL then this function will 
+ * This function returns a list of currently available readers on the system.
+ * \p mszReaders is a pointer to a character string that is allocated by the application.
+ * If the application sends mszGroups and mszReaders as NULL then this function will
  * return the size of the buffer needed to allocate in pcchReaders.
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -2783,7 +2783,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
  * mszReaders = malloc(sizeof(char)*dwReaders);
- * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders); 
+ * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
  * @endcode
  */
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
@@ -2811,7 +2811,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	dwReadersLen = 0;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -2825,14 +2825,14 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 		|| (*pcchReaders == 0))	/* size == 0 */
 	{
 		*pcchReaders = dwReadersLen;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_S_SUCCESS;
 	}
-	
+
 	if (*pcchReaders < dwReadersLen)
 	{
 		*pcchReaders = dwReadersLen;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
@@ -2852,7 +2852,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 	*pcchReaders = dwReadersLen;
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -2866,7 +2866,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
  * will return the size of the buffer needed to allocate in pcchGroups.
  *
  * The group names is a multi-string and separated by a nul character ('\\0') and ended by
- * a double nul character. "SCard$DefaultReaders\\0Group 2\\0\\0". 
+ * a double nul character. "SCard$DefaultReaders\\0Group 2\\0\\0".
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
@@ -2911,7 +2911,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	if (mszGroups)
 	{
@@ -2927,7 +2927,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 
 	*pcchGroups = dwGroups;
 
-	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);	
+	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
@@ -2984,7 +2984,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 }
 
 /**
- * Functions for managing instances of SCardEstablishContext These functions 
+ * Functions for managing instances of SCardEstablishContext These functions
  * keep track of Context handles and associate the blocking
  * variable contextBlockStatus to an hContext
  */
@@ -3182,7 +3182,7 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndi
 					return SCARD_S_SUCCESS;
 				}
 			}
-			
+
 		}
 	}
 

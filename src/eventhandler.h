@@ -23,9 +23,9 @@ extern "C"
 {
 #endif
 
-	/** 
+	/**
 	 * Define an exported public reader state structure so each
-	 * application gets instant notification of changes in state. 
+	 * application gets instant notification of changes in state.
 	 */
 	typedef struct pubReaderStatesList
 	{

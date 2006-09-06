@@ -427,7 +427,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	strncpy(readerTracker[i].bus_device, bus_device,
 		sizeof(readerTracker[i].bus_device));
 	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
-   
+
 	readerTracker[i].driver = driver;
 
 #ifdef ADD_SERIAL_NUMBER

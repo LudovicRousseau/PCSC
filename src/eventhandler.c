@@ -64,13 +64,13 @@ LONG EHInitializeEventStructures(void)
 	pageSize = SYS_GetPageSize();
 
 	/*
-	 * Jump to end of file space and allocate zero's 
+	 * Jump to end of file space and allocate zero's
 	 */
 	SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_READERS_CONTEXTS);
 	SYS_WriteFile(fd, "", 1);
 
 	/*
-	 * Allocate each reader structure 
+	 * Allocate each reader structure
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -84,7 +84,7 @@ LONG EHInitializeEventStructures(void)
 		}
 
 		/*
-		 * Zero out each value in the struct 
+		 * Zero out each value in the struct
 		 */
 		memset((readerStates[i])->readerName, 0, MAX_READERNAME);
 		memset((readerStates[i])->cardAtr, 0, MAX_ATR_SIZE);
@@ -114,7 +114,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	}
 
 	/*
-	 * Set the thread to 0 to exit thread 
+	 * Set the thread to 0 to exit thread
 	 */
 	rContext->dwLockId = 0xFFFF;
 
@@ -123,14 +123,14 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	do
 	{
 		/*
-		 * Wait 0.05 seconds for the child to respond 
+		 * Wait 0.05 seconds for the child to respond
 		 */
 		SYS_USleep(50000);
 	}
 	while (rContext->dwLockId == 0xFFFF);
 	/*
 	 * Zero out the public status struct to allow it to be recycled and
-	 * used again 
+	 * used again
 	 */
 
 	memset(rContext->readerState->readerName, 0,
@@ -168,7 +168,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	}
 
 	/*
-	 * Find an empty reader slot and insert the new reader 
+	 * Find an empty reader slot and insert the new reader
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -180,7 +180,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 		return SCARD_F_INTERNAL_ERROR;
 
 	/*
-	 * Set all the attributes to this reader 
+	 * Set all the attributes to this reader
 	 */
 	rContext->readerState = readerStates[i];
 	strlcpy(rContext->readerState->readerName, rContext->lpcReader,
@@ -209,7 +209,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	int pageSize;
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	dwStatus = 0;
 	dwReaderSharing = 0;
@@ -280,7 +280,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	}
 
 	/*
-	 * Set all the public attributes to this reader 
+	 * Set all the public attributes to this reader
 	 */
 	rContext->readerState->readerState = dwStatus;
 	rContext->readerState->readerSharing = dwReaderSharing =
@@ -301,7 +301,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			Log2(PCSC_LOG_ERROR, "Error communicating to: %s", lpcReader);
 
 			/*
-			 * Set error status on this reader while errors occur 
+			 * Set error status on this reader while errors occur
 			 */
 
 			rContext->readerState->readerState &= ~SCARD_ABSENT;
@@ -320,22 +320,22 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			/*
 			 * This code causes race conditions on G4's with USB
-			 * insertion 
+			 * insertion
 			 */
 			/*
-			 * dwErrorCount += 1; SYS_Sleep(1); 
+			 * dwErrorCount += 1; SYS_Sleep(1);
 			 */
 			/*
 			 * After 10 seconds of errors, try to reinitialize the reader
-			 * This sometimes helps bring readers out of *crazy* states. 
+			 * This sometimes helps bring readers out of *crazy* states.
 			 */
 			/*
 			 * if ( dwErrorCount == 10 ) { RFUnInitializeReader( rContext
-			 * ); RFInitializeReader( rContext ); dwErrorCount = 0; } 
+			 * ); RFInitializeReader( rContext ); dwErrorCount = 0; }
 			 */
 
 			/*
-			 * End of race condition code block 
+			 * End of race condition code block
 			 */
 		}
 
@@ -345,11 +345,11 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				dwCurrentState == SCARD_UNKNOWN)
 			{
 				/*
-				 * Change the status structure 
+				 * Change the status structure
 				 */
 				Log2(PCSC_LOG_INFO, "Card Removed From %s", lpcReader);
 				/*
-				 * Notify the card has been removed 
+				 * Notify the card has been removed
 				 */
 				RFSetReaderEventState(rContext, SCARD_REMOVED);
 
@@ -374,7 +374,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				dwCurrentState == SCARD_UNKNOWN)
 			{
 				/*
-				 * Power and reset the card 
+				 * Power and reset the card
 				 */
 				SYS_USleep(PCSCLITE_STATUS_WAIT);
 				rContext->readerState->cardAtrLength = MAX_ATR_SIZE;
@@ -396,9 +396,9 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					rContext->readerState->readerState &= ~SCARD_SWALLOWED;
 
 					/*
-					 * Notify the card has been reset 
+					 * Notify the card has been reset
 					 */
-					RFSetReaderEventState(rContext, SCARD_RESET); 
+					RFSetReaderEventState(rContext, SCARD_RESET);
 				}
 				else
 				{
@@ -437,7 +437,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		if (rContext->dwLockId == 0xFFFF)
 		{
 			/*
-			 * Exit and notify the caller 
+			 * Exit and notify the caller
 			 */
 			rContext->dwLockId = 0;
 			SYS_ThreadDetach(rContext->pthThread);
@@ -445,7 +445,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		}
 
 		/*
-		 * Sharing may change w/o an event pass it on 
+		 * Sharing may change w/o an event pass it on
 		 */
 
 		if (dwReaderSharing != rContext->dwContexts)

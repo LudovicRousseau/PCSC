@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Have to understand the multi-string here 
+	 * Have to understand the multi-string here
 	 */
 	p = 0;
 	for (i = 0; i < dwGroups - 1; i++)
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Have to understand the multi-string here 
+	 * Have to understand the multi-string here
 	 */
 	p = 0;
 	for (i = 0; i < dwReaders - 1; i++)

@@ -67,7 +67,7 @@ pcsc-lite-1.2.9-beta9: Ludovic Rousseau
     32-bits data to the CCID format (replace HOST_TO_CCID)
 - add support of SUN C compiler and try to avoid GCC specific features
   (Heiko Nardmann)
-- SCardGetStatusChange(): 
+- SCardGetStatusChange():
   . exists if the list of readers changed (one reader added) so that the
     application can update its list of readers (Najam Siddiqui)
   . correct a bug when two contexts where used (Najam Siddiqui)
@@ -624,7 +624,7 @@ pcsc-lite-1.0.2beta3: (Ludovic Rousseau <ludovic.rousseau@free.fr>)
 (from Carlos Prados Debian package)
 - configure.in
    . add AC_PREFIX_DEFAULT(/usr/local/pcsc) to install in /usr/local/pcsc by
-   default 
+   default
 - etc/
    . add makeFMStyle, makeSTDStyle and moveFMCode scripts
 - src/utils/Makefile.am

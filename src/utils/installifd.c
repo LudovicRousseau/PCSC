@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	if (iStat != 0)
 	{
 		/*
-		 * Library does not exist 
+		 * Library does not exist
 		 */
 		printf("Library path %s does not exist.\n\n", lpcLibrary);
 		goto retrylib;

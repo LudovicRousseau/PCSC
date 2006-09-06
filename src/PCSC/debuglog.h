@@ -53,8 +53,8 @@ enum {
 };
 
 #define DEBUG_CATEGORY_NOTHING  0
-#define DEBUG_CATEGORY_APDU     1 
-#define DEBUG_CATEGORY_SW       2 
+#define DEBUG_CATEGORY_APDU     1
+#define DEBUG_CATEGORY_SW       2
 
 enum {
 	PCSC_LOG_DEBUG = 0,

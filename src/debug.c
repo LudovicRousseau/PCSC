@@ -13,7 +13,7 @@
  * @file
  * @brief This handles debugging for libpcsclite.
  */
- 
+
 #include "config.h"
 #include <stdarg.h>
 #include <stdlib.h>

@@ -30,7 +30,7 @@
 /*
  * Function: PHGetDefaultProtocol Purpose : To get the default protocol
  * used immediately after reset. This protocol is returned from the
- * function. 
+ * function.
  */
 
 UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
@@ -38,7 +38,7 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 	SMARTCARD_EXTENSION sSmartCard;
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
 
@@ -51,7 +51,7 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 /*
  * Function: PHGetAvailableProtocols Purpose : To get the protocols
  * supported by the card. These protocols are returned from the function
- * as bit masks. 
+ * as bit masks.
  */
 
 UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
@@ -59,7 +59,7 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 	SMARTCARD_EXTENSION sSmartCard;
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
 
@@ -71,7 +71,7 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 
 /*
  * Function: PHSetProtocol Purpose : To determine which protocol to use.
- * SCardConnect has a DWORD dwPreferredProtocols that is a bitmask of what 
+ * SCardConnect has a DWORD dwPreferredProtocols that is a bitmask of what
  * protocols to use.  Basically, if T=N where N is not zero will be used
  * first if it is available in ucAvailable.  Otherwise it will always
  * default to T=0.

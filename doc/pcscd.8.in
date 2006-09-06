@@ -44,33 +44,33 @@ Displays information about the pcscd command line
 Displays the program version number
 .
 .SH DESCRIPTION
-pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is 
-a resource manager that coordinates communications with smart card readers 
+pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is
+a resource manager that coordinates communications with smart card readers
 and smart cards and cryptographic tokens that are connected to the system.
 .PP
-pcscd is normally started at boot time from 
+pcscd is normally started at boot time from
 .IR @sysconfdir_exp@/init.d/pcscd .
 It allows applications to access smart cards and readers without knowing
-details of the card or reader.  
+details of the card or reader.
 .PP
 pcscd coordinates the loading of drivers for card readers.
 .PP
 The purpose of pcsc-lite is to provide a cross compatible API (called
 winscard) for migrating Windows based PC/SC applications to Unix.
 .PP
-At startup, pcscd loads the smart card reader drivers specified in the 
-.I @confdir@/reader.conf 
+At startup, pcscd loads the smart card reader drivers specified in the
+.I @confdir@/reader.conf
 file (or specified using
-.B \-\-config 
+.B \-\-config
 .IR file ).
 .
 .SH "SERIAL SMART CARD READER DRIVERS"
-Smart card reader drivers are placed in the 
+Smart card reader drivers are placed in the
 .I @usbdropdir@
-directory. Each driver is simply an 
-.I .so 
-file.  pcscd locates the driver using the 
-.I @confdir@/reader.conf 
+directory. Each driver is simply an
+.I .so
+file.  pcscd locates the driver using the
+.I @confdir@/reader.conf
 file.  See the
 .BR reader.conf (5)
 manual page for more information.
@@ -80,7 +80,7 @@ Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fP.
 USB smart card reader drivers are located in
 .I @usbdropdir@
 directory as a bundle. You shall not add a USB driver in
-.I @confdir@/reader.conf 
+.I @confdir@/reader.conf
 file.
 .
 .SH FILES

@@ -13,7 +13,7 @@
  * @file
  * @brief This is responsible for client/server communication.
  *
- * A file based socket (\c commonSocket) is used to send/receive only messages 
+ * A file based socket (\c commonSocket) is used to send/receive only messages
  * among clients and server.\n
  * The messages' data are passed throw a memory mapped file: \c sharedSegmentMsg.
  */
@@ -65,7 +65,7 @@ INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int bl
  * server. The socket is associated to the file \c PCSCLITE_CSOCK_NAME.
  *
  * @param[out] pdwClientID Client Connection ID.
- * 
+ *
  * @retval 0 Success.
  * @retval -1 Can not create the socket.
  * @retval -1 The socket can not open a connection.
@@ -143,20 +143,20 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 	int filedes, int blockAmount)
 {
 	/*
-	 * default is success 
+	 * default is success
 	 */
 	int retval = 0;
 	/*
-	 * record the time when we started 
+	 * record the time when we started
 	 */
 	time_t start = time(0);
 	/*
-	 * how many bytes remains to be written 
+	 * how many bytes remains to be written
 	 */
 	size_t remaining = buffer_size;
 
 	/*
-	 * repeat until all data is written 
+	 * repeat until all data is written
 	 */
 	while (remaining > 0)
 	{
@@ -171,7 +171,7 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 		if ((timeout.tv_sec = start + blockAmount - time(0)) < 0)
 		{
 			/*
-			 * we already timed out 
+			 * we already timed out
 			 */
 			retval = -1;
 			break;
@@ -180,7 +180,7 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 		selret = select(filedes + 1, NULL, &write_fd, NULL, &timeout);
 
 		/*
-		 * try to write only when the file descriptor is writable 
+		 * try to write only when the file descriptor is writable
 		 */
 		if (selret > 0)
 		{
@@ -189,7 +189,7 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 			if (!FD_ISSET(filedes, &write_fd))
 			{
 				/*
-				 * very strange situation. it should be an assert really 
+				 * very strange situation. it should be an assert really
 				 */
 				retval = -1;
 				break;
@@ -199,14 +199,14 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 			if (written > 0)
 			{
 				/*
-				 * we wrote something 
+				 * we wrote something
 				 */
 				buffer += written;
 				remaining -= written;
 			} else if (written == 0)
 			{
 				/*
-				 * peer closed the socket 
+				 * peer closed the socket
 				 */
 				retval = -1;
 				break;
@@ -214,7 +214,7 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 			{
 				/*
 				 * we ignore the signals and socket full situations, all
-				 * other errors are fatal 
+				 * other errors are fatal
 				 */
 				if (errno != EINTR && errno != EAGAIN)
 				{
@@ -225,14 +225,14 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
 		} else if (selret == 0)
 		{
 			/*
-			 * timeout 
+			 * timeout
 			 */
 			retval = -1;
 			break;
 		} else
 		{
 			/*
-			 * ignore signals 
+			 * ignore signals
 			 */
 			if (errno != EINTR)
 			{
@@ -266,20 +266,20 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 	int filedes, int blockAmount)
 {
 	/*
-	 * default is success 
+	 * default is success
 	 */
 	int retval = 0;
 	/*
-	 * record the time when we started 
+	 * record the time when we started
 	 */
 	time_t start = time(0);
 	/*
-	 * how many bytes we must read 
+	 * how many bytes we must read
 	 */
 	size_t remaining = buffer_size;
 
 	/*
-	 * repeate until we get the whole message 
+	 * repeate until we get the whole message
 	 */
 	while (remaining > 0)
 	{
@@ -294,7 +294,7 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 		if ((timeout.tv_sec = start + blockAmount - time(0)) < 0)
 		{
 			/*
-			 * we already timed out 
+			 * we already timed out
 			 */
 			retval = -1;
 			break;
@@ -303,7 +303,7 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
 
 		/*
-		 * try to read only when socket is readable 
+		 * try to read only when socket is readable
 		 */
 		if (selret > 0)
 		{
@@ -312,7 +312,7 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 			if (!FD_ISSET(filedes, &read_fd))
 			{
 				/*
-				 * very strange situation. it should be an assert really 
+				 * very strange situation. it should be an assert really
 				 */
 				retval = -1;
 				break;
@@ -322,14 +322,14 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 			if (readed > 0)
 			{
 				/*
-				 * we got something 
+				 * we got something
 				 */
 				buffer += readed;
 				remaining -= readed;
 			} else if (readed == 0)
 			{
 				/*
-				 * peer closed the socket 
+				 * peer closed the socket
 				 */
 				retval = -1;
 				break;
@@ -337,7 +337,7 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 			{
 				/*
 				 * we ignore the signals and empty socket situations, all
-				 * other errors are fatal 
+				 * other errors are fatal
 				 */
 				if (errno != EINTR && errno != EAGAIN)
 				{
@@ -348,14 +348,14 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
 		} else if (selret == 0)
 		{
 			/*
-			 * timeout 
+			 * timeout
 			 */
 			retval = -1;
 			break;
 		} else
 		{
 			/*
-			 * we ignore signals, all other errors are fatal 
+			 * we ignore signals, all other errors are fatal
 			 */
 			if (errno != EINTR)
 			{
@@ -392,7 +392,7 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	int ret;
 
 	/*
-	 * Set the appropriate packet parameters 
+	 * Set the appropriate packet parameters
 	 */
 
 	memset(&msgStruct, 0, sizeof(msgStruct));

@@ -254,7 +254,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			for (j=0; j<reader_nb; j++)
 			{
 				CFStringRef strValue = CFArrayGetValueAtIndex(vendorArray, j);
-				
+
 				driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
 					CFStringGetSystemEncoding()), NULL, 16);
 

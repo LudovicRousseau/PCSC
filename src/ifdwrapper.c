@@ -28,8 +28,8 @@
 #undef PCSCLITE_STATIC_DRIVER
 
 /*
- * Function: IFDSetPTS Purpose : To set the protocol type selection (PTS). 
- * This function sets the appropriate protocol to be used on the card. 
+ * Function: IFDSetPTS Purpose : To set the protocol type selection (PTS).
+ * This function sets the appropriate protocol to be used on the card.
  */
 
 LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
@@ -64,7 +64,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 	SYS_MutexLock(rContext->mMutex);
 
@@ -80,9 +80,9 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	}
 	else
 	{
-		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot, 
+		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot,
 						      dwProtocol,
-						      ucFlags, ucPTS1, 
+						      ucFlags, ucPTS1,
 						      ucPTS2, ucPTS3);
 	}
 #else
@@ -102,7 +102,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 
 	SYS_MutexUnLock(rContext->mMutex);
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	return rv;
@@ -110,7 +110,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 
 /*
  * Function: IFDOpenIFD Purpose : This function opens a communication
- * channel to the IFD. 
+ * channel to the IFD.
  */
 
 LONG IFDOpenIFD(PREADER_CONTEXT rContext)
@@ -139,7 +139,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -163,7 +163,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	{
 		rv = IO_Create_Channel(rContext->dwPort);
 	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
-	{ 
+	{
 		rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	} else
 	{
@@ -177,7 +177,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	return rv;
@@ -185,7 +185,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 
 /*
  * Function: IFDCloseIFD Purpose : This function closes a communication
- * channel to the IFD. 
+ * channel to the IFD.
  */
 
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
@@ -203,13 +203,13 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	
+
 		rv = (*IO_close_channel) ();
 	else
 		rv = (*IFDH_close_channel) (rContext->dwSlot);
@@ -222,7 +222,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	return rv;
@@ -230,7 +230,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 
 /*
  * Function: IFDSetCapabilites Purpose : This function set's capabilities
- * in the reader. 
+ * in the reader.
  */
 
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
@@ -250,7 +250,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 
 	/*
 	 * Let the calling function lock this otherwise a deadlock will
-	 * result 
+	 * result
 	 */
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -273,7 +273,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 /*
  * Function: IFDGetCapabilites Purpose : This function get's capabilities
  * in the reader. Other functions int this file will call the driver
- * directly to not cause a deadlock. 
+ * directly to not cause a deadlock.
  */
 
 LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
@@ -294,7 +294,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -316,15 +316,15 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	return rv;
 }
 
 /*
- * Function: IFDPowerICC Purpose : This function powers up/down or reset's 
- * an ICC located in the IFD. 
+ * Function: IFDPowerICC Purpose : This function powers up/down or reset's
+ * an ICC located in the IFD.
  */
 
 LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
@@ -341,14 +341,14 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #endif
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	rv = 0;
 	dwStatus = 0;
 	ucValue[0] = 0;
 
 	/*
-	 * Check that the card is inserted first 
+	 * Check that the card is inserted first
 	 */
 	IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
@@ -362,7 +362,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -394,7 +394,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	/* use clean values in case of error */
@@ -405,7 +405,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	}
 
 	/*
-	 * Get the ATR and it's length 
+	 * Get the ATR and it's length
 	 */
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 		IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
@@ -416,7 +416,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 /*
  * Function: IFDStatusICC Purpose : This function provides statistical
  * information about the IFD and ICC including insertions, atr, powering
- * status/etc. 
+ * status/etc.
  */
 
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
@@ -444,7 +444,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -471,7 +471,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
@@ -488,7 +488,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	/*
 	 * Now lets get the ATR and process it if IFD Handler version 1.0.
 	 * IFD Handler version 2.0 does this immediately after reset/power up
-	 * to conserve resources 
+	 * to conserve resources
 	 */
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -498,7 +498,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			dwTag = TAG_IFD_ATR;
 
 			/*
-			 * LOCK THIS CODE REGION 
+			 * LOCK THIS CODE REGION
 			 */
 
 			SYS_MutexLock(rContext->mMutex);
@@ -514,18 +514,18 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			SYS_MutexUnLock(rContext->mMutex);
 
 			/*
-			 * END OF LOCKED REGION 
+			 * END OF LOCKED REGION
 			 */
 
 			/*
 			 * FIX :: This is a temporary way to return the correct size
-			 * of the ATR since most of the drivers return MAX_ATR_SIZE 
+			 * of the ATR since most of the drivers return MAX_ATR_SIZE
 			 */
 
 			rv = ATRDecodeAtr(&sSmartCard, pucAtr, MAX_ATR_SIZE);
 
 			/*
-			 * Might be a memory card without an ATR 
+			 * Might be a memory card without an ATR
 			 */
 			if (rv == 0)
 				*pdwAtrLen = 0;
@@ -535,12 +535,12 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		else
 		{
 			/*
-			 * No card is inserted - Atr length is 0 
+			 * No card is inserted - Atr length is 0
 			 */
 			*pdwAtrLen = 0;
 		}
 		/*
-		 * End of FIX 
+		 * End of FIX
 		 */
 	}
 
@@ -552,7 +552,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 /*
  * Function: IFDControl Purpose : This function provides a means for
  * toggling a specific action on the reader such as swallow, eject,
- * biometric. 
+ * biometric.
  */
 
 /*
@@ -576,7 +576,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 	SYS_MutexLock(rContext->mMutex);
 
@@ -589,7 +589,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #endif
 	SYS_MutexUnLock(rContext->mMutex);
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	if (rv == IFD_SUCCESS)
@@ -604,7 +604,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 /*
  * Function: IFDControl Purpose : This function provides a means for
  * toggling a specific action on the reader such as swallow, eject,
- * biometric. 
+ * biometric.
  */
 
 /*
@@ -629,7 +629,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -644,7 +644,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	if (rv == IFD_SUCCESS)
@@ -658,7 +658,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 
 /*
  * Function: IFDTransmit Purpose : This function transmits an APDU to the
- * ICC. 
+ * ICC.
  */
 
 LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
@@ -688,7 +688,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION 
+	 * LOCK THIS CODE REGION
 	 */
 
 	SYS_MutexLock(rContext->mMutex);
@@ -722,7 +722,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	SYS_MutexUnLock(rContext->mMutex);
 
 	/*
-	 * END OF LOCKED REGION 
+	 * END OF LOCKED REGION
 	 */
 
 	/* log the returned status word */

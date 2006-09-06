@@ -25,7 +25,7 @@
 #include <CoreFoundation/CFURL.h>
 
 /*
- * / Load a module (if needed) 
+ * / Load a module (if needed)
  */
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
@@ -37,7 +37,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	*pvLHandle = 0;
 
 	/*
-	 * @@@ kCFStringEncodingMacRoman might be wrong on non US systems. 
+	 * @@@ kCFStringEncodingMacRoman might be wrong on non US systems.
 	 */
 
 	bundlePath = CFStringCreateWithCString(NULL, pcLibrary,

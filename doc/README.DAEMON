@@ -10,6 +10,6 @@ If you installed using ./configure --enable-daemon then just use:
 pcscd
 
 Mac OS X Users may create a Startup by doing the following:
-Copy the files SmartcardServices and StartupParameters.plist from the 
-/etc directory to /System/Library/StartupItems/SmartcardServices.  
+Copy the files SmartcardServices and StartupParameters.plist from the
+/etc directory to /System/Library/StartupItems/SmartcardServices.
 ( You will have to create the SmartcardServices directory )

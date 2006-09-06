@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 
 	/*
-	 * Have to understand the multi-string here 
+	 * Have to understand the multi-string here
 	 */
 	p = 0;
 	for (i = 0; i < dwReaders - 1; i++)
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-	 * Now lets get some work done 
+	 * Now lets get some work done
 	 */
 
 	SCardBeginTransaction(hCard);

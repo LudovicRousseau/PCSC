@@ -21,8 +21,8 @@ extern "C"
 #endif
 
 
-/* 
- * Registers for Power Management callbacks 
+/*
+ * Registers for Power Management callbacks
  */
 
 ULONG PMRegisterForPowerEvents(void);

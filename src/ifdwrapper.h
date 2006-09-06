@@ -9,7 +9,7 @@
  */
 
 /**
- * @file 
+ * @file
  * @brief This wraps the dynamic ifdhandler functions. The abstraction will
  * eventually allow multiple card slots in the same terminal.
  */

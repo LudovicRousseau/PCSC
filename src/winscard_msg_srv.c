@@ -13,7 +13,7 @@
  * @file
  * @brief client/server communication (on the server side only)
  *
- * A file based socket (\c commonSocket) is used to send/receive only messages 
+ * A file based socket (\c commonSocket) is used to send/receive only messages
  * among clients and server.\n
  * The messages' data are passed throw a memory mapped file: \c sharedSegmentMsg.
  */
@@ -100,7 +100,7 @@ static int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
  * This is called by the server to create a socket for local IPC with the
  * clients. The socket is associated to the file \c PCSCLITE_CSOCK_NAME.
  * Each client will open a connection to this socket.
- * 
+ *
  * @return Error code.
  * @retval 0 Success
  * @retval -1 Can not create the socket.
@@ -112,7 +112,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
 	static struct sockaddr_un serv_adr;
 
 	/*
-	 * Create the common shared connection socket 
+	 * Create the common shared connection socket
 	 */
 	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
@@ -144,7 +144,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
 	}
 
 	/*
-	 * Chmod the public entry channel 
+	 * Chmod the public entry channel
 	 */
 	SYS_Chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
 
@@ -169,11 +169,11 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
 	fd_set read_fd;
 	int selret;
-	
+
 	FD_ZERO(&read_fd);
 
 	/*
-	 * Set up the bit masks for select 
+	 * Set up the bit masks for select
 	 */
 	FD_SET(commonSocket, &read_fd);
 
@@ -189,7 +189,7 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	}
 
 	/*
-	 * A common pipe packet has arrived - it could be a new application  
+	 * A common pipe packet has arrived - it could be a new application
 	 */
 	if (FD_ISSET(commonSocket, &read_fd))
 	{
@@ -206,12 +206,12 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 			return 0;
 		}
 	}
-	
+
 	return -1;
 }
 
 /**
- * @brief 
+ * @brief
  *
  * Called by \c ContextThread().
  */
@@ -244,11 +244,11 @@ INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgSt
 	if (FD_ISSET(*pdwClientID, &read_fd))
 	{
 		/*
-		 * Return the current handle 
+		 * Return the current handle
 		 */
 		rv = SHMMessageReceive(msgStruct, sizeof(*msgStruct), *pdwClientID,
 				       PCSCLITE_SERVER_ATTEMPTS);
-		
+
 		if (rv == -1)
 		{	/* The client has died */
 			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d",
@@ -259,15 +259,15 @@ INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgSt
 
 			return 0;
 		}
-		
+
 		/*
-		 * Set the identifier handle 
+		 * Set the identifier handle
 		 */
 		Log2(PCSC_LOG_DEBUG, "correctly processed client: %d",
 			*pdwClientID);
 		return 1;
 	}
-	
+
 	return -1;
 }
 

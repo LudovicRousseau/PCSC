@@ -79,14 +79,14 @@ extern "C"
 		CardCapabilities;
 
 		/*
-		 * PREADER_CONNECTION psReaderConnection; 
+		 * PREADER_CONNECTION psReaderConnection;
 		 */
 
 	}
 	SMARTCARD_EXTENSION, *PSMARTCARD_EXTENSION;
 
 	/*
-	 * Decodes the ATR and fills the structure 
+	 * Decodes the ATR and fills the structure
 	 */
 
 	short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,

@@ -194,7 +194,7 @@ INTERNAL int SYS_WriteFile(int iHandle, char *pcBuffer, int iLength)
 /**
  * @brief Gets the memory page size.
  *
- * The page size is used when calling the \c SYS_MemoryMap() and 
+ * The page size is used when calling the \c SYS_MemoryMap() and
  * \c SYS_PublicMemoryMap() functions.
  *
  * @return Number of bytes per page.
@@ -226,8 +226,8 @@ INTERNAL void *SYS_MemoryMap(int iSize, int iFid, int iOffset)
 	/*
 	 * Here are some common error types: switch( errno ) { case EINVAL:
 	 * printf("EINVAL"); case EBADF: printf("EBADF"); break; case EACCES:
-	 * printf("EACCES"); break; case EAGAIN: printf("EAGAIN"); break; case 
-	 * ENOMEM: printf("ENOMEM"); break; } 
+	 * printf("EACCES"); break; case EAGAIN: printf("EAGAIN"); break; case
+	 * ENOMEM: printf("ENOMEM"); break; }
 	 */
 
 	return vAddress;
@@ -326,7 +326,7 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 			/* the father exits */
 			exit(0);
 	}
-	
+
 	setsid();
 
 	pid = SYS_Fork();

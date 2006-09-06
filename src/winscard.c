@@ -10,7 +10,7 @@
 
 /**
  * @mainpage MUSCLE PC/SC-Lite API Documentation
- * 
+ *
  * @section Introduction
  *
  * This document contains the reference API calls for communicating to the
@@ -29,7 +29,7 @@
  *
  * I would really like to hear from you. If you have any feedback either on
  * this documentation or on the MUSCLE project please feel free to email me at:
- * corcoran@musclecard.com. 
+ * corcoran@musclecard.com.
  *
  *
  * @section API Routines
@@ -45,10 +45,10 @@
  *
  * For a human readable representation of an error the function
  * pcsc_stringify_error() is declared in pcsclite.h. This function is not
- * available on Microsoft(R) winscard API and is pcsc-lite specific. 
+ * available on Microsoft(R) winscard API and is pcsc-lite specific.
  *
  * @section Internals
- * 
+ *
  * PC/SC Lite is formed by a server deamon (<tt>pcscd</tt>) and a client
  * library (<tt>libpcsclite.so</tt>) that communicate via IPC.
  *
@@ -115,7 +115,7 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
  *
  * This must be the first function called in a PC/SC application.
  *
- * @param[in] dwScope Scope of the establishment. 
+ * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * <ul>
  *   <li>SCARD_SCOPE_USER - Not used.

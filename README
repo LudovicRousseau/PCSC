@@ -8,7 +8,7 @@ Requires: A C compiler
           Make, linker tools
           Lex (Lexical Analyzer).
 
-Tested Platforms: 
+Tested Platforms:
 	Linux 2.4 (Redhat 7.1, Suse 7.1/7.2, Debian 3.0)
 	Mac OS X 10.2, 10.3
 	FreeBSD, NetBSD, OpenBSD
@@ -23,7 +23,7 @@ communicating to smart cards and readers. PCSC Lite can be compiled
 directly to a desired reader driver or can be used to dynamically
 allocate/deallocate reader drivers at runtime (default).
 
-PCSC Lite uses the same winscard API as used under Windows(R).  
+PCSC Lite uses the same winscard API as used under Windows(R).
 
 For security aware persons please read the SECURITY file on possible
 vulnerabilites to pcsclite, how you can fix some, and how some will
@@ -33,14 +33,14 @@ For information on how to install driver please read the DRIVERS file.
 
 Memory cards are supported through MCT specifications which is an APDU
 like manner sent normally through the SCardTransmit() function.  This
-functionality is done in the driver. 
+functionality is done in the driver.
 
 INSTALLATION:
 
 Installation is simple.  Type ./configure and then make and make install.
 Options:
 
-   ./configure 
+   ./configure
 
           --enable-libusb        Enable USB libusb support
                                  (on Linux, *BSD, etc.).
@@ -57,12 +57,12 @@ Options:
                                  (default /var/run)
 
 
-By running pcscd under a priveledged account you can link to 
-libpcsclite.so and it will act as a client to the pcscd allowing multiple 
+By running pcscd under a priveledged account you can link to
+libpcsclite.so and it will act as a client to the pcscd allowing multiple
 applications to be run under non-priveledged accounts.
 
 Then type make install to copy etc/reader.conf to
-/etc/reader.conf and the libraries to /usr/local/lib. If you choose 
+/etc/reader.conf and the libraries to /usr/local/lib. If you choose
 not to have your reader.conf in /etc then use --enable-confdir=DIR
 
 You must be root to do make install in the default locations.
@@ -71,13 +71,13 @@ Be sure to edit the /etc/reader.conf file to fit your needs and make sure
 your IFD Handler driver is located in the path specified as LIBRARYPATH
 in reader.conf.  If you are using a reader with multiple smart card slots
 all you have to do is define a different FRIENDLYNAME in the reader.conf
-for each reader.  Both will have the same information otherwise.  
+for each reader.  Both will have the same information otherwise.
 
 There is an config file generator in the utils directory.  It is called
 installifd.  You may use this to generate the /etc/reader.conf file.
 
 USB users shall not use /etc/reader.conf.  pcscd will give
-a warning that the file does not exist or contain anything useful.  
+a warning that the file does not exist or contain anything useful.
 
 There is a test program with this package:
 
@@ -103,10 +103,10 @@ SOLARIS:
 Solaris PC/SC applications must link with -lsocket since
 the libraries are not statically linked.
 
-QUESTIONS: 
+QUESTIONS:
 
-The API documentation is provided in PDF format under the docs 
-directory.  For questions, please email me at: 
+The API documentation is provided in PDF format under the docs
+directory.  For questions, please email me at:
 <David Corcoran> corcoran@linuxnet.com
 
 On some plateforms (GNU/Linux on mips and mipsel, FreeBSD and possibly

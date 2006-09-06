@@ -13,7 +13,7 @@
  * @file
  * @brief This handles debugging for pcscd.
  */
- 
+
 #include "config.h"
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -32,9 +32,9 @@
 #include "sys_generic.h"
 #include "strlcpycat.h"
 
-/** 
+/**
  * Max string size when dumping a 256 bytes longs APDU
- * Should be bigger than 256*3+30 
+ * Should be bigger than 256*3+30
  */
 #define DEBUG_BUF_SIZE 2048
 

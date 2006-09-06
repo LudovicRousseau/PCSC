@@ -53,7 +53,7 @@ LONG RFAllocateReaderSpace(void)
 	int i;   					/* Counter */
 
 	/*
-	 * Allocate each reader structure 
+	 * Allocate each reader structure
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -63,7 +63,7 @@ LONG RFAllocateReaderSpace(void)
 	}
 
 	/*
-	 * Create public event structures 
+	 * Create public event structures
 	 */
 	return EHInitializeEventStructures();
 }
@@ -103,7 +103,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	}
 
 	/*
-	 * Same name, same port - duplicate reader cannot be used 
+	 * Same name, same port - duplicate reader cannot be used
 	 */
 	if (dwNumReadersContexts != 0)
 	{
@@ -131,7 +131,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	}
 
 	/*
-	 * We must find an empty slot to put the reader structure 
+	 * We must find an empty slot to put the reader structure
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -145,13 +145,13 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
 		/*
-		 * No more spots left return 
+		 * No more spots left return
 		 */
 		return SCARD_E_NO_MEMORY;
 	}
 
 	/*
-	 * Check and set the readername to see if it must be enumerated 
+	 * Check and set the readername to see if it must be enumerated
 	 */
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], lpcReader,
 		lpcLibrary, dwPort, 0);
@@ -178,22 +178,22 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContext])->psHandles[i].hCard = 0;
 
 	/*
-	 * If a clone to this reader exists take some values from that clone 
+	 * If a clone to this reader exists take some values from that clone
 	 */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		(sReadersContexts[dwContext])->pdwFeeds = 
+		(sReadersContexts[dwContext])->pdwFeeds =
 		  (sReadersContexts[parentNode])->pdwFeeds;
 		*(sReadersContexts[dwContext])->pdwFeeds += 1;
-		(sReadersContexts[dwContext])->vHandle = 
+		(sReadersContexts[dwContext])->vHandle =
 		  (sReadersContexts[parentNode])->vHandle;
-		(sReadersContexts[dwContext])->mMutex = 
+		(sReadersContexts[dwContext])->mMutex =
 		  (sReadersContexts[parentNode])->mMutex;
-		(sReadersContexts[dwContext])->pdwMutex = 
+		(sReadersContexts[dwContext])->pdwMutex =
 		  (sReadersContexts[parentNode])->pdwMutex;
 
 		/*
-		 * Call on the driver to see if it is thread safe 
+		 * Call on the driver to see if it is thread safe
 		 */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[parentNode]),
@@ -213,8 +213,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	{
 		(sReadersContexts[dwContext])->pdwFeeds = malloc(sizeof(DWORD));
 
-		/* Initialize pdwFeeds to 1, otherwise multiple 
-		   cloned readers will cause pcscd to crash when 
+		/* Initialize pdwFeeds to 1, otherwise multiple
+		   cloned readers will cause pcscd to crash when
 		   RFUnloadReader unloads the driver library
 		   and there are still devices attached using it --mikeg*/
 
@@ -241,10 +241,10 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if (rv != SCARD_S_SUCCESS)
 	{
 		/*
-		 * Cannot connect to reader exit gracefully 
+		 * Cannot connect to reader exit gracefully
 		 */
 		/*
-		 * Clean up so it is not using needed space 
+		 * Clean up so it is not using needed space
 		 */
 		Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
 
@@ -255,7 +255,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContext])->dwIdentity = 0;
 
 		/*
-		 * Destroy and free the mutex 
+		 * Destroy and free the mutex
 		 */
 		if (*(sReadersContexts[dwContext])->pdwMutex == 1)
 		{
@@ -289,7 +289,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		return rv;
 
 	/*
-	 * Call on the driver to see if there are multiple slots 
+	 * Call on the driver to see if there are multiple slots
 	 */
 
 	dwGetSize = sizeof(ucGetData);
@@ -299,23 +299,23 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if (rv != IFD_SUCCESS || dwGetSize != 1 || ucGetData[0] == 0)
 		/*
 		 * Reader does not have this defined.  Must be a single slot
-		 * reader so we can just return SCARD_S_SUCCESS. 
+		 * reader so we can just return SCARD_S_SUCCESS.
 		 */
 		return SCARD_S_SUCCESS;
 
 	if (rv == IFD_SUCCESS && dwGetSize == 1 && ucGetData[0] == 1)
 		/*
-		 * Reader has this defined and it only has one slot 
+		 * Reader has this defined and it only has one slot
 		 */
 		return SCARD_S_SUCCESS;
 
 	/*
-	 * Check the number of slots and create a different 
-	 * structure for each one accordingly 
+	 * Check the number of slots and create a different
+	 * structure for each one accordingly
 	 */
 
 	/*
-	 * Initialize the rest of the slots 
+	 * Initialize the rest of the slots
 	 */
 
 	for (j = 1; j < ucGetData[0]; j++)
@@ -324,8 +324,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		DWORD dwContextB = 0;
 
 		/*
-		 * We must find an empty spot to put the 
-		 * reader structure 
+		 * We must find an empty spot to put the
+		 * reader structure
 		 */
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
@@ -339,7 +339,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/*
-			 * No more spots left return 
+			 * No more spots left return
 			 */
 			rv = RFRemoveReader(lpcReader, dwPort);
 			return SCARD_E_NO_MEMORY;
@@ -370,7 +370,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		sReadersContexts[dwContextB]->dwSlot =
 			sReadersContexts[dwContext]->dwSlot + j;
 
-		/* 
+		/*
 		 * Added by Dave - slots did not have a pdwFeeds
 		 * parameter so it was by luck they were working
 		 */
@@ -392,7 +392,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
 
 		/*
-		 * Call on the driver to see if the slots are thread safe 
+		 * Call on the driver to see if the slots are thread safe
 		 */
 
 		dwGetSize = sizeof(ucThread);
@@ -417,10 +417,10 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv != SCARD_S_SUCCESS)
 		{
 			/*
-			 * Cannot connect to slot exit gracefully 
+			 * Cannot connect to slot exit gracefully
 			 */
 			/*
-			 * Clean up so it is not using needed space 
+			 * Clean up so it is not using needed space
 			 */
 			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
 
@@ -431,7 +431,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			(sReadersContexts[dwContextB])->dwIdentity = 0;
 
 			/*
-			 * Destroy and free the mutex 
+			 * Destroy and free the mutex
 			 */
 			if (*(sReadersContexts[dwContextB])->pdwMutex == 1)
 			{
@@ -480,7 +480,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		int i;
 
 		/*
-		 * Try to destroy the thread 
+		 * Try to destroy the thread
 		 */
 		rv = EHDestroyEventHandler(sContext);
 
@@ -489,7 +489,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 			return rv;
 
 		/*
-		 * Destroy and free the mutex 
+		 * Destroy and free the mutex
 		 */
 		if ((NULL == sContext->pdwMutex) || (NULL == sContext->pdwFeeds))
 		{
@@ -554,7 +554,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	int i;
 
 	/*
-	 * Clear the list 
+	 * Clear the list
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		usedDigits[i] = FALSE;
@@ -571,7 +571,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 					LONG ret;
 
 					/*
-					 * Ask the driver if it supports multiple channels 
+					 * Ask the driver if it supports multiple channels
 					 */
 					valueLength = sizeof(tagValue);
 					ret = IFDGetCapabilities((sReadersContexts[i]),
@@ -590,7 +590,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 
 					/*
 					 * Check to see if it is a hotplug reader and
-					 * different 
+					 * different
 					 */
 					if (((((sReadersContexts[i])->dwPort & 0xFFFF0000) ==
 							PCSCLITE_HP_BASE_PORT)
@@ -602,19 +602,19 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 						/*
 						 * tells the caller who the parent of this
 						 * clone is so it can use it's shared
-						 * resources like mutex/etc. 
+						 * resources like mutex/etc.
 						 */
 						parent = i;
 
 						/*
-						 * If the same reader already exists and it is 
+						 * If the same reader already exists and it is
 						 * hotplug then we must look for others and
-						 * enumerate the readername 
+						 * enumerate the readername
 						 */
 						currentDigit = strtol(lpcReader + strlen(lpcReader) - 5, NULL, 16);
 
 						/*
-						 * This spot is taken 
+						 * This spot is taken
 						 */
 						usedDigits[currentDigit] = TRUE;
 					}
@@ -644,7 +644,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	sprintf(rContext->lpcReader, "%s %02X %02lX", readerName, i, dwSlot);
 
 	/*
-	 * Set the slot in 0xDDDDCCCC 
+	 * Set the slot in 0xDDDDCCCC
 	 */
 	rContext->dwSlot = (i << 16) + dwSlot;
 
@@ -662,7 +662,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 		return SCARD_E_READER_UNAVAILABLE;
 
 	/*
-	 * Ignore the groups for now, return all readers 
+	 * Ignore the groups for now, return all readers
 	 */
 	dwCSize = 0;
 	p = 0;
@@ -678,23 +678,23 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 
 	if (p > dwNumReadersContexts)
 		/*
-		 * We are severely hosed here 
+		 * We are severely hosed here
 		 */
 		/*
-		 * Hopefully this will never be true 
+		 * Hopefully this will never be true
 		 */
 		return SCARD_F_UNKNOWN_ERROR;
 
 	/*
-	 * Added for extra NULL byte on MultiString 
+	 * Added for extra NULL byte on MultiString
 	 */
 	dwCSize += 1;
 
 	/*
-	 * If lpcReaders is not allocated then just 
+	 * If lpcReaders is not allocated then just
 	 */
 	/*
-	 * return the amount needed to allocate 
+	 * return the amount needed to allocate
 	 */
 	if (lpcReaders == 0)
 	{
@@ -710,7 +710,7 @@ LONG RFListReaders(LPSTR lpcReaders, LPDWORD pdwReaderNum)
 	p = 0;
 
 	/*
-	 * Creating MultiString 
+	 * Creating MultiString
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -785,7 +785,7 @@ LONG RFReaderInfoById(DWORD dwIdentity, PREADER_CONTEXT * sReader)
 	int i;
 
 	/*
-	 * Strip off the lower nibble and get the identity 
+	 * Strip off the lower nibble and get the identity
 	 */
 	dwIdentity = dwIdentity >> (sizeof(DWORD) / 2) * 8;
 	dwIdentity = dwIdentity << (sizeof(DWORD) / 2) * 8;
@@ -808,7 +808,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 	{
 		Log1(PCSC_LOG_ERROR, "Warning library pointer not NULL");
 		/*
-		 * Another reader exists with this library loaded 
+		 * Another reader exists with this library loaded
 		 */
 		return SCARD_S_SUCCESS;
 	}
@@ -824,7 +824,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	/*
 	 * Use this function as a dummy to determine the IFD Handler version
 	 * type  1.0/2.0/3.0.  Suppress error messaging since it can't be 1.0,
-	 * 2.0 and 3.0. 
+	 * 2.0 and 3.0.
 	 */
 
 	DebugLogSuppress(DEBUGLOG_IGNORE_ENTRIES);
@@ -838,7 +838,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	if (rv1 != SCARD_S_SUCCESS && rv2 != SCARD_S_SUCCESS && rv3 != SCARD_S_SUCCESS)
 	{
 		/*
-		 * Neither version of the IFD Handler was found - exit 
+		 * Neither version of the IFD Handler was found - exit
 		 */
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 
@@ -846,26 +846,26 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	} else if (rv1 == SCARD_S_SUCCESS)
 	{
 		/*
-		 * Ifd Handler 1.0 found 
+		 * Ifd Handler 1.0 found
 		 */
 		rContext->dwVersion = IFD_HVERSION_1_0;
 	} else if (rv3 == SCARD_S_SUCCESS)
 	{
 		/*
-		 * Ifd Handler 3.0 found 
+		 * Ifd Handler 3.0 found
 		 */
 		rContext->dwVersion = IFD_HVERSION_3_0;
 	}
 	else
 	{
 		/*
-		 * Ifd Handler 2.0 found 
+		 * Ifd Handler 2.0 found
 		 */
 		rContext->dwVersion = IFD_HVERSION_2_0;
 	}
 
 	/*
-	 * The following binds version 1.0 of the IFD Handler specs 
+	 * The following binds version 1.0 of the IFD Handler specs
 	 */
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -909,7 +909,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
 		/*
-		 * The following binds version 2.0 of the IFD Handler specs 
+		 * The following binds version 2.0 of the IFD Handler specs
 		 */
 
 #define GET_ADDRESS_OPTIONALv2(s, code) \
@@ -943,7 +943,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	else if (rContext->dwVersion == IFD_HVERSION_3_0)
 	{
 		/*
-		 * The following binds version 3.0 of the IFD Handler specs 
+		 * The following binds version 3.0 of the IFD Handler specs
 		 */
 
 #define GET_ADDRESS_OPTIONALv3(s, code) \
@@ -978,7 +978,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	else
 	{
 		/*
-		 * Who knows what could have happenned for it to get here. 
+		 * Who knows what could have happenned for it to get here.
 		 */
 		Log1(PCSC_LOG_CRITICAL, "IFD Handler not 1.0/2.0 or 3.0");
 		exit(1);
@@ -990,7 +990,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 {
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 
 	memset(&rContext->psFunctions, 0, sizeof(rContext->psFunctions));
@@ -1001,7 +1001,7 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 LONG RFUnloadReader(PREADER_CONTEXT rContext)
 {
 	/*
-	 * Make sure no one else is using this library 
+	 * Make sure no one else is using this library
 	 */
 
 	if (*rContext->pdwFeeds == 1)
@@ -1087,14 +1087,14 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	LONG rv;
 
 	/*
-	 * Spawn the event handler thread 
+	 * Spawn the event handler thread
 	 */
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
 		rContext->lpcReader, rContext->lpcLibrary);
 
   /******************************************/
 	/*
-	 * This section loads the library 
+	 * This section loads the library
 	 */
   /******************************************/
 	rv = RFLoadReader(rContext);
@@ -1103,7 +1103,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
   /*******************************************/
 	/*
-	 * This section binds the functions 
+	 * This section binds the functions
 	 */
   /*******************************************/
 	rv = RFBindFunctions(rContext);
@@ -1116,7 +1116,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
   /*******************************************/
 	/*
-	 * This section tries to open the port 
+	 * This section tries to open the port
 	 */
   /*******************************************/
 
@@ -1140,14 +1140,14 @@ LONG RFUnInitializeReader(PREADER_CONTEXT rContext)
 		rContext->lpcReader);
 
 	/*
-	 * Close the port, unbind the functions, and unload the library 
+	 * Close the port, unbind the functions, and unload the library
 	 */
 
 	/*
 	 * If the reader is getting uninitialized then it is being unplugged
 	 * so I can't send a IFDPowerICC call to it
-	 * 
-	 * IFDPowerICC( rContext, IFD_POWER_DOWN, Atr, &AtrLen ); 
+	 *
+	 * IFDPowerICC( rContext, IFD_POWER_DOWN, Atr, &AtrLen );
 	 */
 	IFDCloseIFD(rContext);
 	RFUnBindFunctions(rContext);
@@ -1162,7 +1162,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 
 	/*
 	 * Create a random handle with 16 bits check to see if it already is
-	 * used. 
+	 * used.
 	 */
 	randHandle = SYS_RandomInt(10, 65000);
 
@@ -1182,7 +1182,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 						(sReadersContexts[i])->psHandles[j].hCard)
 					{
 						/*
-						 * Get a new handle and loop again 
+						 * Get a new handle and loop again
 						 */
 						randHandle = SYS_RandomInt(10, 65000);
 						continue;
@@ -1193,7 +1193,7 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 
 		/*
 		 * Once the for loop is completed w/o restart a good handle was
-		 * found and the loop can be exited. 
+		 * found and the loop can be exited.
 		 */
 
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
@@ -1276,7 +1276,7 @@ LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 	int i;
 
 	/*
-	 * Set all the handles for that reader to the event 
+	 * Set all the handles for that reader to the event
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 	{
@@ -1359,7 +1359,7 @@ void RFCleanupReaders(int shouldExit)
 			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
 				sizeof(lpcStripReader));
 			/*
-			 * strip the 6 last char ' 00 00' 
+			 * strip the 6 last char ' 00 00'
 			 */
 			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
 
@@ -1371,10 +1371,10 @@ void RFCleanupReaders(int shouldExit)
 	}
 
 	/*
-	 * exit() will call at_exit() 
+	 * exit() will call at_exit()
 	 */
 
-	if (shouldExit) 
+	if (shouldExit)
 		exit(0);
 }
 
@@ -1510,7 +1510,7 @@ void RFReCheckReaderConf(void)
 	free(reader_list);
 }
 
-void RFSuspendAllReaders(void) 
+void RFSuspendAllReaders(void)
 {
 	int i;
 
@@ -1525,12 +1525,12 @@ void RFSuspendAllReaders(void)
 
 }
 
-void RFAwakeAllReaders(void) 
+void RFAwakeAllReaders(void)
 {
 	LONG rv = IFD_SUCCESS;
 	int i;
 	int initFlag;
-        
+
 	initFlag = 0;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -1544,12 +1544,12 @@ void RFAwakeAllReaders(void)
 			for (j=0; j < i; j++)
 			{
 				if (((sReadersContexts[j])->vHandle == (sReadersContexts[i])->vHandle)&&
-					((sReadersContexts[j])->dwPort   == (sReadersContexts[i])->dwPort)) 
+					((sReadersContexts[j])->dwPort   == (sReadersContexts[i])->dwPort))
 				{
 					initFlag = 1;
 				}
 			}
-                        
+
 			if (initFlag == 0)
 				rv = IFDOpenIFD(sReadersContexts[i]);
 			else

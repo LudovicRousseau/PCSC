@@ -24,7 +24,7 @@ extern "C"
 #endif
 
 	/*
-	 * List of data structures available to ifdhandler 
+	 * List of data structures available to ifdhandler
 	 */
 
 	typedef struct _DEVICE_CAPABILITIES
@@ -83,12 +83,12 @@ extern "C"
 	SCARD_IO_HEADER, *PSCARD_IO_HEADER;
 
 	/*
-	 * End of structure list 
+	 * End of structure list
 	 */
 
 	/*
 	 * The list of tags should be alot more but this is all I use in the
-	 * meantime 
+	 * meantime
 	 */
 
 #define TAG_IFD_ATR                     0x0303
@@ -99,21 +99,21 @@ extern "C"
 #define TAG_IFD_SIMULTANEOUS_ACCESS     0x0FAF
 
 	/*
-	 * End of tag list 
+	 * End of tag list
 	 */
 
 	/*
-	 * IFD Handler version number enummerations 
+	 * IFD Handler version number enummerations
 	 */
 #define IFD_HVERSION_1_0               0x00010000
 #define IFD_HVERSION_2_0               0x00020000
 #define IFD_HVERSION_3_0               0x00030000
 	/*
-	 * End of version number enummerations 
+	 * End of version number enummerations
 	 */
 
 	/*
-	 * List of defines available to ifdhandler 
+	 * List of defines available to ifdhandler
 	 */
 
 #define IFD_POWER_UP			500
@@ -151,7 +151,7 @@ extern "C"
 #ifndef IFDHANDLERv2
 
 	/*
-	 * List of Defined Functions Available to IFD_Handler 3.0 
+	 * List of Defined Functions Available to IFD_Handler 3.0
 	 *
 	 * All the functions of IFD_Handler 2.0 are available
 	 * IFDHCreateChannelByName() is new
@@ -164,7 +164,7 @@ extern "C"
 #else
 
 	/*
-	 * List of Defined Functions Available to IFD_Handler 2.0 
+	 * List of Defined Functions Available to IFD_Handler 2.0
 	 */
 
 	RESPONSECODE IFDHControl(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
@@ -186,7 +186,7 @@ extern "C"
 	RESPONSECODE IFDHICCPresence(DWORD);
 
 	/*
-	 * List of Defined Functions Available to IFD_Handler 1.0 
+	 * List of Defined Functions Available to IFD_Handler 1.0
 	 */
 
 	RESPONSECODE IO_Create_Channel(DWORD);

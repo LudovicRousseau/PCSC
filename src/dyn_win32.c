@@ -63,7 +63,7 @@ int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
 	char *pcFunctionName;
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	rv = 0;
 	pcFunctionName = NULL;

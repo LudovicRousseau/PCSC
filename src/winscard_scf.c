@@ -378,7 +378,7 @@ static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 		return SCARD_E_INVALID_HANDLE;
 
 	/* TODO Take Care of the Disposition...  */
-	/* Resetting the card for SCARD_RESET_CARD | 
+	/* Resetting the card for SCARD_RESET_CARD |
 	   SCARD_UNPOWER_CARD | SCARD_EJECT_CARD */
 	if (SCARD_LEAVE_CARD != dwDisposition)
 	{
@@ -389,7 +389,7 @@ static LONG SCardDisconnectTH(SCARDHANDLE hCard, DWORD dwDisposition)
 		{
 			status = SCF_Card_reset(psChannelMap[retIndice].SCF_hCard);
 			SCF_Card_unlock(psChannelMap[retIndice].SCF_hCard);
-			/*a usleep here will allow the RESET_EVENT to be reported and 
+			/*a usleep here will allow the RESET_EVENT to be reported and
 			   the Maps to be updated */
 			SYS_USleep(10);
 		}
@@ -729,7 +729,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		return SCARD_E_INVALID_HANDLE;
 
 	/* Application is waiting for a reader -
-	   return the first available reader 
+	   return the first available reader
 	 */
 	if (cReaders == 0)
 	{
@@ -953,7 +953,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				SCardEventUnlock();
 				if (currReader->dwCurrentState == SCARD_STATE_UNAWARE)
 				{
-					/* Break out of the while .. loop and return status 
+					/* Break out of the while .. loop and return status
 					   once all the status's for all readers is met */
 					dwBreakFlag = 1;
 				}
@@ -972,7 +972,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		{
 			dwTime += PCSCLITE_STATUS_WAIT;
 
-			/* If time is greater than timeout and all readers have been 
+			/* If time is greater than timeout and all readers have been
 			   checked
 			 */
 			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
@@ -1574,7 +1574,7 @@ LONG SCardEventLock(void)
 }
 
 /*  This function unlocks a mutex so another thread
-    may use the client library 
+    may use the client library
 */
 
 LONG SCardUnlockThread(void)
@@ -1587,14 +1587,14 @@ LONG SCardEventUnlock(void)
 	return SYS_MutexUnLock(&EventMutex);
 }
 
-static LONG isActiveContextPresent(void) 
+static LONG isActiveContextPresent(void)
 {
 	long fActiveContext = FALSE;
 	int i;
 
-	for (i=0; i<PCSCLITE_MAX_APPLICATION_CONTEXTS; i++) 
+	for (i=0; i<PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
-		if (psContextMap[i].hContext != 0) 
+		if (psContextMap[i].hContext != 0)
 		{
 			fActiveContext = TRUE;
 			break;
@@ -1695,13 +1695,13 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 		break;
 	}							/* switch */
 	/*
-	 * The OCF Server always calls the registered callback function 
+	 * The OCF Server always calls the registered callback function
 	 * immediately after the callback function is registered,
-	 * but always with the state of SCF_EVENT_CARDABSENT even if 
-	 * there is a card present in the reader, the OCF server then 
+	 * but always with the state of SCF_EVENT_CARDABSENT even if
+	 * there is a card present in the reader, the OCF server then
 	 * calls the callback the second time with the correct state,
 	 * that is the reason for the check if (bInitialized == 2).
-	 * If there is no card present in the reader the PCSC_SCF_Initialize's 
+	 * If there is no card present in the reader the PCSC_SCF_Initialize's
 	 * pthread_cond_timedwait times out after 2 secs.
      */
 	if (bInitialized < 2)
@@ -1709,7 +1709,7 @@ static void EventCallback(SCF_Event_t eventType, SCF_Terminal_t hTerm,
 		bInitialized++;
 		if (2 == bInitialized)
 			pthread_cond_signal(&EventCondition);
-	} 
+	}
 
 	SCardEventUnlock();
 }
@@ -1918,20 +1918,20 @@ void SCardUnload(void)
 	 *	memory having the same impact that PCSC is uninitialized enen though
 	 *	there are active references.
      */
-	if((!PCSC_Initialized) || isActiveContextPresent()) 
+	if((!PCSC_Initialized) || isActiveContextPresent())
 		return;
 
-	for(i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++) 
+	for(i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		if (psReaderMap[i].hTerminal)
 		{
 			SCF_Terminal_removeEventListener(psReaderMap[i].hTerminal,
 				psReaderMap[i].lHandle);
 
-			SCF_Terminal_close(psReaderMap[i].hTerminal); 
+			SCF_Terminal_close(psReaderMap[i].hTerminal);
 
 			if (psReaderMap[i].ReaderName)
 				free(psReaderMap[i].ReaderName);
-		}   
+		}
 
 	SCF_Session_close(g_hSession);
 	PCSC_Initialized = 0;

@@ -22,7 +22,7 @@ static int iLinenumber;
 static char *pcPrevious;
 static char *pcCurrent;
 static char *pcFriendlyname;
-static char *pcDevicename;                
+static char *pcDevicename;
 static char *pcLibpath;
 static char *pcChannelid;
 static int badError;
@@ -40,9 +40,9 @@ void tok_error(char *pcToken_error);
 
 #.*                                       {}
 "\n"                                      { iLinenumber++; }
-(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { evaluatetoken( yytext); } 
+(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { evaluatetoken( yytext); }
 [ \t]                                     {}
-([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { evaluatetoken( yytext ); } 
+([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { evaluatetoken( yytext ); }
 .                                         { tok_error( yytext ); }
 %%
 

@@ -304,7 +304,7 @@ extern "C"
 	typedef struct getset_struct getset_struct;
 
 	/*
-	 * Now some function definitions 
+	 * Now some function definitions
 	 */
 
 	int SHMClientRead(psharedSegmentMsg, DWORD, int);

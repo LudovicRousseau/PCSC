@@ -54,7 +54,7 @@ static char Init = TRUE;
 extern char ReCheckSerialReaders;
 
 /*
- * Some internal functions 
+ * Some internal functions
  */
 void SVCServiceRunLoop(void);
 void SVCClientCleanup(psharedSegmentMsg);
@@ -68,12 +68,12 @@ void print_usage (char const * const);
 PCSCLITE_MUTEX usbNotifierMutex;
 
 /*
- * Cleans up messages still on the queue when a client dies 
+ * Cleans up messages still on the queue when a client dies
  */
 void SVCClientCleanup(psharedSegmentMsg msgStruct)
 {
 	/*
-	 * May be implemented in future releases 
+	 * May be implemented in future releases
 	 */
 }
 
@@ -82,7 +82,7 @@ void SVCClientCleanup(psharedSegmentMsg msgStruct)
  *
  * An endless loop calls the function \c SHMProcessEventsServer() to check for
  * messages sent by clients.
- * If the message is valid, \c CreateContextThread() is called to serve this 
+ * If the message is valid, \c CreateContextThread() is called to serve this
  * request.
  */
 void SVCServiceRunLoop(void)
@@ -90,12 +90,12 @@ void SVCServiceRunLoop(void)
 	int rsp;
 	LONG rv;
 	DWORD dwClientID;	/* Connection ID used to reference the Client */
-	
+
 	rsp = 0;
 	rv = 0;
 
 	/*
-	 * Initialize the comm structure 
+	 * Initialize the comm structure
 	 */
 	rsp = SHMInitializeCommonSegment();
 
@@ -106,7 +106,7 @@ void SVCServiceRunLoop(void)
 	}
 
 	/*
-	 * Initialize the contexts structure 
+	 * Initialize the contexts structure
 	 */
 	rv = ContextsInitialize();
 
@@ -117,7 +117,7 @@ void SVCServiceRunLoop(void)
 	}
 
 	/*
-	 * Solaris sends a SIGALRM and it is annoying 
+	 * Solaris sends a SIGALRM and it is annoying
 	 */
 
 	signal(SIGALRM, SIG_IGN);
@@ -126,12 +126,12 @@ void SVCServiceRunLoop(void)
 				 * when the shell is existed */
 
 	/*
-	 * This function always returns zero 
+	 * This function always returns zero
 	 */
 	rsp = SYS_MutexInit(&usbNotifierMutex);
 
 	/*
-	 * Set up the search for USB/PCMCIA devices 
+	 * Set up the search for USB/PCMCIA devices
 	 */
 	HPSearchHotPluggables();
 	HPRegisterForHotplugEvents();
@@ -205,13 +205,13 @@ int main(int argc, char **argv)
 		{0, 0, 0, 0}
 	};
 #endif
-	
+
 	rv = 0;
 	newReaderConfig = 0;
 	setToForeground = FALSE;
 
 	/*
-	 * test the version 
+	 * test the version
 	 */
 	if (strcmp(PCSCLITE_VERSION_NUMBER, VERSION) != 0)
 	{
@@ -230,7 +230,7 @@ int main(int argc, char **argv)
 	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
 
 	/*
-	 * Handle any command line arguments 
+	 * Handle any command line arguments
 	 */
 #ifdef  HAVE_GETOPT_LONG
 	while ((opt = getopt_long (argc, argv, "c:fdhvaeC", long_options, &option_index)) != -1) {
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 		}
 
 	}
-	
+
 	if (argv[optind])
 	{
 		printf("Unknown option: %s\n\n", argv[optind]);
@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 #ifdef USE_RUN_PID
 
 		/* read the pid file to get the old pid and test if the old pcscd is
-		 * still running 
+		 * still running
 		 */
 		FILE *f;
 		/* pids are only 15 bits but 4294967296
@@ -335,7 +335,7 @@ int main(int argc, char **argv)
 				"file " PCSCLITE_PUBSHM_FILE " already exists.");
 			Log1(PCSC_LOG_CRITICAL,
 				"Maybe another pcscd is running?");
-			Log1(PCSC_LOG_CRITICAL, 
+			Log1(PCSC_LOG_CRITICAL,
 				"I can't read process pid from " USE_RUN_PID);
 			Log1(PCSC_LOG_CRITICAL,
 				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
@@ -357,7 +357,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * If this is set to one the user has asked it not to fork 
+	 * If this is set to one the user has asked it not to fork
 	 */
 	if (!setToForeground)
 	{
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * cleanly remove /tmp/pcsc when exiting 
+	 * cleanly remove /tmp/pcsc when exiting
 	 */
 	signal(SIGQUIT, signal_trap);
 	signal(SIGTERM, signal_trap);
@@ -410,12 +410,12 @@ int main(int argc, char **argv)
 		Log2(PCSC_LOG_CRITICAL, "atexit() failed: %s", strerror(errno));
 
 	/*
-	 * Allocate memory for reader structures 
+	 * Allocate memory for reader structures
 	 */
 	RFAllocateReaderSpace();
 
 	/*
-	 * Grab the information from the reader.conf 
+	 * Grab the information from the reader.conf
 	 */
 	if (newReaderConfig)
 	{
@@ -437,7 +437,7 @@ int main(int argc, char **argv)
 			Log1(PCSC_LOG_INFO,
 				"warning: no " PCSCLITE_READER_CONFIG " found");
 			/*
-			 * Token error in file 
+			 * Token error in file
 			 */
 		}
 		else
@@ -447,7 +447,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Set the default globals 
+	 * Set the default globals
 	 */
 	g_rgSCardT0Pci.dwProtocol = SCARD_PROTOCOL_T0;
 	g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
@@ -456,12 +456,12 @@ int main(int argc, char **argv)
 	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
 	/*
-	 * post initialistion 
+	 * post initialistion
 	 */
 	Init = FALSE;
 
 	/*
-	 * signal_trap() does just set a global variable used by the main loop 
+	 * signal_trap() does just set a global variable used by the main loop
 	 */
 	signal(SIGQUIT, signal_trap);
 	signal(SIGTERM, signal_trap);
@@ -552,15 +552,15 @@ void print_usage (char const * const progname)
 	printf("			send logs to stderr instead of syslog\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -v, --version		display the program version number\n");
-	printf("  -d, --debug	 	display lower level debug messages\n"); 
-	printf("      --info	 	display info level debug messages (default level)\n"); 
-	printf("  -e  --error	 	display error level debug messages\n"); 
-	printf("  -C  --critical 	display critical only level debug messages\n"); 
+	printf("  -d, --debug	 	display lower level debug messages\n");
+	printf("      --info	 	display info level debug messages (default level)\n");
+	printf("  -e  --error	 	display error level debug messages\n");
+	printf("  -C  --critical 	display critical only level debug messages\n");
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
 	printf("  -f	run in foreground (no daemon), send logs to stderr instead of syslog\n");
-	printf("  -d 	display debug messages. Output may be:\n"); 
+	printf("  -d 	display debug messages. Output may be:\n");
 	printf("  -h 	display usage information\n");
 	printf("  -v 	display the program version number\n");
 #endif

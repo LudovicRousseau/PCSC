@@ -17,7 +17,7 @@
  * @file
  * @brief This handles pcsc_stringify_error()
  */
- 
+
 #include <stdio.h>
 #include <sys/types.h>
 

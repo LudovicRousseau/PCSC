@@ -38,7 +38,7 @@ under Linux and
 under FreeBSD.
 .PP
 The "LIBPATH" field is the filename of the driver code. The driver is
-a dynamically loaded piece of code (generally a 
+a dynamically loaded piece of code (generally a
 .IR drivername.so* file).
 .PP
 The "CHANNELID" is no more used for recent drivers (IFD handler 3.0) and

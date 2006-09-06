@@ -38,7 +38,7 @@
  * @param psExtension
  * @param pucAtr
  * @param dwLength
- * @return 
+ * @return
  */
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
@@ -49,7 +49,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	int i = 1;					/* value of the index in TAi, TBi, etc. */
 
 	/*
-	 * Zero out everything 
+	 * Zero out everything
 	 */
 	p = K = TCK = Y1i = T = 0;
 
@@ -62,13 +62,13 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		return 0;	/** @retval 0 Atr must have TS and T0 */
 
 	/*
-	 * Zero out the bitmasks 
+	 * Zero out the bitmasks
 	 */
 	psExtension->CardCapabilities.AvailableProtocols = SCARD_PROTOCOL_UNSET;
 	psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_UNSET;
 
 	/*
-	 * Decode the TS byte 
+	 * Decode the TS byte
 	 */
 	if (pucAtr[0] == 0x3F)
 	{	/* Inverse convention used */
@@ -86,11 +86,11 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 		}
 
 	/*
-	 * Here comes the platform dependant stuff 
+	 * Here comes the platform dependant stuff
 	 */
 
 	/*
-	 * Decode the T0 byte 
+	 * Decode the T0 byte
 	 */
 	Y1i = pucAtr[1] >> 4;	/* Get the MSN in Y1 */
 	K = pucAtr[1] & 0x0F;	/* Get the LSN in K */
@@ -103,7 +103,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 #endif
 
 	/*
-	 * Examine Y1 
+	 * Examine Y1
 	 */
 	do
 	{
@@ -121,7 +121,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 #endif
 
 		/*
-		 * Examine TDi to determine protocol and more 
+		 * Examine TDi to determine protocol and more
 		 */
 		if (TDi >= 0)
 		{
@@ -182,7 +182,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 					{
 						/*
 						 * Do nothing for now since other protocols are not
-						 * supported at this time 
+						 * supported at this time
 						 */
 					}
 
@@ -226,7 +226,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	while (Y1i != 0);
 
 	/*
-	 * If TDx is not set then the current must be T0 
+	 * If TDx is not set then the current must be T0
 	 */
 	if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNSET)
 	{
@@ -235,7 +235,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	}
 
 	/*
-	 * Take care of the historical characters 
+	 * Take care of the historical characters
 	 */
 	psExtension->ATR.HistoryLength = K;
 	memcpy(psExtension->ATR.HistoryValue, &pucAtr[p], K);
@@ -244,7 +244,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 
 	/*
 	 * Check to see if TCK character is included It will be included if
-	 * more than T=0 is supported 
+	 * more than T=0 is supported
 	 */
 	if (psExtension->CardCapabilities.AvailableProtocols & SCARD_PROTOCOL_T1)
 		TCK = pucAtr[p++];

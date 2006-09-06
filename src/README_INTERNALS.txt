@@ -113,11 +113,11 @@ READER_CONTEXT_CHANNELS.
 
 PC/SC D2
         \ (3)           (1)              -- R1
-         ------       --------          / 
+         ------       --------          /
                \     /        \        /
                 App A          PC/SC D1---- R2S1
-                     \        /  | | | \ 
-                      --------   | | |  \ 
+                     \        /  | | | \
+                      --------   | | |  \
                         (2)      | | |   -- R2S2
 PC/SC D3                         | | |
         \   (4)          (5)     | | |
@@ -218,7 +218,7 @@ libpcsclite side:
   in winscard_clnt.c)
 - each entry readerStates[i] gets a reference to the memory segment of
   the server.
-  
+
 The memory is READ ONLY on the library side.
 
 

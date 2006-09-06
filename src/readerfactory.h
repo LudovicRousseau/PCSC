@@ -94,7 +94,7 @@ extern "C"
 	typedef struct FctMap_V3 FCT_MAP_V3, *PFCT_MAP_V3;
 
 	/*
-	 * The following is not currently used but in place if needed 
+	 * The following is not currently used but in place if needed
 	 */
 
 	struct RdrCapabilities
@@ -147,7 +147,7 @@ extern "C"
 		char lpcDevice[MAX_DEVICENAME];	/* Device Name */
 		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
-		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];	
+		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];
                                          /* Structure of connected handles */
 		union
 		{
@@ -212,8 +212,8 @@ extern "C"
 	void RFCleanupReaders(int);
 	int RFStartSerialReaders(char *readerconf);
 	void RFReCheckReaderConf(void);
-	void RFSuspendAllReaders(void); 
-	void RFAwakeAllReaders(void); 
+	void RFSuspendAllReaders(void);
+	void RFAwakeAllReaders(void);
 
 #ifdef __cplusplus
 }
