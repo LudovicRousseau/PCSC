@@ -490,7 +490,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	LONG rv;
 	release_struct scReleaseStruct;
 	sharedSegmentMsg msgStruct;
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 
 	PROFILE_START
 
@@ -621,7 +621,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	LONG rv;
 	connect_struct scConnectStruct;
 	sharedSegmentMsg msgStruct;
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 
 	PROFILE_START
 
@@ -1611,7 +1611,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	DWORD dwState;
 	DWORD dwBreakFlag = 0;
 	int j;
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 	int currentReaderCount = 0;
 
 	PROFILE_START
@@ -2781,7 +2781,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 {
 	DWORD dwReadersLen;
 	int i, lastChrPtr;
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 
 	PROFILE_START
 
@@ -2884,7 +2884,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	LONG rv = SCARD_S_SUCCESS;
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 
 	PROFILE_START
 
@@ -2953,7 +2953,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
  */
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
-	DWORD dwContextIndex;
+	LONG dwContextIndex;
 
 	PROFILE_START
 
