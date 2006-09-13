@@ -187,6 +187,7 @@ int main(int argc, char **argv)
 {
 	int rv;
 	char setToForeground;
+	char HotPlug;
 	char *newReaderConfig;
 	struct stat fStatBuf;
 	int opt;
@@ -202,6 +203,7 @@ int main(int argc, char **argv)
 		{"info", 0, 0, 0},
 		{"error", 0, 0, 'e'},
 		{"critical", 0, 0, 'C'},
+		{"hotplug", 0, 0, 'H'},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -209,6 +211,7 @@ int main(int argc, char **argv)
 	rv = 0;
 	newReaderConfig = 0;
 	setToForeground = FALSE;
+	HotPlug = FALSE;
 
 	/*
 	 * test the version
@@ -233,9 +236,9 @@ int main(int argc, char **argv)
 	 * Handle any command line arguments
 	 */
 #ifdef  HAVE_GETOPT_LONG
-	while ((opt = getopt_long (argc, argv, "c:fdhvaeC", long_options, &option_index)) != -1) {
+	while ((opt = getopt_long (argc, argv, "c:fdhvaeCH", long_options, &option_index)) != -1) {
 #else
-	while ((opt = getopt (argc, argv, "c:fdhvaeC")) != -1) {
+	while ((opt = getopt (argc, argv, "c:fdhvaeCH")) != -1) {
 #endif
 		switch (opt) {
 			case 'c':
@@ -273,6 +276,12 @@ int main(int argc, char **argv)
 
 			case 'a':
 				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
+				break;
+
+			case 'H':
+				/* debug to stderr instead of default syslog */
+				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+				HotPlug = TRUE;
 				break;
 
 			default:
@@ -317,6 +326,19 @@ int main(int argc, char **argv)
 
 			pid = atoi(pid_ascii);
 
+			if (HotPlug)
+			{
+				Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)",
+					pid);
+				if (kill(pid, SIGUSR1) < 0)
+				{
+					Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
+							pid, strerror(errno));
+					return EXIT_FAILURE ;
+				}
+				return EXIT_SUCCESS;
+			}
+
 			if (kill(pid, 0) == 0)
 			{
 				Log1(PCSC_LOG_CRITICAL,
@@ -330,30 +352,29 @@ int main(int argc, char **argv)
 				clean_temp_files();
 		}
 		else
+#endif
 		{
+			if (HotPlug)
+			{
+				Log1(PCSC_LOG_CRITICAL, "file " USE_RUN_PID " do not exist");
+				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
+				return EXIT_FAILURE;
+			}
+
 			Log1(PCSC_LOG_CRITICAL,
 				"file " PCSCLITE_PUBSHM_FILE " already exists.");
 			Log1(PCSC_LOG_CRITICAL,
 				"Maybe another pcscd is running?");
+#ifdef USE_RUN_PID
 			Log1(PCSC_LOG_CRITICAL,
 				"I can't read process pid from " USE_RUN_PID);
+#endif
 			Log1(PCSC_LOG_CRITICAL,
 				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 			Log1(PCSC_LOG_CRITICAL,
 				"if pcscd is not running to clear this message.");
 			return EXIT_FAILURE;
 		}
-#else
-		Log1(PCSC_LOG_CRITICAL,
-			"file " PCSCLITE_PUBSHM_FILE " already exists.");
-		Log1(PCSC_LOG_CRITICAL,
-			"Maybe another pcscd is running?");
-		Log1(PCSC_LOG_CRITICAL,
-			"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
-		Log1(PCSC_LOG_CRITICAL,
-			"if pcscd is not running to clear this message.");
-		return EXIT_FAILURE;
-#endif
 	}
 
 	/*
@@ -551,6 +572,7 @@ void print_usage (char const * const progname)
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stderr instead of syslog\n");
 	printf("  -h, --help		display usage information\n");
+	printf("  -H, --hotplug		ask the daemon to rescan the avaiable readers\n");
 	printf("  -v, --version		display the program version number\n");
 	printf("  -d, --debug	 	display lower level debug messages\n");
 	printf("      --info	 	display info level debug messages (default level)\n");
@@ -562,6 +584,7 @@ void print_usage (char const * const progname)
 	printf("  -f	run in foreground (no daemon), send logs to stderr instead of syslog\n");
 	printf("  -d 	display debug messages. Output may be:\n");
 	printf("  -h 	display usage information\n");
+	printf("  -H	ask the daemon to rescan the avaiable readers\n");
 	printf("  -v 	display the program version number\n");
 #endif
 }
