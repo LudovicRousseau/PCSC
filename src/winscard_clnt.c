@@ -328,8 +328,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		 */
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			readerStates[i] = (PREADER_STATE)
-				SYS_PublicMemoryMap(sizeof(READER_STATE),
+			readerStates[i] =
+				(PREADER_STATE)SYS_PublicMemoryMap(sizeof(READER_STATE),
 				mapAddr, (i * pageSize));
 			if (readerStates[i] == NULL)
 			{
@@ -1774,9 +1774,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/************ Look for IGNORED readers ****************************/
 
 		if (currReader->dwCurrentState & SCARD_STATE_IGNORE)
-		{
 			currReader->dwEventState = SCARD_STATE_IGNORE;
-		} else
+		else
 		{
 			LPSTR lpcReaderName;
 			int i;
@@ -1787,11 +1786,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
-				if (strcmp(lpcReaderName,
-						(readerStates[i])->readerName) == 0)
-				{
+				if (strcmp(lpcReaderName, (readerStates[i])->readerName) == 0)
 					break;
-				}
 			}
 
 			/*
@@ -1800,9 +1796,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
-				{
 					currReader->dwEventState = SCARD_STATE_UNKNOWN;
-				} else
+				else
 				{
 					currReader->dwEventState =
 						SCARD_STATE_UNKNOWN | SCARD_STATE_CHANGED;
@@ -1813,7 +1808,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					 */
 					dwBreakFlag = 1;
 				}
-			} else
+			}
+			else
 			{
 
 				/*
@@ -1844,11 +1840,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/*
 					 * App thinks reader is in bad state and it is
 					 */
-					if (currReader->
-						dwCurrentState & SCARD_STATE_UNAVAILABLE)
-					{
+					if (currReader-> dwCurrentState & SCARD_STATE_UNAVAILABLE)
 						currReader->dwEventState = SCARD_STATE_UNAVAILABLE;
-					} else
+					else
 					{
 						/*
 						 * App thinks reader is in good state and it is
@@ -1858,13 +1852,13 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 							SCARD_STATE_UNAVAILABLE;
 						dwBreakFlag = 1;
 					}
-				} else
+				}
+				else
 				{
 					/*
 					 * App thinks reader in bad state but it is not
 					 */
-					if (currReader->
-						dwCurrentState & SCARD_STATE_UNAVAILABLE)
+					if (currReader-> dwCurrentState & SCARD_STATE_UNAVAILABLE)
 					{
 						currReader->dwEventState &=
 							~SCARD_STATE_UNAVAILABLE;
@@ -1885,10 +1879,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					currReader->cbAtr = rContext->cardAtrLength;
 					memcpy(currReader->rgbAtr, rContext->cardAtr,
 						currReader->cbAtr);
-				} else
-				{
-					currReader->cbAtr = 0;
 				}
+				else
+					currReader->cbAtr = 0;
 
 				/*
 				 * Card is now absent
@@ -1908,10 +1901,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/*
 					 * After present the rest are assumed
 					 */
-					if (currReader->dwCurrentState & SCARD_STATE_PRESENT ||
-						currReader->dwCurrentState & SCARD_STATE_ATRMATCH
-						|| currReader->
-						dwCurrentState & SCARD_STATE_EXCLUSIVE
+					if (currReader->dwCurrentState & SCARD_STATE_PRESENT
+						|| currReader->dwCurrentState & SCARD_STATE_ATRMATCH
+						|| currReader->dwCurrentState & SCARD_STATE_EXCLUSIVE
 						|| currReader->dwCurrentState & SCARD_STATE_INUSE)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
@@ -1940,20 +1932,17 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (dwState & SCARD_SWALLOWED)
 					{
 						if (currReader->dwCurrentState & SCARD_STATE_MUTE)
+							currReader->dwEventState |= SCARD_STATE_MUTE;
+						else
 						{
 							currReader->dwEventState |= SCARD_STATE_MUTE;
-						} else
-						{
-							currReader->dwEventState |= SCARD_STATE_MUTE;
-							if (currReader->dwCurrentState !=
-								SCARD_STATE_UNAWARE)
-							{
-								currReader->dwEventState |=
-									SCARD_STATE_CHANGED;
-							}
+							if (currReader->dwCurrentState
+								!= SCARD_STATE_UNAWARE)
+								currReader->dwEventState |= SCARD_STATE_CHANGED;
 							dwBreakFlag = 1;
 						}
-					} else
+					}
+					else
 					{
 						/*
 						 * App thinks card is mute but it is not
@@ -1979,7 +1968,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
 					}
-				} else if (rContext->readerSharing >= 1)
+				}
+				else if (rContext->readerSharing >= 1)
 				{
 					/*
 					 * A card must be inserted for it to be INUSE
@@ -1988,15 +1978,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					{
 						currReader->dwEventState |= SCARD_STATE_INUSE;
 						currReader->dwEventState &= ~SCARD_STATE_EXCLUSIVE;
-						if (currReader->
-							dwCurrentState & SCARD_STATE_EXCLUSIVE)
+						if (currReader-> dwCurrentState & SCARD_STATE_EXCLUSIVE)
 						{
-							currReader->dwEventState |=
-								SCARD_STATE_CHANGED;
+							currReader->dwEventState |= SCARD_STATE_CHANGED;
 							dwBreakFlag = 1;
 						}
 					}
-				} else if (rContext->readerSharing == 0)
+				}
+				else if (rContext->readerSharing == 0)
 				{
 					currReader->dwEventState &= ~SCARD_STATE_INUSE;
 					currReader->dwEventState &= ~SCARD_STATE_EXCLUSIVE;
@@ -2005,8 +1994,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
-					} else if (currReader->
-						dwCurrentState & SCARD_STATE_EXCLUSIVE)
+					}
+					else if (currReader-> dwCurrentState
+						& SCARD_STATE_EXCLUSIVE)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
@@ -2049,8 +2039,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		 * Declare all the break conditions
 		 */
 
-		if (psContextMap[dwContextIndex].contextBlockStatus ==
-			BLOCK_STATUS_RESUME)
+		if (psContextMap[dwContextIndex].contextBlockStatus
+				== BLOCK_STATUS_RESUME)
 			break;
 
 		/*
