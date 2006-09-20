@@ -261,6 +261,13 @@ int main(int argc, char **argv)
 	if (rv == SCARD_S_SUCCESS)
 		printf("Vendor IFD version: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
 
+	printf("Testing SCardGetAttrib           : ");
+	dwAtrLen = sizeof(pbAtr);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, pbAtr, &dwAtrLen);
+	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	if (rv == SCARD_S_SUCCESS)
+		printf("Vendor name: %s\n", pbAtr);
+
 	printf("Testing SCardSetAttrib           : ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
 	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
