@@ -165,7 +165,7 @@ PCSC_API char* pcsc_stringify_error(long pcscError)
 	};
 
 	/* add a null byte */
-	strError[sizeof(strError)] = '\0';
+	strError[sizeof(strError)-1] = '\0';
 
 	return strError;
 }
