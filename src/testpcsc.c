@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2004
+ * Copyright (C) 2004-2006
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -22,6 +22,26 @@
 #include "pcsclite.h"
 #include "winscard.h"
 #include "reader.h"
+
+#define PANIC 0
+#define DONT_PANIC 1
+
+void test_rv(int rv, SCARDCONTEXT hContext, int dont_panic)
+{
+	if (rv != SCARD_S_SUCCESS)
+	{
+		if (dont_panic)
+			printf("\33[34m%s (don't panic)\33[0m\n", pcsc_stringify_error(rv));
+		else
+		{
+			printf("\33[01;31m%s\33[0m\n", pcsc_stringify_error(rv));
+			SCardReleaseContext(hContext);
+			exit(-1);
+		}
+	}
+	else
+		puts(pcsc_stringify_error(rv));
+}
 
 int main(int argc, char **argv)
 {
@@ -46,52 +66,26 @@ int main(int argc, char **argv)
 
 	printf("\nMUSCLE PC/SC Lite unitary test Program\n\n");
 
-	printf("THIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
-	printf("Do NOT use it unless you really know what you do.\n\n");
+	printf("\33[35mTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
+	printf("Do NOT use it unless you really know what you do.\33[0m\n\n");
 
 	printf("Testing SCardEstablishContext    : ");
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardGetStatusChange \n");
 	printf("Please insert a working reader   : ");
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, 0, 0);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups    : ");
-
 	rv = SCardListReaderGroups(hContext, 0, &dwGroups);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	mszGroups = malloc(sizeof(char) * dwGroups);
 	rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	/*
 	 * Have to understand the multi-string here
@@ -109,23 +103,11 @@ int main(int argc, char **argv)
 
 	mszGroups = 0;
 	rv = SCardListReaders(hContext, mszGroups, 0, &dwReaders);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	mszReaders = malloc(sizeof(char) * dwReaders);
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	/*
 	 * Have to understand the multi-string here
@@ -159,27 +141,13 @@ int main(int argc, char **argv)
 	printf("Waiting for card insertion       : ");
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardConnect             : ");
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&hCard, &dwPref);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	switch(dwPref)
 	{
@@ -235,18 +203,18 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 
 	printf("Testing SCardGetAttrib           : ");
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAtrLen);
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("ATR length: %ld\n", dwAtrLen);
 
 	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
 		for (i = 0; i < dwAtrLen; i++)
@@ -257,20 +225,20 @@ int main(int argc, char **argv)
 	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, pbAtr, &dwAtrLen);
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("Vendor IFD version: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
 
 	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, pbAtr, &dwAtrLen);
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("Vendor name: %s\n", pbAtr);
 
 	printf("Testing SCardSetAttrib           : ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
-	printf("%s %s\n", pcsc_stringify_error(rv), rv != SCARD_S_SUCCESS ? "(don't panic)" : "");
+	test_rv(rv, hContext, DONT_PANIC);
 
 	printf("Testing SCardStatus              : ");
 
@@ -280,8 +248,7 @@ int main(int argc, char **argv)
 
 	rv = SCardStatus(hCard, pcReaders, &dwReaderLen, &dwState, &dwProt,
 		pbAtr, &dwAtrLen);
-
-	printf("%s\n", pcsc_stringify_error(rv));
+	test_rv(rv, hContext, PANIC);
 
 	printf("Current Reader Name              : %s\n", pcReaders);
 	printf("Current Reader State             : 0x%.4lx\n", dwState);
@@ -306,35 +273,15 @@ int main(int argc, char **argv)
 	printf("Testing SCardReconnect           : ");
 	rv = SCardReconnect(hCard, SCARD_SHARE_SHARED,
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD, &dwPref);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardDisconnect          : ");
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		SCardReleaseContext(hContext);
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardReleaseContext      : ");
 	rv = SCardReleaseContext(hContext);
-
-	printf("%s\n", pcsc_stringify_error(rv));
-
-	if (rv != SCARD_S_SUCCESS)
-	{
-		return -1;
-	}
+	test_rv(rv, hContext, PANIC);
 
 	printf("\n");
 	printf("PC/SC Test Completed Successfully !\n");
