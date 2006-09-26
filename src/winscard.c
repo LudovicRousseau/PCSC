@@ -242,6 +242,12 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_E_SHARING_VIOLATION;
 	}
 
+	/*
+	 * wait until a possible transaction is finished
+	 */
+	while (rContext->dwLockId != 0)
+		SYS_USleep(100);
+
 	/*******************************************
 	 *
 	 * This section tries to determine the
@@ -442,7 +448,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -703,9 +710,17 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		return SCARD_E_INVALID_VALUE;
 
 	/*
+	 * wait until a possible transaction is finished
+	 */
+	while (rContext->dwLockId != 0)
+		SYS_USleep(100);
+
+	/*
 	 * Unlock any blocks on this context
 	 */
-	RFUnlockSharing(hCard);
+	rv = RFUnlockSharing(hCard);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->dwContexts);
 
