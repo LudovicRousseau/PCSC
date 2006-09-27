@@ -246,7 +246,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 * wait until a possible transaction is finished
 	 */
 	while (rContext->dwLockId != 0)
-		SYS_USleep(100);
+		SYS_USleep(100000);
 
 	/*******************************************
 	 *
@@ -713,7 +713,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * wait until a possible transaction is finished
 	 */
 	while (rContext->dwLockId != 0)
-		SYS_USleep(100);
+		SYS_USleep(100000);
 
 	/*
 	 * Unlock any blocks on this context
