@@ -31,6 +31,7 @@
 #include "winscard_svc.h"
 #include "sys_generic.h"
 #include "thread_generic.h"
+#include "readerfactory.h"
 
 /**
  * @brief Represents the an Application Context on the Server side.
@@ -461,7 +462,6 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 
 	if (psContext[dwContextIndex].hContext == hContext)
 	{
-
 		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 		{
 			/*
@@ -470,6 +470,17 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 
 			if (psContext[dwContextIndex].hCard[i] != 0)
 			{
+				PREADER_CONTEXT rContext = NULL;
+
+				/*
+				 * Unlock the sharing
+				 */
+				rv = RFReaderInfoById(psContext[dwContextIndex].hCard[i],
+					&rContext);
+				if (rv != SCARD_S_SUCCESS)
+					return rv;
+
+				rContext->dwLockId = 0;
 
 				/*
 				 * We will use SCardStatus to see if the card has been
@@ -477,20 +488,18 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 				 * Disconnect is called
 				 */
 
-				rv = SCardStatus(psContext[dwContextIndex].hCard[i], 0, 0, 0, 0, 0, 0);
+				rv = SCardStatus(psContext[dwContextIndex].hCard[i], NULL,
+					NULL, NULL, NULL, NULL, NULL);
 
-				if (rv == SCARD_W_RESET_CARD
-				    || rv == SCARD_W_REMOVED_CARD)
-				{
-					SCardDisconnect(psContext[dwContextIndex].hCard[i], SCARD_LEAVE_CARD);
-				} else
-				{
-					SCardDisconnect(psContext[dwContextIndex].hCard[i], SCARD_RESET_CARD);
-				}
+				if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
+					SCardDisconnect(psContext[dwContextIndex].hCard[i],
+						SCARD_LEAVE_CARD);
+				else
+					SCardDisconnect(psContext[dwContextIndex].hCard[i],
+						SCARD_RESET_CARD);
 
 				psContext[dwContextIndex].hCard[i] = 0;
 			}
-
 		}
 
 		psContext[dwContextIndex].hContext = 0;
