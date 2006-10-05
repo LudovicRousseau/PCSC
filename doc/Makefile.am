@@ -7,8 +7,8 @@ data_DATA = pcsc-lite.tex pcsc-lite.bib pcsc-lite.pdf \
 			ifdhandler-3.tex ifdhandler-3.pdf \
 			README.DAEMON
 
-man_MANS = pcscd.8 formaticc.1 reader.conf.5
-man_in = pcscd.8.in formaticc.1 reader.conf.5.in
+man_MANS = pcscd.8 formaticc.1 reader.conf.5 update-reader.conf.8
+man_in = pcscd.8.in formaticc.1 reader.conf.5.in update-reader.conf.8
 
 EXTRA_DIST = $(data_DATA) $(man_in) doxygen.conf.in
 
