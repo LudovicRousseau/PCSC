@@ -1052,16 +1052,18 @@ LONG RFLockSharing(DWORD hCard)
 LONG RFUnlockSharing(DWORD hCard)
 {
 	PREADER_CONTEXT rContext = NULL;
+	LONG rv;
 
-	RFReaderInfoById(hCard, &rContext);
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
-	if (RFCheckSharing(hCard) == SCARD_S_SUCCESS)
-	{
-		EHSetSharingEvent(rContext, 0);
-		rContext->dwLockId = 0;
-	}
-	else
-		return SCARD_E_SHARING_VIOLATION;
+	rv = RFCheckSharing(hCard);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	EHSetSharingEvent(rContext, 0);
+	rContext->dwLockId = 0;
 
 	return SCARD_S_SUCCESS;
 }
