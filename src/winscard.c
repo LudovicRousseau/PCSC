@@ -245,8 +245,16 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * wait until a possible transaction is finished
 	 */
-	while (rContext->dwLockId != 0)
-		SYS_USleep(100000);
+	if (rContext->dwLockId != 0)
+	{
+		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
+		while (rContext->dwLockId != 0)
+			SYS_USleep(100000);
+		Log1(PCSC_LOG_INFO, "Lock released");
+
+		/* Allow the status thread to convey information */
+		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+	}
 
 	/*******************************************
 	 *
