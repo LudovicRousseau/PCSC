@@ -471,6 +471,7 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 			if (psContext[dwContextIndex].hCard[i] != 0)
 			{
 				PREADER_CONTEXT rContext = NULL;
+				DWORD dwLockId;
 
 				/*
 				 * Unlock the sharing
@@ -480,16 +481,27 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 				if (rv != SCARD_S_SUCCESS)
 					return rv;
 
+				dwLockId = rContext->dwLockId;
 				rContext->dwLockId = 0;
 
-				/*
-				 * We will use SCardStatus to see if the card has been
-				 * reset there is no need to reset each time
-				 * Disconnect is called
-				 */
-
-				rv = SCardStatus(psContext[dwContextIndex].hCard[i], NULL,
-					NULL, NULL, NULL, NULL, NULL);
+				if (psContext[dwContextIndex].hCard[i] != dwLockId) 
+				{
+					/*
+					 * if the card is locked by someone else we do not reset it
+					 * and simulate a card removal
+					 */
+					rv = SCARD_W_REMOVED_CARD;
+				}
+				else
+				{
+					/*
+					 * We will use SCardStatus to see if the card has been
+					 * reset there is no need to reset each time
+					 * Disconnect is called
+					 */
+					rv = SCardStatus(psContext[dwContextIndex].hCard[i], NULL,
+						NULL, NULL, NULL, NULL, NULL);
+				}
 
 				if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
 					SCardDisconnect(psContext[dwContextIndex].hCard[i],
