@@ -356,7 +356,9 @@ int main(int argc, char **argv)
 		{
 			if (HotPlug)
 			{
+#ifdef USE_RUN_PID
 				Log1(PCSC_LOG_CRITICAL, "file " USE_RUN_PID " do not exist");
+#endif
 				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
 				return EXIT_FAILURE;
 			}
