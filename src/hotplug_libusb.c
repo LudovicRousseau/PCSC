@@ -55,7 +55,6 @@ extern PCSCLITE_MUTEX usbNotifierMutex;
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
 static char AraKiriHotPlug = FALSE;
-char ReCheckSerialReaders = FALSE;
 
 /*
  * keep track of drivers in a dynamically allocated array
@@ -226,149 +225,153 @@ LONG HPReadBundleValues(void)
 	return rv;
 }
 
-void HPEstablishUSBNotifications(void)
+void HPRescanUsbBus(void)
 {
 	int i, j;
 	struct usb_bus *bus;
 	struct usb_device *dev;
 	char bus_device[BUS_DEVICE_STRSIZE];
 
-	usb_init();
-	while (1)
+	usb_find_busses();
+	usb_find_devices();
+
+	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		/* clear rollcall */
+		readerTracker[i].status = READER_ABSENT;
+
+	/* For each USB bus */
+	for (bus = usb_get_busses(); bus; bus = bus->next)
 	{
-		usb_find_busses();
-		usb_find_devices();
-
-		for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-			/* clear rollcall */
-			readerTracker[i].status = READER_ABSENT;
-
-		/* For each USB bus */
-		for (bus = usb_get_busses(); bus; bus = bus->next)
+		/* For each USB device */
+		for (dev = bus->devices; dev; dev = dev->next)
 		{
-			/* For each USB device */
-			for (dev = bus->devices; dev; dev = dev->next)
-			{
-				/* check if the device is supported by one driver */
-				for (i=0; i<driverSize; i++)
-				{
-					if (driverTracker[i].libraryPath != NULL &&
-						dev->descriptor.idVendor == driverTracker[i].manuID &&
-						dev->descriptor.idProduct == driverTracker[i].productID)
-					{
-						int newreader;
-
-						/* A known device has been found */
-						snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s",
-							bus->dirname, dev->filename);
-						bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-#ifdef DEBUG_HOTPLUG
-						Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s", bus_device);
-#endif
-						newreader = TRUE;
-
-						/* Check if the reader is a new one */
-						for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
-						{
-							if (strncmp(readerTracker[j].bus_device,
-								bus_device, BUS_DEVICE_STRSIZE) == 0)
-							{
-								/* The reader is already known */
-								readerTracker[j].status = READER_PRESENT;
-								newreader = FALSE;
-#ifdef DEBUG_HOTPLUG
-								Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s", bus_device);
-#endif
-								break;
-							}
-						}
-
-						/* New reader found */
-						if (newreader)
-							HPAddHotPluggable(dev, bus_device, &driverTracker[i]);
-					}
-				}
-			} /* End of USB device for..loop */
-
-		} /* End of USB bus for..loop */
-
-		/*
-		 * check if all the previously found readers are still present
-		 */
-		for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		{
-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
-			int fd;
-			char filename[BUS_DEVICE_STRSIZE];
-
-			/*	BSD workaround:
-			 *	ugenopen() in sys/dev/usb/ugen.c returns EBUSY
-			 *	when the character device file is already open.
-			 *	Because of this, open usb devices will not be
-			 *	detected by usb_find_devices(), so we have to
-			 *	check for this explicitly.
-			 */
-			if (readerTracker[i].status == READER_PRESENT ||
-				 readerTracker[i].driver == NULL)
-				continue;
-
-			sscanf(readerTracker[i].bus_device, "%*[^:]%*[:]%s", filename);
-			fd = open(filename, O_RDONLY);
-			if (fd == -1)
-			{
-				if (errno == EBUSY)
-				{
-					/* The device is present */
-#ifdef DEBUG_HOTPLUG
-					Log2(PCSC_LOG_DEBUG, "BSD: EBUSY on %s", filename);
-#endif
-					readerTracker[i].status = READER_PRESENT;
-				}
-#ifdef DEBUG_HOTPLUG
-				else
-					Log3(PCSC_LOG_DEBUG, "BSD: %s error: %s", filename,
-						strerror(errno));
-#endif
-			}
-			else
-			{
-#ifdef DEBUG_HOTPLUG
-				Log2(PCSC_LOG_DEBUG, "BSD: %s still present", filename);
-#endif
-				readerTracker[i].status = READER_PRESENT;
-				close(fd);
-			}
-#endif
-			if (readerTracker[i].status == READER_ABSENT &&
-					readerTracker[i].driver != NULL)
-				HPRemoveHotPluggable(i);
-		}
-
-		SYS_Sleep(1);
-		if (AraKiriHotPlug)
-		{
-			int retval;
-
+			/* check if the device is supported by one driver */
 			for (i=0; i<driverSize; i++)
 			{
-				/* free strings allocated by strdup() */
-				free(driverTracker[i].bundleName);
-				free(driverTracker[i].libraryPath);
-				free(driverTracker[i].readerName);
+				if (driverTracker[i].libraryPath != NULL &&
+					dev->descriptor.idVendor == driverTracker[i].manuID &&
+					dev->descriptor.idProduct == driverTracker[i].productID)
+				{
+					int newreader;
+
+					/* A known device has been found */
+					snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s",
+						bus->dirname, dev->filename);
+					bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+#ifdef DEBUG_HOTPLUG
+					Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s", bus_device);
+#endif
+					newreader = TRUE;
+
+					/* Check if the reader is a new one */
+					for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
+					{
+						if (strncmp(readerTracker[j].bus_device,
+							bus_device, BUS_DEVICE_STRSIZE) == 0)
+						{
+							/* The reader is already known */
+							readerTracker[j].status = READER_PRESENT;
+							newreader = FALSE;
+#ifdef DEBUG_HOTPLUG
+							Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s", bus_device);
+#endif
+							break;
+						}
+					}
+
+					/* New reader found */
+					if (newreader)
+						HPAddHotPluggable(dev, bus_device, &driverTracker[i]);
+				}
 			}
-			free(driverTracker);
+		} /* End of USB device for..loop */
 
-			Log1(PCSC_LOG_INFO, "Hotplug stopped");
-			pthread_exit(&retval);
-		}
+	} /* End of USB bus for..loop */
 
-		if (ReCheckSerialReaders)
+	/*
+	 * check if all the previously found readers are still present
+	 */
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+		int fd;
+		char filename[BUS_DEVICE_STRSIZE];
+
+		/*	BSD workaround:
+		 *	ugenopen() in sys/dev/usb/ugen.c returns EBUSY
+		 *	when the character device file is already open.
+		 *	Because of this, open usb devices will not be
+		 *	detected by usb_find_devices(), so we have to
+		 *	check for this explicitly.
+		 */
+		if (readerTracker[i].status == READER_PRESENT ||
+			 readerTracker[i].driver == NULL)
+			continue;
+
+		sscanf(readerTracker[i].bus_device, "%*[^:]%*[:]%s", filename);
+		fd = open(filename, O_RDONLY);
+		if (fd == -1)
 		{
-			ReCheckSerialReaders = FALSE;
-			RFReCheckReaderConf();
+			if (errno == EBUSY)
+			{
+				/* The device is present */
+#ifdef DEBUG_HOTPLUG
+				Log2(PCSC_LOG_DEBUG, "BSD: EBUSY on %s", filename);
+#endif
+				readerTracker[i].status = READER_PRESENT;
+			}
+#ifdef DEBUG_HOTPLUG
+			else
+				Log3(PCSC_LOG_DEBUG, "BSD: %s error: %s", filename,
+					strerror(errno));
+#endif
 		}
+		else
+		{
+#ifdef DEBUG_HOTPLUG
+			Log2(PCSC_LOG_DEBUG, "BSD: %s still present", filename);
+#endif
+			readerTracker[i].status = READER_PRESENT;
+			close(fd);
+		}
+#endif
+		if (readerTracker[i].status == READER_ABSENT &&
+				readerTracker[i].driver != NULL)
+			HPRemoveHotPluggable(i);
+	}
 
-	}	/* End of while loop */
+	if (AraKiriHotPlug)
+	{
+		int retval;
+
+		for (i=0; i<driverSize; i++)
+		{
+			/* free strings allocated by strdup() */
+			free(driverTracker[i].bundleName);
+			free(driverTracker[i].libraryPath);
+			free(driverTracker[i].readerName);
+		}
+		free(driverTracker);
+
+		Log1(PCSC_LOG_INFO, "Hotplug stopped");
+		pthread_exit(&retval);
+	}
+}
+
+void HPEstablishUSBNotifications(void)
+{
+	usb_init();
+
+	/* scan the USB bus for devices at startup */
+	HPRescanUsbBus();
+
+#ifdef USB_POLLING
+	while (1)
+	{
+		SYS_Sleep(1);
+		HPRescanUsbBus();
+	}
+#endif
 }
 
 LONG HPSearchHotPluggables(void)
@@ -490,7 +493,20 @@ ULONG HPRegisterForHotplugEvents(void)
 
 void HPReCheckSerialReaders(void)
 {
-	ReCheckSerialReaders = TRUE;
+	static int rescan_ongoing = FALSE;
+
+	if (rescan_ongoing)
+	{
+		Log1(PCSC_LOG_INFO, "Rescan already ongoing");
+		return;
+	}
+
+	rescan_ongoing = TRUE;
+
+	HPRescanUsbBus();
+	RFReCheckReaderConf();
+
+	rescan_ongoing = FALSE;
 }
 
 #endif
