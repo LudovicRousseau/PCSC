@@ -143,7 +143,6 @@ void SVCServiceRunLoop(void)
 
 	while (TRUE)
 	{
-
 		switch (rsp = SHMProcessEventsServer(&dwClientID, 0))
 		{
 
@@ -160,9 +159,13 @@ void SVCServiceRunLoop(void)
 			break;
 
 		case -1:
-			/* do not display if we are exiting or re-reading the config */
-			if ((!AraKiri) && (!ReCheckSerialReaders))
-				Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
+			Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
+			break;
+
+		case -2:
+			/* Nothing to do in case of a syscall interrupted
+			 * It happens when SIGUSR1 (reload) or SIGINT (Ctrl-C) is received
+			 * We just try again */
 			break;
 
 		default:

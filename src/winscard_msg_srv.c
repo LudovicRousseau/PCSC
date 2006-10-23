@@ -182,9 +182,11 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 
 	if (selret < 0)
 	{
-		if ((!AraKiri) && (!ReCheckSerialReaders))
-			Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
-				strerror(errno));
+		if (EINTR == errno)
+			return -2;
+
+		Log2(PCSC_LOG_CRITICAL, "Select returns with failure: %s",
+			strerror(errno));
 		return -1;
 	}
 
