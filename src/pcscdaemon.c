@@ -378,6 +378,12 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+	else
+		if (HotPlug)
+		{
+			Log1(PCSC_LOG_CRITICAL, "Hotplug failed: pcscd is not running");
+			return EXIT_FAILURE;
+		}
 
 	/*
 	 * If this is set to one the user has asked it not to fork
