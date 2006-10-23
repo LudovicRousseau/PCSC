@@ -51,7 +51,6 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
-extern char ReCheckSerialReaders;
 
 /*
  * Some internal functions
