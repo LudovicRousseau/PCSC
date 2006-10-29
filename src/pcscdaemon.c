@@ -540,8 +540,20 @@ void clean_temp_files(void)
 
 void signal_reload(int sig)
 {
+	static int rescan_ongoing = FALSE;
+
 	Log1(PCSC_LOG_INFO, "Reload serial configuration");
+	if (rescan_ongoing)
+	{
+		Log1(PCSC_LOG_INFO, "Rescan already ongoing");
+		return;
+	}
+
+	rescan_ongoing = TRUE;
+
 	HPReCheckSerialReaders();
+
+	rescan_ongoing = FALSE;
 } /* signal_reload */
 
 void signal_trap(int sig)

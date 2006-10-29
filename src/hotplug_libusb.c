@@ -493,20 +493,8 @@ ULONG HPRegisterForHotplugEvents(void)
 
 void HPReCheckSerialReaders(void)
 {
-	static int rescan_ongoing = FALSE;
-
-	if (rescan_ongoing)
-	{
-		Log1(PCSC_LOG_INFO, "Rescan already ongoing");
-		return;
-	}
-
-	rescan_ongoing = TRUE;
-
 	HPRescanUsbBus();
 	RFReCheckReaderConf();
-
-	rescan_ongoing = FALSE;
 }
 
 #endif
