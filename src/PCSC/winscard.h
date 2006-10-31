@@ -88,8 +88,6 @@ extern "C"
 	PCSC_API LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 		LPCBYTE pbAttr, DWORD cbAttrLen);
 
-	void SCardUnload(void);
-
 #ifdef __cplusplus
 }
 #endif
