@@ -321,7 +321,6 @@ src/Makefile
 src/libpcsclite.pc
 src/PCSC/pcsclite.h
 src/PCSC/reader.h
-src/utils/Makefile
 win32/Makefile
 ])
 AC_OUTPUT

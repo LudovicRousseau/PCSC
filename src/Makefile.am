@@ -1,6 +1,5 @@
 # Process this file with automake to create Makefile.in.
 
-SUBDIRS = . utils
 AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	$(SYMBOL_VISIBILITY)
 
