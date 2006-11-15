@@ -24,6 +24,7 @@
 #include "atrhandler.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
+#include "hotplug.h"
 
 #undef PCSCLITE_STATIC_DRIVER
 
@@ -402,6 +403,14 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	{
 		*pdwAtrLen = 0;
 		pucAtr[0] = '\0';
+
+		if (rv == IFD_NO_SUCH_DEVICE)
+		{
+			SendHotplugSignal();
+			return SCARD_E_READER_UNAVAILABLE;
+		}
+
+		return SCARD_E_NOT_TRANSACTED;
 	}
 
 	/*
@@ -482,6 +491,13 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		else
 		{
 			Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+
+			if (rv == IFD_NO_SUCH_DEVICE)
+			{
+				SendHotplugSignal();
+				return SCARD_E_READER_UNAVAILABLE;
+			}
+
 			return SCARD_E_NOT_TRANSACTED;
 		}
 
@@ -652,6 +668,13 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	else
 	{
 		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+
+		if (rv == IFD_NO_SUCH_DEVICE)
+		{
+			SendHotplugSignal();
+			return SCARD_E_READER_UNAVAILABLE;
+		}
+
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
@@ -733,6 +756,13 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	else
 	{
 		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+
+		if (rv == IFD_NO_SUCH_DEVICE)
+		{
+			SendHotplugSignal();
+			return SCARD_E_READER_UNAVAILABLE;
+		}
+
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
