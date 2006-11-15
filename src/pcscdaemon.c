@@ -66,6 +66,54 @@ void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
+pid_t GetDaemonPid(void)
+{
+	FILE *f;
+	pid_t pid;
+
+	/* pids are only 15 bits but 4294967296
+	 * (32 bits in case of a new system use it) is on 10 bytes
+	 */
+	if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
+	{
+#define PID_ASCII_SIZE 11
+		char pid_ascii[PID_ASCII_SIZE];
+
+		fgets(pid_ascii, PID_ASCII_SIZE, f);
+		fclose(f);
+
+		pid = atoi(pid_ascii);
+	}
+	else
+	{
+		Log2(PCSC_LOG_CRITICAL, "Can't open " USE_RUN_PID ": %s",
+			strerror(errno));
+		return -1;
+	}
+
+	return pid;
+} /* GetDaemonPid */
+
+int SendHotplugSignal(void)
+{
+	pid_t pid;
+
+	pid = GetDaemonPid();
+
+	if (pid != -1)
+	{
+		Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)", pid);
+		if (kill(pid, SIGUSR1) < 0)
+		{
+			Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
+				pid, strerror(errno));
+			return EXIT_FAILURE ;
+		}
+	}
+
+	return EXIT_SUCCESS;
+} /* SendHotplugSignal */
+
 /*
  * Cleans up messages still on the queue when a client dies
  */
@@ -309,37 +357,17 @@ int main(int argc, char **argv)
 	if (rv == 0)
 	{
 #ifdef USE_RUN_PID
+		pid_t pid;
 
 		/* read the pid file to get the old pid and test if the old pcscd is
 		 * still running
 		 */
-		FILE *f;
-		/* pids are only 15 bits but 4294967296
-		 * (32 bits in case of a new system use it) is on 10 bytes
-		 */
-#define PID_ASCII_SIZE 11
-		char pid_ascii[PID_ASCII_SIZE];
-		int pid;
+		pid = GetDaemonPid();
 
-		if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
+		if (pid != -1)
 		{
-			fgets(pid_ascii, PID_ASCII_SIZE, f);
-			fclose(f);
-
-			pid = atoi(pid_ascii);
-
 			if (HotPlug)
-			{
-				Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)",
-					pid);
-				if (kill(pid, SIGUSR1) < 0)
-				{
-					Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
-							pid, strerror(errno));
-					return EXIT_FAILURE ;
-				}
-				return EXIT_SUCCESS;
-			}
+				return SendHotplugSignal();
 
 			if (kill(pid, 0) == 0)
 			{
