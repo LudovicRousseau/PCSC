@@ -70,17 +70,17 @@ int main(int argc, char **argv)
 	printf("\33[35mTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
 	printf("Do NOT use it unless you really know what you do.\33[0m\n\n");
 
-	printf("Testing SCardEstablishContext    : ");
+	printf("Testing SCardEstablishContext\t: ");
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardGetStatusChange \n");
-	printf("Please insert a working reader   : ");
+	printf("Please insert a working reader\t: ");
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, 0, 0);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Testing SCardListReaderGroups    : ");
+	printf("Testing SCardListReaderGroups\t: ");
 	rv = SCardListReaderGroups(hContext, 0, &dwGroups);
 	test_rv(rv, hContext, PANIC);
 
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 		while (mszGroups[++i] != 0) ;
 	}
 
-	printf("Testing SCardListReaders         : ");
+	printf("Testing SCardListReaders\t: ");
 
 	mszGroups = 0;
 	rv = SCardListReaders(hContext, mszGroups, 0, &dwReaders);
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 	if (p > 1)
 		do
 		{
-			printf("Enter the reader number          : ");
+			printf("Enter the reader number\t\t: ");
 			scanf("%d", &iReader);
 			printf("\n");
 
@@ -139,12 +139,12 @@ int main(int argc, char **argv)
 	rgReaderStates[0].szReader = &mszReaders[iList[iReader]];
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
-	printf("Waiting for card insertion       : ");
+	printf("Waiting for card insertion\t: ");
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Testing SCardConnect             : ");
+	printf("Testing SCardConnect\t\t: ");
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&hCard, &dwPref);
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 	printf("\n");
 	length = sizeof(bRecvBuffer);
 
-	printf("Testing SCardTransmit            : ");
+	printf("Testing SCardTransmit\t\t: ");
 	rv = SCardTransmit(hCard, &pioSendPci, bSendBuffer, send_length,
 		&pioRecvPci, bRecvBuffer, &length);
 	printf("%s\n", pcsc_stringify_error(rv));
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 		printf(" %02X", bRecvBuffer[i]);
 	printf("\n");
 
-	printf("Testing SCardControl             : ");
+	printf("Testing SCardControl\t\t: ");
 #ifdef PCSC_PRE_120
 	{
 		char buffer[1024] = "Foobar";
@@ -206,13 +206,13 @@ int main(int argc, char **argv)
 #endif
 	test_rv(rv, hContext, DONT_PANIC);
 
-	printf("Testing SCardGetAttrib           : ");
+	printf("Testing SCardGetAttrib\t\t: ");
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("ATR length: %ld\n", dwAtrLen);
 
-	printf("Testing SCardGetAttrib           : ");
+	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
@@ -223,37 +223,37 @@ int main(int argc, char **argv)
 		printf("\n");
 	}
 
-	printf("Testing SCardGetAttrib           : ");
+	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor IFD version: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
+		printf("Vendor IFD version\t\t: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
 
-	printf("Testing SCardGetAttrib           : ");
+	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_MAXINPUT, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
 		if (dwAtrLen == sizeof(uint32_t))
-			printf("Max message length               : %d\n", *(uint32_t *)pbAtr);
+			printf("Max message length\t\t: %d\n", *(uint32_t *)pbAtr);
 		else
 			printf(RED_PRINTF_FORMAT, "Wrong size");
 	}
 
-	printf("Testing SCardGetAttrib           : ");
+	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor name: %s\n", pbAtr);
+		printf("Vendor name\t\t\t: %s\n", pbAtr);
 
-	printf("Testing SCardSetAttrib           : ");
+	printf("Testing SCardSetAttrib\t\t: ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
 	test_rv(rv, hContext, DONT_PANIC);
 
-	printf("Testing SCardStatus              : ");
+	printf("Testing SCardStatus\t\t: ");
 
 	dwReaderLen = 50;
 	pcReaders   = malloc(sizeof(char) * 50);
@@ -263,11 +263,11 @@ int main(int argc, char **argv)
 		pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Current Reader Name              : %s\n", pcReaders);
-	printf("Current Reader State             : 0x%.4lx\n", dwState);
-	printf("Current Reader Protocol          : T=%ld\n", dwProt - 1);
-	printf("Current Reader ATR Size          : %ld bytes\n", dwAtrLen);
-	printf("Current Reader ATR Value         : ");
+	printf("Current Reader Name\t\t: %s\n", pcReaders);
+	printf("Current Reader State\t\t: 0x%.4lx\n", dwState);
+	printf("Current Reader Protocol\t\t: T=%ld\n", dwProt - 1);
+	printf("Current Reader ATR Size\t\t: %ld bytes\n", dwAtrLen);
+	printf("Current Reader ATR Value\t: ");
 
 	for (i = 0; i < dwAtrLen; i++)
 	{
@@ -283,16 +283,16 @@ int main(int argc, char **argv)
 
 	printf("Press enter: ");
 	getchar();
-	printf("Testing SCardReconnect           : ");
+	printf("Testing SCardReconnect\t\t: ");
 	rv = SCardReconnect(hCard, SCARD_SHARE_SHARED,
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD, &dwPref);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Testing SCardDisconnect          : ");
+	printf("Testing SCardDisconnect\t\t: ");
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Testing SCardReleaseContext      : ");
+	printf("Testing SCardReleaseContext\t: ");
 	rv = SCardReleaseContext(hContext);
 	test_rv(rv, hContext, PANIC);
 
