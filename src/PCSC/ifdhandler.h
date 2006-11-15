@@ -140,6 +140,7 @@ extern "C"
 #define IFD_NOT_SUPPORTED		614
 #define IFD_ICC_PRESENT			615
 #define IFD_ICC_NOT_PRESENT		616
+#define IFD_NO_SUCH_DEVICE		617
 
 	/*
 	 * If you want to compile a V2.0 IFDHandler, define IFDHANDLERv2 before you
