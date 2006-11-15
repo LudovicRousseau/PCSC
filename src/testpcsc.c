@@ -25,6 +25,7 @@
 
 #define PANIC 0
 #define DONT_PANIC 1
+#define RED_PRINTF_FORMAT "\33[01;31m%s\33[0m\n"
 
 void test_rv(int rv, SCARDCONTEXT hContext, int dont_panic)
 {
@@ -34,7 +35,7 @@ void test_rv(int rv, SCARDCONTEXT hContext, int dont_panic)
 			printf("\33[34m%s (don't panic)\33[0m\n", pcsc_stringify_error(rv));
 		else
 		{
-			printf("\33[01;31m%s\33[0m\n", pcsc_stringify_error(rv));
+			printf(RED_PRINTF_FORMAT, pcsc_stringify_error(rv));
 			SCardReleaseContext(hContext);
 			exit(-1);
 		}
@@ -228,6 +229,18 @@ int main(int argc, char **argv)
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("Vendor IFD version: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
+
+	printf("Testing SCardGetAttrib           : ");
+	dwAtrLen = sizeof(pbAtr);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_MAXINPUT, pbAtr, &dwAtrLen);
+	test_rv(rv, hContext, DONT_PANIC);
+	if (rv == SCARD_S_SUCCESS)
+	{
+		if (dwAtrLen == sizeof(uint32_t))
+			printf("Max message length               : %d\n", *(uint32_t *)pbAtr);
+		else
+			printf(RED_PRINTF_FORMAT, "Wrong size");
+	}
 
 	printf("Testing SCardGetAttrib           : ");
 	dwAtrLen = sizeof(pbAtr);
