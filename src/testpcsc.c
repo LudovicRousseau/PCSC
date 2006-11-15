@@ -125,9 +125,11 @@ int main(int argc, char **argv)
 	if (p > 1)
 		do
 		{
+			char input[80];
+
 			printf("Enter the reader number\t\t: ");
-			scanf("%d", &iReader);
-			printf("\n");
+			fgets(input, sizeof(input), stdin);
+			sscanf(input, "%d", &iReader);
 
 			if (iReader > p || iReader <= 0)
 				printf("Invalid Value - try again\n");
