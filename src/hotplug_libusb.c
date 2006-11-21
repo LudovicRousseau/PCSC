@@ -360,6 +360,10 @@ void HPRescanUsbBus(void)
 
 void HPEstablishUSBNotifications(void)
 {
+	/* libusb default is /dev/bus/usb but the devices are not yet visible there
+	 * when a hotplug is requested */
+	setenv("USB_DEVFS_PATH", "/proc/bus/usb", 0);
+
 	usb_init();
 
 	/* scan the USB bus for devices at startup */
