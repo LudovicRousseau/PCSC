@@ -78,8 +78,6 @@ static struct _readerTracker
 	char status;
 	char bus_device[BUS_DEVICE_STRSIZE];	/* device name */
 	char *fullName;	/* full reader name (including serial number) */
-
-	struct _driverTracker *driver;	/* driver for this reader */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 LONG HPReadBundleValues(void);
@@ -335,8 +333,8 @@ void HPRescanUsbBus(void)
 			close(fd);
 		}
 #endif
-		if (readerTracker[i].status == READER_ABSENT &&
-				readerTracker[i].driver != NULL)
+		if ((readerTracker[i].status == READER_ABSENT) &&
+			(readerTracker[i].fullName != NULL))
 			HPRemoveHotPluggable(i);
 	}
 
@@ -384,9 +382,9 @@ LONG HPSearchHotPluggables(void)
 
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		readerTracker[i].driver = NULL;
 		readerTracker[i].status = READER_ABSENT;
 		readerTracker[i].bus_device[0] = '\0';
+		readerTracker[i].fullName = NULL;
 	}
 
 	if (HPReadBundleValues())
@@ -420,7 +418,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (readerTracker[i].driver == NULL)
+		if (readerTracker[i].fullName == NULL)
 			break;
 	}
 
@@ -434,8 +432,6 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	strncpy(readerTracker[i].bus_device, bus_device,
 		sizeof(readerTracker[i].bus_device));
 	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
-
-	readerTracker[i].driver = driver;
 
 #ifdef ADD_SERIAL_NUMBER
 	if (dev->descriptor.iSerialNumber)
@@ -480,7 +476,7 @@ LONG HPRemoveHotPluggable(int index)
 	free(readerTracker[index].fullName);
 	readerTracker[index].status = READER_ABSENT;
 	readerTracker[index].bus_device[0] = '\0';
-	readerTracker[index].driver = NULL;
+	readerTracker[index].fullName = NULL;
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
