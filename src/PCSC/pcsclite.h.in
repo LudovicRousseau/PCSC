@@ -66,43 +66,43 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_PCI_RAW	(&g_rgSCardRawPci)
 
 #define SCARD_S_SUCCESS			0x00000000
-#define SCARD_E_CANCELLED		0x80100002
-#define SCARD_E_CANT_DISPOSE		0x8010000E
-#define SCARD_E_INSUFFICIENT_BUFFER	0x80100008
-#define SCARD_E_INVALID_ATR		0x80100015
-#define SCARD_E_INVALID_HANDLE		0x80100003
-#define SCARD_E_INVALID_PARAMETER	0x80100004
-#define SCARD_E_INVALID_TARGET		0x80100005
-#define SCARD_E_INVALID_VALUE		0x80100011
-#define SCARD_E_NO_MEMORY		0x80100006
-#define SCARD_F_COMM_ERROR		0x80100013
-#define SCARD_F_INTERNAL_ERROR		0x80100001
-#define SCARD_F_UNKNOWN_ERROR		0x80100014
-#define SCARD_F_WAITED_TOO_LONG		0x80100007
-#define SCARD_E_UNKNOWN_READER		0x80100009
-#define SCARD_E_TIMEOUT			0x8010000A
-#define SCARD_E_SHARING_VIOLATION	0x8010000B
-#define SCARD_E_NO_SMARTCARD		0x8010000C
-#define SCARD_E_UNKNOWN_CARD		0x8010000D
-#define SCARD_E_PROTO_MISMATCH		0x8010000F
-#define SCARD_E_NOT_READY		0x80100010
-#define SCARD_E_SYSTEM_CANCELLED	0x80100012
-#define SCARD_E_NOT_TRANSACTED		0x80100016
-#define SCARD_E_READER_UNAVAILABLE	0x80100017
+#define SCARD_E_CANCELLED		0x80100002 /**< The action was cancelled by an SCardCancel request. */
+#define SCARD_E_CANT_DISPOSE		0x8010000E /**< The system could not dispose of the media in the requested manner. */
+#define SCARD_E_INSUFFICIENT_BUFFER	0x80100008 /**< The data buffer to receive returned data is too small for the returned data. */
+#define SCARD_E_INVALID_ATR		0x80100015 /**< An ATR obtained from the registry is not a valid ATR string. */
+#define SCARD_E_INVALID_HANDLE		0x80100003 /**< The supplied handle was invalid. */
+#define SCARD_E_INVALID_PARAMETER	0x80100004 /**< One or more of the supplied parameters could not be properly interpreted. */
+#define SCARD_E_INVALID_TARGET		0x80100005 /**< Registry startup information is missing or invalid. */
+#define SCARD_E_INVALID_VALUE		0x80100011 /**< One or more of the supplied parameters values could not be properly interpreted. */
+#define SCARD_E_NO_MEMORY		0x80100006 /**< Not enough memory available to complete this command. */
+#define SCARD_F_COMM_ERROR		0x80100013 /**< An internal communications error has been detected. */
+#define SCARD_F_INTERNAL_ERROR		0x80100001 /**< An internal consistency check failed. */
+#define SCARD_F_UNKNOWN_ERROR		0x80100014 /**< An internal error has been detected, but the source is unknown. */
+#define SCARD_F_WAITED_TOO_LONG		0x80100007 /**< An internal consistency timer has expired. */
+#define SCARD_E_UNKNOWN_READER		0x80100009 /**< The specified reader name is not recognized. */
+#define SCARD_E_TIMEOUT			0x8010000A /**< The user-specified timeout value has expired. */
+#define SCARD_E_SHARING_VIOLATION	0x8010000B /**< The smart card cannot be accessed because of other connections outstanding. */
+#define SCARD_E_NO_SMARTCARD		0x8010000C /**< The operation requires a Smart Card, but no Smart Card is currently in the device. */
+#define SCARD_E_UNKNOWN_CARD		0x8010000D /**< The specified smart card name is not recognized. */
+#define SCARD_E_PROTO_MISMATCH		0x8010000F /**< The requested protocols are incompatible with the protocol currently in use with the smart card. */
+#define SCARD_E_NOT_READY		0x80100010 /**< The reader or smart card is not ready to accept commands. */
+#define SCARD_E_SYSTEM_CANCELLED	0x80100012 /**< The action was cancelled by the system, presumably to log off or shut down. */
+#define SCARD_E_NOT_TRANSACTED		0x80100016 /**< An attempt was made to end a non-existent transaction. */
+#define SCARD_E_READER_UNAVAILABLE	0x80100017 /**< The specified reader is not currently available for use. */
 
-#define SCARD_W_UNSUPPORTED_CARD	0x80100065
-#define SCARD_W_UNRESPONSIVE_CARD	0x80100066
-#define SCARD_W_UNPOWERED_CARD		0x80100067
-#define SCARD_W_RESET_CARD		0x80100068
-#define SCARD_W_REMOVED_CARD		0x80100069
+#define SCARD_W_UNSUPPORTED_CARD	0x80100065 /**< The reader cannot communicate with the card, due to ATR string configuration conflicts. */
+#define SCARD_W_UNRESPONSIVE_CARD	0x80100066 /**< The smart card is not responding to a reset. */
+#define SCARD_W_UNPOWERED_CARD		0x80100067 /**< Power has been removed from the smart card, so that further communication is not possible. */
+#define SCARD_W_RESET_CARD		0x80100068 /**< The smart card has been reset, so any shared state information is invalid. */
+#define SCARD_W_REMOVED_CARD		0x80100069 /**< The smart card has been removed, so further communication is not possible. */
 
-#define SCARD_E_PCI_TOO_SMALL		0x80100019
-#define SCARD_E_READER_UNSUPPORTED	0x8010001A
-#define SCARD_E_DUPLICATE_READER	0x8010001B
-#define SCARD_E_CARD_UNSUPPORTED	0x8010001C
-#define SCARD_E_NO_SERVICE		0x8010001D
-#define SCARD_E_SERVICE_STOPPED		0x8010001E
-#define SCARD_E_NO_READERS_AVAILABLE    0x8010002E
+#define SCARD_E_PCI_TOO_SMALL		0x80100019 /**< The PCI Receive buffer was too small. */
+#define SCARD_E_READER_UNSUPPORTED	0x8010001A /**< The reader driver does not meet minimal requirements for support. */
+#define SCARD_E_DUPLICATE_READER	0x8010001B /**< The reader driver did not produce a unique reader name. */
+#define SCARD_E_CARD_UNSUPPORTED	0x8010001C /**< The smart card does not meet minimal requirements for support. */
+#define SCARD_E_NO_SERVICE		0x8010001D /**< The Smart card resource manager is not running. */
+#define SCARD_E_SERVICE_STOPPED		0x8010001E /**< The Smart card resource manager has shut down. */
+#define SCARD_E_NO_READERS_AVAILABLE    0x8010002E /**< Cannot find a smart card reader. */
 
 #define SCARD_SCOPE_USER		0x0000	/**< Scope in user space */
 #define SCARD_SCOPE_TERMINAL		0x0001	/**< Scope in terminal */
