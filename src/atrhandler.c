@@ -34,10 +34,11 @@
 /* #define ATR_DEBUG */
 
 /**
- * @brief
- * @param psExtension
- * @param pucAtr
- * @param dwLength
+ * @brief parse an ATR
+ *
+ * @param[out] psExtension
+ * @param[in] pucAtr ATR
+ * @param[in] dwLength ATR length
  * @return
  */
 short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
