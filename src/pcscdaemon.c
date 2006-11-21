@@ -582,6 +582,7 @@ void signal_reload(int sig)
 	HPReCheckSerialReaders();
 
 	rescan_ongoing = FALSE;
+	Log1(PCSC_LOG_INFO, "End reload serial configuration");
 } /* signal_reload */
 
 void signal_trap(int sig)
