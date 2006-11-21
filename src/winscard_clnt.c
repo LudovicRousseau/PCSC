@@ -137,7 +137,7 @@ typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
 /**
  * @brief Represents the an Application Context on the Client side.
  *
- * An Application Context contains Channels (\c psChannelMap).
+ * An Application Context contains Channels (\c _psChannelMap).
  */
 static struct _psContextMap
 {
@@ -155,7 +155,7 @@ static short isExecuted = 0;
 
 /**
  * Memory mapped address used to read status information about the readers.
- * Each element in the vector \c readerStates makes references to a part of
+ * Each element in the vector \ref readerStates makes references to a part of
  * the memory mapped.
  */
 static int mapAddr = 0;
@@ -169,8 +169,8 @@ static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * Pointers to a memory mapped area used to read status information about the
  * readers.
- * Each element in the vector \c readerStates makes references to a part of
- * the memory mapped \c mapAddr.
+ * Each element in the vector \ref readerStates makes references to a part of
+ * the memory mapped \ref mapAddr.
  */
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
@@ -206,25 +206,25 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
  * @brief Creates an Application Context to the PC/SC Resource Manager.
 
  * This must be the first function called in a PC/SC application.
- * This is a thread-safe wrapper to the function \c SCardEstablishContextTH().
+ * This is a thread-safe wrapper to the function SCardEstablishContextTH().
  *
  * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * <ul>
- *   <li>SCARD_SCOPE_USER - Not used.
- *   <li>SCARD_SCOPE_TERMINAL - Not used.
- *   <li>SCARD_SCOPE_GLOBAL - Not used.
- *   <li>SCARD_SCOPE_SYSTEM - Services on the local machine.
+ *   <li>\ref SCARD_SCOPE_USER - Not used.
+ *   <li>\ref SCARD_SCOPE_TERMINAL - Not used.
+ *   <li>\ref SCARD_SCOPE_GLOBAL - Not used.
+ *   <li>\ref SCARD_SCOPE_SYSTEM - Services on the local machine.
  * </ul>
  * @param[in] pvReserved1 Reserved for future use. Can be used for remote connection.
  * @param[in] pvReserved2 Reserved for future use.
  * @param[out] phContext Returned Application Context.
  *
  * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_NO_SERVICE The server is not runing
- * @retval SCARD_E_INVALID_VALUE Invalid scope type passed.
- * @retval SCARD_E_INVALID_PARAMETER phContext is null.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE )
+ * @retval SCARD_E_INVALID_PARAMETER phContext is null (\ref SCARD_E_INVALID_PARAMETER)
  *
  * @test
  * @code
@@ -256,25 +256,25 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
  * Manager.
  *
  * This function shuld not be called directly. Instead, the thread-safe
- * function \c SCardEstablishContext() should be called.
+ * function SCardEstablishContext() should be called.
  *
  * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * <ul>
- *   <li>SCARD_SCOPE_USER - Not used.
- *   <li>SCARD_SCOPE_TERMINAL - Not used.
- *   <li>SCARD_SCOPE_GLOBAL - Not used.
- *   <li>SCARD_SCOPE_SYSTEM - Services on the local machine.
+ *   <li>\ref SCARD_SCOPE_USER - Not used.
+ *   <li>\ref SCARD_SCOPE_TERMINAL - Not used.
+ *   <li>\ref SCARD_SCOPE_GLOBAL - Not used.
+ *   <li>\ref SCARD_SCOPE_SYSTEM - Services on the local machine.
  * </ul>
  * @param[in] pvReserved1 Reserved for future use. Can be used for remote connection.
  * @param[in] pvReserved2 Reserved for future use.
  * @param[out] phContext Returned reference to this connection.
  *
  * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_NO_SERVICE The server is not runing
- * @retval SCARD_E_INVALID_PARAMETER phContext is null.
- * @retval SCARD_E_INVALID_VALUE Invalid scope type passed.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_INVALID_PARAMETER phContext is null. (\ref SCARD_E_INVALID_PARAMETER)
+ * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE)
  */
 static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
@@ -474,7 +474,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
  * @param[in] hContext Connection context to be closed.
  *
  * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  *
  * @test
  * @code
@@ -549,13 +549,13 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
  * @deprecated
  * This function is not in Microsoft(R) WinSCard API and is deprecated
  * in pcsc-lite API.
- * The function does not do anything except returning \c SCARD_S_SUCCESS.
+ * The function does not do anything except returning \ref SCARD_S_SUCCESS.
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout New timeout value.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  */
 LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 {
@@ -575,18 +575,20 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * @param[in] szReader Reader name to connect to.
  * @param[in] dwShareMode Mode of connection type: exclusive or shared.
  * <ul>
- *   <li>SCARD_SHARE_SHARED - This application will allow others to share the reader.
- *   <li>SCARD_SHARE_EXCLUSIVE - This application will NOT allow others to share the reader.
- *   <li>SCARD_SHARE_DIRECT - Direct control of the reader, even without a card.
- *       SCARD_SHARE_DIRECT can be used before using SCardControl() to send
- *       control commands to the reader even if a card is not present in
- *       the reader.
+ *   <li>\ref SCARD_SHARE_SHARED - This application will allow others to share
+ *   the reader.
+ *   <li>\ref SCARD_SHARE_EXCLUSIVE - This application will NOT allow others to
+ *   share the reader.
+ *   <li>\ref SCARD_SHARE_DIRECT - Direct control of the reader, even without a
+ *   card.  \ref SCARD_SHARE_DIRECT can be used before using SCardControl() to
+ *   send control commands to the reader even if a card is not present in the
+ *   reader.
  * </ul>
  * @param[in] dwPreferredProtocols Desired protocol use.
  * <ul>
- *   <li>SCARD_PROTOCOL_T0 - Use the T=0 protocol.
- *   <li>SCARD_PROTOCOL_T1 - Use the T=1 protocol.
- *   <li>SCARD_PROTOCOL_RAW - Use with memory type cards.
+ *   <li>\ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
+ *   <li>\ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
+ *   <li>\ref SCARD_PROTOCOL_RAW - Use with memory type cards.
  * </ul>
  * dwPreferredProtocols is a bit mask of acceptable protocols for the
  * connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1) if you
@@ -595,13 +597,13 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * @param[out] pdwActiveProtocol Established protocol to this connection.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hContext handle.
- * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name.
- * @retval SCARD_E_NOT_READY Could not allocate the desired port.
- * @retval SCARD_E_READER_UNAVAILABLE Could not power up the reader or card.
- * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights.
- * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hContext handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_NOT_READY Could not allocate the desired port (\ref SCARD_E_NOT_READY)
+ * @retval SCARD_E_READER_UNAVAILABLE Could not power up the reader or card (\ref SCARD_E_READER_UNAVAILABLE)
+ * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
+ * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported (\ref SCARD_E_UNSUPPORTED_FEATURE)
  *
  * @test
  * @code
@@ -729,35 +731,37 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  * @param[in] hCard Handle to a previous call to connect.
  * @param[in] dwShareMode Mode of connection type: exclusive/shared.
  * <ul>
- *   <li>SCARD_SHARE_SHARED - This application will allow others to share the reader.
- *   <li>SCARD_SHARE_EXCLUSIVE - This application will NOT allow others to share the reader.
+ *   <li>\ref SCARD_SHARE_SHARED - This application will allow others to share
+ *   the reader.
+ *   <li>\ref SCARD_SHARE_EXCLUSIVE - This application will NOT allow others to
+ *   share the reader.
  * </ul>
  * @param[in] dwPreferredProtocols Desired protocol use.
  * <ul>
- *   <li>SCARD_PROTOCOL_T0 - Use the T=0 protocol.
- *   <li>SCARD_PROTOCOL_T1 - Use the T=1 protocol.
- *   <li>SCARD_PROTOCOL_RAW - Use with memory type cards.
+ *   <li>\ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
+ *   <li>\ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
+ *   <li>\ref SCARD_PROTOCOL_RAW - Use with memory type cards.
  * </ul>
  * \p dwPreferredProtocols is a bit mask of acceptable protocols for
  * the connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1)
  * if you do not have a preferred protocol.
  * @param[in] dwInitialization Desired action taken on the card/reader.
  * <ul>
- *   <li>SCARD_LEAVE_CARD - Do nothing.
- *   <li>SCARD_RESET_CARD - Reset the card (warm reset).
- *   <li>SCARD_UNPOWER_CARD - Unpower the card (cold reset).
- *   <li>SCARD_EJECT_CARD - Eject the card.
+ *   <li>\ref SCARD_LEAVE_CARD - Do nothing.
+ *   <li>\ref SCARD_RESET_CARD - Reset the card (warm reset).
+ *   <li>\ref SCARD_UNPOWER_CARD - Unpower the card (cold reset).
+ *   <li>\ref SCARD_EJECT_CARD - Eject the card.
  * </ul>
  * @param[out] pdwActiveProtocol Established protocol to this connection.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle.
- * @retval SCARD_E_NOT_READY Could not allocate the desired port.
- * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
- * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported.
- * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_NOT_READY Could not allocate the desired port (\ref SCARD_E_NOT_READY)
+ * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
+ * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported (\ref SCARD_E_UNSUPPORTED_FEATURE)
+ * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  *
  * @test
  * @code
@@ -886,16 +890,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
  * @param[in] hCard Connection made from SCardConnect.
  * @param[in] dwDisposition Reader function to execute.
  * <ul>
- *   <li>SCARD_LEAVE_CARD - Do nothing.
- *   <li>SCARD_RESET_CARD - Reset the card (warm reset).
- *   <li>SCARD_UNPOWER_CARD - Unpower the card (cold reset).
- *   <li>SCARD_EJECT_CARD - Eject the card.
+ *   <li>\ref SCARD_LEAVE_CARD - Do nothing.
+ *   <li>\ref SCARD_RESET_CARD - Reset the card (warm reset).
+ *   <li>\ref SCARD_UNPOWER_CARD - Unpower the card (cold reset).
+ *   <li>\ref SCARD_EJECT_CARD - Eject the card.
  * </ul>
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle.
- * @retval SCARD_E_INVALID_VALUE - Invalid \p dwDisposition.
+ * @retval SCARD_S_SUCCESS Successful(\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INVALID_VALUE - Invalid \p dwDisposition (\ref SCARD_E_INVALID_VALUE)
  *
  * @test
  * @code
@@ -982,16 +986,16 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * You might want to use this when you are selecting a few files and then
  * writing a large file so you can make sure that another application will
  * not change the current file. If another application has a lock on this
- * reader or this application is in \c SCARD_SHARE_EXCLUSIVE there will be no
+ * reader or this application is in \ref SCARD_SHARE_EXCLUSIVE there will be no
  * action taken.
  *
  * @param[in] hCard Connection made from SCardConnect.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
- * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  *
  * @test
  * @code
@@ -1125,17 +1129,17 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * @param[in] dwDisposition Action to be taken on the reader.
  * The disposition action is not currently used in this release.
  * <ul>
- *   <li>SCARD_LEAVE_CARD - Do nothing.
- *   <li>SCARD_RESET_CARD - Reset the card.
- *   <li>SCARD_UNPOWER_CARD - Unpower the card.
- *   <li>SCARD_EJECT_CARD - Eject the card.
+ *   <li>\ref SCARD_LEAVE_CARD - Do nothing.
+ *   <li>\ref SCARD_RESET_CARD - Reset the card.
+ *   <li>\ref SCARD_UNPOWER_CARD - Unpower the card.
+ *   <li>\ref SCARD_EJECT_CARD - Eject the card.
  * </ul>
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
- * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  *
  * @test
  * @code
@@ -1324,7 +1328,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * It's friendly name will be stored in szReaderName. pcchReaderLen will be
  * the size of the allocated buffer for szReaderName, while pcbAtrLen will
  * be the size of the allocated buffer for pbAtr. If either of these is too
- * small, the function will return with SCARD_E_INSUFFICIENT_BUFFER and the
+ * small, the function will return with \ref SCARD_E_INSUFFICIENT_BUFFER and the
  * necessary size in pcchReaderLen and pcbAtrLen. The current state, and
  * protocol will be stored in pdwState and pdwProtocol respectively.
  *
@@ -1334,30 +1338,31 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * @param[out] pdwState Current state of this reader. pdwState
  * is a DWORD possibly OR'd with the following values:
  * <ul>
- *   <li>SCARD_ABSENT - There is no card in the reader.
- *   <li>SCARD_PRESENT - There is a card in the reader, but it has not been
- *                       moved into position for use.
- *   <li>SCARD_SWALLOWED - There is a card in the reader in position for use.
- *                         The card is not powered.
- *   <li>SCARD_POWERED - Power is being provided to the card, but the reader
- *                       driver is unaware of the mode of the card.
- *   <li>SCARD_NEGOTIABLE - The card has been reset and is awaiting PTS negotiation.
- *   <li>SCARD_SPECIFIC - The card has been reset and specific communication
- *                        protocols have been established.
+ *   <li>\ref SCARD_ABSENT - There is no card in the reader.
+ *   <li>\ref SCARD_PRESENT - There is a card in the reader, but it has not
+ *       been moved into position for use.
+ *   <li>\ref SCARD_SWALLOWED - There is a card in the reader in position for
+ *       use.  The card is not powered.
+ *   <li>\ref SCARD_POWERED - Power is being provided to the card, but the
+ *       reader driver is unaware of the mode of the card.
+ *   <li>\ref SCARD_NEGOTIABLE - The card has been reset and is awaiting PTS
+ *       negotiation.
+ *   <li>\ref SCARD_SPECIFIC - The card has been reset and specific
+ *       communication protocols have been established.
  * </ul>
  * @param[out] pdwProtocol Current protocol of this reader.
  * <ul>
- *   <li>SCARD_PROTOCOL_T0 	Use the T=0 protocol.
- *   <li>SCARD_PROTOCOL_T1 	Use the T=1 protocol.
+ *   <li>\ref SCARD_PROTOCOL_T0 	Use the T=0 protocol.
+ *   <li>\ref SCARD_PROTOCOL_T1 	Use the T=1 protocol.
  * </ul>
  * @param[out] pbAtr Current ATR of a card in this reader.
  * @param[out] pcbAtrLen Length of ATR.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
- * @retval SCARD_E_INSUFFICIENT_BUFFER Not enough allocated memory for szReaderName or for pbAtr.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER Not enough allocated memory for szReaderName or for pbAtr (\ref SCARD_E_INSUFFICIENT_BUFFER)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  *
  * @test
  * @code
@@ -1545,34 +1550,34 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  *
  * Value of dwCurrentState and dwEventState:
  * <ul>
- *   <li>SCARD_STATE_UNAWARE The application is unaware of the current
+ *   <li>\ref SCARD_STATE_UNAWARE The application is unaware of the current
  *       state, and would like to know. The use of this value results in an
  *       immediate return from state transition monitoring services. This is
  *       represented by all bits set to zero.
- *   <li>SCARD_STATE_IGNORE This reader should be ignored
- *   <li>SCARD_STATE_CHANGED There is a difference between the state believed
+ *   <li>\ref SCARD_STATE_IGNORE This reader should be ignored
+ *   <li>\ref SCARD_STATE_CHANGED There is a difference between the state believed
  *       by the application, and the state known by the resource manager.
  *       When this bit is set, the application may assume a significant state
  *       change has occurred on this reader.
- *   <li>SCARD_STATE_UNKNOWN The given reader name is not recognized by the
- *       resource manager. If this bit is set, then \c SCARD_STATE_CHANGED and
- *       \c SCARD_STATE_IGNORE will also be set
- *   <li>SCARD_STATE_UNAVAILABLE The actual state of this reader is not
+ *   <li>\ref SCARD_STATE_UNKNOWN The given reader name is not recognized by the
+ *       resource manager. If this bit is set, then \ref SCARD_STATE_CHANGED and
+ *       \ref SCARD_STATE_IGNORE will also be set
+ *   <li>\ref SCARD_STATE_UNAVAILABLE The actual state of this reader is not
  *       available. If this bit is set, then all the following bits are clear.
- *   <li>SCARD_STATE_EMPTY There is no card in the reader. If this bit is set,
+ *   <li>\ref SCARD_STATE_EMPTY There is no card in the reader. If this bit is set,
  *       all the following bits will be clear
- *   <li>SCARD_STATE_PRESENT There is a card in the reader
- *   <li>SCARD_STATE_ATRMATCH There is a card in the reader with an ATR
+ *   <li>\ref SCARD_STATE_PRESENT There is a card in the reader
+ *   <li>\ref SCARD_STATE_ATRMATCH There is a card in the reader with an ATR
  *       matching one of the target cards. If this bit is set,
- *       \c SCARD_STATE_PRESENT will also be set. This bit is only returned on
- *       the \c SCardLocateCards function.
- *   <li>SCARD_STATE_EXCLUSIVE The card in the reader is allocated for
+ *       \ref SCARD_STATE_PRESENT will also be set. This bit is only returned on
+ *       the SCardLocateCards() function.
+ *   <li>\ref SCARD_STATE_EXCLUSIVE The card in the reader is allocated for
  *       exclusive use by another application. If this bit is set,
- *       \c SCARD_STATE_PRESENT will also be set.
- *   <li>SCARD_STATE_INUSE The card in the reader is in use by one or more
+ *       \ref SCARD_STATE_PRESENT will also be set.
+ *   <li>\ref SCARD_STATE_INUSE The card in the reader is in use by one or more
  *       other applications, but may be connected to in shared mode. If this
- *       bit is set, \c SCARD_STATE_PRESENT will also be set.
- *   <li>SCARD_STATE_MUTE There is an unresponsive card in the reader.
+ *       bit is set, \ref SCARD_STATE_PRESENT will also be set.
+ *   <li>\ref SCARD_STATE_MUTE There is an unresponsive card in the reader.
  * </ul>
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -1582,10 +1587,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  * @param[in] cReaders Number of structures.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_VALUE Invalid States, reader name, etc.
- * @retval SCARD_E_INVALID_HANDLE Invalid hContext handle.
- * @retval SCARD_E_READER_UNAVAILABLE The reader is unavailable.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_VALUE Invalid States, reader name, etc (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hContext handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader is unavailable (\ref SCARD_E_READER_UNAVAILABLE)
  *
  * @test
  * @code
@@ -2117,13 +2122,13 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
  * @param[out] lpBytesReturned Length of the response.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
- * @retval SCARD_E_INVALID_VALUE Invalid value was presented.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
- * @retval SCARD_W_RESET_CARD The card has been reset by another application.
- * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INVALID_VALUE Invalid value was presented (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed(\ref SCARD_E_READER_UNAVAILABLE)
+ * @retval SCARD_W_RESET_CARD The card has been reset by another application (\ref SCARD_W_RESET_CARD)
+ * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader(\ref SCARD_W_REMOVED_CARD)
  *
  * @test
  * @code
@@ -2244,53 +2249,53 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * This function get an attribute from the IFD Handler. The list of possible
  * attributes is available in the file \c pcsclite.h.
  *
- * @param[in] hCard Connection made from \c SCardConnect.
+ * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwAttrId Identifier for the attribute to get.
  * <ul>
- *   <li>SCARD_ATTR_ASYNC_PROTOCOL_TYPES
- *   <li>SCARD_ATTR_ATR_STRING
- *   <li>SCARD_ATTR_CHANNEL_ID
- *   <li>SCARD_ATTR_CHARACTERISTICS
- *   <li>SCARD_ATTR_CURRENT_BWT
- *   <li>SCARD_ATTR_CURRENT_CLK
- *   <li>SCARD_ATTR_CURRENT_CWT
- *   <li>SCARD_ATTR_CURRENT_D
- *   <li>SCARD_ATTR_CURRENT_EBC_ENCODING
- *   <li>SCARD_ATTR_CURRENT_F
- *   <li>SCARD_ATTR_CURRENT_IFSC
- *   <li>SCARD_ATTR_CURRENT_IFSD
- *   <li>SCARD_ATTR_CURRENT_IO_STATE
- *   <li>SCARD_ATTR_CURRENT_N
- *   <li>SCARD_ATTR_CURRENT_PROTOCOL_TYPE
- *   <li>SCARD_ATTR_CURRENT_W
- *   <li>SCARD_ATTR_DEFAULT_CLK
- *   <li>SCARD_ATTR_DEFAULT_DATA_RATE
- *   <li>SCARD_ATTR_DEVICE_FRIENDLY_NAME_A
- *   <li>SCARD_ATTR_DEVICE_FRIENDLY_NAME_W
- *   <li>SCARD_ATTR_DEVICE_IN_USE
- *   <li>SCARD_ATTR_DEVICE_SYSTEM_NAME_A
- *   <li>SCARD_ATTR_DEVICE_SYSTEM_NAME_W
- *   <li>SCARD_ATTR_DEVICE_UNIT
- *   <li>SCARD_ATTR_ESC_AUTHREQUEST
- *   <li>SCARD_ATTR_ESC_CANCEL
- *   <li>SCARD_ATTR_ESC_RESET
- *   <li>SCARD_ATTR_EXTENDED_BWT
- *   <li>SCARD_ATTR_ICC_INTERFACE_STATUS
- *   <li>SCARD_ATTR_ICC_PRESENCE
- *   <li>SCARD_ATTR_ICC_TYPE_PER_ATR
- *   <li>SCARD_ATTR_MAX_CLK
- *   <li>SCARD_ATTR_MAX_DATA_RATE
- *   <li>SCARD_ATTR_MAX_IFSD
- *   <li>SCARD_ATTR_MAXINPUT
- *   <li>SCARD_ATTR_POWER_MGMT_SUPPORT
- *   <li>SCARD_ATTR_SUPRESS_T1_IFS_REQUEST
- *   <li>SCARD_ATTR_SYNC_PROTOCOL_TYPES
- *   <li>SCARD_ATTR_USER_AUTH_INPUT_DEVICE
- *   <li>SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE
- *   <li>SCARD_ATTR_VENDOR_IFD_SERIAL_NO
- *   <li>SCARD_ATTR_VENDOR_IFD_TYPE
- *   <li>SCARD_ATTR_VENDOR_IFD_VERSION
- *   <li>SCARD_ATTR_VENDOR_NAME
+ *   <li>\ref SCARD_ATTR_ASYNC_PROTOCOL_TYPES
+ *   <li>\ref SCARD_ATTR_ATR_STRING
+ *   <li>\ref SCARD_ATTR_CHANNEL_ID
+ *   <li>\ref SCARD_ATTR_CHARACTERISTICS
+ *   <li>\ref SCARD_ATTR_CURRENT_BWT
+ *   <li>\ref SCARD_ATTR_CURRENT_CLK
+ *   <li>\ref SCARD_ATTR_CURRENT_CWT
+ *   <li>\ref SCARD_ATTR_CURRENT_D
+ *   <li>\ref SCARD_ATTR_CURRENT_EBC_ENCODING
+ *   <li>\ref SCARD_ATTR_CURRENT_F
+ *   <li>\ref SCARD_ATTR_CURRENT_IFSC
+ *   <li>\ref SCARD_ATTR_CURRENT_IFSD
+ *   <li>\ref SCARD_ATTR_CURRENT_IO_STATE
+ *   <li>\ref SCARD_ATTR_CURRENT_N
+ *   <li>\ref SCARD_ATTR_CURRENT_PROTOCOL_TYPE
+ *   <li>\ref SCARD_ATTR_CURRENT_W
+ *   <li>\ref SCARD_ATTR_DEFAULT_CLK
+ *   <li>\ref SCARD_ATTR_DEFAULT_DATA_RATE
+ *   <li>\ref SCARD_ATTR_DEVICE_FRIENDLY_NAME_A
+ *   <li>\ref SCARD_ATTR_DEVICE_FRIENDLY_NAME_W
+ *   <li>\ref SCARD_ATTR_DEVICE_IN_USE
+ *   <li>\ref SCARD_ATTR_DEVICE_SYSTEM_NAME_A
+ *   <li>\ref SCARD_ATTR_DEVICE_SYSTEM_NAME_W
+ *   <li>\ref SCARD_ATTR_DEVICE_UNIT
+ *   <li>\ref SCARD_ATTR_ESC_AUTHREQUEST
+ *   <li>\ref SCARD_ATTR_ESC_CANCEL
+ *   <li>\ref SCARD_ATTR_ESC_RESET
+ *   <li>\ref SCARD_ATTR_EXTENDED_BWT
+ *   <li>\ref SCARD_ATTR_ICC_INTERFACE_STATUS
+ *   <li>\ref SCARD_ATTR_ICC_PRESENCE
+ *   <li>\ref SCARD_ATTR_ICC_TYPE_PER_ATR
+ *   <li>\ref SCARD_ATTR_MAX_CLK
+ *   <li>\ref SCARD_ATTR_MAX_DATA_RATE
+ *   <li>\ref SCARD_ATTR_MAX_IFSD
+ *   <li>\ref SCARD_ATTR_MAXINPUT
+ *   <li>\ref SCARD_ATTR_POWER_MGMT_SUPPORT
+ *   <li>\ref SCARD_ATTR_SUPRESS_T1_IFS_REQUEST
+ *   <li>\ref SCARD_ATTR_SYNC_PROTOCOL_TYPES
+ *   <li>\ref SCARD_ATTR_USER_AUTH_INPUT_DEVICE
+ *   <li>\ref SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE
+ *   <li>\ref SCARD_ATTR_VENDOR_IFD_SERIAL_NO
+ *   <li>\ref SCARD_ATTR_VENDOR_IFD_TYPE
+ *   <li>\ref SCARD_ATTR_VENDOR_IFD_VERSION
+ *   <li>\ref SCARD_ATTR_VENDOR_NAME
  * </ul>
  *
  * Not all the dwAttrId values listed above may be implemented in the IFD
@@ -2301,9 +2306,9 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * @param pcbAttrLen [inout] Length of the \p pbAttr buffer in bytes.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful.
- * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  *
  * @test
  * @code
@@ -2345,14 +2350,14 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * The list of attributes you can set is dependent on the IFD Handler you are
  * using.
  *
- * @param[in] hCard Connection made from \c SCardConnect.
+ * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwAttrId Identifier for the attribute to set.
  * @param[in] pbAttr Pointer to a buffer that receives the attribute.
  * @param[in] cbAttrLen Length of the \p pbAttr buffer in bytes.
  *
  * @return Error code
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  *
  * @test
  * @code
@@ -2501,8 +2506,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * @param[in] hCard Connection made from SCardConnect().
  * @param pioSendPci [inout] Structure of protocol information.
  * <ul>
- *   <li>SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
- *   <li>SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
+ *   <li>\ref SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
+ *   <li>\ref SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
  * </ul>
  * @param[in] pbSendBuffer APDU to send to the card.
  * @param[in] cbSendLength Length of the APDU.
@@ -2511,14 +2516,14 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * @param pcbRecvLength [inout] Length of the response.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle.
- * @retval SCARD_E_NOT_TRANSACTED APDU exchange not successful.
- * @retval SCARD_E_PROTO_MISMATCH Connect protocol is different than desired.
- * @retval SCARD_E_INVALID_VALUE Invalid Protocol, reader name, etc.
- * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed.
- * @retval SCARD_W_RESET_CARD The card has been reset by another application.
- * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_NOT_TRANSACTED APDU exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
+ * @retval SCARD_E_PROTO_MISMATCH Connect protocol is different than desired (\ref SCARD_E_PROTO_MISMATCH)
+ * @retval SCARD_E_INVALID_VALUE Invalid Protocol, reader name, etc (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
+ * @retval SCARD_W_RESET_CARD The card has been reset by another application (\ref SCARD_W_RESET_CARD)
+ * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader (\ref SCARD_W_REMOVED_CARD)
  *
  * @test
  * @code
@@ -2759,9 +2764,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * @param pcchReaders [inout] Size of multi-string buffer including NULL's.
  *
  * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle.
- * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  *
  * @test
  * @code
@@ -2863,9 +2868,9 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
  * @param pcchGroups [inout] Size of multi-string buffer including NULL's.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle.
- * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle (\ref SCARD_E_INVALID_HANDLE)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  *
  * @test
  * @code
@@ -2926,13 +2931,13 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 
 /**
  * This function cancels all pending blocking requests on the
- * \c SCardGetStatusChange() function.
+ * SCardGetStatusChange() function.
  *
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle (\ref SCARD_E_INVALID_HANDLE)
  *
  * @test
  * @code
@@ -2986,8 +2991,8 @@ LONG SCardCancel(SCARDCONTEXT hContext)
  * @param[in] dwClientID Client connection ID.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Success.
- * @retval SCARD_E_NO_MEMORY There is no free slot to store \p hContext.
+ * @retval SCARD_S_SUCCESS Success (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NO_MEMORY There is no free slot to store \p hContext (\ref SCARD_E_NO_MEMORY)
  */
 static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 {
@@ -3014,7 +3019,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
  * for the passed context.
  *
  * This function is a thread-safe wrapper to the function
- * \c SCardGetContextIndiceTH().
+ * SCardGetContextIndiceTH().
  *
  * @param[in] hContext Application Context whose index will be find.
  *
@@ -3037,7 +3042,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
  * for the passed context.
  *
  * This functions is not thread-safe and should not be called. Instead, call
- * the function \c SCardGetContextIndice().
+ * the function SCardGetContextIndice().
  *
  * @param[in] hContext Application Context whose index will be find.
  *
@@ -3066,8 +3071,8 @@ static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
  * @param[in] hContext Application Context to be removed.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Success.
- * @retval SCARD_E_INVALID_HANDLE The context \p hContext was not found.
+ * @retval SCARD_S_SUCCESS Success (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE The context \p hContext was not found (\ref SCARD_E_INVALID_HANDLE)
  */
 static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 {
@@ -3183,7 +3188,7 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndi
  * @brief This function locks a mutex so another thread must wait to use this
  * function.
  *
- * Wrapper to the function \c SYS_MutexLock().
+ * Wrapper to the function SYS_MutexLock().
  */
 inline static LONG SCardLockThread(void)
 {
@@ -3193,7 +3198,7 @@ inline static LONG SCardLockThread(void)
 /**
  * @brief This function unlocks a mutex so another thread may use the client.
  *
- * Wrapper to the function \c SYS_MutexUnLock().
+ * Wrapper to the function SYS_MutexUnLock().
  */
 inline static LONG SCardUnlockThread(void)
 {
@@ -3204,8 +3209,8 @@ inline static LONG SCardUnlockThread(void)
  * @brief Checks if the Server is running.
  *
  * @return Error code.
- * @retval SCARD_S_SUCCESS Server is running.
- * @retval SCARD_E_NO_SERVICE Server is not running.
+ * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_NO_SERVICE Server is not running (\ref SCARD_E_NO_SERVICE)
  */
 static LONG SCardCheckDaemonAvailability(void)
 {

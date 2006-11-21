@@ -128,9 +128,9 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };
  * @param[out] phContext Returned Application Context.
  *
  * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful.
- * @retval SCARD_E_INVALID_VALUE Invalid scope type passed.
- * @retval SCARD_E_INVALID_PARAMETER phContext is null.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE)
+ * @retval SCARD_E_INVALID_PARAMETER phContext is null (\ref SCARD_E_INVALID_PARAMETER)
  */
 LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
