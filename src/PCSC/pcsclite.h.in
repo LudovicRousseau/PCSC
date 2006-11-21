@@ -102,6 +102,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_E_CARD_UNSUPPORTED	0x8010001C
 #define SCARD_E_NO_SERVICE		0x8010001D
 #define SCARD_E_SERVICE_STOPPED		0x8010001E
+#define SCARD_E_NO_READERS_AVAILABLE    0x8010002E
 
 #define SCARD_SCOPE_USER		0x0000	/**< Scope in user space */
 #define SCARD_SCOPE_TERMINAL		0x0001	/**< Scope in terminal */
