@@ -8,6 +8,10 @@
 
 - include Apple patches and improvements (if possible/needed)
 
+- Allow connection from a 32-bits and 64-bits client to the same pcscd
+  server. This is part of the Apple patches and improvements.
+  see Alioth bug #303790
+
 - power on the card _only_ if an application requests a connection
   see Alioth bug #301965
 
@@ -21,4 +25,4 @@
 - manage power suspend/resume (in a laptop for example) and coordinate
   with the driver (when/if possible)
 
-Sep 2006
+Nov 2006
