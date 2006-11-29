@@ -303,7 +303,7 @@ void HPRescanUsbBus(void)
 		 *	check for this explicitly.
 		 */
 		if (readerTracker[i].status == READER_PRESENT ||
-			 readerTracker[i].driver == NULL)
+			 readerTracker[i].fullName == NULL)
 			continue;
 
 		sscanf(readerTracker[i].bus_device, "%*[^:]%*[:]%s", filename);
