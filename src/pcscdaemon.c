@@ -96,6 +96,7 @@ pid_t GetDaemonPid(void)
 
 int SendHotplugSignal(void)
 {
+#ifdef USE_RUN_PID
 	pid_t pid;
 
 	pid = GetDaemonPid();
@@ -110,6 +111,7 @@ int SendHotplugSignal(void)
 			return EXIT_FAILURE ;
 		}
 	}
+#endif
 
 	return EXIT_SUCCESS;
 } /* SendHotplugSignal */
