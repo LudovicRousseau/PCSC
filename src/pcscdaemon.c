@@ -66,6 +66,7 @@ void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
+#ifdef USE_RUN_PID
 pid_t GetDaemonPid(void)
 {
 	FILE *f;
@@ -93,6 +94,7 @@ pid_t GetDaemonPid(void)
 
 	return pid;
 } /* GetDaemonPid */
+#endif
 
 int SendHotplugSignal(void)
 {
