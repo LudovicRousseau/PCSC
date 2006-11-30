@@ -3244,7 +3244,7 @@ void DESTRUCTOR SCardUnload(void)
 	if (!isExecuted)
 		return;
 
-	// unmap public shared file from memory
+	/* unmap public shared file from memory */
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
 		if (readerStates[i] != NULL)
