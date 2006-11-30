@@ -139,9 +139,11 @@ INTERNAL int SHMClientCloseSession(DWORD dwClientID)
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
+INTERNAL int SHMMessageSend(void *buffer_void, size_t buffer_size,
 	int filedes, int blockAmount)
 {
+	char *buffer = buffer_void;
+
 	/*
 	 * default is success
 	 */
@@ -262,9 +264,11 @@ INTERNAL int SHMMessageSend(void *buffer, size_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
+INTERNAL int SHMMessageReceive(void *buffer_void, size_t buffer_size,
 	int filedes, int blockAmount)
 {
+	char *buffer = buffer_void;
+
 	/*
 	 * default is success
 	 */
@@ -386,8 +390,10 @@ INTERNAL int SHMMessageReceive(void *buffer, size_t buffer_size,
  * @return Same error codes as SHMMessageSend().
  */
 INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
-	unsigned int size, unsigned int blockAmount, void *data)
+	unsigned int size, unsigned int blockAmount, void *data_void)
 {
+	char *data = data_void;
+
 	sharedSegmentMsg msgStruct;
 	int ret;
 
