@@ -1260,9 +1260,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
 		return rv;
 
-	if (cbSendLength > MAX_BUFFER_SIZE)
-		return SCARD_E_INSUFFICIENT_BUFFER;
-
 	if (IFD_HVERSION_2_0 == rContext->dwVersion)
 	{
 		/* we must wrap a API 3.0 client in an API 2.0 driver */
