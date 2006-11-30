@@ -21,7 +21,7 @@
 /** Major version of the current message protocol */
 #define PROTOCOL_VERSION_MAJOR 2
 /** Minor version of the current message protocol */
-#define PROTOCOL_VERSION_MINOR 1
+#define PROTOCOL_VERSION_MINOR 2
 
 #ifdef __cplusplus
 extern "C"
@@ -88,7 +88,8 @@ extern "C"
 		SCARD_CANCEL_TRANSACTION = 0x0E,
 		SCARD_GET_ATTRIB = 0x0F,
 		SCARD_SET_ATTRIB = 0x10,
-		SCARD_TRANSMIT_EXTENDED = 0x11
+		SCARD_TRANSMIT_EXTENDED = 0x11,
+		SCARD_CONTROL_EXTENDED = 0x12
 	};
 
 	/**
@@ -287,6 +288,24 @@ extern "C"
 		LONG rv;
 	};
 	typedef struct control_struct control_struct;
+
+	/**
+	 * @brief contained in \c SCARD_CONTROL_EXTENDED Messages.
+	 *
+	 * These data are passed throw the field \c sharedSegmentMsg.data.
+	 */
+	struct control_struct_extended
+	{
+		SCARDHANDLE hCard;
+		DWORD dwControlCode;
+		DWORD cbSendLength;
+		DWORD cbRecvLength;
+		DWORD pdwBytesReturned;
+		LONG rv;
+		size_t size;
+		BYTE data[1];
+	};
+	typedef struct control_struct_extended control_struct_extended;
 
 	/**
 	 * @brief contained in \c SCARD_GET_ATTRIB and \c  Messages.

@@ -407,7 +407,8 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
 	msgStruct.date = time(NULL);
-	if (SCARD_TRANSMIT_EXTENDED == command)
+	if ((SCARD_TRANSMIT_EXTENDED == command)
+		|| (SCARD_CONTROL_EXTENDED == command))
 	{
 		/* first block */
 		memcpy(msgStruct.data, data, PCSCLITE_MAX_MESSAGE_SIZE);

@@ -2193,59 +2193,134 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
-	if (cbSendLength > MAX_BUFFER_SIZE)
+	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
+		|| (cbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
 	{
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
-	scControlStruct.hCard = hCard;
-	scControlStruct.dwControlCode = dwControlCode;
-	scControlStruct.cbSendLength = cbSendLength;
-	scControlStruct.cbRecvLength = cbRecvLength;
-	memcpy(scControlStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
-
-	rv = WrapSHMWrite(SCARD_CONTROL, psContextMap[dwContextIndex].dwClientID,
-		sizeof(scControlStruct), PCSCLITE_CLIENT_ATTEMPTS, &scControlStruct);
-
-	if (rv == -1)
+	if ((cbSendLength > MAX_BUFFER_SIZE) || (cbRecvLength > MAX_BUFFER_SIZE))
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
-	}
+		/* extended control */
+		unsigned char buffer[sizeof(sharedSegmentMsg) + MAX_BUFFER_SIZE_EXTENDED];
+		control_struct_extended *scControlStructExtended = (control_struct_extended *)buffer;
+		sharedSegmentMsg *pmsgStruct = (psharedSegmentMsg)buffer;
 
-	/*
-	 * Read a message from the server
-	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		scControlStructExtended->hCard = hCard;
+		scControlStructExtended->dwControlCode = dwControlCode;
+		scControlStructExtended->cbSendLength = cbSendLength;
+		scControlStructExtended->cbRecvLength = cbRecvLength;
+		scControlStructExtended->size = sizeof(*scControlStructExtended) + cbSendLength;
+		memcpy(scControlStructExtended->data, pbSendBuffer, cbSendLength);
 
-	if (rv == -1)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
-	}
+		rv = WrapSHMWrite(SCARD_CONTROL_EXTENDED,
+			psContextMap[dwContextIndex].dwClientID,
+			scControlStructExtended->size,
+			PCSCLITE_CLIENT_ATTEMPTS, buffer);
 
-	memcpy(&scControlStruct, &msgStruct.data, sizeof(scControlStruct));
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_E_NO_SERVICE;
+		}
 
-	if (NULL != lpBytesReturned)
-		*lpBytesReturned = scControlStruct.dwBytesReturned;
-
-	if (scControlStruct.rv == SCARD_S_SUCCESS)
-	{
 		/*
-		 * Copy and zero it so any secret information is not leaked
+		 * Read a message from the server
 		 */
-		memcpy(pbRecvBuffer, scControlStruct.pbRecvBuffer,
-			scControlStruct.cbRecvLength);
-		memset(scControlStruct.pbRecvBuffer, 0x00,
-			sizeof(scControlStruct.pbRecvBuffer));
+		/* read the first block */
+		rv = SHMMessageReceive(buffer, sizeof(sharedSegmentMsg), psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_F_COMM_ERROR;
+		}
+
+		/* we receive a sharedSegmentMsg and not a control_struct_extended */
+		scControlStructExtended = (control_struct_extended *)&(pmsgStruct -> data);
+
+		/* a second block is present */
+		if (scControlStructExtended->size > PCSCLITE_MAX_MESSAGE_SIZE)
+		{
+			rv = SHMMessageReceive(buffer + sizeof(sharedSegmentMsg),
+				scControlStructExtended->size-PCSCLITE_MAX_MESSAGE_SIZE,
+				psContextMap[dwContextIndex].dwClientID,
+				PCSCLITE_CLIENT_ATTEMPTS);
+			if (rv == -1)
+			{
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+				return SCARD_F_COMM_ERROR;
+			}
+		}
+
+		if (scControlStructExtended -> rv == SCARD_S_SUCCESS)
+		{
+			/*
+			 * Copy and zero it so any secret information is not leaked
+			 */
+			memcpy(pbRecvBuffer, scControlStructExtended -> data,
+				scControlStructExtended -> pdwBytesReturned);
+			memset(scControlStructExtended -> data, 0x00,
+				scControlStructExtended -> pdwBytesReturned);
+		}
+
+		if (NULL != lpBytesReturned)
+			*lpBytesReturned = scControlStructExtended -> pdwBytesReturned;
+
+		rv = scControlStructExtended -> rv;
+	}
+	else
+	{
+		scControlStruct.hCard = hCard;
+		scControlStruct.dwControlCode = dwControlCode;
+		scControlStruct.cbSendLength = cbSendLength;
+		scControlStruct.cbRecvLength = cbRecvLength;
+		memcpy(scControlStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
+
+		rv = WrapSHMWrite(SCARD_CONTROL, psContextMap[dwContextIndex].dwClientID,
+			sizeof(scControlStruct), PCSCLITE_CLIENT_ATTEMPTS, &scControlStruct);
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_E_NO_SERVICE;
+		}
+
+		/*
+		 * Read a message from the server
+		 */
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_F_COMM_ERROR;
+		}
+
+		memcpy(&scControlStruct, &msgStruct.data, sizeof(scControlStruct));
+
+		if (NULL != lpBytesReturned)
+			*lpBytesReturned = scControlStruct.dwBytesReturned;
+
+		if (scControlStruct.rv == SCARD_S_SUCCESS)
+		{
+			/*
+			 * Copy and zero it so any secret information is not leaked
+			 */
+			memcpy(pbRecvBuffer, scControlStruct.pbRecvBuffer,
+				scControlStruct.cbRecvLength);
+			memset(scControlStruct.pbRecvBuffer, 0x00,
+				sizeof(scControlStruct.pbRecvBuffer));
+		}
+
+		rv = scControlStruct.rv;
 	}
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END
 
-	return scControlStruct.rv;
+	return rv;
 }
 
 /**

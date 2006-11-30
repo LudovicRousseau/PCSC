@@ -159,7 +159,8 @@ static void ContextThread(LPVOID dwIndex)
 
 				/* the SCARD_TRANSMIT_EXTENDED anwser is already sent by
 				 * MSGFunctionDemarshall */
-				if (msgStruct.command != SCARD_TRANSMIT_EXTENDED)
+				if ((msgStruct.command != SCARD_TRANSMIT_EXTENDED)
+					&& (msgStruct.command != SCARD_CONTROL_EXTENDED))
 					rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
 						psContext[dwContextIndex].dwClientID,
 						PCSCLITE_SERVER_ATTEMPTS);
@@ -446,6 +447,75 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			{
 				/* one block only */
 				memcpy(treStr->data, pbRecvBuffer, treStr->pcbRecvLength);
+
+				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+			}
+		}
+		break;
+
+	case SCARD_CONTROL_EXTENDED:
+		{
+			control_struct_extended *cteStr;
+			unsigned char pbSendBuffer[MAX_BUFFER_SIZE_EXTENDED];
+			unsigned char pbRecvBuffer[MAX_BUFFER_SIZE_EXTENDED];
+
+			cteStr = ((control_struct_extended *) msgStruct->data);
+			rv = MSGCheckHandleAssociation(cteStr->hCard, dwContextIndex);
+			if (rv != 0) return rv;
+
+			/* on more block to read? */
+			if (cteStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
+			{
+				/* copy the first data part */
+				memcpy(pbSendBuffer, cteStr->data,
+					PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*cteStr));
+
+				/* receive the second block */
+				rv = SHMMessageReceive(
+					pbSendBuffer+PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*cteStr),
+					cteStr->size - PCSCLITE_MAX_MESSAGE_SIZE,
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "reception failed");
+			}
+			else
+				memcpy(pbSendBuffer, cteStr->data, cteStr->cbSendLength);
+
+			cteStr->rv = SCardControl(cteStr->hCard, cteStr->dwControlCode,
+				pbSendBuffer, cteStr->cbSendLength,
+				pbRecvBuffer, cteStr->cbRecvLength,
+				&cteStr->pdwBytesReturned);
+
+			cteStr->size = sizeof(*cteStr) + cteStr->pdwBytesReturned;
+			if (cteStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
+			{
+				/* two blocks */
+				memcpy(cteStr->data, pbRecvBuffer, PCSCLITE_MAX_MESSAGE_SIZE
+					- sizeof(*cteStr));
+
+				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+
+				rv = SHMMessageSend(pbRecvBuffer + PCSCLITE_MAX_MESSAGE_SIZE
+					- sizeof(*cteStr),
+					cteStr->size - PCSCLITE_MAX_MESSAGE_SIZE,
+					psContext[dwContextIndex].dwClientID,
+					PCSCLITE_SERVER_ATTEMPTS);
+				if (rv)
+					Log1(PCSC_LOG_CRITICAL, "transmission failed");
+			}
+			else
+			{
+				/* one block only */
+				memcpy(cteStr->data, pbRecvBuffer, cteStr->pdwBytesReturned);
 
 				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
 					psContext[dwContextIndex].dwClientID,
