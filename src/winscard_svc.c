@@ -179,10 +179,25 @@ static void ContextThread(LPVOID dwIndex)
 						"Client is protocol version %d:%d",
 						veStr->major, veStr->minor);
 
+					veStr->rv = SCARD_S_SUCCESS;
+
+					/* client is newer than server */
+					if ((veStr->major > PROTOCOL_VERSION_MAJOR)
+						|| (veStr->major == PROTOCOL_VERSION_MAJOR
+							&& veStr->minor > PROTOCOL_VERSION_MINOR))
+					{
+						Log3(PCSC_LOG_CRITICAL,
+							"Client protocol is too new %d:%d",
+							veStr->major, veStr->minor);
+						Log3(PCSC_LOG_CRITICAL,
+							"Server protocol is %d:%d",
+							PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
+						veStr->rv = SCARD_E_NO_SERVICE;
+					}
+
 					/* set the server protocol version */
 					veStr->major = PROTOCOL_VERSION_MAJOR;
 					veStr->minor = PROTOCOL_VERSION_MINOR;
-					veStr->rv = SCARD_S_SUCCESS;
 
 					/* send back the response */
 					rv = SHMMessageSend(&msgStruct, sizeof(msgStruct),
