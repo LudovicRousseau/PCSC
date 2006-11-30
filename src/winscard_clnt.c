@@ -420,6 +420,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
 			veStr->major, veStr->minor);
 
+		if (veStr->rv != SCARD_S_SUCCESS)
+			return veStr->rv;
+
 		isExecuted = 1;
 	}
 
