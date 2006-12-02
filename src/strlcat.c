@@ -24,6 +24,7 @@
 
 #include <sys/types.h>
 #include <string.h>
+#include "strlcpycat.h"
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
