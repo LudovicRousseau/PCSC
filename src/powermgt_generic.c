@@ -14,6 +14,7 @@
 
 #include "config.h"
 #include "pcsclite.h"
+#include "powermgt_generic.h"
 
 /*
  * Check for platforms that have their own specific support.
