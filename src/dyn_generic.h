@@ -22,7 +22,7 @@ extern "C"
 
 	int DYN_LoadLibrary(void **, char *);
 	int DYN_CloseLibrary(void **);
-	int DYN_GetAddress(void *, void **, char *);
+	int DYN_GetAddress(void *, void **, const char *);
 
 #ifdef __cplusplus
 }

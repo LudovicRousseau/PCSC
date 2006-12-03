@@ -56,7 +56,7 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, char *pcFunction)
+INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction)
 {
 	char pcFunctionName[256];
 	int rv;
