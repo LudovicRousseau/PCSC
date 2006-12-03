@@ -25,7 +25,7 @@ extern "C"
 
 	int SYS_Initialize(void);
 
-	int SYS_Mkdir(char *, int);
+	int SYS_Mkdir(const char *, int);
 
 	int SYS_GetPID(void);
 
@@ -33,11 +33,11 @@ extern "C"
 
 	int SYS_USleep(int);
 
-	int SYS_OpenFile(char *, int, int);
+	int SYS_OpenFile(const char *, int, int);
 
 	int SYS_CloseFile(int);
 
-	int SYS_RemoveFile(char *);
+	int SYS_RemoveFile(const char *);
 
 	int SYS_Chmod(const char *, int);
 
@@ -47,13 +47,13 @@ extern "C"
 
 	int SYS_GetGID(void);
 
-	int SYS_ChangePermissions(char *, int);
+	int SYS_ChangePermissions(const char *, int);
 
 	int SYS_SeekFile(int, int);
 
 	int SYS_ReadFile(int, char *, int);
 
-	int SYS_WriteFile(int, char *, int);
+	int SYS_WriteFile(int, const char *, int);
 
 	int SYS_GetPageSize(void);
 
@@ -69,7 +69,7 @@ extern "C"
 
 	int SYS_Daemon(int, int);
 
-	int SYS_Stat(char *pcFile, struct stat *psStatus);
+	int SYS_Stat(const char *pcFile, struct stat *psStatus);
 
 	int SYS_RandomInt(int, int);
 
@@ -77,7 +77,7 @@ extern "C"
 
 	void SYS_Exit(int);
 
-	int SYS_Unlink(char *pcFile);
+	int SYS_Unlink(const char *pcFile);
 
 #ifdef __cplusplus
 }

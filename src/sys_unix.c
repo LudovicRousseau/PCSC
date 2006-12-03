@@ -58,7 +58,7 @@ INTERNAL int SYS_Initialize(void)
  * @retval 0 Success.
  * @retval -1 An error occurred.
  */
-INTERNAL int SYS_Mkdir(char *path, int perms)
+INTERNAL int SYS_Mkdir(const char *path, int perms)
 {
 	return mkdir(path, perms);
 }
@@ -121,7 +121,7 @@ INTERNAL int SYS_USleep(int iTimeVal)
  * @retval >0 The file descriptor.
  * @retval -1 An error ocurred.
  */
-INTERNAL int SYS_OpenFile(char *pcFile, int flags, int mode)
+INTERNAL int SYS_OpenFile(const char *pcFile, int flags, int mode)
 {
 	return open(pcFile, flags, mode);
 }
@@ -149,7 +149,7 @@ INTERNAL int SYS_CloseFile(int iHandle)
  * @retval 0 Success.
  * @retval -1 An error ocurred.
  */
-INTERNAL int SYS_RemoveFile(char *pcFile)
+INTERNAL int SYS_RemoveFile(const char *pcFile)
 {
 	return remove(pcFile);
 }
@@ -186,7 +186,7 @@ INTERNAL int SYS_ReadFile(int iHandle, char *pcBuffer, int iLength)
 	return read(iHandle, pcBuffer, iLength);
 }
 
-INTERNAL int SYS_WriteFile(int iHandle, char *pcBuffer, int iLength)
+INTERNAL int SYS_WriteFile(int iHandle, const char *pcBuffer, int iLength)
 {
 	return write(iHandle, pcBuffer, iLength);
 }
@@ -374,7 +374,7 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #endif
 }
 
-INTERNAL int SYS_Stat(char *pcFile, struct stat *psStatus)
+INTERNAL int SYS_Stat(const char *pcFile, struct stat *psStatus)
 {
 	return stat(pcFile, psStatus);
 }
@@ -418,7 +418,7 @@ INTERNAL void SYS_Exit(int iRetVal)
 	_exit(iRetVal);
 }
 
-INTERNAL int SYS_Unlink(char *pcFile)
+INTERNAL int SYS_Unlink(const char *pcFile)
 {
 	return unlink(pcFile);
 }
