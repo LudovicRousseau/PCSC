@@ -29,6 +29,7 @@
 static char LogLevel = PCSC_LOG_ERROR;
 
 static signed char LogDoColor = 0;	/* no color by default */
+void log_init(void);
 
 void log_init(void)
 {
