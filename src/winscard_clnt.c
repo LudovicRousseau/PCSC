@@ -3229,6 +3229,9 @@ static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard, PDWORD pdwContextIndice
 {
 	LONG rv;
 
+	if (0 == hCard)
+		return -1;
+
 	SCardLockThread();
 	rv = SCardGetIndicesFromHandleTH(hCard, pdwContextIndice, pdwChannelIndice);
 	SCardUnlockThread();
