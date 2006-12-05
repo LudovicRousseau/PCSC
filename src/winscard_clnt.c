@@ -1392,6 +1392,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	status_struct scStatusStruct;
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex, dwChannelIndex;
+	char *r;
 
 	PROFILE_START
 
@@ -1429,10 +1430,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
 		/* by default r == NULL */
 		if (r && strcmp(r, (readerStates[i])->readerName) == 0)
 			break;
