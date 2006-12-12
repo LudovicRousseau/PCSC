@@ -1315,7 +1315,10 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
 	else
-		return SCARD_E_NOT_TRANSACTED;
+		if (rv == IFD_ERROR_TAG)
+			return SCARD_E_UNSUPPORTED_FEATURE;
+		else
+			return SCARD_E_NOT_TRANSACTED;
 }
 
 LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
@@ -1358,7 +1361,10 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
 	else
-		return SCARD_E_NOT_TRANSACTED;
+		if (rv == IFD_ERROR_TAG)
+			return SCARD_E_UNSUPPORTED_FEATURE;
+		else
+			return SCARD_E_NOT_TRANSACTED;
 }
 
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
