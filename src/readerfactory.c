@@ -586,7 +586,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 							"Support %d simultaneous readers", tagValue[0]);
 					}
 					else
-						supportedChannels = -1;
+						supportedChannels = 1;
 
 					/*
 					 * Check to see if it is a hotplug reader and
@@ -637,8 +637,19 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 				break;
 		}
 
-		if ((i == PCSCLITE_MAX_READERS_CONTEXTS) || (i > supportedChannels))
-			return -1;
+		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		{
+			Log2(PCSC_LOG_ERROR, "Max number of readers reached: %d", PCSCLITE_MAX_READERS_CONTEXTS);
+			return -2;
+		}
+
+		if (i >= supportedChannels)
+		{
+			Log3(PCSC_LOG_ERROR, "Driver %s does not support more than "
+				"%d reader(s). Maybe the driver should support "
+				"TAG_IFD_SIMULTANEOUS_ACCESS", libraryName, supportedChannels);
+			return -2;
+		}
 	}
 
 	sprintf(rContext->lpcReader, "%s %02X %02lX", readerName, i, dwSlot);
