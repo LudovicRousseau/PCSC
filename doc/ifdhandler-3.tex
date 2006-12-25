@@ -610,12 +610,6 @@ supports access to multiple slots of the same reader at the same time.
 \texttt{Value[0] = 1} indicates the driver supports simultaneous slot
 accesses.
 
-\item \texttt{IOCTL\_SMARTCARD\_VENDOR\_VERIFY\_PIN}
-
-Return a non null value if the driver/reader is able to perform a
-\texttt{SCardControl(hCard, IOCTL\_SMARTCARD\_VENDOR\_VERIFY\_PIN,
-...)}. See pcsc-lite documentation~\cite{pcsclite}.
-
 \end{itemize}
 
 \item \texttt{Length} - the length of the returned data
