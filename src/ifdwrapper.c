@@ -491,6 +491,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		else
 		{
 			Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+			dwCardStatus = SCARD_UNKNOWN;
 
 			if (rv == IFD_NO_SUCH_DEVICE)
 			{
