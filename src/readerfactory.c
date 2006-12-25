@@ -155,6 +155,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	 */
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], lpcReader,
 		lpcLibrary, dwPort, 0);
+	if (parentNode < -1)
+		return SCARD_E_NO_MEMORY;
 
 	strlcpy((sReadersContexts[dwContext])->lpcLibrary, lpcLibrary,
 		sizeof((sReadersContexts[dwContext])->lpcLibrary));
