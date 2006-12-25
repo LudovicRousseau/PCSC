@@ -574,6 +574,9 @@ void signal_reload(int sig)
 {
 	static int rescan_ongoing = FALSE;
 
+	if (AraKiri)
+		return;
+
 	Log1(PCSC_LOG_INFO, "Reload serial configuration");
 	if (rescan_ongoing)
 	{
