@@ -446,7 +446,7 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
  * @param[in] sockValue Socket to be closed.
  * @param[in] pcFilePath File used by the socket.
  */
-INTERNAL void SHMCleanupSharedSegment(int sockValue, char *pcFilePath)
+INTERNAL void SHMCleanupSharedSegment(int sockValue, const char *pcFilePath)
 {
 	SYS_CloseFile(sockValue);
 	SYS_Unlink(pcFilePath);

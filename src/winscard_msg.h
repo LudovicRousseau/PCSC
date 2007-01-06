@@ -338,7 +338,7 @@ extern "C"
 		int filedes, int blockAmount);
 	int WrapSHMWrite(unsigned int command, DWORD dwClientID, unsigned int size,
 		unsigned int blockAmount, void *data);
-	void SHMCleanupSharedSegment(int, char *);
+	void SHMCleanupSharedSegment(int, const char *);
 
 #ifdef __cplusplus
 }
