@@ -367,6 +367,7 @@ void HPEstablishUSBNotifications(void)
 	/* scan the USB bus for devices at startup */
 	HPRescanUsbBus();
 
+#define USB_POLLING
 #ifdef USB_POLLING
 	while (1)
 	{
