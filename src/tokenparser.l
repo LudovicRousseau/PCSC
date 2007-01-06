@@ -57,7 +57,7 @@ void tperrorCheck (char *pcToken_error);
 
 void tpevalToken(char *pcToken, int tokType)
 {
-	int len;
+	unsigned int len;
 	len = 0;
 
 	if (tokType == TOKEN_TYPE_KEY)
