@@ -27,7 +27,7 @@ extern "C"
 #define TOKEN_TYPE_KEY         1
 #define TOKEN_TYPE_STRING      2
 
-int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
+int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
                               char *tokenValue, int tokenIndice);
 
 #ifdef __cplusplus

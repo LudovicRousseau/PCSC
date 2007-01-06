@@ -112,7 +112,7 @@ void tperrorCheck (char *token_error)
  * @retval 0 OK
  * @retval 1 key not found
  */
-int LTPBundleFindValueWithKey(char *fileName, char *tokenKey,
+int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
                               char *tokenValue, int tokenIndice)
 {
 	FILE *file = NULL;
