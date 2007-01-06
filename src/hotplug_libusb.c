@@ -84,6 +84,8 @@ LONG HPReadBundleValues(void);
 LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver);
 LONG HPRemoveHotPluggable(int index);
+static void HPRescanUsbBus(void);
+static void HPEstablishUSBNotifications(void);
 
 LONG HPReadBundleValues(void)
 {
