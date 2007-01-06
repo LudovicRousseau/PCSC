@@ -28,6 +28,7 @@ extern "C"
 #define PCSCLITE_HP_PRODKEY_NAME	"ifdProductID"
 #define PCSCLITE_HP_NAMEKEY_NAME	"ifdFriendlyName"
 #define PCSCLITE_HP_LIBRKEY_NAME	"CFBundleExecutable"
+#define PCSCLITE_HP_CPCTKEY_NAME	"ifdCapabilities"
 
 #define PCSCLITE_HP_BASE_PORT		0x200000
 

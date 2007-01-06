@@ -56,6 +56,9 @@ static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
 static char AraKiriHotPlug = FALSE;
 
+/* values of ifdCapabilities bits */
+#define IFD_GENERATE_HOTPLUG 1
+
 /*
  * keep track of drivers in a dynamically allocated array
  */
@@ -67,6 +70,7 @@ static struct _driverTracker
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
+	int ifdCapabilities;
 } *driverTracker = NULL;
 #define DRIVER_TRACKER_SIZE_STEP 8
 
@@ -166,6 +170,12 @@ LONG HPReadBundleValues(void)
 					driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
+				/* Get ifdCapabilities */
+				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_CPCTKEY_NAME,
+					keyValue, 0);
+				if (rv == 0)
+					driverTracker[listCount].ifdCapabilities = strtol(keyValue, 0, 16);
+
 #ifdef DEBUG_HOTPLUG
 					Log2(PCSC_LOG_INFO, "Found driver for: %s",
 						driverTracker[listCount].readerName);
@@ -201,6 +211,7 @@ LONG HPReadBundleValues(void)
 						driverTracker[i].bundleName = NULL;
 						driverTracker[i].libraryPath = NULL;
 						driverTracker[i].readerName = NULL;
+						driverTracker[i].ifdCapabilities = 0;
 					}
 				}
 			}
@@ -360,6 +371,8 @@ void HPRescanUsbBus(void)
 
 void HPEstablishUSBNotifications(void)
 {
+	int i, do_polling;
+
 	/* libusb default is /dev/bus/usb but the devices are not yet visible there
 	 * when a hotplug is requested */
 	setenv("USB_DEVFS_PATH", "/proc/bus/usb", 0);
@@ -369,14 +382,24 @@ void HPEstablishUSBNotifications(void)
 	/* scan the USB bus for devices at startup */
 	HPRescanUsbBus();
 
-#define USB_POLLING
-#ifdef USB_POLLING
-	while (1)
+	/* if at least one driver do not have IFD_GENERATE_HOTPLUG */
+	do_polling = FALSE;
+	for (i=0; i<driverSize; i++)
+		if (driverTracker[i].libraryPath)
+			if ((driverTracker[i].ifdCapabilities & IFD_GENERATE_HOTPLUG) == 0)
+			{
+				Log2(PCSC_LOG_INFO,
+					"Driver %s does not support IFD_GENERATE_HOTPLUG",
+					driverTracker[i].bundleName);
+				do_polling = TRUE;
+				break;
+			}
+
+	while (do_polling)
 	{
 		SYS_Sleep(1);
 		HPRescanUsbBus();
 	}
-#endif
 }
 
 LONG HPSearchHotPluggables(void)
