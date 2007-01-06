@@ -176,7 +176,7 @@ void DebugLogSetLogType(const int dbgtype)
 		term = getenv("TERM");
 		if (term)
 		{
-			int i;
+			unsigned int i;
 
 			/* for each known color terminal */
 			for (i = 0; i < sizeof(terms) / sizeof(terms[0]); i++)
