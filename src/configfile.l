@@ -62,7 +62,7 @@ int evaluatetoken(char *pcToken)
 
 	DWORD dwChannelId = 0;
 	int p = 0;
-	int n = 0;
+	unsigned int n = 0;
 
 	if (pcPrevious == NULL)
 	{							/* This is the key */
