@@ -887,12 +887,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
-	void *f = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFD_" #function)) \
+	void *f1 = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function)) \
 	{ \
 		code \
 	} \
-	rContext->psFunctions.psFunctions_v1.pvf ## field = f; \
+	rContext->psFunctions.psFunctions_v1.pvf ## field = f1; \
 }
 
 #define GET_ADDRESSv1(field, function) \
@@ -927,12 +927,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
-	void *f = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFDH" #s)) \
+	void *f1 = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s)) \
 	{ \
 		code \
 	} \
-	rContext->psFunctions.psFunctions_v2.pvf ## s = f; \
+	rContext->psFunctions.psFunctions_v2.pvf ## s = f1; \
 }
 
 #define GET_ADDRESSv2(s) \
@@ -961,12 +961,12 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
-	void *f = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f, "IFDH" #s)) \
+	void *f1 = NULL; \
+	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s)) \
 	{ \
 		code \
 	} \
-	rContext->psFunctions.psFunctions_v3.pvf ## s = f; \
+	rContext->psFunctions.psFunctions_v3.pvf ## s = f1; \
 }
 
 #define GET_ADDRESSv3(s) \
