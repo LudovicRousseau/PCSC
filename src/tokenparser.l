@@ -30,7 +30,7 @@
 
 void tpevalToken(char *pcToken, int tokType);
 
-static char *pcDesiredKey = 0;
+static const char *pcDesiredKey = NULL;
 static char pcKey[TOKEN_MAX_KEY_SIZE];
 static char pcValue[TOKEN_MAX_VALUE_SIZE];
 static char pcFinValue[TOKEN_MAX_VALUE_SIZE];
