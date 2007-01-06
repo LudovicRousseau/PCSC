@@ -67,6 +67,7 @@ void print_usage (char const * const);
 PCSCLITE_MUTEX usbNotifierMutex;
 
 #ifdef USE_RUN_PID
+pid_t GetDaemonPid(void);
 pid_t GetDaemonPid(void)
 {
 	FILE *f;
