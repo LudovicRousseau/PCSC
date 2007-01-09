@@ -74,6 +74,14 @@ int main(int argc, char **argv)
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 	test_rv(rv, hContext, PANIC);
 
+	printf("Testing SCardIsValidContext\t: ");
+	rv = SCardIsValidContext(hContext);
+	test_rv(rv, hContext, PANIC);
+
+	printf("Testing SCardIsValidContext\t: ");
+	rv = SCardIsValidContext(hContext+1);
+	test_rv(rv, hContext, DONT_PANIC);
+
 	printf("Testing SCardGetStatusChange \n");
 	printf("Please insert a working reader\t: ");
 	fflush(stdout);
