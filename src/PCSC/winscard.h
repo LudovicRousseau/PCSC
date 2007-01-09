@@ -32,6 +32,8 @@ extern "C"
 
 	PCSC_API LONG SCardReleaseContext(SCARDCONTEXT hContext);
 
+	PCSC_API LONG SCardIsValidContext(SCARDCONTEXT hContext);
+
 	PCSC_API LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout);
 
 	PCSC_API LONG SCardConnect(SCARDCONTEXT hContext,

@@ -3057,6 +3057,50 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 }
 
 /**
+ * @brief check if a \ref SCARDCONTEXT is valid.
+ *
+ * Call this function to determine whether a smart card context handle is still
+ * valid. After a smart card context handle has been set by \ref
+ * SCardEstablishContext, it may become not valid if the resource manager
+ * service has been shut down.
+ *
+ * @param[in] hContext Connection context to the PC/SC Resource Manager.
+ *
+ * @return Error code.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_INVALID_HANDLE Invalid Handle (\ref SCARD_E_INVALID_HANDLE)
+ *
+ * @test
+ * @code
+ * SCARDCONTEXT hContext;
+ * LONG rv;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * rv = SCardIsValidContext(hContext);
+ * @endcode
+ */
+LONG SCardIsValidContext(SCARDCONTEXT hContext)
+{
+	LONG rv;
+	LONG dwContextIndex;
+
+	PROFILE_START
+
+	rv = SCARD_S_SUCCESS;
+
+	/*
+	 * Make sure this context has been opened
+	 */
+	dwContextIndex = SCardGetContextIndice(hContext);
+	if (dwContextIndex == -1)
+		rv = SCARD_E_INVALID_HANDLE;
+
+	PROFILE_END
+
+	return rv;
+}
+
+/**
  * Functions for managing instances of SCardEstablishContext These functions
  * keep track of Context handles and associate the blocking
  * variable contextBlockStatus to an hContext
