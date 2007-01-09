@@ -129,7 +129,7 @@ INTERNAL int SHMClientCloseSession(DWORD dwClientID)
  *
  * Writes the message in the shared file \c filedes.
  *
- * @param[in] buffer Message to be sent.
+ * @param[in] buffer_void Message to be sent.
  * @param[in] buffer_size Size of the message to send
  * @param[in] filedes Socket handle.
  * @param[in] blockAmount Timeout in milliseconds.
@@ -254,7 +254,7 @@ INTERNAL int SHMMessageSend(void *buffer_void, size_t buffer_size,
  *
  * Reads the message from the file \c filedes.
  *
- * @param[out] buffer Message read.
+ * @param[out] buffer_void Message read.
  * @param[in] buffer_size Size to read
  * @param[in] filedes Socket handle.
  * @param[in] blockAmount Timeout in milliseconds.
@@ -385,7 +385,7 @@ INTERNAL int SHMMessageReceive(void *buffer_void, size_t buffer_size,
  * @param[in] dwClientID Client socket handle.
  * @param[in] size Size of the message (\p data).
  * @param[in] blockAmount Timeout to the operation in ms.
- * @param[in] data Data to be sent.
+ * @param[in] data_void Data to be sent.
  *
  * @return Same error codes as SHMMessageSend().
  */
