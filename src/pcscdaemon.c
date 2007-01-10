@@ -393,6 +393,9 @@ int main(int argc, char **argv)
 			{
 #ifdef USE_RUN_PID
 				Log1(PCSC_LOG_CRITICAL, "file " USE_RUN_PID " do not exist");
+#else
+				Log1(PCSC_LOG_CRITICAL,
+					"pcscd was not configured with --enable-runpid=FILE");
 #endif
 				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
 				return EXIT_FAILURE;
