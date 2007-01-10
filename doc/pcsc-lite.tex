@@ -76,6 +76,8 @@ Document history: \\
 0.9.0 & May 26, 2004 & reformat using \LaTeX{}, correct bugs and add
 parts 4 and 5 \\
 \hline
+0.9.1 & Jan 10, 2007 & add SCardIsValidContext() \\
+\hline
 \end{tabular}
 
 \newpage
@@ -313,6 +315,46 @@ LONG rv;
 
 rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardReleaseContext(hContext);
+\end{verbatim}
+
+\returns
+
+\begin{tabular}{ll}
+\texttt{SCARD\_S\_SUCCESS} & Successful\\
+\texttt{SCARD\_E\_INVALID\_HANDLE} & Invalid \texttt{hContext} handle
+\end{tabular}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{SCardIsValidContext}
+
+\synopsis
+\begin{verbatim}
+#include <winscard.h>
+
+LONG SCardIsValidContext(SCARDCONTEXT hContext);
+\end{verbatim}
+
+\parameters
+
+\begin{tabular}{lll}
+\texttt{hContext} & IN & Connection context to be checked
+\end{tabular}
+
+\desc
+
+This function determines whether a smart card context handle is still
+valid. After a smart card context handle has been set by
+SCardEstablishContext(), it may become not valid if the resource manager
+service has been shut down.
+
+\example
+\begin{verbatim}
+SCARDCONTEXT hContext;
+LONG rv;
+
+rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+rv = SCardIsValidContext(hContext);
 \end{verbatim}
 
 \returns
