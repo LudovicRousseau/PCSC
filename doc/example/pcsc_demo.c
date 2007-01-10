@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 	char pbReader[MAX_READERNAME] = "";
 	int reader_nb;
 	int i;
+    SCARD_IO_REQUEST *pioSendPci;
 	SCARD_IO_REQUEST pioRecvPci;
 	BYTE pbRecvBuffer[10];
 	BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
@@ -173,10 +174,23 @@ int main(int argc, char *argv[])
 	printf("\n");
 	PCSC_ERROR(rv, "SCardStatus")
 
+    switch(dwActiveProtocol)
+    {
+        case SCARD_PROTOCOL_T0:
+            pioSendPci = SCARD_PCI_T0;
+            break;
+        case SCARD_PROTOCOL_T1:
+            pioSendPci = SCARD_PCI_T1;
+            break;
+        default:
+            printf("Unknown protocol\n");
+            return -1;
+    }
+
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
-	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
 	PCSC_ERROR(rv, "SCardTransmit")
 
@@ -187,14 +201,14 @@ int main(int argc, char *argv[])
 	/* connect to a card */
 	dwActiveProtocol = -1;
 	rv = SCardConnect(hContext, readers[reader_nb], SCARD_SHARE_EXCLUSIVE,
-		SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &dwActiveProtocol);
 	printf(" Protocol: %ld\n", dwActiveProtocol);
 	PCSC_ERROR(rv, "SCardConnect")
 
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
-	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
 	PCSC_ERROR(rv, "SCardTransmit")
 
@@ -234,7 +248,7 @@ int main(int argc, char *argv[])
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
-	rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
 	PCSC_ERROR(rv, "SCardTransmit")
 
