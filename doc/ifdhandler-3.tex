@@ -76,6 +76,8 @@ Document history: \\
 3.1.0 & July 28, 2004 & reformat using \LaTeX{}, correct bugs and add
 information \\
 \hline
+3.2.0 & Jan 10, 2007 & document \texttt{IFD\_GENERATE\_HOTPLUG} capability \\
+\hline
 \end{tabular}
 
 \newpage
@@ -151,12 +153,18 @@ IFD\_ICC\_PRESENT\\
 IFD\_NOT\_SUPPORTED\\
 IFD\_PROTOCOL\_NOT\_SUPPORTED\\
 IFD\_RESPONSE\_TIMEOUT\\
+IFD\_NO\_SUCH\_DEVICE\\
 \hline
 \end{longtable}
 }
 
+The \texttt{IFD\_NO\_SUCH\_DEVICE} error must be returned by the driver
+when it detects the reader is no more present. This will tell
+\texttt{pcscd} to remove the reader from the list of available readers.
+
+
 %---------%---------%---------%---------%---------%---------%---------
-\section{Readers configuration}
+\section{Readers' configuration}
 
 
 %---------%---------%---------%---------%---------%---------
@@ -238,6 +246,24 @@ Example:
 <key>CFBundleExecutable</key>
 <string>libccid.so.0.4.2</string>
 \end{verbatim}
+
+\item \texttt{ifdCapabilities}
+
+List of capabilities supported by the driver. This is a bit field.
+Possible values are:
+
+\begin{itemize}
+\item 0
+
+No special capabilities
+
+\item 1 \texttt{IFD\_GENERATE\_HOTPLUG}
+
+The driver supports the hotplug feature. See
+\ref{IFD_GENERATE_HOTPLUG}.
+
+\end{itemize}
+
 
 \end{itemize}
 
@@ -343,6 +369,58 @@ reader will be located. This may be done by a symbolic link where
 
 
 %---------%---------%---------%---------%---------%---------%---------
+\section{IFD Capabilities}
+
+The reader may announce some supported capabilities to the \texttt{pcscd}
+daemon.
+
+
+%---------%---------%---------%---------%---------%---------
+\subsection{IFD\_GENERATE\_HOTPLUG}
+\label{IFD_GENERATE_HOTPLUG}
+
+This capability allows pcscd to avoid continuously scanning the USB bus for
+new readers supported by the driver. The driver has two obligations:
+\begin{itemize}
+\item tell pcscd when a new reader is connected
+
+\item tell pcscd when a reader has been removed.
+
+\end{itemize}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsubsection{Reader connection}
+
+When a reader supported by the driver is connected the driver
+infrastructure shall call \texttt{pcscd --hotplug} to signal it to pcscd.
+
+On recent GNU/Linux systems you can use a \texttt{udev} rule file to do
+that.  For example create a file
+\texttt{/etc/udev/rules.d/pcscd\_ccid.rules} containing something like:
+
+\begin{verbatim}
+# udev rules for pcscd and CCID readers
+
+# generic CCID device
+BUS=="usb", SYSFS{bInterfaceClass}=="0b", ACTION=="add", RUN+="/usr/sbin/pcscd --hotplug"
+\end{verbatim}
+
+
+%---------%---------%---------%---------%---------%---------
+\subsubsection{Reader disconnection}
+
+Pcscd will not detect the reader is gone unless the driver tells it so.
+When the driver detects the reader is no more there (by getting an ENODEV
+(No such device) error for example) it shall return the error code
+\texttt{IFD\_NO\_SUCH\_DEVICE} to pcscd.
+
+If the driver fails to return \texttt{IFD\_NO\_SUCH\_DEVICE} then pcscd
+will continue trying to contact the reader and will fail endlessly. This
+will generate a lot of errors.
+
+
+%---------%---------%---------%---------%---------%---------%---------
 \section{API Routines}
 
 The routines specified hereafter will allow you to write an IFD handler
@@ -428,7 +506,8 @@ bus for the particular reader by manufacturer and product id.
 
 \begin{tabular}{ll}
 \texttt{IFD\_SUCCESS} & Successful\\
-\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -494,7 +573,7 @@ printf("usb:%04x/%04x:libusb:%s:%s",
 So it is something like: \texttt{usb:08e6/3437:libusb:001:042} under
 Linux.
 
-It is the responsability of the driver to correctly identify the reader.
+It is the responsibility of the driver to correctly identify the reader.
 This scheme was put in place to be able to distinguish two identical
 readers connected at the same time.
 
@@ -504,7 +583,8 @@ readers connected at the same time.
 
 \begin{tabular}{ll}
 \texttt{IFD\_SUCCESS} & Successful\\
-\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -535,7 +615,8 @@ powered down.
 
 \begin{tabular}{ll}
 \texttt{IFD\_SUCCESS} & Successful\\
-\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred
+\texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -590,9 +671,9 @@ This is used for multiple readers sharing the same driver.
 
 \item \texttt{TAG\_IFD\_THREAD\_SAFE}
 
-If the driver support more than one reader (see
+If the driver supports more than one reader (see
 \texttt{TAG\_IFD\_SIMULTANEOUS\_ACCESS} above) this tag indicates if the
-driver supports access to multiple reader at the same time.
+driver supports access to multiple readers at the same time.
 
 \texttt{Value[0] = 1} indicates the driver supports simultaneous
 accesses.
@@ -626,7 +707,8 @@ limited.  The ones above are used by the PC/SC lite resource manager.
 
 \begin{tabular}{ll}
 \texttt{IFD\_SUCCESS} & Successful\\
-\texttt{IFD\_ERROR\_TAG} & Invalid tag given
+\texttt{IFD\_ERROR\_TAG} & Invalid tag given\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -683,7 +765,8 @@ This function is also called when the application uses the PC/SC
 \texttt{IFD\_SUCCESS} & Success\\
 \texttt{IFD\_ERROR\_TAG} & Invalid tag given\\
 \texttt{IFD\_ERROR\_SET\_FAILURE} & Could not set value\\
-\texttt{IFD\_ERROR\_VALUE\_READ\_ONLY} & Trying to set read only value
+\texttt{IFD\_ERROR\_VALUE\_READ\_ONLY} & Trying to set read only value\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -747,6 +830,7 @@ See ISO 7816/EMV documentation.
 \texttt{IFD\_COMMUNICATION\_ERROR} & Error has occurred\\
 \texttt{IFD\_PROTOCOL\_NOT\_SUPPORTED} & Protocol is not supported\\
 \texttt{IFD\_NOT\_SUPPORTED} & Action not supported\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -793,15 +877,15 @@ Power down the card then power up if not done already (\texttt{Atr} and
 
 \item \texttt{IFD\_RESET}
 
-Perform a quick reset on the card. If the card is not powered power up
-the card. (Store and return \texttt{Atr} and \texttt{Length})
+Perform a quick reset on the card. If the card is not powered then power
+up the card. (Store and return \texttt{Atr} and \texttt{Length})
 
 \end{itemize}
 
 \item \texttt{Atr} - Answer to Reset of the card
 
 The driver is responsible for caching this value in case
-\texttt{IFDHGetCapabilities()} is called requesting the ATR and it's
+\texttt{IFDHGetCapabilities()} is called requesting the ATR and its
 length. The ATR length should not exceed \texttt{MAX\_ATR\_SIZE}.
 
 \item \texttt{AtrLength} - Length of the Atr
@@ -824,6 +908,7 @@ Reset errors should return zero for the \texttt{AtrLength} and return
 \texttt{IFD\_ERROR\_POWER\_ACTION} & Error powering/resetting card\\
 \texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
 \texttt{IFD\_NOT\_SUPPORTED} & Action not supported\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -875,12 +960,12 @@ T=0 ... T=14
 
 \item \texttt{TxBuffer} \tab - Transmit APDU
 
-example: \verb+"\x00\xA4\x00\x00\x02\x3F\x00"+
+Example: \verb+"\x00\xA4\x00\x00\x02\x3F\x00"+
 
 \item \texttt{TxLength} \tab - Length of this buffer
 \item \texttt{RxBuffer} \tab - Receive APDU
 
-example: \verb+"\x61\x14"+
+Example: \verb+"\x61\x14"+
 
 \item \texttt{RxLength} \tab - Length of the received APDU
 
@@ -922,7 +1007,8 @@ command for received buffers containing \texttt{61 XX}.
 \texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
 \texttt{IFD\_RESPONSE\_TIMEOUT} & The response timed out\\
 \texttt{IFD\_ICC\_NOT\_PRESENT} & ICC is not present\\
-\texttt{IFD\_PROTOCOL\_NOT\_SUPPORTED} & Protocol is not supported
+\texttt{IFD\_PROTOCOL\_NOT\_SUPPORTED} & Protocol is not supported\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -992,7 +1078,8 @@ in \texttt{RxLength} and it must set the length of the received data in
 \begin{tabular}{ll}
 \texttt{IFD\_SUCCESS} & Success\\
 \texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
-\texttt{IFD\_RESPONSE\_TIMEOUT} & The response timed out
+\texttt{IFD\_RESPONSE\_TIMEOUT} & The response timed out\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -1025,7 +1112,8 @@ and receive a command each time this function is called.
 \begin{tabular}{ll}
 \texttt{IFD\_ICC\_PRESENT} & ICC is present\\
 \texttt{IFD\_ICC\_NOT\_PRESENT} & ICC is not present\\
-\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred
+\texttt{IFD\_COMMUNICATION\_ERROR} & An error has occurred\\
+\texttt{IFD\_NO\_SUCH\_DEVICE} & The reader is no more present\\
 \end{tabular}
 
 
@@ -1160,7 +1248,7 @@ RESPONSECODE IFDHControl(DWORD Lun,
 \subsection{API version 3.0}
 
 \begin{itemize}
-\item introduction of \texttt{IFDHCreateChannelByName()}.
+\item Introduction of \texttt{IFDHCreateChannelByName()}.
 
 For serial drivers, \texttt{CHANNELID} is no more used and
 \texttt{DEVICENAME} is used instead.
