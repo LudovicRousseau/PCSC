@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 #endif
 
 	rv = 0;
-	newReaderConfig = 0;
+	newReaderConfig = NULL;
 	setToForeground = FALSE;
 	HotPlug = FALSE;
 
