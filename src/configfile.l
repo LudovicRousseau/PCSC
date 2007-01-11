@@ -201,7 +201,7 @@ void tok_error(char *token_error)
 	badError = 1;
 }
 
-int DBGetReaderList(char *readerconf, SerialReader **caller_reader_list)
+int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 {
 	FILE *configFile = NULL;
 
