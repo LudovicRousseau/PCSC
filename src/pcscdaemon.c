@@ -650,6 +650,7 @@ void print_usage (char const * const progname)
 	printf("      --info	 	display info level debug messages (default level)\n");
 	printf("  -e  --error	 	display error level debug messages\n");
 	printf("  -C  --critical 	display critical only level debug messages\n");
+	printf("  --force-reader-polling ignore the IFD_GENERATE_HOTPLUG reader capability\n");
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
