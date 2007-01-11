@@ -262,6 +262,7 @@ int main(int argc, char **argv)
 		{0, 0, 0, 0}
 	};
 #endif
+#define OPT_STRING "c:fdhvaeCH"
 
 	rv = 0;
 	newReaderConfig = NULL;
@@ -291,9 +292,9 @@ int main(int argc, char **argv)
 	 * Handle any command line arguments
 	 */
 #ifdef  HAVE_GETOPT_LONG
-	while ((opt = getopt_long (argc, argv, "c:fdhvaeCH", long_options, &option_index)) != -1) {
+	while ((opt = getopt_long (argc, argv, OPT_STRING, long_options, &option_index)) != -1) {
 #else
-	while ((opt = getopt (argc, argv, "c:fdhvaeCH")) != -1) {
+	while ((opt = getopt (argc, argv, OPT_STRING)) != -1) {
 #endif
 		switch (opt) {
 			case 'c':
