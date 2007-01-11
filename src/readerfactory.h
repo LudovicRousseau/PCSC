@@ -210,7 +210,7 @@ extern "C"
 	LONG RFClearReaderEventState(PREADER_CONTEXT, SCARDHANDLE);
 	LONG RFCheckReaderStatus(PREADER_CONTEXT);
 	void RFCleanupReaders(int);
-	int RFStartSerialReaders(char *readerconf);
+	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);
 	void RFSuspendAllReaders(void);
 	void RFAwakeAllReaders(void);

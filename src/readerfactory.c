@@ -1393,7 +1393,7 @@ void RFCleanupReaders(int shouldExit)
 		exit(0);
 }
 
-int RFStartSerialReaders(char *readerconf)
+int RFStartSerialReaders(const char *readerconf)
 {
 	SerialReader *reader_list;
 	int i, rv;
