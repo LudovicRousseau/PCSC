@@ -55,6 +55,7 @@ extern PCSCLITE_MUTEX usbNotifierMutex;
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
 static char AraKiriHotPlug = FALSE;
+extern int HPForceReaderPolling;
 
 /* values of ifdCapabilities bits */
 #define IFD_GENERATE_HOTPLUG 1
@@ -395,9 +396,16 @@ void HPEstablishUSBNotifications(void)
 				break;
 			}
 
+	if (HPForceReaderPolling)
+	{
+		Log2(PCSC_LOG_INFO,
+				"Polling forced every %d second(s)", HPForceReaderPolling);
+		do_polling = TRUE;
+	}
+
 	while (do_polling)
 	{
-		SYS_Sleep(1);
+		SYS_Sleep(HPForceReaderPolling);
 		HPRescanUsbBus();
 	}
 }

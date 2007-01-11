@@ -51,6 +51,7 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
+int HPForceReaderPolling = 0;
 
 /*
  * Some internal functions
@@ -259,6 +260,7 @@ int main(int argc, char **argv)
 		{"error", 0, 0, 'e'},
 		{"critical", 0, 0, 'C'},
 		{"hotplug", 0, 0, 'H'},
+		{"force-reader-polling", optional_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -297,6 +299,13 @@ int main(int argc, char **argv)
 	while ((opt = getopt (argc, argv, OPT_STRING)) != -1) {
 #endif
 		switch (opt) {
+#ifdef  HAVE_GETOPT_LONG
+			case 0:
+				if (strcmp(long_options[option_index].name,
+					"force-reader-polling") == 0)
+					HPForceReaderPolling = optarg ? abs(atoi(optarg)) : 1;
+				break;
+#endif
 			case 'c':
 				Log2(PCSC_LOG_INFO, "using new config file: %s", optarg);
 				newReaderConfig = optarg;
