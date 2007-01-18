@@ -104,7 +104,6 @@ file.
 .
 .SH "SEE ALSO"
 .BR bundleTool (8),
-.BR formaticc (1),
 .BR reader.conf (5),
 .BR syslog (3)
 .
