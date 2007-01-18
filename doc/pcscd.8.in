@@ -1,4 +1,4 @@
-.TH PCSCD 8 "August 2005" Muscle "PC/SC Lite"
+.TH PCSCD 8 "January 2007" Muscle "PC/SC Lite"
 .SH NAME
 pcscd \- PC/SC Smart Card Daemon
 .
@@ -42,6 +42,12 @@ Displays information about the pcscd command line
 .TP
 .BR \-v ", " \-\-version
 Displays the program version number
+.TP
+.BR \-H ", " \-\-hotplug
+Ask pcscd to rescan the USB buses for added or removed readers and re-read
+the
+.I @confdir@/reader.conf
+file to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is
