@@ -1,3 +1,31 @@
+pcsc-lite-1.3.3: Ludovic Rousseau
+19 January 2007
+- add -H --hotplug argument to ask the pcscd daemon to rescan the
+  avaiable readers
+- add support for IFD_GENERATE_HOTPLUG bit in driver Info.plist
+  ifdCapabilities
+- add --force-reader-polling to ignore the IFD_GENERATE_HOTPLUG bit in
+  driver Info.plist ifdCapabilities (pcscd will poll the USB bus every 1
+  second as in previous versions)
+- SCardConnect() & SCardDisconnect(): wait until any transaction
+  finishes before going on. This avoids the possibility to reset a card
+  in the middle of a transaction Thanks to Martin Paljak for the bug
+  report
+- the tools installifd and formaticc are now completely outdated and
+  should not be used anymore.
+- PCSC/ifdhandler.h: add IFD_NO_SUCH_DEVICE for readers supporting
+  hotplug
+- PCSC/pcsclite.h: add SCARD_E_NO_READERS_AVAILABLE
+- SCardControl(): do not limit cbSendLength to MAX_BUFFER_SIZE bytes
+  since we now transparently support up to MAX_BUFFER_SIZE_EXTENDED
+  bytes.  Thanks to Martin Führlinger for the bug report
+- SCardGetAttrib()/SCardSetAttrib(): if the driver returns IFD_ERROR_TAG
+  we return SCARD_E_UNSUPPORTED_FEATURE instead of the generic error
+  code SCARD_E_NOT_TRANSACTED
+- implement SCardIsValidContext() PC/SC call
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.3.2: Ludovic Rousseau
 11 August 2006
 - add support of extended APDU in the standard configuration and in a
