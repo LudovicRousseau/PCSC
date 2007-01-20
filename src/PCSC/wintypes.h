@@ -41,7 +41,6 @@ extern "C"
 	typedef unsigned long *PDWORD;
 	typedef unsigned short WORD;
 	typedef long LONG;
-	typedef long RESPONSECODE;
 	typedef const char *LPCSTR;
 	typedef const BYTE *LPCBYTE;
 	typedef BYTE *LPBYTE;
