@@ -36,7 +36,7 @@
 LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -191,7 +191,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IO_close_channel) () = NULL;
@@ -237,7 +237,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
-	LONG rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_set_capabilities) (DWORD, PUCHAR) = NULL;
@@ -280,7 +280,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
-	LONG rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
@@ -331,7 +331,8 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
-	RESPONSECODE rv, ret;
+	RESPONSECODE rv;
+	short ret;
 	SMARTCARD_EXTENSION sSmartCard;
 	DWORD dwStatus;
 	UCHAR ucValue[1];
@@ -344,7 +345,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	/*
 	 * Zero out everything
 	 */
-	rv = 0;
+	rv = IFD_SUCCESS;
 	dwStatus = 0;
 	ucValue[0] = 0;
 
@@ -431,7 +432,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 	DWORD dwTag = 0, dwCardStatus = 0;
 	SMARTCARD_EXTENSION sSmartCard;
 	UCHAR ucValue[1] = "\x00";
@@ -512,6 +513,8 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	{
 		if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		{
+			short ret;
+
 			dwTag = TAG_IFD_ATR;
 
 			/*
@@ -539,12 +542,12 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			 * of the ATR since most of the drivers return MAX_ATR_SIZE
 			 */
 
-			rv = ATRDecodeAtr(&sSmartCard, pucAtr, MAX_ATR_SIZE);
+			ret = ATRDecodeAtr(&sSmartCard, pucAtr, MAX_ATR_SIZE);
 
 			/*
 			 * Might be a memory card without an ATR
 			 */
-			if (rv == 0)
+			if (ret == 0)
 				*pdwAtrLen = 0;
 			else
 				*pdwAtrLen = sSmartCard.ATR.Length;
@@ -579,7 +582,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	DWORD TxLength, PUCHAR RxBuffer, PDWORD RxLength)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
@@ -632,7 +635,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	LPCVOID TxBuffer, DWORD TxLength, LPVOID RxBuffer, DWORD RxLength,
 	LPDWORD BytesReturned)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD, LPDWORD);
@@ -689,7 +692,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	PUCHAR pucTxBuffer, DWORD dwTxLength, PUCHAR pucRxBuffer,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
