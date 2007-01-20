@@ -271,7 +271,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 			Log1(PCSC_LOG_ERROR, "Card Not Inserted");
 			return SCARD_E_NO_SMARTCARD;
 		}
+
+		if (dwStatus & SCARD_SWALLOWED)
+		{
+			Log1(PCSC_LOG_ERROR, "Card Not Powered");
+			return SCARD_W_UNPOWERED_CARD;
+		}
 	}
+
 
 	/*******************************************
 	 *
