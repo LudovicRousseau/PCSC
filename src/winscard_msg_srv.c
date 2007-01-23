@@ -165,10 +165,19 @@ INTERNAL int SHMInitializeCommonSegment(void)
  * @retval -1 Can not set the connection to non-blocking mode.
  * @retval 2 Timeout.
  */
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#define DO_TIMEOUT
+#endif
 INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 {
 	fd_set read_fd;
 	int selret;
+#ifdef DO_TIMEOUT
+	struct timeval tv;
+	 	
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+#endif
 
 	FD_ZERO(&read_fd);
 
@@ -178,7 +187,13 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 	FD_SET(commonSocket, &read_fd);
 
 	selret = select(commonSocket + 1, &read_fd, (fd_set *) NULL,
-		(fd_set *) NULL, NULL);
+		(fd_set *) NULL,
+#ifdef DO_TIMEOUT
+		&tv
+#else
+		NULL
+#endif
+		);
 
 	if (selret < 0)
 	{
@@ -189,6 +204,10 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
 			strerror(errno));
 		return -1;
 	}
+
+	if (selret == 0)
+		/* timeout. On *BSD only */
+		return 2;
 
 	/*
 	 * A common pipe packet has arrived - it could be a new application
