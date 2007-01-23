@@ -100,8 +100,8 @@ INTERNAL int SYS_USleep(int iTimeVal)
 {
 #ifdef HAVE_NANOSLEEP
 	struct timespec mrqtp;
-	mrqtp.tv_sec = 0;
-	mrqtp.tv_nsec = iTimeVal * 1000;
+	mrqtp.tv_sec = iTimeVal/1000000;
+	mrqtp.tv_nsec = (iTimeVal - (mrqtp.tv_sec * 1000000)) * 1000;
 
 	return nanosleep(&mrqtp, NULL);
 #else
