@@ -392,7 +392,7 @@ void HPEstablishUSBNotifications(void)
 				Log2(PCSC_LOG_INFO,
 					"Driver %s does not support IFD_GENERATE_HOTPLUG",
 					driverTracker[i].bundleName);
-				do_polling = TRUE;
+				HPForceReaderPolling = 1;
 				break;
 			}
 
