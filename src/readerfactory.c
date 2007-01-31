@@ -1114,7 +1114,10 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
   /******************************************/
 	rv = RFLoadReader(rContext);
 	if (rv != SCARD_S_SUCCESS)
+	{
+		Log2(PCSC_LOG_ERROR, "RFLoadReader failed: %X", rv);
 		return rv;
+	}
 
   /*******************************************/
 	/*
@@ -1125,6 +1128,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 
 	if (rv != SCARD_S_SUCCESS)
 	{
+		Log2(PCSC_LOG_ERROR, "RFBindFunctions failed: %X", rv);
 		RFUnloadReader(rContext);
 		return rv;
 	}
