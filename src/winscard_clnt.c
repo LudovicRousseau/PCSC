@@ -69,8 +69,11 @@ static void profile_start(const char *f)
 
 	if (!initialized)
 	{
+		char filename[80];
+
 		initialized = TRUE;
-		fd = fopen(PROFILE_FILE, "a+");
+		sprintf(filename, "%s-%d", PROFILE_FILE, getuid());
+		fd = fopen(filename, "a+");
 		if (NULL == fd)
 		{
 			fprintf(stderr, "\33[01;31mCan't open %s: %s\33[0m\n",
