@@ -895,6 +895,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
+		/*
+		 * Allow the status thread to convey information
+		 */
+		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
@@ -959,11 +963,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rContext->dwContexts < 0)
 		rContext->dwContexts = 0;
-
-	/*
-	 * Allow the status thread to convey information
-	 */
-	SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 
 	return SCARD_S_SUCCESS;
 }
