@@ -1002,6 +1002,9 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		return rv;
 
 	rv = RFLockSharing(hCard);
+
+	/* if the transaction is not yet ready we sleep a bit so the client
+	 * do not retry immediately */
 	if (SCARD_E_SHARING_VIOLATION == rv)
 		SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 
