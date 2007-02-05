@@ -13,6 +13,7 @@
 
 %{
 #include "wintypes.h"
+#include "pcscd.h"
 #include "readerfactory.h"
 #include "configfile.h"
 
@@ -52,6 +53,7 @@ void tok_error(char *pcToken_error);
 
 #include "misc.h"
 #include "pcsclite.h"
+#include "pcscd.h"
 #include "debuglog.h"
 #include "config.h"
 #include "sys_generic.h"

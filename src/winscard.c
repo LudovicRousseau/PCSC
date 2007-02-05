@@ -83,7 +83,7 @@
 #include <sys/time.h>
 #include <string.h>
 
-#include "pcsclite.h"
+#include "pcscd.h"
 #include "winscard.h"
 #include "ifdhandler.h"
 #include "debuglog.h"

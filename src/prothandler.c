@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include "misc.h"
-#include "pcsclite.h"
+#include "pcscd.h"
 #include "ifdhandler.h"
 #include "debuglog.h"
 #include "readerfactory.h"

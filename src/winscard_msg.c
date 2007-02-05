@@ -36,7 +36,7 @@
 #endif
 
 #include "misc.h"
-#include "pcsclite.h"
+#include "pcscd.h"
 #include "winscard.h"
 #include "debug.h"
 #include "winscard_msg.h"

@@ -27,7 +27,7 @@
 #include <errno.h>
 
 #include "misc.h"
-#include "pcsclite.h"
+#include "pcscd.h"
 #include "winscard.h"
 #include "debug.h"
 #include "thread_generic.h"

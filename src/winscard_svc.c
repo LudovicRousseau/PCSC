@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "pcsclite.h"
+#include "pcscd.h"
 #include "winscard.h"
 #include "debuglog.h"
 #include "winscard_msg.h"
