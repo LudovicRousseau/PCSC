@@ -245,12 +245,20 @@ int main(int argc, char *argv[])
 		PCSC_ERROR(rv, "SCardGetStatusChange")
 	}
 
+	/* begin transaction */
+	rv = SCardBeginTransaction(hCard);
+	PCSC_ERROR(rv, "SCardBeginTransaction")
+
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
 	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
 	PCSC_ERROR(rv, "SCardTransmit")
+
+	/* end transaction */
+	rv = SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
+	PCSC_ERROR(rv, "SCardEndTransaction")
 
 	/* card disconnect */
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
