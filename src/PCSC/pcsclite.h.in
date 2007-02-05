@@ -152,65 +152,15 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_W_INSERTED_CARD		0x8010006A
 #define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F
 
-#define SCARD_SCOPE_GLOBAL		0x0003	/**< Scope is global */
-
-#define SCARD_RESET			0x0001	/**< Card was reset */
-#define SCARD_INSERTED			0x0002	/**< Card was inserted */
-#define SCARD_REMOVED			0x0004	/**< Card was removed */
-
-#define BLOCK_STATUS_RESUME		0x00FF	/**< Normal resume */
-#define BLOCK_STATUS_BLOCKING		0x00FA	/**< Function is blocking */
-
-#define PCSCLITE_CONFIG_DIR		"@confdir_exp@"
-
-#ifndef USE_IPCDIR
-#define PCSCLITE_IPC_DIR		"/var/run"
-#else
-#define PCSCLITE_IPC_DIR		USE_IPCDIR
-#endif
-
-#define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
-#define PCSCLITE_PUBSHM_FILE		PCSCLITE_IPC_DIR "/pcscd.pub"
-#define PCSCLITE_CSOCK_NAME		PCSCLITE_IPC_DIR "/pcscd.comm"
-
-#define PCSCLITE_SVC_IDENTITY		0x01030000	/**< Service ID */
-
 #ifndef INFINITE
 #define INFINITE			0xFFFFFFFF	/**< Infinite timeout */
 #endif
-#define PCSCLITE_INFINITE_TIMEOUT	4320000		/**< 50 day infinite t/o */
 
 #define PCSCLITE_VERSION_NUMBER		"@VERSION@"	/**< Current version */
-#define PCSCLITE_CLIENT_ATTEMPTS	120		/**< Attempts to reach sv */
-#define PCSCLITE_MCLIENT_ATTEMPTS	20		/**< Attempts to reach sv */
-#define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
-#define PCSCLITE_MSG_KEY_LEN		16		/**< App ID key length */
-#define PCSCLITE_RW_ATTEMPTS		100		/**< Attempts to rd/wrt */
-
-/** Maximum applications */
-#define PCSCLITE_MAX_APPLICATIONS			16
-/** Maximum contexts by application */
-#define PCSCLITE_MAX_APPLICATION_CONTEXTS		16
-/** Maximum of applications contexts that pcscd can accept */
-#define PCSCLITE_MAX_APPLICATIONS_CONTEXTS \
-	PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
-/** Maximum channels on a reader context */
-#define PCSCLITE_MAX_READER_CONTEXT_CHANNELS		16
-/** Maximum channels on an application context */
-#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS	16
 /** Maximum readers context (a slot is count as a reader) */
 #define PCSCLITE_MAX_READERS_CONTEXTS			16
 
-/* PCSCLITE_MAX_READERS is deprecated
- * use PCSCLITE_MAX_READERS_CONTEXTS instead */
-/* extern int PCSCLITE_MAX_READERS __attribute__ ((deprecated)); */
-
-#define PCSCLITE_MAX_THREADS		16	/**< Stat change threads */
-#define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
-#define PCSCLITE_TRANSACTION_TIMEOUT	40	/**< Transaction timeout */
 #define MAX_READERNAME			52
-#define MAX_LIBNAME			100
-#define MAX_DEVICENAME		255
 
 #ifndef SCARD_ATR_LENGTH
 #define SCARD_ATR_LENGTH		MAX_ATR_SIZE	/**< Maximum ATR size */
@@ -221,10 +171,8 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
  * The max message size must be at least large enough
  * to accomodate the transmit_struct
  */
-#define PCSCLITE_MAX_MESSAGE_SIZE	2048	/**< Transport msg len */
 #define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for short APDU */
 #define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/**< enhanced (64K + APDU + Lc + Le) Tx/Rx Buffer */
-#define PCSCLITE_SERVER_ATTEMPTS	5	/**< Attempts to reach cl */
 
 /*
  * Gets a stringified error response
