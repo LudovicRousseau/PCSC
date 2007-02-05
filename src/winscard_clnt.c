@@ -1066,30 +1066,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	do
 	{
-		/*
-		 * Look to see if it is locked before polling the server for
-		 * admission to the readers resources
-		 */
-		if ((readerStates[i])->lockState != 0)
-		{
-			int randnum = 0;
-			int j;
-
-			for (j = 0; j < 100; j++)
-			{
-				/*
-				 * This helps prevent starvation
-				 */
-				randnum = SYS_RandomInt(1000, 10000);
-				SYS_USleep(randnum);
-
-				if ((readerStates[i])->lockState == 0)
-				{
-					break;
-				}
-			}
-		}
-
 		rv = WrapSHMWrite(SCARD_BEGIN_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
 			sizeof(scBeginStruct),
 			PCSCLITE_CLIENT_ATTEMPTS, (void *) &scBeginStruct);

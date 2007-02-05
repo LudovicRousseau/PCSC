@@ -1002,6 +1002,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		return rv;
 
 	rv = RFLockSharing(hCard);
+	if (SCARD_E_SHARING_VIOLATION == rv)
+		SYS_USleep(100000);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
