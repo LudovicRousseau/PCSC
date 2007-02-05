@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 	BYTE pbAtr[MAX_ATR_SIZE] = "";
 	char pbReader[MAX_READERNAME] = "";
 	int reader_nb;
-	int i;
+	unsigned int i;
     SCARD_IO_REQUEST *pioSendPci;
 	SCARD_IO_REQUEST pioRecvPci;
 	BYTE pbRecvBuffer[10];
