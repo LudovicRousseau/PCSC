@@ -118,6 +118,7 @@ static void profile_end(const char *f)
 	if (profile_tty)
 		fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
 	fprintf(fd, "%s %ld\n", f, d);
+	fflush(fd);
 } /* profile_end */
 
 #else
