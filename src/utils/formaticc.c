@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	rv = SCardEstablishContext(SCARD_SCOPE_GLOBAL, pcHost, NULL, &hContext);
+	rv = SCardEstablishContext(SCARD_SCOPE_USER, pcHost, NULL, &hContext);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
