@@ -1003,7 +1003,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	rv = RFLockSharing(hCard);
 
-	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
 	return rv;
 }
@@ -1151,7 +1151,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	RFUnlockSharing(hCard);
 
-	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
 	return rv;
 }
@@ -1187,7 +1187,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	rv = RFUnlockSharing(hCard);
 
-	Log2(PCSC_LOG_DEBUG, "Status: %d.", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
 	return rv;
 }
