@@ -320,6 +320,7 @@ etc/reader.conf
 etc/update-reader.conf
 src/Makefile
 src/libpcsclite.pc
+src/pcscd.h
 src/PCSC/pcsclite.h
 src/PCSC/reader.h
 win32/Makefile
