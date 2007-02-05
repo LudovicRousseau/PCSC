@@ -334,7 +334,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
 		while (rContext->dwLockId != 0)
-			SYS_USleep(100000);
+			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 
 		/* Allow the status thread to convey information */
@@ -821,7 +821,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
 		while (rContext->dwLockId != 0)
-			SYS_USleep(100000);
+			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}
 
@@ -1003,7 +1003,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	rv = RFLockSharing(hCard);
 	if (SCARD_E_SHARING_VIOLATION == rv)
-		SYS_USleep(100000);
+		SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
