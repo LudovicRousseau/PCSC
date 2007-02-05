@@ -507,6 +507,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 {
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
+	int do_sleep = 1;
 
 	Log1(PCSC_LOG_DEBUG, "Attempting reconnect to token.");
 
@@ -668,6 +669,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				break;
 		}
 
+		do_sleep = 1;
 	}
 	else
 		if (dwInitialization == SCARD_LEAVE_CARD)
@@ -675,6 +677,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * Do nothing
 			 */
+			do_sleep = 0;
 		}
 
 	/*******************************************
@@ -787,7 +790,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Allow the status thread to convey information
 	 */
-	SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+	if (do_sleep)
+		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 
 	return SCARD_S_SUCCESS;
 }
