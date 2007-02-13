@@ -86,7 +86,7 @@ AM_PROG_LIBTOOL
 # Checks for header files
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([dirent.h dl.h dlfcn.h errno.h fcntl.h getopt.h malloc.h stdlib.h string.h strings.h sys/filio.h sys/time.h syslog.h unistd.h smartcard/scf.h])
+AC_CHECK_HEADERS([getopt.h sys/filio.h syslog.h dl.h fcntl.h ])
 
 # Checks for typedefs, structures, and compiler characteristics
 AC_C_CONST
