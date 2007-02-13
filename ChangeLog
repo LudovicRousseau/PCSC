@@ -1,3 +1,21 @@
+pcsc-lite-1.4.0: Ludovic Rousseau
+13 February 2007
+- great speed improvements for SCardBeginTransaction(), SCardReconnect()
+  and SCardDisconnect()
+- SCardConnect(): return SCARD_W_UNPOWERED_CARD if the card is mute
+  instead of returning SCARD_E_PROTO_MISMATCH because the requested
+  protocol is not supported by the (mute) card
+- Ctrl-C works again to stop pcscd on FreeBSD
+- USB polling was not active even if a driver does not support
+  IFD_GENERATE_HOTPLUG.
+- split pcsclite.h in pcsclite.h and an internal pcscd.h. Some
+  application compilations may fail but should not
+- move RESPONSECODE definition from wintypes.h to ifdhandler.h since it
+  should only be used as return type of IFDHandler functions. Some
+  driver compilations may fail
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.3.3: Ludovic Rousseau
 19 January 2007
 - add -H --hotplug argument to ask the pcscd daemon to rescan the
