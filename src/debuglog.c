@@ -47,6 +47,8 @@ static char LogLevel = PCSC_LOG_INFO;
 
 static signed char LogDoColor = 0;	/* no color by default */
 
+static void log_line(const int priority, const char *DebugBuffer);
+
 void log_msg(const int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
@@ -69,6 +71,11 @@ void log_msg(const int priority, const char *fmt, ...)
 #endif
 	va_end(argptr);
 
+	log_line(priority, DebugBuffer);
+} /* log_msg */
+
+static void log_line(const int priority, const char *DebugBuffer)
+{
 #ifndef WIN32
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
@@ -135,12 +142,7 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	if ((c >= debug_buf_end) && (i < len))
 		c[-3] = c[-2] = c[-1] = '.';
 
-#ifndef WIN32
-	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
-		syslog(LOG_INFO, "%s", DebugBuffer);
-	else
-#endif
-		fprintf(stderr, "%s\n", DebugBuffer);
+	log_line(priority, DebugBuffer);
 } /* log_xxd */
 
 #ifdef PCSCD
