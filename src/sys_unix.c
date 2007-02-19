@@ -105,8 +105,10 @@ INTERNAL int SYS_USleep(int iTimeVal)
 
 	return nanosleep(&mrqtp, NULL);
 #else
-	usleep(iTimeVal);
-	return iTimeVal;
+	struct timeval tv;
+	tv.tv_sec  = iTimeVal/1000000;
+	tv.tv_usec = iTimeVal - (tv.tv_sec * 1000000);
+	return select(0, NULL, NULL, NULL, &tv);
 #endif
 }
 
