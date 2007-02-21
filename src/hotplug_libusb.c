@@ -39,7 +39,7 @@
 #include "sys_generic.h"
 #include "hotplug.h"
 
-#define DEBUG_HOTPLUG
+#undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
 
 #define BUS_DEVICE_STRSIZE	256
@@ -142,45 +142,47 @@ LONG HPReadBundleValues(void)
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 
 				/* Get ifdVendorID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
-					keyValue, alias);
+				rv = LTPBundleFindValueWithKey(fullPath,
+					PCSCLITE_HP_MANUKEY_NAME, keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].manuID = strtol(keyValue, 0, 16);
 
 				/* get ifdProductID */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_PRODKEY_NAME,
-					keyValue, alias);
+				rv = LTPBundleFindValueWithKey(fullPath,
+					PCSCLITE_HP_PRODKEY_NAME, keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].productID =
 						strtol(keyValue, 0, 16);
 
 				/* get ifdFriendlyName */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_NAMEKEY_NAME,
-					keyValue, alias);
+				rv = LTPBundleFindValueWithKey(fullPath,
+					PCSCLITE_HP_NAMEKEY_NAME, keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].readerName = strdup(keyValue);
 
 				/* get CFBundleExecutable */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_LIBRKEY_NAME,
-					keyValue, 0);
+				rv = LTPBundleFindValueWithKey(fullPath,
+					PCSCLITE_HP_LIBRKEY_NAME, keyValue, 0);
 				if (rv == 0)
 				{
 					snprintf(fullLibPath, sizeof(fullLibPath),
 						"%s/%s/Contents/%s/%s",
-						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH, keyValue);
+						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
+						keyValue);
 					fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 					driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				}
 
 				/* Get ifdCapabilities */
-				rv = LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_CPCTKEY_NAME,
-					keyValue, 0);
+				rv = LTPBundleFindValueWithKey(fullPath,
+					PCSCLITE_HP_CPCTKEY_NAME, keyValue, 0);
 				if (rv == 0)
-					driverTracker[listCount].ifdCapabilities = strtol(keyValue, 0, 16);
+					driverTracker[listCount].ifdCapabilities = strtol(keyValue,
+						0, 16);
 
 #ifdef DEBUG_HOTPLUG
-					Log2(PCSC_LOG_INFO, "Found driver for: %s",
-						driverTracker[listCount].readerName);
+				Log2(PCSC_LOG_INFO, "Found driver for: %s",
+					driverTracker[listCount].readerName);
 #endif
 				alias++;
 
@@ -274,7 +276,8 @@ void HPRescanUsbBus(void)
 						bus->dirname, dev->filename);
 					bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
 #ifdef DEBUG_HOTPLUG
-					Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s", bus_device);
+					Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s",
+						bus_device);
 #endif
 					newreader = TRUE;
 
@@ -288,7 +291,8 @@ void HPRescanUsbBus(void)
 							readerTracker[j].status = READER_PRESENT;
 							newreader = FALSE;
 #ifdef DEBUG_HOTPLUG
-							Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s", bus_device);
+							Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
+								bus_device);
 #endif
 							break;
 						}
