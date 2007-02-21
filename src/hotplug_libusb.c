@@ -39,7 +39,7 @@
 #include "sys_generic.h"
 #include "hotplug.h"
 
-#undef DEBUG_HOTPLUG
+#define DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
 
 #define BUS_DEVICE_STRSIZE	256
@@ -182,10 +182,12 @@ LONG HPReadBundleValues(void)
 					Log2(PCSC_LOG_INFO, "Found driver for: %s",
 						driverTracker[listCount].readerName);
 #endif
-
-				listCount++;
 				alias++;
 
+				if (NULL == driverTracker[listCount].readerName)
+					continue;
+
+				listCount++;
 				if (listCount >= driverSize)
 				{
 					int i;
