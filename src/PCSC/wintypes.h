@@ -48,7 +48,7 @@ extern "C"
 	typedef char *LPSTR;
 
 	/* this type is deprecated but still used by old drivers and applications
-	 * You should use LPTSTR instead */
+	 * You should use LPSTR instead */
 	typedef char *LPTSTR
 #ifdef __GNUC__
 		/* __attribute__ is a GCC only extension */
