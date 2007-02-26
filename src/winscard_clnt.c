@@ -325,6 +325,11 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 			return SCARD_E_NO_SERVICE;
 		}
 
+		/* close on exec so that child processes do not inherits the file
+		 * descriptor. The child process will call SCardEstablishContext()
+		 * if needed. */
+		fcntl(mapAddr, F_SETFD, FD_CLOEXEC);
+
 		pageSize = SYS_GetPageSize();
 
 		/*
