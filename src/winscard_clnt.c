@@ -3326,6 +3326,7 @@ static LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
+	static time_t daemon_ctime = 0;
 
 	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &statBuffer);
 
@@ -3334,6 +3335,16 @@ static LONG SCardCheckDaemonAvailability(void)
 		Log1(PCSC_LOG_ERROR, "PCSC Not Running");
 		return SCARD_E_NO_SERVICE;
 	}
+	if (daemon_ctime)
+	{
+		if (statBuffer.st_ctime > daemon_ctime)
+		{
+			Log1(PCSC_LOG_ERROR, "PCSC restarted");
+			return SCARD_E_NO_SERVICE;
+		}
+	}
+	else
+		daemon_ctime = statBuffer.st_ctime;
 
 	return SCARD_S_SUCCESS;
 }
