@@ -3073,6 +3073,10 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 
 	rv = SCARD_S_SUCCESS;
 
+	/* Check if the _same_ server is running */
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_INVALID_HANDLE;
+
 	/*
 	 * Make sure this context has been opened
 	 */
