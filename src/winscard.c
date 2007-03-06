@@ -32,16 +32,16 @@
  * corcoran@musclecard.com.
  *
  *
- * @section API Routines
+ * @section API_Routines
  *
- * These routines specified here are winscard routines like those in the
+ * These routines specified here are winscard.h routines like those in the
  * winscard API provided under Windows(R). These are compatible with the
  * Microsoft(R) API calls. This list of calls is mainly an abstraction of
  * readers. It gives a common API for communication to most readers in a
  * homogeneous fashion.
  *
- * Since all functions can produce a wide array of errors, please refer to §
- * Error codes for a list of error returns.
+ * Since all functions can produce a wide array of errors, please refer to
+ * pcsclite.h for a list of error returns.
  *
  * For a human readable representation of an error the function
  * pcsc_stringify_error() is declared in pcsclite.h. This function is not
