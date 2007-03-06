@@ -245,6 +245,10 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 
 	PROFILE_START
 
+	/* Check if the server is running */
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_NO_SERVICE;
+
 	SCardLockThread();
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
 		pvReserved2, phContext);
@@ -293,10 +297,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		return SCARD_E_INVALID_PARAMETER;
 	else
 		*phContext = 0;
-
-	/* Check if the server is running */
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
 
 	/*
 	 * Do this only once:
