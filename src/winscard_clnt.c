@@ -187,6 +187,7 @@ static LONG SCardAddContext(SCARDCONTEXT, DWORD);
 static LONG SCardGetContextIndice(SCARDCONTEXT);
 static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
+static LONG SCardCleanContext(LONG indice);
 
 static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPSTR);
 static LONG SCardGetIndicesFromHandle(SCARDHANDLE, PDWORD, PDWORD);
@@ -3194,28 +3195,31 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 	if (retIndice == -1)
 		return SCARD_E_INVALID_HANDLE;
 	else
+		return SCardCleanContext(retIndice);
+}
+
+static LONG SCardCleanContext(LONG indice)
+{
+	int i;
+
+	psContextMap[indice].hContext = 0;
+	SHMClientCloseSession(psContextMap[indice].dwClientID);
+	psContextMap[indice].dwClientID = 0;
+	free(psContextMap[indice].mMutex);
+	psContextMap[indice].mMutex = NULL;
+	psContextMap[indice].contextBlockStatus = BLOCK_STATUS_RESUME;
+
+	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{
-		int i;
-
-		psContextMap[retIndice].hContext = 0;
-		SHMClientCloseSession(psContextMap[retIndice].dwClientID);
-		psContextMap[retIndice].dwClientID = 0;
-		free(psContextMap[retIndice].mMutex);
-		psContextMap[retIndice].mMutex = NULL;
-		psContextMap[retIndice].contextBlockStatus = BLOCK_STATUS_RESUME;
-
-		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
-		{
-			/*
-			 * Reset the \c hCard structs to zero
-			 */
-			psContextMap[retIndice].psChannelMap[i].hCard = 0;
-			free(psContextMap[retIndice].psChannelMap[i].readerName);
-			psContextMap[retIndice].psChannelMap[i].readerName = NULL;
-		}
-
-		return SCARD_S_SUCCESS;
+		/*
+		 * Reset the \c hCard structs to zero
+		 */
+		psContextMap[indice].psChannelMap[i].hCard = 0;
+		free(psContextMap[indice].psChannelMap[i].readerName);
+		psContextMap[indice].psChannelMap[i].readerName = NULL;
 	}
+
+	return SCARD_S_SUCCESS;
 }
 
 /*
