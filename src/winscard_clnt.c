@@ -199,6 +199,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 static LONG SCardCheckDaemonAvailability(void);
 
+void DESTRUCTOR SCardUnload(void);
+
 /*
  * Thread safety functions
  */
