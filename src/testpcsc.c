@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 		while (mszGroups[++i] != 0) ;
 	}
 
+wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
 
 	mszGroups = 0;
@@ -153,6 +154,11 @@ int main(int argc, char **argv)
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	test_rv(rv, hContext, PANIC);
+	if (SCARD_STATE_EMPTY == rgReaderStates[0].dwEventState)
+	{
+		printf("\nA reader has been connected/disconnected\n");
+		goto wait_for_card_again;
+	}
 
 	printf("Testing SCardConnect\t\t: ");
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
