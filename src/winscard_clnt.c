@@ -157,6 +157,12 @@ static struct _psContextMap
  */
 static short isExecuted = 0;
 
+
+/**
+ * creation time of pcscd PCSCLITE_PUBSHM_FILE file
+ */
+static time_t daemon_ctime = 0;
+
 /**
  * Memory mapped address used to read status information about the readers.
  * Each element in the vector \ref readerStates makes references to a part of
@@ -3336,7 +3342,6 @@ static LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
-	static time_t daemon_ctime = 0;
 
 	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &statBuffer);
 
@@ -3345,11 +3350,30 @@ static LONG SCardCheckDaemonAvailability(void)
 		Log1(PCSC_LOG_ERROR, "PCSC Not Running");
 		return SCARD_E_NO_SERVICE;
 	}
+
 	if (daemon_ctime)
 	{
 		if (statBuffer.st_ctime > daemon_ctime)
 		{
+			int i;
+
 			Log1(PCSC_LOG_ERROR, "PCSC restarted");
+
+			/* invalid all handles */
+			SCardLockThread();
+
+			for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+				if (psContextMap[i].hContext)
+					SCardCleanContext(i);
+
+			SCardUnlockThread();
+
+			/* reset pcscd status */
+			daemon_ctime = 0;
+
+			/* reset the lib */
+			SCardUnload();
+
 			return SCARD_E_NO_SERVICE;
 		}
 	}
