@@ -142,7 +142,9 @@ extern "C"
 #define IFD_ICC_NOT_PRESENT		616
 #define IFD_NO_SUCH_DEVICE		617
 
+#ifndef RESPONSECODE_DEFINED_IN_WINTYPES_H
 	typedef long RESPONSECODE;
+#endif
 
 	/*
 	 * If you want to compile a V2.0 IFDHandler, define IFDHANDLERv2 before you
