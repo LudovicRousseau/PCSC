@@ -61,7 +61,7 @@ FILE *fd;
 char profile_tty;
 
 #define PROFILE_START profile_start(__FUNCTION__);
-#define PROFILE_END profile_end(__FUNCTION__);
+#define PROFILE_END(rv) profile_end(__FUNCTION__, rv);
 
 static void profile_start(const char *f)
 {
@@ -107,7 +107,7 @@ static long int time_sub(struct timeval *a, struct timeval *b)
 } /* time_sub */
 
 
-static void profile_end(const char *f)
+static void profile_end(const char *f, LONG rv)
 {
 	struct timeval profile_time_end;
 	long d;
@@ -116,14 +116,21 @@ static void profile_end(const char *f)
 	d = time_sub(&profile_time_end, &profile_time_start);
 
 	if (profile_tty)
-		fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
+	{
+		if (rv != SCARD_S_SUCCESS)
+			fprintf(stderr,
+				"\33[01;31mRESULT %s \33[35m%ld \33[34m0x%08lX %s\33[0m\n",
+				f, d, rv, pcsc_stringify_error(rv));
+		else
+			fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
+	}
 	fprintf(fd, "%s %ld\n", f, d);
 	fflush(fd);
 } /* profile_end */
 
 #else
 #define PROFILE_START
-#define PROFILE_END
+#define PROFILE_END(rv)
 #endif
 
 /**
@@ -263,7 +270,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 		pvReserved2, phContext);
 	SCardUnlockThread();
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -561,7 +568,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	SCardRemoveContext(hContext);
 	SCardUnlockThread();
 
-	PROFILE_END
+	PROFILE_END(scReleaseStruct.rv)
 
 	return scReleaseStruct.rv;
 }
@@ -727,14 +734,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		rv = SCardAddHandle(*phCard, dwContextIndex, (LPSTR) szReader);
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-		PROFILE_END
+		PROFILE_END(rv)
 
 		return rv;
 	}
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scConnectStruct.rv)
 
 	return scConnectStruct.rv;
 }
@@ -902,7 +909,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scReconnectStruct.rv)
 
 	return scReconnectStruct.rv;
 }
@@ -998,7 +1005,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scDisconnectStruct.rv)
 
 	return scDisconnectStruct.rv;
 }
@@ -1114,7 +1121,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scBeginStruct.rv);
 
 	return scBeginStruct.rv;
 }
@@ -1242,7 +1249,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scEndStruct.rv)
 
 	return scEndStruct.rv;
 }
@@ -1317,7 +1324,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scCancelStruct.rv)
 
 	return scCancelStruct.rv;
 }
@@ -1517,7 +1524,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -1663,7 +1670,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					 */
 					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-					PROFILE_END
+					PROFILE_END(SCARD_S_SUCCESS)
 
 					return SCARD_S_SUCCESS;
 				}
@@ -1688,7 +1695,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				{
 					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-					PROFILE_END
+					PROFILE_END(SCARD_E_TIMEOUT)
 
 					return SCARD_E_TIMEOUT;
 				}
@@ -1754,7 +1761,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		{
 			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-			PROFILE_END
+			PROFILE_END(SCARD_E_NO_SERVICE)
 
 			return SCARD_E_NO_SERVICE;
 		}
@@ -2095,7 +2102,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(SCARD_S_SUCCESS)
 
 	return SCARD_S_SUCCESS;
 }
@@ -2315,7 +2322,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -2403,6 +2410,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 	LPDWORD pcbAttrLen)
 {
+	LONG ret;
+
 	PROFILE_START
 
 	if (NULL == pcbAttrLen)
@@ -2413,10 +2422,12 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 		/* this variable may not be set by the caller. use a reasonable size */
 		*pcbAttrLen = MAX_BUFFER_SIZE;
 
-	PROFILE_END
-
-	return SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, pbAttr,
+	ret = SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, pbAttr,
 		pcbAttrLen);
+
+	PROFILE_END(ret)
+
+	return ret;
 }
 
 /**
@@ -2452,15 +2463,19 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 	DWORD cbAttrLen)
 {
+	LONG ret;
+
 	PROFILE_START
 
 	if (NULL == pbAttr || 0 == cbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
-	PROFILE_END
-
-	return SCardGetSetAttrib(hCard, SCARD_SET_ATTRIB, dwAttrId, (LPBYTE)pbAttr,
+	ret = SCardGetSetAttrib(hCard, SCARD_SET_ATTRIB, dwAttrId, (LPBYTE)pbAttr,
 		&cbAttrLen);
+
+	PROFILE_END(ret)
+
+	return ret;
 }
 
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
@@ -2559,7 +2574,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(scGetSetStruct.rv)
 
 	return scGetSetStruct.rv;
 }
@@ -2822,7 +2837,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		rv = scTransmitStruct.rv;
 	}
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -2924,7 +2939,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(SCARD_S_SUCCESS)
 
 	return SCARD_S_SUCCESS;
 }
@@ -2999,7 +3014,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -3048,7 +3063,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	 */
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_RESUME;
 
-	PROFILE_END
+	PROFILE_END(SCARD_S_SUCCESS)
 
 	return SCARD_S_SUCCESS;
 }
@@ -3096,7 +3111,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	if (dwContextIndex == -1)
 		rv = SCARD_E_INVALID_HANDLE;
 
-	PROFILE_END
+	PROFILE_END(rv)
 
 	return rv;
 }
