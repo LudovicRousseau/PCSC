@@ -866,34 +866,37 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		return SCARD_E_READER_UNAVAILABLE;
 	}
 
-	scReconnectStruct.hCard = hCard;
-	scReconnectStruct.dwShareMode = dwShareMode;
-	scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
-	scReconnectStruct.dwInitialization = dwInitialization;
-	scReconnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
-
-	rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
-		sizeof(scReconnectStruct),
-		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scReconnectStruct);
-
-	if (rv == -1)
+	do
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
-	}
+		scReconnectStruct.hCard = hCard;
+		scReconnectStruct.dwShareMode = dwShareMode;
+		scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
+		scReconnectStruct.dwInitialization = dwInitialization;
+		scReconnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
 
-	/*
-	 * Read a message from the server
-	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
+			sizeof(scReconnectStruct),
+			PCSCLITE_CLIENT_ATTEMPTS, (void *) &scReconnectStruct);
 
-	memcpy(&scReconnectStruct, &msgStruct.data, sizeof(scReconnectStruct));
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_E_NO_SERVICE;
+		}
 
-	if (rv == -1)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
-	}
+		/*
+		 * Read a message from the server
+		 */
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+
+		memcpy(&scReconnectStruct, &msgStruct.data, sizeof(scReconnectStruct));
+
+		if (rv == -1)
+		{
+			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			return SCARD_F_COMM_ERROR;
+		}
+	} while (SCARD_E_SHARING_VIOLATION == scReconnectStruct.rv);
 
 	*pdwActiveProtocol = scReconnectStruct.pdwActiveProtocol;
 
