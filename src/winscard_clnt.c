@@ -31,6 +31,7 @@
 #include "winscard.h"
 #include "debug.h"
 #include "thread_generic.h"
+#include "strlcpycat.h"
 
 #include "readerfactory.h"
 #include "eventhandler.h"
@@ -59,6 +60,7 @@
 struct timeval profile_time_start;
 FILE *fd;
 char profile_tty;
+char fct_name[100];
 
 #define PROFILE_START profile_start(__FUNCTION__);
 #define PROFILE_END(rv) profile_end(__FUNCTION__, rv);
@@ -87,6 +89,12 @@ static void profile_start(const char *f)
 		else
 			profile_tty = FALSE;
 	}
+
+	/* PROFILE_END was not called before? */
+	if (profile_tty && fct_name[0])
+		printf("\33[01;34m ERROR: lost return value of %s\33[0m\n", fct_name);
+
+	strlcpy(fct_name, f, sizeof(fct_name));
 
 	gettimeofday(&profile_time_start, NULL);
 } /* profile_start */
@@ -117,6 +125,9 @@ static void profile_end(const char *f, LONG rv)
 
 	if (profile_tty)
 	{
+		/* allow to detect missing PROFILE_END calls */
+		fct_name[0] = '\0';
+
 		if (rv != SCARD_S_SUCCESS)
 			fprintf(stderr,
 				"\33[01;31mRESULT %s \33[35m%ld \33[34m0x%08lX %s\33[0m\n",
@@ -2481,8 +2492,6 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen)
 {
-	PROFILE_START
-
 	LONG rv;
 	getset_struct scGetSetStruct;
 	sharedSegmentMsg msgStruct;
@@ -2573,8 +2582,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	}
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-
-	PROFILE_END(scGetSetStruct.rv)
 
 	return scGetSetStruct.rv;
 }
@@ -2911,6 +2918,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	{
 		*pcchReaders = dwReadersLen;
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+		PROFILE_END(SCARD_S_SUCCESS)
 		return SCARD_S_SUCCESS;
 	}
 
@@ -2918,6 +2926,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	{
 		*pcchReaders = dwReadersLen;
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+		PROFILE_END(SCARD_E_INSUFFICIENT_BUFFER)
 		return SCARD_E_INSUFFICIENT_BUFFER;
 	}
 
