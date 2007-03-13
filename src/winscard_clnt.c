@@ -126,9 +126,15 @@ static void profile_end(const char *f, LONG rv)
 
 	if (profile_tty)
 	{
-		if (strncmp(fct_name, f, sizeof(fct_name)))
-			printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
-					f, fct_name);
+		if (fct_name[0])
+		{
+			if (strncmp(fct_name, f, sizeof(fct_name)))
+				printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
+						f, fct_name);
+		}
+		else
+			printf("\33[01;34m WARNING: %s ends but we lost its start\33[0m\n",
+				f);
 
 		/* allow to detect missing PROFILE_END calls */
 		fct_name[0] = '\0';
