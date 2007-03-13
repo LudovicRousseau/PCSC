@@ -92,7 +92,8 @@ static void profile_start(const char *f)
 
 	/* PROFILE_END was not called before? */
 	if (profile_tty && fct_name[0])
-		printf("\33[01;34m ERROR: lost return value of %s\33[0m\n", fct_name);
+		printf("\33[01;34m WARNING: %s starts before %s finishes\33[0m\n",
+			f, fct_name);
 
 	strlcpy(fct_name, f, sizeof(fct_name));
 
@@ -125,6 +126,10 @@ static void profile_end(const char *f, LONG rv)
 
 	if (profile_tty)
 	{
+		if (strncmp(fct_name, f, sizeof(fct_name)))
+			printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
+					f, fct_name);
+
 		/* allow to detect missing PROFILE_END calls */
 		fct_name[0] = '\0';
 
@@ -2087,6 +2092,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
 			{
 				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+				PROFILE_END(SCARD_E_TIMEOUT)
 				return SCARD_E_TIMEOUT;
 			}
 		}
@@ -2108,6 +2114,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			BLOCK_STATUS_RESUME)
 	{
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+		PROFILE_END(SCARD_E_CANCELLED)
 		return SCARD_E_CANCELLED;
 	}
 
