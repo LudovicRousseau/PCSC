@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     SCARD_IO_REQUEST *pioSendPci;
 	SCARD_IO_REQUEST pioRecvPci;
 	BYTE pbRecvBuffer[10];
-	BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
+	BYTE pbSendBuffer[] = { 0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
 	DWORD dwSendLength, dwRecvLength;
 
 	printf("PC/SC sample code\n");
@@ -190,8 +190,16 @@ int main(int argc, char *argv[])
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
+	printf("Sending: ");
+	for (i=0; i<dwSendLength; i++)
+		printf("%02X ", pbSendBuffer[i]);
+	printf("\n");
 	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	printf("Received: ");
+	for (i=0; i<dwRecvLength; i++)
+		printf("%02X ", pbRecvBuffer[i]);
+	printf("\n");
 	PCSC_ERROR(rv, "SCardTransmit")
 
 	/* card disconnect */
@@ -208,8 +216,16 @@ int main(int argc, char *argv[])
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
+	printf("Sending: ");
+	for (i=0; i<dwSendLength; i++)
+		printf("%02X ", pbSendBuffer[i]);
+	printf("\n");
 	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	printf("Received: ");
+	for (i=0; i<dwRecvLength; i++)
+		printf("%02X ", pbRecvBuffer[i]);
+	printf("\n");
 	PCSC_ERROR(rv, "SCardTransmit")
 
 	/* card reconnect */
@@ -252,8 +268,16 @@ int main(int argc, char *argv[])
 	/* exchange APDU */
 	dwSendLength = sizeof(pbSendBuffer);
 	dwRecvLength = sizeof(pbRecvBuffer);
+	printf("Sending: ");
+	for (i=0; i<dwSendLength; i++)
+		printf("%02X ", pbSendBuffer[i]);
+	printf("\n");
 	rv = SCardTransmit(hCard, pioSendPci, pbSendBuffer, dwSendLength,
 		&pioRecvPci, pbRecvBuffer, &dwRecvLength);
+	printf("Received: ");
+	for (i=0; i<dwRecvLength; i++)
+		printf("%02X ", pbRecvBuffer[i]);
+	printf("\n");
 	PCSC_ERROR(rv, "SCardTransmit")
 
 	/* end transaction */
