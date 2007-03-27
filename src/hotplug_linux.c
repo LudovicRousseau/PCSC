@@ -30,6 +30,7 @@
 
 #include "misc.h"
 #include "pcsclite.h"
+#include "pcscd.h"
 #include "debuglog.h"
 #include "parser.h"
 #include "readerfactory.h"
