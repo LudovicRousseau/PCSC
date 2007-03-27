@@ -16,7 +16,7 @@
 
 #include "config.h"
 #include "misc.h"
-#include "pcsclite.h"
+#include "pcscd.h"
 
 #if defined(__APPLE__) && !defined(HAVE_LIBUSB)
 #include <CoreFoundation/CoreFoundation.h>

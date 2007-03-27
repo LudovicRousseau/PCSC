@@ -36,6 +36,7 @@
 
 #include "misc.h"
 #include "pcsclite.h"
+#include "pcscd.h"
 #include "debuglog.h"
 #include "readerfactory.h"
 #include "thread_generic.h"
