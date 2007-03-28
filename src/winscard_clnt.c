@@ -1946,10 +1946,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/*
 					 * After present the rest are assumed
 					 */
-					if (currReader->dwCurrentState & SCARD_STATE_PRESENT
-						|| currReader->dwCurrentState & SCARD_STATE_ATRMATCH
-						|| currReader->dwCurrentState & SCARD_STATE_EXCLUSIVE
-						|| currReader->dwCurrentState & SCARD_STATE_INUSE)
+					if (currReader->dwCurrentState & SCARD_STATE_PRESENT)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
