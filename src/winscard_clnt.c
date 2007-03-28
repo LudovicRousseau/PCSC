@@ -1863,6 +1863,21 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				 * Now we check all the Reader States
 				 */
 				dwState = rContext->readerState;
+				{
+					int currentCounter, stateCounter;
+
+					stateCounter = (dwState >> 16) & 0xFFFF;
+					currentCounter = (currReader->dwCurrentState >> 16) & 0xFFFF;
+
+					/* has the event counter changed since the last call? */
+					if (stateCounter != currentCounter)
+						currReader->dwEventState |= SCARD_STATE_CHANGED;
+
+					/* add an event counter in the upper word of dwEventState */
+					currReader->dwEventState =
+						((currReader->dwEventState & 0xffff )
+						| (stateCounter << 16));  
+				}
 
 	/*********** Check if the reader is in the correct state ********/
 				if (dwState & SCARD_UNKNOWN)

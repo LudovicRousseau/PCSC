@@ -200,6 +200,16 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 		return SCARD_E_NO_MEMORY;
 }
 
+static void incrementEventCounter(struct pubReaderStatesList *readerState)
+{
+	int counter;
+
+	counter = (readerState -> readerState >> 16) & 0xFFFF;
+	counter++;
+	readerState -> readerState = (readerState -> readerState & 0xFFFF)
+		+ (counter << 16);
+}
+
 void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
 	LONG rv;
@@ -364,6 +374,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 				dwCurrentState = SCARD_ABSENT;
 
+				incrementEventCounter(rContext->readerState);
+
 				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 			}
 
@@ -413,6 +425,8 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				}
 
 				dwCurrentState = SCARD_PRESENT;
+
+				incrementEventCounter(rContext->readerState);
 
 				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 
