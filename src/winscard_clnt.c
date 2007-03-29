@@ -1777,7 +1777,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 		if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			if (psContextMap[dwContextIndex].mMutex)
+				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 			PROFILE_END(SCARD_E_NO_SERVICE)
 
