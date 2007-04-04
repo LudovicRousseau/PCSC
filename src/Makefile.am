@@ -28,6 +28,7 @@ libpcsclite_la_SOURCES = \
 	strlcpy.c \
 	sys_unix.c \
 	thread_unix.c \
+	utils.c \
 	winscard_msg.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE
@@ -79,6 +80,8 @@ pcscd_SOURCES = \
 	thread_generic.h \
 	thread_unix.c \
 	tokenparser.l \
+	utils.c \
+	utils.h \
 	winscard.c \
 	winscard_msg.c \
 	winscard_msg.h \
