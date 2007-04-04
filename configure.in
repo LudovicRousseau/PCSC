@@ -255,7 +255,7 @@ fi
 # --enable-runpid=FILE
 AC_ARG_ENABLE(runpid,
   AC_HELP_STRING([--enable-runpid=FILE],[file containing pcscd pid]),
-[runpid="${enableval}"], [runpid=false])
+[runpid="${enableval}"], [AC_ERROR([use of --enable-runpid=FILE is mandatory])])
 
 AC_MSG_RESULT([enable runpid                 : $runpid])
 

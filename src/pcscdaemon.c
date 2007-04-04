@@ -71,7 +71,6 @@ PCSCLITE_MUTEX usbNotifierMutex;
 
 int SendHotplugSignal(void)
 {
-#ifdef USE_RUN_PID
 	pid_t pid;
 
 	pid = GetDaemonPid();
@@ -86,7 +85,6 @@ int SendHotplugSignal(void)
 			return EXIT_FAILURE ;
 		}
 	}
-#endif
 
 	return EXIT_SUCCESS;
 } /* SendHotplugSignal */
@@ -350,7 +348,6 @@ int main(int argc, char **argv)
 
 	if (rv == 0)
 	{
-#ifdef USE_RUN_PID
 		pid_t pid;
 
 		/* read the pid file to get the old pid and test if the old pcscd is
@@ -376,16 +373,10 @@ int main(int argc, char **argv)
 				clean_temp_files();
 		}
 		else
-#endif
 		{
 			if (HotPlug)
 			{
-#ifdef USE_RUN_PID
 				Log1(PCSC_LOG_CRITICAL, "file " USE_RUN_PID " do not exist");
-#else
-				Log1(PCSC_LOG_CRITICAL,
-					"pcscd was not configured with --enable-runpid=FILE");
-#endif
 				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
 				return EXIT_FAILURE;
 			}
@@ -394,10 +385,8 @@ int main(int argc, char **argv)
 				"file " PCSCLITE_PUBSHM_FILE " already exists.");
 			Log1(PCSC_LOG_CRITICAL,
 				"Maybe another pcscd is running?");
-#ifdef USE_RUN_PID
 			Log1(PCSC_LOG_CRITICAL,
 				"I can't read process pid from " USE_RUN_PID);
-#endif
 			Log1(PCSC_LOG_CRITICAL,
 				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 			Log1(PCSC_LOG_CRITICAL,
@@ -430,7 +419,6 @@ int main(int argc, char **argv)
 	signal(SIGINT, signal_trap);
 	signal(SIGHUP, signal_trap);
 
-#ifdef USE_RUN_PID
 	/*
 	 * Record our pid to make it easier
 	 * to kill the correct pcscd
@@ -444,7 +432,6 @@ int main(int argc, char **argv)
 			fclose(f);
 		}
 	}
-#endif
 
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
@@ -555,12 +542,10 @@ void clean_temp_files(void)
 		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
-#ifdef USE_RUN_PID
 	rv = SYS_Unlink(USE_RUN_PID);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot unlink " USE_RUN_PID ": %s",
 			strerror(errno));
-#endif
 }
 
 void signal_reload(int sig)
