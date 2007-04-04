@@ -44,6 +44,7 @@
 #include "readerfactory.h"
 #include "configfile.h"
 #include "powermgt_generic.h"
+#include "utils.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -67,37 +68,6 @@ void print_version (void);
 void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
-
-#ifdef USE_RUN_PID
-pid_t GetDaemonPid(void);
-pid_t GetDaemonPid(void)
-{
-	FILE *f;
-	pid_t pid;
-
-	/* pids are only 15 bits but 4294967296
-	 * (32 bits in case of a new system use it) is on 10 bytes
-	 */
-	if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
-	{
-#define PID_ASCII_SIZE 11
-		char pid_ascii[PID_ASCII_SIZE];
-
-		fgets(pid_ascii, PID_ASCII_SIZE, f);
-		fclose(f);
-
-		pid = atoi(pid_ascii);
-	}
-	else
-	{
-		Log2(PCSC_LOG_CRITICAL, "Can't open " USE_RUN_PID ": %s",
-			strerror(errno));
-		return -1;
-	}
-
-	return pid;
-} /* GetDaemonPid */
-#endif
 
 int SendHotplugSignal(void)
 {
