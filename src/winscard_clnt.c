@@ -37,6 +37,7 @@
 #include "eventhandler.h"
 #include "sys_generic.h"
 #include "winscard_msg.h"
+#include "utils.h"
 
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	0x1000
@@ -187,6 +188,7 @@ static short isExecuted = 0;
  * creation time of pcscd PCSCLITE_PUBSHM_FILE file
  */
 static time_t daemon_ctime = 0;
+static pid_t daemon_pid = 0;
 
 /**
  * Memory mapped address used to read status information about the readers.
@@ -3402,32 +3404,47 @@ static LONG SCardCheckDaemonAvailability(void)
 
 	if (daemon_ctime)
 	{
+		/* when the _first_ reader is connected the ctime changes
+		 * I don't know why yet */
 		if (statBuffer.st_ctime > daemon_ctime)
 		{
-			int i;
+			pid_t new_pid;
 
-			Log1(PCSC_LOG_ERROR, "PCSC restarted");
+			new_pid = GetDaemonPid();
 
-			/* invalid all handles */
-			SCardLockThread();
+			/* so we also check the daemon pid to be sure it is a new pcscd */
+			if (new_pid != daemon_pid)
+			{
+				int i;
 
-			for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
-				if (psContextMap[i].hContext)
-					SCardCleanContext(i);
+				Log1(PCSC_LOG_ERROR, "PCSC restarted");
 
-			SCardUnlockThread();
+				/* invalid all handles */
+				SCardLockThread();
 
-			/* reset pcscd status */
-			daemon_ctime = 0;
+				for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+					if (psContextMap[i].hContext)
+						SCardCleanContext(i);
 
-			/* reset the lib */
-			SCardUnload();
+				SCardUnlockThread();
 
-			return SCARD_E_NO_SERVICE;
+				/* reset pcscd status */
+				daemon_ctime = 0;
+
+				/* reset the lib */
+				SCardUnload();
+
+				return SCARD_E_NO_SERVICE;
+			}
+
+			daemon_ctime = statBuffer.st_ctime;
 		}
 	}
 	else
+	{
 		daemon_ctime = statBuffer.st_ctime;
+		daemon_pid = GetDaemonPid();
+	}
 
 	return SCARD_S_SUCCESS;
 }
