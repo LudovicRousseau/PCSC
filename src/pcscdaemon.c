@@ -1,8 +1,9 @@
 /*
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999-2005
+ * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 1999-2007
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -593,7 +594,7 @@ void print_version (void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@linuxnet.com>.\n");
-	printf("Copyright (C) 2001-2005 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
+	printf("Copyright (C) 2001-2007 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
 	printf("Copyright (C) 2003-2004 by Damien Sauveron <sauveron@labri.fr>.\n");
 	printf("Report bugs to <sclinux@linuxnet.com>.\n");
 }
