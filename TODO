@@ -9,6 +9,8 @@
 
 - power on the card _only_ if an application requests a connection
   see Alioth bug #301965
+  That could be implemented by polling the reader only if an application
+  requests it.
 
 - use a callback from IFD handler to pcscd instead of polling to get the
   card status: better performance, possible lower power consumption
@@ -20,4 +22,4 @@
 - manage power suspend/resume (in a laptop for example) and coordinate
   with the driver (when/if possible)
 
-Nov 2006
+May 2007
