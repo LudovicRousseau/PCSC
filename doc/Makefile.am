@@ -2,8 +2,8 @@
 
 SUBDIRS = . example
 
-doc_DATA = pcsc-lite.tex pcsc-lite.bib pcsc-lite.pdf \
-			ifdhandler-3.tex ifdhandler-3.pdf \
+doc_DATA = pcsc-lite.tex pcsc-lite.bib \
+			ifdhandler-3.tex \
 			README.DAEMON
 
 man_MANS = pcscd.8 reader.conf.5 update-reader.conf.8
