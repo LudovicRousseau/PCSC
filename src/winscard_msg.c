@@ -351,11 +351,30 @@ INTERNAL int SHMMessageReceive(void *buffer_void, size_t buffer_size,
 			}
 		} else if (selret == 0)
 		{
+#ifdef PCSCD
 			/*
 			 * timeout
 			 */
 			retval = -1;
 			break;
+#else
+			/* is the daemon still there? */
+			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+			{	
+				/*
+				 * timeout
+				 */
+				retval = -1;
+				break;
+			}
+
+			/* the command is extra slow so we keep waiting */
+			start = time(0);
+
+			/* you need to set the env variable PCSCLITE_DEBUG=0 since this is
+			 * logged on the client side and not on the pcscd side*/
+			Log1(PCSC_LOG_INFO, "Command not yet finished");
+#endif
 		} else
 		{
 			/*
