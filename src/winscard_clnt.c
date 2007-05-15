@@ -230,7 +230,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
-static LONG SCardCheckDaemonAvailability(void);
+LONG SCardCheckDaemonAvailability(void);
 
 void DESTRUCTOR SCardUnload(void);
 
@@ -3389,7 +3389,7 @@ inline static LONG SCardUnlockThread(void)
  * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_NO_SERVICE Server is not running (\ref SCARD_E_NO_SERVICE)
  */
-static LONG SCardCheckDaemonAvailability(void)
+LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
