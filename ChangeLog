@@ -1,3 +1,23 @@
+pcsc-lite-1.4.1: Ludovic Rousseau
+16 May 2007
+- do not limit the execution of an APDU to 2 minutes (Thanks to Harsh
+  Sangal for the bug report)
+- if the daemon is restarted we invalidate all the existing handles so
+  SCard functions returns SCARD_E_INVALID_HANDLE
+- SCardReconnect(): block instead of returning SCARD_E_SHARING_VIOLATION
+- clean the data buffer for SCardTransmit() to clean the APDU buffer to
+  remove any possible PIN or secret value (Thanks to Nils Larsch for the
+  patch)
+- SCardGetStatusChange(): add a counter in the upper word of
+  dwEventState so it is possible to detect a card movement betweeen two
+  calls to SCardGetStatusChange() (Thanks to Matheus Ribeiro for the
+  patch)
+- SCardGetStatusChange(): do not check for SCARD_STATE_ATRMATCH,
+  SCARD_STATE_EXCLUSIVE or SCARD_STATE_INUSE bits when the card is not
+  present.  (thanks to Matheus Ribeiro for the bug report)
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.0: Ludovic Rousseau
 13 February 2007
 - great speed improvements for SCardBeginTransaction(), SCardReconnect()
