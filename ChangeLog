@@ -9,7 +9,7 @@ pcsc-lite-1.4.1: Ludovic Rousseau
   remove any possible PIN or secret value (Thanks to Nils Larsch for the
   patch)
 - SCardGetStatusChange(): add a counter in the upper word of
-  dwEventState so it is possible to detect a card movement betweeen two
+  dwEventState so it is possible to detect a card movement between two
   calls to SCardGetStatusChange() (Thanks to Matheus Ribeiro for the
   patch)
 - SCardGetStatusChange(): do not check for SCARD_STATE_ATRMATCH,
