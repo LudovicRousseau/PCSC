@@ -47,20 +47,10 @@ extern "C"
 	typedef DWORD *LPDWORD;
 	typedef char *LPSTR;
 
-	/* this type is deprecated but still used by old drivers and applications
-	 * You should use LPSTR instead */
-	typedef char *LPTSTR
-#ifdef __GNUC__
-		/* __attribute__ is a GCC only extension */
-		__attribute__ ((deprecated))
-#endif
-		;
-	typedef const char *LPCTSTR
-#ifdef __GNUC__
-		/* __attribute__ is a GCC only extension */
-		__attribute__ ((deprecated))
-#endif
-		;
+	/* these types were deprecated but still used by old drivers and
+	 * applications. So just declare and use them. */
+	typedef LPSTR LPTSTR;
+	typedef LPCSTR LPCTSTR;
 
 #else
 #include <windows.h>
