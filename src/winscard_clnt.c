@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <sys/un.h>
 #include <errno.h>
+#include <stddef.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -483,7 +484,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	 */
 	scEstablishStruct.dwScope = dwScope;
 	scEstablishStruct.phContext = 0;
-	scEstablishStruct.rv = 0;
+	scEstablishStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, dwClientID,
 		sizeof(scEstablishStruct), PCSCLITE_MCLIENT_ATTEMPTS,
@@ -555,7 +556,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	scReleaseStruct.hContext = hContext;
-	scReleaseStruct.rv = 0;
+	scReleaseStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, psContextMap[dwContextIndex].dwClientID,
 			  sizeof(scReleaseStruct),
@@ -717,8 +718,9 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.hContext = hContext;
 	scConnectStruct.dwShareMode = dwShareMode;
 	scConnectStruct.dwPreferredProtocols = dwPreferredProtocols;
-	scConnectStruct.phCard = *phCard;
-	scConnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
+	scConnectStruct.phCard = 0;
+	scConnectStruct.pdwActiveProtocol = 0;
+	scConnectStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_CONNECT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scConnectStruct),
@@ -900,6 +902,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
 		scReconnectStruct.dwInitialization = dwInitialization;
 		scReconnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
+		scReconnectStruct.rv = SCARD_S_SUCCESS;
 
 		rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
 			sizeof(scReconnectStruct),
@@ -996,6 +999,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	scDisconnectStruct.hCard = hCard;
 	scDisconnectStruct.dwDisposition = dwDisposition;
+	scDisconnectStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_DISCONNECT, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scDisconnectStruct),
@@ -1102,6 +1106,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	}
 
 	scBeginStruct.hCard = hCard;
+	scBeginStruct.rv = SCARD_S_SUCCESS;
 
 	/*
 	 * Query the server every so often until the sharing violation ends
@@ -1237,6 +1242,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	scEndStruct.hCard = hCard;
 	scEndStruct.dwDisposition = dwDisposition;
+	scEndStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_END_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
 		sizeof(scEndStruct),
@@ -2250,7 +2256,15 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		scControlStructExtended->dwControlCode = dwControlCode;
 		scControlStructExtended->cbSendLength = cbSendLength;
 		scControlStructExtended->cbRecvLength = cbRecvLength;
-		scControlStructExtended->size = sizeof(*scControlStructExtended) + cbSendLength;
+		scControlStructExtended->pdwBytesReturned = 0;
+		scControlStructExtended->rv = SCARD_S_SUCCESS;
+		/* The size of data to send is the size of
+		 * struct control_struct_extended WITHOUT the data[] field
+		 * plus the effective data[] size
+		 */
+		scControlStructExtended->size = sizeof(*scControlStructExtended)
+			- (sizeof(control_struct_extended) - offsetof(control_struct_extended, data))
+			+ cbSendLength;
 		memcpy(scControlStructExtended->data, pbSendBuffer, cbSendLength);
 
 		rv = WrapSHMWrite(SCARD_CONTROL_EXTENDED,
@@ -2560,6 +2574,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	scGetSetStruct.dwAttrId = dwAttrId;
 	scGetSetStruct.cbAttrLen = *pcbAttrLen;
 	scGetSetStruct.rv = SCARD_E_NO_SERVICE;
+	memset(scGetSetStruct.pbAttr, 0, sizeof(scGetSetStruct.pbAttr));
 	if (SCARD_SET_ATTRIB == command)
 		memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
 
@@ -2730,6 +2745,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		memcpy(&scTransmitStructExtended->pioSendPci, pioSendPci,
 			sizeof(SCARD_IO_REQUEST));
 		memcpy(scTransmitStructExtended->data, pbSendBuffer, cbSendLength);
+		scTransmitStructExtended->rv = SCARD_S_SUCCESS;
 
 		if (pioRecvPci)
 		{
@@ -2737,7 +2753,10 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 				sizeof(SCARD_IO_REQUEST));
 		}
 		else
+		{
 			scTransmitStructExtended->pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
+			scTransmitStructExtended->pioRecvPci.cbPciLength = sizeof(SCARD_IO_REQUEST);
+		}
 
 		rv = WrapSHMWrite(SCARD_TRANSMIT_EXTENDED,
 			psContextMap[dwContextIndex].dwClientID,
@@ -2810,6 +2829,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		memcpy(&scTransmitStruct.pioSendPci, pioSendPci,
 			sizeof(SCARD_IO_REQUEST));
 		memcpy(scTransmitStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
+		memset(scTransmitStruct.pbSendBuffer+cbSendLength, 0, sizeof(scTransmitStruct.pbSendBuffer)-cbSendLength);
+		memset(scTransmitStruct.pbRecvBuffer, 0, sizeof(scTransmitStruct.pbRecvBuffer));
+		scTransmitStruct.rv = SCARD_S_SUCCESS;
 
 		if (pioRecvPci)
 		{
@@ -2817,7 +2839,10 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 				sizeof(SCARD_IO_REQUEST));
 		}
 		else
+		{
 			scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
+			scTransmitStruct.pioRecvPci.cbPciLength = sizeof(scTransmitStruct.pioRecvPci);
+		}
 
 		rv = WrapSHMWrite(SCARD_TRANSMIT,
 			psContextMap[dwContextIndex].dwClientID, sizeof(scTransmitStruct),

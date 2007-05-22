@@ -425,12 +425,14 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	msgStruct.user_id = SYS_GetUID();
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
+	msgStruct.dummy = 0;
 	msgStruct.date = time(NULL);
+	memset(msgStruct.key, 0, sizeof(msgStruct.key));
 	if ((SCARD_TRANSMIT_EXTENDED == command)
 		|| (SCARD_CONTROL_EXTENDED == command))
 	{
 		/* first block */
-		memcpy(msgStruct.data, data, PCSCLITE_MAX_MESSAGE_SIZE);
+		memcpy(msgStruct.data, data, size);
 		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
 			blockAmount);
 
