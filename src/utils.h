@@ -10,7 +10,12 @@
 #ifndef __utils_h__
 #define __utils_h__
 
+#include "wintypes.h"
+
 pid_t GetDaemonPid(void);
+
+/* defined in winscard_clnt.c */
+LONG SCardCheckDaemonAvailability(void);
 
 #endif
 

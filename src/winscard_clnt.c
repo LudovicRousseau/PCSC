@@ -231,8 +231,6 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
-LONG SCardCheckDaemonAvailability(void);
-
 void DESTRUCTOR SCardUnload(void);
 
 /*
