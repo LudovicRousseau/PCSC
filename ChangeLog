@@ -1,3 +1,15 @@
+pcsc-lite-1.4.2: Ludovic Rousseau
+23 May 2007
+- add a Lock counter so that SCardBeginTransaction/SCardEndTransaction
+  can be nested
+- SCardDisconnect(): do not block if dwDisposition == SCARD_LEAVE_CARD.
+  We block only for SCARD_UNPOWER_CARD, SCARD_RESET_CARD and
+  SCARD_EJECT_CARD since that would impact other running transactions
+- LPTSTR and LPCTSTR types are no more deprecated since they are found
+  in many applications. And using them is not a problem.
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.1: Ludovic Rousseau
 16 May 2007
 - do not limit the execution of an APDU to 2 minutes (Thanks to Harsh
