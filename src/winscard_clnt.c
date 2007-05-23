@@ -2831,16 +2831,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		memset(scTransmitStruct.pbRecvBuffer, 0, sizeof(scTransmitStruct.pbRecvBuffer));
 		scTransmitStruct.rv = SCARD_S_SUCCESS;
 
-		if (pioRecvPci)
-		{
-			memcpy(&scTransmitStruct.pioRecvPci, pioRecvPci,
-				sizeof(SCARD_IO_REQUEST));
-		}
-		else
-		{
-			scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
-			scTransmitStruct.pioRecvPci.cbPciLength = sizeof(scTransmitStruct.pioRecvPci);
-		}
+		scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
+		scTransmitStruct.pioRecvPci.cbPciLength = sizeof(scTransmitStruct.pioRecvPci);
 
 		rv = WrapSHMWrite(SCARD_TRANSMIT,
 			psContextMap[dwContextIndex].dwClientID, sizeof(scTransmitStruct),
