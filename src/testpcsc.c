@@ -179,7 +179,6 @@ wait_for_card_again:
 			printf("Unknown protocol\n");
 			return -1;
 	}
-	pioRecvPci = pioSendPci;
 
 	/* APDU select file */
 	printf("Select file: ");
