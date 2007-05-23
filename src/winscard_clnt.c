@@ -2739,7 +2739,13 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		scTransmitStructExtended->hCard = hCard;
 		scTransmitStructExtended->cbSendLength = cbSendLength;
 		scTransmitStructExtended->pcbRecvLength = *pcbRecvLength;
-		scTransmitStructExtended->size = sizeof(*scTransmitStructExtended) + cbSendLength;
+		/* The size of data to send is the size of
+		 * struct control_struct_extended WITHOUT the data[] field
+		 * plus the effective data[] size
+		 */
+		scTransmitStructExtended->size = sizeof(*scTransmitStructExtended)
+			- (sizeof(transmit_struct_extended) - offsetof(transmit_struct_extended, data))
+			+ cbSendLength;
 		memcpy(&scTransmitStructExtended->pioSendPci, pioSendPci,
 			sizeof(SCARD_IO_REQUEST));
 		memcpy(scTransmitStructExtended->data, pbSendBuffer, cbSendLength);
