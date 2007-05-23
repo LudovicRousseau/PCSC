@@ -821,7 +821,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * wait until a possible transaction is finished
 	 */
-	if ((rContext->dwLockId != 0) && (rContext->dwLockId != hCard))
+	if ((dwDisposition != SCARD_LEAVE_CARD) && (rContext->dwLockId != 0)
+		&& (rContext->dwLockId != hCard))
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
 		while (rContext->dwLockId != 0)
