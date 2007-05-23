@@ -162,6 +162,7 @@ extern "C"
 		DWORD dwSlot;			/* Current Reader Slot */
 		DWORD dwBlockStatus;	/* Current blocking status */
 		DWORD dwLockId;			/* Lock Id */
+		int LockCount;			/* number of recursive locks */
 		DWORD dwIdentity;		/* Shared ID High Nibble */
 		int32_t dwContexts;		/* Number of open contexts */
 		PDWORD pdwFeeds;		/* Number of shared client to lib */

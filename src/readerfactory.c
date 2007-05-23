@@ -169,6 +169,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	(sReadersContexts[dwContext])->dwContexts = 0;
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->dwLockId = 0;
+	(sReadersContexts[dwContext])->LockCount = 0;
 	(sReadersContexts[dwContext])->vHandle = 0;
 	(sReadersContexts[dwContext])->pdwFeeds = NULL;
 	(sReadersContexts[dwContext])->pdwMutex = NULL;
@@ -386,6 +387,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContextB])->dwBlockStatus = 0;
 		(sReadersContexts[dwContextB])->dwContexts = 0;
 		(sReadersContexts[dwContextB])->dwLockId = 0;
+		(sReadersContexts[dwContextB])->LockCount = 0;
 		(sReadersContexts[dwContextB])->readerState = NULL;
 		(sReadersContexts[dwContextB])->dwIdentity =
 			(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
@@ -532,6 +534,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		sContext->dwContexts = 0;
 		sContext->dwSlot = 0;
 		sContext->dwLockId = 0;
+		sContext->LockCount = 0;
 		sContext->vHandle = 0;
 		sContext->dwIdentity = 0;
 		sContext->readerState = NULL;
@@ -1054,6 +1057,7 @@ LONG RFLockSharing(DWORD hCard)
 	if (RFCheckSharing(hCard) == SCARD_S_SUCCESS)
 	{
 		EHSetSharingEvent(rContext, 1);
+		rContext->LockCount += 1;
 		rContext->dwLockId = hCard;
 	}
 	else
@@ -1076,7 +1080,10 @@ LONG RFUnlockSharing(DWORD hCard)
 		return rv;
 
 	EHSetSharingEvent(rContext, 0);
-	rContext->dwLockId = 0;
+	if (rContext->LockCount > 0)
+		rContext->LockCount -= 1;
+	if (0 == rContext->LockCount)
+		rContext->dwLockId = 0;
 
 	return SCARD_S_SUCCESS;
 }
