@@ -41,6 +41,7 @@
 #include "debug.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
+#include "utils.h"
 
 /**
  * @brief Wrapper for the SHMMessageReceive() function.
