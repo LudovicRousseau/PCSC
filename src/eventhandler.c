@@ -90,7 +90,6 @@ LONG EHInitializeEventStructures(void)
 		memset((readerStates[i])->cardAtr, 0, MAX_ATR_SIZE);
 		(readerStates[i])->readerID = 0;
 		(readerStates[i])->readerState = 0;
-		(readerStates[i])->lockState = 0;
 		(readerStates[i])->readerSharing = 0;
 		(readerStates[i])->cardAtrLength = 0;
 		(readerStates[i])->cardProtocol = SCARD_PROTOCOL_UNSET;
@@ -139,7 +138,6 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 		sizeof(rContext->readerState->cardAtr));
 	rContext->readerState->readerID = 0;
 	rContext->readerState->readerState = 0;
-	rContext->readerState->lockState = 0;
 	rContext->readerState->readerSharing = 0;
 	rContext->readerState->cardAtrLength = 0;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
@@ -473,7 +471,3 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	}
 }
 
-void EHSetSharingEvent(PREADER_CONTEXT rContext, DWORD dwValue)
-{
-	rContext->readerState->lockState = dwValue;
-}

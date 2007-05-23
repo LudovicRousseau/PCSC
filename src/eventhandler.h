@@ -33,7 +33,7 @@ extern "C"
 		char readerName[MAX_READERNAME];
 		DWORD readerState;
 		LONG readerSharing;
-		DWORD lockState;
+		DWORD dummy;
 
 		UCHAR cardAtr[MAX_ATR_SIZE];
 		DWORD cardAtrLength;
@@ -44,7 +44,6 @@ extern "C"
 	LONG EHInitializeEventStructures(void);
 	LONG EHSpawnEventHandler(PREADER_CONTEXT);
 	LONG EHDestroyEventHandler(PREADER_CONTEXT);
-	void EHSetSharingEvent(PREADER_CONTEXT, DWORD);
 
 #ifdef __cplusplus
 }

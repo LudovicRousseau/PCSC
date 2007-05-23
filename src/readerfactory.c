@@ -1056,7 +1056,6 @@ LONG RFLockSharing(DWORD hCard)
 
 	if (RFCheckSharing(hCard) == SCARD_S_SUCCESS)
 	{
-		EHSetSharingEvent(rContext, 1);
 		rContext->LockCount += 1;
 		rContext->dwLockId = hCard;
 	}
@@ -1079,7 +1078,6 @@ LONG RFUnlockSharing(DWORD hCard)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	EHSetSharingEvent(rContext, 0);
 	if (rContext->LockCount > 0)
 		rContext->LockCount -= 1;
 	if (0 == rContext->LockCount)
