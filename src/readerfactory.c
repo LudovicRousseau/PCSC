@@ -1308,6 +1308,13 @@ LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 			rContext->psHandles[i].dwEventStatus = dwEvent;
 	}
 
+	if (SCARD_REMOVED == dwEvent)
+	{
+		/* unlock the card */
+		rContext->dwLockId = 0;
+		rContext->LockCount = 0;
+	}
+
 	return SCARD_S_SUCCESS;
 }
 
