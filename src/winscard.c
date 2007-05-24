@@ -341,6 +341,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 	}
 
+	/* the reader has been removed while we were waiting */
+	if (NULL == rContext->readerState)
+		return SCARD_E_NO_SMARTCARD;
+
 	/*******************************************
 	 *
 	 * This section tries to determine the
@@ -829,6 +833,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}
+
+	/* the reader has been removed while we were waiting */
+	if (NULL == rContext->readerState)
+		return SCARD_E_NO_SMARTCARD;
 
 	/*
 	 * Unlock any blocks on this context
