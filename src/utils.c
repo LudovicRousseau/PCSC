@@ -33,7 +33,6 @@ pid_t GetDaemonPid(void)
 	 */
 	if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
 	{
-#define PID_ASCII_SIZE 11
 		char pid_ascii[PID_ASCII_SIZE];
 
 		fgets(pid_ascii, PID_ASCII_SIZE, f);
