@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -425,13 +426,23 @@ int main(int argc, char **argv)
 	 * to kill the correct pcscd
 	 */
 	{
-		FILE *f;
+		int f;
 
-		if ((f = fopen(USE_RUN_PID, "wb")) != NULL)
+		if ((f = SYS_OpenFile(USE_RUN_PID, O_RDWR | O_CREAT, 00644)) != -1)
 		{
-			fprintf(f, "%u\n", (unsigned) getpid());
-			fclose(f);
+			char pid[PID_ASCII_SIZE];
+
+			snprintf(pid, sizeof(pid), "%u", (unsigned) getpid());
+			SYS_WriteFile(f, pid, strlen(pid));
+			SYS_CloseFile(f);
+
+			/* set mode so that the file is world readable.
+			 * The file is used by libpcsclite */
+			SYS_Chmod(USE_RUN_PID, 0644);
 		}
+		else
+			Log2(PCSC_LOG_CRITICAL, "cannot create " USE_RUN_PID ": %s",
+				strerror(errno));
 	}
 
 	/*
