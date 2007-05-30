@@ -433,7 +433,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	}
 
 	{	/* exchange client/server protocol versions */
-		sharedSegmentMsg msgStruct;
 		version_struct *veStr;
 
 		memset(&msgStruct, 0, sizeof(msgStruct));
