@@ -223,7 +223,7 @@ static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
 static LONG SCardCleanContext(LONG indice);
 
-static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPSTR);
+static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPCSTR);
 static LONG SCardGetIndicesFromHandle(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, PDWORD, PDWORD);
 static LONG SCardRemoveHandle(SCARDHANDLE);
@@ -750,7 +750,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Keep track of the handle locally
 		 */
-		rv = SCardAddHandle(*phCard, dwContextIndex, (LPSTR) szReader);
+		rv = SCardAddHandle(*phCard, dwContextIndex, szReader);
 		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 		PROFILE_END(rv)
@@ -3306,7 +3306,7 @@ static LONG SCardCleanContext(LONG indice)
  */
 
 static LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex,
-	LPSTR readerName)
+	LPCSTR readerName)
 {
 	int i;
 
