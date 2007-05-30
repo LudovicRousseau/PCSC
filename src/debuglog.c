@@ -261,6 +261,7 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
  * defined only for pcscd
  */
 #ifdef PCSCD
+void debug_msg(const char *fmt, ...);
 void debug_msg(const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
@@ -290,6 +291,7 @@ void debug_msg(const char *fmt, ...)
 		fprintf(stderr, "%s\n", DebugBuffer);
 } /* debug_msg */
 
+void debug_xxd(const char *msg, const unsigned char *buffer, const int len);
 void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 {
 	log_xxd(PCSC_LOG_ERROR, msg, buffer, len);
