@@ -89,7 +89,7 @@ static struct _readerTracker
 LONG HPReadBundleValues(void);
 LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver);
-LONG HPRemoveHotPluggable(int index);
+LONG HPRemoveHotPluggable(int reader_index);
 static void HPRescanUsbBus(void);
 static void HPEstablishUSBNotifications(void);
 
@@ -506,19 +506,19 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	return 1;
 }	/* End of function */
 
-LONG HPRemoveHotPluggable(int index)
+LONG HPRemoveHotPluggable(int reader_index)
 {
 	SYS_MutexLock(&usbNotifierMutex);
 
-	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", index,
-		readerTracker[index].bus_device);
+	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", reader_index,
+		readerTracker[reader_index].bus_device);
 
-	RFRemoveReader(readerTracker[index].fullName,
-		PCSCLITE_HP_BASE_PORT + index);
-	free(readerTracker[index].fullName);
-	readerTracker[index].status = READER_ABSENT;
-	readerTracker[index].bus_device[0] = '\0';
-	readerTracker[index].fullName = NULL;
+	RFRemoveReader(readerTracker[reader_index].fullName,
+		PCSCLITE_HP_BASE_PORT + reader_index);
+	free(readerTracker[reader_index].fullName);
+	readerTracker[reader_index].status = READER_ABSENT;
+	readerTracker[reader_index].bus_device[0] = '\0';
+	readerTracker[reader_index].fullName = NULL;
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
