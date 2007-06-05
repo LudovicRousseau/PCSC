@@ -822,7 +822,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 {
 	if (rContext->vHandle != 0)
 	{
-		Log1(PCSC_LOG_ERROR, "Warning library pointer not NULL");
+		Log1(PCSC_LOG_INFO, "Warning library pointer not NULL");
 		/*
 		 * Another reader exists with this library loaded
 		 */
