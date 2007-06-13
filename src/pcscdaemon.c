@@ -229,18 +229,18 @@ int main(int argc, char **argv)
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
 	static struct option long_options[] = {
-		{"config", 1, 0, 'c'},
-		{"foreground", 0, 0, 'f'},
-		{"help", 0, 0, 'h'},
-		{"version", 0, 0, 'v'},
-		{"apdu", 0, 0, 'a'},
-		{"debug", 0, 0, 'd'},
-		{"info", 0, 0, 0},
-		{"error", 0, 0, 'e'},
-		{"critical", 0, 0, 'C'},
-		{"hotplug", 0, 0, 'H'},
-		{"force-reader-polling", optional_argument, 0, 0},
-		{0, 0, 0, 0}
+		{"config", 1, NULL, 'c'},
+		{"foreground", 0, NULL, 'f'},
+		{"help", 0, NULL, 'h'},
+		{"version", 0, NULL, 'v'},
+		{"apdu", 0, NULL, 'a'},
+		{"debug", 0, NULL, 'd'},
+		{"info", 0, NULL, 0},
+		{"error", 0, NULL, 'e'},
+		{"critical", 0, NULL, 'C'},
+		{"hotplug", 0, NULL, 'H'},
+		{"force-reader-polling", optional_argument, NULL, 0},
+		{NULL, 0, NULL, 0}
 	};
 #endif
 #define OPT_STRING "c:fdhvaeCH"

@@ -164,13 +164,13 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		sizeof((sReadersContexts[dwContext])->lpcDevice));
 	(sReadersContexts[dwContext])->dwVersion = 0;
 	(sReadersContexts[dwContext])->dwPort = dwPort;
-	(sReadersContexts[dwContext])->mMutex = 0;
+	(sReadersContexts[dwContext])->mMutex = NULL;
 	(sReadersContexts[dwContext])->dwBlockStatus = 0;
 	(sReadersContexts[dwContext])->dwContexts = 0;
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->dwLockId = 0;
 	(sReadersContexts[dwContext])->LockCount = 0;
-	(sReadersContexts[dwContext])->vHandle = 0;
+	(sReadersContexts[dwContext])->vHandle = NULL;
 	(sReadersContexts[dwContext])->pdwFeeds = NULL;
 	(sReadersContexts[dwContext])->pdwMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
@@ -205,7 +205,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
 			Log1(PCSC_LOG_INFO, "Driver is thread safe");
-			(sReadersContexts[dwContext])->mMutex = 0;
+			(sReadersContexts[dwContext])->mMutex = NULL;
 			(sReadersContexts[dwContext])->pdwMutex = NULL;
 		}
 		else
@@ -253,7 +253,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 		(sReadersContexts[dwContext])->dwVersion = 0;
 		(sReadersContexts[dwContext])->dwPort = 0;
-		(sReadersContexts[dwContext])->vHandle = 0;
+		(sReadersContexts[dwContext])->vHandle = NULL;
 		(sReadersContexts[dwContext])->readerState = NULL;
 		(sReadersContexts[dwContext])->dwIdentity = 0;
 
@@ -430,7 +430,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 			(sReadersContexts[dwContextB])->dwVersion = 0;
 			(sReadersContexts[dwContextB])->dwPort = 0;
-			(sReadersContexts[dwContextB])->vHandle = 0;
+			(sReadersContexts[dwContextB])->vHandle = NULL;
 			(sReadersContexts[dwContextB])->readerState = NULL;
 			(sReadersContexts[dwContextB])->dwIdentity = 0;
 
@@ -529,13 +529,13 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		sContext->lpcDevice[0] = 0;
 		sContext->dwVersion = 0;
 		sContext->dwPort = 0;
-		sContext->mMutex = 0;
+		sContext->mMutex = NULL;
 		sContext->dwBlockStatus = 0;
 		sContext->dwContexts = 0;
 		sContext->dwSlot = 0;
 		sContext->dwLockId = 0;
 		sContext->LockCount = 0;
-		sContext->vHandle = 0;
+		sContext->vHandle = NULL;
 		sContext->dwIdentity = 0;
 		sContext->readerState = NULL;
 
@@ -1026,7 +1026,7 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 		DYN_CloseLibrary(&rContext->vHandle);
 	}
 
-	rContext->vHandle = 0;
+	rContext->vHandle = NULL;
 
 	return SCARD_S_SUCCESS;
 }

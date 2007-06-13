@@ -97,7 +97,7 @@ LONG HPReadBundleValues(void)
 {
 	LONG rv;
 	DIR *hpDir;
-	struct dirent *currFP = 0;
+	struct dirent *currFP = NULL;
 	char fullPath[FILENAME_MAX];
 	char fullLibPath[FILENAME_MAX];
 	char keyValue[TOKEN_MAX_VALUE_SIZE];
@@ -145,14 +145,14 @@ LONG HPReadBundleValues(void)
 				rv = LTPBundleFindValueWithKey(fullPath,
 					PCSCLITE_HP_MANUKEY_NAME, keyValue, alias);
 				if (rv == 0)
-					driverTracker[listCount].manuID = strtol(keyValue, 0, 16);
+					driverTracker[listCount].manuID = strtol(keyValue, NULL, 16);
 
 				/* get ifdProductID */
 				rv = LTPBundleFindValueWithKey(fullPath,
 					PCSCLITE_HP_PRODKEY_NAME, keyValue, alias);
 				if (rv == 0)
 					driverTracker[listCount].productID =
-						strtol(keyValue, 0, 16);
+						strtol(keyValue, NULL, 16);
 
 				/* get ifdFriendlyName */
 				rv = LTPBundleFindValueWithKey(fullPath,
@@ -178,7 +178,7 @@ LONG HPReadBundleValues(void)
 					PCSCLITE_HP_CPCTKEY_NAME, keyValue, 0);
 				if (rv == 0)
 					driverTracker[listCount].ifdCapabilities = strtol(keyValue,
-						0, 16);
+						NULL, 16);
 
 #ifdef DEBUG_HOTPLUG
 				Log2(PCSC_LOG_INFO, "Found driver for: %s",
@@ -431,7 +431,7 @@ LONG HPSearchHotPluggables(void)
 
 	if (HPReadBundleValues())
 		SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
-			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
+			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL);
 
 	return 0;
 }
