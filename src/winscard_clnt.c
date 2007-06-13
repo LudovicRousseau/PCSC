@@ -236,8 +236,8 @@ void DESTRUCTOR SCardUnload(void);
 /*
  * Thread safety functions
  */
-inline static LONG SCardLockThread(void);
-inline static LONG SCardUnlockThread(void);
+static LONG SCardLockThread(void);
+static LONG SCardUnlockThread(void);
 
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
