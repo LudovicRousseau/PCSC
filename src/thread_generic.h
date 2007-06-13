@@ -22,6 +22,7 @@
 #include "PCSC.h"
 #else
 #include <pthread.h>
+#include <wintypes.h>
 #endif
 
 #ifdef __cplusplus
