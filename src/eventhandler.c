@@ -453,7 +453,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			 */
 			rContext->dwLockId = 0;
 			SYS_ThreadDetach(rContext->pthThread);
-			SYS_ThreadExit(0);
+			SYS_ThreadExit(NULL);
 		}
 
 		/*
