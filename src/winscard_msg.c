@@ -433,7 +433,14 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 		|| (SCARD_CONTROL_EXTENDED == command))
 	{
 		/* first block */
-		memcpy(msgStruct.data, data, size);
+		if (size > sizeof(msgStruct.data))
+			memcpy(msgStruct.data, data, sizeof(msgStruct.data));
+		else
+		{
+			memcpy(msgStruct.data, data, size);
+			memset(msgStruct.data+size, 0, sizeof(msgStruct.data)-size);
+		}
+			
 		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
 			blockAmount);
 
