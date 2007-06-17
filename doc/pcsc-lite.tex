@@ -1521,7 +1521,7 @@ LONG rv;
 
 rv = SCardEstablishContext(SCARD\_SCOPE\_SYSTEM, NULL, NULL, &hContext);
 if (rv != SCARD_S_SUCCESS)
-    printf("SCardReleaseContext: %s (0x%lX)\n",
+    printf("SCardEstablishContext: %s (0x%lX)\n",
         pcsc_stringify_error(rv), rv);
 \end{verbatim}
 
