@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	if (rv != SCARD_S_SUCCESS)
 	{
 		printf("SCardEstablishContext: Cannot Connect to Resource Manager %lX\n", rv);
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	/* Retrieve the available readers list.
