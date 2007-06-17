@@ -445,11 +445,11 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 			blockAmount);
 
 		/* do not send an empty second block */
-		if ((0 == ret) && (size > PCSCLITE_MAX_MESSAGE_SIZE))
+		if ((0 == ret) && (size > sizeof(msgStruct.data)))
 		{
 			/* second block */
-			ret = SHMMessageSend(data+PCSCLITE_MAX_MESSAGE_SIZE,
-				size-PCSCLITE_MAX_MESSAGE_SIZE, dwClientID, blockAmount);
+			ret = SHMMessageSend(data+sizeof(msgStruct.data),
+				size-sizeof(msgStruct.data), dwClientID, blockAmount);
 		}
 	}
 	else
@@ -462,7 +462,7 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 
 	if (SCARD_TRANSMIT == command)
 		/* clean APDU buffer to remove any possible PIN or secret value */
-		memset(msgStruct.data, 0, min(size, PCSCLITE_MAX_MESSAGE_SIZE));
+		memset(msgStruct.data, 0, min(size, sizeof(msgStruct.data)));
 
 	return ret;
 }
