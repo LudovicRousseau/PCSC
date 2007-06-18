@@ -1216,6 +1216,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
 
+	if (hCard == 0)
+		return SCARD_E_INVALID_HANDLE;
+
 	rv = RFReaderInfoById(hCard, &rContext);
 
 	/*
