@@ -175,11 +175,7 @@ void SVCServiceRunLoop(void)
 			rv = CreateContextThread(&dwClientID);
 
  			if (rv != SCARD_S_SUCCESS)
-			{
 				Log1(PCSC_LOG_ERROR, "Problem during the context thread creation");
-				AraKiri = TRUE;
-			}
-
 			break;
 
 		case 2:
