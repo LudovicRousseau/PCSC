@@ -1,4 +1,12 @@
 pcsc-lite-1.4.2: Ludovic Rousseau
+19 June 2007
+- correctly handle lock (SCardBeginTransaction) when the locked card is
+  removed.
+- correct a buffer overflow introduced in 1.4.2 when extended APDU are
+  used
+- some other minor improvements and bug corrections
+
+pcsc-lite-1.4.2: Ludovic Rousseau
 23 May 2007
 - add a Lock counter so that SCardBeginTransaction/SCardEndTransaction
   can be nested
