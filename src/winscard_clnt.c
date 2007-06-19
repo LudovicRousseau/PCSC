@@ -236,8 +236,26 @@ void DESTRUCTOR SCardUnload(void);
 /*
  * Thread safety functions
  */
-static LONG SCardLockThread(void);
-static LONG SCardUnlockThread(void);
+/**
+ * @brief This function locks a mutex so another thread must wait to use this
+ * function.
+ *
+ * Wrapper to the function SYS_MutexLock().
+ */
+inline static LONG SCardLockThread(void)
+{
+	return SYS_MutexLock(&clientMutex);
+}
+
+/**
+ * @brief This function unlocks a mutex so another thread may use the client.
+ *
+ * Wrapper to the function SYS_MutexUnLock().
+ */
+inline static LONG SCardUnlockThread(void)
+{
+	return SYS_MutexUnLock(&clientMutex);
+}
 
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
 
@@ -3379,27 +3397,6 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndi
 	}
 
 	return -1;
-}
-
-/**
- * @brief This function locks a mutex so another thread must wait to use this
- * function.
- *
- * Wrapper to the function SYS_MutexLock().
- */
-inline static LONG SCardLockThread(void)
-{
-	return SYS_MutexLock(&clientMutex);
-}
-
-/**
- * @brief This function unlocks a mutex so another thread may use the client.
- *
- * Wrapper to the function SYS_MutexUnLock().
- */
-inline static LONG SCardUnlockThread(void)
-{
-	return SYS_MutexUnLock(&clientMutex);
 }
 
 /**
