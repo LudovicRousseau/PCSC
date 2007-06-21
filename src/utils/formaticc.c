@@ -92,8 +92,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	mszGroups = 0;
-	SCardListReaders(hContext, mszGroups, 0, &dwReaders);
+	mszGroups = NULL;
+	SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
 	mszReaders = (char *) malloc(sizeof(char) * dwReaders);
 	SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 
