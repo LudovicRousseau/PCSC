@@ -1,13 +1,13 @@
 .TH UPDATE-READER.CONF 8 "Oct 2006"
 .SH NAME
-update\-reader.conf \- (re)generate /etc/reader.conf
+update\-reader.conf \- (re)generate @confdir@/reader.conf
 .SH SYNOPSIS
 .B update\-reader.conf
 [force]
 .SH DESCRIPTION
 .B update\-reader.conf
 is a simple tool to manage
-.IR /etc/reader.conf .
+.IR @confdir@/reader.conf .
 The PCSC daemon (pcscd) uses one configuration file for its
 configuration. This makes it hard for packages to dynamically add
 information about their own smart card reader drivers. To fix this
@@ -18,9 +18,9 @@ has been introduced.
 .B update-reader.conf
 attempts to fix this by generating the configuration file from seperate
 files which are located in
-.IR /etc/reader.conf.d/ .
+.IR @confdir@/reader.conf.d/ .
 All files in that directory are assembled together to form
-.IR /etc/reader.conf .
+.IR @confdir@/reader.conf .
 .SH "FILES"
 .B update\-reader.conf
 will only use files that match the following wildcard:

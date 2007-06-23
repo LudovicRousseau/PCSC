@@ -309,6 +309,7 @@ doc/Makefile
 doc/doxygen.conf
 doc/pcscd.8
 doc/reader.conf.5
+doc/update-reader.conf.8
 doc/example/Makefile
 etc/Makefile
 etc/pcscd.init
