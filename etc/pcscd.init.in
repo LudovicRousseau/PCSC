@@ -11,6 +11,19 @@
 # processname: pcscd
 # config:      @confdir@/reader.conf
 #
+### BEGIN INIT INFO
+# Provides: pcscd
+# Should-Start: $syslog openct
+# Should-Stop: $syslog openct
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: PC/SC smart card daemon
+# Description: The PC/SC smart card daemon is a resource manager for the
+#              PC/SC lite and Musclecard frameworks.  It coordinates
+#              communications with smart card readers, smart cards, and
+#              cryptographic tokens that are connected to the system.
+### END INIT INFO
+#
 # Note!  pcscd should be started after pcmcia, and shut down before it
 # for smooth experience with PCMCIA readers.
 
