@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	LONG rv;
 	SCARDCONTEXT hContext;
 	DWORD dwReaders;
-	LPSTR mszReaders;
+	LPSTR mszReaders = NULL;
 	char *ptr, **readers = NULL;
 	int nbReaders;
 	SCARDHANDLE hCard;
@@ -89,11 +89,7 @@ int main(int argc, char *argv[])
 	 * 3. call with the real allocated buffer
 	 */
 	rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
-	if (rv != SCARD_S_SUCCESS)
-	{
-		printf("SCardListReader: %lX\n", rv);
-		return EXIT_FAILURE;
-	}
+	PCSC_ERROR(rv, "SCardListReaders")
 
 	mszReaders = malloc(sizeof(char)*dwReaders);
 	if (mszReaders == NULL)
