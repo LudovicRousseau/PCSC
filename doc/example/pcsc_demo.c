@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2003-2004
+ * Copyright (C) 2003-2007
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	DWORD dwSendLength, dwRecvLength;
 
 	printf("PC/SC sample code\n");
-	printf("V 1.2 2003-2007, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
+	printf("V 1.3 2003-2007, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
 
 	printf("\nTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
 	printf("Do NOT use it unless you really know what you do.\n\n");
