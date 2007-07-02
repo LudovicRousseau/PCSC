@@ -296,8 +296,10 @@ end:
 			rv);
 
 	/* free allocated memory */
-	free(mszReaders);
-	free(readers);
+	if (mszReaders)
+		free(mszReaders);
+	if (readers)
+		free(readers);
 
 	return EXIT_SUCCESS;
 } /* main */
