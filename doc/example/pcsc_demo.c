@@ -99,8 +99,7 @@ int main(int argc, char *argv[])
 	}
 
 	rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
-	if (rv != SCARD_S_SUCCESS)
-		printf("SCardListReader: %lX\n", rv);
+	PCSC_ERROR(rv, "SCardListReaders")
 
 	/* Extract readers from the null separated string and get the total
 	 * number of readers */
