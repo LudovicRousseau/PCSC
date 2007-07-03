@@ -1,4 +1,4 @@
-pcsc-lite-1.4.2: Ludovic Rousseau
+pcsc-lite-1.4.3: Ludovic Rousseau
 19 June 2007
 - correctly handle lock (SCardBeginTransaction) when the locked card is
   removed.
