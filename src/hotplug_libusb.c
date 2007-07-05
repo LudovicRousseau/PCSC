@@ -56,6 +56,7 @@ extern PCSCLITE_MUTEX usbNotifierMutex;
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
 static char AraKiriHotPlug = FALSE;
+static int rescan_pipe[] = { -1, -1 };
 extern int HPForceReaderPolling;
 
 /* values of ifdCapabilities bits */
@@ -411,10 +412,28 @@ void HPEstablishUSBNotifications(void)
 		do_polling = TRUE;
 	}
 
-	while (do_polling)
+	if (do_polling)
 	{
-		SYS_Sleep(HPForceReaderPolling);
-		HPRescanUsbBus();
+		while (!AraKiriHotPlug)
+		{
+			SYS_Sleep(HPForceReaderPolling);
+			HPRescanUsbBus();
+		}
+	}
+	else
+	{
+		char dummy;
+
+	  	pipe(rescan_pipe);
+		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
+		{
+			Log1(PCSC_LOG_INFO, "Reload serial configuration");
+			HPRescanUsbBus();
+			RFReCheckReaderConf();
+			Log1(PCSC_LOG_INFO, "End reload serial configuration");
+		}
+		close(rescan_pipe[0]);
+		rescan_pipe[0] = -1;
 	}
 }
 
@@ -439,6 +458,11 @@ LONG HPSearchHotPluggables(void)
 LONG HPStopHotPluggables(void)
 {
 	AraKiriHotPlug = TRUE;
+	if (rescan_pipe[1] >= 0)
+	{
+	  	close(rescan_pipe[1]);
+		rescan_pipe[1] = -1;
+	}
 
 	return 0;
 }
@@ -535,8 +559,11 @@ ULONG HPRegisterForHotplugEvents(void)
 
 void HPReCheckSerialReaders(void)
 {
-	HPRescanUsbBus();
-	RFReCheckReaderConf();
+  	if (rescan_pipe[1] >= 0)
+	{
+		char dummy = 0;
+		write(rescan_pipe[1], &dummy, sizeof(dummy));
+	}
 }
 
 #endif
