@@ -867,28 +867,28 @@ reader at the particular reader/slot specified by Lun.
 \begin{itemize}
 \item \texttt{IFD\_POWER\_UP}
 
-Power and reset the card if not done so (store the ATR and return it and
-it's length)
+Power up the card (store and return \texttt{Atr} and \texttt{AtrLength})
 
 \item \texttt{IFD\_POWER\_DOWN}
 
-Power down the card then power up if not done already (\texttt{Atr} and
-\texttt{AtrLength} should be zeroed)
+Power down the card (\texttt{Atr} and \texttt{AtrLength} should be
+zeroed)
 
 \item \texttt{IFD\_RESET}
 
-Perform a quick reset on the card. If the card is not powered then power
-up the card. (Store and return \texttt{Atr} and \texttt{Length})
+Perform a warm reset of the card (no power down). If the card is not
+powered then power up the card (store and return \texttt{Atr} and
+\texttt{AtrLength})
 
 \end{itemize}
 
-\item \texttt{Atr} - Answer to Reset of the card
+\item \texttt{Atr} - Answer to Reset (ATR) of the card
 
 The driver is responsible for caching this value in case
 \texttt{IFDHGetCapabilities()} is called requesting the ATR and its
 length. The ATR length should not exceed \texttt{MAX\_ATR\_SIZE}.
 
-\item \texttt{AtrLength} - Length of the Atr
+\item \texttt{AtrLength} - Length of the ATR
 
 This should not exceed \texttt{MAX\_ATR\_SIZE}.
 
