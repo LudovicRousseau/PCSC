@@ -398,7 +398,7 @@ void HPEstablishUSBNotifications(void)
 			if ((driverTracker[i].ifdCapabilities & IFD_GENERATE_HOTPLUG) == 0)
 			{
 				Log2(PCSC_LOG_INFO,
-					"Driver %s does not support IFD_GENERATE_HOTPLUG",
+					"Driver %s does not support IFD_GENERATE_HOTPLUG. Using active polling instead.",
 					driverTracker[i].bundleName);
 				if (HPForceReaderPolling < 1)
 					HPForceReaderPolling = 1;
