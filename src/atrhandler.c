@@ -65,8 +65,8 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	/*
 	 * Zero out the bitmasks
 	 */
-	psExtension->CardCapabilities.AvailableProtocols = SCARD_PROTOCOL_UNSET;
-	psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_UNSET;
+	psExtension->CardCapabilities.AvailableProtocols = SCARD_PROTOCOL_UNDEFINED;
+	psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	/*
 	 * Decode the TS byte
@@ -132,7 +132,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			/*
 			 * Set the current protocol TD1 (first TD only)
 			 */
-			if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNSET)
+			if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNDEFINED)
 			{
 				switch (T)
 				{
@@ -229,7 +229,7 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 	/*
 	 * If TDx is not set then the current must be T0
 	 */
-	if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNSET)
+	if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNDEFINED)
 	{
 		psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T0;
 		psExtension->CardCapabilities.AvailableProtocols |= SCARD_PROTOCOL_T0;

@@ -382,7 +382,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
 			/* the protocol is not yet set (no PPS yet) */
-			if (SCARD_PROTOCOL_UNSET == rContext->readerState->cardProtocol)
+			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
 				UCHAR ucAvailable, ucDefault;
 				int ret;
@@ -402,7 +402,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					ucAvailable, ucDefault);
 
-				/* keep cardProtocol = SCARD_PROTOCOL_UNSET in case of error  */
+				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 					return SCARD_W_UNRESPONSIVE_CARD;
 
@@ -587,7 +587,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
 		 * Notify the card has been reset
@@ -697,7 +697,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
 			/* the protocol is not yet set (no PPS yet) */
-			if (SCARD_PROTOCOL_UNSET == rContext->readerState->cardProtocol)
+			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
 				UCHAR ucAvailable, ucDefault;
 				int ret;
@@ -715,7 +715,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					ucAvailable, ucDefault);
 
-				/* keep cardProtocol = SCARD_PROTOCOL_UNSET in case of error  */
+				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 					return SCARD_W_UNRESPONSIVE_CARD;
 
@@ -868,7 +868,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
 		 * Notify the card has been reset
@@ -1081,7 +1081,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNSET;
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
 		 * Notify the card has been reset
