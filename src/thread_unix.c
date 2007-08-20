@@ -48,18 +48,23 @@ INTERNAL int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 	pthread_attr_t attr;
+	int ret = FALSE;
 
 	if (0 != pthread_attr_init(&attr))
 		return FALSE;
 
 	if (0 != pthread_attr_setdetachstate(&attr,
 		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE))
+	{
+		pthread_attr_destroy(&attr);
 		return FALSE;
+	}
 
 	if (0 == pthread_create(pthThread, &attr, pvFunction, pvArg))
-		return TRUE;
-	else
-		return FALSE;
+		ret = TRUE;
+
+	pthread_attr_destroy(&attr);
+	return ret;
 }
 
 INTERNAL int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
