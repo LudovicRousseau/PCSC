@@ -822,7 +822,8 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 {
 	if (rContext->vHandle != 0)
 	{
-		Log1(PCSC_LOG_INFO, "Warning library pointer not NULL");
+		Log2(PCSC_LOG_INFO, "Reusing already loaded driver for %s",
+			rContext->lpcLibrary);
 		/*
 		 * Another reader exists with this library loaded
 		 */
