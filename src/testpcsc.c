@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
 
-	mszGroups = 0;
+	mszGroups = NULL;
 	rv = SCardListReaders(hContext, mszGroups, 0, &dwReaders);
 	test_rv(rv, hContext, PANIC);
 
