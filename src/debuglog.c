@@ -25,6 +25,8 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "pcsclite.h"
 #include "misc.h"
@@ -84,6 +86,11 @@ static void log_line(const int priority, const char *DebugBuffer)
 		if (LogDoColor)
 		{
 			const char *color_pfx = "", *color_sfx = "\33[0m";
+			const char *time_pfx = "\33[36m", *time_sfx = color_sfx;
+			static struct timeval last_time = { 0, 0 };
+			struct timeval new_time = { 0, 0 };
+			struct timeval tmp;
+			int delta;
 
 			switch (priority)
 			{
@@ -104,7 +111,23 @@ static void log_line(const int priority, const char *DebugBuffer)
 					color_sfx = "";
 					break;
 			}
-			fprintf(stderr, "%s%s%s\n", color_pfx, DebugBuffer, color_sfx);
+
+			gettimeofday(&new_time, NULL);
+			if (0 == last_time.tv_sec)
+				last_time = new_time;
+
+			tmp.tv_sec = new_time.tv_sec - last_time.tv_sec;
+			tmp.tv_usec = new_time.tv_usec - last_time.tv_usec;
+			if (tmp.tv_usec < 0)
+			{
+				tmp.tv_sec--;
+				tmp.tv_usec += 1000000;
+			}
+			delta = tmp.tv_sec * 1000000 + tmp.tv_usec;
+
+			fprintf(stderr, "%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
+				color_pfx, DebugBuffer, color_sfx);
+			last_time = new_time;
 		}
 		else
 			fprintf(stderr, "%s\n", DebugBuffer);
