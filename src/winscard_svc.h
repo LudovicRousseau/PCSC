@@ -22,7 +22,7 @@ extern "C"
 {
 #endif
 	LONG ContextsInitialize(void);
-	LONG CreateContextThread(PDWORD);
+	LONG CreateContextThread(uint32_t *);
 #ifdef __cplusplus
 }
 #endif

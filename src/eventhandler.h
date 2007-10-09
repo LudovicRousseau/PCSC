@@ -18,6 +18,8 @@
 #ifndef __eventhandler_h__
 #define __eventhandler_h__
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -29,15 +31,15 @@ extern "C"
 	 */
 	typedef struct pubReaderStatesList
 	{
-		LONG readerID;
+		int32_t readerID;
 		char readerName[MAX_READERNAME];
-		DWORD readerState;
-		LONG readerSharing;
-		DWORD dummy;
+		uint32_t readerState;
+		int32_t readerSharing;
+		uint32_t dummy;
 
 		UCHAR cardAtr[MAX_ATR_SIZE];
-		DWORD cardAtrLength;
-		DWORD cardProtocol;
+		uint32_t cardAtrLength;
+		uint32_t cardProtocol;
 	}
 	READER_STATE, *PREADER_STATE;
 

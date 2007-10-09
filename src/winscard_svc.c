@@ -40,9 +40,9 @@
  */
 static struct _psContext
 {
-	SCARDCONTEXT hContext;
-	SCARDHANDLE hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
-	DWORD dwClientID;			/* Connection ID used to reference the Client. */
+	uint32_t hContext;
+	uint32_t hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
+	uint32_t dwClientID;			/* Connection ID used to reference the Client. */
 	PCSCLITE_THREAD_T pthThread;		/* Event polling thread's ID */
 	sharedSegmentMsg msgStruct;		/* Msg sent by the Client */
 	int protocol_major, protocol_minor;	/* Protocol number agreed between client and server*/
@@ -74,7 +74,7 @@ LONG ContextsInitialize(void)
  * @retval SCARD_F_INTERNAL_ERROR Exceded the maximum number of simultaneous Application Contexts.
  * @retval SCARD_E_NO_MEMORY Error creating the Context Thread.
  */
-LONG CreateContextThread(PDWORD pdwClientID)
+LONG CreateContextThread(uint32_t *pdwClientID)
 {
 	int i;
 
@@ -259,6 +259,21 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 	control_struct *ctStr;
 	getset_struct *gsStr;
 
+	SCARDCONTEXT hContext;
+	SCARDHANDLE hCard;
+	DWORD dwActiveProtocol;
+
+	DWORD cchReaderLen;
+	DWORD dwState;
+	DWORD dwProtocol;
+	DWORD cbAtrLen;
+	DWORD cbRecvLength;
+	DWORD dwBytesReturned;
+	DWORD cbAttrLen;
+
+	SCARD_IO_REQUEST ioSendPci;
+	SCARD_IO_REQUEST ioRecvPci;
+
 	/*
 	 * Zero out everything
 	 */
@@ -268,8 +283,10 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 
 	case SCARD_ESTABLISH_CONTEXT:
 		esStr = ((establish_struct *) msgStruct->data);
-		esStr->rv = SCardEstablishContext(esStr->dwScope, 0, 0,
-			&esStr->phContext);
+
+		hContext = esStr->phContext;
+		esStr->rv = SCardEstablishContext(esStr->dwScope, 0, 0, &hContext);
+		esStr->phContext = hContext;
 
 		if (esStr->rv == SCARD_S_SUCCESS)
 			esStr->rv =
@@ -288,9 +305,16 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 
 	case SCARD_CONNECT:
 		coStr = ((connect_struct *) msgStruct->data);
+                
+		hCard = coStr->phCard;
+		dwActiveProtocol = coStr->pdwActiveProtocol;
+
 		coStr->rv = SCardConnect(coStr->hContext, coStr->szReader,
 			coStr->dwShareMode, coStr->dwPreferredProtocols,
-			&coStr->phCard, &coStr->pdwActiveProtocol);
+			&hCard, &dwActiveProtocol);
+
+		coStr->phCard = hCard;
+		coStr->pdwActiveProtocol = dwActiveProtocol;
 
 		if (coStr->rv == SCARD_S_SUCCESS)
 			coStr->rv =
@@ -305,7 +329,8 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 
 		rcStr->rv = SCardReconnect(rcStr->hCard, rcStr->dwShareMode,
 			rcStr->dwPreferredProtocols,
-			rcStr->dwInitialization, &rcStr->pdwActiveProtocol);
+			rcStr->dwInitialization, &dwActiveProtocol);
+		rcStr->pdwActiveProtocol = dwActiveProtocol;
 		break;
 
 	case SCARD_DISCONNECT:
@@ -345,37 +370,74 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 		stStr = ((status_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(stStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
+
+		cchReaderLen = stStr->pcchReaderLen;
+		dwState = stStr->pdwState;
+		dwProtocol = stStr->pdwProtocol;
+		cbAtrLen = stStr->pcbAtrLen;
+
 		stStr->rv = SCardStatus(stStr->hCard, stStr->mszReaderNames,
-			&stStr->pcchReaderLen, &stStr->pdwState,
-			&stStr->pdwProtocol, stStr->pbAtr, &stStr->pcbAtrLen);
+			&cchReaderLen, &dwState,
+			&dwProtocol, stStr->pbAtr, &cbAtrLen);
+
+		stStr->pcchReaderLen = cchReaderLen;
+		stStr->pdwState = dwState;
+		stStr->pdwProtocol = dwProtocol;
+		stStr->pcbAtrLen = cbAtrLen;
 		break;
 
 	case SCARD_TRANSMIT:
 		trStr = ((transmit_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(trStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
-		trStr->rv = SCardTransmit(trStr->hCard, &trStr->pioSendPci,
+
+		ioSendPci.dwProtocol = trStr->pioSendPciProtocol;
+		ioSendPci.cbPciLength = trStr->pioSendPciLength;
+		ioRecvPci.dwProtocol = trStr->pioRecvPciProtocol;
+		ioRecvPci.cbPciLength = trStr->pioRecvPciLength;
+		cbRecvLength = trStr->pcbRecvLength;
+
+		trStr->rv = SCardTransmit(trStr->hCard, &ioSendPci,
 			trStr->pbSendBuffer, trStr->cbSendLength,
-			&trStr->pioRecvPci, trStr->pbRecvBuffer,
-			&trStr->pcbRecvLength);
+			&ioRecvPci, trStr->pbRecvBuffer,
+			&cbRecvLength);
+
+		trStr->pioSendPciProtocol = ioSendPci.dwProtocol;
+		trStr->pioSendPciLength = ioSendPci.cbPciLength;
+		trStr->pioRecvPciProtocol = ioRecvPci.dwProtocol;
+		trStr->pioRecvPciLength = ioRecvPci.cbPciLength;
+		trStr->pcbRecvLength = cbRecvLength;
+
 		break;
 
 	case SCARD_CONTROL:
 		ctStr = ((control_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(ctStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
+
+		dwBytesReturned = ctStr->dwBytesReturned;
+
 		ctStr->rv = SCardControl(ctStr->hCard, ctStr->dwControlCode,
 			ctStr->pbSendBuffer, ctStr->cbSendLength,
 			ctStr->pbRecvBuffer, ctStr->cbRecvLength,
-			&ctStr->dwBytesReturned);
+			&dwBytesReturned);
+
+		ctStr->dwBytesReturned = dwBytesReturned;
+
 		break;
 
 	case SCARD_GET_ATTRIB:
 		gsStr = ((getset_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
+                
+		cbAttrLen = gsStr->cbAttrLen;
+
 		gsStr->rv = SCardGetAttrib(gsStr->hCard, gsStr->dwAttrId,
-			gsStr->pbAttr, &gsStr->cbAttrLen);
+			gsStr->pbAttr, &cbAttrLen);
+
+		gsStr->cbAttrLen = cbAttrLen;
+
 		break;
 
 	case SCARD_SET_ATTRIB:
@@ -415,10 +477,22 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			else
 				memcpy(pbSendBuffer, treStr->data, treStr->cbSendLength);
 
-			treStr->rv = SCardTransmit(treStr->hCard, &treStr->pioSendPci,
+			ioSendPci.dwProtocol = treStr->pioSendPciProtocol;
+			ioSendPci.cbPciLength = treStr->pioSendPciLength;
+			ioRecvPci.dwProtocol = treStr->pioRecvPciProtocol;
+			ioRecvPci.cbPciLength = treStr->pioRecvPciLength;
+			cbRecvLength = treStr->pcbRecvLength;
+
+			treStr->rv = SCardTransmit(treStr->hCard, &ioSendPci,
 				pbSendBuffer, treStr->cbSendLength,
-				&treStr->pioRecvPci, pbRecvBuffer,
-				&treStr->pcbRecvLength);
+				&ioRecvPci, pbRecvBuffer,
+				&cbRecvLength);
+
+			treStr->pioSendPciProtocol = ioSendPci.dwProtocol;
+			treStr->pioSendPciLength = ioSendPci.cbPciLength;
+			treStr->pioRecvPciProtocol = ioRecvPci.dwProtocol;
+			treStr->pioRecvPciLength = ioRecvPci.cbPciLength;
+			treStr->pcbRecvLength = cbRecvLength;
 
 			treStr->size = sizeof(*treStr) + treStr->pcbRecvLength;
 			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
@@ -484,10 +558,14 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 			else
 				memcpy(pbSendBuffer, cteStr->data, cteStr->cbSendLength);
 
+			dwBytesReturned = cteStr->pdwBytesReturned;
+
 			cteStr->rv = SCardControl(cteStr->hCard, cteStr->dwControlCode,
 				pbSendBuffer, cteStr->cbSendLength,
 				pbRecvBuffer, cteStr->cbRecvLength,
-				&cteStr->pdwBytesReturned);
+				&dwBytesReturned);
+
+			cteStr->pdwBytesReturned = dwBytesReturned;
 
 			cteStr->size = sizeof(*cteStr) + cteStr->pdwBytesReturned;
 			if (cteStr->size > PCSCLITE_MAX_MESSAGE_SIZE)

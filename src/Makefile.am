@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libpcsclite.la
 if !HAVE_SCF
 sbin_PROGRAMS = pcscd
 endif
-noinst_PROGRAMS = testpcsc
+noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
 
 if HAVE_SCF
 PCSC_CLIENT_SRC  = winscard_scf.c
@@ -97,6 +97,38 @@ pcscd_LDADD = \
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
+
+pcsc_wirecheck_gen_SOURCES = \
+	pcsc-wirecheck-gen.c
+
+# pcsc_wirecheck_gen_CPPFLAGS := $(LIBPCSCLITE_CFLAGS)
+
+pcsc_wirecheck_SOURCES = \
+	lassert.h \
+	pcsc-wirecheck-dist.c \
+	pcsc-wirecheck-main.c
+
+# pcsc_wirecheck_CFLAGS := $(LIBPCSCLITE_CFLAGS) -DCOMPAT_64BIT_SERVER=1
+
+$(srcdir)/pcsc-wirecheck-dist.c: pcsc-wirecheck-gen
+	@if test -f $@ ; then \
+		echo "touch $@" ; \
+		touch $@ ; \
+	else \
+		echo "rm -f $@" ; \
+		rm -f $@ ; \
+		echo "./pcsc-wirecheck-gen > $@.tmp" ; \
+		./pcsc-wirecheck-gen > $@.tmp ; \
+		echo "mv $@.tmp $@" ; \
+		mv $@.tmp $@ ; \
+	fi
+
+.PHONY: regen
+
+regen: pcsc-wirecheck-gen
+	rm -f $(srcdir)/pcsc-wirecheck-dist.c
+	./pcsc-wirecheck-gen > $(srcdir)/pcsc-wirecheck-dist.c.tmp
+	mv $(srcdir)/pcsc-wirecheck-dist.c.tmp $(srcdir)/pcsc-wirecheck-dist.c
 
 nobase_include_HEADERS = \
 	PCSC/debuglog.h \

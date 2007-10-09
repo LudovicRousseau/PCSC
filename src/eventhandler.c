@@ -214,6 +214,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	LPCSTR lpcReader;
 	DWORD dwStatus, dwReaderSharing;
 	DWORD dwCurrentState;
+	DWORD dwAtrLen;
 	int pageSize;
 
 	/*
@@ -227,14 +228,18 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 	pageSize = SYS_GetPageSize();
 
+	dwAtrLen = rContext->readerState->cardAtrLength;
 	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
-			&rContext->readerState->cardAtrLength);
+		&dwAtrLen);
+	rContext->readerState->cardAtrLength = dwAtrLen;
+
 	if (dwStatus & SCARD_PRESENT)
 	{
-		rContext->readerState->cardAtrLength = MAX_ATR_SIZE;
+		dwAtrLen = MAX_ATR_SIZE;
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->readerState->cardAtr,
-			&rContext->readerState->cardAtrLength);
+			&dwAtrLen);
+		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -300,9 +305,11 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	{
 		dwStatus = 0;
 
+		dwAtrLen = rContext->readerState->cardAtrLength;
 		rv = IFDStatusICC(rContext, &dwStatus,
 			rContext->readerState->cardAtr,
-			&rContext->readerState->cardAtrLength);
+			&dwAtrLen);
+		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		if (rv != SCARD_S_SUCCESS)
 		{
@@ -387,10 +394,11 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				 * Power and reset the card
 				 */
 				SYS_USleep(PCSCLITE_STATUS_WAIT);
-				rContext->readerState->cardAtrLength = MAX_ATR_SIZE;
+				dwAtrLen = MAX_ATR_SIZE;
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
 					rContext->readerState->cardAtr,
-					&rContext->readerState->cardAtrLength);
+					&dwAtrLen);
+				rContext->readerState->cardAtrLength = dwAtrLen;
 
 				/* the protocol is unset after a power on */
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;

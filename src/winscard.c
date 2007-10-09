@@ -569,22 +569,25 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (dwInitialization == SCARD_RESET_CARD ||
 		dwInitialization == SCARD_UNPOWER_CARD)
 	{
+		DWORD dwAtrLen;
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
+		dwAtrLen = rContext->readerState->cardAtrLength;
 		if (SCARD_RESET_CARD == dwInitialization)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		}
+		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -804,6 +807,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
+	DWORD dwAtrLen;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -853,19 +857,21 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
+		dwAtrLen = rContext->readerState->cardAtrLength;
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		}
+		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -1029,6 +1035,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
+	DWORD dwAtrLen;
 
 	/*
 	 * Ignoring dwDisposition for now
@@ -1066,19 +1073,21 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Currently pcsc-lite keeps the card always powered
 		 */
+		dwAtrLen = rContext->readerState->cardAtrLength;
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
-				&rContext->readerState->cardAtrLength);
+				&dwAtrLen);
 		}
+		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;

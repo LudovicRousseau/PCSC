@@ -54,7 +54,7 @@
  *
  * @return Same error codes as SHMMessageReceive().
  */
-INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int blockamount)
+INTERNAL int32_t SHMClientRead(psharedSegmentMsg msgStruct, uint32_t dwClientID, int32_t blockamount)
 {
 	return SHMMessageReceive(msgStruct, sizeof(*msgStruct), dwClientID, blockamount);
 }
@@ -72,7 +72,7 @@ INTERNAL int SHMClientRead(psharedSegmentMsg msgStruct, DWORD dwClientID, int bl
  * @retval -1 The socket can not open a connection.
  * @retval -1 Can not set the socket to non-blocking.
  */
-INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
+INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 {
 	struct sockaddr_un svc_addr;
 	int one;
@@ -119,7 +119,7 @@ INTERNAL int SHMClientSetupSession(PDWORD pdwClientID)
  *
  * @retval 0 Success.
  */
-INTERNAL int SHMClientCloseSession(DWORD dwClientID)
+INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
 {
 	SYS_CloseFile(dwClientID);
 	return 0;
@@ -140,8 +140,8 @@ INTERNAL int SHMClientCloseSession(DWORD dwClientID)
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageSend(void *buffer_void, size_t buffer_size,
-	int filedes, int blockAmount)
+INTERNAL int SHMMessageSend(void *buffer_void, uint64_t buffer_size,
+	int32_t filedes, int32_t blockAmount)
 {
 	char *buffer = buffer_void;
 
@@ -265,8 +265,8 @@ INTERNAL int SHMMessageSend(void *buffer_void, size_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageReceive(void *buffer_void, size_t buffer_size,
-	int filedes, int blockAmount)
+INTERNAL int SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
+	int32_t filedes, int32_t blockAmount)
 {
 	char *buffer = buffer_void;
 
@@ -409,8 +409,8 @@ INTERNAL int SHMMessageReceive(void *buffer_void, size_t buffer_size,
  *
  * @return Same error codes as SHMMessageSend().
  */
-INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
-	unsigned int size, unsigned int blockAmount, void *data_void)
+INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
+	uint64_t size, uint32_t blockAmount, void *data_void)
 {
 	char *data = data_void;
 
@@ -426,7 +426,6 @@ INTERNAL int WrapSHMWrite(unsigned int command, DWORD dwClientID,
 	msgStruct.user_id = SYS_GetUID();
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
-	msgStruct.dummy = 0;
 	msgStruct.date = time(NULL);
 	memset(msgStruct.key, 0, sizeof(msgStruct.key));
 	if ((SCARD_TRANSMIT_EXTENDED == command)

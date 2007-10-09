@@ -344,7 +344,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	int i;
 	establish_struct scEstablishStruct;
 	sharedSegmentMsg msgStruct;
-	DWORD dwClientID = 0;
+	uint32_t dwClientID = 0;
 
 	if (phContext == NULL)
 		return SCARD_E_INVALID_PARAMETER;
@@ -2763,20 +2763,20 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		scTransmitStructExtended->size = sizeof(*scTransmitStructExtended)
 			- (sizeof(transmit_struct_extended) - offsetof(transmit_struct_extended, data))
 			+ cbSendLength;
-		memcpy(&scTransmitStructExtended->pioSendPci, pioSendPci,
-			sizeof(SCARD_IO_REQUEST));
+		scTransmitStructExtended->pioSendPciProtocol = pioSendPci->dwProtocol;
+		scTransmitStructExtended->pioSendPciLength = pioSendPci->cbPciLength;
 		memcpy(scTransmitStructExtended->data, pbSendBuffer, cbSendLength);
 		scTransmitStructExtended->rv = SCARD_S_SUCCESS;
 
 		if (pioRecvPci)
 		{
-			memcpy(&scTransmitStructExtended->pioRecvPci, pioRecvPci,
-				sizeof(SCARD_IO_REQUEST));
+			scTransmitStructExtended->pioRecvPciProtocol = pioRecvPci->dwProtocol;
+			scTransmitStructExtended->pioRecvPciLength = pioRecvPci->cbPciLength;
 		}
 		else
 		{
-			scTransmitStructExtended->pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
-			scTransmitStructExtended->pioRecvPci.cbPciLength = sizeof(SCARD_IO_REQUEST);
+			scTransmitStructExtended->pioRecvPciProtocol = SCARD_PROTOCOL_ANY;
+			scTransmitStructExtended->pioRecvPciLength = sizeof(SCARD_IO_REQUEST);
 		}
 
 		rv = WrapSHMWrite(SCARD_TRANSMIT_EXTENDED,
@@ -2829,8 +2829,10 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 				scTransmitStructExtended -> pcbRecvLength);
 
 			if (pioRecvPci)
-				memcpy(pioRecvPci, &scTransmitStructExtended -> pioRecvPci,
-					sizeof(SCARD_IO_REQUEST));
+			{
+				pioRecvPci->dwProtocol = scTransmitStructExtended->pioRecvPciProtocol;
+				pioRecvPci->cbPciLength = scTransmitStructExtended->pioRecvPciLength;
+			}
 		}
 
 		*pcbRecvLength = scTransmitStructExtended -> pcbRecvLength;
@@ -2847,15 +2849,15 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		scTransmitStruct.hCard = hCard;
 		scTransmitStruct.cbSendLength = cbSendLength;
 		scTransmitStruct.pcbRecvLength = *pcbRecvLength;
-		memcpy(&scTransmitStruct.pioSendPci, pioSendPci,
-			sizeof(SCARD_IO_REQUEST));
+		scTransmitStruct.pioSendPciProtocol = pioSendPci->dwProtocol;
+		scTransmitStruct.pioSendPciLength = pioSendPci->cbPciLength;
 		memcpy(scTransmitStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
 		memset(scTransmitStruct.pbSendBuffer+cbSendLength, 0, sizeof(scTransmitStruct.pbSendBuffer)-cbSendLength);
 		memset(scTransmitStruct.pbRecvBuffer, 0, sizeof(scTransmitStruct.pbRecvBuffer));
 		scTransmitStruct.rv = SCARD_S_SUCCESS;
 
-		scTransmitStruct.pioRecvPci.dwProtocol = SCARD_PROTOCOL_ANY;
-		scTransmitStruct.pioRecvPci.cbPciLength = sizeof(scTransmitStruct.pioRecvPci);
+		scTransmitStruct.pioRecvPciProtocol = SCARD_PROTOCOL_ANY;
+		scTransmitStruct.pioRecvPciLength = sizeof(SCARD_IO_REQUEST);
 
 		rv = WrapSHMWrite(SCARD_TRANSMIT,
 			psContextMap[dwContextIndex].dwClientID, sizeof(scTransmitStruct),
@@ -2896,8 +2898,10 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 				scTransmitStruct.pcbRecvLength);
 
 			if (pioRecvPci)
-				memcpy(pioRecvPci, &scTransmitStruct.pioRecvPci,
-					sizeof(SCARD_IO_REQUEST));
+			{
+				pioRecvPci->dwProtocol = scTransmitStruct.pioRecvPciProtocol;
+				pioRecvPci->cbPciLength = scTransmitStruct.pioRecvPciLength;
+			}
 		}
 
 		*pcbRecvLength = scTransmitStruct.pcbRecvLength;

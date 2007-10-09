@@ -113,7 +113,7 @@ void SVCServiceRunLoop(void)
 {
 	int rsp;
 	LONG rv;
-	DWORD dwClientID;	/* Connection ID used to reference the Client */
+	uint32_t dwClientID;	/* Connection ID used to reference the Client */
 
 	rsp = 0;
 	rv = 0;

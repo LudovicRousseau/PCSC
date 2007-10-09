@@ -61,7 +61,7 @@ extern char ReCheckSerialReaders;
  * @retval -1 Can not establish the connection.
  * @retval -1 Can not set the connection to non-blocking mode.
  */
-static int SHMProcessCommonChannelRequest(PDWORD pdwClientID)
+static int SHMProcessCommonChannelRequest(uint32_t *pdwClientID)
 {
 	socklen_t clnt_len;
 	int new_sock;
@@ -168,7 +168,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #define DO_TIMEOUT
 #endif
-INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
+INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime)
 {
 	fd_set read_fd;
 	int selret;
@@ -236,7 +236,7 @@ INTERNAL int SHMProcessEventsServer(PDWORD pdwClientID, int blocktime)
  *
  * Called by \c ContextThread().
  */
-INTERNAL int SHMProcessEventsContext(PDWORD pdwClientID, psharedSegmentMsg msgStruct, int blocktime)
+INTERNAL int32_t SHMProcessEventsContext(uint32_t *pdwClientID, psharedSegmentMsg msgStruct, int32_t blocktime)
 {
 	fd_set read_fd;
 	int selret, rv;

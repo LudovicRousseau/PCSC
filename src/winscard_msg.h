@@ -18,10 +18,12 @@
 #ifndef __winscard_msg_h__
 #define __winscard_msg_h__
 
+#include <stdint.h>
+
 /** Major version of the current message protocol */
-#define PROTOCOL_VERSION_MAJOR 2
+#define PROTOCOL_VERSION_MAJOR 3
 /** Minor version of the current message protocol */
-#define PROTOCOL_VERSION_MINOR 2
+#define PROTOCOL_VERSION_MINOR 0
 
 #ifdef __cplusplus
 extern "C"
@@ -41,13 +43,12 @@ extern "C"
 	 */
 	typedef struct rxSharedSegment
 	{
-		unsigned int mtype;		/** one of the \c pcsc_adm_commands */
-		unsigned int user_id;
-		unsigned int group_id;
-		unsigned int command;	/** one of the \c pcsc_msg_commands */
-		unsigned int dummy;	/* was request_id in pcsc-lite <= 1.2.0 */
-		time_t date;
-		unsigned char key[PCSCLITE_MSG_KEY_LEN];
+		uint32_t mtype;		/** one of the \c pcsc_adm_commands */
+		uint32_t user_id;
+		uint32_t group_id;
+		uint32_t command;	/** one of the \c pcsc_msg_commands */
+		uint64_t date;
+		unsigned char key[PCSCLITE_MSG_KEY_LEN]; /* 16 bytes */
 		unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
 	}
 	sharedSegmentMsg, *psharedSegmentMsg;
@@ -97,15 +98,15 @@ extern "C"
 	 */
 	struct version_struct
 	{
-		int major;
-		int minor;
-		LONG rv;
+		int32_t major;
+		int32_t minor;
+		int32_t rv;
 	};
 	typedef struct version_struct version_struct;
 
 	struct client_struct
 	{
-		SCARDCONTEXT hContext;
+		uint32_t hContext;
 	};
 	typedef struct client_struct client_struct;
 
@@ -116,9 +117,9 @@ extern "C"
 	 */
 	struct establish_struct
 	{
-		DWORD dwScope;
-		SCARDCONTEXT phContext;
-		LONG rv;
+		uint32_t dwScope;
+		uint32_t phContext;
+		int32_t rv;
 	};
 	typedef struct establish_struct establish_struct;
 
@@ -129,8 +130,8 @@ extern "C"
 	 */
 	struct release_struct
 	{
-		SCARDCONTEXT hContext;
-		LONG rv;
+		uint32_t hContext;
+		int32_t rv;
 	};
 	typedef struct release_struct release_struct;
 
@@ -141,13 +142,13 @@ extern "C"
 	 */
 	struct connect_struct
 	{
-		SCARDCONTEXT hContext;
+		uint32_t hContext;
 		char szReader[MAX_READERNAME];
-		DWORD dwShareMode;
-		DWORD dwPreferredProtocols;
-		SCARDHANDLE phCard;
-		DWORD pdwActiveProtocol;
-		LONG rv;
+		uint32_t dwShareMode;
+		uint32_t dwPreferredProtocols;
+		int32_t phCard;
+		uint32_t pdwActiveProtocol;
+		int32_t rv;
 	};
 	typedef struct connect_struct connect_struct;
 
@@ -158,12 +159,12 @@ extern "C"
 	 */
 	struct reconnect_struct
 	{
-		SCARDHANDLE hCard;
-		DWORD dwShareMode;
-		DWORD dwPreferredProtocols;
-		DWORD dwInitialization;
-		DWORD pdwActiveProtocol;
-		LONG rv;
+		int32_t hCard;
+		uint32_t dwShareMode;
+		uint32_t dwPreferredProtocols;
+		uint32_t dwInitialization;
+		uint32_t pdwActiveProtocol;
+		int32_t rv;
 	};
 	typedef struct reconnect_struct reconnect_struct;
 
@@ -174,9 +175,9 @@ extern "C"
 	 */
 	struct disconnect_struct
 	{
-		SCARDHANDLE hCard;
-		DWORD dwDisposition;
-		LONG rv;
+		int32_t hCard;
+		uint32_t dwDisposition;
+		int32_t rv;
 	};
 	typedef struct disconnect_struct disconnect_struct;
 
@@ -187,8 +188,8 @@ extern "C"
 	 */
 	struct begin_struct
 	{
-		SCARDHANDLE hCard;
-		LONG rv;
+		int32_t hCard;
+		int32_t rv;
 	};
 	typedef struct begin_struct begin_struct;
 
@@ -199,9 +200,9 @@ extern "C"
 	 */
 	struct end_struct
 	{
-		SCARDHANDLE hCard;
-		DWORD dwDisposition;
-		LONG rv;
+		int32_t hCard;
+		uint32_t dwDisposition;
+		int32_t rv;
 	};
 	typedef struct end_struct end_struct;
 
@@ -212,8 +213,8 @@ extern "C"
 	 */
 	struct cancel_struct
 	{
-		SCARDHANDLE hCard;
-		LONG rv;
+		int32_t hCard;
+		int32_t rv;
 	};
 	typedef struct cancel_struct cancel_struct;
 
@@ -224,14 +225,14 @@ extern "C"
 	 */
 	struct status_struct
 	{
-		SCARDHANDLE hCard;
+		int32_t hCard;
 		char mszReaderNames[MAX_READERNAME];
-		DWORD pcchReaderLen;
-		DWORD pdwState;
-		DWORD pdwProtocol;
-		UCHAR pbAtr[MAX_ATR_SIZE];
-		DWORD pcbAtrLen;
-		LONG rv;
+		uint32_t pcchReaderLen;
+		uint32_t pdwState;
+		uint32_t pdwProtocol;
+		uint8_t pbAtr[MAX_ATR_SIZE];
+		uint32_t pcbAtrLen;
+		int32_t rv;
 	};
 	typedef struct status_struct status_struct;
 
@@ -242,14 +243,16 @@ extern "C"
 	 */
 	struct transmit_struct
 	{
-		SCARDHANDLE hCard;
-		SCARD_IO_REQUEST pioSendPci;
-		UCHAR pbSendBuffer[MAX_BUFFER_SIZE];
-		DWORD cbSendLength;
-		SCARD_IO_REQUEST pioRecvPci;
-		BYTE pbRecvBuffer[MAX_BUFFER_SIZE];
-		DWORD pcbRecvLength;
-		LONG rv;
+		int32_t hCard;
+		uint32_t pioSendPciProtocol;
+		uint32_t pioSendPciLength;
+		uint8_t pbSendBuffer[MAX_BUFFER_SIZE];
+		uint32_t cbSendLength;
+		uint32_t pioRecvPciProtocol;
+		uint32_t pioRecvPciLength;
+		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
+		uint32_t pcbRecvLength;
+		int32_t rv;
 	};
 	typedef struct transmit_struct transmit_struct;
 
@@ -260,14 +263,16 @@ extern "C"
 	 */
 	struct transmit_struct_extended
 	{
-		SCARDHANDLE hCard;
-		SCARD_IO_REQUEST pioSendPci;
-		DWORD cbSendLength;
-		SCARD_IO_REQUEST pioRecvPci;
-		DWORD pcbRecvLength;
-		LONG rv;
-		size_t size;
-		BYTE data[1];
+		int32_t hCard;
+		uint32_t pioSendPciProtocol;
+		uint32_t pioSendPciLength;
+		uint32_t cbSendLength;
+		uint32_t pioRecvPciProtocol;
+		uint32_t pioRecvPciLength;
+		uint32_t pcbRecvLength;
+		int32_t rv;
+		uint64_t size;
+		uint8_t data[1];
 	};
 	typedef struct transmit_struct_extended transmit_struct_extended;
 
@@ -278,14 +283,14 @@ extern "C"
 	 */
 	struct control_struct
 	{
-		SCARDHANDLE hCard;
-		DWORD dwControlCode;
-		UCHAR pbSendBuffer[MAX_BUFFER_SIZE];
-		DWORD cbSendLength;
-		UCHAR pbRecvBuffer[MAX_BUFFER_SIZE];
-		DWORD cbRecvLength;
-		DWORD dwBytesReturned;
-		LONG rv;
+		int32_t hCard;
+		uint32_t dwControlCode;
+		uint8_t pbSendBuffer[MAX_BUFFER_SIZE];
+		uint32_t cbSendLength;
+		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
+		uint32_t cbRecvLength;
+		uint32_t dwBytesReturned;
+		int32_t rv;
 	};
 	typedef struct control_struct control_struct;
 
@@ -296,14 +301,14 @@ extern "C"
 	 */
 	struct control_struct_extended
 	{
-		SCARDHANDLE hCard;
-		DWORD dwControlCode;
-		DWORD cbSendLength;
-		DWORD cbRecvLength;
-		DWORD pdwBytesReturned;
-		LONG rv;
-		size_t size;
-		BYTE data[1];
+		int32_t hCard;
+		uint32_t dwControlCode;
+		uint32_t cbSendLength;
+		uint32_t cbRecvLength;
+		uint32_t pdwBytesReturned;
+		int32_t rv;
+		uint64_t size;
+		uint8_t data[1];
 	};
 	typedef struct control_struct_extended control_struct_extended;
 
@@ -314,11 +319,11 @@ extern "C"
 	 */
 	struct getset_struct
 	{
-		SCARDHANDLE hCard;
-		DWORD dwAttrId;
-		UCHAR pbAttr[MAX_BUFFER_SIZE];
-		DWORD cbAttrLen;
-		LONG rv;
+		int32_t hCard;
+		uint32_t dwAttrId;
+		uint8_t pbAttr[MAX_BUFFER_SIZE];
+		uint32_t cbAttrLen;
+		int32_t rv;
 	};
 	typedef struct getset_struct getset_struct;
 
@@ -326,19 +331,19 @@ extern "C"
 	 * Now some function definitions
 	 */
 
-	int SHMClientRead(psharedSegmentMsg, DWORD, int);
-	int SHMClientSetupSession(PDWORD);
-	int SHMClientCloseSession(DWORD);
-	int SHMInitializeCommonSegment(void);
-	int SHMProcessEventsContext(PDWORD, psharedSegmentMsg, int);
-	int SHMProcessEventsServer(PDWORD, int);
-	int SHMMessageSend(void *buffer, size_t buffer_size, int filedes,
-		int blockAmount);
-	int SHMMessageReceive(void *buffer, size_t buffer_size,
-		int filedes, int blockAmount);
-	int WrapSHMWrite(unsigned int command, DWORD dwClientID, unsigned int size,
-		unsigned int blockAmount, void *data);
-	void SHMCleanupSharedSegment(int, const char *);
+	int32_t SHMClientRead(psharedSegmentMsg, uint32_t, int32_t);
+	int32_t SHMClientSetupSession(uint32_t *);
+	int32_t SHMClientCloseSession(uint32_t);
+	int32_t SHMInitializeCommonSegment(void);
+	int32_t SHMProcessEventsContext(uint32_t *, psharedSegmentMsg, int32_t);
+	int32_t SHMProcessEventsServer(uint32_t *, int32_t);
+	int32_t SHMMessageSend(void *buffer, uint64_t buffer_size, int32_t filedes,
+		int32_t blockAmount);
+	int32_t SHMMessageReceive(void *buffer, uint64_t buffer_size,
+		int32_t filedes, int32_t blockAmount);
+	int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID, uint64_t size,
+		uint32_t blockAmount, void *data);
+	void SHMCleanupSharedSegment(int32_t, const char *);
 
 #ifdef __cplusplus
 }

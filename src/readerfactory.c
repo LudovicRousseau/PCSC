@@ -48,6 +48,8 @@ static DWORD dwNumReadersContexts = 0;
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
 
+#define IDENTITY_SHIFT 16
+
 LONG RFAllocateReaderSpace(void)
 {
 	int i;   					/* Counter */
@@ -174,7 +176,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	(sReadersContexts[dwContext])->pdwFeeds = NULL;
 	(sReadersContexts[dwContext])->pdwMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
-		(dwContext + 1) << (sizeof(DWORD) / 2) * 8;
+		(dwContext + 1) << IDENTITY_SHIFT;
 	(sReadersContexts[dwContext])->readerState = NULL;
 
 	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
@@ -390,7 +392,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContextB])->LockCount = 0;
 		(sReadersContexts[dwContextB])->readerState = NULL;
 		(sReadersContexts[dwContextB])->dwIdentity =
-			(dwContextB + 1) << (sizeof(DWORD) / 2) * 8;
+			(dwContextB + 1) << IDENTITY_SHIFT;
 
 		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 			(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
@@ -803,8 +805,8 @@ LONG RFReaderInfoById(DWORD dwIdentity, PREADER_CONTEXT * sReader)
 	/*
 	 * Strip off the lower nibble and get the identity
 	 */
-	dwIdentity = dwIdentity >> (sizeof(DWORD) / 2) * 8;
-	dwIdentity = dwIdentity << (sizeof(DWORD) / 2) * 8;
+	dwIdentity = dwIdentity >> IDENTITY_SHIFT;
+	dwIdentity = dwIdentity << IDENTITY_SHIFT;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
