@@ -181,7 +181,7 @@ wait_for_card_again:
 	}
 
 	/* APDU select file */
-	printf("Select file: ");
+	printf("Select file:");
 	send_length = 7;
 	memcpy(bSendBuffer, "\x00\xA4\x00\x00\x02\x3F\x00", send_length);
 	for (i=0; i<send_length; i++)
