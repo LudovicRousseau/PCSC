@@ -272,8 +272,8 @@ wait_for_card_again:
 
 	printf("Testing SCardStatus\t\t: ");
 
-	dwReaderLen = 50;
-	pcReaders   = malloc(sizeof(char) * 50);
+	dwReaderLen = 100;
+	pcReaders   = malloc(sizeof(char) * 100);
 	dwAtrLen    = MAX_ATR_SIZE;
 
 	rv = SCardStatus(hCard, pcReaders, &dwReaderLen, &dwState, &dwProt,
