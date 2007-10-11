@@ -35,7 +35,6 @@ extern "C"
 		char readerName[MAX_READERNAME];
 		uint32_t readerState;
 		int32_t readerSharing;
-		uint32_t dummy;
 
 		UCHAR cardAtr[MAX_ATR_SIZE];
 		uint32_t cardAtrLength;
