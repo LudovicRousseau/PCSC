@@ -96,9 +96,9 @@ file.
 .I @sysconfdir_exp@/init.d/pcscd
 : pcscd startup script
 .PP
-@HAVE_RUNPID@.I @runpid@
-@HAVE_RUNPID@: process id of the running pcscd
-@HAVE_RUNPID@
+.I @ipcdir@/pcscd.pid
+: process id of the running pcscd
+.PP
 .I @usbdropdir@
 : directory containing bundles for USB drivers
 .
