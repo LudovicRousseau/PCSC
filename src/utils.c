@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "config.h"
 #include "utils.h"
+#include "pcscd.h"
 
 pid_t GetDaemonPid(void)
 {
@@ -31,7 +32,7 @@ pid_t GetDaemonPid(void)
 	/* pids are only 15 bits but 4294967296
 	 * (32 bits in case of a new system use it) is on 10 bytes
 	 */
-	if ((f = fopen(USE_RUN_PID, "rb")) != NULL)
+	if ((f = fopen(PCSCLITE_RUN_PID, "rb")) != NULL)
 	{
 		char pid_ascii[PID_ASCII_SIZE];
 
@@ -42,7 +43,7 @@ pid_t GetDaemonPid(void)
 	}
 	else
 	{
-		Log2(PCSC_LOG_CRITICAL, "Can't open " USE_RUN_PID ": %s",
+		Log2(PCSC_LOG_CRITICAL, "Can't open " PCSCLITE_RUN_PID ": %s",
 			strerror(errno));
 		return -1;
 	}

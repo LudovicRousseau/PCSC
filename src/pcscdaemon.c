@@ -374,7 +374,7 @@ int main(int argc, char **argv)
 		{
 			if (HotPlug)
 			{
-				Log1(PCSC_LOG_CRITICAL, "file " USE_RUN_PID " do not exist");
+				Log1(PCSC_LOG_CRITICAL, "file " PCSCLITE_RUN_PID " do not exist");
 				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
 				return EXIT_FAILURE;
 			}
@@ -384,7 +384,7 @@ int main(int argc, char **argv)
 			Log1(PCSC_LOG_CRITICAL,
 				"Maybe another pcscd is running?");
 			Log1(PCSC_LOG_CRITICAL,
-				"I can't read process pid from " USE_RUN_PID);
+				"I can't read process pid from " PCSCLITE_RUN_PID);
 			Log1(PCSC_LOG_CRITICAL,
 				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
 			Log1(PCSC_LOG_CRITICAL,
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 	{
 		int f;
 
-		if ((f = SYS_OpenFile(USE_RUN_PID, O_RDWR | O_CREAT, 00644)) != -1)
+		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, 00644)) != -1)
 		{
 			char pid[PID_ASCII_SIZE];
 
@@ -434,10 +434,10 @@ int main(int argc, char **argv)
 
 			/* set mode so that the file is world readable.
 			 * The file is used by libpcsclite */
-			SYS_Chmod(USE_RUN_PID, 0644);
+			SYS_Chmod(PCSCLITE_RUN_PID, 0644);
 		}
 		else
-			Log2(PCSC_LOG_CRITICAL, "cannot create " USE_RUN_PID ": %s",
+			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
 				strerror(errno));
 	}
 
@@ -550,9 +550,9 @@ void clean_temp_files(void)
 		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
-	rv = SYS_Unlink(USE_RUN_PID);
+	rv = SYS_Unlink(PCSCLITE_RUN_PID);
 	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot unlink " USE_RUN_PID ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_RUN_PID ": %s",
 			strerror(errno));
 }
 
