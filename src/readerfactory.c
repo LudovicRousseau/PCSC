@@ -80,11 +80,11 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if ((lpcReader == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
 		return SCARD_E_INVALID_VALUE;
 
-	/* Reader name too long? */
-	if (strlen(lpcReader) >= MAX_READERNAME)
+	/* Reader name too long? also count " 00 00"*/
+	if (strlen(lpcReader) > MAX_READERNAME - sizeof(" 00 00"))
 	{
 		Log3(PCSC_LOG_ERROR, "Reader name too long: %d chars instead of max %d",
-			strlen(lpcReader), MAX_READERNAME);
+			strlen(lpcReader), MAX_READERNAME - sizeof(" 00 00"));
 		return SCARD_E_INVALID_VALUE;
 	}
 
