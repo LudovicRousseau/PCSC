@@ -1,6 +1,3 @@
-- improve performances between pcscd and libpcsclite
-  see http://archives.neohapsis.com/archives/dev/muscle/2005-q4/0086.html
-
 - include Apple patches and improvements (if possible/needed)
 
 - power on the card _only_ if an application requests a connection
