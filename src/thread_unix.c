@@ -67,9 +67,9 @@ INTERNAL int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 	return ret;
 }
 
-INTERNAL int SYS_ThreadCancel(PCSCLITE_THREAD_T * pthThread)
+INTERNAL int SYS_ThreadCancel(PCSCLITE_THREAD_T pthThread)
 {
-	if (0 == pthread_cancel(*pthThread))
+	if (0 == pthread_cancel(pthThread))
 		return TRUE;
 	else
 		return FALSE;
