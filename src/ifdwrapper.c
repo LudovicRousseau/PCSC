@@ -194,7 +194,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	RESPONSECODE(*IO_close_channel) () = NULL;
+	RESPONSECODE(*IO_close_channel) (void) = NULL;
 	RESPONSECODE(*IFDH_close_channel) (DWORD) = NULL;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -438,7 +438,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	RESPONSECODE(*IFD_is_icc_present) () = NULL;
+	RESPONSECODE(*IFD_is_icc_present) (void) = NULL;
 	RESPONSECODE(*IFDH_icc_presence) (DWORD) = NULL;
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
 
