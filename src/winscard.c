@@ -657,11 +657,11 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				}
 				else
 				{
-					DWORD dwStatus, dwAtrLen;
+					DWORD dwStatus, dwAtrLen2;
 					UCHAR ucAtr[MAX_ATR_SIZE];
 
 					Log1(PCSC_LOG_ERROR, "Error resetting card.");
-					IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
+					IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
 					if (dwStatus & SCARD_PRESENT)
 						return SCARD_W_UNRESPONSIVE_CARD;
 					else
