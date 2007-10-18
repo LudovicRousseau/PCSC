@@ -42,7 +42,7 @@
  *         pcsc_stringify_error(rv), rv);
  * @endcode
  */
-PCSC_API char* pcsc_stringify_error(long pcscError)
+PCSC_API char* pcsc_stringify_error(const long pcscError)
 {
 	static char strError[75];
 

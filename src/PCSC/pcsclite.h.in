@@ -178,7 +178,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 /*
  * Gets a stringified error response
  */
-char *pcsc_stringify_error(long);
+char *pcsc_stringify_error(const long);
 
 #ifdef __cplusplus
 }
