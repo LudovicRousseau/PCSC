@@ -418,6 +418,22 @@ int main(int argc, char **argv)
 	signal(SIGHUP, signal_trap);
 
 	/*
+	 * If PCSCLITE_IPC_DIR does not exist then create it
+	 */
+	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
+	if (rv < 0)
+	{
+		rv = SYS_Mkdir(PCSCLITE_IPC_DIR,
+			S_ISVTX | S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU);
+		if (rv != 0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+				"cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
+			return EXIT_FAILURE;
+		}
+	}
+
+	/*
 	 * Record our pid to make it easier
 	 * to kill the correct pcscd
 	 */
@@ -439,22 +455,6 @@ int main(int argc, char **argv)
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
 				strerror(errno));
-	}
-
-	/*
-	 * If PCSCLITE_IPC_DIR does not exist then create it
-	 */
-	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
-	if (rv < 0)
-	{
-		rv = SYS_Mkdir(PCSCLITE_IPC_DIR,
-			S_ISVTX | S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU);
-		if (rv != 0)
-		{
-			Log2(PCSC_LOG_CRITICAL,
-				"cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
-			return EXIT_FAILURE;
-		}
 	}
 
 	/* cleanly remove /var/run/pcsc.* files when exiting */
