@@ -603,7 +603,7 @@ void print_usage (char const * const progname)
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stderr instead of syslog\n");
 	printf("  -h, --help		display usage information\n");
-	printf("  -H, --hotplug		ask the daemon to rescan the avaiable readers\n");
+	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
 	printf("  -d, --debug	 	display lower level debug messages\n");
 	printf("      --info	 	display info level debug messages (default level)\n");
@@ -616,7 +616,7 @@ void print_usage (char const * const progname)
 	printf("  -f	run in foreground (no daemon), send logs to stderr instead of syslog\n");
 	printf("  -d 	display debug messages. Output may be:\n");
 	printf("  -h 	display usage information\n");
-	printf("  -H	ask the daemon to rescan the avaiable readers\n");
+	printf("  -H	ask the daemon to rescan the available readers\n");
 	printf("  -v 	display the program version number\n");
 #endif
 }
