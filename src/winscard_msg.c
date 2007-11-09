@@ -284,7 +284,7 @@ INTERNAL int SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 	size_t remaining = buffer_size;
 
 	/*
-	 * repeate until we get the whole message
+	 * repeat until we get the whole message
 	 */
 	while (remaining > 0)
 	{
