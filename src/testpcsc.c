@@ -213,7 +213,7 @@ wait_for_card_again:
 
 		rv = SCardControl(hCard, SCARD_CTL_CODE(1), buffer, 1, buffer,
 			sizeof(buffer), &cbRecvLength);
-		if (cbRecvLength)
+		if (cbRecvLength && (SCARD_S_SUCCESS == rv))
 		{
 			for (i=0; i<cbRecvLength; i++)
 				printf("%c", buffer[i]);
