@@ -27,8 +27,8 @@
 #define DONT_PANIC 1
 #define RED_PRINTF_FORMAT "\33[01;31m%s\33[0m\n"
 
-void test_rv(int rv, SCARDCONTEXT hContext, int dont_panic);
-void test_rv(int rv, SCARDCONTEXT hContext, int dont_panic)
+void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic);
+void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 {
 	if (rv != SCARD_S_SUCCESS)
 	{
