@@ -100,7 +100,7 @@ extern "C"
 	{
 		int32_t major;
 		int32_t minor;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct version_struct version_struct;
 
@@ -119,7 +119,7 @@ extern "C"
 	{
 		uint32_t dwScope;
 		uint32_t phContext;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct establish_struct establish_struct;
 
@@ -131,7 +131,7 @@ extern "C"
 	struct release_struct
 	{
 		uint32_t hContext;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct release_struct release_struct;
 
@@ -148,7 +148,7 @@ extern "C"
 		uint32_t dwPreferredProtocols;
 		int32_t phCard;
 		uint32_t pdwActiveProtocol;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct connect_struct connect_struct;
 
@@ -164,7 +164,7 @@ extern "C"
 		uint32_t dwPreferredProtocols;
 		uint32_t dwInitialization;
 		uint32_t pdwActiveProtocol;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct reconnect_struct reconnect_struct;
 
@@ -177,7 +177,7 @@ extern "C"
 	{
 		int32_t hCard;
 		uint32_t dwDisposition;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct disconnect_struct disconnect_struct;
 
@@ -189,7 +189,7 @@ extern "C"
 	struct begin_struct
 	{
 		int32_t hCard;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct begin_struct begin_struct;
 
@@ -202,7 +202,7 @@ extern "C"
 	{
 		int32_t hCard;
 		uint32_t dwDisposition;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct end_struct end_struct;
 
@@ -214,7 +214,7 @@ extern "C"
 	struct cancel_struct
 	{
 		int32_t hCard;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct cancel_struct cancel_struct;
 
@@ -232,7 +232,7 @@ extern "C"
 		uint32_t pdwProtocol;
 		uint8_t pbAtr[MAX_ATR_SIZE];
 		uint32_t pcbAtrLen;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct status_struct status_struct;
 
@@ -252,7 +252,7 @@ extern "C"
 		uint32_t pioRecvPciLength;
 		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
 		uint32_t pcbRecvLength;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct transmit_struct transmit_struct;
 
@@ -270,7 +270,7 @@ extern "C"
 		uint32_t pioRecvPciProtocol;
 		uint32_t pioRecvPciLength;
 		uint32_t pcbRecvLength;
-		int32_t rv;
+		uint32_t rv;
 		uint64_t size;
 		uint8_t data[1];
 	};
@@ -290,7 +290,7 @@ extern "C"
 		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
 		uint32_t cbRecvLength;
 		uint32_t dwBytesReturned;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct control_struct control_struct;
 
@@ -306,7 +306,7 @@ extern "C"
 		uint32_t cbSendLength;
 		uint32_t cbRecvLength;
 		uint32_t pdwBytesReturned;
-		int32_t rv;
+		uint32_t rv;
 		uint64_t size;
 		uint8_t data[1];
 	};
@@ -323,7 +323,7 @@ extern "C"
 		uint32_t dwAttrId;
 		uint8_t pbAttr[MAX_BUFFER_SIZE];
 		uint32_t cbAttrLen;
-		int32_t rv;
+		uint32_t rv;
 	};
 	typedef struct getset_struct getset_struct;
 
