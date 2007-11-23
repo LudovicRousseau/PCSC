@@ -26,10 +26,10 @@ extern "C"
 #ifdef WIN32
 #include <winscard.h>
 #else
-typedef long SCARDCONTEXT;
+typedef long SCARDCONTEXT; /**< \p hContext returned by SCardEstablishContext() */
 typedef SCARDCONTEXT *PSCARDCONTEXT;
 typedef SCARDCONTEXT *LPSCARDCONTEXT;
-typedef long SCARDHANDLE;
+typedef long SCARDHANDLE; /**< \p hCard returned by SCardConnect() */
 typedef SCARDHANDLE *PSCARDHANDLE;
 typedef SCARDHANDLE *LPSCARDHANDLE;
 
@@ -61,11 +61,11 @@ typedef const SCARD_IO_REQUEST *LPCSCARD_IO_REQUEST;
 extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 	g_rgSCardRawPci;
 
-#define SCARD_PCI_T0	(&g_rgSCardT0Pci)
-#define SCARD_PCI_T1	(&g_rgSCardT1Pci)
-#define SCARD_PCI_RAW	(&g_rgSCardRawPci)
+#define SCARD_PCI_T0	(&g_rgSCardT0Pci) /**< protocol control information (PCI) for T=0 */
+#define SCARD_PCI_T1	(&g_rgSCardT1Pci) /**< protocol control information (PCI) for T=1 */
+#define SCARD_PCI_RAW	(&g_rgSCardRawPci) /**< protocol control information (PCI) for RAW protocol */
 
-#define SCARD_S_SUCCESS			0x00000000
+#define SCARD_S_SUCCESS			0x00000000 /**< No error was encountered. */
 #define SCARD_F_INTERNAL_ERROR		0x80100001 /**< An internal consistency check failed. */
 #define SCARD_E_CANCELLED		0x80100002 /**< The action was cancelled by an SCardCancel request. */
 #define SCARD_E_INVALID_HANDLE		0x80100003 /**< The supplied handle was invalid. */
@@ -151,7 +151,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 
 /** PC/SC Lite specific extensions */
 #define SCARD_W_INSERTED_CARD		0x8010006A
-#define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F
+#define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F /**< feature not supported. */
 
 #ifndef INFINITE
 #define INFINITE			0xFFFFFFFF	/**< Infinite timeout */
