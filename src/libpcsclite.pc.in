@@ -7,5 +7,6 @@ usbdropdir=@usbdropdir@
 Name: PCSC Lite
 Description: PC/SC smart card interface
 Version: @VERSION@
-Libs: -L${libdir} -lpcsclite @PTHREAD_LIBS@
+Libs: -L${libdir} -lpcsclite
+Libs.private: @PTHREAD_LIBS@
 Cflags: -I${includedir} @PTHREAD_CFLAGS@
