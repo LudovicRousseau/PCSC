@@ -55,7 +55,7 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
-static ExitValue = EXIT_SUCCESS;
+static int ExitValue = EXIT_SUCCESS;
 int HPForceReaderPolling = 0;
 
 /*
