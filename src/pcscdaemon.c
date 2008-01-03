@@ -55,6 +55,7 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
+static ExitValue = EXIT_SUCCESS;
 int HPForceReaderPolling = 0;
 
 /*
@@ -476,6 +477,7 @@ int main(int argc, char **argv)
 		{
 			Log3(PCSC_LOG_CRITICAL, "invalid file %s: %s", newReaderConfig,
 				strerror(errno));
+			ExitValue = EXIT_FAILURE;
 			at_exit();
 		}
 	}
@@ -495,7 +497,10 @@ int main(int argc, char **argv)
 		else
 #endif
 			if (rv == -1)
+			{
+				ExitValue = EXIT_FAILURE;
 				at_exit();
+			}
 	}
 
 	/*
@@ -534,7 +539,7 @@ void at_exit(void)
 
 	clean_temp_files();
 
-	SYS_Exit(EXIT_SUCCESS);
+	SYS_Exit(ExitValue);
 }
 
 void clean_temp_files(void)
