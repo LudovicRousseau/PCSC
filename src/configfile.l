@@ -20,6 +20,7 @@
 int evaluatetoken(char *pcToken);
 
 static int iLinenumber;
+static int iOldLinenumber;
 static char *pcPrevious;
 static char *pcCurrent;
 static char *pcFriendlyname;
@@ -69,9 +70,19 @@ int evaluatetoken(char *pcToken)
 	if (pcPrevious == NULL)
 	{							/* This is the key */
 		pcPrevious = strdup(pcToken);
+		iOldLinenumber = iLinenumber;
 	}
 	else
 	{
+		/* first and second tokens are not on the same line */
+		if (iOldLinenumber != iLinenumber)
+		{
+			tok_error(pcPrevious);
+			pcPrevious = strdup(pcToken);
+			iOldLinenumber = iLinenumber;
+			return 1;
+		}
+
 		pcCurrent = pcToken;
 		if (strcmp(pcPrevious, "FRIENDLYNAME") == 0)
 		{
@@ -155,6 +166,8 @@ int evaluatetoken(char *pcToken)
 		else
 		{
 			tok_error(pcPrevious);
+			free(pcPrevious);
+			pcPrevious = NULL;
 			return 1;
 		}
 
@@ -198,8 +211,7 @@ int evaluatetoken(char *pcToken)
 
 void tok_error(char *token_error)
 {
-	Log2(PCSC_LOG_ERROR, "tok_error: invalid value in reader.conf: %s",
-		token_error);
+	Log3(PCSC_LOG_ERROR, "tok_error: invalid value line %d in " PCSCLITE_READER_CONFIG ": %s", iOldLinenumber, token_error);
 	badError = 1;
 }
 
@@ -218,6 +230,7 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 
 	/* (re)start with a clean state */
 	iLinenumber = 1;
+	iOldLinenumber = -1;
 	reader_list = NULL;
 	reader_list_size = 0;
 	pcFriendlyname = NULL;
