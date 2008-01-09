@@ -1,3 +1,17 @@
+pcsc-lite-1.4.99: Ludovic Rousseau
+9 January 2008
+- add support of mix 32/64 bits platforms.  Thanks to Jacob Berkman for
+  the big patch
+- increase MAX_READERNAME from 52 to 100
+- default ipcdir is /var/run/pcscd instead of /var/run so the directory
+  can be shared locally between 32/64 bits systems on chroots
+- display time delta between two lines of logs when printed to stderr
+- return EXIT_SUCCESS (instead of EXIT_SUCCESS) if parsing
+  /etc/reader.conf fails.
+- performance improvement when powering a card after insertion
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.4: Ludovic Rousseau
 14 August 2007
 - do not call a Log function in a signal handler and do hotplug
