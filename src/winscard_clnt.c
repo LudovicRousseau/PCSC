@@ -3469,7 +3469,7 @@ LONG SCardCheckDaemonAvailability(void)
 
 	if (rv != 0)
 	{
-		Log1(PCSC_LOG_ERROR, "PCSC Not Running");
+		Log1(PCSC_LOG_INFO, "PCSC Not Running");
 		return SCARD_E_NO_SERVICE;
 	}
 
