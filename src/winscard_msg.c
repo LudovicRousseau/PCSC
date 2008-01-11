@@ -94,8 +94,8 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	if (connect(*pdwClientID, (struct sockaddr *) &svc_addr,
 			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "Error: connect to client socket: %s",
-			strerror(errno));
+		Log3(PCSC_LOG_CRITICAL, "Error: connect to client socket %s: %s",
+			PCSCLITE_CSOCK_NAME, strerror(errno));
 		SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
@@ -103,8 +103,8 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	one = 1;
 	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "Error: cannot set socket nonblocking: %s",
-			strerror(errno));
+		Log3(PCSC_LOG_CRITICAL, "Error: cannot set socket %s nonblocking: %s",
+			PCSCLITE_CSOCK_NAME, strerror(errno));
 		SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
