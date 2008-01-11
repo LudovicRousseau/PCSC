@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2007
+ * Copyright (C) 1999-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -445,7 +445,7 @@ int main(int argc, char **argv)
 		{
 			char pid[PID_ASCII_SIZE];
 
-			snprintf(pid, sizeof(pid), "%u", (unsigned) getpid());
+			snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
 			SYS_WriteFile(f, pid, strlen(pid));
 			SYS_CloseFile(f);
 
