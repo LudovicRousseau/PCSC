@@ -379,8 +379,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 		mapAddr = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDONLY, 0);
 		if (mapAddr < 0)
 		{
-			Log2(PCSC_LOG_CRITICAL, "Cannot open public shared file: %s",
-				PCSCLITE_PUBSHM_FILE);
+			Log3(PCSC_LOG_CRITICAL, "Cannot open public shared file %s: %s",
+				PCSCLITE_PUBSHM_FILE, strerror(errno));
 			return SCARD_E_NO_SERVICE;
 		}
 
@@ -401,7 +401,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 				mapAddr, (i * pageSize));
 			if (readerStates[i] == NULL)
 			{
-				Log1(PCSC_LOG_CRITICAL, "Cannot public memory map");
+				Log2(PCSC_LOG_CRITICAL, "Cannot public memory map: %s",
+					strerror(errno));
 				SYS_CloseFile(mapAddr);	/* Close the memory map file */
 				return SCARD_F_INTERNAL_ERROR;
 			}
