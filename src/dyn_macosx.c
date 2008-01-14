@@ -54,10 +54,14 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	bundle = CFBundleCreate(NULL, bundleURL);
 	CFRelease(bundleURL);
 	if (bundle == NULL)
+	{
+		Log1(PCSC_LOG_ERROR, "CFBundleCreate");
 		return SCARD_F_UNKNOWN_ERROR;
+	}
 
 	if (!CFBundleLoadExecutable(bundle))
 	{
+		Log1(PCSC_LOG_ERROR, "CFBundleLoadExecutable");
 		CFRelease(bundle);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
