@@ -10,6 +10,7 @@
 #ifndef __utils_h__
 #define __utils_h__
 
+#include <sys/types.h>
 #include "wintypes.h"
 
 #define PID_ASCII_SIZE 11
