@@ -473,8 +473,6 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	int i;
 	char deviceName[MAX_DEVICENAME];
 
-	SYS_MutexLock(&usbNotifierMutex);
-
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
 	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb:%s",
@@ -494,6 +492,8 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 			"Not enough reader entries. Already found %d readers", i);
 		return 0;
 	}
+
+	SYS_MutexLock(&usbNotifierMutex);
 
 	strncpy(readerTracker[i].bus_device, bus_device,
 		sizeof(readerTracker[i].bus_device));
