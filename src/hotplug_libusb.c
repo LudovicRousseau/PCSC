@@ -87,14 +87,14 @@ static struct _readerTracker
 	char *fullName;	/* full reader name (including serial number) */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
-LONG HPReadBundleValues(void);
-LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
+static LONG HPReadBundleValues(void);
+static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver);
-LONG HPRemoveHotPluggable(int reader_index);
+static LONG HPRemoveHotPluggable(int reader_index);
 static void HPRescanUsbBus(void);
 static void HPEstablishUSBNotifications(void);
 
-LONG HPReadBundleValues(void)
+static LONG HPReadBundleValues(void)
 {
 	LONG rv;
 	DIR *hpDir;
@@ -467,7 +467,7 @@ LONG HPStopHotPluggables(void)
 	return 0;
 }
 
-LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
+static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver)
 {
 	int i;
@@ -530,7 +530,7 @@ LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	return 1;
 }	/* End of function */
 
-LONG HPRemoveHotPluggable(int reader_index)
+static LONG HPRemoveHotPluggable(int reader_index)
 {
 	SYS_MutexLock(&usbNotifierMutex);
 

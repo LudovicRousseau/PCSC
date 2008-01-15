@@ -65,9 +65,9 @@ struct usb_device_descriptor
 }
 __attribute__ ((packed));
 
-LONG HPAddHotPluggable(int, unsigned long);
-LONG HPRemoveHotPluggable(int, unsigned long);
-LONG HPReadBundleValues(void);
+static LONG HPAddHotPluggable(int, unsigned long);
+static LONG HPRemoveHotPluggable(int, unsigned long);
+static LONG HPReadBundleValues(void);
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int AraKiriHotPlug = FALSE;
@@ -93,7 +93,7 @@ static struct _bundleTracker
 }
 bundleTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
-LONG HPReadBundleValues(void)
+static LONG HPReadBundleValues(void)
 {
 
 	LONG rv;
@@ -401,7 +401,7 @@ LONG HPStopHotPluggables(void)
 	return 0;
 }
 
-LONG HPAddHotPluggable(int i, unsigned long usbAddr)
+static LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 {
 	/* NOTE: The deviceName is an empty string "" until someone implements
 	 * the code to get it */
@@ -411,7 +411,7 @@ LONG HPAddHotPluggable(int i, unsigned long usbAddr)
 	return 1;
 }	/* End of function */
 
-LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
+static LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 {
 	RFRemoveReader(bundleTracker[i].readerName, PCSCLITE_HP_BASE_PORT + usbAddr);
 
