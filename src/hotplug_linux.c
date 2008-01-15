@@ -68,6 +68,7 @@ __attribute__ ((packed));
 static LONG HPAddHotPluggable(int, unsigned long);
 static LONG HPRemoveHotPluggable(int, unsigned long);
 static LONG HPReadBundleValues(void);
+static void HPEstablishUSBNotifications(void);
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int AraKiriHotPlug = FALSE;
@@ -76,7 +77,6 @@ static int bundleSize = 0;
 /*
  * A list to keep track of 20 simultaneous readers
  */
-
 static struct _bundleTracker
 {
 	long  manuID;
@@ -191,7 +191,7 @@ end:
 	return 0;
 }
 
-void HPEstablishUSBNotifications(void)
+static void HPEstablishUSBNotifications(void)
 {
 
 	int i, j, usbDeviceStatus;
