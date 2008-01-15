@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 #include "debug.h"
 #include "config.h"
@@ -50,4 +51,24 @@ pid_t GetDaemonPid(void)
 
 	return pid;
 } /* GetDaemonPid */
+
+int SendHotplugSignal(void)
+{
+	pid_t pid;
+
+	pid = GetDaemonPid();
+
+	if (pid != -1)
+	{
+		Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)", pid);
+		if (kill(pid, SIGUSR1) < 0)
+		{
+			Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
+				pid, strerror(errno));
+			return EXIT_FAILURE ;
+		}
+	}
+
+	return EXIT_SUCCESS;
+} /* SendHotplugSignal */
 

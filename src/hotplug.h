@@ -36,7 +36,6 @@ extern "C"
 	ULONG HPRegisterForHotplugEvents(void);
 	LONG HPStopHotPluggables(void);
 	void HPReCheckSerialReaders(void);
-	int SendHotplugSignal(void);
 
 #ifdef __cplusplus
 }

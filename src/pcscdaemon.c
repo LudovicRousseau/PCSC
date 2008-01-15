@@ -72,26 +72,6 @@ void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
-int SendHotplugSignal(void)
-{
-	pid_t pid;
-
-	pid = GetDaemonPid();
-
-	if (pid != -1)
-	{
-		Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)", pid);
-		if (kill(pid, SIGUSR1) < 0)
-		{
-			Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
-				pid, strerror(errno));
-			return EXIT_FAILURE ;
-		}
-	}
-
-	return EXIT_SUCCESS;
-} /* SendHotplugSignal */
-
 /*
  * Cleans up messages still on the queue when a client dies
  */

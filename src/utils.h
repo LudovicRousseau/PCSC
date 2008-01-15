@@ -17,6 +17,7 @@ pid_t GetDaemonPid(void);
 
 /* defined in winscard_clnt.c */
 LONG SCardCheckDaemonAvailability(void);
+int SendHotplugSignal(void);
 
 #endif
 
