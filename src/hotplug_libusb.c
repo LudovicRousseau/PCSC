@@ -243,7 +243,7 @@ static LONG HPReadBundleValues(void)
 	return rv;
 }
 
-void HPRescanUsbBus(void)
+static void HPRescanUsbBus(void)
 {
 	int i, j;
 	struct usb_bus *bus;
@@ -378,7 +378,7 @@ void HPRescanUsbBus(void)
 	}
 }
 
-void HPEstablishUSBNotifications(void)
+static void HPEstablishUSBNotifications(void)
 {
 	int i, do_polling;
 
