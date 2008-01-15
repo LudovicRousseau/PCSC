@@ -14,9 +14,10 @@
 
 #define PID_ASCII_SIZE 11
 pid_t GetDaemonPid(void);
-
-LONG SCardCheckDaemonAvailability(void);
 int SendHotplugSignal(void);
+
+/* defined in winscard_clnt.c */
+LONG SCardCheckDaemonAvailability(void);
 
 #endif
 
