@@ -24,7 +24,7 @@
 #include "atrhandler.h"
 #include "dyn_generic.h"
 #include "sys_generic.h"
-#include "hotplug.h"
+#include "utils.h"
 
 #undef PCSCLITE_STATIC_DRIVER
 
