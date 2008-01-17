@@ -123,7 +123,10 @@ static void log_line(const int priority, const char *DebugBuffer)
 				tmp.tv_sec--;
 				tmp.tv_usec += 1000000;
 			}
-			delta = tmp.tv_sec * 1000000 + tmp.tv_usec;
+			if (tmp.tv_sec < 100)
+				delta = tmp.tv_sec * 1000000 + tmp.tv_usec;
+			else
+				delta = 99999999;
 
 			fprintf(stderr, "%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
 				color_pfx, DebugBuffer, color_sfx);
