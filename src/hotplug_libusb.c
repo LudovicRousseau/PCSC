@@ -479,6 +479,8 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
 	deviceName[sizeof(deviceName) -1] = '\0';
 
+	SYS_MutexLock(&usbNotifierMutex);
+
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -490,10 +492,9 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", i);
+		SYS_MutexUnLock(&usbNotifierMutex);
 		return 0;
 	}
-
-	SYS_MutexLock(&usbNotifierMutex);
 
 	strncpy(readerTracker[i].bus_device, bus_device,
 		sizeof(readerTracker[i].bus_device));
