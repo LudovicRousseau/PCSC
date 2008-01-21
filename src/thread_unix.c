@@ -107,3 +107,8 @@ INTERNAL int SYS_ThreadEqual(PCSCLITE_THREAD_T *pthThread1, PCSCLITE_THREAD_T *p
 	return pthread_equal(*pthThread1, *pthThread2);
 }
 
+INTERNAL int SYS_ThreadSetCancelType(int type, int *oldtype)
+{
+	return pthread_setcanceltype(type, oldtype);
+}
+

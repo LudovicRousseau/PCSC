@@ -57,6 +57,7 @@ extern "C"
 	int SYS_ThreadExit(LPVOID);
 	PCSCLITE_THREAD_T SYS_ThreadSelf(void);
 	int SYS_ThreadEqual(PCSCLITE_THREAD_T *, PCSCLITE_THREAD_T *);
+	int SYS_ThreadSetCancelType(int, int *);
 
 #ifdef __cplusplus
 }
