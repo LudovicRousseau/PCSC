@@ -25,7 +25,7 @@
 #define FALSE 0
 #endif
 
-#if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__)
+#if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__) && !defined(HAVE_LIBHAL)
 
 char ReCheckSerialReaders = FALSE;
 

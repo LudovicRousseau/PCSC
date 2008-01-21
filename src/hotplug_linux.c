@@ -19,7 +19,7 @@
 #include "config.h"
 #include <string.h>
 
-#if defined(__linux__) && !defined(HAVE_LIBUSB)
+#if defined(__linux__) && !defined(HAVE_LIBUSB) && !defined(HAVE_LIBHAL)
 #include <sys/types.h>
 #include <stdio.h>
 #include <dirent.h>

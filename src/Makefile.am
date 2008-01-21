@@ -49,6 +49,7 @@ pcscd_SOURCES = \
 	eventhandler.h \
 	hotplug_generic.c \
 	hotplug.h \
+	hotplug_libhal.c \
 	hotplug_libusb.c \
 	hotplug_linux.c \
 	hotplug_macosx.c \
@@ -88,11 +89,12 @@ pcscd_SOURCES = \
 	winscard_msg_srv.c \
 	winscard_svc.c \
 	winscard_svc.h
-pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) -DPCSCD
+pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBHAL_CFLAGS) \
+	-DPCSCD
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
-	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) \
+	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) $(LIBHAL_LIBS) \
 	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS)
 
 testpcsc_SOURCES = testpcsc.c
