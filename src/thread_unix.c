@@ -83,9 +83,9 @@ INTERNAL int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
 		return FALSE;
 }
 
-INTERNAL int SYS_ThreadJoin(PCSCLITE_THREAD_T *pthThread, LPVOID* pvRetVal)
+INTERNAL int SYS_ThreadJoin(PCSCLITE_THREAD_T pthThread, LPVOID* pvRetVal)
 {
-	if (0 == pthread_join(*pthThread, pvRetVal))
+	if (0 == pthread_join(pthThread, pvRetVal))
 		return TRUE;
 	else
 		return FALSE;
