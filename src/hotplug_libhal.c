@@ -4,7 +4,7 @@
  * Copyright (C) 2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
- * $Id:$
+ * $Id$
  */
 
 /**
