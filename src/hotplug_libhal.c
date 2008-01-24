@@ -324,6 +324,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	char deviceName[MAX_DEVICENAME];
 	DBusError error;
 	struct _driverTracker *driver;
+	LONG ret;
 
 	dbus_error_init (&error);
 
@@ -386,8 +387,16 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		dbus_error_free(&error);
 #endif
 
-	RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
+	ret = RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName);
+	if (SCARD_S_SUCCESS != ret)
+	{
+		Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s", short_name(udi));
+		free(readerTracker[i].fullName);
+		readerTracker[i].fullName = NULL;
+		free(readerTracker[i].udi);
+		readerTracker[i].udi = NULL;
+	}
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 } /* HPAddDevice */
