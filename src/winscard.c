@@ -336,9 +336,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		while (rContext->dwLockId != 0)
 			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
-
-		/* Allow the status thread to convey information */
-		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 	}
 
 	/* the reader has been removed while we were waiting */
@@ -496,9 +493,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	}
 
 	/*
-	 * Allow the status thread to convey information
+	 * Propagate new state to Shared Memory
 	 */
-	SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+	rContext->readerState->readerSharing = rContext->dwContexts;
+	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
 
 	PROFILE_END
 
@@ -511,7 +509,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 {
 	LONG rv;
 	PREADER_CONTEXT rContext = NULL;
-	int do_sleep = 1;
 
 	Log1(PCSC_LOG_DEBUG, "Attempting reconnect to token.");
 
@@ -675,8 +672,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				return SCARD_F_INTERNAL_ERROR;
 				break;
 		}
-
-		do_sleep = 1;
 	}
 	else
 		if (dwInitialization == SCARD_LEAVE_CARD)
@@ -684,7 +679,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * Do nothing
 			 */
-			do_sleep = 0;
 		}
 
 	/*******************************************
@@ -795,10 +789,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	RFClearReaderEventState(rContext, hCard);
 
 	/*
-	 * Allow the status thread to convey information
+	 * Propagate new state to Shared Memory
 	 */
-	if (do_sleep)
-		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+	rContext->readerState->readerSharing = rContext->dwContexts;
+	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
 
 	return SCARD_S_SUCCESS;
 }
@@ -913,11 +907,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 		else
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
-
-		/*
-		 * Allow the status thread to convey information
-		 */
-		SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
@@ -970,18 +959,23 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * For exclusive connection reset it to no connections
 	 */
 	if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
-	{
 		rContext->dwContexts = SCARD_NO_CONTEXT;
-		return SCARD_S_SUCCESS;
+	else
+	{
+		/*
+		 * Remove a connection from the context stack
+		 */
+		rContext->dwContexts -= 1;
+
+		if (rContext->dwContexts < 0)
+			rContext->dwContexts = 0;
 	}
 
 	/*
-	 * Remove a connection from the context stack
+	 * Propagate new state to Shared Memory
 	 */
-	rContext->dwContexts -= 1;
-
-	if (rContext->dwContexts < 0)
-		rContext->dwContexts = 0;
+	rContext->readerState->readerSharing = rContext->dwContexts;
+	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
 
 	return SCARD_S_SUCCESS;
 }
