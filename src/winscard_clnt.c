@@ -2998,6 +2998,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	DWORD dwReadersLen;
 	int i, lastChrPtr;
 	LONG dwContextIndex;
+	LONG rv = SCARD_S_SUCCESS;
 
 	PROFILE_START
 
@@ -3026,22 +3027,18 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 	/* for the last NULL byte */
 	dwReadersLen += 1;
+	*pcchReaders = dwReadersLen;
 
 	if ((mszReaders == NULL)	/* text array not allocated */
 		|| (*pcchReaders == 0))	/* size == 0 */
 	{
-		*pcchReaders = dwReadersLen;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		PROFILE_END(SCARD_S_SUCCESS)
-		return SCARD_S_SUCCESS;
+		goto end;
 	}
 
 	if (*pcchReaders < dwReadersLen)
 	{
-		*pcchReaders = dwReadersLen;
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		PROFILE_END(SCARD_E_INSUFFICIENT_BUFFER)
-		return SCARD_E_INSUFFICIENT_BUFFER;
+		rv = SCARD_E_INSUFFICIENT_BUFFER;
+		goto end;
 	}
 
 	lastChrPtr = 0;
@@ -3058,13 +3055,12 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	}
 	mszReaders[lastChrPtr] = '\0';	/* Add the last null */
 
-	*pcchReaders = dwReadersLen;
-
+end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END(SCARD_S_SUCCESS)
+	PROFILE_END(rv)
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 /**
