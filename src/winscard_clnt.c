@@ -3029,6 +3029,12 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	dwReadersLen += 1;
 	*pcchReaders = dwReadersLen;
 
+	if (1 == dwReadersLen)
+	{
+		rv = SCARD_E_NO_READERS_AVAILABLE;
+		goto end;
+	}
+
 	if ((mszReaders == NULL)	/* text array not allocated */
 		|| (*pcchReaders == 0))	/* size == 0 */
 	{
