@@ -159,6 +159,9 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 	case SCARD_E_SERVICE_STOPPED:
 		strlcpy(strError, "Service was stopped.", sizeof(strError));
 		break;
+	case SCARD_E_NO_READERS_AVAILABLE:
+		strlcpy(strError, "Cannot find a smart card reader.", sizeof(strError));
+		break;
 	default:
 		snprintf(strError, sizeof(strError)-1, "Unkown error: 0x%08lX",
 			pcscError);
