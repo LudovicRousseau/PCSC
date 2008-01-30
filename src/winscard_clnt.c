@@ -3471,7 +3471,7 @@ LONG SCardCheckDaemonAvailability(void)
 
 	if (rv != 0)
 	{
-		Log1(PCSC_LOG_INFO, "PCSC Not Running");
+		Log2(PCSC_LOG_INFO, "PCSC Not Running: " PCSCLITE_PUBSHM_FILE ": %s", strerror(errno));
 		return SCARD_E_NO_SERVICE;
 	}
 
