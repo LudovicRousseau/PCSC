@@ -289,9 +289,23 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		return rv;
 	}
 
-	rv = EHSpawnEventHandler(sReadersContexts[dwContext]);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
+	/*
+	 * asynchronous card movement?
+	 */
+	{
+		RESPONSECODE (*fct)(DWORD) = NULL;
+
+		dwGetSize = sizeof(fct);
+
+		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
+			TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
+		if (rv != SCARD_S_SUCCESS)
+			fct = NULL;
+
+		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
+	}
 
 	/*
 	 * Call on the driver to see if there are multiple slots
@@ -466,7 +480,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			return rv;
 		}
 
-		EHSpawnEventHandler(sReadersContexts[dwContextB]);
+		EHSpawnEventHandler(sReadersContexts[dwContextB], NULL);
 	}
 
 	return SCARD_S_SUCCESS;
@@ -1596,7 +1610,7 @@ void RFAwakeAllReaders(void)
 			}
 
 
-			EHSpawnEventHandler(sReadersContexts[i]);
+			EHSpawnEventHandler(sReadersContexts[i], NULL);
 			RFSetReaderEventState(sReadersContexts[i], SCARD_RESET);
 		}
 	}

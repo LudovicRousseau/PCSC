@@ -43,7 +43,7 @@ extern "C"
 	READER_STATE, *PREADER_STATE;
 
 	LONG EHInitializeEventStructures(void);
-	LONG EHSpawnEventHandler(PREADER_CONTEXT);
+	LONG EHSpawnEventHandler(PREADER_CONTEXT, RESPONSECODE (*)(DWORD));
 	LONG EHDestroyEventHandler(PREADER_CONTEXT);
 
 #ifdef __cplusplus

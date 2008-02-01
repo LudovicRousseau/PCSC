@@ -146,6 +146,7 @@ extern "C"
 		char lpcLibrary[MAX_LIBNAME];	/* Library Path */
 		char lpcDevice[MAX_DEVICENAME];	/* Device Name */
 		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
+		RESPONSECODE (*pthCardEvent)(DWORD);	/* Card Event sync */
 		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
 		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];
                                          /* Structure of connected handles */

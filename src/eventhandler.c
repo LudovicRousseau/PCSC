@@ -119,19 +119,16 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 
 	Log1(PCSC_LOG_INFO, "Stomping thread.");
 
-	do
-	{
-		/*
-		 * Wait 0.05 seconds for the child to respond
-		 */
-		SYS_USleep(50000);
-	}
-	while (rContext->dwLockId == 0xFFFF);
+	/* kill the "polling" thread */
+	SYS_ThreadCancel(rContext->pthThread);
+
+	/* wait for the thread to finish */
+	SYS_ThreadJoin(rContext->pthThread, NULL);
+
 	/*
 	 * Zero out the public status struct to allow it to be recycled and
 	 * used again
 	 */
-
 	memset(rContext->readerState->readerName, 0,
 		sizeof(rContext->readerState->readerName));
 	memset(rContext->readerState->cardAtr, 0,
@@ -150,7 +147,8 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
+LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
+	RESPONSECODE (*card_event)(DWORD))
 {
 	LONG rv;
 	DWORD dwStatus = 0;
@@ -190,6 +188,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext)
 	rContext->readerState->cardAtrLength = dwAtrLen;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
+	rContext->pthCardEvent = card_event;
 	rv = SYS_ThreadCreate(&rContext->pthThread, THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv == 1)
@@ -453,16 +452,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			}
 		}
 
-		if (rContext->dwLockId == 0xFFFF)
-		{
-			/*
-			 * Exit and notify the caller
-			 */
-			rContext->dwLockId = 0;
-			SYS_ThreadDetach(rContext->pthThread);
-			SYS_ThreadExit(NULL);
-		}
-
 		/*
 		 * Sharing may change w/o an event pass it on
 		 */
@@ -474,7 +463,27 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
 		}
 
-		SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+		if (rContext->pthCardEvent)
+		{
+			int ret;
+			
+			ret = rContext->pthCardEvent(rContext->dwSlot);
+			if (IFD_NO_SUCH_DEVICE == ret)
+				SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+		}
+		else
+			SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+
+		if (rContext->dwLockId == 0xFFFF)
+		{
+			/*
+			 * Exit and notify the caller
+			 */
+			Log1(PCSC_LOG_CRITICAL, "Die");
+			rContext->dwLockId = 0;
+			SYS_ThreadDetach(rContext->pthThread);
+			SYS_ThreadExit(NULL);
+		}
 	}
 }
 
