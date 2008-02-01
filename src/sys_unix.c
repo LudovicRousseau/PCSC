@@ -203,7 +203,12 @@ INTERNAL int SYS_WriteFile(int iHandle, const char *pcBuffer, int iLength)
  */
 INTERNAL int SYS_GetPageSize(void)
 {
-	return getpagesize();
+	static int size = -1;
+
+	/* we use a cache to avoid a system call and improve perfs */
+	if (-1 == size)
+		size = getpagesize();
+	return size;
 }
 
 /**
