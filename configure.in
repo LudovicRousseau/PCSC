@@ -122,16 +122,16 @@ AC_SUBST(LIBDL)
 AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
 
 # Use 'uname' output as an architecture define
-uname=`uname`
-case "$uname" in
+PCSC_ARCH=`uname`
+case "$PCSC_ARCH" in
 Darwin)
-	uname=MacOS
+	PCSC_ARCH=MacOS
 	;;
 SunOS)
-	uname=Solaris
+	PCSC_ARCH=Solaris
 	;;
 esac
-AC_DEFINE_UNQUOTED(PCSC_ARCH, "$uname", [PC/SC target architecture])
+AC_DEFINE_UNQUOTED(PCSC_ARCH, "$PCSC_ARCH", [PC/SC target architecture])
 
 # See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
@@ -231,8 +231,6 @@ AC_SUBST(LIBUSB_LIBS)
 if test x$use_libusb = xyes; then
   AC_DEFINE(HAVE_LIBUSB, 1, [Libusb is available])
 fi
-AC_MSG_RESULT([enable libhal support         : $use_libhal])
-AC_MSG_RESULT([enable libusb support         : $use_libusb])
 
 # --enable-usbdropdir=DIR
 AC_ARG_ENABLE(usbdropdir,
@@ -246,7 +244,6 @@ if test x${usbdropdir} = xfalse ; then
 		usbdropdir="$ac_default_prefix/pcsc/drivers"
 	fi
 fi
-AC_MSG_RESULT([enable USB drop directory     : $usbdropdir])
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 
 # --enable-debugatr
@@ -257,8 +254,6 @@ AC_ARG_ENABLE(debugatr,
   no)	debugatr=false ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-debugatr]) ;;
 esac], [debugatr=false])
-
-AC_MSG_RESULT([enable ATR parsing messages   : $debugatr])
 
 if test x${debugatr} = xtrue ; then
   AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
@@ -279,7 +274,6 @@ if test x$scf = xtrue -a x$ac_cv_header_smartcard_scf_h = xyes; then
 else
   scf=false
 fi
-AC_MSG_RESULT([enable SCF reader support     : $scf])
 AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
 
 # --enable-confdir=DIR
@@ -287,13 +281,6 @@ AC_ARG_ENABLE(confdir,
 AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
 				(default /etc)]),
 [confdir="${enableval}"], [confdir=false])
-
-if test x${confdir} != xfalse ; then
-	AC_MSG_RESULT([enable confdir                : $confdir])
-else
-	confdir="/etc"
-	AC_MSG_RESULT([enable confdir                : /etc (default)])
-fi
 
 # --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
@@ -305,7 +292,6 @@ if test x${ipcdir} = xfalse ; then
 	ipcdir="/var/run/pcscd"
 fi
 AC_DEFINE_UNQUOTED(USE_IPCDIR, "$ipcdir", [directory containing IPC files])
-AC_MSG_RESULT([enable ipcdir                 : $ipcdir])
 
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
@@ -330,6 +316,37 @@ AS_AC_EXPAND(confdir_exp,$confdir)
 AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
+
+cat << EOF
+
+PC/SC lite has been configured with following options:
+
+Version:             ${PACKAGE_VERSION}
+System binaries:     $(eval eval eval echo "${sbindir_exp}")
+Configuration files: $(eval eval eval echo "${sysconfdir}")
+
+
+Host:                ${host}
+Compiler:            ${CC}
+Preprocessor flags:  ${CPPFLAGS}
+Compiler flags:      ${CFLAGS}
+Preprocessor flags:  ${CPPFLAGS}
+Linker flags:        ${LDFLAGS}
+Libraries:           ${LIBS}
+
+PTHREAD_CFLAGS:      ${PTHREAD_CFLAGS}
+PTHREAD_LIBS:        ${PTHREAD_LIBS}
+PCSC_ARCH:           ${PCSC_ARCH}
+
+libhal support:       ${use_libhal}
+libusb support:       ${use_libusb}
+SCF reader support:   ${scf}
+USB drop directory:   ${usbdropdir}
+ATR parsing messages: ${debugatr}
+confdir:              ${confdir}
+ipcdir:               ${ipcdir}
+
+EOF
 
 # Write Makefiles
 AC_CONFIG_FILES([
