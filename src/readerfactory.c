@@ -299,7 +299,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
 			TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
-		if (rv != SCARD_S_SUCCESS)
+		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
 			fct = NULL;
 
 		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
