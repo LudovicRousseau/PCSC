@@ -281,6 +281,9 @@ AC_ARG_ENABLE(confdir,
 AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
 				(default /etc)]),
 [confdir="${enableval}"], [confdir=false])
+if test x${confdir} = xfalse ; then
+	confdir="/etc"
+fi
 
 # --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
