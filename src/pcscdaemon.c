@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * test the presence of /var/run/pcsc.pub
+	 * test the presence of /var/run/pcscd/pcsc.pub
 	 */
 
 	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &fStatBuf);
@@ -438,7 +438,7 @@ int main(int argc, char **argv)
 				strerror(errno));
 	}
 
-	/* cleanly remove /var/run/pcsc.* files when exiting */
+	/* cleanly remove /var/run/pcscd/pcsc.* files when exiting */
 	if (atexit(at_exit))
 		Log2(PCSC_LOG_CRITICAL, "atexit() failed: %s", strerror(errno));
 
