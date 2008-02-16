@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 	if (rv < 0)
 	{
 		rv = SYS_Mkdir(PCSCLITE_IPC_DIR,
-			S_ISVTX | S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU);
+			S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU);
 		if (rv != 0)
 		{
 			Log2(PCSC_LOG_CRITICAL,
