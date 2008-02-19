@@ -585,9 +585,10 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	scReleaseStruct.hContext = hContext;
 	scReleaseStruct.rv = SCARD_S_SUCCESS;
 
-	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT, psContextMap[dwContextIndex].dwClientID,
-			  sizeof(scReleaseStruct),
-			  PCSCLITE_MCLIENT_ATTEMPTS, (void *) &scReleaseStruct);
+	rv = WrapSHMWrite(SCARD_RELEASE_CONTEXT,
+		psContextMap[dwContextIndex].dwClientID,
+		sizeof(scReleaseStruct),
+		PCSCLITE_MCLIENT_ATTEMPTS, (void *) &scReleaseStruct);
 
 	if (rv == -1)
 	{
@@ -598,7 +599,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 	memcpy(&scReleaseStruct, &msgStruct.data, sizeof(scReleaseStruct));
 
 	if (rv == -1)
@@ -759,7 +761,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	memcpy(&scConnectStruct, &msgStruct.data, sizeof(scConnectStruct));
 
@@ -944,7 +947,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Read a message from the server
 		 */
-		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+			PCSCLITE_CLIENT_ATTEMPTS);
 
 		memcpy(&scReconnectStruct, &msgStruct.data, sizeof(scReconnectStruct));
 
@@ -1043,7 +1047,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	memcpy(&scDisconnectStruct, &msgStruct.data,
 		sizeof(scDisconnectStruct));
@@ -1160,8 +1165,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		/*
 		 * Read a message from the server
 		 */
-		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
-
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+			PCSCLITE_CLIENT_ATTEMPTS);
 
 		memcpy(&scBeginStruct, &msgStruct.data, sizeof(scBeginStruct));
 
@@ -1278,7 +1283,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	scEndStruct.dwDisposition = dwDisposition;
 	scEndStruct.rv = SCARD_S_SUCCESS;
 
-	rv = WrapSHMWrite(SCARD_END_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_END_TRANSACTION,
+		psContextMap[dwContextIndex].dwClientID,
 		sizeof(scEndStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scEndStruct);
 
@@ -1291,7 +1297,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	memcpy(&scEndStruct, &msgStruct.data, sizeof(scEndStruct));
 
@@ -1359,7 +1366,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	scCancelStruct.hCard = hCard;
 
-	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
+	rv = WrapSHMWrite(SCARD_CANCEL_TRANSACTION,
+		psContextMap[dwContextIndex].dwClientID,
 		sizeof(scCancelStruct),
 		PCSCLITE_CLIENT_ATTEMPTS, (void *) &scCancelStruct);
 
@@ -1372,7 +1380,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	memcpy(&scCancelStruct, &msgStruct.data, sizeof(scCancelStruct));
 
@@ -1534,7 +1543,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	memcpy(&scStatusStruct, &msgStruct.data, sizeof(scStatusStruct));
 
@@ -2327,7 +2337,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		 * Read a message from the server
 		 */
 		/* read the first block */
-		rv = SHMMessageReceive(buffer, sizeof(sharedSegmentMsg), psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		rv = SHMMessageReceive(buffer, sizeof(sharedSegmentMsg),
+			psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
 		if (rv == -1)
 		{
 			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
@@ -2375,7 +2386,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		scControlStruct.cbRecvLength = cbRecvLength;
 		memcpy(scControlStruct.pbSendBuffer, pbSendBuffer, cbSendLength);
 
-		rv = WrapSHMWrite(SCARD_CONTROL, psContextMap[dwContextIndex].dwClientID,
+		rv = WrapSHMWrite(SCARD_CONTROL,
+			psContextMap[dwContextIndex].dwClientID,
 			sizeof(scControlStruct), PCSCLITE_CLIENT_ATTEMPTS, &scControlStruct);
 
 		if (rv == -1)
@@ -2387,7 +2399,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		/*
 		 * Read a message from the server
 		 */
-		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+			PCSCLITE_CLIENT_ATTEMPTS);
 
 		if (rv == -1)
 		{
@@ -2642,7 +2655,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+	rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+		PCSCLITE_CLIENT_ATTEMPTS);
 
 	if (rv == -1)
 	{
@@ -2912,7 +2926,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		/*
 		 * Read a message from the server
 		 */
-		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID, PCSCLITE_CLIENT_ATTEMPTS);
+		rv = SHMClientRead(&msgStruct, psContextMap[dwContextIndex].dwClientID,
+			PCSCLITE_CLIENT_ATTEMPTS);
 
 		memcpy(&scTransmitStruct, &msgStruct.data, sizeof(scTransmitStruct));
 
@@ -3175,7 +3190,6 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	PROFILE_START
 
 	dwContextIndex = SCardGetContextIndice(hContext);
-
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -3410,7 +3424,8 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 	}
 }
 
-static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard, PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
+static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard,
+	PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
 {
 	LONG rv;
 
@@ -3424,7 +3439,8 @@ static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard, PDWORD pdwContextIndice
 	return rv;
 }
 
-static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard, PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
+static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard,
+	PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
 {
 	int i;
 
@@ -3466,7 +3482,8 @@ LONG SCardCheckDaemonAvailability(void)
 
 	if (rv != 0)
 	{
-		Log2(PCSC_LOG_INFO, "PCSC Not Running: " PCSCLITE_PUBSHM_FILE ": %s", strerror(errno));
+		Log2(PCSC_LOG_INFO, "PCSC Not Running: " PCSCLITE_PUBSHM_FILE ": %s",
+			strerror(errno));
 		return SCARD_E_NO_SERVICE;
 	}
 
