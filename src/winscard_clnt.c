@@ -568,15 +568,22 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	PROFILE_START
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
-
 	/*
 	 * Make sure this context has been opened
 	 */
 	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
+
+	/*
+	 * Remove the local context from the stack
+	 */
+	SCardLockThread();
+	SCardRemoveContext(hContext);
+	SCardUnlockThread();
+
+	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		return SCARD_E_NO_SERVICE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
@@ -606,13 +613,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	}
 
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-
-	/*
-	 * Remove the local context from the stack
-	 */
-	SCardLockThread();
-	SCardRemoveContext(hContext);
-	SCardUnlockThread();
 
 	PROFILE_END(scReleaseStruct.rv)
 
