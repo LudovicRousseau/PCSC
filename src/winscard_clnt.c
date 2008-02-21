@@ -569,6 +569,14 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	PROFILE_START
 
 	/*
+	 * Make sure this context has been opened 	 
+	 * and get dwContextIndex
+	 */ 	 
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1) 	 
+		return SCARD_E_INVALID_HANDLE;
+
+	/*
 	 * Remove the local context from the stack
 	 */
 	SCardLockThread();
