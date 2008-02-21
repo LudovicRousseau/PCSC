@@ -391,7 +391,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * cleanly remove /var/run/pcscd/* when exiting
+	 * cleanly remove /var/run/pcscd/files when exiting
 	 */
 	signal(SIGQUIT, signal_trap);
 	signal(SIGTERM, signal_trap);
