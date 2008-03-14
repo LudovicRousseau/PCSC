@@ -37,7 +37,7 @@ lockfile=@localstatedir_exp@/lock/subsys/$prog
 PCSCD_OPTIONS=
 
 # Source config
-if [ -f @sysconfdir_exp@/sysconfig/pscsd ] ; then
+if [ -f @sysconfdir_exp@/sysconfig/pcscd ] ; then
     . @sysconfdir_exp@/sysconfig/pcscd
 fi
 
