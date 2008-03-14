@@ -3517,7 +3517,7 @@ LONG SCardCheckDaemonAvailability(void)
 			{
 				int i;
 
-				Log1(PCSC_LOG_ERROR, "PCSC restarted");
+				Log1(PCSC_LOG_INFO, "PCSC restarted");
 
 				/* invalid all handles */
 				SCardLockThread();
