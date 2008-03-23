@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.58)
 
-AC_INIT(pcsc-lite, 1.4.99)
+AC_INIT(pcsc-lite, 1.4.100)
 AC_CONFIG_SRCDIR(src/pcscdaemon.c)
 AM_INIT_AUTOMAKE(1.8)
 AM_CONFIG_HEADER(config.h)

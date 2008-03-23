@@ -1,3 +1,28 @@
+pcsc-lite-1.4.100: Ludovic Rousseau
+23 March 2008
+- add libhal support to avoid polling the USB bus.  libusb is still
+  supported but libhal is now the default
+- improve performances in SCardConnect(), SCardReconnect(),
+  SCardDisconnect(). Thanks to Sean Wykes for the patch
+- SCardListReaders(): returns SCARD_E_NO_READERS_AVAILABLE when no
+  reader are available.  Thanks to Thomas Harning for the bug report
+- add support of TAG_IFD_POLLING_THREAD to use an asynchronous card
+  movements detection instead of an active polling. The reader driver
+  need to support TAG_IFD_POLLING_THREAD to use this feature
+- CardCheckDaemonAvailability(): lower the priority of the log message
+  in case of "PCSC Not Running" or "PCSC restarted" so that nothing is
+  logged by default.  PCSCLITE_DEBUG can be defined to see the message.
+  Programs linked with libpcsclite will not display anything if pcscd is
+  not running. Solves Red Hat bug 428299. 
+- default log level is PCSC_LOG_CRITICAL+1 so that NO log is sent to
+  stderr by default. You need to explicitly set PCSCLITE_DEBUG to have
+  logs. (in a library stderr(2) can be any file opened with fd=2 so
+  should not be used)
+- ifdhandler-3.tex: more details about deviceName argument of
+  IFDHCreateChannelByName()
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.99: Ludovic Rousseau
 9 January 2008
 - add support of mix 32/64 bits platforms.  Thanks to Jacob Berkman for
