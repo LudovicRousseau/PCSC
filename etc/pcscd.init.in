@@ -13,11 +13,13 @@
 #
 ### BEGIN INIT INFO
 # Provides: pcscd
-# Should-Start: $syslog openct
-# Should-Stop: $syslog openct
+# Required-Start: $local_fs $remote_fs $syslog
+# Required-Stop: $local_fs $remote_fs $syslog
+# Should-Start: udev hal openct
+# Should-Stop: udev hal openct
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
-# Short-Description: PC/SC smart card daemon
+# Short-Description: Daemon to access a smart card using PC/SC
 # Description: The PC/SC smart card daemon is a resource manager for the
 #              PC/SC lite and Musclecard frameworks.  It coordinates
 #              communications with smart card readers, smart cards, and
