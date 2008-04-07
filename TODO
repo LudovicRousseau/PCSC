@@ -15,4 +15,8 @@
 - manage power suspend/resume (in a laptop for example) and coordinate
   with the driver (when/if possible)
 
-October 2007
+- start pcscd only when a reader is connected. Use HAL to detect USB
+  reader insertion? use an external launcher like launch on Mac OS X?
+  See https://bugzilla.redhat.com/show_bug.cgi?id=233762
+
+April 2008
