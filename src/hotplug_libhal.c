@@ -444,7 +444,7 @@ ULONG HPRegisterForHotplugEvents(void)
     int i, num_devices;
 	DBusError error;
 
-	if (0 == driverSize)
+	if (driverSize <= 0)
 	{
 		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
 		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
