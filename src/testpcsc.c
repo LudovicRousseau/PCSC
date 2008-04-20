@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2004-2006
+ * Copyright (C) 2004-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -25,7 +25,13 @@
 
 #define PANIC 0
 #define DONT_PANIC 1
-#define RED_PRINTF_FORMAT "\33[01;31m%s\33[0m\n"
+
+#define BLUE "\33[34m"
+#define RED "\33[31m"
+#define BRIGHT_RED "\33[01;31m"
+#define GREEN "\33[32m"
+#define NORMAL "\33[0m"
+#define MAGENTA "\33[35m"
 
 void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic);
 void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
@@ -33,10 +39,10 @@ void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		if (dont_panic)
-			printf("\33[34m%s (don't panic)\33[0m\n", pcsc_stringify_error(rv));
+			printf(BLUE "%s (don't panic)\n" NORMAL, pcsc_stringify_error(rv));
 		else
 		{
-			printf(RED_PRINTF_FORMAT, pcsc_stringify_error(rv));
+			printf(RED "%s\n" NORMAL, pcsc_stringify_error(rv));
 			SCardReleaseContext(hContext);
 			exit(-1);
 		}
@@ -68,8 +74,8 @@ int main(int argc, char **argv)
 
 	printf("\nMUSCLE PC/SC Lite unitary test Program\n\n");
 
-	printf("\33[35mTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
-	printf("Do NOT use it unless you really know what you do.\33[0m\n\n");
+	printf(MAGENTA "THIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
+	printf("Do NOT use it unless you really know what you do.\n\n" NORMAL);
 
 	printf("Testing SCardEstablishContext\t: ");
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
@@ -93,6 +99,7 @@ int main(int argc, char **argv)
 	rv = SCardListReaderGroups(hContext, 0, &dwGroups);
 	test_rv(rv, hContext, PANIC);
 
+	printf("Testing SCardListReaderGroups\t: ");
 	mszGroups = malloc(sizeof(char) * dwGroups);
 	rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
 	test_rv(rv, hContext, PANIC);
@@ -104,7 +111,7 @@ int main(int argc, char **argv)
 	for (i = 0; i < dwGroups - 1; i++)
 	{
 		++p;
-		printf("Group %02d: %s\n", p, &mszGroups[i]);
+		printf(GREEN "Group %02d: %s\n" NORMAL, p, &mszGroups[i]);
 		iList[p] = i;
 		while (mszGroups[++i] != 0) ;
 	}
@@ -116,6 +123,7 @@ wait_for_card_again:
 	rv = SCardListReaders(hContext, mszGroups, 0, &dwReaders);
 	test_rv(rv, hContext, PANIC);
 
+	printf("Testing SCardListReaders\t: ");
 	mszReaders = malloc(sizeof(char) * dwReaders);
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 	test_rv(rv, hContext, PANIC);
@@ -127,7 +135,7 @@ wait_for_card_again:
 	for (i = 0; i < dwReaders - 1; i++)
 	{
 		++p;
-		printf("Reader %02d: %s\n", p, &mszReaders[i]);
+		printf(GREEN "Reader %02d: %s\n" NORMAL, p, &mszReaders[i]);
 		iList[p] = i;
 		while (mszReaders[++i] != 0) ;
 	}
@@ -193,10 +201,10 @@ wait_for_card_again:
 	rv = SCardTransmit(hCard, &pioSendPci, bSendBuffer, send_length,
 		&pioRecvPci, bRecvBuffer, &length);
 	printf("%s\n", pcsc_stringify_error(rv));
-	printf(" card response:");
+	printf(" card response:" GREEN);
 	for (i=0; i<length; i++)
 		printf(" %02X", bRecvBuffer[i]);
-	printf("\n");
+	printf("\n" NORMAL);
 
 	printf("Testing SCardControl\t\t: ");
 #ifdef PCSC_PRE_120
@@ -227,7 +235,7 @@ wait_for_card_again:
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("ATR length: %ld\n", dwAtrLen);
+		printf("SCARD_ATTR_ATR_STRING length: " GREEN "%ld\n" NORMAL, dwAtrLen);
 
 	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
@@ -235,9 +243,10 @@ wait_for_card_again:
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
+		printf("SCARD_ATTR_ATR_STRING: " GREEN);
 		for (i = 0; i < dwAtrLen; i++)
 			printf("%02X ", pbAtr[i]);
-		printf("\n");
+		printf("\n" NORMAL);
 	}
 
 	printf("Testing SCardGetAttrib\t\t: ");
@@ -245,7 +254,8 @@ wait_for_card_again:
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor IFD version\t\t: 0x%08lX\n", ((DWORD *)pbAtr)[0]);
+		printf("Vendor IFD version\t\t: " GREEN "0x%08lX\n" NORMAL,
+			((DWORD *)pbAtr)[0]);
 
 	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
@@ -254,9 +264,10 @@ wait_for_card_again:
 	if (rv == SCARD_S_SUCCESS)
 	{
 		if (dwAtrLen == sizeof(uint32_t))
-			printf("Max message length\t\t: %d\n", *(uint32_t *)pbAtr);
+			printf("Max message length\t\t: " GREEN "%d\n" NORMAL,
+				*(uint32_t *)pbAtr);
 		else
-			printf(RED_PRINTF_FORMAT, "Wrong size");
+			printf(RED "Wrong size" NORMAL);
 	}
 
 	printf("Testing SCardGetAttrib\t\t: ");
@@ -264,7 +275,7 @@ wait_for_card_again:
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor name\t\t\t: %s\n", pbAtr);
+		printf("Vendor name\t\t\t: " GREEN "%s\n" NORMAL, pbAtr);
 
 	printf("Testing SCardSetAttrib\t\t: ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
@@ -280,17 +291,18 @@ wait_for_card_again:
 		pbAtr, &dwAtrLen);
 	test_rv(rv, hContext, PANIC);
 
-	printf("Current Reader Name\t\t: %s\n", pcReaders);
-	printf("Current Reader State\t\t: 0x%.4lx\n", dwState);
-	printf("Current Reader Protocol\t\t: T=%ld\n", dwProt - 1);
-	printf("Current Reader ATR Size\t\t: %ld bytes\n", dwAtrLen);
-	printf("Current Reader ATR Value\t: ");
+	printf("Current Reader Name\t\t: " GREEN "%s\n" NORMAL, pcReaders);
+	printf("Current Reader State\t\t: " GREEN "0x%.4lx\n" NORMAL, dwState);
+	printf("Current Reader Protocol\t\t: T=" GREEN "%ld\n" NORMAL, dwProt - 1);
+	printf("Current Reader ATR Size\t\t: " GREEN "%ld" NORMAL " bytes\n",
+		dwAtrLen);
+	printf("Current Reader ATR Value\t: " GREEN);
 
 	for (i = 0; i < dwAtrLen; i++)
 	{
 		printf("%02X ", pbAtr[i]);
 	}
-	printf("\n");
+	printf(NORMAL "\n");
 
 	if (rv != SCARD_S_SUCCESS)
 	{
