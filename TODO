@@ -19,4 +19,8 @@
   reader insertion? use an external launcher like launch on Mac OS X?
   See https://bugzilla.redhat.com/show_bug.cgi?id=233762
 
+- start pcscd as an normal user daemon (as id smartcard?) instead as
+  root.  Of course the smart card readers should be accessible by this
+  user (use UDEV rule files to set the correct access rights).
+
 April 2008
