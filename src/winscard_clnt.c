@@ -11,6 +11,7 @@
 
 /**
  * @file
+ * @defgroup API
  * @brief This handles smartcard reader communications and
  * forwarding requests over message queues.
  *
@@ -265,6 +266,7 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
  * This must be the first function called in a PC/SC application.
  * This is a thread-safe wrapper to the function SCardEstablishContextTH().
  *
+ * @ingroup API
  * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
  * - \ref SCARD_SCOPE_USER - Not used.
@@ -538,6 +540,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
  * @brief This function destroys a communication context to the PC/SC Resource
  * Manager. This must be the last function called in a PC/SC application.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to be closed.
  *
  * @return Connection status.
@@ -653,6 +656,7 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * specified in \p szReader. The first connection will power up and perform a
  * reset on the card.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] szReader Reader name to connect to.
  * @param[in] dwShareMode Mode of connection type: exclusive or shared.
@@ -814,6 +818,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  * order to acknowledge that the card was reset and allow it to change it's
  * state accordingly.
  *
+ * @ingroup API
  * @param[in] hCard Handle to a previous call to connect.
  * @param[in] dwShareMode Mode of connection type: exclusive/shared.
  * - \ref SCARD_SHARE_SHARED - This application will allow others to share
@@ -975,6 +980,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
  * This function terminates a connection to the connection made through
  * SCardConnect(). \p dwDisposition can have the following values:
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwDisposition Reader function to execute.
  * - \ref SCARD_LEAVE_CARD - Do nothing.
@@ -1079,6 +1085,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * reader or this application is in \ref SCARD_SHARE_EXCLUSIVE there will be no
  * action taken.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  *
  * @return Error code.
@@ -1194,6 +1201,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * The calling application must be the owner of the previously begun
  * transaction or an error will occur.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwDisposition Action to be taken on the reader.
  * The disposition action is not currently used in this release.
@@ -1409,6 +1417,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * state, and protocol will be stored in pdwState and \p pdwProtocol
  * respectively.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param mszReaderNames [inout] Friendly name of this reader.
  * @param pcchReaderLen [inout] Size of the \p szReaderName multistring.
@@ -1655,6 +1664,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  *   bit is set, \ref SCARD_STATE_PRESENT will also be set.
  * - \ref SCARD_STATE_MUTE There is an unresponsive card in the reader.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout Maximum waiting time (in miliseconds) for status
  *            change, zero (or \ref INFINITE) for infinite.
@@ -2204,6 +2214,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
  * @note the API of this function changed. In pcsc-lite 1.2.0 and before the
  * API was not Windows(R) PC/SC compatible. This has been corrected.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwControlCode Control code for the operation.\n
  * <a href="http://pcsclite.alioth.debian.org/pcsc-lite/node28.html">
@@ -2431,6 +2442,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * This function get an attribute from the IFD Handler. The list of possible
  * attributes is available in the file \c pcsclite.h.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwAttrId Identifier for the attribute to get.
  * - \ref SCARD_ATTR_ASYNC_PROTOCOL_TYPES
@@ -2536,6 +2548,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * The list of attributes you can set is dependent on the IFD Handler you are
  * using.
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwAttrId Identifier for the attribute to set.
  * @param[in] pbAttr Pointer to a buffer that receives the attribute.
@@ -2695,6 +2708,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * } SCARD_IO_REQUEST;
  * @endcode
  *
+ * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param pioSendPci [inout] Structure of protocol information.
  * - \ref SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
@@ -2966,6 +2980,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * NULL then this function will return the size of the buffer needed to
  * allocate in \p pcchReaders.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] mszGroups List of groups to list readers (not used).
  * @param[out] mszReaders Multi-string with list of readers.
@@ -3078,6 +3093,7 @@ end:
  * The group names is a multi-string and separated by a nul character ('\\0')
  * and ended by a double nul character. "SCard$DefaultReaders\\0Group 2\\0\\0".
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
  * @param pcchGroups [inout] Size of multi-string buffer including NUL's.
@@ -3149,6 +3165,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
  * This function cancels all pending blocking requests on the
  * SCardGetStatusChange() function.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  *
  * @return Error code.
@@ -3201,6 +3218,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
  * SCardEstablishContext(), it may become not valid if the resource manager
  * service has been shut down.
  *
+ * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  *
  * @return Error code.

@@ -28,6 +28,7 @@
 /**
  * @brief This function return a human readable text for the given PC/SC error code.
  *
+ * @ingroup API
  * @param[in] pcscError Error code to be translated to text.
  *
  * @return Text representing de error code passed.
