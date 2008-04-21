@@ -200,12 +200,10 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(SCARD_IO_REQUEST
  *
  * @param[in] dwScope Scope of the establishment.
  * This can either be a local or remote connection.
- * <ul>
- *   <li>SCARD_SCOPE_USER - Not used.
- *   <li>SCARD_SCOPE_TERMINAL - Not used.
- *   <li>SCARD_SCOPE_GLOBAL - Not used.
- *   <li>SCARD_SCOPE_SYSTEM - Services on the local machine.
- * </ul>
+ * - SCARD_SCOPE_USER - Not used.
+ * - SCARD_SCOPE_TERMINAL - Not used.
+ * - SCARD_SCOPE_GLOBAL - Not used.
+ * - SCARD_SCOPE_SYSTEM - Services on the local machine.
  * @param[in] pvReserved1 Reserved for future use. Can be used for remote connection.
  * @param[in] pvReserved2 Reserved for future use.
  * @param[out] phContext Returned Application Context.
