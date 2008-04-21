@@ -95,42 +95,42 @@ extern "C"
 
 	struct RdrCliHandles
 	{
-		SCARDHANDLE hCard;		/* hCard for this connection */
-		DWORD dwEventStatus;	/* Recent event that must be sent */
+		SCARDHANDLE hCard;		/**< hCard for this connection */
+		DWORD dwEventStatus;	/**< Recent event that must be sent */
 	};
 
 	typedef struct RdrCliHandles RDR_CLIHANDLES, *PRDR_CLIHANDLES;
 
 	struct ReaderContext
 	{
-		char lpcReader[MAX_READERNAME];	/* Reader Name */
-		char lpcLibrary[MAX_LIBNAME];	/* Library Path */
-		char lpcDevice[MAX_DEVICENAME];	/* Device Name */
-		PCSCLITE_THREAD_T pthThread;	/* Event polling thread */
-		RESPONSECODE (*pthCardEvent)(DWORD);	/* Card Event sync */
-		PCSCLITE_MUTEX_T mMutex;	/* Mutex for this connection */
+		char lpcReader[MAX_READERNAME];	/**< Reader Name */
+		char lpcLibrary[MAX_LIBNAME];	/**< Library Path */
+		char lpcDevice[MAX_DEVICENAME];	/**< Device Name */
+		PCSCLITE_THREAD_T pthThread;	/**< Event polling thread */
+		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
+		PCSCLITE_MUTEX_T mMutex;	/**< Mutex for this connection */
 		RDR_CLIHANDLES psHandles[PCSCLITE_MAX_READER_CONTEXT_CHANNELS];
-                                         /* Structure of connected handles */
+                                         /**< Structure of connected handles */
 		union
 		{
-			FCT_MAP_V1 psFunctions_v1;	/* API V1.0 */
-			FCT_MAP_V2 psFunctions_v2;	/* API V2.0 */
-			FCT_MAP_V3 psFunctions_v3;	/* API V3.0 */
+			FCT_MAP_V1 psFunctions_v1;	/**< API V1.0 */
+			FCT_MAP_V2 psFunctions_v2;	/**< API V2.0 */
+			FCT_MAP_V3 psFunctions_v3;	/**< API V3.0 */
 		} psFunctions;
 
-		LPVOID vHandle;			/* Dlopen handle */
-		DWORD dwVersion;		/* IFD Handler version number */
-		DWORD dwPort;			/* Port ID */
-		DWORD dwSlot;			/* Current Reader Slot */
-		DWORD dwBlockStatus;	/* Current blocking status */
-		DWORD dwLockId;			/* Lock Id */
-		int LockCount;			/* number of recursive locks */
-		DWORD dwIdentity;		/* Shared ID High Nibble */
-		int32_t dwContexts;		/* Number of open contexts */
-		PDWORD pdwFeeds;		/* Number of shared client to lib */
-		PDWORD pdwMutex;		/* Number of client to mutex */
+		LPVOID vHandle;			/**< Dlopen handle */
+		DWORD dwVersion;		/**< IFD Handler version number */
+		DWORD dwPort;			/**< Port ID */
+		DWORD dwSlot;			/**< Current Reader Slot */
+		DWORD dwBlockStatus;	/**< Current blocking status */
+		DWORD dwLockId;			/**< Lock Id */
+		int LockCount;			/**< number of recursive locks */
+		DWORD dwIdentity;		/**< Shared ID High Nibble */
+		int32_t dwContexts;		/**< Number of open contexts */
+		PDWORD pdwFeeds;		/**< Number of shared client to lib */
+		PDWORD pdwMutex;		/**< Number of client to mutex */
 
-		struct pubReaderStatesList *readerState; /* link to the reader state */
+		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use PREADER_STATE here since eventhandler.h can't be
 		 * included because of circular dependencies */
 	};
