@@ -700,7 +700,8 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * @endcode
  */
 LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
@@ -2247,10 +2248,12 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
  * BYTE pbSendBuffer[] = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10 0x00 };
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
  * dwSendLength = sizeof(pbSendBuffer);
  * dwRecvLength = sizeof(pbRecvBuffer);
- * rv = SCardControl(hCard, 0x42000001, pbSendBuffer, dwSendLength, pbRecvBuffer, sizeof(pbRecvBuffer), &dwRecvLength);
+ * rv = SCardControl(hCard, 0x42000001, pbSendBuffer, dwSendLength,
+ *          pbRecvBuffer, sizeof(pbRecvBuffer), &dwRecvLength);
  * @endcode
  */
 LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
@@ -2515,7 +2518,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
- *                           SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+ *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
  * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
  * @endcode
  */
@@ -2573,7 +2576,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
- *                   SCARD_PROTOCOL_RAW &hCard, &dwActiveProtocol);
+ *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
  * rv = SCardSetAttrib(hCard, 0x42000001, "\x12\x34\x56", 3);
  * @endcode
  */
