@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2005
+ * Copyright (C) 1999-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id: debuglog.c 1953 2006-03-21 13:46:28Z rousseau $
@@ -25,7 +25,7 @@
 
 #define DEBUG_BUF_SIZE 2048
 
-/** default level is a bit verbose to be backward compatible */
+/** default level is quiet to avoid polluting fd 2 (possibly NOT stderr) */
 static char LogLevel = PCSC_LOG_CRITICAL+1;
 
 static signed char LogDoColor = 0;	/**< no color by default */
