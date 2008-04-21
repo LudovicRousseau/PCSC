@@ -29,10 +29,10 @@ extern "C"
 
 	typedef struct
 	{
-		char *pcFriendlyname;
-		char *pcDevicename;
-		char *pcLibpath;
-		int dwChannelId;
+		char *pcFriendlyname;	/**< FRIENDLYNAME */
+		char *pcDevicename;		/**< DEVICENAME */
+		char *pcLibpath;		/**< LIBPATH */
+		int dwChannelId;		/**< CHANNELID */
 	} SerialReader;
 
 	struct FctMap_V1
