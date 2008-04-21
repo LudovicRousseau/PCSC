@@ -93,45 +93,6 @@ extern "C"
 
 	typedef struct FctMap_V3 FCT_MAP_V3, *PFCT_MAP_V3;
 
-	/*
-	 * The following is not currently used but in place if needed
-	 */
-
-	struct RdrCapabilities
-	{
-		DWORD dwAsynch_Supported;	/* Asynchronous Support */
-		DWORD dwDefault_Clock;	/* Default Clock Rate */
-		DWORD dwMax_Clock;		/* Max Clock Rate */
-		DWORD dwDefault_Data_Rate;	/* Default Data Rate */
-		DWORD dwMax_Data_Rate;	/* Max Data Rate */
-		DWORD dwMax_IFSD;		/* Maximum IFSD Size */
-		DWORD dwSynch_Supported;	/* Synchronous Support */
-		DWORD dwPower_Mgmt;		/* Power Mgmt Features */
-		DWORD dwCard_Auth_Devices;	/* Card Auth Devices */
-		DWORD dwUser_Auth_Device;	/* User Auth Devices */
-		DWORD dwMechanics_Supported;	/* Machanics Supported */
-		DWORD dwVendor_Features;	/* User Defined.  */
-	};
-
-	typedef struct RdrCapabilities RDR_CAPABILITIES, *PRDR_CAPABILITIES;
-
-	struct ProtOptions
-	{
-		DWORD dwProtocol_Type;	/* Protocol Type */
-		DWORD dwCurrent_Clock;	/* Current Clock */
-		DWORD dwCurrent_F;		/* Current F */
-		DWORD dwCurrent_D;		/* Current D */
-		DWORD dwCurrent_N;		/* Current N */
-		DWORD dwCurrent_W;		/* Current W */
-		DWORD dwCurrent_IFSC;	/* Current IFSC */
-		DWORD dwCurrent_IFSD;	/* Current IFSD */
-		DWORD dwCurrent_BWT;	/* Current BWT */
-		DWORD dwCurrent_CWT;	/* Current CWT */
-		DWORD dwCurrent_EBC;	/* Current EBC */
-	};
-
-	typedef struct ProtOptions PROT_OPTIONS, *PPROT_OPTIONS;
-
 	struct RdrCliHandles
 	{
 		SCARDHANDLE hCard;		/* hCard for this connection */
@@ -172,13 +133,6 @@ extern "C"
 		struct pubReaderStatesList *readerState; /* link to the reader state */
 		/* we can't use PREADER_STATE here since eventhandler.h can't be
 		 * included because of circular dependencies */
-
-		/* these structures are unused */
-#if 0
-		RDR_CAPABILITIES psCapabilites;	/* Structure of reader
-						   capabilities */
-		PROT_OPTIONS psProtOptions;	/* Structure of protocol options */
-#endif
 	};
 
 	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
