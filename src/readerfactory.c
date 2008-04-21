@@ -300,7 +300,12 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
 			TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
 		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
+		{
 			fct = NULL;
+			Log1(PCSC_LOG_INFO, "Using the pcscd polling thread");
+		}
+		else
+			Log1(PCSC_LOG_INFO, "Using the reader polling thread");
 
 		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
 		if (rv != SCARD_S_SUCCESS)
