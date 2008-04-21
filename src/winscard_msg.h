@@ -65,7 +65,7 @@ extern "C"
 		CMD_READER_EVENT = 0xF5,
 		CMD_SYN = 0xF6,
 		CMD_ACK = 0xF7,
-		CMD_VERSION = 0xF8
+		CMD_VERSION = 0xF8	/**< version of the IPC */
 	};
 
 	/**
@@ -73,28 +73,28 @@ extern "C"
 	 */
 	enum pcsc_msg_commands
 	{
-		SCARD_ESTABLISH_CONTEXT = 0x01,
-		SCARD_RELEASE_CONTEXT = 0x02,
-		SCARD_LIST_READERS = 0x03,
-		SCARD_CONNECT = 0x04,
-		SCARD_RECONNECT = 0x05,
-		SCARD_DISCONNECT = 0x06,
-		SCARD_BEGIN_TRANSACTION = 0x07,
-		SCARD_END_TRANSACTION = 0x08,
-		SCARD_TRANSMIT = 0x09,
-		SCARD_CONTROL = 0x0A,
-		SCARD_STATUS = 0x0B,
-		SCARD_GET_STATUS_CHANGE = 0x0C,
-		SCARD_CANCEL = 0x0D,
+		SCARD_ESTABLISH_CONTEXT = 0x01,	/**< used by SCardEstablishContext() */
+		SCARD_RELEASE_CONTEXT = 0x02,	/**< used by SCardReleaseContext() */
+		SCARD_LIST_READERS = 0x03,		/**< used by SCardListReaders() */
+		SCARD_CONNECT = 0x04,			/**< used by SCardConnect() */
+		SCARD_RECONNECT = 0x05,			/**< used by SCardReconnect() */
+		SCARD_DISCONNECT = 0x06,		/**< used by SCardDisconnect() */
+		SCARD_BEGIN_TRANSACTION = 0x07,	/**< used by SCardBeginTransaction() */
+		SCARD_END_TRANSACTION = 0x08,	/**< used by SCardEndTransaction() */
+		SCARD_TRANSMIT = 0x09,			/**< used by SCardTransmit() */
+		SCARD_CONTROL = 0x0A,			/**< used by SCardControl() */
+		SCARD_STATUS = 0x0B,			/**< used by SCardStatus() */
+		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< used by SCardGetStatusChange() */
+		SCARD_CANCEL = 0x0D,			/**< used by SCardCancel() */
 		SCARD_CANCEL_TRANSACTION = 0x0E,
-		SCARD_GET_ATTRIB = 0x0F,
-		SCARD_SET_ATTRIB = 0x10,
-		SCARD_TRANSMIT_EXTENDED = 0x11,
-		SCARD_CONTROL_EXTENDED = 0x12
+		SCARD_GET_ATTRIB = 0x0F,		/**< used by SCardGetAttrib() */
+		SCARD_SET_ATTRIB = 0x10,		/**< used by SCardSetAttrib() */
+		SCARD_TRANSMIT_EXTENDED = 0x11,	/**< used by SCardTransmit() */
+		SCARD_CONTROL_EXTENDED = 0x12	/**< used by SCardControl() */
 	};
 
 	/**
-	 * @brief Information transmitted in \c CMD_VERSION Messages.
+	 * @brief Information transmitted in \ref CMD_VERSION Messages.
 	 */
 	struct version_struct
 	{
@@ -111,7 +111,7 @@ extern "C"
 	typedef struct client_struct client_struct;
 
 	/**
-	 * @brief Information contained in \c SCARD_ESTABLISH_CONTEXT Messages.
+	 * @brief Information contained in \ref SCARD_ESTABLISH_CONTEXT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -124,7 +124,7 @@ extern "C"
 	typedef struct establish_struct establish_struct;
 
 	/**
-	 * @brief Information contained in \c SCARD_RELEASE_CONTEXT Messages.
+	 * @brief Information contained in \ref SCARD_RELEASE_CONTEXT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -136,7 +136,7 @@ extern "C"
 	typedef struct release_struct release_struct;
 
 	/**
-	 * @brief contained in \c SCARD_CONNECT Messages.
+	 * @brief contained in \ref SCARD_CONNECT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -153,7 +153,7 @@ extern "C"
 	typedef struct connect_struct connect_struct;
 
 	/**
-	 * @brief contained in \c SCARD_RECONNECT Messages.
+	 * @brief contained in \ref SCARD_RECONNECT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -169,7 +169,7 @@ extern "C"
 	typedef struct reconnect_struct reconnect_struct;
 
 	/**
-	 * @brief contained in \c SCARD_DISCONNECT Messages.
+	 * @brief contained in \ref SCARD_DISCONNECT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -182,7 +182,7 @@ extern "C"
 	typedef struct disconnect_struct disconnect_struct;
 
 	/**
-	 * @brief contained in \c SCARD_BEGIN_TRANSACTION Messages.
+	 * @brief contained in \ref SCARD_BEGIN_TRANSACTION Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -194,7 +194,7 @@ extern "C"
 	typedef struct begin_struct begin_struct;
 
 	/**
-	 * @brief contained in \c SCARD_END_TRANSACTION Messages.
+	 * @brief contained in \ref SCARD_END_TRANSACTION Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -207,7 +207,7 @@ extern "C"
 	typedef struct end_struct end_struct;
 
 	/**
-	 * @brief contained in \c SCARD_CANCEL Messages.
+	 * @brief contained in \ref SCARD_CANCEL Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -219,7 +219,7 @@ extern "C"
 	typedef struct cancel_struct cancel_struct;
 
 	/**
-	 * @brief contained in \c SCARD_STATUS Messages.
+	 * @brief contained in \ref SCARD_STATUS Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -237,7 +237,7 @@ extern "C"
 	typedef struct status_struct status_struct;
 
 	/**
-	 * @brief contained in \c SCARD_TRANSMIT Messages.
+	 * @brief contained in \ref SCARD_TRANSMIT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -257,7 +257,7 @@ extern "C"
 	typedef struct transmit_struct transmit_struct;
 
 	/**
-	 * @brief contained in \c SCARD_TRANSMIT_EXTENDED Messages.
+	 * @brief contained in \ref SCARD_TRANSMIT_EXTENDED Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -277,7 +277,7 @@ extern "C"
 	typedef struct transmit_struct_extended transmit_struct_extended;
 
 	/**
-	 * @brief contained in \c SCARD_CONTROL Messages.
+	 * @brief contained in \ref SCARD_CONTROL Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -295,7 +295,7 @@ extern "C"
 	typedef struct control_struct control_struct;
 
 	/**
-	 * @brief contained in \c SCARD_CONTROL_EXTENDED Messages.
+	 * @brief contained in \ref SCARD_CONTROL_EXTENDED Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
@@ -313,7 +313,7 @@ extern "C"
 	typedef struct control_struct_extended control_struct_extended;
 
 	/**
-	 * @brief contained in \c SCARD_GET_ATTRIB and \c  Messages.
+	 * @brief contained in \ref SCARD_GET_ATTRIB and \c  Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
 	 */
