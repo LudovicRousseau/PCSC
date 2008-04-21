@@ -45,16 +45,6 @@ extern "C"
 			UCHAR Convention;
 			USHORT ETU;
 
-			struct _PtsData
-			{
-				UCHAR F1;
-				UCHAR D1;
-				UCHAR I1;
-				UCHAR P1;
-				UCHAR N1;
-			}
-			PtsData;
-
 			struct _T1
 			{
 				USHORT BGT;
