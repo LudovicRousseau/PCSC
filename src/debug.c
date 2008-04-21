@@ -29,9 +29,8 @@
 static char LogLevel = PCSC_LOG_CRITICAL+1;
 
 static signed char LogDoColor = 0;	/**< no color by default */
-void log_init(void);
 
-void log_init(void)
+static void log_init(void)
 {
 	char *e;
 
