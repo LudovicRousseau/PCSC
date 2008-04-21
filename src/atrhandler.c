@@ -156,22 +156,12 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 			{
 				psExtension->CardCapabilities.AvailableProtocols |=
 					SCARD_PROTOCOL_T0;
-				psExtension->CardCapabilities.T0.BGT = 0;
-				psExtension->CardCapabilities.T0.BWT = 0;
-				psExtension->CardCapabilities.T0.CWT = 0;
-				psExtension->CardCapabilities.T0.CGT = 0;
-				psExtension->CardCapabilities.T0.WT = 0;
 			}
 			else
 				if (1 == T)
 				{
 					psExtension->CardCapabilities.AvailableProtocols |=
 						SCARD_PROTOCOL_T1;
-					psExtension->CardCapabilities.T1.BGT = 0;
-					psExtension->CardCapabilities.T1.BWT = 0;
-					psExtension->CardCapabilities.T1.CWT = 0;
-					psExtension->CardCapabilities.T1.CGT = 0;
-					psExtension->CardCapabilities.T1.WT = 0;
 				}
 				else
 					if (15 == T)

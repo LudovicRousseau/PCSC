@@ -36,42 +36,13 @@ extern "C"
 		}
 		ATR;
 
-		DWORD ReadTimeout;
-
 		struct _CardCapabilities
 		{
 			UCHAR AvailableProtocols;
 			UCHAR CurrentProtocol;
 			UCHAR Convention;
-			USHORT ETU;
-
-			struct _T1
-			{
-				USHORT BGT;
-				USHORT BWT;
-				USHORT CWT;
-				USHORT CGT;
-				USHORT WT;
-			}
-			T1;
-
-			struct _T0
-			{
-				USHORT BGT;
-				USHORT BWT;
-				USHORT CWT;
-				USHORT CGT;
-				USHORT WT;
-			}
-			T0;
-
 		}
 		CardCapabilities;
-
-		/*
-		 * PREADER_CONNECTION psReaderConnection;
-		 */
-
 	}
 	SMARTCARD_EXTENSION, *PSMARTCARD_EXTENSION;
 
