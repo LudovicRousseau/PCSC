@@ -62,7 +62,7 @@ extern int HPForceReaderPolling;
 /* values of ifdCapabilities bits */
 #define IFD_GENERATE_HOTPLUG 1
 
-/*
+/**
  * keep track of drivers in a dynamically allocated array
  */
 static struct _driverTracker
@@ -77,14 +77,14 @@ static struct _driverTracker
 } *driverTracker = NULL;
 #define DRIVER_TRACKER_SIZE_STEP 8
 
-/*
+/**
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
  */
 static struct _readerTracker
 {
 	char status;
-	char bus_device[BUS_DEVICE_STRSIZE];	/* device name */
-	char *fullName;	/* full reader name (including serial number) */
+	char bus_device[BUS_DEVICE_STRSIZE];	/**< device name */
+	char *fullName;	/**< full reader name (including serial number) */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 static LONG HPReadBundleValues(void);
@@ -550,7 +550,7 @@ static LONG HPRemoveHotPluggable(int reader_index)
 	return 1;
 }	/* End of function */
 
-/*
+/**
  * Sets up callbacks for device hotplug events.
  */
 ULONG HPRegisterForHotplugEvents(void)
