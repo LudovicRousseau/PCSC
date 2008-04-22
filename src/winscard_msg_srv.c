@@ -236,7 +236,8 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime
  *
  * Called by \c ContextThread().
  */
-INTERNAL int32_t SHMProcessEventsContext(uint32_t *pdwClientID, psharedSegmentMsg msgStruct, int32_t blocktime)
+INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
+	psharedSegmentMsg msgStruct, int32_t blocktime)
 {
 	fd_set read_fd;
 	int selret, rv;
@@ -246,9 +247,9 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t *pdwClientID, psharedSegmentMs
 	tv.tv_usec = 0;
 
 	FD_ZERO(&read_fd);
-	FD_SET(*pdwClientID, &read_fd);
+	FD_SET(dwClientID, &read_fd);
 
-	selret = select(*pdwClientID + 1, &read_fd, (fd_set *) NULL,
+	selret = select(dwClientID + 1, &read_fd, (fd_set *) NULL,
 		(fd_set *) NULL, &tv);
 
 	if (selret < 0)
@@ -262,21 +263,20 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t *pdwClientID, psharedSegmentMs
 		/* timeout */
 		return 2;
 
-	if (FD_ISSET(*pdwClientID, &read_fd))
+	if (FD_ISSET(dwClientID, &read_fd))
 	{
 		/*
 		 * Return the current handle
 		 */
-		rv = SHMMessageReceive(msgStruct, sizeof(*msgStruct), *pdwClientID,
+		rv = SHMMessageReceive(msgStruct, sizeof(*msgStruct), dwClientID,
 				       PCSCLITE_SERVER_ATTEMPTS);
 
 		if (rv == -1)
 		{	/* The client has died */
-			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d",
-				*pdwClientID);
+			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d", dwClientID);
 			msgStruct->mtype = CMD_CLIENT_DIED;
 			msgStruct->command = 0;
-			SYS_CloseFile(*pdwClientID);
+			SYS_CloseFile(dwClientID);
 
 			return 0;
 		}
@@ -284,8 +284,7 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t *pdwClientID, psharedSegmentMs
 		/*
 		 * Set the identifier handle
 		 */
-		Log2(PCSC_LOG_DEBUG, "correctly processed client: %d",
-			*pdwClientID);
+		Log2(PCSC_LOG_DEBUG, "correctly processed client: %d", dwClientID);
 		return 1;
 	}
 
