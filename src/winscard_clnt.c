@@ -669,7 +669,6 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  *   card.  \ref SCARD_SHARE_DIRECT can be used before using SCardControl() to
  *   send control commands to the reader even if a card is not present in the
  *   reader.
- * </ul>
  * @param[in] dwPreferredProtocols Desired protocol use.
  * - \ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
  * - \ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
@@ -827,7 +826,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  *   the reader.
  * - \ref SCARD_SHARE_EXCLUSIVE - This application will NOT allow others to
  *   share the reader.
- * </ul>
  * @param[in] dwPreferredProtocols Desired protocol use.
  * - \ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
  * - \ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
