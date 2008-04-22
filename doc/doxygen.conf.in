@@ -694,7 +694,7 @@ DISABLE_INDEX          = NO
 # This tag can be used to set the number of enum values (range [1..20])
 # that doxygen will group on one line in the generated HTML documentation.
 
-ENUM_VALUES_PER_LINE   = 4
+ENUM_VALUES_PER_LINE   = 1
 
 # If the GENERATE_TREEVIEW tag is set to YES, a side panel will be
 # generated containing a tree-like index structure (just like the one that
