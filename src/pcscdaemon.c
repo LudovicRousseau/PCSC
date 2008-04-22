@@ -72,7 +72,7 @@ void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
-/*
+/**
  * Cleans up messages still on the queue when a client dies
  */
 void SVCClientCleanup(psharedSegmentMsg msgStruct)

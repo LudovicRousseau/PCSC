@@ -41,10 +41,10 @@
 #undef PCSCLITE_MAX_READERS_CONTEXTS
 #define PCSCLITE_MAX_READERS_CONTEXTS	2
 
-/* Global session to manage Readers, Card events. */
+/** Global session to manage Readers, Card events. */
 static SCF_Session_t g_hSession = NULL;
 
-/* Have to define this because they are defined in pcsclite.h as externs */
+/** Have to define this because they are defined in pcsclite.h as externs */
 SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 
 static struct _psTransmitMap
@@ -54,7 +54,7 @@ static struct _psTransmitMap
 	LONG bufferLength;
 } psTransmitMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
-/* Channel Map to manage Card Connections. */
+/** Channel Map to manage Card Connections. */
 static struct _psChannelMap
 {
 	SCARDHANDLE PCSC_hCard;
@@ -67,7 +67,7 @@ static struct _psChannelMap
 	int ReaderIndice;
 } psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
-/* Context Map to manage contexts and sessions. */
+/** Context Map to manage contexts and sessions. */
 static struct _psContextMap
 {
 	SCARDCONTEXT hContext;
@@ -75,7 +75,7 @@ static struct _psContextMap
 	DWORD contextBlockStatus;
 } psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
-/* Reader Map to handle Status and GetStatusChange. */
+/** Reader Map to handle Status and GetStatusChange. */
 static struct _psReaderMap
 {
 	SCF_Terminal_t hTerminal;
@@ -89,7 +89,7 @@ static struct _psReaderMap
 
 static PCSCLITE_MUTEX clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
-/*
+/**
  * Mutex for the Smardcard Event Handling, different from client Mutex
  * because event reporting from the ocfserver is done using a single thread,
  * so to get lock on the clientMutex may affect the performance of the ocf server.

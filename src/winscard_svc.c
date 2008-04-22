@@ -42,10 +42,10 @@ static struct _psContext
 {
 	uint32_t hContext;
 	uint32_t hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
-	uint32_t dwClientID;			/* Connection ID used to reference the Client. */
-	PCSCLITE_THREAD_T pthThread;		/* Event polling thread's ID */
-	sharedSegmentMsg msgStruct;		/* Msg sent by the Client */
-	int protocol_major, protocol_minor;	/* Protocol number agreed between client and server*/
+	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
+	PCSCLITE_THREAD_T pthThread;		/**< Event polling thread's ID */
+	sharedSegmentMsg msgStruct;		/**< Msg sent by the Client */
+	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
 } psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
 LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);

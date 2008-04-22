@@ -28,11 +28,10 @@
 
 #undef PCSCLITE_STATIC_DRIVER
 
-/*
- * Function: IFDSetPTS Purpose : To set the protocol type selection (PTS).
+/**
+ * Set the protocol type selection (PTS).
  * This function sets the appropriate protocol to be used on the card.
  */
-
 LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
@@ -109,11 +108,9 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	return rv;
 }
 
-/*
- * Function: IFDOpenIFD Purpose : This function opens a communication
- * channel to the IFD.
+/**
+ * Open a communication channel to the IFD.
  */
-
 LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 {
 	RESPONSECODE rv = 0;
@@ -184,11 +181,9 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 	return rv;
 }
 
-/*
- * Function: IFDCloseIFD Purpose : This function closes a communication
- * channel to the IFD.
+/**
+ * Close a communication channel to the IFD.
  */
-
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -229,11 +224,9 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	return rv;
 }
 
-/*
- * Function: IFDSetCapabilites Purpose : This function set's capabilities
- * in the reader.
+/**
+ * Set capabilities in the reader.
  */
-
 LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
@@ -271,12 +264,11 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	return rv;
 }
 
-/*
- * Function: IFDGetCapabilites Purpose : This function get's capabilities
- * in the reader. Other functions int this file will call the driver
- * directly to not cause a deadlock.
+/**
+ * Get's capabilities in the reader.
+ * Other functions int this file will call
+ * the driver directly to not cause a deadlock.
  */
-
 LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
@@ -323,11 +315,9 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	return rv;
 }
 
-/*
- * Function: IFDPowerICC Purpose : This function powers up/down or reset's
- * an ICC located in the IFD.
+/**
+ * Power up/down or reset's an ICC located in the IFD.
  */
-
 LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
@@ -423,12 +413,10 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	return rv;
 }
 
-/*
- * Function: IFDStatusICC Purpose : This function provides statistical
- * information about the IFD and ICC including insertions, atr, powering
- * status/etc.
+/**
+ * Provide statistical information about the IFD and ICC including insertions,
+ * atr, powering status/etc.
  */
-
 LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
@@ -621,10 +609,9 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	}
 }
 
-/*
- * Function: IFDControl Purpose : This function provides a means for
- * toggling a specific action on the reader such as swallow, eject,
- * biometric.
+/**
+ * Provide a means for toggling a specific action on the reader such as
+ * swallow, eject, biometric.
  */
 
 /*
@@ -683,11 +670,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	}
 }
 
-/*
- * Function: IFDTransmit Purpose : This function transmits an APDU to the
- * ICC.
+/**
+ * Transmit an APDU to the ICC.
  */
-
 LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	PUCHAR pucTxBuffer, DWORD dwTxLength, PUCHAR pucRxBuffer,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)

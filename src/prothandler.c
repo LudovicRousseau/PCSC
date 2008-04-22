@@ -27,12 +27,11 @@
 #include "ifdwrapper.h"
 #include "eventhandler.h"
 
-/*
- * Function: PHGetDefaultProtocol Purpose : To get the default protocol
- * used immediately after reset. This protocol is returned from the
- * function.
+/**
+ * Get the default protocol used immediately after reset.
+ *
+ * This protocol is returned from the function.
  */
-
 UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 {
 	SMARTCARD_EXTENSION sSmartCard;
@@ -48,12 +47,11 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 		return 0x00;
 }
 
-/*
- * Function: PHGetAvailableProtocols Purpose : To get the protocols
- * supported by the card. These protocols are returned from the function
- * as bit masks.
+/**
+ * Get the protocols supported by the card.
+ *
+ * These protocols are returned from the function as bit masks.
  */
-
 UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 {
 	SMARTCARD_EXTENSION sSmartCard;
@@ -69,8 +67,9 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 		return 0x00;
 }
 
-/*
- * Function: PHSetProtocol Purpose : To determine which protocol to use.
+/**
+ * Determine which protocol to use.
+ *
  * SCardConnect has a DWORD dwPreferredProtocols that is a bitmask of what
  * protocols to use.  Basically, if T=N where N is not zero will be used
  * first if it is available in ucAvailable.  Otherwise it will always
@@ -78,7 +77,6 @@ UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
  *
  * IFDSetPTS() is _always_ called so that the driver can initialise its data
  */
-
 DWORD PHSetProtocol(struct ReaderContext * rContext,
 	DWORD dwPreferred, UCHAR ucAvailable, UCHAR ucDefault)
 {

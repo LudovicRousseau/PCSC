@@ -74,7 +74,7 @@ static PCSCLITE_THREAD_T usbNotifyThread;
 static int AraKiriHotPlug = FALSE;
 static int bundleSize = 0;
 
-/*
+/**
  * A list to keep track of 20 simultaneous readers
  */
 static struct _bundleTracker
@@ -418,7 +418,7 @@ static LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
 	return 1;
 }	/* End of function */
 
-/*
+/**
  * Sets up callbacks for device hotplug events.
  */
 ULONG HPRegisterForHotplugEvents(void)

@@ -48,7 +48,7 @@ static char AraKiriHotPlug = FALSE;
 static DBusConnection *conn;
 static LibHalContext *hal_ctx;
 
-/*
+/**
  * keep track of drivers in a dynamically allocated array
  */
 static struct _driverTracker
@@ -63,13 +63,13 @@ static struct _driverTracker
 } *driverTracker = NULL;
 #define DRIVER_TRACKER_SIZE_STEP 8
 
-/*
+/**
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
  */
 static struct _readerTracker
 {
-	char *udi;	/* device name seen by HAL */
-	char *fullName;	/* full reader name (including serial number) */
+	char *udi;	/**< device name seen by HAL */
+	char *fullName;	/**< full reader name (including serial number) */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 static LONG HPReadBundleValues(void);
@@ -77,7 +77,8 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi);
 static void HPRemoveDevice(LibHalContext *ctx, const char *udi);
 static void HPEstablishUSBNotifications(void);
 
-/** Generate a short name for a device
+/**
+ * Generate a short name for a device
  *
  * @param  udi                 Universal Device Id
  */
@@ -240,7 +241,7 @@ void HPEstablishUSBNotifications(void)
 } /* HPEstablishUSBNotifications */
 
 
-/**
+/***
  * Start a thread waiting for hotplug events
  */
 LONG HPSearchHotPluggables(void)
@@ -435,7 +436,7 @@ static void HPRemoveDevice(LibHalContext *ctx, const char *udi)
 } /* HPRemoveDevice */
 
 
-/*
+/**
  * Sets up callbacks for device hotplug events.
  */
 ULONG HPRegisterForHotplugEvents(void)
