@@ -116,7 +116,7 @@ extern "C"
 			FCT_MAP_V1 psFunctions_v1;	/**< API V1.0 */
 			FCT_MAP_V2 psFunctions_v2;	/**< API V2.0 */
 			FCT_MAP_V3 psFunctions_v3;	/**< API V3.0 */
-		} psFunctions;
+		} psFunctions;	/**< driver functions */
 
 		LPVOID vHandle;			/**< Dlopen handle */
 		DWORD dwVersion;		/**< IFD Handler version number */

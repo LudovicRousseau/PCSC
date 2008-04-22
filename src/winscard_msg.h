@@ -98,8 +98,8 @@ extern "C"
 	 */
 	struct version_struct
 	{
-		int32_t major;
-		int32_t minor;
+		int32_t major;	/**< IPC major \ref PROTOCOL_VERSION_MAJOR */
+		int32_t minor;	/**< IPC minor \ref PROTOCOL_VERSION_MINOR */
 		uint32_t rv;
 	};
 	typedef struct version_struct version_struct;
