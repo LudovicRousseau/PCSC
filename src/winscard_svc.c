@@ -153,7 +153,15 @@ static void ContextThread(LPVOID dwIndex)
 				/*
 				 * Command must be found
 				 */
-				MSGFunctionDemarshall(&msgStruct, dwContextIndex);
+				rv = MSGFunctionDemarshall(&msgStruct, dwContextIndex);
+				if (rv)
+				{
+					Log2(PCSC_LOG_DEBUG, "MSGFunctionDemarshall failed: %d",
+						rv);
+					SYS_CloseFile(psContext[dwContextIndex].dwClientID);
+					MSGCleanupClient(dwContextIndex);
+					SYS_ThreadExit((LPVOID) NULL);
+				}
 
 				/* the SCARD_TRANSMIT_EXTENDED anwser is already sent by
 				 * MSGFunctionDemarshall */
