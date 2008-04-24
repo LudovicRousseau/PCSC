@@ -57,11 +57,11 @@ int main(int argc, char **argv)
 	SCARDCONTEXT hContext;
 	SCARD_READERSTATE_A rgReaderStates[1];
 	DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
-	DWORD dwPref, dwReaders;
+	DWORD dwPref, dwReaders = 0;
 	char *pcReaders, *mszReaders;
 	unsigned char pbAtr[MAX_ATR_SIZE];
 	char *mszGroups;
-	DWORD dwGroups;
+	DWORD dwGroups = 0;
 	long rv;
 	DWORD i;
 	int p, iReader;
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups\t: ");
-	mszGroups = malloc(sizeof(char) * dwGroups);
+	mszGroups = calloc(dwGroups, sizeof(char));
 	rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
 	test_rv(rv, hContext, PANIC);
 
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 	 * Have to understand the multi-string here
 	 */
 	p = 0;
-	for (i = 0; i < dwGroups - 1; i++)
+	for (i = 0; i+1 < dwGroups; i++)
 	{
 		++p;
 		printf(GREEN "Group %02d: %s\n" NORMAL, p, &mszGroups[i]);
@@ -124,7 +124,7 @@ wait_for_card_again:
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaders\t: ");
-	mszReaders = malloc(sizeof(char) * dwReaders);
+	mszReaders = calloc(dwReaders, sizeof(char));
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 	test_rv(rv, hContext, PANIC);
 
@@ -132,7 +132,7 @@ wait_for_card_again:
 	 * Have to understand the multi-string here
 	 */
 	p = 0;
-	for (i = 0; i < dwReaders - 1; i++)
+	for (i = 0; i+1 < dwReaders; i++)
 	{
 		++p;
 		printf(GREEN "Reader %02d: %s\n" NORMAL, p, &mszReaders[i]);
