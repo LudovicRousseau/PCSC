@@ -34,7 +34,7 @@
 #include "readerfactory.h"
 
 /**
- * @brief Represents the an Application Context on the Server side.
+ * @brief Represents an Application Context on the Server side.
  *
  * An Application Context contains Channels (\c hCard).
  */
