@@ -191,6 +191,11 @@ static short isExecuted = 0;
  */
 static time_t daemon_ctime = 0;
 static pid_t daemon_pid = 0;
+/**
+ * PID of the client application.
+ * Used to detect fork() and disable handles in the child process
+ */
+static pid_t client_pid = 0;
 
 /**
  * Memory mapped address used to read status information about the readers.
@@ -3487,6 +3492,7 @@ LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
+	int after_fork = (client_pid != 0) && (client_pid != getpid());
 
 	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &statBuffer);
 
@@ -3497,18 +3503,18 @@ LONG SCardCheckDaemonAvailability(void)
 		return SCARD_E_NO_SERVICE;
 	}
 
-	if (daemon_ctime)
+	if (daemon_ctime || after_fork)
 	{
 		/* when the _first_ reader is connected the ctime changes
 		 * I don't know why yet */
-		if (statBuffer.st_ctime > daemon_ctime)
+		if (statBuffer.st_ctime > daemon_ctime || after_fork)
 		{
 			pid_t new_pid;
 
 			new_pid = GetDaemonPid();
 
 			/* so we also check the daemon pid to be sure it is a new pcscd */
-			if (new_pid != daemon_pid)
+			if (new_pid != daemon_pid || after_fork)
 			{
 				int i;
 
@@ -3525,11 +3531,15 @@ LONG SCardCheckDaemonAvailability(void)
 
 				/* reset pcscd status */
 				daemon_ctime = 0;
+				client_pid = 0;
 
 				/* reset the lib */
 				SCardUnload();
 
-				return SCARD_E_NO_SERVICE;
+				if (after_fork)
+					return SCARD_E_INVALID_HANDLE;
+				else
+					return SCARD_E_NO_SERVICE;
 			}
 
 			daemon_ctime = statBuffer.st_ctime;
@@ -3539,6 +3549,7 @@ LONG SCardCheckDaemonAvailability(void)
 	{
 		daemon_ctime = statBuffer.st_ctime;
 		daemon_pid = GetDaemonPid();
+		client_pid = getpid();
 	}
 
 	return SCARD_S_SUCCESS;
