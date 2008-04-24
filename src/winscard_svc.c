@@ -158,7 +158,7 @@ static void ContextThread(LPVOID dwIndex)
 				{
 					Log2(PCSC_LOG_DEBUG, "MSGFunctionDemarshall failed: %d",
 						rv);
-					SYS_CloseFile(psContext[dwContextIndex].dwClientID);
+					SHMClientCloseSession(psContext[dwContextIndex].dwClientID);
 					MSGCleanupClient(dwContextIndex);
 					SYS_ThreadExit((LPVOID) NULL);
 				}
