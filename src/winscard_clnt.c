@@ -307,8 +307,13 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	PROFILE_START
 
 	/* Check if the server is running */
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (SCARD_E_INVALID_HANDLE == rv)
+		/* we got called from a forked child */
+		rv = SCardCheckDaemonAvailability();
+
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	SCardLockThread();
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
