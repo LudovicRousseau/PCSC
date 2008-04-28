@@ -585,7 +585,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	if (dwContextIndex == -1) 	 
 		return SCARD_E_INVALID_HANDLE;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
 	{
 		/*
 		 * Remove the local context from the stack
@@ -594,7 +595,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		SCardRemoveContext(hContext);
 		SCardUnlockThread();
 
-		return SCARD_E_INVALID_HANDLE;
+		return rv;
 	}
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
@@ -750,8 +751,9 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this context has been opened
@@ -914,8 +916,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1034,8 +1037,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1131,8 +1135,9 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	PROFILE_START
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1268,8 +1273,9 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1354,8 +1360,9 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	PROFILE_START
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1510,8 +1517,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	*pcchReaderLen = 0;
 	*pcbAtrLen = 0;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -1717,14 +1725,16 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	int j;
 	LONG dwContextIndex;
 	int currentReaderCount = 0;
+	LONG rv;
 
 	PROFILE_START
 
 	if (rgReaderStates == NULL && cReaders > 0)
 		return SCARD_E_INVALID_PARAMETER;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this context has been opened
@@ -1747,10 +1757,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		{
 			int i;
 
-			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+			rv = SCardCheckDaemonAvailability();
+			if (rv != SCARD_S_SUCCESS)
 			{
 				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-				return SCARD_E_NO_SERVICE;
+				return rv;
 			}
 
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -1849,14 +1860,15 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		int newReaderCount = 0;
 		char ReaderCountChanged = FALSE;
 
-		if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+		rv = SCardCheckDaemonAvailability();
+		if (rv != SCARD_S_SUCCESS)
 		{
 			if (psContextMap[dwContextIndex].mMutex)
 				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-			PROFILE_END(SCARD_E_NO_SERVICE)
+			PROFILE_END(rv)
 
-			return SCARD_E_NO_SERVICE;
+			return rv;
 		}
 
 		if (j == 0)
@@ -2282,8 +2294,9 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -2617,8 +2630,9 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -2778,8 +2792,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			pcbRecvLength == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this handle has been opened
@@ -3035,8 +3050,9 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	if (pcchReaders == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this context has been opened
@@ -3141,8 +3157,9 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	const char ReaderGroup[] = "SCard$DefaultReaders";
 	const int dwGroups = strlen(ReaderGroup) + 2;
 
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_NO_SERVICE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this context has been opened
@@ -3257,8 +3274,9 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	rv = SCARD_S_SUCCESS;
 
 	/* Check if the _same_ server is running */
-	if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-		return SCARD_E_INVALID_HANDLE;
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * Make sure this context has been opened
