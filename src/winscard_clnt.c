@@ -309,7 +309,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
 	if (SCARD_E_INVALID_HANDLE == rv)
-		/* we got called from a forked child */
+		/* we reconnected to a daemon or we got called from a forked child */
 		rv = SCardCheckDaemonAvailability();
 
 	if (rv != SCARD_S_SUCCESS)
@@ -594,7 +594,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		SCardRemoveContext(hContext);
 		SCardUnlockThread();
 
-		return SCARD_E_NO_SERVICE;
+		return SCARD_E_INVALID_HANDLE;
 	}
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
@@ -3492,12 +3492,13 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard,
  * @return Error code.
  * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_NO_SERVICE Server is not running (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_INVALID_HANDLE Server was restarted or after fork() (\ref SCARD_E_INVALID_HANDLE)
  */
 LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
-	int after_fork = (client_pid != 0) && (client_pid != getpid());
+	int need_restart = 0;
 
 	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &statBuffer);
 
@@ -3508,54 +3509,51 @@ LONG SCardCheckDaemonAvailability(void)
 		return SCARD_E_NO_SERVICE;
 	}
 
-	if (daemon_ctime || after_fork)
+	/* when the _first_ reader is connected the ctime changes
+	 * I don't know why yet */
+	if (daemon_ctime && statBuffer.st_ctime > daemon_ctime)
 	{
-		/* when the _first_ reader is connected the ctime changes
-		 * I don't know why yet */
-		if (statBuffer.st_ctime > daemon_ctime || after_fork)
+		/* so we also check the daemon pid to be sure it is a new pcscd */
+		if (GetDaemonPid() != daemon_pid)
 		{
-			pid_t new_pid;
-
-			new_pid = GetDaemonPid();
-
-			/* so we also check the daemon pid to be sure it is a new pcscd */
-			if (new_pid != daemon_pid || after_fork)
-			{
-				int i;
-
-				Log1(PCSC_LOG_INFO, "PCSC restarted");
-
-				/* invalid all handles */
-				SCardLockThread();
-
-				for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
-					if (psContextMap[i].hContext)
-						SCardCleanContext(i);
-
-				SCardUnlockThread();
-
-				/* reset pcscd status */
-				daemon_ctime = 0;
-				client_pid = 0;
-
-				/* reset the lib */
-				SCardUnload();
-
-				if (after_fork)
-					return SCARD_E_INVALID_HANDLE;
-				else
-					return SCARD_E_NO_SERVICE;
-			}
-
-			daemon_ctime = statBuffer.st_ctime;
+			Log1(PCSC_LOG_INFO, "PCSC restarted");
+			need_restart = 1;
 		}
 	}
-	else
+
+	/* after fork() need to restart */
+	if (client_pid && client_pid != getpid())
 	{
-		daemon_ctime = statBuffer.st_ctime;
-		daemon_pid = GetDaemonPid();
-		client_pid = getpid();
+		Log1(PCSC_LOG_INFO, "Client forked");
+		need_restart = 1;
 	}
+
+	if (need_restart)
+	{
+		int i;
+
+		/* invalid all handles */
+		SCardLockThread();
+
+		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+			if (psContextMap[i].hContext)
+				SCardCleanContext(i);
+
+		SCardUnlockThread();
+
+		/* reset pcscd status */
+		daemon_ctime = 0;
+		client_pid = 0;
+
+		/* reset the lib */
+		SCardUnload();
+
+		return SCARD_E_INVALID_HANDLE;
+	}
+
+	daemon_ctime = statBuffer.st_ctime;
+	daemon_pid = GetDaemonPid();
+	client_pid = getpid();
 
 	return SCARD_S_SUCCESS;
 }
