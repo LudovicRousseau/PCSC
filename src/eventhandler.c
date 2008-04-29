@@ -410,11 +410,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
 					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
 					rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-
-					/*
-					 * Notify the card has been reset
-					 */
-					RFSetReaderEventState(rContext, SCARD_RESET);
 				}
 				else
 				{
