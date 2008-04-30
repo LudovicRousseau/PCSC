@@ -1466,6 +1466,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
+ * @retval SCARD_W_REMOVED_CARD The smart card has been removed (\ref SCARD_W_REMOVED_CARD)
+ * @retval SCARD_W_RESET_CARD The smart card has been reset (\ref SCARD_W_RESET_CARD)
  *
  * @test
  * @code
