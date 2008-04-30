@@ -1,3 +1,13 @@
+pcsc-lite-1.4.101: Ludovic Rousseau
+30 April 2008
+- support for fork(). Handles are now invalid in the child process
+- SCardStatus() returns SCARD_W_REMOVED_CARD instead of
+  SCARD_W_RESET_CARD when a card has been removed and inserted
+- Doxygen improvements
+- add support for DragonFly BSD
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.100: Ludovic Rousseau
 23 March 2008
 - add libhal support to avoid polling the USB bus.  libusb is still
