@@ -313,7 +313,7 @@ static void HPRescanUsbBus(void)
 	 */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 		int fd;
 		char filename[BUS_DEVICE_STRSIZE];
 

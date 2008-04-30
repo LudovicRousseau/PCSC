@@ -165,7 +165,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
  * @retval -1 Can not set the connection to non-blocking mode.
  * @retval 2 Timeout.
  */
-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define DO_TIMEOUT
 #endif
 INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime)
