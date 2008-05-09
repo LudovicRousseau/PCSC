@@ -245,47 +245,9 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	rv = RFInitializeReader(sReadersContexts[dwContext]);
 	if (rv != SCARD_S_SUCCESS)
 	{
-		/*
-		 * Cannot connect to reader exit gracefully
-		 */
-		/*
-		 * Clean up so it is not using needed space
-		 */
+		/* Cannot connect to reader. Exit gracefully */
 		Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-
-		(sReadersContexts[dwContext])->dwVersion = 0;
-		(sReadersContexts[dwContext])->dwPort = 0;
-		(sReadersContexts[dwContext])->vHandle = NULL;
-		(sReadersContexts[dwContext])->readerState = NULL;
-		(sReadersContexts[dwContext])->dwIdentity = 0;
-
-		/*
-		 * Destroy and free the mutex
-		 */
-		if (*(sReadersContexts[dwContext])->pdwMutex == 1)
-		{
-			SYS_MutexDestroy((sReadersContexts[dwContext])->mMutex);
-			free((sReadersContexts[dwContext])->mMutex);
-		}
-
-		*(sReadersContexts[dwContext])->pdwMutex -= 1;
-
-		if (*(sReadersContexts[dwContext])->pdwMutex == 0)
-		{
-			free((sReadersContexts[dwContext])->pdwMutex);
-			(sReadersContexts[dwContext])->pdwMutex = NULL;
-		}
-
-		*(sReadersContexts[dwContext])->pdwFeeds -= 1;
-
-		if (*(sReadersContexts[dwContext])->pdwFeeds == 0)
-		{
-			free((sReadersContexts[dwContext])->pdwFeeds);
-			(sReadersContexts[dwContext])->pdwFeeds = NULL;
-		}
-
-		dwNumReadersContexts -= 1;
-
+		RFRemoveReader(lpcReader, dwPort);
 		return rv;
 	}
 
@@ -445,47 +407,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		rv = RFInitializeReader(sReadersContexts[dwContextB]);
 		if (rv != SCARD_S_SUCCESS)
 		{
-			/*
-			 * Cannot connect to slot exit gracefully
-			 */
-			/*
-			 * Clean up so it is not using needed space
-			 */
-			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-
-			(sReadersContexts[dwContextB])->dwVersion = 0;
-			(sReadersContexts[dwContextB])->dwPort = 0;
-			(sReadersContexts[dwContextB])->vHandle = NULL;
-			(sReadersContexts[dwContextB])->readerState = NULL;
-			(sReadersContexts[dwContextB])->dwIdentity = 0;
-
-			/*
-			 * Destroy and free the mutex
-			 */
-			if (*(sReadersContexts[dwContextB])->pdwMutex == 1)
-			{
-				SYS_MutexDestroy((sReadersContexts[dwContextB])->mMutex);
-				free((sReadersContexts[dwContextB])->mMutex);
-			}
-
-			*(sReadersContexts[dwContextB])->pdwMutex -= 1;
-
-			if (*(sReadersContexts[dwContextB])->pdwMutex == 0)
-			{
-				free((sReadersContexts[dwContextB])->pdwMutex);
-				(sReadersContexts[dwContextB])->pdwMutex = NULL;
-			}
-
-			*(sReadersContexts[dwContextB])->pdwFeeds -= 1;
-
-			if (*(sReadersContexts[dwContextB])->pdwFeeds == 0)
-			{
-				free((sReadersContexts[dwContextB])->pdwFeeds);
-				(sReadersContexts[dwContextB])->pdwFeeds = NULL;
-			}
-
-			dwNumReadersContexts -= 1;
-
+			/* Cannot connect to slot. Exit gracefully */
+			RFRemoveReader(lpcReader, dwPort);
 			return rv;
 		}
 
