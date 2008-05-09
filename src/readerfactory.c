@@ -309,7 +309,11 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
 		if (rv != SCARD_S_SUCCESS)
+		{
+			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
+			RFRemoveReader(lpcReader, dwPort);
 			return rv;
+		}
 	}
 
 	/*
