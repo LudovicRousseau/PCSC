@@ -1,4 +1,4 @@
-# Process this file with automake to create Makefile.in.
+AUTOMAKE_OPTIONS = dist-bzip2
 
 SUBDIRS = m4 win32 src etc doc
 
