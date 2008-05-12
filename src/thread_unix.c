@@ -39,6 +39,11 @@ INTERNAL int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
 	return pthread_mutex_lock(mMutex);
 }
 
+INTERNAL int SYS_MutexTryLock(PCSCLITE_MUTEX_T mMutex)
+{
+	return pthread_mutex_trylock(mMutex);
+}
+
 INTERNAL int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_unlock(mMutex);

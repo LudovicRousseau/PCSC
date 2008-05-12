@@ -49,6 +49,7 @@ extern "C"
 	int SYS_MutexInit(PCSCLITE_MUTEX_T);
 	int SYS_MutexDestroy(PCSCLITE_MUTEX_T);
 	int SYS_MutexLock(PCSCLITE_MUTEX_T);
+	int SYS_MutexTryLock(PCSCLITE_MUTEX_T);
 	int SYS_MutexUnLock(PCSCLITE_MUTEX_T);
 	int SYS_ThreadCreate(PCSCLITE_THREAD_T *, int, PCSCLITE_THREAD_FUNCTION( ), LPVOID);
 	int SYS_ThreadCancel(PCSCLITE_THREAD_T);
