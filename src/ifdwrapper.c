@@ -14,6 +14,7 @@
  * @brief This wraps the dynamic ifdhandler functions.
  */
 
+#include <errno.h>
 #include "config.h"
 #include "misc.h"
 #include "pcscd.h"
@@ -202,7 +203,9 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	 * LOCK THIS CODE REGION
 	 */
 
-	SYS_MutexLock(rContext->mMutex);
+	rv = SYS_MutexTryLock(rContext->mMutex);
+	if (EBUSY == rv)
+		Log1(PCSC_LOG_ERROR, "Locking failed");
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 
