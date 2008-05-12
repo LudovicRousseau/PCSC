@@ -329,7 +329,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/*
-			 * No more spots left return
+			 * No more slot left return
 			 */
 			rv = RFRemoveReader(lpcReader, dwPort);
 			return SCARD_E_NO_MEMORY;
