@@ -476,7 +476,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			 */
 			Log1(PCSC_LOG_CRITICAL, "Die");
 			rContext->dwLockId = 0;
-			SYS_ThreadDetach(rContext->pthThread);
 			SYS_ThreadExit(NULL);
 		}
 	}
