@@ -150,5 +150,5 @@ pc_DATA = libpcsclite.pc
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
-EXTRA_DIST = README_INTERNALS.txt dyn_win32.c thread_win32.c winscard_scf.c
+EXTRA_DIST = README_INTERNALS.txt winscard_scf.c
 
