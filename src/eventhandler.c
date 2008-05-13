@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2000
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2004
+ * Copyright (C) 2004-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -100,6 +100,8 @@ LONG EHInitializeEventStructures(void)
 
 LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
+	int rv;
+
 	if (NULL == rContext->readerState)
 	{
 		Log1(PCSC_LOG_ERROR, "Thread never started (reader init failed?)");
@@ -123,7 +125,9 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	SYS_ThreadCancel(rContext->pthThread);
 
 	/* wait for the thread to finish */
-	SYS_ThreadJoin(rContext->pthThread, NULL);
+	rv = SYS_ThreadJoin(rContext->pthThread, NULL);
+	if (rv)
+		Log2(PCSC_LOG_ERROR, "SYS_ThreadJoin failed: %s", strerror(rv));
 
 	/*
 	 * Zero out the public status struct to allow it to be recycled and
@@ -191,10 +195,13 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	rContext->pthCardEvent = card_event;
 	rv = SYS_ThreadCreate(&rContext->pthThread, 0,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
-	if (rv == 1)
-		return SCARD_S_SUCCESS;
-	else
+	if (rv)
+	{
+		Log2(PCSC_LOG_ERROR, "SYS_ThreadCreate failed: %s", strerror(rv));
 		return SCARD_E_NO_MEMORY;
+	}
+	else
+		return SCARD_S_SUCCESS;
 }
 
 static void incrementEventCounter(struct pubReaderStatesList *readerState)
