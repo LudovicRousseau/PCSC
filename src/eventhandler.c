@@ -189,7 +189,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	rContext->pthCardEvent = card_event;
-	rv = SYS_ThreadCreate(&rContext->pthThread, THREAD_ATTR_DETACHED,
+	rv = SYS_ThreadCreate(&rContext->pthThread, 0,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv == 1)
 		return SCARD_S_SUCCESS;
