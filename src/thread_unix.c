@@ -19,11 +19,6 @@
 #include "thread_generic.h"
 #include "misc.h"
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
 INTERNAL int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
 {
 	return pthread_mutex_init(mMutex, NULL);
@@ -53,47 +48,41 @@ INTERNAL int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 	pthread_attr_t attr;
-	int ret = FALSE;
+	int ret;
 
-	if (0 != pthread_attr_init(&attr))
-		return FALSE;
+	ret = pthread_attr_init(&attr);
+	if (ret)
+		return ret;
 
-	if (0 != pthread_attr_setdetachstate(&attr,
-		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE))
+	ret = pthread_attr_setdetachstate(&attr,
+		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
+	if (ret)
 	{
 		pthread_attr_destroy(&attr);
-		return FALSE;
+		return ret;
 	}
 
-	if (0 == pthread_create(pthThread, &attr, pvFunction, pvArg))
-		ret = TRUE;
+	ret = pthread_create(pthThread, &attr, pvFunction, pvArg);
+	if (ret)
+		return ret;
 
-	pthread_attr_destroy(&attr);
+	ret = pthread_attr_destroy(&attr);
 	return ret;
 }
 
 INTERNAL int SYS_ThreadCancel(PCSCLITE_THREAD_T pthThread)
 {
-	if (0 == pthread_cancel(pthThread))
-		return TRUE;
-	else
-		return FALSE;
+	return pthread_cancel(pthThread);
 }
 
 INTERNAL int SYS_ThreadDetach(PCSCLITE_THREAD_T pthThread)
 {
-	if (0 == pthread_detach(pthThread))
-		return TRUE;
-	else
-		return FALSE;
+	return pthread_detach(pthThread);
 }
 
 INTERNAL int SYS_ThreadJoin(PCSCLITE_THREAD_T pthThread, LPVOID* pvRetVal)
 {
-	if (0 == pthread_join(pthThread, pvRetVal))
-		return TRUE;
-	else
-		return FALSE;
+	return pthread_join(pthThread, pvRetVal);
 }
 
 INTERNAL int SYS_ThreadExit(LPVOID pvRetVal)
