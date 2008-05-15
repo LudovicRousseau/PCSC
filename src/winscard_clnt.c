@@ -503,12 +503,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
 	}
 
 
-	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
-		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
-
 	/*
 	 * Try to establish an Application Context with the server
 	 */
@@ -743,14 +737,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	if (strlen(szReader) > MAX_READERNAME)
 		return SCARD_E_INVALID_VALUE;
 
-	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
-
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
@@ -897,22 +883,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	PROFILE_START
 
-	if (dwInitialization != SCARD_LEAVE_CARD &&
-		dwInitialization != SCARD_RESET_CARD &&
-		dwInitialization != SCARD_UNPOWER_CARD &&
-		dwInitialization != SCARD_EJECT_CARD)
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
-
-	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
-		!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
-
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
@@ -1028,14 +998,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
-
-	if (dwDisposition != SCARD_LEAVE_CARD &&
-		dwDisposition != SCARD_RESET_CARD &&
-		dwDisposition != SCARD_UNPOWER_CARD &&
-		dwDisposition != SCARD_EJECT_CARD)
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
@@ -1264,14 +1226,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Zero out everything
 	 */
 	randnum = 0;
-
-	if (dwDisposition != SCARD_LEAVE_CARD &&
-		dwDisposition != SCARD_RESET_CARD &&
-		dwDisposition != SCARD_UNPOWER_CARD &&
-		dwDisposition != SCARD_EJECT_CARD)
-	{
-		return SCARD_E_INVALID_VALUE;
-	}
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
