@@ -139,7 +139,9 @@ void SVCServiceRunLoop(void)
 	 * Set up the search for USB/PCMCIA devices
 	 */
 	HPSearchHotPluggables();
-	HPRegisterForHotplugEvents();
+	rsp = HPRegisterForHotplugEvents();
+	if (rsp)
+		return;
 
 	/*
 	 * Set up the power management callback routine
