@@ -281,7 +281,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	else
 		*phCard = 0;
 
-	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
+	if ((dwShareMode != SCARD_SHARE_DIRECT) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
@@ -526,7 +527,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
 
-	if (!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
+	if ((dwShareMode != SCARD_SHARE_DIRECT) &&
+			!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_T1) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_RAW) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
