@@ -77,6 +77,7 @@ LONG ContextsInitialize(void)
 LONG CreateContextThread(uint32_t *pdwClientID)
 {
 	int i;
+	int rv;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
 	{
@@ -95,13 +96,13 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
-	if (SYS_ThreadCreate(&psContext[i].pthThread, THREAD_ATTR_DETACHED,
-		(PCSCLITE_THREAD_FUNCTION( )) ContextThread,
-		(LPVOID) i) != 1)
+	rv = SYS_ThreadCreate(&psContext[i].pthThread, THREAD_ATTR_DETACHED,
+		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) i);
+	if (rv)
 	{
 		SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0;
-		Log1(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed");
+		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
 		return SCARD_E_NO_MEMORY;
 	}
 
