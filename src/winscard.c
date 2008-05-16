@@ -225,7 +225,6 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
 		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
 	{
-
 		*phContext = 0;
 		return SCARD_E_INVALID_VALUE;
 	}
