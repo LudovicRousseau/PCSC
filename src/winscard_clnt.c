@@ -594,6 +594,14 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the context is still opened */
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1)
+		/* the context is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	scReleaseStruct.hContext = hContext;
 	scReleaseStruct.rv = SCARD_S_SUCCESS;
 
@@ -749,6 +757,14 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the context is still opened */
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1)
+		/* the context is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	strncpy(scConnectStruct.szReader, szReader, MAX_READERNAME);
 
@@ -1701,6 +1717,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the context is still opened */
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1)
+		/* the context is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	/*
 	 * Application is waiting for a reader - return the first available
@@ -3019,6 +3043,14 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the context is still opened */
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1)
+		/* the context is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	dwReadersLen = 0;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		if ((readerStates[i])->readerID != 0)
@@ -3125,6 +3157,14 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the context is still opened */
+	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	if (dwContextIndex == -1)
+		/* the context is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	if (mszGroups)
 	{
