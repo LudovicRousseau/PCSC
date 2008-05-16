@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = dist-bzip2
 
-SUBDIRS = m4 win32 src etc doc
+SUBDIRS = m4 src etc doc
 
 ACLOCAL_AMFLAGS = -I m4
 
