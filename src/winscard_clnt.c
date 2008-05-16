@@ -915,6 +915,14 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
@@ -1026,6 +1034,14 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	scDisconnectStruct.hCard = hCard;
 	scDisconnectStruct.dwDisposition = dwDisposition;
 	scDisconnectStruct.rv = SCARD_S_SUCCESS;
@@ -1122,6 +1138,14 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1252,6 +1276,14 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
@@ -1337,6 +1369,14 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1495,6 +1535,14 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -2280,6 +2328,14 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
@@ -2615,6 +2671,14 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
+
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
@@ -2778,6 +2842,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	}
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+
+	/* check the handle is still valid */
+	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	if (rv == -1)
+		/* the handle is now invalid
+		 * -> another thread may have called SCardReleaseContext
+		 * -> so the mMutex has been unlocked */
+		return SCARD_E_INVALID_HANDLE;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
