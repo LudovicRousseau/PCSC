@@ -572,11 +572,11 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	PROFILE_START
 
 	/*
-	 * Make sure this context has been opened 	 
+	 * Make sure this context has been opened
 	 * and get dwContextIndex
-	 */ 	 
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
-	if (dwContextIndex == -1) 	 
+	 */
+	dwContextIndex = SCardGetContextIndice(hContext);
+	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
 	rv = SCardCheckDaemonAvailability();
@@ -595,7 +595,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -759,7 +759,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -910,12 +910,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
-
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -1023,7 +1021,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1121,7 +1118,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1251,7 +1247,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1338,7 +1333,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1497,7 +1491,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1719,7 +1712,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -1943,7 +1936,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/* add an event counter in the upper word of dwEventState */
 					currReader->dwEventState =
 						((currReader->dwEventState & 0xffff )
-						| (stateCounter << 16));  
+						| (stateCounter << 16));
 				}
 
 	/*********** Check if the reader is in the correct state ********/
@@ -2282,7 +2275,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -2618,7 +2610,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -2780,7 +2771,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	 * Make sure this handle has been opened
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
-
 	if (rv == -1)
 	{
 		*pcbRecvLength = 0;
@@ -3044,7 +3034,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -3159,7 +3149,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext); 	 
+	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -3446,7 +3436,6 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 	LONG rv;
 
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndice, &dwChannelIndice);
-
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 	else

@@ -314,7 +314,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 
 	case SCARD_CONNECT:
 		coStr = ((connect_struct *) msgStruct->data);
-                
+
 		hCard = coStr->phCard;
 		dwActiveProtocol = coStr->pdwActiveProtocol;
 
@@ -439,7 +439,7 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 		gsStr = ((getset_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
-                
+
 		cbAttrLen = gsStr->cbAttrLen;
 
 		gsStr->rv = SCardGetAttrib(gsStr->hCard, gsStr->dwAttrId,
@@ -654,7 +654,7 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 				dwLockId = rContext->dwLockId;
 				rContext->dwLockId = 0;
 
-				if (psContext[dwContextIndex].hCard[i] != dwLockId) 
+				if (psContext[dwContextIndex].hCard[i] != dwLockId)
 				{
 					/*
 					 * if the card is locked by someone else we do not reset it

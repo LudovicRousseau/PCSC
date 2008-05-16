@@ -174,7 +174,7 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime
 	int selret;
 #ifdef DO_TIMEOUT
 	struct timeval tv;
-	 	
+
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
 #endif

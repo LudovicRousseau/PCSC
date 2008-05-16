@@ -361,7 +361,7 @@ INTERNAL int SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 #else
 			/* is the daemon still there? */
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-			{	
+			{
 				/*
 				 * timeout
 				 */
@@ -439,7 +439,7 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
 			memcpy(msgStruct.data, data, size);
 			memset(msgStruct.data+size, 0, sizeof(msgStruct.data)-size);
 		}
-			
+
 		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
 			blockAmount);
 

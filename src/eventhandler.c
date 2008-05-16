@@ -468,7 +468,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		if (rContext->pthCardEvent)
 		{
 			int ret;
-			
+
 			ret = rContext->pthCardEvent(rContext->dwSlot);
 			if (IFD_NO_SUCH_DEVICE == ret)
 				SYS_USleep(PCSCLITE_STATUS_POLL_RATE);

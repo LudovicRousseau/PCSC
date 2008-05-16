@@ -267,7 +267,7 @@ main(int argc, char **argv)
             "{\n");
 
     BLANK_LINE ();
- 
+
     check_constants ();
     check_types ();
 
