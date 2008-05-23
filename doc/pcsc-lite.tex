@@ -1112,7 +1112,7 @@ rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
 dwAtrLen = sizeof(pbAtr);
-rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol,
+rv = SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol,
     pbAtr, &dwAtrLen);
 \end{verbatim}
 
