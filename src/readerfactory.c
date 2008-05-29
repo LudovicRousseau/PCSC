@@ -312,6 +312,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	{
 		char *tmpReader = NULL;
 		DWORD dwContextB = 0;
+		RESPONSECODE (*fct)(DWORD) = NULL;
 
 		/*
 		 * We must find an empty spot to put the
@@ -412,7 +413,26 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			return rv;
 		}
 
-		EHSpawnEventHandler(sReadersContexts[dwContextB], NULL);
+		/* asynchronous card movement? */
+		dwGetSize = sizeof(fct);
+
+		rv = IFDGetCapabilities((sReadersContexts[dwContextB]),
+				TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
+		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
+		{
+			fct = NULL;
+			Log1(PCSC_LOG_INFO, "Using the pcscd polling thread");
+		}
+		else
+			Log1(PCSC_LOG_INFO, "Using the reader polling thread");
+
+		rv = EHSpawnEventHandler(sReadersContexts[dwContextB], fct);
+		if (rv != SCARD_S_SUCCESS)
+		{
+			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
+			RFRemoveReader(lpcReader, dwPort);
+			return rv;
+		}
 	}
 
 	return SCARD_S_SUCCESS;
