@@ -120,7 +120,7 @@ wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
 
 	mszGroups = NULL;
-	rv = SCardListReaders(hContext, mszGroups, 0, &dwReaders);
+	rv = SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaders\t: ");
