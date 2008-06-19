@@ -82,6 +82,8 @@ extern "C"
 		LPCSTR mszGroups,
 		LPSTR mszReaders, LPDWORD pcchReaders);
 
+	PCSC_API LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem);
+
 	PCSC_API LONG SCardCancel(SCARDCONTEXT hContext);
 
 	PCSC_API LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,

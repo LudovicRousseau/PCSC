@@ -3080,9 +3080,10 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	DWORD dwReadersLen;
-	int i, lastChrPtr;
+	int i;
 	LONG dwContextIndex;
 	LONG rv = SCARD_S_SUCCESS;
+	char *buf = NULL;
 
 	PROFILE_START
 
@@ -3121,29 +3122,40 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	/* for the last NULL byte */
 	dwReadersLen += 1;
 
-	/* not enough place to store the reader names */
-	if ((NULL != mszReaders) && (*pcchReaders < dwReadersLen))
-	{
-		rv = SCARD_E_INSUFFICIENT_BUFFER;
-		goto end;
-	}
-
-	/* set the reader names length */
-	*pcchReaders = dwReadersLen;
-
 	if (1 == dwReadersLen)
 	{
 		rv = SCARD_E_NO_READERS_AVAILABLE;
 		goto end;
 	}
 
-	if ((mszReaders == NULL)	/* text array not allocated */
-		|| (*pcchReaders == 0))	/* size == 0 */
+	if (SCARD_AUTOALLOCATE == *pcchReaders)
 	{
-		goto end;
+		buf = malloc(dwReadersLen);
+		if (NULL == buf)
+		{
+			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		*(char **)mszReaders = buf;
+	}
+	else
+	{
+		buf = mszReaders;
+
+		/* not enough place to store the reader names */
+		if ((NULL != mszReaders) && (*pcchReaders < dwReadersLen))
+		{
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+			goto end;
+		}
 	}
 
-	lastChrPtr = 0;
+	/* set the reader names length */
+	*pcchReaders = dwReadersLen;
+
+	if (mszReaders == NULL)	/* text array not allocated */
+		goto end;
+
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((readerStates[i])->readerID != 0)
@@ -3151,14 +3163,51 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 			/*
 			 * Build the multi-string
 			 */
-			strcpy(&mszReaders[lastChrPtr], (readerStates[i])->readerName);
-			lastChrPtr += strlen((readerStates[i])->readerName)+1;
+			strcpy(buf, (readerStates[i])->readerName);
+			buf += strlen((readerStates[i])->readerName)+1;
 		}
 	}
-	mszReaders[lastChrPtr] = '\0';	/* Add the last null */
+	*buf = '\0';	/* Add the last null */
 
 end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+
+	PROFILE_END(rv)
+
+	return rv;
+}
+
+/**
+ * @brief releases memory that has been returned from the resource manager
+ * using the SCARD_AUTOALLOCATE length designator.
+ *
+ * @ingroup API
+ * @param[in] hContext Connection context to the PC/SC Resource Manager.
+ * @param[in] pvMem pointer to allocated memory
+ *
+ * @return Error code.
+ * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ */
+
+LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
+{
+	LONG rv = SCARD_S_SUCCESS;
+	LONG dwContextIndex;
+
+	PROFILE_START
+
+	rv = SCardCheckDaemonAvailability();
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/*
+	 * Make sure this context has been opened
+	 */
+	dwContextIndex = SCardGetContextIndice(hContext);
+	if (dwContextIndex == -1)
+		return SCARD_E_INVALID_HANDLE;
+
+	free((void *)pvMem);
 
 	PROFILE_END(rv)
 
