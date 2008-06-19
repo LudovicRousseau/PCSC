@@ -26,6 +26,8 @@
 #define PANIC 0
 #define DONT_PANIC 1
 
+#define USE_AUTOALLOCATE
+
 #define BLUE "\33[34m"
 #define RED "\33[31m"
 #define BRIGHT_RED "\33[01;31m"
@@ -116,10 +118,17 @@ int main(int argc, char **argv)
 		while (mszGroups[++i] != 0) ;
 	}
 
+	free(mszGroups);
+
 wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
 
 	mszGroups = NULL;
+#ifdef USE_AUTOALLOCATE
+	dwReaders = SCARD_AUTOALLOCATE;
+	rv = SCardListReaders(hContext, mszGroups, (LPSTR)&mszReaders, &dwReaders);
+	test_rv(rv, hContext, PANIC);
+#else
 	rv = SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
 	test_rv(rv, hContext, PANIC);
 
@@ -127,6 +136,7 @@ wait_for_card_again:
 	mszReaders = calloc(dwReaders, sizeof(char));
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 	test_rv(rv, hContext, PANIC);
+#endif
 
 	/*
 	 * Have to understand the multi-string here
@@ -320,6 +330,14 @@ wait_for_card_again:
 	printf("Testing SCardDisconnect\t\t: ");
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
 	test_rv(rv, hContext, PANIC);
+
+#ifdef USE_AUTOALLOCATE
+	printf("Testing SCardFreeMemory\t\t: ");
+	rv = SCardFreeMemory(hContext, mszReaders);
+	test_rv(rv, hContext, PANIC);
+#else
+	free(mszReaders);
+#endif
 
 	printf("Testing SCardReleaseContext\t: ");
 	rv = SCardReleaseContext(hContext);
