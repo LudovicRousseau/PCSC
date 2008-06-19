@@ -3120,6 +3120,15 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 
 	/* for the last NULL byte */
 	dwReadersLen += 1;
+
+	/* not enough place to store the reader names */
+	if ((NULL != mszReaders) && (*pcchReaders < dwReadersLen))
+	{
+		rv = SCARD_E_INSUFFICIENT_BUFFER;
+		goto end;
+	}
+
+	/* set the reader names length */
 	*pcchReaders = dwReadersLen;
 
 	if (1 == dwReadersLen)
@@ -3131,12 +3140,6 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	if ((mszReaders == NULL)	/* text array not allocated */
 		|| (*pcchReaders == 0))	/* size == 0 */
 	{
-		goto end;
-	}
-
-	if (*pcchReaders < dwReadersLen)
-	{
-		rv = SCARD_E_INSUFFICIENT_BUFFER;
 		goto end;
 	}
 
