@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups\t: ");
-	rv = SCardListReaderGroups(hContext, 0, &dwGroups);
+	rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups\t: ");
