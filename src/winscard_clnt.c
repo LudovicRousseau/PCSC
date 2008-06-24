@@ -3253,11 +3253,13 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 {
 	LONG rv = SCARD_S_SUCCESS;
 	LONG dwContextIndex;
+	char *buf = NULL;
 
 	PROFILE_START
 
-	const char ReaderGroup[] = "SCard$DefaultReaders";
-	const int dwGroups = strlen(ReaderGroup) + 2;
+	/* Multi-string with two trailing \0 */
+	const char ReaderGroup[] = "SCard$DefaultReaders\0";
+	const int dwGroups = sizeof(ReaderGroup);
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
@@ -3280,20 +3282,30 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
-	if (mszGroups)
+	if (SCARD_AUTOALLOCATE == *pcchGroups)
 	{
+		buf = malloc(dwGroups);
+		if (NULL == buf)
+		{
+			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		*(char **)mszGroups = buf;
+	}
+	else
+	{
+		buf = mszGroups;
 
 		if (*pcchGroups < dwGroups)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
-		else
-		{
-			memset(mszGroups, 0, dwGroups);
-			memcpy(mszGroups, ReaderGroup, strlen(ReaderGroup));
-		}
 	}
+
+	if (buf)
+		memcpy(buf, ReaderGroup, dwGroups);
 
 	*pcchGroups = dwGroups;
 
+end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(rv)
