@@ -98,12 +98,17 @@ int main(int argc, char **argv)
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups\t: ");
+#ifdef USE_AUTOALLOCATE
+	dwGroups = SCARD_AUTOALLOCATE;
+	rv = SCardListReaderGroups(hContext, (LPSTR)&mszGroups, &dwGroups);
+#else
 	rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
 	test_rv(rv, hContext, PANIC);
 
 	printf("Testing SCardListReaderGroups\t: ");
 	mszGroups = calloc(dwGroups, sizeof(char));
 	rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
+#endif
 	test_rv(rv, hContext, PANIC);
 
 	/*
@@ -114,11 +119,16 @@ int main(int argc, char **argv)
 	{
 		++p;
 		printf(GREEN "Group %02d: %s\n" NORMAL, p, &mszGroups[i]);
-		iList[p] = i;
 		while (mszGroups[++i] != 0) ;
 	}
 
+#ifdef USE_AUTOALLOCATE
+	printf("Testing SCardFreeMemory\t\t: ");
+	rv = SCardFreeMemory(hContext, mszGroups);
+	test_rv(rv, hContext, PANIC);
+#else
 	free(mszGroups);
+#endif
 
 wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
@@ -127,7 +137,6 @@ wait_for_card_again:
 #ifdef USE_AUTOALLOCATE
 	dwReaders = SCARD_AUTOALLOCATE;
 	rv = SCardListReaders(hContext, mszGroups, (LPSTR)&mszReaders, &dwReaders);
-	test_rv(rv, hContext, PANIC);
 #else
 	rv = SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
 	test_rv(rv, hContext, PANIC);
@@ -135,8 +144,8 @@ wait_for_card_again:
 	printf("Testing SCardListReaders\t: ");
 	mszReaders = calloc(dwReaders, sizeof(char));
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
-	test_rv(rv, hContext, PANIC);
 #endif
+	test_rv(rv, hContext, PANIC);
 
 	/*
 	 * Have to understand the multi-string here
