@@ -2577,18 +2577,33 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 	LPDWORD pcbAttrLen)
 {
 	LONG ret;
+	unsigned char *buf = NULL;
 
 	PROFILE_START
 
 	if (NULL == pcbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
-	/* if only get the length */
-	if (NULL == pbAttr)
-		/* this variable may not be set by the caller. use a reasonable size */
+	if (SCARD_AUTOALLOCATE == *pcbAttrLen)
+	{
 		*pcbAttrLen = MAX_BUFFER_SIZE;
+		buf = malloc(*pcbAttrLen);
+		if (NULL == buf)
+			return SCARD_E_NO_MEMORY;
 
-	ret = SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, pbAttr,
+		*(unsigned char **)pbAttr = buf;
+	}
+	else
+	{
+		buf = pbAttr;
+
+		/* if only get the length */
+		if (NULL == pbAttr)
+			/* use a reasonable size */
+			*pcbAttrLen = MAX_BUFFER_SIZE;
+	}
+
+	ret = SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, buf,
 		pcbAttrLen);
 
 	PROFILE_END(ret)
