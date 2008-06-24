@@ -62,6 +62,8 @@ int main(int argc, char **argv)
 	DWORD dwPref, dwReaders = 0;
 	char *pcReaders, *mszReaders;
 	unsigned char pbAtr[MAX_ATR_SIZE];
+	unsigned char *pbAttr = NULL;
+	DWORD pcbAttrLen;
 	char *mszGroups;
 	DWORD dwGroups = 0;
 	long rv;
@@ -251,22 +253,40 @@ wait_for_card_again:
 	test_rv(rv, hContext, DONT_PANIC);
 
 	printf("Testing SCardGetAttrib\t\t: ");
-	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAtrLen);
-	test_rv(rv, hContext, DONT_PANIC);
-	if (rv == SCARD_S_SUCCESS)
-		printf("SCARD_ATTR_ATR_STRING length: " GREEN "%ld\n" NORMAL, dwAtrLen);
-
-	printf("Testing SCardGetAttrib\t\t: ");
-	dwAtrLen = sizeof(pbAtr);
-	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+#ifdef USE_AUTOALLOCATE
+	pcbAttrLen = SCARD_AUTOALLOCATE;
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, (unsigned char *)&pbAttr,
+		&pcbAttrLen);
+#else
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &pcbAttrLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
+		printf("SCARD_ATTR_ATR_STRING length: " GREEN "%ld\n" NORMAL, pcbAttrLen);
+		pbAttr = malloc(pcbAttrLen);
+	}
+
+	printf("Testing SCardGetAttrib\t\t: ");
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAttr, &pcbAttrLen);
+#endif
+	test_rv(rv, hContext, DONT_PANIC);
+	if (rv == SCARD_S_SUCCESS)
+	{
+		printf("SCARD_ATTR_ATR_STRING length: " GREEN "%ld\n" NORMAL, pcbAttrLen);
 		printf("SCARD_ATTR_ATR_STRING: " GREEN);
-		for (i = 0; i < dwAtrLen; i++)
-			printf("%02X ", pbAtr[i]);
+		for (i = 0; i < pcbAttrLen; i++)
+			printf("%02X ", pbAttr[i]);
 		printf("\n" NORMAL);
 	}
+
+#ifdef USE_AUTOALLOCATE
+	printf("Testing SCardFreeMemory\t\t: ");
+	rv = SCardFreeMemory(hContext, pbAttr);
+	test_rv(rv, hContext, PANIC);
+#else
+	if (pbAttr)
+		free(pbAttr);
+#endif
 
 	printf("Testing SCardGetAttrib\t\t: ");
 	dwAtrLen = sizeof(pbAtr);
