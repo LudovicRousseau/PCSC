@@ -3150,9 +3150,6 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 		}
 	}
 
-	/* set the reader names length */
-	*pcchReaders = dwReadersLen;
-
 	if (mszReaders == NULL)	/* text array not allocated */
 		goto end;
 
@@ -3170,6 +3167,9 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	*buf = '\0';	/* Add the last null */
 
 end:
+	/* set the reader names length */
+	*pcchReaders = dwReadersLen;
+
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(rv)
