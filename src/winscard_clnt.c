@@ -3296,16 +3296,19 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	{
 		buf = mszGroups;
 
-		if (*pcchGroups < dwGroups)
+		if ((NULL != mszGroups) && (*pcchGroups < dwGroups))
+		{
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
+			goto end;
+		}
 	}
 
 	if (buf)
 		memcpy(buf, ReaderGroup, dwGroups);
 
+end:
 	*pcchGroups = dwGroups;
 
-end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(rv)
