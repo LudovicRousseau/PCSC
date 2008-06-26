@@ -101,6 +101,8 @@ LONG EHInitializeEventStructures(void)
 LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 {
 	int rv;
+	DWORD dwGetSize;
+	UCHAR ucGetData[1];
 
 	if (NULL == rContext->readerState)
 	{
@@ -122,7 +124,17 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	Log1(PCSC_LOG_INFO, "Stomping thread.");
 
 	/* kill the "polling" thread */
-	SYS_ThreadCancel(rContext->pthThread);
+	dwGetSize = sizeof(ucGetData);
+	rv = IFDGetCapabilities(rContext, TAG_IFD_POLLING_THREAD_KILLABLE,
+		&dwGetSize, ucGetData);
+
+	if ((IFD_SUCCESS == rv) && (1 == dwGetSize) && ucGetData[0])
+	{
+		Log1(PCSC_LOG_INFO, "Killing polling thread");
+		SYS_ThreadCancel(rContext->pthThread);
+	}
+	else
+		Log1(PCSC_LOG_INFO, "Waiting polling thread");
 
 	/* wait for the thread to finish */
 	rv = SYS_ThreadJoin(rContext->pthThread, NULL);
