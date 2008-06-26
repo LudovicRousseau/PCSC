@@ -98,6 +98,7 @@ extern "C"
 #define TAG_IFD_SLOTS_NUMBER            0x0FAE
 #define TAG_IFD_SIMULTANEOUS_ACCESS     0x0FAF
 #define TAG_IFD_POLLING_THREAD          0x0FB0
+#define TAG_IFD_POLLING_THREAD_KILLABLE 0x0FB1
 
 	/*
 	 * End of tag list
