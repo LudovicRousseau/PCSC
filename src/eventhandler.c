@@ -481,7 +481,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			/*
 			 * Exit and notify the caller
 			 */
-			Log1(PCSC_LOG_CRITICAL, "Die");
+			Log1(PCSC_LOG_INFO, "Die");
 			rContext->dwLockId = 0;
 			SYS_ThreadExit(NULL);
 		}
