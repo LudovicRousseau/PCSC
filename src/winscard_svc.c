@@ -76,7 +76,7 @@ LONG ContextsInitialize(void)
  */
 LONG CreateContextThread(uint32_t *pdwClientID)
 {
-	int i;
+	long i;
 	int rv;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
