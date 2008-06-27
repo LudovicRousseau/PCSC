@@ -1,3 +1,23 @@
+pcsc-lite-1.4.102: Ludovic Rousseau
+27 June 2008
+- pcscd -v now displays the enabled features 
+- add support of SCARD_AUTOALLOCATE in SCardListReaders(),
+  SCardListReaderGroups() and SCardGetAttrib
+- add SCardFreeMemory()
+- try to use the reader polling thread also for the other slots on a
+  multi-slots reader
+- solve a possible crash with SCardCancel() in multithreading environment
+- SCardConnect(), SCardReconnect(): do not check the parameter
+  dwPreferredProtocols if dwShareMode == SCARD_SHARE_DIRECT
+  This is used on contactless readers to talk to the reader without any
+  card and "random" value of dwPreferredProtocols
+- better support of driver termination (when pcscd exits)
+- kill the driver polling thread only if the driver supports it
+  (declared using TAG_IFD_POLLING_THREAD_KILLABLE)
+- generate a .tar.bz2 archive (smaller than the .tar.gz archive)
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.101: Ludovic Rousseau
 30 April 2008
 - support for fork(). Handles are now invalid in the child process
