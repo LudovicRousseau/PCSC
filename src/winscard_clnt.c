@@ -1851,10 +1851,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 * Clear the event state for all readers
 	 */
 	for (j = 0; j < cReaders; j++)
-	{
-		currReader = &rgReaderStates[j];
-		currReader->dwEventState = 0;
-	}
+		rgReaderStates[j].dwEventState = 0;
 
 	/*
 	 * Now is where we start our event checking loop
