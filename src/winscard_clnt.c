@@ -1790,6 +1790,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*
 	 * Application is waiting for a reader - return the first available
 	 * reader
+	 * This is DEPRECATED. Use the special reader name \\?PnP?\Notification
+	 * instead
 	 */
 	if (cReaders == 0)
 	{
@@ -1854,9 +1856,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	j = 0;
 	do
 	{
-		int newReaderCount = 0;
-		char ReaderCountChanged = FALSE;
-
 		rv = SCardCheckDaemonAvailability();
 		if (rv != SCARD_S_SUCCESS)
 		{
@@ -1868,21 +1867,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			return rv;
 		}
 
-		if (j == 0)
-		{
-			int i;
-
-			for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-				if ((readerStates[i])->readerID != 0)
-					newReaderCount++;
-
-			if (newReaderCount != currentReaderCount)
-			{
-				Log1(PCSC_LOG_INFO, "Reader list changed");
-				ReaderCountChanged = TRUE;
-				currentReaderCount = newReaderCount;
-			}
-		}
 		currReader = &rgReaderStates[j];
 
 		/* Ignore for IGNORED readers */
@@ -1904,16 +1888,37 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			/* The requested reader name is not recognized */
 			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
-				currReader->dwEventState = SCARD_STATE_UNKNOWN;
-				if (!(currReader->dwCurrentState & SCARD_STATE_UNKNOWN))
+				/* PnP special reader? */
+				if (strcasecmp(lpcReaderName, "\\\\?PnP?\\Notification") == 0)
 				{
-					currReader->dwEventState |= SCARD_STATE_CHANGED;
-					/*
-					 * Spec says use SCARD_STATE_IGNORE but a removed USB
-					 * reader with eventState fed into currentState will
-					 * be ignored forever
-					 */
-					dwBreakFlag = 1;
+					int i, newReaderCount = 0;
+
+					for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+						if ((readerStates[i])->readerID != 0)
+							newReaderCount++;
+
+					if (newReaderCount != currentReaderCount)
+					{
+						Log1(PCSC_LOG_INFO, "Reader list changed");
+						currentReaderCount = newReaderCount;
+
+						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						dwBreakFlag = 1;
+					}
+				}
+				else
+				{
+					currReader->dwEventState = SCARD_STATE_UNKNOWN;
+					if (!(currReader->dwCurrentState & SCARD_STATE_UNKNOWN))
+					{
+						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						/*
+						 * Spec says use SCARD_STATE_IGNORE but a removed USB
+						 * reader with eventState fed into currentState will
+						 * be ignored forever
+						 */
+						dwBreakFlag = 1;
+					}
 				}
 			}
 			else
@@ -2097,9 +2102,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					currReader->dwEventState |= SCARD_STATE_CHANGED;
 					dwBreakFlag = 1;
 				}
-
 			}	/* End of SCARD_STATE_UNKNOWN */
-
 		}	/* End of SCARD_STATE_IGNORE */
 
 		/* Counter and resetter */
@@ -2110,13 +2113,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			j = 0;
 
 			/* Declare all the break conditions */
-
-			/* break if the reader count changed,
-			 * so that the calling application can update
-			 * the reader list
-			 */
-			if (ReaderCountChanged)
-				break;
 
 			/* Break if UNAWARE is set and all readers have been checked */
 			if (dwBreakFlag == 1)
