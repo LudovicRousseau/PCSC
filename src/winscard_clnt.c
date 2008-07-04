@@ -2164,60 +2164,48 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/*
 		 * Counter and resetter
 		 */
-		j = j + 1;
+		j++;
 		if (j == cReaders)
 		{
-			if (!dwBreakFlag)
-			{
-				/* break if the reader count changed,
-				 * so that the calling application can update
-				 * the reader list
-				 */
-				if (ReaderCountChanged)
-					break;
-			}
+			/* go back to the first reader */
 			j = 0;
-		}
 
-		/*
-		 * Declare all the break conditions
-		 */
+			/* Declare all the break conditions */
 
-		if (psContextMap[dwContextIndex].contextBlockStatus
-				== BLOCK_STATUS_RESUME)
-			break;
-
-		/*
-		 * Break if UNAWARE is set and all readers have been checked
-		 */
-		if ((dwBreakFlag == 1) && (j == 0))
-			break;
-
-		/*
-		 * Timeout has occurred and all readers checked
-		 */
-		if ((dwTimeout == 0) && (j == 0))
-			break;
-
-		if (dwTimeout != INFINITE && dwTimeout != 0)
-		{
-			/*
-			 * If time is greater than timeout and all readers have been
-			 * checked
+			/* break if the reader count changed,
+			 * so that the calling application can update
+			 * the reader list
 			 */
-			if ((dwTime >= (dwTimeout * 1000)) && (j == 0))
-			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-				PROFILE_END(SCARD_E_TIMEOUT)
-				return SCARD_E_TIMEOUT;
-			}
-		}
+			if (ReaderCountChanged)
+				break;
 
-		/*
-		 * Only sleep once for each cycle of reader checks.
-		 */
-		if (j == 0)
-		{
+			/* Break if UNAWARE is set and all readers have been checked */
+			if (dwBreakFlag == 1)
+				break;
+
+			/* Timeout has occurred and all readers checked */
+			if (0 == dwTimeout)
+				break;
+
+			if (BLOCK_STATUS_RESUME
+				== psContextMap[dwContextIndex].contextBlockStatus)
+				break;
+
+			if (dwTimeout != INFINITE && dwTimeout != 0)
+			{
+				/*
+				 * If time is greater than timeout and all readers have been
+				 * checked
+				 */
+				if (dwTime >= (dwTimeout * 1000))
+				{
+					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+					PROFILE_END(SCARD_E_TIMEOUT)
+					return SCARD_E_TIMEOUT;
+				}
+			}
+
+			/* Only sleep once for each cycle of reader checks. */
 			SYS_USleep(PCSCLITE_STATUS_WAIT);
 			dwTime += PCSCLITE_STATUS_WAIT;
 		}
