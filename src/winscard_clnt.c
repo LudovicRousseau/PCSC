@@ -1738,7 +1738,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	int j;
 	LONG dwContextIndex;
 	int currentReaderCount = 0;
-	LONG rv;
+	LONG rv = SCARD_S_SUCCESS;
 
 	PROFILE_START
 
@@ -1801,10 +1801,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			rv = SCardCheckDaemonAvailability();
 			if (rv != SCARD_S_SUCCESS)
-			{
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-				return rv;
-			}
+				goto end;
 
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
@@ -1813,11 +1810,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/*
 					 * Reader was found
 					 */
-					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-
-					PROFILE_END(SCARD_S_SUCCESS)
-
-					return SCARD_S_SUCCESS;
+					rv = SCARD_S_SUCCESS;
+					goto end;
 				}
 			}
 
@@ -1826,8 +1820,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/*
 				 * return immediately - no reader available
 				 */
-				SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-				return SCARD_E_READER_UNAVAILABLE;
+				rv = SCARD_E_READER_UNAVAILABLE;
+				goto end;
 			}
 
 			SYS_USleep(PCSCLITE_STATUS_WAIT);
@@ -1838,11 +1832,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				if (dwTime >= (dwTimeout * 1000))
 				{
-					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-
-					PROFILE_END(SCARD_E_TIMEOUT)
-
-					return SCARD_E_TIMEOUT;
+					rv = SCARD_E_TIMEOUT;
+					goto end;
 				}
 			}
 		}
@@ -2195,9 +2186,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				 */
 				if (dwTime >= (dwTimeout * 1000))
 				{
-					SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-					PROFILE_END(SCARD_E_TIMEOUT)
-					return SCARD_E_TIMEOUT;
+					rv = SCARD_E_TIMEOUT;
+					goto end;
 				}
 			}
 
@@ -2210,19 +2200,15 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	Log1(PCSC_LOG_DEBUG, "Event Loop End");
 
-	if (psContextMap[dwContextIndex].contextBlockStatus ==
-			BLOCK_STATUS_RESUME)
-	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		PROFILE_END(SCARD_E_CANCELLED)
-		return SCARD_E_CANCELLED;
-	}
+	if (psContextMap[dwContextIndex].contextBlockStatus == BLOCK_STATUS_RESUME)
+		rv = SCARD_E_CANCELLED;
 
+end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END(SCARD_S_SUCCESS)
+	PROFILE_END(rv)
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 /**
