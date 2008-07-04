@@ -1918,12 +1918,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			 */
 			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
-				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
-					currReader->dwEventState = SCARD_STATE_UNKNOWN;
-				else
+				currReader->dwEventState = SCARD_STATE_UNKNOWN;
+				if (!(currReader->dwCurrentState & SCARD_STATE_UNKNOWN))
 				{
-					currReader->dwEventState =
-						SCARD_STATE_UNKNOWN | SCARD_STATE_CHANGED;
+					currReader->dwEventState |= SCARD_STATE_CHANGED;
 					/*
 					 * Spec says use SCARD_STATE_IGNORE but a removed USB
 					 * reader with eventState fed into currentState will
@@ -1934,7 +1932,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 			else
 			{
-
 				/*
 				 * The reader has come back after being away
 				 */
