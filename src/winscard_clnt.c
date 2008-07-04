@@ -2027,14 +2027,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 					if (dwState & SCARD_SWALLOWED)
 					{
-						if (currReader->dwCurrentState & SCARD_STATE_MUTE)
-							currReader->dwEventState |= SCARD_STATE_MUTE;
-						else
+						currReader->dwEventState |= SCARD_STATE_MUTE;
+						if (!(currReader->dwCurrentState & SCARD_STATE_MUTE))
 						{
-							currReader->dwEventState |= SCARD_STATE_MUTE;
-							if (currReader->dwCurrentState
-								!= SCARD_STATE_UNAWARE)
-								currReader->dwEventState |= SCARD_STATE_CHANGED;
+							currReader->dwEventState |= SCARD_STATE_CHANGED;
 							dwBreakFlag = 1;
 						}
 					}
@@ -2043,8 +2039,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						/* App thinks card is mute but it is not */
 						if (currReader->dwCurrentState & SCARD_STATE_MUTE)
 						{
-							currReader->dwEventState |=
-								SCARD_STATE_CHANGED;
+							currReader->dwEventState |= SCARD_STATE_CHANGED;
 							dwBreakFlag = 1;
 						}
 					}
