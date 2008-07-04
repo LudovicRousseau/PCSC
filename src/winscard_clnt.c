@@ -1901,11 +1901,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		}
 		currReader = &rgReaderStates[j];
 
-	/************ Look for IGNORED readers ****************************/
-
-		if (currReader->dwCurrentState & SCARD_STATE_IGNORE)
-			currReader->dwEventState = SCARD_STATE_IGNORE;
-		else
+		/* Ignore for IGNORED readers */
+		if (!(currReader->dwCurrentState & SCARD_STATE_IGNORE))
 		{
 			LPSTR lpcReaderName;
 			int i;
