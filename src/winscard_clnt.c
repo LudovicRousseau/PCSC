@@ -1908,7 +1908,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 				else
 				{
-					currReader->dwEventState = SCARD_STATE_UNKNOWN;
+					currReader->dwEventState = SCARD_STATE_UNKNOWN | SCARD_STATE_UNAVAILABLE;
 					if (!(currReader->dwCurrentState & SCARD_STATE_UNKNOWN))
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
