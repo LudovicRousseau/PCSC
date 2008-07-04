@@ -93,12 +93,6 @@ int main(int argc, char **argv)
 	rv = SCardIsValidContext(hContext+1);
 	test_rv(rv, hContext, DONT_PANIC);
 
-	printf("Testing SCardGetStatusChange \n");
-	printf("Please insert a working reader\t: ");
-	fflush(stdout);
-	rv = SCardGetStatusChange(hContext, INFINITE, 0, 0);
-	test_rv(rv, hContext, PANIC);
-
 	printf("Testing SCardListReaderGroups\t: ");
 #ifdef USE_AUTOALLOCATE
 	dwGroups = SCARD_AUTOALLOCATE;
@@ -133,9 +127,23 @@ int main(int argc, char **argv)
 #endif
 
 wait_for_card_again:
-	printf("Testing SCardListReaders\t: ");
-
 	mszGroups = NULL;
+	printf("Testing SCardListReaders\t: ");
+	rv = SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
+	test_rv(rv, hContext, DONT_PANIC);
+	if (SCARD_E_NO_READERS_AVAILABLE == rv)
+	{
+		printf("Testing SCardGetStatusChange \n");
+		printf("Please insert a working reader\t: ");
+		fflush(stdout);
+		rgReaderStates[0].szReader = "\\\\?PnP?\\Notification";
+		rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
+
+		rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+		test_rv(rv, hContext, PANIC);
+	}
+
+	printf("Testing SCardListReaders\t: ");
 #ifdef USE_AUTOALLOCATE
 	dwReaders = SCARD_AUTOALLOCATE;
 	rv = SCardListReaders(hContext, mszGroups, (LPSTR)&mszReaders, &dwReaders);
@@ -147,7 +155,7 @@ wait_for_card_again:
 	mszReaders = calloc(dwReaders, sizeof(char));
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 #endif
-	test_rv(rv, hContext, PANIC);
+	test_rv(rv, hContext, DONT_PANIC);
 
 	/*
 	 * Have to understand the multi-string here
