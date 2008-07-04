@@ -1743,7 +1743,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	PROFILE_START
 
 	if ((rgReaderStates == NULL && cReaders > 0)
-		|| (cReaders >= PCSCLITE_MAX_READERS_CONTEXTS))
+		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
 		return SCARD_E_INVALID_PARAMETER;
 
 	rv = SCardCheckDaemonAvailability();
