@@ -1746,6 +1746,19 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
 		return SCARD_E_INVALID_PARAMETER;
 
+	/* return if all readers are SCARD_STATE_IGNORE */
+	if (cReaders > 0)
+	{
+		int nbNonIgnoredReaders = cReaders;
+
+		for (j=0; j<cReaders; j++)
+			if (rgReaderStates[j].dwCurrentState & SCARD_STATE_IGNORE)
+				nbNonIgnoredReaders--;
+
+		if (0 == nbNonIgnoredReaders)
+			return SCARD_S_SUCCESS;
+	}
+
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
