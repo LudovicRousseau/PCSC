@@ -192,7 +192,7 @@ wait_for_card_again:
 	fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	test_rv(rv, hContext, PANIC);
-	if (SCARD_STATE_EMPTY == rgReaderStates[0].dwEventState)
+	if (rgReaderStates[0].dwEventState & SCARD_STATE_UNKNOWN)
 	{
 		printf("\nA reader has been connected/disconnected\n");
 		goto wait_for_card_again;
