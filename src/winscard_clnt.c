@@ -1773,7 +1773,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*
 	 * Make sure this context has been opened
 	 */
-
 	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
@@ -1792,7 +1791,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 * Application is waiting for a reader - return the first available
 	 * reader
 	 */
-
 	if (cReaders == 0)
 	{
 		while (1)
@@ -1807,9 +1805,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			{
 				if ((readerStates[i])->readerID != 0)
 				{
-					/*
-					 * Reader was found
-					 */
+					/* Reader was found */
 					rv = SCARD_S_SUCCESS;
 					goto end;
 				}
@@ -1817,9 +1813,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			if (dwTimeout == 0)
 			{
-				/*
-				 * return immediately - no reader available
-				 */
+				/* return immediately - no reader available */
 				rv = SCARD_E_READER_UNAVAILABLE;
 				goto end;
 			}
@@ -1843,16 +1837,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 * End of search for readers
 	 */
 
-	/*
-	 * Clear the event state for all readers
-	 */
+	/* Clear the event state for all readers */
 	for (j = 0; j < cReaders; j++)
 		rgReaderStates[j].dwEventState = 0;
 
-	/*
-	 * Now is where we start our event checking loop
-	 */
-
+	/* Now is where we start our event checking loop */
 	Log1(PCSC_LOG_DEBUG, "Event Loop Start");
 
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_BLOCKING;
@@ -1863,7 +1852,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			currentReaderCount++;
 
 	j = 0;
-
 	do
 	{
 		int newReaderCount = 0;
@@ -1913,9 +1901,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					break;
 			}
 
-			/*
-			 * The requested reader name is not recognized
-			 */
+			/* The requested reader name is not recognized */
 			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				currReader->dwEventState = SCARD_STATE_UNKNOWN;
@@ -1932,9 +1918,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 			else
 			{
-				/*
-				 * The reader has come back after being away
-				 */
+				/* The reader has come back after being away */
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
 					currReader->dwEventState |= SCARD_STATE_CHANGED;
@@ -1944,14 +1928,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	/*****************************************************************/
 
-				/*
-				 * Set the reader status structure
-				 */
+				/* Set the reader status structure */
 				rContext = readerStates[i];
 
-				/*
-				 * Now we check all the Reader States
-				 */
+				/* Now we check all the Reader States */
 				dwState = rContext->readerState;
 				{
 					int currentCounter, stateCounter;
@@ -2008,9 +1988,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				else
 					currReader->cbAtr = 0;
 
-				/*
-				 * Card is now absent
-				 */
+				/* Card is now absent */
 				if (dwState & SCARD_ABSENT)
 				{
 					currReader->dwEventState |= SCARD_STATE_EMPTY;
@@ -2023,19 +2001,15 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					currReader->dwEventState &= ~SCARD_STATE_MUTE;
 					currReader->dwEventState &= ~SCARD_STATE_INUSE;
 
-					/*
-					 * After present the rest are assumed
-					 */
+					/* After present the rest are assumed */
 					if (currReader->dwCurrentState & SCARD_STATE_PRESENT)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
 					}
-
-					/*
-					 * Card is now present
-					 */
-				} else if (dwState & SCARD_PRESENT)
+				}
+				/* Card is now present */
+				else if (dwState & SCARD_PRESENT)
 				{
 					currReader->dwEventState |= SCARD_STATE_PRESENT;
 					currReader->dwEventState &= ~SCARD_STATE_EMPTY;
@@ -2066,9 +2040,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 					else
 					{
-						/*
-						 * App thinks card is mute but it is not
-						 */
+						/* App thinks card is mute but it is not */
 						if (currReader->dwCurrentState & SCARD_STATE_MUTE)
 						{
 							currReader->dwEventState |=
@@ -2078,9 +2050,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 				}
 
-				/*
-				 * Now figure out sharing modes
-				 */
+				/* Now figure out sharing modes */
 				if (rContext->readerSharing == -1)
 				{
 					currReader->dwEventState |= SCARD_STATE_EXCLUSIVE;
@@ -2093,9 +2063,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 				else if (rContext->readerSharing >= 1)
 				{
-					/*
-					 * A card must be inserted for it to be INUSE
-					 */
+					/* A card must be inserted for it to be INUSE */
 					if (dwState & SCARD_PRESENT)
 					{
 						currReader->dwEventState |= SCARD_STATE_INUSE;
@@ -2139,9 +2107,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 		}	/* End of SCARD_STATE_IGNORE */
 
-		/*
-		 * Counter and resetter
-		 */
+		/* Counter and resetter */
 		j++;
 		if (j == cReaders)
 		{
@@ -2167,8 +2133,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			if (dwTimeout != INFINITE)
 			{
-				/*
-				 * If time is greater than timeout and all readers have been
+				/* If time is greater than timeout and all readers have been
 				 * checked
 				 */
 				if (dwTime >= (dwTimeout * 1000))
