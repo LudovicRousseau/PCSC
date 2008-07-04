@@ -1746,6 +1746,13 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
 		return SCARD_E_INVALID_PARAMETER;
 
+	/* Check the integrity of the reader states structures */
+	for (j = 0; j < cReaders; j++)
+	{
+		if (rgReaderStates[j].szReader == NULL)
+			return SCARD_E_INVALID_VALUE;
+	}
+
 	/* return if all readers are SCARD_STATE_IGNORE */
 	if (cReaders > 0)
 	{
@@ -1838,21 +1845,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					return SCARD_E_TIMEOUT;
 				}
 			}
-		}
-	}
-
-	/*
-	 * Check the integrity of the reader states structures
-	 */
-
-	for (j = 0; j < cReaders; j++)
-	{
-		currReader = &rgReaderStates[j];
-
-		if (currReader->szReader == NULL)
-		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-			return SCARD_E_INVALID_VALUE;
 		}
 	}
 
