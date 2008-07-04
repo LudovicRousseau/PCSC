@@ -1972,31 +1972,21 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*********** Check if the reader is in the correct state ********/
 				if (dwState & SCARD_UNKNOWN)
 				{
-					/*
-					 * App thinks reader is in bad state and it is
-					 */
-					if (currReader-> dwCurrentState & SCARD_STATE_UNAVAILABLE)
-						currReader->dwEventState = SCARD_STATE_UNAVAILABLE;
-					else
+					/* reader is in bad state */
+					currReader->dwEventState = SCARD_STATE_UNAVAILABLE;
+					if (!(currReader->dwCurrentState & SCARD_STATE_UNAVAILABLE))
 					{
-						/*
-						 * App thinks reader is in good state and it is
-						 * not
-						 */
-						currReader->dwEventState = SCARD_STATE_CHANGED |
-							SCARD_STATE_UNAVAILABLE;
+						/* App thinks reader is in good state and it is not */
+						currReader->dwEventState = SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
 					}
 				}
 				else
 				{
-					/*
-					 * App thinks reader in bad state but it is not
-					 */
+					/* App thinks reader in bad state but it is not */
 					if (currReader-> dwCurrentState & SCARD_STATE_UNAVAILABLE)
 					{
-						currReader->dwEventState &=
-							~SCARD_STATE_UNAVAILABLE;
+						currReader->dwEventState &= ~SCARD_STATE_UNAVAILABLE;
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
 					}
