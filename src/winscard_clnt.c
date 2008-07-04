@@ -2183,15 +2183,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (dwBreakFlag == 1)
 				break;
 
-			/* Timeout has occurred and all readers checked */
-			if (0 == dwTimeout)
-				break;
-
 			if (BLOCK_STATUS_RESUME
 				== psContextMap[dwContextIndex].contextBlockStatus)
 				break;
 
-			if (dwTimeout != INFINITE && dwTimeout != 0)
+			if (dwTimeout != INFINITE)
 			{
 				/*
 				 * If time is greater than timeout and all readers have been
