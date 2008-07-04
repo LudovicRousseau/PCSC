@@ -1742,7 +1742,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	PROFILE_START
 
-	if (rgReaderStates == NULL && cReaders > 0)
+	if ((rgReaderStates == NULL && cReaders > 0)
+		|| (cReaders >= PCSCLITE_MAX_READERS_CONTEXTS))
 		return SCARD_E_INVALID_PARAMETER;
 
 	rv = SCardCheckDaemonAvailability();
@@ -1826,12 +1827,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 		}
 	}
-	else
-		if (cReaders >= PCSCLITE_MAX_READERS_CONTEXTS)
-		{
-			SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-			return SCARD_E_INVALID_VALUE;
-		}
 
 	/*
 	 * Check the integrity of the reader states structures
