@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2005
+ * Copyright (C) 1999-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This file is dual licenced:
@@ -26,18 +26,19 @@
 #include "strlcpycat.h"
 
 /**
- * @brief This function return a human readable text for the given PC/SC error code.
+ * @brief This function return a human readable text for the given PC/SC error
+ * code.
  *
  * @ingroup API
  * @param[in] pcscError Error code to be translated to text.
  *
- * @return Text representing de error code passed.
+ * @return Text representing the error code passed.
  *
  * @test
  * @code
  * SCARDCONTEXT hContext;
  * LONG rv;
- * rv = SCardEstablishContext(SCARD\_SCOPE\_SYSTEM, NULL, NULL, &hContext);
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * if (rv != SCARD_S_SUCCESS)
  *     printf("SCardReleaseContext: %s (0x%lX)\n",
  *         pcsc_stringify_error(rv), rv);
@@ -173,5 +174,4 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 
 	return strError;
 }
-
 

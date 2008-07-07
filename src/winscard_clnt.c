@@ -269,7 +269,6 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
  * @brief Creates an Application Context to the PC/SC Resource Manager.
 
  * This must be the first function called in a PC/SC application.
- * This is a thread-safe wrapper to the function SCardEstablishContextTH().
  *
  * @ingroup API
  * @param[in] dwScope Scope of the establishment.
@@ -278,7 +277,7 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
  * - \ref SCARD_SCOPE_TERMINAL - Not used.
  * - \ref SCARD_SCOPE_GLOBAL - Not used.
  * - \ref SCARD_SCOPE_SYSTEM - Services on the local machine.
- * @param[in] pvReserved1 Reserved for future use. Can be used for remote connection.
+ * @param[in] pvReserved1 Reserved for future use.
  * @param[in] pvReserved2 Reserved for future use.
  * @param[out] phContext Returned Application Context.
  *
@@ -666,9 +665,8 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 }
 
 /**
- * This function establishes a connection to the friendly name of the reader
- * specified in \p szReader. The first connection will power up and perform a
- * reset on the card.
+ * @brief This function establishes a connection to the reader specified in \p
+ * szReader.
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -687,8 +685,8 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * - \ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
  * - \ref SCARD_PROTOCOL_RAW - Use with memory type cards.
  * \p dwPreferredProtocols is a bit mask of acceptable protocols for the
- * connection. You can use (SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1) if you
- * do not have a preferred protocol.
+ * connection. You can use (\ref SCARD_PROTOCOL_T0 | \ref SCARD_PROTOCOL_T1) if
+ * you do not have a preferred protocol.
  * @param[out] phCard Handle to this connection.
  * @param[out] pdwActiveProtocol Established protocol to this connection.
  *
@@ -875,15 +873,18 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  * BYTE pbSendBuffer[] = {0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00};
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * ...
  * dwSendLength = sizeof(pbSendBuffer);
  * dwRecvLength = sizeof(pbRecvBuffer);
- * rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength, &pioRecvPci, pbRecvBuffer, &dwRecvLength);
+ * rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+ *          &pioRecvPci, pbRecvBuffer, &dwRecvLength);
  * / * Card has been reset by another application * /
  * if (rv == SCARD_W_RESET_CARD)
  * {
- *   rv = SCardReconnect(hCard, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, SCARD_RESET_CARD, &dwActiveProtocol);
+ *   rv = SCardReconnect(hCard, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0,
+ *            SCARD_RESET_CARD, &dwActiveProtocol);
  * }
  * @endcode
  */
@@ -982,8 +983,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 }
 
 /**
- * This function terminates a connection to the connection made through
- * SCardConnect(). \p dwDisposition can have the following values:
+ * @brief This function terminates a connection made through SCardConnect().
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
@@ -1008,7 +1008,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
  * @endcode
  */
@@ -1082,7 +1083,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 /**
  * @brief This function establishes a temporary exclusive access mode for
- * doing a series of commands or transaction.
+ * doing a serie of commands in a transaction.
  *
  * You might want to use this when you are selecting a few files and then
  * writing a large file so you can make sure that another application will
@@ -1109,7 +1110,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * rv = SCardBeginTransaction(hCard);
  * ...
  * / * Do some transmit commands * /
@@ -1240,7 +1242,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * rv = SCardBeginTransaction(hCard);
  * ...
  * / * Do some transmit commands * /
@@ -2155,8 +2158,8 @@ end:
 }
 
 /**
- * @brief This function sends a command directly to the IFD Handler to be
- * processed by the reader.
+ * @brief This function sends a command directly to the IFD Handler (reader
+ * driver) to be processed by the reader.
  *
  * This is useful for creating client side reader drivers for functions like
  * PIN pads, biometrics, or other extensions to the normal smart card reader
@@ -2400,8 +2403,9 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 }
 
 /**
- * This function get an attribute from the IFD Handler. The list of possible
- * attributes is available in the file \c pcsclite.h.
+ * @brief This function get an attribute from the IFD Handler (reader driver).
+ *
+ * The list of possible attributes is available in the file \c reader.h.
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
@@ -2728,10 +2732,12 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * dwSendLength = sizeof(pbSendBuffer);
  * dwRecvLength = sizeof(pbRecvBuffer);
- * rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength, &pioRecvPci, pbRecvBuffer, &dwRecvLength);
+ * rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
+ *          &pioRecvPci, pbRecvBuffer, &dwRecvLength);
  * @endcode
  */
 LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
@@ -3100,8 +3106,8 @@ end:
 }
 
 /**
- * @brief releases memory that has been returned from the resource manager
- * using the SCARD_AUTOALLOCATE length designator.
+ * @brief Releases memory that has been returned from the resource manager
+ * using the \ref SCARD_AUTOALLOCATE length designator.
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -3143,9 +3149,9 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * then this function will return the size of the buffer needed to allocate in
  * \p pcchGroups.
  *
- * The group names is a multi-string and separated by a nul character ('\\0')
- * and ended by a double nul character. "SCard$DefaultReaders\\0Group 2\\0\\0".
- *
+ * The group names is a multi-string and separated by a nul character (\c
+ * '\\0') and ended by a double nul character like
+ * \c "SCard$DefaultReaders\\0Group 2\\0\\0".
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
@@ -3288,7 +3294,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 }
 
 /**
- * @brief check if a \ref SCARDCONTEXT is valid.
+ * @brief Check if a \ref SCARDCONTEXT is valid.
  *
  * Call this function to determine whether a smart card context handle is still
  * valid. After a smart card context handle has been set by
@@ -3344,7 +3350,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
  */
 
 /**
- * @brief Adds an Application Context to the vector \ref psContextMap.
+ * @brief Adds an Application Context to the vector \c _psContextMap.
  *
  * @param[in] hContext Application Context ID.
  * @param[in] dwClientID Client connection ID.
@@ -3374,7 +3380,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 }
 
 /**
- * @brief Get the index from the Application Context vector \ref psContextMap
+ * @brief Get the index from the Application Context vector \c _psContextMap
  * for the passed context.
  *
  * This function is a thread-safe wrapper to the function
@@ -3397,7 +3403,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 }
 
 /**
- * @brief Get the index from the Application Context vector \ref psContextMap
+ * @brief Get the index from the Application Context vector \c _psContextMap
  * for the passed context.
  *
  * This functions is not thread-safe and should not be called. Instead, call
