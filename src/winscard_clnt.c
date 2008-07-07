@@ -329,7 +329,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
  * @brief Creates a communication context to the PC/SC Resource
  * Manager.
  *
- * This function shuld not be called directly. Instead, the thread-safe
+ * This function should not be called directly. Instead, the thread-safe
  * function SCardEstablishContext() should be called.
  *
  * @param[in] dwScope Scope of the establishment.
@@ -1643,14 +1643,14 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 /**
  * @brief This function receives a structure or list of structures containing
  * reader names. It then blocks for a change in state to occur on any of the
- * OR'd values contained in dwCurrentState for a maximum blocking time of
- * dwTimeout or forever if \ref INFINITE is used.
+ * OR'd values contained in \p dwCurrentState for a maximum blocking time of
+ * \p dwTimeout or forever if \ref INFINITE is used.
  *
- * The new event state will be contained in dwEventState. A status change might
- * be a card insertion or removal event, a change in ATR, etc.
+ * The new event state will be contained in \p dwEventState. A status change
+ * might be a card insertion or removal event, a change in ATR, etc.
  *
- * This function will block for reader availability if cReaders is equal to
- * zero and rgReaderStates is NULL.
+ * This function will block for reader availability if \p cReaders is equal to
+ * zero and \p rgReaderStates is NULL.
  *
  * @code
  * typedef struct {
@@ -1666,7 +1666,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  * ...
  * @endcode
  *
- * Value of dwCurrentState and dwEventState:
+ * Value of \p dwCurrentState and \p dwEventState:
  * - \ref SCARD_STATE_UNAWARE The application is unaware of the current
  *   state, and would like to know. The use of this value results in an
  *   immediate return from state transition monitoring services. This is
@@ -3344,7 +3344,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
  */
 
 /**
- * @brief Adds an Application Context to the vector \c psContextMap.
+ * @brief Adds an Application Context to the vector \ref psContextMap.
  *
  * @param[in] hContext Application Context ID.
  * @param[in] dwClientID Client connection ID.
@@ -3374,7 +3374,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 }
 
 /**
- * @brief Get the index from the Application Context vector \c psContextMap
+ * @brief Get the index from the Application Context vector \ref psContextMap
  * for the passed context.
  *
  * This function is a thread-safe wrapper to the function
@@ -3397,7 +3397,7 @@ static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
 }
 
 /**
- * @brief Get the index from the Application Context vector \c psContextMap
+ * @brief Get the index from the Application Context vector \ref psContextMap
  * for the passed context.
  *
  * This functions is not thread-safe and should not be called. Instead, call
@@ -3551,7 +3551,7 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard,
 }
 
 /**
- * @brief Checks if the Server is running.
+ * @brief Checks if the server is running.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
@@ -3623,7 +3623,8 @@ LONG SCardCheckDaemonAvailability(void)
 }
 
 /**
- * free resources allocated by the library
+ * @brief Free resources allocated by the library
+ *
  * You _shall_ call this function if you use dlopen/dlclose to load/unload the
  * library. Otherwise you will exhaust the ressources available.
  */
