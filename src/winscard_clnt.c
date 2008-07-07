@@ -2973,10 +2973,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 /**
  * This function returns a list of currently available readers on the system.
+ *
  * \p mszReaders is a pointer to a character string that is allocated by the
  * application.  If the application sends \p mszGroups and \p mszReaders as
  * NULL then this function will return the size of the buffer needed to
  * allocate in \p pcchReaders.
+ *
+ * If \c *pcchReaders is equal to \ref SCARD_AUTOALLOCATE then the function
+ * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -3002,6 +3006,18 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
  * mszReaders = malloc(sizeof(char)*dwReaders);
  * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
+ * @endcode
+ *
+ * @code
+ * SCARDCONTEXT hContext;
+ * LPSTR mszReaders;
+ * DWORD dwReaders;
+ * LONG rv;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * dwReaders = SCARD_AUTOALLOCATE
+ * rv = SCardListReaders(hContext, NULL, (LPSTR)&mszReaders, &dwReaders);
+ * rv = SCardFreeMemory(hContext, mszReaders);
  * @endcode
  */
 LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
@@ -3152,6 +3168,10 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * The group names is a multi-string and separated by a nul character (\c
  * '\\0') and ended by a double nul character like
  * \c "SCard$DefaultReaders\\0Group 2\\0\\0".
+ *
+ * If \c *pcchGroups is equal to \ref SCARD_AUTOALLOCATE then the function
+ * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
+ *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
@@ -3174,6 +3194,18 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * rv = SCardListReaderGroups(hContext, NULL, &dwGroups);
  * mszGroups = malloc(sizeof(char)*dwGroups);
  * rv = SCardListReaderGroups(hContext, mszGroups, &dwGroups);
+ * @endcode
+ *
+ * @code
+ * SCARDCONTEXT hContext;
+ * LPSTR mszGroups;
+ * DWORD dwGroups;
+ * LONG rv;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * dwGroups = SCARD_AUTOALLOCATE;
+ * rv = SCardListReaderGroups(hContext, (LPSTR)&mszGroups, &dwGroups);
+ * rv = SCardFreeMemory(hContext, mszGroups);
  * @endcode
  */
 LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
