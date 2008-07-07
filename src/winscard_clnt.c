@@ -1652,8 +1652,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  * The new event state will be contained in \p dwEventState. A status change
  * might be a card insertion or removal event, a change in ATR, etc.
  *
- * This function will block for reader availability if \p cReaders is equal to
- * zero and \p rgReaderStates is NULL.
+ * To wait for a reader event (reader added or removed) you may use the special
+ * reader name \c "\\?PnP?\Notification". If a reader event occurs the state of
+ * this reader will change and the bit \ref SCARD_STATE_CHANGED will be set.
  *
  * @code
  * typedef struct {
@@ -1718,16 +1719,20 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
  * @test
  * @code
  * SCARDCONTEXT hContext;
- * SCARD_READERSTATE_A rgReaderStates[1];
+ * SCARD_READERSTATE_A rgReaderStates[2];
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * ...
  * rgReaderStates[0].szReader = "Reader X";
  * rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
+ *
+ * rgReaderStates[1].szReader = "\\\\?PnP?\\Notification";
+ * rgReaderStates[1].dwCurrentState = SCARD_STATE_UNAWARE;
  * ...
- * rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+ * rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 2);
  * printf("reader state: 0x%04X\n", rgReaderStates[0].dwEventState);
+ * printf("reader state: 0x%04X\n", rgReaderStates[1].dwEventState);
  * @endcode
  */
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
