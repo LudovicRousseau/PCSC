@@ -1505,23 +1505,20 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	PROFILE_START
 
-	/*
-	 * Check for NULL parameters
-	 */
-
-	if (pcchReaderLen == NULL || pcbAtrLen == NULL)
-		return SCARD_E_INVALID_PARAMETER;
-
-	/* length passed from caller */
-	dwReaderLen = *pcchReaderLen;
-	dwAtrLen = *pcbAtrLen;
-
 	/* default output values */
 	if (pdwState)
 		*pdwState = 0;
 
 	if (pdwProtocol)
 		*pdwProtocol = 0;
+
+	/* Check for NULL parameters */ 
+	if (pcchReaderLen == NULL || pcbAtrLen == NULL)
+		return SCARD_E_INVALID_PARAMETER;
+
+	/* length passed from caller */
+	dwReaderLen = *pcchReaderLen;
+	dwAtrLen = *pcbAtrLen;
 
 	*pcchReaderLen = 0;
 	*pcbAtrLen = 0;
