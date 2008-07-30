@@ -16,7 +16,6 @@
  * @note log message is sent to syslog or stderr depending on --foreground
  * command line argument
  *
- * @test
  * @code
  * Log1(priority, "text");
  *  log "text" with priority level priority

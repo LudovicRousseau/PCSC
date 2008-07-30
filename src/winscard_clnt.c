@@ -290,7 +290,6 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LONG rv;
@@ -552,7 +551,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LONG rv;
@@ -702,7 +700,6 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
  * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported (\ref SCARD_E_UNSUPPORTED_FEATURE)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -862,7 +859,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
  * @retval SCARD_E_UNSUPPORTED_FEATURE Protocol not supported (\ref SCARD_E_UNSUPPORTED_FEATURE)
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -999,7 +995,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
  * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -1101,7 +1096,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -1233,7 +1227,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -1483,7 +1476,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * @retval SCARD_W_REMOVED_CARD The smart card has been removed (\ref SCARD_W_REMOVED_CARD)
  * @retval SCARD_W_RESET_CARD The smart card has been reset (\ref SCARD_W_RESET_CARD)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
@@ -1768,7 +1760,6 @@ end:
  * @retval SCARD_E_READER_UNAVAILABLE The reader is unavailable (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_E_TIMEOUT The user-specified timeout value has expired (\ref SCARD_E_TIMEOUT)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * SCARD_READERSTATE_A rgReaderStates[2];
@@ -2248,7 +2239,6 @@ end:
  * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader(\ref SCARD_W_REMOVED_CARD)
  * @retval SCARD_W_RESET_CARD The card has been reset by another application (\ref SCARD_W_RESET_CARD)
  *
- * @test
  * @code
  * LONG rv;
  * SCARDCONTEXT hContext;
@@ -2526,7 +2516,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * LONG rv;
  * SCARDCONTEXT hContext;
@@ -2599,7 +2588,6 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
- * @test
  * @code
  * LONG rv;
  * SCARDCONTEXT hContext;
@@ -2778,7 +2766,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  * @retval SCARD_W_RESET_CARD The card has been reset by another application (\ref SCARD_W_RESET_CARD)
  * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader (\ref SCARD_W_REMOVED_CARD)
  *
- * @test
  * @code
  * LONG rv;
  * SCARDCONTEXT hContext;
@@ -3052,7 +3039,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LPSTR mszReaders;
@@ -3240,7 +3226,6 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LPSTR mszGroups;
@@ -3344,7 +3329,6 @@ end:
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle (\ref SCARD_E_INVALID_HANDLE)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * DWORD cReaders;
@@ -3397,7 +3381,6 @@ LONG SCardCancel(SCARDCONTEXT hContext)
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE Invalid Handle (\ref SCARD_E_INVALID_HANDLE)
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LONG rv;

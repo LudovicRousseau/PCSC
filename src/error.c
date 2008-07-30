@@ -34,7 +34,6 @@
  *
  * @return Text representing the error code passed.
  *
- * @test
  * @code
  * SCARDCONTEXT hContext;
  * LONG rv;
