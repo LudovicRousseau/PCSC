@@ -62,6 +62,8 @@ int main(int argc, char **argv)
 	DWORD dwPref, dwReaders = 0;
 	char *pcReaders, *mszReaders;
 	unsigned char pbAtr[MAX_ATR_SIZE];
+	unsigned char buf[100];
+	DWORD dwBufLen;
 	unsigned char *pbAttr = NULL;
 	DWORD pcbAttrLen;
 	char *mszGroups;
@@ -297,32 +299,32 @@ wait_for_card_again:
 #endif
 
 	printf("Testing SCardGetAttrib\t\t: ");
-	dwAtrLen = sizeof(pbAtr);
-	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, pbAtr, &dwAtrLen);
+	dwBufLen = sizeof(buf);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, buf, &dwBufLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 		printf("Vendor IFD version\t\t: " GREEN "0x%08lX\n" NORMAL,
-			((DWORD *)pbAtr)[0]);
+			((DWORD *)buf)[0]);
 
 	printf("Testing SCardGetAttrib\t\t: ");
-	dwAtrLen = sizeof(pbAtr);
-	rv = SCardGetAttrib(hCard, SCARD_ATTR_MAXINPUT, pbAtr, &dwAtrLen);
+	dwBufLen = sizeof(buf);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_MAXINPUT, buf, &dwBufLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
-		if (dwAtrLen == sizeof(uint32_t))
+		if (dwBufLen == sizeof(uint32_t))
 			printf("Max message length\t\t: " GREEN "%d\n" NORMAL,
-				*(uint32_t *)pbAtr);
+				*(uint32_t *)buf);
 		else
 			printf(RED "Wrong size" NORMAL);
 	}
 
 	printf("Testing SCardGetAttrib\t\t: ");
-	dwAtrLen = sizeof(pbAtr);
-	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, pbAtr, &dwAtrLen);
+	dwBufLen = sizeof(buf);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_NAME, buf, &dwBufLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor name\t\t\t: " GREEN "%s\n" NORMAL, pbAtr);
+		printf("Vendor name\t\t\t: " GREEN "%s\n" NORMAL, buf);
 
 	printf("Testing SCardSetAttrib\t\t: ");
 	rv = SCardSetAttrib(hCard, SCARD_ATTR_ATR_STRING, (LPCBYTE)"", 1);
