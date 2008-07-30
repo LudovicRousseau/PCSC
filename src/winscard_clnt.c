@@ -648,7 +648,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
  * in pcsc-lite API.
  * The function does not do anything except returning \ref SCARD_S_SUCCESS.
  *
- * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout New timeout value.
  *
