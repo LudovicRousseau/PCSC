@@ -1502,6 +1502,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	sharedSegmentMsg msgStruct;
 	DWORD dwContextIndex, dwChannelIndex;
 	char *r;
+	char *bufReader = NULL;
+	LPBYTE bufAtr = NULL;
 
 	PROFILE_START
 
@@ -1613,26 +1615,54 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (pdwProtocol)
 		*pdwProtocol = (readerStates[i])->cardProtocol;
 
+	if (SCARD_AUTOALLOCATE == dwReaderLen)
+	{
+		dwReaderLen = *pcchReaderLen;
+		bufReader = malloc(dwReaderLen);
+		if (NULL == bufReader)
+		{
+			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		*(char **)mszReaderNames = bufReader;
+	}
+	else
+		bufReader = mszReaderNames;
+
 	/* return SCARD_E_INSUFFICIENT_BUFFER only if buffer pointer is non NULL */
-	if (mszReaderNames)
+	if (bufReader)
 	{
 		if (*pcchReaderLen > dwReaderLen)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
-		strncpy(mszReaderNames,
+		strncpy(bufReader,
 			psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
 			dwReaderLen);
 	}
 
-	if (pbAtr)
+	if (SCARD_AUTOALLOCATE == dwAtrLen)
+	{
+		dwAtrLen = *pcbAtrLen;
+		bufAtr = malloc(dwAtrLen);
+		if (NULL == bufAtr)
+		{
+			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		*(LPBYTE *)pbAtr = bufAtr;
+	}
+	else
+		bufAtr = pbAtr;
+
+	if (bufAtr)
 	{
 		if (*pcbAtrLen > dwAtrLen)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
-		memcpy(pbAtr, (readerStates[i])->cardAtr,
-			min(*pcbAtrLen, dwAtrLen));
+		memcpy(bufAtr, (readerStates[i])->cardAtr, min(*pcbAtrLen, dwAtrLen));
 	}
 
+end:
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(rv)
