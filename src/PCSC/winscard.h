@@ -56,7 +56,7 @@ extern "C"
 	PCSC_API LONG SCardCancelTransaction(SCARDHANDLE hCard);
 
 	PCSC_API LONG SCardStatus(SCARDHANDLE hCard,
-		LPSTR mszReaderNames, LPDWORD pcchReaderLen,
+		LPSTR mszReaderName, LPDWORD pcchReaderLen,
 		LPDWORD pdwState,
 		LPDWORD pdwProtocol,
 		LPBYTE pbAtr, LPDWORD pcbAtrLen);
