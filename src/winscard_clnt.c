@@ -2454,7 +2454,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  *
  * The list of possible attributes is available in the file \c reader.h.
  *
- * If \c pcbAttrLen is equal to \ref SCARD_AUTOALLOCATE then the function
+ * If \c *pcbAttrLen is equal to \ref SCARD_AUTOALLOCATE then the function
  * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
  *
  * @ingroup API
