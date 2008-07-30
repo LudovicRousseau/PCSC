@@ -1444,7 +1444,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param mszReaderNames [inout] Friendly name of this reader.
+ * @param mszReaderName [inout] Friendly name of this reader.
  * @param pcchReaderLen [inout] Size of the \p szReaderName multistring.
  * @param[out] pdwState Current state of this reader. \p pdwState
  * is a DWORD possibly OR'd with the following values:
@@ -1491,7 +1491,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol, pbAtr, &dwAtrLen);
  * @endcode
  */
-LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1624,10 +1624,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 			rv = SCARD_E_NO_MEMORY;
 			goto end;
 		}
-		*(char **)mszReaderNames = bufReader;
+		*(char **)mszReaderName = bufReader;
 	}
 	else
-		bufReader = mszReaderNames;
+		bufReader = mszReaderName;
 
 	/* return SCARD_E_INSUFFICIENT_BUFFER only if buffer pointer is non NULL */
 	if (bufReader)
