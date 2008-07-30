@@ -2454,6 +2454,9 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  *
  * The list of possible attributes is available in the file \c reader.h.
  *
+ * If \c pcbAttrLen is equal to \ref SCARD_AUTOALLOCATE then the function
+ * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
+ *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwAttrId Identifier for the attribute to get.
@@ -2528,6 +2531,21 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
  *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
  * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+ * @endcode
+ *
+ * @code
+ * LONG rv;
+ * SCARDCONTEXT hContext;
+ * SCARDHANDLE hCard;
+ * DWORD dwActiveProtocol;
+ * unsigned char *pbAttr;
+ * DWORD dwAttrLen;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
+ * dwAttrLen = SCARD_AUTOALLOCATE;
+ * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, (unsigned char *)&pbAttr, &dwAttrLen);
  * @endcode
  */
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
