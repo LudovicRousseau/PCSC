@@ -1556,8 +1556,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 
 	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_READER_UNAVAILABLE;
+		rv = SCARD_E_READER_UNAVAILABLE;
+		goto end;
 	}
 
 	/* initialise the structure */
@@ -1574,8 +1574,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
+		rv = SCARD_E_NO_SERVICE;
+		goto end;
 	}
 
 	/*
@@ -1588,8 +1588,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 
 	if (rv == -1)
 	{
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
+		rv = SCARD_F_COMM_ERROR;
+		goto end;
 	}
 
 	rv = scStatusStruct.rv;
@@ -1598,8 +1598,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		/*
 		 * An event must have occurred
 		 */
-		SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return rv;
+		goto end;
 	}
 
 	/*
