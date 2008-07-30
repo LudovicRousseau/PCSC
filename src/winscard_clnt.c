@@ -1441,6 +1441,14 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * state, and protocol will be stored in pdwState and \p pdwProtocol
  * respectively.
  *
+ * If \c *pcchReaderLen is equal to \ref SCARD_AUTOALLOCATE then the function
+ * will allocate itself the needed memory for mszReaderName. Use
+ * SCardFreeMemory() to release it.
+ *
+ * If \c *pcbAtrLen is equal to \ref SCARD_AUTOALLOCATE then the function will
+ * allocate itself the needed memory for pbAtr. Use SCardFreeMemory() to
+ * release it.
+ *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param mszReaderName [inout] Friendly name of this reader.
@@ -1484,10 +1492,29 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  * BYTE pbAtr[MAX_ATR_SIZE];
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * ...
  * dwAtrLen = sizeof(pbAtr);
  * rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol, pbAtr, &dwAtrLen);
+ * @endcode
+ *
+ * @code
+ * SCARDCONTEXT hContext;
+ * SCARDHANDLE hCard;
+ * DWORD dwActiveProtocol;
+ * DWORD dwState, dwProtocol, dwAtrLen, dwReaderLen;
+ * BYTE *pbAtr = NULL;
+ * char *pcReader = NULL;
+ * ...
+ * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+ * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
+ *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
+ * ...
+ * dwReaderLen = SCARD_AUTOALLOCATE;
+ * dwAtrLen = SCARD_AUTOALLOCATE;
+ * rv = SCardStatus(hCard, (LPSTR)&pcReader, &dwReaderLen, &dwState,
+ *          &dwProtocol, (LPBYTE)&pbAtr, &dwAtrLen);
  * @endcode
  */
 LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
