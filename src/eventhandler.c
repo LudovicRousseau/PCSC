@@ -58,8 +58,7 @@ LONG EHInitializeEventStructures(void)
 		exit(1);
 	}
 
-	SYS_Chmod(PCSCLITE_PUBSHM_FILE,
-		S_IRGRP | S_IREAD | S_IWRITE | S_IROTH);
+	SYS_Chmod(PCSCLITE_PUBSHM_FILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	pageSize = SYS_GetPageSize();
 
