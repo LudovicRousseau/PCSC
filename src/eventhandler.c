@@ -50,15 +50,14 @@ LONG EHInitializeEventStructures(void)
 
 	SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
 
-	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, 00644);
+	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT,
+		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd < 0)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Cannot create public shared file %s: %s",
 			PCSCLITE_PUBSHM_FILE, strerror(errno));
 		exit(1);
 	}
-
-	SYS_Chmod(PCSCLITE_PUBSHM_FILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	pageSize = SYS_GetPageSize();
 
