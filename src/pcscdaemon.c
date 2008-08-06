@@ -426,17 +426,16 @@ int main(int argc, char **argv)
 	{
 		int f;
 
-		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, 00644)) != -1)
+		/* set mode so that the file is world readable.
+		 * The file is used by libpcsclite */
+		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) != -1)
 		{
 			char pid[PID_ASCII_SIZE];
 
 			snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
 			SYS_WriteFile(f, pid, strlen(pid));
 			SYS_CloseFile(f);
-
-			/* set mode so that the file is world readable.
-			 * The file is used by libpcsclite */
-			SYS_Chmod(PCSCLITE_RUN_PID, 0644);
 		}
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
