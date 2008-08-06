@@ -21,6 +21,7 @@
 
 #include "thread_generic.h"
 #include "ifdhandler.h"
+#include "pcscd.h"
 
 #ifdef __cplusplus
 extern "C"
