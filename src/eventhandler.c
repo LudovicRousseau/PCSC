@@ -59,10 +59,10 @@ LONG EHInitializeEventStructures(void)
 		exit(1);
 	}
 
-	pageSize = SYS_GetPageSize();
-
 	/* set correct mode even is umask is too restictive */
 	SYS_Chmod(PCSCLITE_PUBSHM_FILE, mode);
+
+	pageSize = SYS_GetPageSize();
 
 	/*
 	 * Jump to end of file space and allocate zero's
