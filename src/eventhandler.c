@@ -43,6 +43,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT);
 LONG EHInitializeEventStructures(void)
 {
 	int fd, i, pageSize;
+	int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
 	fd = 0;
 	i = 0;
@@ -50,8 +51,7 @@ LONG EHInitializeEventStructures(void)
 
 	SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
 
-	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, mode);
 	if (fd < 0)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Cannot create public shared file %s: %s",
@@ -60,6 +60,9 @@ LONG EHInitializeEventStructures(void)
 	}
 
 	pageSize = SYS_GetPageSize();
+
+	/* set correct mode even is umask is too restictive */
+	SYS_Chmod(PCSCLITE_PUBSHM_FILE, mode);
 
 	/*
 	 * Jump to end of file space and allocate zero's

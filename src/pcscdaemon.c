@@ -425,17 +425,20 @@ int main(int argc, char **argv)
 	 */
 	{
 		int f;
+		int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-		/* set mode so that the file is world readable.
-		 * The file is used by libpcsclite */
-		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT,
-			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) != -1)
+		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode)) != -1)
 		{
 			char pid[PID_ASCII_SIZE];
 
 			snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
 			SYS_WriteFile(f, pid, strlen(pid));
 			SYS_CloseFile(f);
+
+			/* set mode so that the file is world readable even is umask is
+			 * restrictive
+			 * The file is used by libpcsclite */
+			SYS_Chmod(PCSCLITE_RUN_PID, mode);
 		}
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
