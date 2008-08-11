@@ -478,6 +478,6 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
 INTERNAL void SHMCleanupSharedSegment(int sockValue, const char *pcFilePath)
 {
 	SYS_CloseFile(sockValue);
-	SYS_Unlink(pcFilePath);
+	SYS_RemoveFile(pcFilePath);
 }
 

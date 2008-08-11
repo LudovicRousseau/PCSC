@@ -533,19 +533,19 @@ void clean_temp_files(void)
 {
 	int rv;
 
-	rv = SYS_Unlink(PCSCLITE_PUBSHM_FILE);
+	rv = SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
 	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_PUBSHM_FILE ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_PUBSHM_FILE ": %s",
 			strerror(errno));
 
-	rv = SYS_Unlink(PCSCLITE_CSOCK_NAME);
+	rv = SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_CSOCK_NAME ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
-	rv = SYS_Unlink(PCSCLITE_RUN_PID);
+	rv = SYS_RemoveFile(PCSCLITE_RUN_PID);
 	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot unlink " PCSCLITE_RUN_PID ": %s",
+		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_RUN_PID ": %s",
 			strerror(errno));
 }
 
