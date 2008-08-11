@@ -77,8 +77,6 @@ extern "C"
 
 	void SYS_Exit(int);
 
-	int SYS_Unlink(const char *pcFile);
-
 #ifdef __cplusplus
 }
 #endif

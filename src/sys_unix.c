@@ -425,8 +425,3 @@ INTERNAL void SYS_Exit(int iRetVal)
 	_exit(iRetVal);
 }
 
-INTERNAL int SYS_Unlink(const char *pcFile)
-{
-	return unlink(pcFile);
-}
-
