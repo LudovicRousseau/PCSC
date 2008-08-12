@@ -49,6 +49,29 @@ static int commonSocket = 0;
 extern char AraKiri;
 extern char ReCheckSerialReaders;
 
+static const char *CommandsText[] = {
+	"CMD_VERSION",	/* mtype = 0xF8 and command = 0x00 */
+	"ESTABLISH_CONTEXT",	/* mtype = 0xF1 */
+	"RELEASE_CONTEXT",
+	"LIST_READERS",
+	"CONNECT",
+	"RECONNECT",
+	"DISCONNECT",
+	"BEGIN_TRANSACTION",
+	"END_TRANSACTION",
+	"TRANSMIT",
+	"CONTROL",
+	"STATUS",
+	"GET_STATUS_CHANGE",
+	"CANCEL",
+	"CANCEL_TRANSACTION",
+	"GET_ATTRIB",
+	"SET_ATTRIB",
+	"TRANSMIT_EXTENDED",
+	"CONTROL_EXTENDED",
+	"NULL"
+};
+
 /**
  * @brief Accepts a Client connection.
  *
@@ -284,7 +307,7 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
 		/*
 		 * Set the identifier handle
 		 */
-		Log2(PCSC_LOG_DEBUG, "correctly processed client: %d", dwClientID);
+		Log3(PCSC_LOG_DEBUG, "command %s received by client %d", CommandsText[msgStruct->command], dwClientID);
 		return 1;
 	}
 
