@@ -32,6 +32,7 @@
 #define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
 #define PCSCLITE_PUBSHM_FILE		PCSCLITE_IPC_DIR "/pcscd.pub"
 #define PCSCLITE_CSOCK_NAME		PCSCLITE_IPC_DIR "/pcscd.comm"
+#define PCSCLITE_EVENTS_DIR		PCSCLITE_IPC_DIR "/pcscd.events"
 
 #define PCSCLITE_SVC_IDENTITY		0x01030000	/**< Service ID */
 
