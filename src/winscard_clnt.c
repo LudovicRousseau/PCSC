@@ -1942,10 +1942,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/* PnP special reader? */
 				if (strcasecmp(lpcReaderName, "\\\\?PnP?\\Notification") == 0)
 				{
-					int i, newReaderCount = 0;
+					int k, newReaderCount = 0;
 
-					for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-						if ((readerStates[i])->readerID != 0)
+					for (k=0; k < PCSCLITE_MAX_READERS_CONTEXTS; k++)
+						if ((readerStates[k])->readerID != 0)
 							newReaderCount++;
 
 					if (newReaderCount != currentReaderCount)
