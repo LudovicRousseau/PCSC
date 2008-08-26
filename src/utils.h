@@ -12,6 +12,7 @@
 
 #include <sys/types.h>
 #include "wintypes.h"
+#include "readerfactory.h"
 
 #define PID_ASCII_SIZE 11
 pid_t GetDaemonPid(void);
@@ -19,6 +20,8 @@ int SendHotplugSignal(void);
 
 /* defined in winscard_clnt.c */
 LONG SCardCheckDaemonAvailability(void);
+
+int StatSynchronize(struct pubReaderStatesList *readerState);
 
 #endif
 

@@ -19,11 +19,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <dirent.h>
+#include <fcntl.h>
 
 #include "debug.h"
 #include "config.h"
 #include "utils.h"
 #include "pcscd.h"
+#include "sys_generic.h"
 
 pid_t GetDaemonPid(void)
 {
@@ -71,4 +74,69 @@ int SendHotplugSignal(void)
 
 	return EXIT_SUCCESS;
 } /* SendHotplugSignal */
+
+/**
+ * Sends an asynchronous event to any waiting client
+ *
+ * Just write 1 byte to any fifo in PCSCLITE_EVENTS_DIR and remove the file
+ *
+ * This function must be secured since the files are created by the library
+ * or any non privileged process. We must not follow symlinks for example
+ */
+int StatSynchronize(struct pubReaderStatesList *readerState)
+{
+	DIR *dir_fd;
+	struct dirent *dir;
+
+	if (readerState)
+		SYS_MMapSynchronize((void *)readerState, SYS_GetPageSize() );
+
+	dir_fd = opendir(PCSCLITE_EVENTS_DIR);
+	while ((dir = readdir(dir_fd)) != NULL)
+	{
+		char filename[FILENAME_MAX];
+		int fd;
+		char buf[] = { '\0' };
+		struct stat fstat_buf;
+
+		if ('.' == dir->d_name[0])
+			continue;
+
+		snprintf(filename, sizeof(filename), "%s/%s", PCSCLITE_EVENTS_DIR,
+			dir->d_name);
+		Log2(PCSC_LOG_DEBUG, "status file: %s", filename);
+
+		fd = SYS_OpenFile(filename, O_WRONLY | O_APPEND | O_NONBLOCK, 0);
+		if (fd < 0)
+		{
+			Log3(PCSC_LOG_ERROR, "Can't open %s: %s", filename,
+				strerror(errno));
+		}
+		else
+		{
+			if (fstat(fd, &fstat_buf))
+			{
+				Log3(PCSC_LOG_ERROR, "Can't fstat %s: %s", filename,
+					strerror(errno));
+			}
+			else
+			{
+				/* check that the file is a FIFO */
+				if (!(fstat_buf.st_mode & S_IFIFO))
+					Log2(PCSC_LOG_ERROR, "%s is not a fifo", filename);
+				else
+					SYS_WriteFile(fd, buf, sizeof(buf));
+			}
+
+			SYS_CloseFile(fd);
+		}
+
+		if (unlink(filename))
+			Log3(PCSC_LOG_ERROR, "Can't remove %s: %s", filename,
+			strerror(errno));
+	}
+	closedir(dir_fd);
+
+	return 0;
+} /* StatSynchronize */
 
