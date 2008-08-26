@@ -445,6 +445,24 @@ int main(int argc, char **argv)
 				strerror(errno));
 	}
 
+	/*
+	 * If PCSCLITE_EVENTS does not exist then create it
+	 */
+	rv = SYS_Stat(PCSCLITE_EVENTS_DIR, &fStatBuf);
+	if (rv < 0)
+	{
+		int mode = S_IRWXU | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH; /* 0755 */
+
+		rv = SYS_Mkdir(PCSCLITE_EVENTS_DIR, mode);
+		if (rv != 0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+				"cannot create " PCSCLITE_EVENTS_DIR ": %s", strerror(errno));
+			return EXIT_FAILURE;
+		}
+		SYS_Chmod(PCSCLITE_EVENTS_DIR, mode);
+	}
+
 	/* cleanly remove /var/run/pcscd/pcsc.* files when exiting */
 	if (atexit(at_exit))
 		Log2(PCSC_LOG_CRITICAL, "atexit() failed: %s", strerror(errno));
@@ -546,6 +564,12 @@ void clean_temp_files(void)
 	rv = SYS_RemoveFile(PCSCLITE_RUN_PID);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_RUN_PID ": %s",
+			strerror(errno));
+
+	StatSynchronize(NULL);
+	rv = SYS_RemoveFile(PCSCLITE_EVENTS_DIR);
+	if (rv != 0)
+		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_EVENTS_DIR ": %s",
 			strerror(errno));
 }
 
