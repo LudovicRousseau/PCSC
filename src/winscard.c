@@ -494,7 +494,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
+	StatSynchronize(rContext->readerState);
 
 	PROFILE_END
 
@@ -791,7 +791,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
+	StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }
@@ -974,7 +974,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	SYS_MMapSynchronize((void *) rContext->readerState, SYS_GetPageSize() );
+	StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }

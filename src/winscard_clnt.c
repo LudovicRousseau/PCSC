@@ -27,6 +27,7 @@
 #include <sys/un.h>
 #include <errno.h>
 #include <stddef.h>
+#include <sys/time.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -1778,12 +1779,56 @@ end:
  * printf("reader state: 0x%04X\n", rgReaderStates[1].dwEventState);
  * @endcode
  */
+static long WaitForPcscdEvent(long dwTime)
+{
+	char filename[FILENAME_MAX];
+	char buf[1];
+	int fd;
+	struct timeval tv, *ptv = NULL;
+	struct timeval before, after;
+	fd_set read_fd;
+
+	if (INFINITE != dwTime)
+	{
+		if (dwTime < 0)
+			return 0;
+		gettimeofday(&before, NULL);
+		tv.tv_sec = dwTime/1000;
+		tv.tv_usec = dwTime*1000 - tv.tv_sec*1000000;
+		ptv = &tv;
+	}
+
+	snprintf(filename, sizeof(filename), "%s/event.%d.%d", PCSCLITE_EVENTS_DIR,
+		SYS_GetPID(), SYS_RandomInt(0, 0x10000));
+	mkfifo(filename, 0644);
+	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
+
+	FD_ZERO(&read_fd);
+	FD_SET(fd, &read_fd);
+	
+	select(fd+1, &read_fd, NULL, NULL, ptv);
+
+	SYS_ReadFile(fd, buf, 1);
+	SYS_CloseFile(fd);
+
+	if (INFINITE != dwTime)
+	{
+		long int diff;
+
+		gettimeofday(&after, NULL);
+		diff = time_sub(&after, &before);
+		dwTime -= diff/1000;
+	}
+
+	return dwTime;
+}
+
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
 	PSCARD_READERSTATE_A currReader;
 	PREADER_STATE rContext;
-	DWORD dwTime = 0;
+	long dwTime = dwTimeout;
 	DWORD dwState;
 	DWORD dwBreakFlag = 0;
 	int j;
@@ -1871,13 +1916,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				goto end;
 			}
 
-			SYS_USleep(PCSCLITE_STATUS_WAIT);
-
+			dwTime = WaitForPcscdEvent(dwTime);
 			if (dwTimeout != INFINITE)
 			{
-				dwTime += PCSCLITE_STATUS_WAIT;
-
-				if (dwTime >= (dwTimeout * 1000))
+				if (dwTime <= 0)
 				{
 					rv = SCARD_E_TIMEOUT;
 					goto end;
@@ -2173,21 +2215,20 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				== psContextMap[dwContextIndex].contextBlockStatus)
 				break;
 
+			/* Only sleep once for each cycle of reader checks. */
+			dwTime = WaitForPcscdEvent(dwTime);
+
 			if (dwTimeout != INFINITE)
 			{
 				/* If time is greater than timeout and all readers have been
 				 * checked
 				 */
-				if (dwTime >= (dwTimeout * 1000))
+				if (dwTime <= 0)
 				{
 					rv = SCARD_E_TIMEOUT;
 					goto end;
 				}
 			}
-
-			/* Only sleep once for each cycle of reader checks. */
-			SYS_USleep(PCSCLITE_STATUS_WAIT);
-			dwTime += PCSCLITE_STATUS_WAIT;
 		}
 	}
 	while (1);

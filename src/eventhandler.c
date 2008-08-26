@@ -35,6 +35,7 @@
 #include "ifdwrapper.h"
 #include "prothandler.h"
 #include "strlcpycat.h"
+#include "utils.h"
 
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
@@ -234,7 +235,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	DWORD dwStatus, dwReaderSharing;
 	DWORD dwCurrentState;
 	DWORD dwAtrLen;
-	int pageSize;
 
 	/*
 	 * Zero out everything
@@ -244,8 +244,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	dwCurrentState = 0;
 
 	lpcReader = rContext->lpcReader;
-
-	pageSize = SYS_GetPageSize();
 
 	dwAtrLen = rContext->readerState->cardAtrLength;
 	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
@@ -318,7 +316,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	rContext->readerState->readerSharing = dwReaderSharing =
 		rContext->dwContexts;
 
-	SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
+	StatSynchronize(rContext->readerState);
 
 	while (1)
 	{
@@ -350,7 +348,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			dwCurrentState = SCARD_UNKNOWN;
 
-			SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
+			StatSynchronize(rContext->readerState);
 
 			/*
 			 * This code causes race conditions on G4's with USB
@@ -400,7 +398,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
+				StatSynchronize(rContext->readerState);
 			}
 
 		}
@@ -447,7 +445,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
+				StatSynchronize(rContext->readerState);
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
 
@@ -475,7 +473,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		{
 			dwReaderSharing = rContext->dwContexts;
 			rContext->readerState->readerSharing = dwReaderSharing;
-			SYS_MMapSynchronize((void *) rContext->readerState, pageSize);
+			StatSynchronize(rContext->readerState);
 		}
 
 		if (rContext->pthCardEvent)
