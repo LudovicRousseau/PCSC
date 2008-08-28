@@ -264,16 +264,24 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
 {
 	fd_set read_fd;
 	int selret, rv;
+#ifdef DO_TIMEOUT
 	struct timeval tv;
 
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
+#endif
 
 	FD_ZERO(&read_fd);
 	FD_SET(dwClientID, &read_fd);
 
 	selret = select(dwClientID + 1, &read_fd, (fd_set *) NULL,
-		(fd_set *) NULL, &tv);
+		(fd_set *) NULL,
+#ifdef DO_TIMEOUT
+		&tv
+#else
+		NULL
+#endif
+		);
 
 	if (selret < 0)
 	{
