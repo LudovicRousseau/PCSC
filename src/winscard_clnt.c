@@ -1688,6 +1688,50 @@ end:
 	return rv;
 }
 
+static long WaitForPcscdEvent(long dwTime)
+{
+	char filename[FILENAME_MAX];
+	char buf[1];
+	int fd;
+	struct timeval tv, *ptv = NULL;
+	struct timeval before, after;
+	fd_set read_fd;
+
+	if (INFINITE != dwTime)
+	{
+		if (dwTime < 0)
+			return 0;
+		gettimeofday(&before, NULL);
+		tv.tv_sec = dwTime/1000;
+		tv.tv_usec = dwTime*1000 - tv.tv_sec*1000000;
+		ptv = &tv;
+	}
+
+	snprintf(filename, sizeof(filename), "%s/event.%d.%d", PCSCLITE_EVENTS_DIR,
+		SYS_GetPID(), SYS_RandomInt(0, 0x10000));
+	mkfifo(filename, 0644);
+	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
+
+	FD_ZERO(&read_fd);
+	FD_SET(fd, &read_fd);
+	
+	select(fd+1, &read_fd, NULL, NULL, ptv);
+
+	SYS_ReadFile(fd, buf, 1);
+	SYS_CloseFile(fd);
+
+	if (INFINITE != dwTime)
+	{
+		long int diff;
+
+		gettimeofday(&after, NULL);
+		diff = time_sub(&after, &before);
+		dwTime -= diff/1000;
+	}
+
+	return dwTime;
+}
+
 /**
  * @brief This function receives a structure or list of structures containing
  * reader names. It then blocks for a change in state to occur on any of the
@@ -1779,50 +1823,6 @@ end:
  * printf("reader state: 0x%04X\n", rgReaderStates[1].dwEventState);
  * @endcode
  */
-static long WaitForPcscdEvent(long dwTime)
-{
-	char filename[FILENAME_MAX];
-	char buf[1];
-	int fd;
-	struct timeval tv, *ptv = NULL;
-	struct timeval before, after;
-	fd_set read_fd;
-
-	if (INFINITE != dwTime)
-	{
-		if (dwTime < 0)
-			return 0;
-		gettimeofday(&before, NULL);
-		tv.tv_sec = dwTime/1000;
-		tv.tv_usec = dwTime*1000 - tv.tv_sec*1000000;
-		ptv = &tv;
-	}
-
-	snprintf(filename, sizeof(filename), "%s/event.%d.%d", PCSCLITE_EVENTS_DIR,
-		SYS_GetPID(), SYS_RandomInt(0, 0x10000));
-	mkfifo(filename, 0644);
-	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
-
-	FD_ZERO(&read_fd);
-	FD_SET(fd, &read_fd);
-	
-	select(fd+1, &read_fd, NULL, NULL, ptv);
-
-	SYS_ReadFile(fd, buf, 1);
-	SYS_CloseFile(fd);
-
-	if (INFINITE != dwTime)
-	{
-		long int diff;
-
-		gettimeofday(&after, NULL);
-		diff = time_sub(&after, &before);
-		dwTime -= diff/1000;
-	}
-
-	return dwTime;
-}
-
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
