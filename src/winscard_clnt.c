@@ -2802,9 +2802,10 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param pioSendPci [inout] Structure of protocol information.
+ * @param pioSendPci [inout] Structure of Protocol Control Information.
  * - \ref SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
  * - \ref SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
+ * - \ref SCARD_PCI_RAW - Pre-defined RAW PCI structure.
  * @param[in] pbSendBuffer APDU to send to the card.
  * @param[in] cbSendLength Length of the APDU.
  * @param pioRecvPci [inout] Structure of protocol information.
