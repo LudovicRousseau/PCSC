@@ -49,7 +49,7 @@ SCARD_READERSTATE_A;
 typedef SCARD_READERSTATE_A SCARD_READERSTATE, *PSCARD_READERSTATE_A,
 	*LPSCARD_READERSTATE_A;
 
-typedef struct _SCARD_IO_REQUEST
+typedef struct
 {
 	unsigned long dwProtocol;	/* Protocol identifier */
 	unsigned long cbPciLength;	/* Protocol Control Inf Length */
