@@ -49,10 +49,11 @@ SCARD_READERSTATE_A;
 typedef SCARD_READERSTATE_A SCARD_READERSTATE, *PSCARD_READERSTATE_A,
 	*LPSCARD_READERSTATE_A;
 
+/** Protocol Control Information (PCI) */
 typedef struct
 {
-	unsigned long dwProtocol;	/* Protocol identifier */
-	unsigned long cbPciLength;	/* Protocol Control Inf Length */
+	unsigned long dwProtocol;	/**< Protocol identifier */
+	unsigned long cbPciLength;	/**< Protocol Control Inf Length */
 }
 SCARD_IO_REQUEST, *PSCARD_IO_REQUEST, *LPSCARD_IO_REQUEST;
 
