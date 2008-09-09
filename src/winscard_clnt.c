@@ -2237,12 +2237,12 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 	while (1);
 
-	Log1(PCSC_LOG_DEBUG, "Event Loop End");
-
 	if (psContextMap[dwContextIndex].contextBlockStatus == BLOCK_STATUS_RESUME)
 		rv = SCARD_E_CANCELLED;
 
 end:
+	Log1(PCSC_LOG_DEBUG, "Event Loop End");
+
 	SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(rv)
