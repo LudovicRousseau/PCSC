@@ -1722,6 +1722,7 @@ static long WaitForPcscdEvent(long dwTime)
 
 	SYS_ReadFile(fd, buf, 1);
 	SYS_CloseFile(fd);
+	SYS_RemoveFile(filename);
 
 	if (INFINITE != dwTime)
 	{
