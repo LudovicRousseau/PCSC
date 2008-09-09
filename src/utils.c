@@ -109,8 +109,10 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 		fd = SYS_OpenFile(filename, O_WRONLY | O_APPEND | O_NONBLOCK, 0);
 		if (fd < 0)
 		{
-			Log3(PCSC_LOG_ERROR, "Can't open %s: %s", filename,
-				strerror(errno));
+			/* ENXIO "No such device or address" is a normal error
+			 * if the client is no more listening the pipe */
+			Log3(ENXIO == errno ? PCSC_LOG_DEBUG : PCSC_LOG_ERROR,
+				"Can't open %s: %s", filename, strerror(errno));
 		}
 		else
 		{
