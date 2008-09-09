@@ -1599,6 +1599,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	sSendPci.Length = pioSendPci->cbPciLength;
 
+	sRecvPci.Protocol = pioRecvPci->dwProtocol;
+	sRecvPci.Length = pioRecvPci->cbPciLength;
+
 	/* the protocol number is decoded a few lines above */
 	Log2(PCSC_LOG_DEBUG, "Send Protocol: T=%d", sSendPci.Protocol);
 
@@ -1614,11 +1617,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			cbSendLength, pbRecvBuffer, &dwRxLength, &sRecvPci);
 	}
 
-	if (pioRecvPci)
-	{
-		pioRecvPci->dwProtocol = sRecvPci.Protocol;
-		pioRecvPci->cbPciLength = sRecvPci.Length;
-	}
+	pioRecvPci->dwProtocol = sRecvPci.Protocol;
+	pioRecvPci->cbPciLength = sRecvPci.Length;
 
 	/*
 	 * Check for any errors that might have occurred
