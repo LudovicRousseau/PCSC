@@ -368,16 +368,17 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	readerTracker[i].udi = strdup(udi);
 
 #ifdef ADD_SERIAL_NUMBER
-	if (libhal_device_property_exists(ctx, udi, "usb_device.serial", &error))
+	if (libhal_device_property_exists(ctx, udi, "usb.serial", &error))
 	{
 		char fullname[MAX_READERNAME];
-		int iSerialNumber;
+		char *sSerialNumber;
 
-		iSerialNumber = libhal_device_get_property_int(ctx, udi,
-			"usb_device.serial", &error);
+		sSerialNumber = libhal_device_get_property_string(ctx, udi,
+			"usb.serial", &error);
 
-		snprintf(fullname, sizeof(fullname), "%s (%d)",
-			driver->readerName, iSerialNumber);
+		printf("SERIAL: %s\n", sSerialNumber);
+		snprintf(fullname, sizeof(fullname), "%s (%s)",
+			driver->readerName, sSerialNumber);
 		readerTracker[i].fullName = strdup(fullname);
 	}
 	else
