@@ -14,5 +14,6 @@ CFLAGS="$CFLAGS -Wno-unused-parameter"
         --enable-muscledropdir=/usr/lib/pcsc/services \
         --enable-maintainer-mode \
         --enable-twinserial \
+        --disable-libhal \
         CFLAGS="$CFLAGS" \
         "$@"
