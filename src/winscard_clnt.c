@@ -1492,7 +1492,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
  *          SCARD_PROTOCOL_T0, &hCard, &dwActiveProtocol);
  * ...
  * dwAtrLen = sizeof(pbAtr);
- * rv=SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol, pbAtr, &dwAtrLen);
+ * rv = SCardStatus(hCard, NULL, &dwReaderLen, &dwState, &dwProtocol, pbAtr, &dwAtrLen);
  * @endcode
  *
  * @code
