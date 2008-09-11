@@ -1645,6 +1645,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 			rv = SCARD_E_NO_MEMORY;
 			goto end;
 		}
+		if (NULL == mszReaderName)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		*(char **)mszReaderName = bufReader;
 	}
 	else
@@ -1668,6 +1673,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		if (NULL == bufAtr)
 		{
 			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		if (NULL == pbAtr)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(LPBYTE *)pbAtr = bufAtr;
@@ -2611,6 +2621,9 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 		if (NULL == buf)
 			return SCARD_E_NO_MEMORY;
 
+		if (NULL == pbAttr)
+			return SCARD_E_INVALID_PARAMETER;
+
 		*(unsigned char **)pbAttr = buf;
 	}
 	else
@@ -3195,6 +3208,11 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 			rv = SCARD_E_NO_MEMORY;
 			goto end;
 		}
+		if (NULL == mszReaders)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		*(char **)mszReaders = buf;
 	}
 	else
@@ -3362,6 +3380,11 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 		if (NULL == buf)
 		{
 			rv = SCARD_E_NO_MEMORY;
+			goto end;
+		}
+		if (NULL == mszGroups)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(char **)mszGroups = buf;
