@@ -1526,6 +1526,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	char *r;
 	char *bufReader = NULL;
 	LPBYTE bufAtr = NULL;
+	DWORD dummy;
 
 	PROFILE_START
 
@@ -1537,8 +1538,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		*pdwProtocol = 0;
 
 	/* Check for NULL parameters */ 
-	if (pcchReaderLen == NULL || pcbAtrLen == NULL)
-		return SCARD_E_INVALID_PARAMETER;
+	if (pcchReaderLen == NULL)
+		pcchReaderLen = &dummy;
+	
+	if (pcbAtrLen == NULL)
+		pcbAtrLen = &dummy;
 
 	/* length passed from caller */
 	dwReaderLen = *pcchReaderLen;
