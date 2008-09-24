@@ -188,6 +188,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
+	int repeat;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IO_close_channel) (void) = NULL;
@@ -203,9 +204,19 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 	 * LOCK THIS CODE REGION
 	 */
 
+	repeat = 5;
+again:
 	rv = SYS_MutexTryLock(rContext->mMutex);
 	if (EBUSY == rv)
+	{
 		Log1(PCSC_LOG_ERROR, "Locking failed");
+		repeat--;
+		if (repeat)
+		{
+			SYS_USleep(100*1000);	/* 100 ms */
+			goto again;
+		}
+	}
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 
