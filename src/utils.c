@@ -92,6 +92,13 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 		SYS_MMapSynchronize((void *)readerState, SYS_GetPageSize() );
 
 	dir_fd = opendir(PCSCLITE_EVENTS_DIR);
+	if (NULL == dir_fd)
+	{
+		Log2(PCSC_LOG_ERROR, "Can't opendir " PCSCLITE_EVENTS_DIR ": %s",
+			strerror(errno));
+		return -1;
+	}
+
 	while ((dir = readdir(dir_fd)) != NULL)
 	{
 		char filename[FILENAME_MAX];
