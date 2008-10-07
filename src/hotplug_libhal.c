@@ -30,6 +30,7 @@
 #include "sys_generic.h"
 #include "hotplug.h"
 #include "thread_generic.h"
+#include "utils.h"
 
 #undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
@@ -397,6 +398,8 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		readerTracker[i].fullName = NULL;
 		free(readerTracker[i].udi);
 		readerTracker[i].udi = NULL;
+
+		(void)CheckForOpenCT();
 	}
 
 	SYS_MutexUnLock(&usbNotifierMutex);

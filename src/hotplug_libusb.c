@@ -38,6 +38,7 @@
 #include "winscard_msg.h"
 #include "sys_generic.h"
 #include "hotplug.h"
+#include "utils.h"
 
 #undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
@@ -524,7 +525,11 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		driver->libraryPath, deviceName) == SCARD_S_SUCCESS)
 		readerTracker[i].status = READER_PRESENT;
 	else
+	{
 		readerTracker[i].status = READER_FAILED;
+
+		(void)CheckForOpenCT();
+	}
 
 	SYS_MutexUnLock(&usbNotifierMutex);
 
