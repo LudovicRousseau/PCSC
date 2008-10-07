@@ -23,5 +23,7 @@ LONG SCardCheckDaemonAvailability(void);
 
 int StatSynchronize(struct pubReaderStatesList *readerState);
 
+int CheckForOpenCT(void);
+
 #endif
 

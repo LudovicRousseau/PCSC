@@ -149,3 +149,25 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 	return 0;
 } /* StatSynchronize */
 
+
+/**
+ * Check is OpenCT is running and display a critical message if it is
+ *
+ * The first cause of pcsc-lite failure is that OpenCT is installed and running
+ * and has already claimed the USB device. In that case RFAddReader() fails
+ * and I get a user support request
+ */
+#define OPENCT_FILE "/var/run/openct/status"
+int CheckForOpenCT(void)
+{
+	struct stat buf;
+
+	if (0 == stat(OPENCT_FILE, &buf))
+	{
+		Log1(PCSC_LOG_CRITICAL, "Remove OpenCT and try again");
+		return 1;
+	}
+
+	return 0;
+} /* CheckForOpenCT */
+
