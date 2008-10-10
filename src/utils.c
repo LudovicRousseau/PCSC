@@ -70,6 +70,7 @@ int SendHotplugSignal(void)
 				pid, strerror(errno));
 			return EXIT_FAILURE ;
 		}
+		SYS_Sleep(1);
 	}
 
 	return EXIT_SUCCESS;
