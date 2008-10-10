@@ -335,7 +335,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			/*
 			 * Set error status on this reader while errors occur
 			 */
-
 			rContext->readerState->readerState &= ~SCARD_ABSENT;
 			rContext->readerState->readerState &= ~SCARD_PRESENT;
 			rContext->readerState->readerState &= ~SCARD_POWERED;
@@ -349,26 +348,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			dwCurrentState = SCARD_UNKNOWN;
 
 			StatSynchronize(rContext->readerState);
-
-			/*
-			 * This code causes race conditions on G4's with USB
-			 * insertion
-			 */
-			/*
-			 * dwErrorCount += 1; SYS_Sleep(1);
-			 */
-			/*
-			 * After 10 seconds of errors, try to reinitialize the reader
-			 * This sometimes helps bring readers out of *crazy* states.
-			 */
-			/*
-			 * if ( dwErrorCount == 10 ) { RFUnInitializeReader( rContext
-			 * ); RFInitializeReader( rContext ); dwErrorCount = 0; }
-			 */
-
-			/*
-			 * End of race condition code block
-			 */
 		}
 
 		if (dwStatus & SCARD_ABSENT)
@@ -468,7 +447,6 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		/*
 		 * Sharing may change w/o an event pass it on
 		 */
-
 		if (dwReaderSharing != rContext->dwContexts)
 		{
 			dwReaderSharing = rContext->dwContexts;
