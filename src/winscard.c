@@ -93,6 +93,7 @@
 #include "atrhandler.h"
 #include "sys_generic.h"
 #include "eventhandler.h"
+#include "utils.h"
 
 #undef DO_PROFILE
 #ifdef DO_PROFILE
