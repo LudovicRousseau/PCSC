@@ -377,6 +377,10 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
+			/* lock here instead in IFDSetPTS() to lock up to
+			 * setting rContext->readerState->cardProtocol */
+			SYS_MutexLock(rContext->mMutex);
+
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
@@ -400,16 +404,26 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
+				{
+					SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
+				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
+				{
+					SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
+				}
 
 				/* use negociated protocol */
 				rContext->readerState->cardProtocol = ret;
+
+				SYS_MutexUnLock(rContext->mMutex);
 			}
 			else
 			{
+				SYS_MutexUnLock(rContext->mMutex);
+
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;
 			}
@@ -693,6 +707,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
+			/* lock here instead in IFDSetPTS() to lock up to
+			 * setting rContext->readerState->cardProtocol */
+			SYS_MutexLock(rContext->mMutex);
+
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
@@ -714,16 +732,26 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
+				{
+					SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
+				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
+				{
+					SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
+				}
 
 				/* use negociated protocol */
 				rContext->readerState->cardProtocol = ret;
+
+				SYS_MutexUnLock(rContext->mMutex);
 			}
 			else
 			{
+				SYS_MutexUnLock(rContext->mMutex);
+
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;
 			}

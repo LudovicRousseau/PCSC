@@ -65,9 +65,11 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 #endif
 
 	/*
-	 * LOCK THIS CODE REGION
+	 * Locking is done in winscard.c SCardConnect() and SCardReconnect()
+	 *
+	 * This avoids to renegociate the protocol and confuse the card
+	 * Error returned by CCID driver is: CCID_Receive Procedure byte conflict
 	 */
-	SYS_MutexLock(rContext->mMutex);
 
 	ucValue[0] = rContext->dwSlot;
 
@@ -100,11 +102,6 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 #endif
-
-	SYS_MutexUnLock(rContext->mMutex);
-	/*
-	 * END OF LOCKED REGION
-	 */
 
 	return rv;
 }
