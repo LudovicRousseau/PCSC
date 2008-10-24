@@ -134,11 +134,9 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		}
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */
 	SYS_MutexLock(rContext->mMutex);
+
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
@@ -170,11 +168,9 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 			rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	}
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	return rv;
 }
@@ -197,10 +193,7 @@ LONG IFDCloseIFD(PREADER_CONTEXT rContext)
 		IFDH_close_channel = rContext->psFunctions.psFunctions_v2.pvfCloseChannel;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* TRY TO LOCK THIS CODE REGION */
 	repeat = 5;
 again:
 	rv = SYS_MutexTryLock(rContext->mMutex);
@@ -214,6 +207,7 @@ again:
 			goto again;
 		}
 	}
+
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 
@@ -226,11 +220,9 @@ again:
 	else
 		rv = IFDHCloseChannel(rContext->dwSlot);
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	return rv;
 }
@@ -297,10 +289,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			rContext->psFunctions.psFunctions_v2.pvfGetCapabilities;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -317,11 +306,8 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 			pucValue);
 #endif
 
+	/* END OF LOCKED REGION */
 	SYS_MutexUnLock(rContext->mMutex);
-
-	/*
-	 * END OF LOCKED REGION
-	 */
 
 	return rv;
 }
@@ -364,10 +350,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		IFDH_power_icc = rContext->psFunctions.psFunctions_v2.pvfPowerICC;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -394,11 +377,9 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	else
 		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, pdwAtrLen);
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	/* use clean values in case of error */
 	if (rv != IFD_SUCCESS)
@@ -452,10 +433,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		IFDH_icc_presence = rContext->psFunctions.psFunctions_v2.pvfICCPresence;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */ 
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -477,11 +455,9 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	else
 		rv = IFDHICCPresence(rContext->dwSlot);
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		dwCardStatus |= SCARD_PRESENT;
@@ -516,10 +492,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 
 			dwTag = TAG_IFD_ATR;
 
-			/*
-			 * LOCK THIS CODE REGION
-			 */
-
+			/* LOCK THIS CODE REGION */ 
 			SYS_MutexLock(rContext->mMutex);
 
 			ucValue[0] = rContext->dwSlot;
@@ -530,11 +503,9 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #else
 			rv = IFD_Get_Capabilities(dwTag, pucAtr);
 #endif
-			SYS_MutexUnLock(rContext->mMutex);
 
-			/*
-			 * END OF LOCKED REGION
-			 */
+			/* END OF LOCKED REGION */
+			SYS_MutexUnLock(rContext->mMutex);
 
 			/*
 			 * FIX :: This is a temporary way to return the correct size
@@ -594,9 +565,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	IFDH_control_v2 = rContext->psFunctions.psFunctions_v2.pvfControl;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
+	/* LOCK THIS CODE REGION */
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -606,10 +575,9 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	rv = IFDHControl_v2(rContext->dwSlot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
 #endif
+
+	/* END OF LOCKED REGION */
 	SYS_MutexUnLock(rContext->mMutex);
-	/*
-	 * END OF LOCKED REGION
-	 */
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -646,10 +614,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	IFDH_control = rContext->psFunctions.psFunctions_v3.pvfControl;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */ 
 	SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -659,11 +624,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -710,12 +673,8 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 			rContext->psFunctions.psFunctions_v2.pvfTransmitToICC;
 #endif
 
-	/*
-	 * LOCK THIS CODE REGION
-	 */
-
+	/* LOCK THIS CODE REGION */ 
 	SYS_MutexLock(rContext->mMutex);
-
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -742,11 +701,9 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 			(LPBYTE) pucTxBuffer, dwTxLength,
 			pucRxBuffer, pdwRxLength, pioRxPci);
 #endif
-	SYS_MutexUnLock(rContext->mMutex);
 
-	/*
-	 * END OF LOCKED REGION
-	 */
+	/* END OF LOCKED REGION */
+	SYS_MutexUnLock(rContext->mMutex);
 
 	/* log the returned status word */
 	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);
