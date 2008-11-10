@@ -507,15 +507,25 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		usb_dev_handle *device;
 		char serialNumber[MAX_READERNAME];
 		char fullname[MAX_READERNAME];
+		int ret;
 
 		device = usb_open(dev);
-		usb_get_string_simple(device, dev->descriptor.iSerialNumber,
+		ret = usb_get_string_simple(device, dev->descriptor.iSerialNumber,
 			serialNumber, MAX_READERNAME);
 		usb_close(device);
 
-		snprintf(fullname, sizeof(fullname), "%s (%s)",
-			driver->readerName, serialNumber);
-		readerTracker[i].fullName = strdup(fullname);
+		if (ret < 0)
+		{
+			Log2(PCSC_LOG_ERROR, "usb_get_string_simple failed: %s",
+				usb_strerror());
+			readerTracker[i].fullName = strdup(driver->readerName);
+		}
+		else
+		{
+			snprintf(fullname, sizeof(fullname), "%s (%s)",
+				driver->readerName, serialNumber);
+			readerTracker[i].fullName = strdup(fullname);
+		}
 	}
 	else
 #endif
