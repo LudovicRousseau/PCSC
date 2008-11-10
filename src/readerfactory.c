@@ -446,8 +446,8 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	if (lpcReader == 0)
 		return SCARD_E_INVALID_VALUE;
 
-	while ((rv = RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
-		== SCARD_S_SUCCESS)
+	while (SCARD_S_SUCCESS ==
+		RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
 	{
 		int i;
 
