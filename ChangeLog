@@ -1,6 +1,6 @@
 pcsc-lite-1.5.0: Ludovic Rousseau
 18 November 2008
-- correctly hanle up to PCSCLITE_MAX_READERS_CONTEXTS readers (instead
+- correctly handle up to PCSCLITE_MAX_READERS_CONTEXTS readers (instead
   of PCSCLITE_MAX_READERS_CONTEXTS-1)
 - SCardGetStatusChange()
   . now returns SCARD_E_TIMEOUT instead of SCARD_S_SUCCESS if dwTimeout
