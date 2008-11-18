@@ -594,6 +594,31 @@ printf("usb:%04x/%04x:libusb:%s:%s",
 So it is something like: \texttt{usb:08e6/3437:libusb:001:042} under
 GNU/Linux.
 
+\item libhal
+
+If \texttt{pcscd} is compiled with \texttt{libhal} support instead of
+\texttt{libusb} (default since pcsc-lite 1.4.100)
+the string will look like:
+\begin{verbatim}
+printf("usb:%04x/%04x:libhal:%s",
+    idVendor, idProduct, udi)
+\end{verbatim}
+
+udi is the Universal Device Id at the HAL level.
+
+So it is something like: \texttt{
+usb:08e6/3437:libhal:/org/freedesktop/Hal/devices/usb\_device\_8e6\_3437\_noserial\_if0}
+under GNU/Linux.
+
+\item other
+
+If the driver does not understand the \texttt{:libusb:} or
+\texttt{:libhal:} scheme or if a new scheme is used, the driver should
+ignore the part it does not understant instead of failing.
+
+The driver shall recognize the \texttt{usb:VID/PID} part and, only if
+possible, the remaining of the \texttt{DeviceName} field.
+
 \end{itemize}
 
 It is the responsibility of the driver to correctly identify the reader.
