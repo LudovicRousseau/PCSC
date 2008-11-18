@@ -1,3 +1,26 @@
+pcsc-lite-1.5.0: Ludovic Rousseau
+18 November 2008
+- correctly hanle up to PCSCLITE_MAX_READERS_CONTEXTS readers (instead
+  of PCSCLITE_MAX_READERS_CONTEXTS-1)
+- SCardGetStatusChange()
+  . now returns SCARD_E_TIMEOUT instead of SCARD_S_SUCCESS if dwTimeout
+    == 0 (conform to Windows XP)
+  . add support of reader name \\?PnP?\Notification to detect reader
+    insertion/removal (conform to Windows XP)
+  . if a reader disappear also set SCARD_STATE_UNAVAILABLE in
+    dwEventState (more conform to Windows XP)
+- SCardStatus(): add support of SCARD_AUTOALLOCATE for pcchReaderLen and
+  pcbAtrLen
+- SCardGetStatusChange() now uses asynchronous events instead of polling
+- more and/or better Doxygen documentation
+- SCardTransmit(): correctly pass the pioRecvPci parameter
+- SCardConnect() and SCardReconnect(): correct a bug when two
+  applications were calling SCardConnect() or SCardReconnect() at the
+  exact same time
+- pcscd logs the command name sent by the application (when in debug mode)
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.4.102: Ludovic Rousseau
 27 June 2008
 - pcscd -v now displays the enabled features 
