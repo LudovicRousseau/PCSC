@@ -262,8 +262,8 @@ main(int argc, char **argv)
             "#include \"eventhandler.h\"\n"
             "#include \"winscard_msg.h\"\n\n"
             "#include \"lassert.h\"\n\n"
-            "void pcsc_assert_wire_constants(void);\n"
-            "void pcsc_assert_wire_constants(void)\n"
+            "int pcsc_assert_wire_constants(void);\n"
+            "int pcsc_assert_wire_constants(void)\n"
             "{\n");
 
     BLANK_LINE ();
@@ -273,6 +273,7 @@ main(int argc, char **argv)
 
     BLANK_LINE ();
 
+    printf ("return 0;\n");
     printf ("}\n");
 
     return 0;

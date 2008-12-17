@@ -7,7 +7,7 @@
 #if 0
 #define FAIL exit (1)
 #else
-#define FAIL
+#define FAIL return 1
 #endif
 
 #define LASSERT(cond)                                                   \
