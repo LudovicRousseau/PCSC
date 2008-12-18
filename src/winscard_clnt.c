@@ -3590,7 +3590,7 @@ static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
 	int i;
 
 	/*
-	 * Find this context and return it's spot in the array
+	 * Find this context and return its spot in the array
 	 */
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
 	{
