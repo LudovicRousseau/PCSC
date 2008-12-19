@@ -2620,13 +2620,13 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 
 	if (SCARD_AUTOALLOCATE == *pcbAttrLen)
 	{
+		if (NULL == pbAttr)
+			return SCARD_E_INVALID_PARAMETER;
+
 		*pcbAttrLen = MAX_BUFFER_SIZE;
 		buf = malloc(*pcbAttrLen);
 		if (NULL == buf)
 			return SCARD_E_NO_MEMORY;
-
-		if (NULL == pbAttr)
-			return SCARD_E_INVALID_PARAMETER;
 
 		*(unsigned char **)pbAttr = buf;
 	}
