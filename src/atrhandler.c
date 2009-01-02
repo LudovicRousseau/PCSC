@@ -19,7 +19,6 @@
  */
 
 #include "config.h"
-#include <syslog.h>
 #include <string.h>
 
 #include "misc.h"
