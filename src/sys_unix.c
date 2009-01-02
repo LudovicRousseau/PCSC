@@ -397,7 +397,7 @@ INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 		iInitialized = 1;
 	}
 
-	iRandNum = (int)((float)rand()/RAND_MAX * (fEnd - fStart)) + fStart;
+	iRandNum = ((rand()+0.0)/RAND_MAX * (fEnd - fStart)) + fStart;
 
 	return iRandNum;
 }
