@@ -40,8 +40,8 @@ pid_t GetDaemonPid(void)
 	{
 		char pid_ascii[PID_ASCII_SIZE];
 
-		fgets(pid_ascii, PID_ASCII_SIZE, f);
-		fclose(f);
+		(void)fgets(pid_ascii, PID_ASCII_SIZE, f);
+		(void)fclose(f);
 
 		pid = atoi(pid_ascii);
 	}
@@ -70,7 +70,7 @@ int SendHotplugSignal(void)
 				pid, strerror(errno));
 			return EXIT_FAILURE ;
 		}
-		SYS_Sleep(1);
+		(void)SYS_Sleep(1);
 	}
 
 	return EXIT_SUCCESS;
@@ -90,7 +90,7 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 	struct dirent *dir;
 
 	if (readerState)
-		SYS_MMapSynchronize((void *)readerState, SYS_GetPageSize() );
+		(void)SYS_MMapSynchronize((void *)readerState, SYS_GetPageSize() );
 
 	dir_fd = opendir(PCSCLITE_EVENTS_DIR);
 	if (NULL == dir_fd)
@@ -110,7 +110,7 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 		if ('.' == dir->d_name[0])
 			continue;
 
-		snprintf(filename, sizeof(filename), "%s/%s", PCSCLITE_EVENTS_DIR,
+		(void)snprintf(filename, sizeof(filename), "%s/%s", PCSCLITE_EVENTS_DIR,
 			dir->d_name);
 		Log2(PCSC_LOG_DEBUG, "status file: %s", filename);
 
@@ -135,17 +135,17 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 				if (!(fstat_buf.st_mode & S_IFIFO))
 					Log2(PCSC_LOG_ERROR, "%s is not a fifo", filename);
 				else
-					SYS_WriteFile(fd, buf, sizeof(buf));
+					(void)SYS_WriteFile(fd, buf, sizeof(buf));
 			}
 
-			SYS_CloseFile(fd);
+			(void)SYS_CloseFile(fd);
 		}
 
 		if (unlink(filename))
 			Log3(PCSC_LOG_ERROR, "Can't remove %s: %s", filename,
 			strerror(errno));
 	}
-	closedir(dir_fd);
+	(void)closedir(dir_fd);
 
 	return 0;
 } /* StatSynchronize */

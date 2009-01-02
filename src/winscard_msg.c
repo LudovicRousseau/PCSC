@@ -96,7 +96,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Error: connect to client socket %s: %s",
 			PCSCLITE_CSOCK_NAME, strerror(errno));
-		SYS_CloseFile(*pdwClientID);
+		(void)SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
 
@@ -105,7 +105,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Error: cannot set socket %s nonblocking: %s",
 			PCSCLITE_CSOCK_NAME, strerror(errno));
-		SYS_CloseFile(*pdwClientID);
+		(void)SYS_CloseFile(*pdwClientID);
 		return -1;
 	}
 
@@ -121,7 +121,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
  */
 INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
 {
-	SYS_CloseFile(dwClientID);
+	(void)SYS_CloseFile(dwClientID);
 	return 0;
 }
 
@@ -477,7 +477,7 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
  */
 INTERNAL void SHMCleanupSharedSegment(int sockValue, const char *pcFilePath)
 {
-	SYS_CloseFile(sockValue);
-	SYS_RemoveFile(pcFilePath);
+	(void)SYS_CloseFile(sockValue);
+	(void)SYS_RemoveFile(pcFilePath);
 }
 

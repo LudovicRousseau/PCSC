@@ -87,7 +87,7 @@ void log_msg(const int priority, const char *fmt, ...)
 
 	va_start(argptr, fmt);
 #ifndef WIN32
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+	(void)vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
 #else
 #if HAVE_VSNPRINTF
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
@@ -145,7 +145,7 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 
 	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
 
-	strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
+	(void)strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
 	c = DebugBuffer + strlen(DebugBuffer);
 
 	for (i = 0; (i < len) && (c < debug_buf_end); ++i)

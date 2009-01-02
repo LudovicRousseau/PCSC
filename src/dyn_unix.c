@@ -62,7 +62,7 @@ INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFun
 	int rv;
 
 	/* Some platforms might need a leading underscore for the symbol */
-	snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);
+	(void)snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);
 
 	*pvFHandle = NULL;
 	*pvFHandle = dlsym(pvLHandle, pcFunctionName);

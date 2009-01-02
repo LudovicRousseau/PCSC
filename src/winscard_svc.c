@@ -100,7 +100,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) i);
 	if (rv)
 	{
-		SYS_CloseFile(psContext[i].dwClientID);
+		(void)SYS_CloseFile(psContext[i].dwClientID);
 		psContext[i].dwClientID = 0;
 		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
 		return SCARD_E_NO_MEMORY;
@@ -143,8 +143,8 @@ static void ContextThread(LPVOID dwIndex)
 				 */
 				Log2(PCSC_LOG_DEBUG, "Client die: %d",
 					psContext[dwContextIndex].dwClientID);
-				MSGCleanupClient(dwContextIndex);
-				SYS_ThreadExit((LPVOID) NULL);
+				(void)MSGCleanupClient(dwContextIndex);
+				(void)SYS_ThreadExit((LPVOID) NULL);
 			}
 			break;
 
@@ -159,9 +159,9 @@ static void ContextThread(LPVOID dwIndex)
 				{
 					Log2(PCSC_LOG_DEBUG, "MSGFunctionDemarshall failed: %d",
 						rv);
-					SHMClientCloseSession(psContext[dwContextIndex].dwClientID);
-					MSGCleanupClient(dwContextIndex);
-					SYS_ThreadExit((LPVOID) NULL);
+					(void)SHMClientCloseSession(psContext[dwContextIndex].dwClientID);
+					(void)MSGCleanupClient(dwContextIndex);
+					(void)SYS_ThreadExit((LPVOID) NULL);
 				}
 
 				/* the SCARD_TRANSMIT_EXTENDED anwser is already sent by
@@ -674,10 +674,10 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 				}
 
 				if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
-					SCardDisconnect(psContext[dwContextIndex].hCard[i],
+					(void)SCardDisconnect(psContext[dwContextIndex].hCard[i],
 						SCARD_LEAVE_CARD);
 				else
-					SCardDisconnect(psContext[dwContextIndex].hCard[i],
+					(void)SCardDisconnect(psContext[dwContextIndex].hCard[i],
 						SCARD_RESET_CARD);
 
 				psContext[dwContextIndex].hCard[i] = 0;
@@ -754,7 +754,7 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
 	Log1(PCSC_LOG_ERROR, "Client failed to authenticate");
-	SYS_Sleep(2);
+	(void)SYS_Sleep(2);
 
 	return -1;
 }
@@ -763,8 +763,9 @@ LONG MSGCleanupClient(DWORD dwContextIndex)
 {
 	if (psContext[dwContextIndex].hContext != 0)
 	{
-		SCardReleaseContext(psContext[dwContextIndex].hContext);
-		MSGRemoveContext(psContext[dwContextIndex].hContext, dwContextIndex);
+		(void)SCardReleaseContext(psContext[dwContextIndex].hContext);
+		(void)MSGRemoveContext(psContext[dwContextIndex].hContext,
+			dwContextIndex);
 	}
 
 	psContext[dwContextIndex].dwClientID = 0;

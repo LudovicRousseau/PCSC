@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		(int)sizeof(lpcReader));
 	printf("-----> ");
 
-	fgets(lpcReader, sizeof(lpcReader), stdin);
+	(void)fgets(lpcReader, sizeof(lpcReader), stdin);
 
 	/* remove trailing \n */
 	lpcReader[strlen(lpcReader)-1] = '\0';
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	printf("Example: %s/librdr_generic.so\n", PCSCLITE_HP_DROPDIR);
 	printf("-----> ");
 
-	fgets(lpcLibrary, sizeof(lpcLibrary), stdin);
+	(void)fgets(lpcLibrary, sizeof(lpcLibrary), stdin);
 
 	/* remove trailing \n */
 	lpcLibrary[strlen(lpcLibrary)-1] = '\0';
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 	{
 		printf("Invalid input (%d) please choose (1-5)\n", iPort);
 		/* eat the \n */
-		getchar();
+		(void)getchar();
 		goto retryport;
 	}
 

@@ -127,7 +127,7 @@ static LONG HPReadBundleValues(void)
 			 * The bundle exists - let's form a full path name and get the
 			 * vendor and product ID's for this particular bundle
 			 */
-			snprintf(fullPath, sizeof(fullPath), "%s/%s/Contents/Info.plist",
+			(void)snprintf(fullPath, sizeof(fullPath), "%s/%s/Contents/Info.plist",
 				PCSCLITE_HP_DROPDIR, currFP->d_name);
 			fullPath[sizeof(fullPath) - 1] = '\0';
 
@@ -161,7 +161,7 @@ static LONG HPReadBundleValues(void)
 					PCSCLITE_HP_LIBRKEY_NAME, keyValue, 0);
 				if (0 == rv)
 				{
-					snprintf(fullLibPath, sizeof(fullLibPath),
+					(void)snprintf(fullLibPath, sizeof(fullLibPath),
 						"%s/%s/Contents/%s/%s",
 						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
 						keyValue);
@@ -221,7 +221,7 @@ static LONG HPReadBundleValues(void)
 	}
 
 	driverSize = listCount;
-	closedir(hpDir);
+	(void)closedir(hpDir);
 
 #ifdef DEBUG_HOTPLUG
 	Log2(PCSC_LOG_INFO, "Found drivers for %d readers", listCount);
@@ -342,14 +342,14 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", short_name(udi));
 
-	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libhal:%s",
+	(void)snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libhal:%s",
 		driver->manuID, driver->productID, udi);
 	deviceName[sizeof(deviceName) -1] = '\0';
 
 	/* wait until the device is visible by libusb/etc.  */
-	SYS_Sleep(1);
+	(void)SYS_Sleep(1);
 
-	SYS_MutexLock(&usbNotifierMutex);
+	(void)SYS_MutexLock(&usbNotifierMutex);
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -362,7 +362,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", i);
-		SYS_MutexUnLock(&usbNotifierMutex);
+		(void)SYS_MutexUnLock(&usbNotifierMutex);
 		return;
 	}
 
@@ -377,7 +377,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		sSerialNumber = libhal_device_get_property_string(ctx, udi,
 			"usb.serial", &error);
 
-		snprintf(fullname, sizeof(fullname), "%s (%s)",
+		(void)snprintf(fullname, sizeof(fullname), "%s (%s)",
 			driver->readerName, sSerialNumber);
 		readerTracker[i].fullName = strdup(fullname);
 	}
@@ -402,7 +402,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		(void)CheckForOpenCT();
 	}
 
-	SYS_MutexUnLock(&usbNotifierMutex);
+	(void)SYS_MutexUnLock(&usbNotifierMutex);
 } /* HPAddDevice */
 
 
@@ -425,15 +425,15 @@ static void HPRemoveDevice(LibHalContext *ctx, const char *udi)
 	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", i,
 		short_name(readerTracker[i].udi));
 
-	SYS_MutexLock(&usbNotifierMutex);
+	(void)SYS_MutexLock(&usbNotifierMutex);
 
-	RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
+	(void)RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
 	free(readerTracker[i].fullName);
 	readerTracker[i].fullName = NULL;
 	free(readerTracker[i].udi);
 	readerTracker[i].udi = NULL;
 
-	SYS_MutexUnLock(&usbNotifierMutex);
+	(void)SYS_MutexUnLock(&usbNotifierMutex);
 
 	return;
 } /* HPRemoveDevice */
@@ -491,10 +491,10 @@ ULONG HPRegisterForHotplugEvents(void)
 	}
 
 	/* callback when device added */
-	libhal_ctx_set_device_added(hal_ctx, HPAddDevice);
+	(void)libhal_ctx_set_device_added(hal_ctx, HPAddDevice);
 
 	/* callback when device removed */
-	libhal_ctx_set_device_removed(hal_ctx, HPRemoveDevice);
+	(void)libhal_ctx_set_device_removed(hal_ctx, HPRemoveDevice);
 
 	device_names = libhal_get_all_devices(hal_ctx, &num_devices, &error);
 	if (device_names == NULL)
@@ -511,7 +511,7 @@ ULONG HPRegisterForHotplugEvents(void)
 
 	libhal_free_string_array(device_names);
 
-	SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+	(void)SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL);
 
 	return 0;

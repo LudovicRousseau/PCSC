@@ -77,7 +77,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+	        (void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 	        rv = (*IFD_set_protocol_parameters) (dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
@@ -92,7 +92,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 	        ucValue[0] = rContext->dwSlot;
-	        IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+	        (void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
 	}
@@ -135,7 +135,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 #endif
 
 	/* LOCK THIS CODE REGION */
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -170,7 +170,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	return rv;
 }
@@ -203,7 +203,7 @@ again:
 		repeat--;
 		if (repeat)
 		{
-			SYS_USleep(100*1000);	/* 100 ms */
+			(void)SYS_USleep(100*1000);	/* 100 ms */
 			goto again;
 		}
 	}
@@ -222,7 +222,7 @@ again:
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	return rv;
 }
@@ -290,7 +290,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
@@ -307,7 +307,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	return rv;
 }
@@ -339,7 +339,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	/*
 	 * Check that the card is inserted first
 	 */
-	IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
+	(void)IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
 	if (dwStatus & SCARD_ABSENT)
 		return SCARD_W_REMOVED_CARD;
@@ -351,13 +351,13 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_power_icc) (dwAction);
 	}
 	else
@@ -371,7 +371,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
 	}
 	else
@@ -379,7 +379,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	/* use clean values in case of error */
 	if (rv != IFD_SUCCESS)
@@ -389,7 +389,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 
 		if (rv == IFD_NO_SUCH_DEVICE)
 		{
-			SendHotplugSignal();
+			(void)SendHotplugSignal();
 			return SCARD_E_READER_UNAVAILABLE;
 		}
 
@@ -400,7 +400,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	 * Get the ATR and it's length
 	 */
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
+		(void)IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
 	return rv;
 }
@@ -434,13 +434,13 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #endif
 
 	/* LOCK THIS CODE REGION */ 
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_is_icc_present) ();
 	}
 	else
@@ -449,7 +449,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
 	}
 	else
@@ -457,7 +457,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		dwCardStatus |= SCARD_PRESENT;
@@ -471,7 +471,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 
 			if (rv == IFD_NO_SUCH_DEVICE)
 			{
-				SendHotplugSignal();
+				(void)SendHotplugSignal();
 				return SCARD_E_READER_UNAVAILABLE;
 			}
 
@@ -493,10 +493,10 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 			dwTag = TAG_IFD_ATR;
 
 			/* LOCK THIS CODE REGION */ 
-			SYS_MutexLock(rContext->mMutex);
+			(void)SYS_MutexLock(rContext->mMutex);
 
 			ucValue[0] = rContext->dwSlot;
-			IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+			(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 			rv = (*IFD_get_capabilities) (dwTag, pucAtr);
@@ -505,7 +505,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #endif
 
 			/* END OF LOCKED REGION */
-			SYS_MutexUnLock(rContext->mMutex);
+			(void)SYS_MutexUnLock(rContext->mMutex);
 
 			/*
 			 * FIX :: This is a temporary way to return the correct size
@@ -566,7 +566,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
@@ -577,7 +577,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -615,7 +615,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 #endif
 
 	/* LOCK THIS CODE REGION */ 
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
@@ -626,7 +626,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -636,7 +636,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 
 		if (rv == IFD_NO_SUCH_DEVICE)
 		{
-			SendHotplugSignal();
+			(void)SendHotplugSignal();
 			return SCARD_E_READER_UNAVAILABLE;
 		}
 
@@ -674,13 +674,13 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #endif
 
 	/* LOCK THIS CODE REGION */ 
-	SYS_MutexLock(rContext->mMutex);
+	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_transmit_to_icc) (pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	}
@@ -692,7 +692,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
-		IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Transmit_to_ICC(pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	}
@@ -703,7 +703,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #endif
 
 	/* END OF LOCKED REGION */
-	SYS_MutexUnLock(rContext->mMutex);
+	(void)SYS_MutexUnLock(rContext->mMutex);
 
 	/* log the returned status word */
 	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);
@@ -716,7 +716,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 
 		if (rv == IFD_NO_SUCH_DEVICE)
 		{
-			SendHotplugSignal();
+			(void)SendHotplugSignal();
 			return SCARD_E_READER_UNAVAILABLE;
 		}
 

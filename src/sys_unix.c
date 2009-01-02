@@ -274,7 +274,7 @@ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
  */
 INTERNAL void SYS_PublicMemoryUnmap(void * ptr, int iSize)
 {
-	munmap(ptr, iSize);
+	(void)munmap(ptr, iSize);
 }
 
 /**

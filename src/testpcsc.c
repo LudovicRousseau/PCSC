@@ -45,12 +45,12 @@ void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 		else
 		{
 			printf(RED "%s\n" NORMAL, pcsc_stringify_error(rv));
-			SCardReleaseContext(hContext);
+			(void)SCardReleaseContext(hContext);
 			exit(-1);
 		}
 	}
 	else
-		puts(pcsc_stringify_error(rv));
+		(void)puts(pcsc_stringify_error(rv));
 }
 
 int main(int argc, char **argv)
@@ -141,7 +141,7 @@ wait_for_card_again:
 	{
 		printf("Testing SCardGetStatusChange \n");
 		printf("Please insert a working reader\t: ");
-		fflush(stdout);
+		(void)fflush(stdout);
 		rgReaderStates[0].szReader = "\\\\?PnP?\\Notification";
 		rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
@@ -181,8 +181,8 @@ wait_for_card_again:
 			char input[80];
 
 			printf("Enter the reader number\t\t: ");
-			fgets(input, sizeof(input), stdin);
-			sscanf(input, "%d", &iReader);
+			(void)fgets(input, sizeof(input), stdin);
+			(void)sscanf(input, "%d", &iReader);
 
 			if (iReader > p || iReader <= 0)
 				printf("Invalid Value - try again\n");
@@ -195,7 +195,7 @@ wait_for_card_again:
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
 	printf("Waiting for card insertion\t: ");
-	fflush(stdout);
+	(void)fflush(stdout);
 	rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	test_rv(rv, hContext, PANIC);
 	if (rgReaderStates[0].dwEventState & SCARD_STATE_UNKNOWN)
@@ -378,12 +378,12 @@ wait_for_card_again:
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		SCardDisconnect(hCard, SCARD_RESET_CARD);
-		SCardReleaseContext(hContext);
+		(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+		(void)SCardReleaseContext(hContext);
 	}
 
 	printf("Press enter: ");
-	getchar();
+	(void)getchar();
 	printf("Testing SCardReconnect\t\t: ");
 	rv = SCardReconnect(hCard, SCARD_SHARE_SHARED,
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, SCARD_UNPOWER_CARD, &dwPref);

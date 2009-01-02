@@ -71,9 +71,9 @@ void tpevalToken(char *pcToken, int tokType)
 		len++;	/* final NULL byte */
 
 		if (len > sizeof(pcKey))
-			strlcpy(pcKey, &pcToken[5], sizeof(pcKey));
+			(void)strlcpy(pcKey, &pcToken[5], sizeof(pcKey));
 		else
-			strlcpy(pcKey, &pcToken[5], len);
+			(void)strlcpy(pcKey, &pcToken[5], len);
 	}
 
 	if (tokType == TOKEN_TYPE_STRING)
@@ -87,13 +87,13 @@ void tpevalToken(char *pcToken, int tokType)
 		len++;	/* final NULL byte */
 
 		if (len > sizeof(pcValue))
-			strlcpy(pcValue, &pcToken[8], sizeof(pcValue));
+			(void)strlcpy(pcValue, &pcToken[8], sizeof(pcValue));
 		else
-			strlcpy(pcValue, &pcToken[8], len);
+			(void)strlcpy(pcValue, &pcToken[8], len);
 
 		if (strcmp(pcKey, pcDesiredKey) == 0)
 			if (desiredIndex == valueIndex)
-				strlcpy(pcFinValue, pcValue, sizeof(pcFinValue));
+				(void)strlcpy(pcFinValue, pcValue, sizeof(pcFinValue));
 	}
 }
 
@@ -135,7 +135,7 @@ int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
 
 	do
 	{
-		yylex();
+		(void)yylex();
 	} while (!feof(file));
 
 	if (pcFinValue[0] == 0)
@@ -149,9 +149,9 @@ int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
 		ret = -1;
 	}
 	else
-		strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
+		(void)strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
 
-	fclose(file);
+	(void)fclose(file);
 	return ret;
 }
 

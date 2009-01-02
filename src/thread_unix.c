@@ -74,7 +74,7 @@ INTERNAL int SYS_ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
 		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
 	if (ret)
 	{
-		pthread_attr_destroy(&attr);
+		(void)pthread_attr_destroy(&attr);
 		return ret;
 	}
 

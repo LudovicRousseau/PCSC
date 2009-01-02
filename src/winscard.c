@@ -333,7 +333,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
 		while (rContext->dwLockId != 0)
-			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+			(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}
 
@@ -379,7 +379,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
 			 * setting rContext->readerState->cardProtocol */
-			SYS_MutexLock(rContext->mMutex);
+			(void)SYS_MutexLock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
@@ -405,24 +405,24 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
-					SYS_MutexUnLock(rContext->mMutex);
+					(void)SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
-					SYS_MutexUnLock(rContext->mMutex);
+					(void)SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
 				/* use negociated protocol */
 				rContext->readerState->cardProtocol = ret;
 
-				SYS_MutexUnLock(rContext->mMutex);
+				(void)SYS_MutexUnLock(rContext->mMutex);
 			}
 			else
 			{
-				SYS_MutexUnLock(rContext->mMutex);
+				(void)SYS_MutexUnLock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;
@@ -464,11 +464,11 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		if (rContext->dwContexts == SCARD_NO_CONTEXT)
 		{
 			rContext->dwContexts = SCARD_EXCLUSIVE_CONTEXT;
-			RFLockSharing(*phCard);
+			(void)RFLockSharing(*phCard);
 		}
 		else
 		{
-			RFDestroyReaderHandle(*phCard);
+			(void)RFDestroyReaderHandle(*phCard);
 			*phCard = 0;
 			return SCARD_E_SHARING_VIOLATION;
 		}
@@ -491,7 +491,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Clean up - there is no more room
 		 */
-		RFDestroyReaderHandle(*phCard);
+		(void)RFDestroyReaderHandle(*phCard);
 		if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
 			rContext->dwContexts = SCARD_NO_CONTEXT;
 		else
@@ -509,7 +509,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	StatSynchronize(rContext->readerState);
+	(void)StatSynchronize(rContext->readerState);
 
 	PROFILE_END
 
@@ -632,7 +632,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				/*
 				 * Notify the card has been reset
 				 */
-				RFSetReaderEventState(rContext, SCARD_RESET);
+				(void)RFSetReaderEventState(rContext, SCARD_RESET);
 
 				/*
 				 * Set up the status bit masks on dwStatus
@@ -672,7 +672,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					UCHAR ucAtr[MAX_ATR_SIZE];
 
 					Log1(PCSC_LOG_ERROR, "Error resetting card.");
-					IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
+					(void)IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
 					if (dwStatus & SCARD_PRESENT)
 						return SCARD_W_UNRESPONSIVE_CARD;
 					else
@@ -709,7 +709,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
 			 * setting rContext->readerState->cardProtocol */
-			SYS_MutexLock(rContext->mMutex);
+			(void)SYS_MutexLock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
@@ -733,24 +733,24 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
-					SYS_MutexUnLock(rContext->mMutex);
+					(void)SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
-					SYS_MutexUnLock(rContext->mMutex);
+					(void)SYS_MutexUnLock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
 				/* use negociated protocol */
 				rContext->readerState->cardProtocol = ret;
 
-				SYS_MutexUnLock(rContext->mMutex);
+				(void)SYS_MutexUnLock(rContext->mMutex);
 			}
 			else
 			{
-				SYS_MutexUnLock(rContext->mMutex);
+				(void)SYS_MutexUnLock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;
@@ -772,7 +772,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			if (rContext->dwContexts == SCARD_LAST_CONTEXT)
 			{
 				rContext->dwContexts = SCARD_EXCLUSIVE_CONTEXT;
-				RFLockSharing(hCard);
+				(void)RFLockSharing(hCard);
 			} else
 			{
 				return SCARD_E_SHARING_VIOLATION;
@@ -790,7 +790,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * We are in exclusive mode but want to share now
 			 */
-			RFUnlockSharing(hCard);
+			(void)RFUnlockSharing(hCard);
 			rContext->dwContexts = SCARD_LAST_CONTEXT;
 		}
 	} else if (dwShareMode == SCARD_SHARE_DIRECT)
@@ -805,7 +805,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * We are in exclusive mode but want to share now
 			 */
-			RFUnlockSharing(hCard);
+			(void)RFUnlockSharing(hCard);
 			rContext->dwContexts = SCARD_LAST_CONTEXT;
 		}
 	} else
@@ -814,13 +814,13 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Clear a previous event to the application
 	 */
-	RFClearReaderEventState(rContext, hCard);
+	(void)RFClearReaderEventState(rContext, hCard);
 
 	/*
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	StatSynchronize(rContext->readerState);
+	(void)StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }
@@ -856,7 +856,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
 		while (rContext->dwLockId != 0)
-			SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+			(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}
 
@@ -901,7 +901,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Notify the card has been reset
 		 */
-		RFSetReaderEventState(rContext, SCARD_RESET);
+		(void)RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
 		 * Set up the status bit masks on dwStatus
@@ -980,8 +980,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Remove and destroy this handle
 	 */
-	RFRemoveReaderHandle(rContext, hCard);
-	RFDestroyReaderHandle(hCard);
+	(void)RFRemoveReaderHandle(rContext, hCard);
+	(void)RFDestroyReaderHandle(hCard);
 
 	/*
 	 * For exclusive connection reset it to no connections
@@ -1003,7 +1003,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Propagate new state to Shared Memory
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	StatSynchronize(rContext->readerState);
+	(void)StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }
@@ -1046,7 +1046,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	/* if the transaction is not yet ready we sleep a bit so the client
 	 * do not retry immediately */
 	if (SCARD_E_SHARING_VIOLATION == rv)
-		SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
@@ -1117,7 +1117,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Notify the card has been reset
 		 */
-		RFSetReaderEventState(rContext, SCARD_RESET);
+		(void)RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
 		 * Set up the status bit masks on dwStatus
@@ -1197,7 +1197,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Unlock any blocks on this context
 	 */
-	RFUnlockSharing(hCard);
+	(void)RFUnlockSharing(hCard);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 

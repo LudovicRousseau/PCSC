@@ -49,26 +49,26 @@ int main(int argc, char *argv[])
 	printf("\nWinscard PC/SC Lite Test Program\n\n");
 
 	printf("Please enter the desired host (localhost for this machine) [localhost]: ");
-	fgets(line, sizeof(line), stdin);
+	(void)fgets(line, sizeof(line), stdin);
 	if (line[0] == '\n')
 		strncpy(pcHost, "localhost", sizeof(pcHost)-1);
 	else
 		strncpy(pcHost, line, sizeof(pcHost)-1);
 
 	printf("Please input the desired transmit protocol (0/1) [0]: ");
-	fgets(line, sizeof(line), stdin);
+	(void)fgets(line, sizeof(line), stdin);
 	if (line[0] == '\n')
 		iProtocol = 0;
 	else
-		sscanf(line, "%d", &iProtocol);
+		(void)sscanf(line, "%d", &iProtocol);
 
 	printf("Please input the desired input apdu file: ");
-	fgets(line, sizeof(line), stdin);
-	sscanf(line, "%s", pcAFile);
+	(void)fgets(line, sizeof(line), stdin);
+	(void)sscanf(line, "%s", pcAFile);
 
 	printf("Please input the desired output apdu file: ");
-	fgets(line, sizeof(line), stdin);
-	sscanf(line, "%s", pcOFile);
+	(void)fgets(line, sizeof(line), stdin);
+	(void)sscanf(line, "%s", pcOFile);
 
 	fp = fopen(pcAFile, "r");
 	if (fp == NULL)
@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
 	}
 
 	mszGroups = NULL;
-	SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
+	(void)SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
 	mszReaders = (char *) malloc(sizeof(char) * dwReaders);
-	SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
+	(void)SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 
 	/*
 	 * Have to understand the multi-string here
@@ -112,8 +112,8 @@ int main(int argc, char *argv[])
 	do
 	{
 		printf("Enter the desired reader number: ");
-		fgets(line, sizeof(line), stdin);
-		sscanf(line, "%d", &iReader);
+		(void)fgets(line, sizeof(line), stdin);
+		(void)sscanf(line, "%d", &iReader);
 		printf("\n");
 
 		if (iReader > p || iReader <= 0)
@@ -127,14 +127,14 @@ int main(int argc, char *argv[])
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
 	printf("Please insert a smart card\n");
-	SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+	(void)SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&hCard, &dwPref);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		SCardReleaseContext(hContext);
+		(void)SCardReleaseContext(hContext);
 		printf("Error connecting to reader %ld\n", rv);
 		return 1;
 	}
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 	 * Now lets get some work done
 	 */
 
-	SCardBeginTransaction(hCard);
+	(void)SCardBeginTransaction(hCard);
 
 	cnum = 0;
 
@@ -169,8 +169,8 @@ int main(int argc, char *argv[])
 			if (sscanf(line_ptr, "%x", &x) == 0)
 			{
 				printf("Corrupt APDU: %s\n", line);
-				SCardDisconnect(hCard, SCARD_RESET_CARD);
-				SCardReleaseContext(hContext);
+				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+				(void)SCardReleaseContext(hContext);
 				return 1;
 			}
 			s[i] = x;
@@ -204,8 +204,8 @@ int main(int argc, char *argv[])
 			else
 			{
 				printf("Invalid Protocol\n");
-				SCardDisconnect(hCard, SCARD_RESET_CARD);
-				SCardReleaseContext(hContext);
+				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+				(void)SCardReleaseContext(hContext);
 				return 1;
 			}
 		}
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 
 		if (rv == SCARD_W_RESET_CARD)
 		{
-			SCardReconnect(hCard, SCARD_SHARE_SHARED,
+			(void)SCardReconnect(hCard, SCARD_SHARE_SHARED,
 				SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 				SCARD_RESET_CARD, &dwPref);
 		}
@@ -232,9 +232,9 @@ int main(int argc, char *argv[])
 	}
 	while (1);
 
-	SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
-	SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
-	SCardReleaseContext(hContext);
+	(void)SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
+	(void)SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
+	(void)SCardReleaseContext(hContext);
 
 	return 0;
 }

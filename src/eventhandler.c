@@ -50,7 +50,7 @@ LONG EHInitializeEventStructures(void)
 	i = 0;
 	pageSize = 0;
 
-	SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
+	(void)SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
 
 	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, mode);
 	if (fd < 0)
@@ -61,15 +61,15 @@ LONG EHInitializeEventStructures(void)
 	}
 
 	/* set correct mode even is umask is too restictive */
-	SYS_Chmod(PCSCLITE_PUBSHM_FILE, mode);
+	(void)SYS_Chmod(PCSCLITE_PUBSHM_FILE, mode);
 
 	pageSize = SYS_GetPageSize();
 
 	/*
 	 * Jump to end of file space and allocate zero's
 	 */
-	SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_READERS_CONTEXTS);
-	SYS_WriteFile(fd, "", 1);
+	(void)SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_READERS_CONTEXTS);
+	(void)SYS_WriteFile(fd, "", 1);
 
 	/*
 	 * Allocate each reader structure
@@ -133,7 +133,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	if ((IFD_SUCCESS == rv) && (1 == dwGetSize) && ucGetData[0])
 	{
 		Log1(PCSC_LOG_INFO, "Killing polling thread");
-		SYS_ThreadCancel(rContext->pthThread);
+		(void)SYS_ThreadCancel(rContext->pthThread);
 	}
 	else
 		Log1(PCSC_LOG_INFO, "Waiting polling thread");
@@ -197,7 +197,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	 * Set all the attributes to this reader
 	 */
 	rContext->readerState = readerStates[i];
-	strlcpy(rContext->readerState->readerName, rContext->lpcReader,
+	(void)strlcpy(rContext->readerState->readerName, rContext->lpcReader,
 		sizeof(rContext->readerState->readerName));
 	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
 	rContext->readerState->readerID = i + 100;
@@ -316,7 +316,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	rContext->readerState->readerSharing = dwReaderSharing =
 		rContext->dwContexts;
 
-	StatSynchronize(rContext->readerState);
+	(void)StatSynchronize(rContext->readerState);
 
 	while (1)
 	{
@@ -347,7 +347,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			dwCurrentState = SCARD_UNKNOWN;
 
-			StatSynchronize(rContext->readerState);
+			(void)StatSynchronize(rContext->readerState);
 		}
 
 		if (dwStatus & SCARD_ABSENT)
@@ -362,7 +362,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 				/*
 				 * Notify the card has been removed
 				 */
-				RFSetReaderEventState(rContext, SCARD_REMOVED);
+				(void)RFSetReaderEventState(rContext, SCARD_REMOVED);
 
 				rContext->readerState->cardAtrLength = 0;
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -377,7 +377,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				StatSynchronize(rContext->readerState);
+				(void)StatSynchronize(rContext->readerState);
 			}
 
 		}
@@ -424,7 +424,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				StatSynchronize(rContext->readerState);
+				(void)StatSynchronize(rContext->readerState);
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
 
@@ -451,7 +451,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		{
 			dwReaderSharing = rContext->dwContexts;
 			rContext->readerState->readerSharing = dwReaderSharing;
-			StatSynchronize(rContext->readerState);
+			(void)StatSynchronize(rContext->readerState);
 		}
 
 		if (rContext->pthCardEvent)
@@ -460,10 +460,10 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			ret = rContext->pthCardEvent(rContext->dwSlot);
 			if (IFD_NO_SUCH_DEVICE == ret)
-				SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+				(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 		}
 		else
-			SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+			(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 
 		if (rContext->dwLockId == 0xFFFF)
 		{
@@ -472,7 +472,7 @@ void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			 */
 			Log1(PCSC_LOG_INFO, "Die");
 			rContext->dwLockId = 0;
-			SYS_ThreadExit(NULL);
+			(void)SYS_ThreadExit(NULL);
 		}
 	}
 }

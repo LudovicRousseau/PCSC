@@ -42,9 +42,9 @@ void tok_error(char *pcToken_error);
 
 #.*                                       {}
 "\n"                                      { iLinenumber++; }
-(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { evaluatetoken( yytext); }
+(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { (void)evaluatetoken( yytext); }
 [ \t]                                     {}
-([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { evaluatetoken( yytext ); }
+([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { (void)evaluatetoken( yytext ); }
 .                                         { tok_error( yytext ); }
 %%
 
@@ -243,11 +243,11 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 
 	do
 	{
-		yylex();
+		(void)yylex();
 	}
 	while (!feof(configFile));
 
-	fclose(configFile);
+	(void)fclose(configFile);
 
 	*caller_reader_list = reader_list;
 

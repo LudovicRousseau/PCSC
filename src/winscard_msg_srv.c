@@ -108,7 +108,7 @@ static int SHMProcessCommonChannelRequest(uint32_t *pdwClientID)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Error: cannot set socket nonblocking: %s",
 			strerror(errno));
-		SYS_CloseFile(*pdwClientID);
+		(void)SYS_CloseFile(*pdwClientID);
 		*pdwClientID = -1;
 		return -1;
 	}
@@ -147,7 +147,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
 	serv_adr.sun_family = AF_UNIX;
 	strncpy(serv_adr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(serv_adr.sun_path));
-	SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
+	(void)SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
 
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
 			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
@@ -169,7 +169,7 @@ INTERNAL int SHMInitializeCommonSegment(void)
 	/*
 	 * Chmod the public entry channel
 	 */
-	SYS_Chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
+	(void)SYS_Chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
 
 	return 0;
 }
@@ -307,7 +307,7 @@ INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
 			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d", dwClientID);
 			msgStruct->mtype = CMD_CLIENT_DIED;
 			msgStruct->command = 0;
-			SYS_CloseFile(dwClientID);
+			(void)SYS_CloseFile(dwClientID);
 
 			return 0;
 		}
