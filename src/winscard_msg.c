@@ -140,7 +140,7 @@ INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageSend(void *buffer_void, uint64_t buffer_size,
+INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes, int32_t blockAmount)
 {
 	char *buffer = buffer_void;
@@ -265,7 +265,7 @@ INTERNAL int SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
+INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes, int32_t blockAmount)
 {
 	char *buffer = buffer_void;
