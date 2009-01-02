@@ -214,8 +214,8 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(SCARD_IO_REQUEST
  * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE)
  * @retval SCARD_E_INVALID_PARAMETER phContext is null (\ref SCARD_E_INVALID_PARAMETER)
  */
-LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
-	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
+LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
+	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	/*
 	 * Check for NULL pointer
@@ -253,7 +253,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
+LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
+	/*@unused@*/ DWORD dwTimeout)
 {
 	/*
 	 * This is only used at the client side of an RPC call but just in
@@ -263,7 +264,7 @@ LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 	return SCARD_E_UNSUPPORTED_FEATURE;
 }
 
-LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
+LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
 {
@@ -1355,8 +1356,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	return rv;
 }
 
-LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
-	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
+LONG SCardGetStatusChange(/*@unused@*/ SCARDCONTEXT hContext,
+	/*@unused@*/ DWORD dwTimeout,
+	/*@unused@*/ LPSCARD_READERSTATE_A rgReaderStates,
+	/*@unused@*/ DWORD cReaders)
 {
 	/*
 	 * Client side function
@@ -1676,8 +1679,10 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
-	LPSTR mszReaders, LPDWORD pcchReaders)
+LONG SCardListReaders(/*@unused@*/ SCARDCONTEXT hContext,
+	/*@unused@*/ LPCSTR mszGroups,
+	/*@unused@*/ LPSTR mszReaders,
+	/*@unused@*/ LPDWORD pcchReaders)
 {
 	/*
 	 * Client side function
@@ -1685,7 +1690,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardCancel(SCARDCONTEXT hContext)
+LONG SCardCancel(/*@unused@*/ SCARDCONTEXT hContext)
 {
 	/*
 	 * Client side function

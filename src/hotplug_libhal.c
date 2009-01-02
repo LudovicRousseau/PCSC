@@ -406,7 +406,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 } /* HPAddDevice */
 
 
-static void HPRemoveDevice(LibHalContext *ctx, const char *udi)
+static void HPRemoveDevice(/*@unused@*/ LibHalContext *ctx, const char *udi)
 {
 	int i;
 

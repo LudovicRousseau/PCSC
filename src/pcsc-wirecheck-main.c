@@ -3,7 +3,7 @@
 int pcsc_assert_wire_constants(void);
 
 int
-main (int argc, char **argv)
+main (/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
 	printf("Checking ABI...\n");
     if (0 == pcsc_assert_wire_constants ())

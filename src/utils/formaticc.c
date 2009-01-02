@@ -24,7 +24,7 @@
 #define MAXHOSTNAMELEN 64
 #endif
 
-int main(int argc, char *argv[])
+int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 {
 	SCARDHANDLE hCard;
 	SCARDCONTEXT hContext;

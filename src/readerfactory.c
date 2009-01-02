@@ -1217,7 +1217,7 @@ LONG RFFindReaderHandle(SCARDHANDLE hCard)
 	return SCARD_E_INVALID_HANDLE;
 }
 
-LONG RFDestroyReaderHandle(SCARDHANDLE hCard)
+LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
 {
 	return SCARD_S_SUCCESS;
 }

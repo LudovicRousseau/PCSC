@@ -27,7 +27,7 @@
 #define PCSCLITE_READER_CONFIG "/etc/reader.conf"
 #endif
 
-int main(int argc, char *argv[])
+int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 {
 
 	struct stat statbuf;

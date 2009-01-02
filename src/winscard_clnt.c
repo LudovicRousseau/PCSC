@@ -350,8 +350,9 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  */
-static LONG SCardEstablishContextTH(DWORD dwScope, LPCVOID pvReserved1,
-	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
+static LONG SCardEstablishContextTH(DWORD dwScope,
+	/*@unused@*/ LPCVOID pvReserved1,
+	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
 	int i;
@@ -656,7 +657,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  */
-LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
+LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
+	/*@unused@*/ DWORD dwTimeout)
 {
 	/*
 	 * Deprecated
@@ -3152,7 +3154,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
  * rv = SCardFreeMemory(hContext, mszReaders);
  * @endcode
  */
-LONG SCardListReaders(SCARDCONTEXT hContext, LPCSTR mszGroups,
+LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	LPSTR mszReaders, LPDWORD pcchReaders)
 {
 	DWORD dwReadersLen;

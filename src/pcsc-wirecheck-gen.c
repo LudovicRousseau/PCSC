@@ -251,7 +251,7 @@ check_types (void)
 }
 
 int
-main(int argc, char **argv)
+main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
     printf ("#include <sys/types.h>\n"
             "#include <time.h>\n"

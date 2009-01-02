@@ -53,7 +53,7 @@ void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 		(void)puts(pcsc_stringify_error(rv));
 }
 
-int main(int argc, char **argv)
+int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
 	SCARDHANDLE hCard;
 	SCARDCONTEXT hContext;
