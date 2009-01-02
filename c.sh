@@ -2,10 +2,9 @@
 
 set -x
 
-CFLAGS="$CFLAGS -Wall -g -D_REENTRANT -O2 -Wextra -Wno-sign-compare"
-CFLAGS="$CFLAGS -pipe -funsigned-char -fstrict-aliasing -Wchar-subscripts -Wundef -Wshadow -Wcast-align -Wwrite-strings -Wsign-compare -Wunused -Wno-unused-value -Wuninitialized -Wpointer-arith -Wredundant-decls -Wmissing-prototypes"
-CFLAGS="$CFLAGS -Wstrict-prototypes -Wold-style-definition -Wmissing-declarations"
-CFLAGS="$CFLAGS -Wno-unused-parameter"
+#CFLAGS="$CFLAGS -Wall -g -O2 -Wextra -pipe -funsigned-char -fstrict-aliasing -Wchar-subscripts -Wundef -Wshadow -Wcast-align -Wwrite-strings -Wunused -Wno-unused-value -Wuninitialized -Wpointer-arith -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -Wmissing-declarations -Wbad-function-cast -Winline -Wnested-externs -Wformat-security -Wswitch-enum -Winit-self -Wmissing-include-dirs -Wno-unused-parameter -Wno-sign-compare"
+
+CFLAGS="$CFLAGS -D_REENTRANT"
 
 ./configure \
         --prefix=/usr \
