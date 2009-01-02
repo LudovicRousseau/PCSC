@@ -61,7 +61,6 @@ int HPForceReaderPolling = 0;
  * Some internal functions
  */
 void SVCServiceRunLoop(void);
-void SVCClientCleanup(psharedSegmentMsg);
 void at_exit(void);
 void clean_temp_files(void);
 void signal_reload(int sig);
@@ -70,16 +69,6 @@ void print_version (void);
 void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
-
-/**
- * Cleans up messages still on the queue when a client dies
- */
-void SVCClientCleanup(/*@unused@*/ psharedSegmentMsg msgStruct)
-{
-	/*
-	 * May be implemented in future releases
-	 */
-}
 
 /**
  * @brief The Server's Message Queue Listener function.
