@@ -130,7 +130,7 @@ static int SHMProcessCommonChannelRequest(uint32_t *pdwClientID)
  * @retval -1 Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME.
  * @retval -1 Can not put the socket in listen mode.
  */
-INTERNAL int SHMInitializeCommonSegment(void)
+INTERNAL int32_t SHMInitializeCommonSegment(void)
 {
 	static struct sockaddr_un serv_adr;
 
