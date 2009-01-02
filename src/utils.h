@@ -21,7 +21,7 @@ int SendHotplugSignal(void);
 /* defined in winscard_clnt.c */
 LONG SCardCheckDaemonAvailability(void);
 
-int StatSynchronize(struct pubReaderStatesList *readerState);
+int StatSynchronize(/*@null@*/ struct pubReaderStatesList *readerState);
 
 int CheckForOpenCT(void);
 

@@ -249,7 +249,7 @@ INTERNAL void *SYS_MemoryMap(int iSize, int iFid, int iOffset)
  *
  * @return Address of the memory map.
  */
-INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
+/*@null@*/ INTERNAL void *SYS_PublicMemoryMap(int iSize, int iFid, int iOffset)
 {
 
 	void *vAddress;

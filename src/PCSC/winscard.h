@@ -28,7 +28,8 @@ extern "C"
 #endif
 
 	PCSC_API LONG SCardEstablishContext(DWORD dwScope,
-		LPCVOID pvReserved1, LPCVOID pvReserved2, LPSCARDCONTEXT phContext);
+		/*@null@*/ LPCVOID pvReserved1, /*@null@*/ LPCVOID pvReserved2,
+		LPSCARDCONTEXT phContext);
 
 	PCSC_API LONG SCardReleaseContext(SCARDCONTEXT hContext);
 
@@ -56,10 +57,10 @@ extern "C"
 	PCSC_API LONG SCardCancelTransaction(SCARDHANDLE hCard);
 
 	PCSC_API LONG SCardStatus(SCARDHANDLE hCard,
-		LPSTR mszReaderName, LPDWORD pcchReaderLen,
-		LPDWORD pdwState,
-		LPDWORD pdwProtocol,
-		LPBYTE pbAtr, LPDWORD pcbAtrLen);
+		/*@null@*/ LPSTR mszReaderName, /*@null@*/ LPDWORD pcchReaderLen,
+		/*@null@*/ LPDWORD pdwState,
+		/*@null@*/ LPDWORD pdwProtocol,
+		/*@null@*/ LPBYTE pbAtr, /*@null@*/ LPDWORD pcbAtrLen);
 
 	PCSC_API LONG SCardGetStatusChange(SCARDCONTEXT hContext,
 		DWORD dwTimeout,
@@ -79,8 +80,8 @@ extern "C"
 		LPSTR mszGroups, LPDWORD pcchGroups);
 
 	PCSC_API LONG SCardListReaders(SCARDCONTEXT hContext,
-		LPCSTR mszGroups,
-		LPSTR mszReaders, LPDWORD pcchReaders);
+		/*@null@*/ LPCSTR mszGroups,
+		/*@null@*/ LPSTR mszReaders, LPDWORD pcchReaders);
 
 	PCSC_API LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem);
 

@@ -270,7 +270,8 @@ LONG HPStopHotPluggables(void)
 } /* HPStopHotPluggables */
 
 
-static struct _driverTracker *get_driver(LibHalContext *ctx, const char *udi)
+/*@null@*/ static struct _driverTracker *get_driver(LibHalContext *ctx,
+	const char *udi)
 {
 	DBusError error;
 	int i;
