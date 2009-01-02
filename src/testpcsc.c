@@ -35,8 +35,7 @@
 #define NORMAL "\33[0m"
 #define MAGENTA "\33[35m"
 
-void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic);
-void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
+static void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 {
 	if (rv != SCARD_S_SUCCESS)
 	{

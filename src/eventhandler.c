@@ -39,7 +39,7 @@
 
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
-void EHStatusHandlerThread(PREADER_CONTEXT);
+static void EHStatusHandlerThread(PREADER_CONTEXT);
 
 LONG EHInitializeEventStructures(void)
 {
@@ -228,7 +228,7 @@ static void incrementEventCounter(struct pubReaderStatesList *readerState)
 		+ (counter << 16);
 }
 
-void EHStatusHandlerThread(PREADER_CONTEXT rContext)
+static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 {
 	LONG rv;
 	LPCSTR lpcReader;

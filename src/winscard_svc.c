@@ -48,13 +48,13 @@ static struct _psContext
 	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
 } psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
 
-LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
-LONG MSGFunctionDemarshall(psharedSegmentMsg, DWORD);
-LONG MSGAddContext(SCARDCONTEXT, DWORD);
-LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
-LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, DWORD);
-LONG MSGRemoveHandle(SCARDHANDLE, DWORD);
-LONG MSGCleanupClient(DWORD);
+static LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
+static LONG MSGFunctionDemarshall(psharedSegmentMsg, DWORD);
+static LONG MSGAddContext(SCARDCONTEXT, DWORD);
+static LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
+static LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, DWORD);
+static LONG MSGRemoveHandle(SCARDHANDLE, DWORD);
+static LONG MSGCleanupClient(DWORD);
 
 static void ContextThread(LPVOID pdwIndex);
 
@@ -252,7 +252,8 @@ static void ContextThread(LPVOID dwIndex)
  * @param[in] msgStruct Message to be demarshalled and executed.
  * @param[in] dwContextIndex
  */
-LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
+static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
+	DWORD dwContextIndex)
 {
 	LONG rv;
 	establish_struct *esStr;
@@ -619,13 +620,13 @@ LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct, DWORD dwContextIndex)
 	return 0;
 }
 
-LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+static LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 {
 	psContext[dwContextIndex].hContext = hContext;
 	return SCARD_S_SUCCESS;
 }
 
-LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+static LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 {
 	int i;
 	LONG rv;
@@ -691,7 +692,8 @@ LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD dwContextIndex)
+static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
+	DWORD dwContextIndex)
 {
 	int i;
 
@@ -723,7 +725,7 @@ LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD dwContextIndex
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
+static LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
 	int i;
 
@@ -740,7 +742,7 @@ LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
 }
 
 
-LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
+static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 {
 	int i;
 
@@ -759,7 +761,7 @@ LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 	return -1;
 }
 
-LONG MSGCleanupClient(DWORD dwContextIndex)
+static LONG MSGCleanupClient(DWORD dwContextIndex)
 {
 	if (psContext[dwContextIndex].hContext != 0)
 	{
