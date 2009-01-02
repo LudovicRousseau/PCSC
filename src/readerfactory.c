@@ -52,7 +52,7 @@ static int ConfigFileCRC = 0;
 
 LONG RFAllocateReaderSpace(void)
 {
-	int i;   					/* Counter */
+	int i;	/* Counter */
 
 	/*
 	 * Allocate each reader structure
@@ -202,7 +202,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		 */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[parentNode]),
-		       TAG_IFD_THREAD_SAFE, &dwGetSize, ucThread);
+			TAG_IFD_THREAD_SAFE, &dwGetSize, ucThread);
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
@@ -355,9 +355,9 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContextB])->vHandle =
 		  (sReadersContexts[dwContext])->vHandle;
 		(sReadersContexts[dwContextB])->mMutex =
-		   (sReadersContexts[dwContext])->mMutex;
+		  (sReadersContexts[dwContext])->mMutex;
 		(sReadersContexts[dwContextB])->pdwMutex =
-		   (sReadersContexts[dwContext])->pdwMutex;
+		  (sReadersContexts[dwContext])->pdwMutex;
 		sReadersContexts[dwContextB]->dwSlot =
 			sReadersContexts[dwContext]->dwSlot + j;
 
@@ -1537,15 +1537,15 @@ void RFAwakeAllReaders(void)
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		/* If the library is loaded and the event handler is not running */
-		if ( ((sReadersContexts[i])->vHandle   != 0) &&
-		     ((sReadersContexts[i])->pthThread == 0) )
+		if ( ((sReadersContexts[i])->vHandle != 0) &&
+			((sReadersContexts[i])->pthThread == 0) )
 		{
 			int j;
 
 			for (j=0; j < i; j++)
 			{
 				if (((sReadersContexts[j])->vHandle == (sReadersContexts[i])->vHandle)&&
-					((sReadersContexts[j])->dwPort   == (sReadersContexts[i])->dwPort))
+					((sReadersContexts[j])->dwPort == (sReadersContexts[i])->dwPort))
 				{
 					initFlag = 1;
 				}
