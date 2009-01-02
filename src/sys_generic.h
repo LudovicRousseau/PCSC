@@ -51,7 +51,7 @@ extern "C"
 
 	int SYS_SeekFile(int, int);
 
-	int SYS_ReadFile(int, char *, int);
+	int SYS_ReadFile(int, /*@out@*/ char *, int);
 
 	int SYS_WriteFile(int, const char *, int);
 
@@ -69,7 +69,7 @@ extern "C"
 
 	int SYS_Daemon(int, int);
 
-	int SYS_Stat(const char *pcFile, struct stat *psStatus);
+	int SYS_Stat(const char *pcFile, /*@out@*/ struct stat *psStatus);
 
 	int SYS_RandomInt(int, int);
 

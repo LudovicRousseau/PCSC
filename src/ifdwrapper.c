@@ -278,8 +278,8 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
-	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, PUCHAR) = NULL;
+	RESPONSECODE(*IFD_get_capabilities) (DWORD, /*@out@*/ PUCHAR) = NULL;
+	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, /*@out@*/ PUCHAR) = NULL;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 		IFD_get_capabilities =
@@ -420,7 +420,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_is_icc_present) (void) = NULL;
 	RESPONSECODE(*IFDH_icc_presence) (DWORD) = NULL;
-	RESPONSECODE(*IFD_get_capabilities) (DWORD, PUCHAR) = NULL;
+	RESPONSECODE(*IFD_get_capabilities) (DWORD, /*@out@*/ PUCHAR) = NULL;
 
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
@@ -555,7 +555,8 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
+	RESPONSECODE(*IFDH_control_v2) (DWORD, PUCHAR, DWORD, /*@out@*/ PUCHAR,
+		PDWORD);
 #endif
 
 	if (rContext->dwVersion != IFD_HVERSION_2_0)
@@ -656,9 +657,9 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_transmit_to_icc) (SCARD_IO_HEADER, PUCHAR, DWORD,
-		PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
+		/*@out@*/ PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 	RESPONSECODE(*IFDH_transmit_to_icc) (DWORD, SCARD_IO_HEADER, PUCHAR,
-		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
+		DWORD, /*@out@*/ PUCHAR, PDWORD, PSCARD_IO_HEADER) = NULL;
 #endif
 
 	/* log the APDU */

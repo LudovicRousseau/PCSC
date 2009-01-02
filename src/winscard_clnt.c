@@ -231,8 +231,10 @@ static LONG SCardRemoveContext(SCARDCONTEXT);
 static LONG SCardCleanContext(LONG indice);
 
 static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPCSTR);
-static LONG SCardGetIndicesFromHandle(SCARDHANDLE, PDWORD, PDWORD);
-static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, PDWORD, PDWORD);
+static LONG SCardGetIndicesFromHandle(SCARDHANDLE, /*@out@*/ PDWORD,
+	/*@out@*/ PDWORD);
+static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, /*@out@*/ PDWORD,
+	/*@out@*/ PDWORD);
 static LONG SCardRemoveHandle(SCARDHANDLE);
 
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
@@ -264,7 +266,8 @@ inline static LONG SCardUnlockThread(void)
 	return SYS_MutexUnLock(&clientMutex);
 }
 
-static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID, LPSCARDCONTEXT);
+static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
+	/*@out@*/ LPSCARDCONTEXT);
 
 /**
  * @brief Creates an Application Context to the PC/SC Resource Manager.

@@ -143,9 +143,9 @@ extern "C"
 	LONG RFRemoveReader(LPSTR, DWORD);
 	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
 	LONG RFListReaders(LPSTR, LPDWORD);
-	LONG RFReaderInfo(LPSTR, struct ReaderContext **);
-	LONG RFReaderInfoNamePort(DWORD, LPSTR, struct ReaderContext **);
-	LONG RFReaderInfoById(DWORD, struct ReaderContext **);
+	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
+	LONG RFReaderInfoNamePort(DWORD, LPSTR, /*@out@*/ struct ReaderContext **);
+	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
 	LONG RFCheckSharing(DWORD);
 	LONG RFLockSharing(DWORD);
 	LONG RFUnlockSharing(DWORD);

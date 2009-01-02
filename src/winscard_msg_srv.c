@@ -84,7 +84,7 @@ static const char *CommandsText[] = {
  * @retval -1 Can not establish the connection.
  * @retval -1 Can not set the connection to non-blocking mode.
  */
-static int SHMProcessCommonChannelRequest(uint32_t *pdwClientID)
+static int SHMProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
 {
 	socklen_t clnt_len;
 	int new_sock;

@@ -17,7 +17,8 @@ extern "C"
 {
 #endif
 
-	int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list);
+	int DBGetReaderList(const char *readerconf,
+		/*@out@*/ SerialReader **caller_reader_list);
 
 #ifdef __cplusplus
 }

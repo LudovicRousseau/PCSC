@@ -50,7 +50,7 @@ extern "C"
 	 * Decodes the ATR and fills the structure
 	 */
 
-	short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
+	short ATRDecodeAtr(/*@out@*/ PSMARTCARD_EXTENSION psExtension,
 		PUCHAR pucAtr, DWORD dwLength);
 
 #ifdef __cplusplus
