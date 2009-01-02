@@ -74,7 +74,7 @@ PCSCLITE_MUTEX usbNotifierMutex;
 /**
  * Cleans up messages still on the queue when a client dies
  */
-void SVCClientCleanup(psharedSegmentMsg msgStruct)
+void SVCClientCleanup(/*@unused@*/ psharedSegmentMsg msgStruct)
 {
 	/*
 	 * May be implemented in future releases
@@ -572,7 +572,7 @@ void clean_temp_files(void)
 			strerror(errno));
 }
 
-void signal_reload(int sig)
+void signal_reload(/*@unused@*/ int sig)
 {
 	if (AraKiri)
 		return;
@@ -580,7 +580,7 @@ void signal_reload(int sig)
 	HPReCheckSerialReaders();
 } /* signal_reload */
 
-void signal_trap(int sig)
+void signal_trap(/*@unused@*/ int sig)
 {
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
