@@ -153,7 +153,7 @@ void SVCServiceRunLoop(void)
 
 	while (TRUE)
 	{
-		switch (rsp = SHMProcessEventsServer(&dwClientID, 0))
+		switch (rsp = SHMProcessEventsServer(&dwClientID))
 		{
 
 		case 0:

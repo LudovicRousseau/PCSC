@@ -133,7 +133,7 @@ static void ContextThread(LPVOID dwIndex)
 
 	while (1)
 	{
-		switch (rv = SHMProcessEventsContext(psContext[dwContextIndex].dwClientID, &msgStruct, 0))
+		switch (rv = SHMProcessEventsContext(psContext[dwContextIndex].dwClientID, &msgStruct))
 		{
 		case 0:
 			if (msgStruct.mtype == CMD_CLIENT_DIED)

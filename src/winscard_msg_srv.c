@@ -180,7 +180,6 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
  * This is called by the Server's function \c SVCServiceRunLoop().
  *
  * @param[out] pdwClientID Connection ID used to reference the Client.
- * @param[in] blocktime Timeout (not used).
  *
  * @return Error code.
  * @retval 0 Success.
@@ -191,7 +190,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define DO_TIMEOUT
 #endif
-INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime)
+INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID)
 {
 	fd_set read_fd;
 	int selret;
@@ -260,7 +259,7 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID, int32_t blocktime
  * Called by \c ContextThread().
  */
 INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
-	psharedSegmentMsg msgStruct, int32_t blocktime)
+	psharedSegmentMsg msgStruct)
 {
 	fd_set read_fd;
 	int selret, rv;

@@ -335,8 +335,8 @@ extern "C"
 	int32_t SHMClientSetupSession(uint32_t *);
 	int32_t SHMClientCloseSession(uint32_t);
 	int32_t SHMInitializeCommonSegment(void);
-	int32_t SHMProcessEventsContext(uint32_t, psharedSegmentMsg, int32_t);
-	int32_t SHMProcessEventsServer(uint32_t *, int32_t);
+	int32_t SHMProcessEventsContext(uint32_t, psharedSegmentMsg);
+	int32_t SHMProcessEventsServer(uint32_t *);
 	int32_t SHMMessageSend(void *buffer, uint64_t buffer_size, int32_t filedes,
 		int32_t blockAmount);
 	int32_t SHMMessageReceive(void *buffer, uint64_t buffer_size,
