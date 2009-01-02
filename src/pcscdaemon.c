@@ -60,13 +60,12 @@ int HPForceReaderPolling = 0;
 /*
  * Some internal functions
  */
-void SVCServiceRunLoop(void);
-void at_exit(void);
-void clean_temp_files(void);
-void signal_reload(int sig);
-void signal_trap(int);
-void print_version (void);
-void print_usage (char const * const);
+static void at_exit(void);
+static void clean_temp_files(void);
+static void signal_reload(int sig);
+static void signal_trap(int);
+static void print_version (void);
+static void print_usage (char const * const);
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
@@ -78,7 +77,7 @@ PCSCLITE_MUTEX usbNotifierMutex;
  * If the message is valid, \c CreateContextThread() is called to serve this
  * request.
  */
-void SVCServiceRunLoop(void)
+static void SVCServiceRunLoop(void)
 {
 	int rsp;
 	LONG rv;
@@ -526,7 +525,7 @@ int main(int argc, char **argv)
 	return EXIT_FAILURE;
 }
 
-void at_exit(void)
+static void at_exit(void)
 {
 	Log1(PCSC_LOG_INFO, "cleaning " PCSCLITE_IPC_DIR);
 
@@ -535,7 +534,7 @@ void at_exit(void)
 	SYS_Exit(ExitValue);
 }
 
-void clean_temp_files(void)
+static void clean_temp_files(void)
 {
 	int rv;
 
@@ -561,7 +560,7 @@ void clean_temp_files(void)
 			strerror(errno));
 }
 
-void signal_reload(/*@unused@*/ int sig)
+static void signal_reload(/*@unused@*/ int sig)
 {
 	if (AraKiri)
 		return;
@@ -569,7 +568,7 @@ void signal_reload(/*@unused@*/ int sig)
 	HPReCheckSerialReaders();
 } /* signal_reload */
 
-void signal_trap(/*@unused@*/ int sig)
+static void signal_trap(/*@unused@*/ int sig)
 {
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
@@ -588,7 +587,7 @@ void signal_trap(/*@unused@*/ int sig)
 	}
 }
 
-void print_version (void)
+static void print_version (void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@linuxnet.com>.\n");
@@ -599,7 +598,7 @@ void print_version (void)
 	printf ("Enabled features:%s\n", PCSCLITE_FEATURES);
 }
 
-void print_usage (char const * const progname)
+static void print_usage (char const * const progname)
 {
 	printf("Usage: %s options\n", progname);
 	printf("Options:\n");
