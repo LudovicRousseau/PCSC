@@ -23,6 +23,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <stddef.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -473,11 +474,11 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			{
 				/* copy the first APDU part */
 				memcpy(pbSendBuffer, treStr->data,
-					PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*treStr));
+					PCSCLITE_MAX_MESSAGE_SIZE-offsetof(transmit_struct_extended, data));
 
 				/* receive the second block */
 				rv = SHMMessageReceive(
-					pbSendBuffer+PCSCLITE_MAX_MESSAGE_SIZE-sizeof(*treStr),
+					pbSendBuffer+PCSCLITE_MAX_MESSAGE_SIZE-offsetof(transmit_struct_extended, data),
 					treStr->size - PCSCLITE_MAX_MESSAGE_SIZE,
 					psContext[dwContextIndex].dwClientID,
 					PCSCLITE_SERVER_ATTEMPTS);
@@ -504,12 +505,12 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			treStr->pioRecvPciLength = ioRecvPci.cbPciLength;
 			treStr->pcbRecvLength = cbRecvLength;
 
-			treStr->size = sizeof(*treStr) + treStr->pcbRecvLength;
+			treStr->size = offsetof(transmit_struct_extended, data) + treStr->pcbRecvLength;
 			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
 			{
 				/* two blocks */
 				memcpy(treStr->data, pbRecvBuffer, PCSCLITE_MAX_MESSAGE_SIZE
-					- sizeof(*treStr));
+					- offsetof(transmit_struct_extended, data));
 
 				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
 					psContext[dwContextIndex].dwClientID,
@@ -518,7 +519,7 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 					Log1(PCSC_LOG_CRITICAL, "transmission failed");
 
 				rv = SHMMessageSend(pbRecvBuffer + PCSCLITE_MAX_MESSAGE_SIZE
-					- sizeof(*treStr),
+					- offsetof(transmit_struct_extended, data),
 					treStr->size - PCSCLITE_MAX_MESSAGE_SIZE,
 					psContext[dwContextIndex].dwClientID,
 					PCSCLITE_SERVER_ATTEMPTS);
