@@ -625,7 +625,8 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 		}
 	}
 
-	sprintf(rContext->lpcReader, "%s %02X %02lX", readerName, i, dwSlot);
+	snprintf(rContext->lpcReader, sizeof(rContext->lpcReader), "%s %02X %02lX",
+		readerName, i, dwSlot);
 
 	/*
 	 * Set the slot in 0xDDDDCCCC
