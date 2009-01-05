@@ -277,10 +277,10 @@ LONG HPStopHotPluggables(void)
 	int i;
 	unsigned int idVendor, idProduct;
 
-	dbus_error_init(&error);
-
 	if (!libhal_device_property_exists(ctx, udi, "usb.vendor_id", NULL))
 		return NULL;
+
+	dbus_error_init(&error);
 
 	/* Vendor ID */
 	idVendor = libhal_device_get_property_int(ctx, udi,
@@ -329,8 +329,6 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	struct _driverTracker *driver;
 	LONG ret;
 
-	dbus_error_init (&error);
-
 	driver = get_driver(ctx, udi);
 	if (NULL == driver)
 	{
@@ -370,6 +368,8 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	readerTracker[i].udi = strdup(udi);
 
 #ifdef ADD_SERIAL_NUMBER
+	dbus_error_init (&error);
+
 	if (libhal_device_property_exists(ctx, udi, "usb.serial", &error))
 	{
 		char fullname[MAX_READERNAME];
