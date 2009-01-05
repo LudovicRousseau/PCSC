@@ -112,9 +112,9 @@ static void SVCServiceRunLoop(void)
 	 * Solaris sends a SIGALRM and it is annoying
 	 */
 
-	signal(SIGALRM, SIG_IGN);
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
+	(void)signal(SIGALRM, SIG_IGN);
+	(void)signal(SIGPIPE, SIG_IGN);
+	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is existed */
 
 	/*
@@ -136,7 +136,7 @@ static void SVCServiceRunLoop(void)
 	/*
 	 * Set up the power management callback routine
 	 */
-	PMRegisterForPowerEvents();
+	(void)PMRegisterForPowerEvents();
 
 	while (TRUE)
 	{
@@ -178,8 +178,8 @@ static void SVCServiceRunLoop(void)
 		if (AraKiri)
 		{
 			/* stop the hotpug thread and waits its exit */
-			HPStopHotPluggables();
-			SYS_Sleep(1);
+			(void)HPStopHotPluggables();
+			(void)SYS_Sleep(1);
 
 			/* now stop all the drivers */
 			RFCleanupReaders(1);
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 
 			case 'a':
-				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
+				(void)DebugLogSetCategory(DEBUG_CATEGORY_APDU);
 				break;
 
 			case 'H':
@@ -385,10 +385,10 @@ int main(int argc, char **argv)
 	/*
 	 * cleanly remove /var/run/pcscd/files when exiting
 	 */
-	signal(SIGQUIT, signal_trap);
-	signal(SIGTERM, signal_trap);
-	signal(SIGINT, signal_trap);
-	signal(SIGHUP, signal_trap);
+	(void)signal(SIGQUIT, signal_trap);
+	(void)signal(SIGTERM, signal_trap);
+	(void)signal(SIGINT, signal_trap);
+	(void)signal(SIGHUP, signal_trap);
 
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
@@ -418,14 +418,14 @@ int main(int argc, char **argv)
 		{
 			char pid[PID_ASCII_SIZE];
 
-			snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			SYS_WriteFile(f, pid, strlen(pid));
-			SYS_CloseFile(f);
+			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
+			(void)SYS_WriteFile(f, pid, strlen(pid));
+			(void)SYS_CloseFile(f);
 
 			/* set mode so that the file is world readable even is umask is
 			 * restrictive
 			 * The file is used by libpcsclite */
-			SYS_Chmod(PCSCLITE_RUN_PID, mode);
+			(void)SYS_Chmod(PCSCLITE_RUN_PID, mode);
 		}
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
@@ -447,7 +447,7 @@ int main(int argc, char **argv)
 				"cannot create " PCSCLITE_EVENTS_DIR ": %s", strerror(errno));
 			return EXIT_FAILURE;
 		}
-		SYS_Chmod(PCSCLITE_EVENTS_DIR, mode);
+		(void)SYS_Chmod(PCSCLITE_EVENTS_DIR, mode);
 	}
 
 	/* cleanly remove /var/run/pcscd/pcsc.* files when exiting */
@@ -457,7 +457,7 @@ int main(int argc, char **argv)
 	/*
 	 * Allocate memory for reader structures
 	 */
-	RFAllocateReaderSpace();
+	(void)RFAllocateReaderSpace();
 
 	/*
 	 * Grab the information from the reader.conf
@@ -512,12 +512,12 @@ int main(int argc, char **argv)
 	/*
 	 * signal_trap() does just set a global variable used by the main loop
 	 */
-	signal(SIGQUIT, signal_trap);
-	signal(SIGTERM, signal_trap);
-	signal(SIGINT, signal_trap);
-	signal(SIGHUP, signal_trap);
+	(void)signal(SIGQUIT, signal_trap);
+	(void)signal(SIGTERM, signal_trap);
+	(void)signal(SIGINT, signal_trap);
+	(void)signal(SIGHUP, signal_trap);
 
-	signal(SIGUSR1, signal_reload);
+	(void)signal(SIGUSR1, signal_reload);
 
 	SVCServiceRunLoop();
 
@@ -553,7 +553,7 @@ static void clean_temp_files(void)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_RUN_PID ": %s",
 			strerror(errno));
 
-	StatSynchronize(NULL);
+	(void)StatSynchronize(NULL);
 	rv = SYS_RemoveFile(PCSCLITE_EVENTS_DIR);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_EVENTS_DIR ": %s",
