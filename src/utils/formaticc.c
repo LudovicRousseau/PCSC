@@ -136,6 +136,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	{
 		(void)SCardReleaseContext(hContext);
 		printf("Error connecting to reader %ld\n", rv);
+		free(mszReaders);
 		return 1;
 	}
 
@@ -171,6 +172,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 				printf("Corrupt APDU: %s\n", line);
 				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
 				(void)SCardReleaseContext(hContext);
+				free(mszReaders);
 				return 1;
 			}
 			s[i] = x;
@@ -206,6 +208,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 				printf("Invalid Protocol\n");
 				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
 				(void)SCardReleaseContext(hContext);
+				free(mszReaders);
 				return 1;
 			}
 		}
@@ -235,6 +238,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	(void)SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
 	(void)SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
 	(void)SCardReleaseContext(hContext);
+	free(mszReaders);
 
 	return 0;
 }
