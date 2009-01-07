@@ -1,3 +1,12 @@
+pcsc-lite-1.5.1: Ludovic Rousseau
+7 January 2009
+- Extended APDU of more than 2048 bytes were corrupted. The problem was
+  introduced in version 1.3.3 (2 years ago) by making the code compile
+  with Sun Studio 11.
+  Thanks to Eric Mounier for the patch
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.0: Ludovic Rousseau
 18 November 2008
 - correctly handle up to PCSCLITE_MAX_READERS_CONTEXTS readers (instead
