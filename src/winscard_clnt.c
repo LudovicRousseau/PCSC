@@ -74,7 +74,7 @@ static long int time_sub(struct timeval *a, struct timeval *b)
 #include <sys/time.h>
 
 struct timeval profile_time_start;
-FILE *fd;
+FILE *profile_fd;
 char profile_tty;
 char fct_name[100];
 
@@ -91,14 +91,14 @@ static void profile_start(const char *f)
 
 		initialized = TRUE;
 		sprintf(filename, "%s-%d", PROFILE_FILE, getuid());
-		fd = fopen(filename, "a+");
-		if (NULL == fd)
+		profile_fd = fopen(filename, "a+");
+		if (NULL == profile_fd)
 		{
 			fprintf(stderr, "\33[01;31mCan't open %s: %s\33[0m\n",
 				PROFILE_FILE, strerror(errno));
 			exit(-1);
 		}
-		fprintf(fd, "\nStart a new profile\n");
+		fprintf(profile_fd, "\nStart a new profile\n");
 
 		if (isatty(fileno(stderr)))
 			profile_tty = TRUE;
@@ -146,8 +146,8 @@ static void profile_end(const char *f, LONG rv)
 		else
 			fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
 	}
-	fprintf(fd, "%s %ld\n", f, d);
-	fflush(fd);
+	fprintf(profile_fd, "%s %ld\n", f, d);
+	fflush(profile_fd);
 } /* profile_end */
 
 #else
