@@ -2062,7 +2062,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 					/* has the event counter changed since the last call? */
 					if (stateCounter != currentCounter)
+					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						dwBreakFlag = 1;
+					}
 
 					/* add an event counter in the upper word of dwEventState */
 					currReader->dwEventState =
