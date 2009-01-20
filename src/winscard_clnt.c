@@ -1710,7 +1710,7 @@ end:
 	return rv;
 }
 
-static long WaitForPcscdEvent(long dwTime)
+static long WaitForPcscdEvent(SCARDCONTEXT hContext, long dwTime)
 {
 	char filename[FILENAME_MAX];
 	char buf[1];
@@ -1729,8 +1729,8 @@ static long WaitForPcscdEvent(long dwTime)
 		ptv = &tv;
 	}
 
-	(void)snprintf(filename, sizeof(filename), "%s/event.%d.%d",
-		PCSCLITE_EVENTS_DIR, SYS_GetPID(), SYS_RandomInt(0, 0x10000));
+	(void)snprintf(filename, sizeof(filename), "%s/event.%d.%ld",
+		PCSCLITE_EVENTS_DIR, SYS_GetPID(), hContext);
 	(void)mkfifo(filename, 0644);
 	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
 
@@ -1939,7 +1939,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				goto end;
 			}
 
-			dwTime = WaitForPcscdEvent(dwTime);
+			dwTime = WaitForPcscdEvent(hContext, dwTime);
 			if (dwTimeout != INFINITE)
 			{
 				if (dwTime <= 0)
@@ -2242,7 +2242,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				break;
 
 			/* Only sleep once for each cycle of reader checks. */
-			dwTime = WaitForPcscdEvent(dwTime);
+			dwTime = WaitForPcscdEvent(hContext, dwTime);
 
 			if (dwTimeout != INFINITE)
 			{
