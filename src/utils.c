@@ -152,6 +152,45 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 
 
 /**
+ * Sends an asynchronous event to any waiting client
+ *
+ * Just write 1 byte to any fifo in PCSCLITE_EVENTS_DIR and remove the file
+ *
+ * This function must be secured since the files are created by the library
+ * or any non privileged process. We must not follow symlinks for example
+ */
+int StatSynchronizeContext(SCARDCONTEXT hContext)
+{
+	char filename[FILENAME_MAX];
+	int fd;
+	char buf[] = { '\0' };
+	struct stat fstat_buf;
+
+	(void)snprintf(filename, sizeof(filename), "%s/event.%d.%ld",
+		PCSCLITE_EVENTS_DIR, SYS_GetPID(), hContext);
+	(void)mkfifo(filename, 0644);
+	fd = SYS_OpenFile(filename, O_WRONLY, 0);
+
+	if (fstat(fd, &fstat_buf))
+	{
+		Log3(PCSC_LOG_ERROR, "Can't fstat %s: %s", filename, strerror(errno));
+	}
+	else
+	{
+		/* check that the file is a FIFO */
+		if (!(fstat_buf.st_mode & S_IFIFO))
+			Log2(PCSC_LOG_ERROR, "%s is not a fifo", filename);
+		else
+			(void)SYS_WriteFile(fd, buf, sizeof(buf));
+	}
+
+	(void)SYS_CloseFile(fd);
+
+	return 0;
+} /* StatSynchronize */
+
+
+/**
  * Check is OpenCT is running and display a critical message if it is
  *
  * The first cause of pcsc-lite failure is that OpenCT is installed and running

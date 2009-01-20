@@ -22,6 +22,7 @@ int SendHotplugSignal(void);
 LONG SCardCheckDaemonAvailability(void);
 
 int StatSynchronize(/*@null@*/ struct pubReaderStatesList *readerState);
+int StatSynchronizeContext(SCARDCONTEXT hContext);
 
 int CheckForOpenCT(void);
 
