@@ -3455,6 +3455,7 @@ end:
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
 	LONG dwContextIndex;
+	LONG rv = SCARD_S_SUCCESS;
 
 	PROFILE_START
 
@@ -3468,9 +3469,12 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	 */
 	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_RESUME;
 
-	PROFILE_END(SCARD_S_SUCCESS)
+	if (StatSynchronizeContext(hContext))
+		rv = SCARD_F_INTERNAL_ERROR;
 
-	return SCARD_S_SUCCESS;
+	PROFILE_END(rv)
+
+	return rv;
 }
 
 /**
