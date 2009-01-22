@@ -379,8 +379,13 @@ daemon.
 
 
 %---------%---------%---------%---------%---------%---------
-\subsection{IFD\_GENERATE\_HOTPLUG}
+\subsection{IFD\_GENERATE\_HOTPLUG (deprecated)}
 \label{IFD_GENERATE_HOTPLUG}
+
+\textbf{Note:} this feature is not used when pcsc-lite is configured to
+use HAL to manage hotplug. Using HAL is now the default mechanism since
+pcsc-lite version 1.4.100. IFD\_GENERATE\_HOTPLUG can then be considered
+\emph{deprecated}.
 
 This capability allows pcscd to avoid continuously scanning the USB bus for
 new readers supported by the driver. The driver has two obligations:
