@@ -152,9 +152,9 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 
 
 /**
- * Sends an asynchronous event to any waiting client
+ * Sends an asynchronous event to a specific waiting client
  *
- * Just write 1 byte to any fifo in PCSCLITE_EVENTS_DIR and remove the file
+ * Just write 1 byte to a specific fifo in PCSCLITE_EVENTS_DIR and remove the file
  *
  * This function must be secured since the files are created by the library
  * or any non privileged process. We must not follow symlinks for example
