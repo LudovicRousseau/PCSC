@@ -585,6 +585,8 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 	else
 	{
 		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+		LogXxd(PCSC_LOG_DEBUG, "TxBuffer ", TxBuffer, TxLength);
+		LogXxd(PCSC_LOG_DEBUG, "RxBuffer ", RxBuffer, *RxLength);
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
@@ -634,6 +636,10 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	else
 	{
 		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
+		Log3(PCSC_LOG_DEBUG, "ControlCode: 0x%.8Lx BytesReturned: %ld",
+			ControlCode, *BytesReturned);
+		LogXxd(PCSC_LOG_DEBUG, "TxBuffer ", TxBuffer, TxLength);
+		LogXxd(PCSC_LOG_DEBUG, "RxBuffer ", RxBuffer, *BytesReturned);
 
 		if (rv == IFD_NO_SUCH_DEVICE)
 		{
