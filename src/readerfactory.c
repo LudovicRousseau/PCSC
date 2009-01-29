@@ -47,6 +47,7 @@ static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static DWORD dwNumReadersContexts = 0;
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
+static PCSCLITE_MUTEX LockMutex = PTHREAD_MUTEX_INITIALIZER;
 
 #define IDENTITY_SHIFT 16
 
@@ -1021,18 +1022,20 @@ LONG RFCheckSharing(DWORD hCard)
 LONG RFLockSharing(DWORD hCard)
 {
 	PREADER_CONTEXT rContext = NULL;
+	LONG rv;
 
 	(void)RFReaderInfoById(hCard, &rContext);
 
-	if (RFCheckSharing(hCard) == SCARD_S_SUCCESS)
+	(void)SYS_MutexLock(&LockMutex);
+	rv = RFCheckSharing(hCard);
+	if (SCARD_S_SUCCESS == rv)
 	{
 		rContext->LockCount += 1;
 		rContext->dwLockId = hCard;
 	}
-	else
-		return SCARD_E_SHARING_VIOLATION;
+	(void)SYS_MutexUnLock(&LockMutex);
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG RFUnlockSharing(DWORD hCard)
@@ -1044,16 +1047,18 @@ LONG RFUnlockSharing(DWORD hCard)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
+	(void)SYS_MutexLock(&LockMutex);
 	rv = RFCheckSharing(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
+	if (SCARD_S_SUCCESS == rv)
+	{
+		if (rContext->LockCount > 0)
+			rContext->LockCount -= 1;
+		if (0 == rContext->LockCount)
+			rContext->dwLockId = 0;
+	}
+	(void)SYS_MutexUnLock(&LockMutex);
 
-	if (rContext->LockCount > 0)
-		rContext->LockCount -= 1;
-	if (0 == rContext->LockCount)
-		rContext->dwLockId = 0;
-
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG RFUnblockContext(SCARDCONTEXT hContext)
