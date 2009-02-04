@@ -20,4 +20,9 @@
   root.  Of course the smart card readers should be accessible by this
   user (use UDEV rule files to set the correct access rights).
 
-April 2008
+- do not open the reader USB device if no client is using the reader.
+  This will allow the Linux kernel to put the USB device in suspend
+  mode.
+  http://www.opensc-project.org/pipermail/opensc-devel/2009-February/011801.html
+
+February 2009
