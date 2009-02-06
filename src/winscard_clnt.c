@@ -363,6 +363,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	sharedSegmentMsg msgStruct;
 	uint32_t dwClientID = 0;
 
+	(void)pvReserved1;
+	(void)pvReserved2;
 	if (phContext == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 	else
@@ -666,7 +668,8 @@ LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
 	/*
 	 * Deprecated
 	 */
-
+	(void)hContext;
+	(void)dwTimeout;
 	return SCARD_S_SUCCESS;
 }
 
@@ -3169,6 +3172,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	LONG rv = SCARD_S_SUCCESS;
 	char *buf = NULL;
 
+	(void)mszGroups;
 	PROFILE_START
 
 	/*

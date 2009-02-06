@@ -562,6 +562,8 @@ static void clean_temp_files(void)
 
 static void signal_reload(/*@unused@*/ int sig)
 {
+	(void)sig;
+
 	if (AraKiri)
 		return;
 
@@ -570,6 +572,8 @@ static void signal_reload(/*@unused@*/ int sig)
 
 static void signal_trap(/*@unused@*/ int sig)
 {
+	(void)sig;
+
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
 	{

@@ -217,6 +217,8 @@ SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(SCARD_IO_REQUEST
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
+	(void)pvReserved1;
+	(void)pvReserved2;
 	/*
 	 * Check for NULL pointer
 	 */
@@ -261,6 +263,8 @@ LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
 	 * case someone calls it here
 	 */
 
+	(void)hContext;
+	(void)dwTimeout;
 	return SCARD_E_UNSUPPORTED_FEATURE;
 }
 
@@ -272,6 +276,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	PREADER_CONTEXT rContext = NULL;
 	DWORD dwStatus;
 
+	(void)hContext;
 	PROFILE_START
 
 	/*
@@ -1364,6 +1369,10 @@ LONG SCardGetStatusChange(/*@unused@*/ SCARDCONTEXT hContext,
 	/*
 	 * Client side function
 	 */
+	(void)hContext;
+	(void)dwTimeout;
+	(void)rgReaderStates;
+	(void)cReaders;
 	return SCARD_S_SUCCESS;
 }
 
@@ -1687,6 +1696,10 @@ LONG SCardListReaders(/*@unused@*/ SCARDCONTEXT hContext,
 	/*
 	 * Client side function
 	 */
+	(void)hContext;
+	(void)mszGroups;
+	(void)mszReaders;
+	(void)pcchReaders;
 	return SCARD_S_SUCCESS;
 }
 
@@ -1695,6 +1708,7 @@ LONG SCardCancel(/*@unused@*/ SCARDCONTEXT hContext)
 	/*
 	 * Client side function
 	 */
+	(void)hContext;
 	return SCARD_S_SUCCESS;
 }
 

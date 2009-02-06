@@ -411,6 +411,7 @@ static void HPRemoveDevice(/*@unused@*/ LibHalContext *ctx, const char *udi)
 {
 	int i;
 
+	(void)ctx;
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if (readerTracker[i].udi && strcmp(readerTracker[i].udi, udi) == 0)

@@ -253,6 +253,9 @@ check_types (void)
 int
 main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
+	(void)argc;
+	(void)argv;
+
     printf ("#include <sys/types.h>\n"
             "#include <time.h>\n"
             "#include <stddef.h>\n\n"

@@ -81,6 +81,9 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
 	DWORD send_length, length;
 
+	(void)argc;
+	(void)argv;
+
 	printf("\nMUSCLE PC/SC Lite unitary test Program\n\n");
 
 	printf(MAGENTA "THIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
