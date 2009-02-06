@@ -1,3 +1,19 @@
+pcsc-lite-1.5.2: Ludovic Rousseau
+6 February 2009
+- SCardGetStatusChange(): return if the state of the reader changed
+  since the previous call. Thanks to Thomas Harning for the patch
+- SCardCancel() no works as expected. It got broken in version 1.5.0.
+  Closes: [#311342] SCardCancel does not cancel an outstanding
+  SCardGetStatusChange
+- log TxBuffer and RxBuffer if the SCardControl() command failed.
+  Closes: [#311376] PCSC_LOG_VERBOSE via -dd; print details of "Card not
+  transacted"
+- add a mutex to avoid a race condition 
+  Closes: [#311377] Race condition in SCardBeginTransaction
+- SCardGetStatusChange() may not return if the reader was removed.
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.1: Ludovic Rousseau
 7 January 2009
 - Extended APDU of more than 2048 bytes were corrupted. The problem was
