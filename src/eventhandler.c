@@ -470,6 +470,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			/*
 			 * Exit and notify the caller
 			 */
+			(void)StatSynchronize(rContext->readerState);
 			Log1(PCSC_LOG_INFO, "Die");
 			rContext->dwLockId = 0;
 			(void)SYS_ThreadExit(NULL);
