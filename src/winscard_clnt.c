@@ -535,7 +535,10 @@ again:
 	if (scEstablishStruct.rv != SCARD_S_SUCCESS)
 		return scEstablishStruct.rv;
 
+	/* check we do not reuse an existing phContext */
 	if (-1 != SCardGetContextIndiceTH(scEstablishStruct.phContext))
+		/* we do not need to release the allocated context since
+		 * SCardReleaseContext() does nothing on the server side */
 		goto again;
 
 	*phContext = scEstablishStruct.phContext;
