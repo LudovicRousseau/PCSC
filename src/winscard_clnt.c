@@ -507,7 +507,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		isExecuted = 1;
 	}
 
-
+again:
 	/*
 	 * Try to establish an Application Context with the server
 	 */
@@ -534,6 +534,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 
 	if (scEstablishStruct.rv != SCARD_S_SUCCESS)
 		return scEstablishStruct.rv;
+
+	if (-1 != SCardGetContextIndiceTH(scEstablishStruct.phContext))
+		goto again;
 
 	*phContext = scEstablishStruct.phContext;
 
