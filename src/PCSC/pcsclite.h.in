@@ -100,7 +100,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_E_UNEXPECTED		0x8010001F /**< An unexpected card error has occurred. */
 #define SCARD_E_ICC_INSTALLATION	0x80100020 /**< No primary provider can be found for the smart card. */
 #define SCARD_E_ICC_CREATEORDER		0x80100021 /**< The requested order of object creation is not supported. */
-/* #define SCARD_E_UNSUPPORTED_FEATURE	0x80100022 /**< This smart card does not support the requested feature. */
+/* #define SCARD_E_UNSUPPORTED_FEATURE	0x80100022 / **< This smart card does not support the requested feature. */
 #define SCARD_E_DIR_NOT_FOUND		0x80100023 /**< The identified directory does not exist in the smart card. */
 #define SCARD_E_FILE_NOT_FOUND		0x80100024 /**< The identified file does not exist in the smart card. */ 
 #define SCARD_E_NO_DIR			0x80100025 /**< The supplied path does not represent a smart card directory. */
