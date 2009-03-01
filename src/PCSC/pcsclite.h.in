@@ -91,19 +91,44 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_E_NOT_TRANSACTED		0x80100016 /**< An attempt was made to end a non-existent transaction. */
 #define SCARD_E_READER_UNAVAILABLE	0x80100017 /**< The specified reader is not currently available for use. */
 
-#define SCARD_W_UNSUPPORTED_CARD	0x80100065 /**< The reader cannot communicate with the card, due to ATR string configuration conflicts. */
-#define SCARD_W_UNRESPONSIVE_CARD	0x80100066 /**< The smart card is not responding to a reset. */
-#define SCARD_W_UNPOWERED_CARD		0x80100067 /**< Power has been removed from the smart card, so that further communication is not possible. */
-#define SCARD_W_RESET_CARD		0x80100068 /**< The smart card has been reset, so any shared state information is invalid. */
-#define SCARD_W_REMOVED_CARD		0x80100069 /**< The smart card has been removed, so further communication is not possible. */
-
 #define SCARD_E_PCI_TOO_SMALL		0x80100019 /**< The PCI Receive buffer was too small. */
 #define SCARD_E_READER_UNSUPPORTED	0x8010001A /**< The reader driver does not meet minimal requirements for support. */
 #define SCARD_E_DUPLICATE_READER	0x8010001B /**< The reader driver did not produce a unique reader name. */
 #define SCARD_E_CARD_UNSUPPORTED	0x8010001C /**< The smart card does not meet minimal requirements for support. */
 #define SCARD_E_NO_SERVICE		0x8010001D /**< The Smart card resource manager is not running. */
 #define SCARD_E_SERVICE_STOPPED		0x8010001E /**< The Smart card resource manager has shut down. */
+#define SCARD_E_UNEXPECTED		0x8010001F /**< An unexpected card error has occurred. */
+#define SCARD_E_ICC_INSTALLATION	0x80100020 /**< No primary provider can be found for the smart card. */
+#define SCARD_E_ICC_CREATEORDER		0x80100021 /**< The requested order of object creation is not supported. */
+/* #define SCARD_E_UNSUPPORTED_FEATURE	0x80100022 /**< This smart card does not support the requested feature. */
+#define SCARD_E_DIR_NOT_FOUND		0x80100023 /**< The identified directory does not exist in the smart card. */
+#define SCARD_E_FILE_NOT_FOUND		0x80100024 /**< The identified file does not exist in the smart card. */ 
+#define SCARD_E_NO_DIR			0x80100025 /**< The supplied path does not represent a smart card directory. */
+#define SCARD_E_NO_FILE			0x80100026 /**< The supplied path does not represent a smart card file. */
+#define SCARD_E_NO_ACCESS		0x80100027 /**< Access is denied to this file. */
+#define SCARD_E_WRITE_TOO_MANY		0x80100028 /**< The smart card does not have enough memory to store the information. */
+#define SCARD_E_BAD_SEEK		0x80100029 /**< There was an error trying to set the smart card file object pointer. */
+#define SCARD_E_INVALID_CHV		0x8010002A /**< The supplied PIN is incorrect. */
+#define SCARD_E_UNKNOWN_RES_MNG		0x8010002B /**< An unrecognized error code was returned from a layered component. */ 
+#define SCARD_E_NO_SUCH_CERTIFICATE	0x8010002C /**< The requested certificate does not exist. */
+#define SCARD_E_CERTIFICATE_UNAVAILABLE	0x8010002D /**< The requested certificate could not be obtained. */
 #define SCARD_E_NO_READERS_AVAILABLE    0x8010002E /**< Cannot find a smart card reader. */
+#define SCARD_E_COMM_DATA_LOST		0x8010002F /**< A communications error with the smart card has been detected. Retry the operation. */
+#define SCARD_E_NO_KEY_CONTAINER	0x80100030 /**< The requested key container does not exist on the smart card. */
+#define SCARD_E_SERVER_TOO_BUSY		0x80100031 /**< The Smart Card Resource Manager is too busy to complete this operation. */
+
+#define SCARD_W_UNSUPPORTED_CARD	0x80100065 /**< The reader cannot communicate with the card, due to ATR string configuration conflicts. */
+#define SCARD_W_UNRESPONSIVE_CARD	0x80100066 /**< The smart card is not responding to a reset. */
+#define SCARD_W_UNPOWERED_CARD		0x80100067 /**< Power has been removed from the smart card, so that further communication is not possible. */
+#define SCARD_W_RESET_CARD		0x80100068 /**< The smart card has been reset, so any shared state information is invalid. */
+#define SCARD_W_REMOVED_CARD		0x80100069 /**< The smart card has been removed, so further communication is not possible. */
+
+#define SCARD_W_SECURITY_VIOLATION	0x8010006A /**< Access was denied because of a security violation. */
+#define SCARD_W_WRONG_CHV		0x8010006B /**< The card cannot be accessed because the wrong PIN was presented. */
+#define SCARD_W_CHV_BLOCKED		0x8010006C /**< The card cannot be accessed because the maximum number of PIN entry attempts has been reached. */
+#define SCARD_W_EOF			0x8010006D /**< The end of the smart card file has been reached. */
+#define SCARD_W_CANCELLED_BY_USER	0x8010006E /**< The user pressed "Cancel" on a Smart Card Selection Dialog. */
+#define SCARD_W_CARD_NOT_AUTHENTICATED	0x8010006F /**< No PIN was presented to the smart card. */
 
 #define SCARD_AUTOALLOCATE (DWORD)(-1)	/**< see SCardFreeMemory() */
 #define SCARD_SCOPE_USER		0x0000	/**< Scope in user space */
