@@ -11,6 +11,8 @@
 /**
  * @file
  * @brief This keeps a list of defines for pcsc-lite.
+ *
+ * Error codes from http://msdn.microsoft.com/en-us/library/aa924526.aspx
  */
 
 #ifndef __pcsclite_h__
