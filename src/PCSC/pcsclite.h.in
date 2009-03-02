@@ -25,9 +25,6 @@ extern "C"
 {
 #endif
 
-#ifdef WIN32
-#include <winscard.h>
-#else
 typedef long SCARDCONTEXT; /**< \p hContext returned by SCardEstablishContext() */
 typedef SCARDCONTEXT *PSCARDCONTEXT;
 typedef SCARDCONTEXT *LPSCARDCONTEXT;
@@ -175,8 +172,6 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_STATE_INUSE		0x0100	/**< Shared Mode */
 #define SCARD_STATE_MUTE		0x0200	/**< Unresponsive card */
 #define SCARD_STATE_UNPOWERED		0x0400	/**< Unpowered card */
-
-#endif
 
 /** PC/SC Lite specific extensions */
 #define SCARD_W_INSERTED_CARD		0x8010006A

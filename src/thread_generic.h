@@ -17,30 +17,18 @@
 #ifndef __thread_generic_h__
 #define __thread_generic_h__
 
-#ifdef WIN32
-#include <windows.h>
-#include "PCSC.h"
-#else
 #include <pthread.h>
 #include <wintypes.h>
-#endif
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#ifdef WIN32
-#define PCSCLITE_THREAD_T                HANDLE
-#define PCSCLITE_MUTEX                   CRITICAL_SECTION
-#define PCSCLITE_MUTEX_T                 CRITICAL_SECTION*
-#define PCSCLITE_THREAD_FUNCTION(f)      void *(*f)(void *)
-#else
 #define PCSCLITE_THREAD_T                pthread_t
 #define PCSCLITE_MUTEX                   pthread_mutex_t
 #define PCSCLITE_MUTEX_T                 pthread_mutex_t*
 #define PCSCLITE_THREAD_FUNCTION(f)      void *(*f)(void *)
-#endif
 
 /* thread attributes */
 #define THREAD_ATTR_DEFAULT			0

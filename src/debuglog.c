@@ -62,15 +62,7 @@ void log_msg(const int priority, const char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
-#ifndef WIN32
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-#if HAVE_VSNPRINTF
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-	vsprintf(DebugBuffer, fmt, argptr);
-#endif
-#endif
 	va_end(argptr);
 
 	log_line(priority, DebugBuffer);
@@ -78,7 +70,6 @@ void log_msg(const int priority, const char *fmt, ...)
 
 static void log_line(const int priority, const char *DebugBuffer)
 {
-#ifndef WIN32
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
@@ -135,9 +126,6 @@ static void log_line(const int priority, const char *DebugBuffer)
 		else
 			fprintf(stderr, "%s\n", DebugBuffer);
 	}
-#else
-	fprintf(stderr, "%s\n", DebugBuffer);
-#endif
 } /* log_msg */
 
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
@@ -193,8 +181,6 @@ void DebugLogSetLogType(const int dbgtype)
 			LogMsgType = DEBUGLOG_STDERR_DEBUG;
 	}
 
-	/* no color under Windows */
-#ifndef WIN32
 	/* log to stderr and stderr is a tty? */
 	if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
 	{
@@ -218,7 +204,6 @@ void DebugLogSetLogType(const int dbgtype)
 			}
 		}
 	}
-#endif
 }
 
 void DebugLogSetLevel(const int level)
@@ -298,22 +283,12 @@ void debug_msg(const char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
-#ifndef WIN32
 	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-#if HAVE_VSNPRINTF
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-	vsprintf(DebugBuffer, fmt, argptr);
-#endif
-#endif
 	va_end(argptr);
 
-#ifndef WIN32
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
-#endif
 		fprintf(stderr, "%s\n", DebugBuffer);
 } /* debug_msg */
 

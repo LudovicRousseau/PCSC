@@ -42,8 +42,6 @@ static void log_init(void)
 	if (e)
 		LogLevel = atoi(e);
 
-	/* no color under Windows */
-#ifndef WIN32
 	/* log to stderr and stderr is a tty? */
 	if (isatty(fileno(stderr)))
 	{
@@ -67,7 +65,6 @@ static void log_init(void)
 			}
 		}
 	}
-#endif
 } /* log_init */
 
 void log_msg(const int priority, const char *fmt, ...)
@@ -86,18 +83,9 @@ void log_msg(const int priority, const char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
-#ifndef WIN32
 	(void)vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-#if HAVE_VSNPRINTF
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
-#else
-	vsprintf(DebugBuffer, fmt, argptr);
-#endif
-#endif
 	va_end(argptr);
 
-#ifndef WIN32
 	{
 		if (LogDoColor)
 		{
@@ -127,9 +115,6 @@ void log_msg(const int priority, const char *fmt, ...)
 		else
 			fprintf(stderr, "%s\n", DebugBuffer);
 	}
-#else
-	fprintf(stderr, "%s\n", DebugBuffer);
-#endif
 } /* log_msg */
 
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,

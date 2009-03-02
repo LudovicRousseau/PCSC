@@ -20,8 +20,6 @@ extern "C"
 {
 #endif
 
-#if !defined(WIN32)
-
 #ifndef BYTE
 	typedef unsigned char BYTE;
 #endif
@@ -53,10 +51,6 @@ extern "C"
 	typedef short BOOL;
 	typedef unsigned short WORD;
 	typedef unsigned long *PULONG;
-
-#else
-#include <windows.h>
-#endif
 
 #ifdef __cplusplus
 }
