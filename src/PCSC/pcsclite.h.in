@@ -65,6 +65,8 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_PCI_T1	(&g_rgSCardT1Pci) /**< protocol control information (PCI) for T=1 */
 #define SCARD_PCI_RAW	(&g_rgSCardRawPci) /**< protocol control information (PCI) for RAW protocol */
 
+/** error codes from http://msdn.microsoft.com/en-us/library/aa924526.aspx
+ */
 #define SCARD_S_SUCCESS			0x00000000 /**< No error was encountered. */
 #define SCARD_F_INTERNAL_ERROR		0x80100001 /**< An internal consistency check failed. */
 #define SCARD_E_CANCELLED		0x80100002 /**< The action was cancelled by an SCardCancel request. */
