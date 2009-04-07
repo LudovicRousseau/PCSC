@@ -23,11 +23,7 @@
  * No, it's still not a perfect solution design wise.
  */
 
-#if !defined(__APPLE__)
-
 ULONG PMRegisterForPowerEvents(void)
 {
   return 0;
 }
-
-#endif

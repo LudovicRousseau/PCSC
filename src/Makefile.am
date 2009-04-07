@@ -68,7 +68,6 @@ pcscd_SOURCES = \
 	PCSC/wintypes.h \
 	powermgt_generic.c \
 	powermgt_generic.h \
-	powermgt_macosx.c \
 	prothandler.c \
 	prothandler.h \
 	readerfactory.c \
