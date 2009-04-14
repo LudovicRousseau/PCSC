@@ -132,7 +132,7 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 			else
 			{
 				/* check that the file is a FIFO */
-				if (!(fstat_buf.st_mode & S_IFIFO))
+				if (!S_ISFIFO(fstat_buf.st_mode))
 					Log2(PCSC_LOG_ERROR, "%s is not a fifo", filename);
 				else
 					(void)SYS_WriteFile(fd, buf, sizeof(buf));
