@@ -1743,13 +1743,18 @@ static long WaitForPcscdEvent(SCARDCONTEXT hContext, long dwTime)
 	(void)mkfifo(filename, 0644);
 	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
 
-	FD_ZERO(&read_fd);
-	FD_SET(fd, &read_fd);
-	
-	(void)select(fd+1, &read_fd, NULL, NULL, ptv);
+	/* the file may have been removed between the mkfifo() and open() */
+	if (-1 != fd)
+	{
+		FD_ZERO(&read_fd);
+		FD_SET(fd, &read_fd);
+		
+		(void)select(fd+1, &read_fd, NULL, NULL, ptv);
 
-	(void)SYS_ReadFile(fd, buf, 1);
-	(void)SYS_CloseFile(fd);
+		(void)SYS_ReadFile(fd, buf, 1);
+		(void)SYS_CloseFile(fd);
+	}
+
 	(void)SYS_RemoveFile(filename);
 
 	if (INFINITE != dwTime)
