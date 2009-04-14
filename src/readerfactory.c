@@ -467,6 +467,9 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 			sContext->psHandles[i].hCard = 0;
 
 		dwNumReadersContexts -= 1;
+
+		/* signal an event to clients */
+		StatSynchronize(NULL);
 	}
 
 	return SCARD_S_SUCCESS;
