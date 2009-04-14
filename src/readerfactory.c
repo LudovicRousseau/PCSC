@@ -37,6 +37,7 @@
 #include "hotplug.h"
 #include "strlcpycat.h"
 #include "configfile.h"
+#include "utils.h"
 
 #ifndef TRUE
 #define TRUE 1
