@@ -141,7 +141,8 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 			(void)SYS_CloseFile(fd);
 		}
 
-		if (unlink(filename))
+		/* remove files older than 60 seconds */
+		if ((difftime(time(NULL), fstat_buf.st_atime) > 60) && unlink(filename))
 			Log3(PCSC_LOG_ERROR, "Can't remove %s: %s", filename,
 			strerror(errno));
 	}
