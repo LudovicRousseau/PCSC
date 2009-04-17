@@ -30,11 +30,11 @@ def cancel():
         print 'Failed to SCardCancel: ' + SCardGetErrorMessage(hresult)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult!=0:
+if hresult!=SCARD_S_SUCCESS:
 	raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
 
 hresult, readers = SCardListReaders(hcontext, [])
-if hresult!=0:
+if hresult!=SCARD_S_SUCCESS:
 	raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
 print 'PC/SC Readers:', readers
 
