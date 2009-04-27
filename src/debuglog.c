@@ -44,8 +44,8 @@ static char LogSuppress = DEBUGLOG_LOG_ENTRIES;
 static char LogMsgType = DEBUGLOG_NO_DEBUG;
 static char LogCategory = DEBUG_CATEGORY_NOTHING;
 
-/** default level is a bit verbose to be backward compatible */
-static char LogLevel = PCSC_LOG_INFO;
+/** default level */
+static char LogLevel = PCSC_LOG_ERROR;
 
 static signed char LogDoColor = 0;	/**< no color by default */
 
