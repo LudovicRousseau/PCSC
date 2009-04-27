@@ -978,6 +978,27 @@ LONG RFUnlockSharing(DWORD hCard)
 	return rv;
 }
 
+LONG RFUnlockAllSharing(DWORD hCard)
+{
+	PREADER_CONTEXT rContext = NULL;
+	LONG rv;
+
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	(void)SYS_MutexLock(&LockMutex);
+	rv = RFCheckSharing(hCard);
+	if (SCARD_S_SUCCESS == rv)
+	{
+		rContext->LockCount = 0;
+		rContext->dwLockId = 0;
+	}
+	(void)SYS_MutexUnLock(&LockMutex);
+
+	return rv;
+}
+
 LONG RFUnblockContext(SCARDCONTEXT hContext)
 {
 	int i;
