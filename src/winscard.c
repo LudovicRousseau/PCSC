@@ -873,7 +873,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Unlock any blocks on this context
 	 */
-	rv = RFUnlockSharing(hCard);
+	rv = RFUnlockAllSharing(hCard);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
