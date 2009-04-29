@@ -1,3 +1,28 @@
+pcsc-lite-1.5.3: Ludovic Rousseau
+29 April 2009
+- SCardEstablishContext(): check we do not reuse an already allocated
+  hContext
+  Thanks to Daniel Nobs for the bug report and patch
+- pcsclite.h: add missing SCARD_E_* and SCARD_W_* return code. They are
+  unused by pcsc-lite but defined on Windows
+- reader.h: add PIN_PROPERTIES_STRUCTURE structure and FEATURE_IFD_PIN_PROPERTIES
+  Thanks to Martin Paljak for the patch
+- remove powermgt_macosx.c since it is using APSL version 1.1 instead of
+  the BSD-like licence like the other files 
+  Thanks to Stanislav Brabec for the bug report
+- avoid a possible crash due to a race condition
+  Thanks to Matheus Ribeiro for the patch
+- change default log level from PCSC_LOG_INFO to PCSC_LOG_ERROR to limit
+  syslog pollution
+- CardDisconnect(): call RFUnlockAllSharing() instead of
+  RFUnlockSharing() to release all nested locks. The problem occurs if
+  SCardBeginTransaction() are made without corresponding
+  SCardEndTransaction().  OpenSC "pkcs11-tool -I" exhibits such a
+  behavior.
+  Thanks to Marc Rios Valles for the bug report
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.2: Ludovic Rousseau
 6 February 2009
 - SCardGetStatusChange(): return if the state of the reader changed
