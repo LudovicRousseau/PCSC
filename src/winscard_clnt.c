@@ -271,8 +271,9 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
 
 /**
  * @brief Creates an Application Context to the PC/SC Resource Manager.
-
- * This must be the first function called in a PC/SC application.
+ *
+ * This must be the first WinSCard function called in a PC/SC application.
+ * Each thread of an application shall use its own SCARDCONTEXT.
  *
  * @ingroup API
  * @param[in] dwScope Scope of the establishment.
