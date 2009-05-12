@@ -81,6 +81,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	if (fo == NULL)
 	{
 		perror(pcOFile);
+		(int)fclose(fp);
 		return 1;
 	}
 
@@ -89,6 +90,8 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	if (rv != SCARD_S_SUCCESS)
 	{
 		printf("ERROR :: Cannot Connect to Resource Manager\n");
+		(int)fclose(fp);
+		(int)fclose(fo);
 		return 1;
 	}
 
