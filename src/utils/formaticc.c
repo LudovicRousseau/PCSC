@@ -240,5 +240,8 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	(void)SCardReleaseContext(hContext);
 	free(mszReaders);
 
+	(int)fclose(fp);
+	(int)fclose(fo);
+
 	return 0;
 }
