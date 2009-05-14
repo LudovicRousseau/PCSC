@@ -2612,6 +2612,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
  *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
+ * dwAtrLen = sizeof(pbAtr);
  * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
  * @endcode
  *
@@ -2696,13 +2697,12 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
  * DWORD dwActiveProtocol;
- * unsigned char pbAtr[MAX_ATR_SIZE];
- * DWORD dwAtrLen;
+ * unsigned char pbAttr[] = { 0x12, 0x34, 0x56 };
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
  *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
- * rv = SCardSetAttrib(hCard, 0x42000001, "\x12\x34\x56", 3);
+ * rv = SCardSetAttrib(hCard, 0x42000001, pbAttr, sizeof(pbAttr));
  * @endcode
  */
 LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
