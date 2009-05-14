@@ -387,6 +387,14 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		dwProtocol = stStr->pdwProtocol;
 		cbAtrLen = stStr->pcbAtrLen;
 
+		/* avoids buffer overflow */
+		if ((cchReaderLen > sizeof(stStr->mszReaderNames))
+			|| (cbAtrLen > sizeof(stStr->pbAtr)))
+		{
+			stStr->rv = SCARD_E_INSUFFICIENT_BUFFER ;
+			break;
+		}
+
 		stStr->rv = SCardStatus(stStr->hCard, stStr->mszReaderNames,
 			&cchReaderLen, &dwState,
 			&dwProtocol, stStr->pbAtr, &cbAtrLen);
@@ -401,6 +409,14 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		trStr = ((transmit_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(trStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
+
+		/* avoids buffer overflow */
+		if ((trStr->pcbRecvLength > sizeof(trStr->pbRecvBuffer))
+			|| (trStr->cbSendLength > sizeof(trStr->pbSendBuffer)))
+		{
+			trStr->rv = SCARD_E_INSUFFICIENT_BUFFER ;
+			break;
+		}
 
 		ioSendPci.dwProtocol = trStr->pioSendPciProtocol;
 		ioSendPci.cbPciLength = trStr->pioSendPciLength;
@@ -426,6 +442,14 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		rv = MSGCheckHandleAssociation(ctStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 
+		/* avoids buffer overflow */
+		if ((ctStr->dwBytesReturned > sizeof(ctStr->cbRecvLength))
+			|| (ctStr->cbSendLength > sizeof(ctStr->pbSendBuffer)))
+		{
+			ctStr->rv = SCARD_E_INSUFFICIENT_BUFFER;
+			break;
+		}
+
 		dwBytesReturned = ctStr->dwBytesReturned;
 
 		ctStr->rv = SCardControl(ctStr->hCard, ctStr->dwControlCode,
@@ -442,6 +466,13 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
 
+		/* avoids buffer overflow */
+		if (gsStr->cbAttrLen > sizeof(gsStr->pbAttr))
+		{
+			gsStr->rv = SCARD_E_INSUFFICIENT_BUFFER ;
+			break;
+		}
+
 		cbAttrLen = gsStr->cbAttrLen;
 
 		gsStr->rv = SCardGetAttrib(gsStr->hCard, gsStr->dwAttrId,
@@ -455,6 +486,14 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		gsStr = ((getset_struct *) msgStruct->data);
 		rv = MSGCheckHandleAssociation(gsStr->hCard, dwContextIndex);
 		if (rv != 0) return rv;
+
+		/* avoids buffer overflow */
+		if (gsStr->cbAttrLen <= sizeof(gsStr->pbAttr))
+		{
+			gsStr->rv = SCARD_E_INSUFFICIENT_BUFFER ;
+			break;
+		}
+
 		gsStr->rv = SCardSetAttrib(gsStr->hCard, gsStr->dwAttrId,
 			gsStr->pbAttr, gsStr->cbAttrLen);
 		break;
@@ -468,6 +507,15 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			treStr = ((transmit_struct_extended *) msgStruct->data);
 			rv = MSGCheckHandleAssociation(treStr->hCard, dwContextIndex);
 			if (rv != 0) return rv;
+
+			/* avoids buffer overflow */
+			if ((treStr->size > sizeof(pbSendBuffer))
+				|| (treStr->cbSendLength > sizeof(pbSendBuffer))
+				|| (treStr->pcbRecvLength > sizeof(pbRecvBuffer)))
+			{
+				treStr->rv = SCARD_E_INSUFFICIENT_BUFFER;
+				break;
+			}
 
 			/* on more block to read? */
 			if (treStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
@@ -549,6 +597,15 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			cteStr = ((control_struct_extended *) msgStruct->data);
 			rv = MSGCheckHandleAssociation(cteStr->hCard, dwContextIndex);
 			if (rv != 0) return rv;
+
+			/* avoids buffer overflow */
+			if ((cteStr->size > sizeof(pbSendBuffer))
+				|| (cteStr->cbSendLength > sizeof(pbSendBuffer))
+				|| (cteStr->cbRecvLength > sizeof(pbRecvBuffer)))
+			{
+				cteStr->rv = SCARD_E_INSUFFICIENT_BUFFER;
+				break;
+			}
 
 			/* on more block to read? */
 			if (cteStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
