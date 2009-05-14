@@ -106,11 +106,11 @@
 #define FEATURE_MODIFY_PIN_START         0x03
 #define FEATURE_MODIFY_PIN_FINISH        0x04
 #define FEATURE_GET_KEY_PRESSED          0x05
-#define FEATURE_VERIFY_PIN_DIRECT        0x06
-#define FEATURE_MODIFY_PIN_DIRECT        0x07
+#define FEATURE_VERIFY_PIN_DIRECT        0x06 /**< Verify PIN */
+#define FEATURE_MODIFY_PIN_DIRECT        0x07 /**< Modify PIN */
 #define FEATURE_MCT_READERDIRECT         0x08
 #define FEATURE_MCT_UNIVERSAL            0x09
-#define FEATURE_IFD_PIN_PROPERTIES       0x0A
+#define FEATURE_IFD_PIN_PROPERTIES       0x0A /**< retrieve properties of the IFD regarding PIN handling */
 #define FEATURE_ABORT                    0x0B
 #define FEATURE_SET_SPE_MESSAGE          0x0C
 #define FEATURE_VERIFY_PIN_DIRECT_APP_ID 0x0D
