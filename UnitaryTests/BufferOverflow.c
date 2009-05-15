@@ -1,6 +1,14 @@
 #include <stdio.h>
+#ifdef __APPLE__
+#include <PCSC/winscard.h>
+#include <PCSC/wintypes.h>
+#define SCARD_ATTR_VALUE(Class, Tag) ((((ULONG)(Class)) << 16) | ((ULONG)(Tag)))
+#define SCARD_CLASS_ICC_STATE       9   /**< ICC State specific definitions */
+#define SCARD_ATTR_ATR_STRING SCARD_ATTR_VALUE(SCARD_CLASS_ICC_STATE, 0x0303) /**< Answer to reset (ATR) string. */
+#else
 #include <winscard.h>
 #include <reader.h>
+#endif
 
 int main(void)
 {
@@ -10,7 +18,7 @@ int main(void)
 	LONG rv;
 	char mszReaders[1024];
 	DWORD dwReaders = sizeof(mszReaders);
-	unsigned char pbAtr[265];
+	unsigned char pbAtr[265];	/* 264 is OK */
 	DWORD dwAtrLen;
 	int i;
 
