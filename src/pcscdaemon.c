@@ -396,14 +396,20 @@ int main(int argc, char **argv)
 	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
 	if (rv < 0)
 	{
-		rv = SYS_Mkdir(PCSCLITE_IPC_DIR,
-			S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU);
+		int mode = S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU;
+
+		rv = SYS_Mkdir(PCSCLITE_IPC_DIR, mode);
 		if (rv != 0)
 		{
 			Log2(PCSC_LOG_CRITICAL,
 				"cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
 			return EXIT_FAILURE;
 		}
+
+		/* set mode so that the directory is world readable and
+		 * executable even is umask is restrictive
+		 * The directory containes files used by libpcsclite */
+		(void)SYS_Chmod(PCSCLITE_IPC_DIR, mode);
 	}
 
 	/*
