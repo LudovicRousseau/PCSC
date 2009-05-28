@@ -31,6 +31,17 @@ extern "C"
 #endif
 
 	/**
+	 * @brief Information transmitted in \ref CMD_VERSION Messages.
+	 */
+	struct version_struct
+	{
+		int32_t major;	/**< IPC major \ref PROTOCOL_VERSION_MAJOR */
+		int32_t minor;	/**< IPC minor \ref PROTOCOL_VERSION_MINOR */
+		uint32_t rv;
+	};
+	typedef struct version_struct version_struct;
+
+	/**
 	 * @brief General structure for client/serve message data exchange.
 	 *
 	 * It is used in the calls of \c SHMMessageSend and \c SHMMessageReceive.
@@ -49,7 +60,11 @@ extern "C"
 		uint32_t command;	/** one of the \c pcsc_msg_commands */
 		uint64_t date;
 		unsigned char key[PCSCLITE_MSG_KEY_LEN]; /* 16 bytes */
-		unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
+		union
+		{
+			unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
+			struct version_struct veStr;
+		};
 	}
 	sharedSegmentMsg, *psharedSegmentMsg;
 
@@ -92,17 +107,6 @@ extern "C"
 		SCARD_TRANSMIT_EXTENDED = 0x11,	/**< used by SCardTransmit() */
 		SCARD_CONTROL_EXTENDED = 0x12	/**< used by SCardControl() */
 	};
-
-	/**
-	 * @brief Information transmitted in \ref CMD_VERSION Messages.
-	 */
-	struct version_struct
-	{
-		int32_t major;	/**< IPC major \ref PROTOCOL_VERSION_MAJOR */
-		int32_t minor;	/**< IPC minor \ref PROTOCOL_VERSION_MINOR */
-		uint32_t rv;
-	};
-	typedef struct version_struct version_struct;
 
 	struct client_struct
 	{

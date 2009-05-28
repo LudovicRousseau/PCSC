@@ -481,7 +481,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		msgStruct.command = 0;
 		msgStruct.date = time(NULL);
 
-		veStr = (version_struct *) msgStruct.data;
+		veStr = &msgStruct.veStr;
 		veStr->major = PROTOCOL_VERSION_MAJOR;
 		veStr->minor = PROTOCOL_VERSION_MINOR;
 

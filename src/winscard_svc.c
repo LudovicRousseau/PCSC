@@ -178,7 +178,7 @@ static void ContextThread(LPVOID dwIndex)
 				if (msgStruct.mtype == CMD_VERSION)
 				{
 					version_struct *veStr;
-					veStr = (version_struct *) msgStruct.data;
+					veStr = &msgStruct.veStr;
 
 					/* get the client protocol version */
 					psContext[dwContextIndex].protocol_major = veStr->major;
