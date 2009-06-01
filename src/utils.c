@@ -155,7 +155,7 @@ int StatSynchronize(struct pubReaderStatesList *readerState)
 /**
  * Sends an asynchronous event to a specific waiting client
  *
- * Just write 1 byte to a specific fifo in PCSCLITE_EVENTS_DIR and remove the file
+ * Just write 1 byte to an (existing) specific fifo in PCSCLITE_EVENTS_DIR
  *
  * This function must be secured since the files are created by the library
  * or any non privileged process. We must not follow symlinks for example
@@ -169,7 +169,6 @@ int StatSynchronizeContext(SCARDCONTEXT hContext)
 
 	(void)snprintf(filename, sizeof(filename), "%s/event.%d.%ld",
 		PCSCLITE_EVENTS_DIR, SYS_GetPID(), hContext);
-	(void)mkfifo(filename, 0644);
 	fd = SYS_OpenFile(filename, O_WRONLY, 0);
 
 	if (fstat(fd, &fstat_buf))
