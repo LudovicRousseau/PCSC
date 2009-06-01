@@ -444,7 +444,8 @@ int main(int argc, char **argv)
 	rv = SYS_Stat(PCSCLITE_EVENTS_DIR, &fStatBuf);
 	if (rv < 0)
 	{
-		int mode = S_IRWXU | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH; /* 0733 */
+		/* 1733 : world writable + sticky bit */
+		int mode = S_IRWXU | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH | S_ISVTX;
 
 		rv = SYS_Mkdir(PCSCLITE_EVENTS_DIR, mode);
 		if (rv != 0)
