@@ -325,7 +325,6 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
-	DBusError error;
 	struct _driverTracker *driver;
 	LONG ret;
 
@@ -368,15 +367,13 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	readerTracker[i].udi = strdup(udi);
 
 #ifdef ADD_SERIAL_NUMBER
-	dbus_error_init (&error);
-
-	if (libhal_device_property_exists(ctx, udi, "usb.serial", &error))
+	if (libhal_device_property_exists(ctx, udi, "usb.serial", NULL))
 	{
 		char fullname[MAX_READERNAME];
 		char *sSerialNumber;
 
 		sSerialNumber = libhal_device_get_property_string(ctx, udi,
-			"usb.serial", &error);
+			"usb.serial", NULL);
 
 		(void)snprintf(fullname, sizeof(fullname), "%s (%s)",
 			driver->readerName, sSerialNumber);
@@ -385,10 +382,6 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	else
 #endif
 		readerTracker[i].fullName = strdup(driver->readerName);
-#ifdef ADD_SERIAL_NUMBER
-	if (dbus_error_is_set(&error))
-		dbus_error_free(&error);
-#endif
 
 	ret = RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName);
