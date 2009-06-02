@@ -1724,7 +1724,7 @@ static long WaitForPcscdEvent(SCARDCONTEXT hContext, long dwTime)
 {
 	char filename[FILENAME_MAX];
 	char buf[1];
-	int fd;
+	int fd, r;
 	struct timeval tv, *ptv = NULL;
 	struct timeval before, after;
 	fd_set read_fd;
@@ -1741,7 +1741,13 @@ static long WaitForPcscdEvent(SCARDCONTEXT hContext, long dwTime)
 
 	(void)snprintf(filename, sizeof(filename), "%s/event.%d.%ld",
 		PCSCLITE_EVENTS_DIR, SYS_GetPID(), hContext);
-	(void)mkfifo(filename, 0644);
+	r = mkfifo(filename, 0644);
+	if (-1 == r)
+	{
+		Log2(PCSC_LOG_CRITICAL, "Can't create event fifo: %s", strerror(errno));
+		goto exit;
+	}
+
 	fd = SYS_OpenFile(filename, O_RDONLY | O_NONBLOCK, 0);
 
 	/* the file may have been removed between the mkfifo() and open() */
@@ -1767,6 +1773,7 @@ static long WaitForPcscdEvent(SCARDCONTEXT hContext, long dwTime)
 		dwTime -= diff/1000;
 	}
 
+exit:
 	return dwTime;
 }
 
