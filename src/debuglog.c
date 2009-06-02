@@ -128,18 +128,13 @@ static void log_line(const int priority, const char *DebugBuffer)
 	}
 } /* log_msg */
 
-void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
-	const int len)
+static void log_xxd_always(const int priority, const char *msg,
+	const unsigned char *buffer, const int len)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	int i;
 	char *c;
 	char *debug_buf_end;
-
-	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (priority < LogLevel) /* log priority lower than threshold? */
-		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
-		return;
 
 	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
 
@@ -157,6 +152,17 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 		c[-3] = c[-2] = c[-1] = '.';
 
 	log_line(priority, DebugBuffer);
+} /* log_xxd_always */
+
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
+	const int len)
+{
+	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
+		|| (priority < LogLevel) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
+		return;
+
+	log_xxd_always(priority, msg, buffer, len);
 } /* log_xxd */
 
 #ifdef PCSCD
@@ -260,11 +266,11 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
 {
 	if ((category & DEBUG_CATEGORY_APDU)
 		&& (LogCategory & DEBUG_CATEGORY_APDU))
-		log_xxd(PCSC_LOG_INFO, "APDU: ", (const unsigned char *)buffer, len);
+		log_xxd_always(PCSC_LOG_INFO, "APDU: ", buffer, len);
 
 	if ((category & DEBUG_CATEGORY_SW)
 		&& (LogCategory & DEBUG_CATEGORY_APDU))
-		log_xxd(PCSC_LOG_INFO, "SW: ", (const unsigned char *)buffer, len);
+		log_xxd_always(PCSC_LOG_INFO, "SW: ", buffer, len);
 }
 
 /*
