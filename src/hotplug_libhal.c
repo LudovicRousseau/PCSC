@@ -394,13 +394,51 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		driver->libraryPath, deviceName);
 	if (SCARD_S_SUCCESS != ret)
 	{
-		Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s", short_name(udi));
-		free(readerTracker[i].fullName);
-		readerTracker[i].fullName = NULL;
-		free(readerTracker[i].udi);
-		readerTracker[i].udi = NULL;
+		char *parent, *device_file;
 
-		(void)CheckForOpenCT();
+		/* get the parent descriptor, without the '_if0' */
+		parent = libhal_device_get_property_string(ctx, udi,
+			"info.parent", NULL);
+		if (! parent)
+			goto error;
+
+		/* get the linux device file: i.e. '/dev/bus/usb/002/012' */
+		device_file = libhal_device_get_property_string(ctx, parent,
+			"linux.device_file", NULL);
+		if (! device_file)
+			goto error;
+
+		/* check the format looks correct */
+#define LIBUSB_HEADER "/dev/bus/usb/"
+		if (strncmp(device_file, LIBUSB_HEADER, strlen(LIBUSB_HEADER)))
+			goto error;
+
+		device_file += strlen(LIBUSB_HEADER);
+
+		(void)snprintf(deviceName, sizeof(deviceName),
+			"usb:%04x/%04x:libusb:%s",
+			driver->manuID, driver->productID, device_file);
+		deviceName[sizeof(deviceName) -1] = '\0';
+
+		/* replace the libusb separator '/' by ':' */
+		if ('/' == deviceName[strlen(deviceName)-3-1])
+			deviceName[strlen(deviceName)-3-1] = ':';
+
+		Log2(PCSC_LOG_INFO, "trying libusb scheme with: %s", deviceName);
+		ret = RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
+			driver->libraryPath, deviceName);
+
+		if (SCARD_S_SUCCESS != ret)
+		{
+error:
+			Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s", short_name(udi));
+			free(readerTracker[i].fullName);
+			readerTracker[i].fullName = NULL;
+			free(readerTracker[i].udi);
+			readerTracker[i].udi = NULL;
+
+			(void)CheckForOpenCT();
+		}
 	}
 
 	(void)SYS_MutexUnLock(&usbNotifierMutex);
