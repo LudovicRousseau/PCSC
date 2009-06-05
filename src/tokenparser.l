@@ -102,6 +102,50 @@ void tperrorCheck (char *token_error)
 }
 
 /**
+ * Find an optional key in a configuration file
+ * No error is logged if the key is not found
+ *
+ * @param fileName file name
+ * @param tokenKey key value
+ * @param[out] tokenValue token value (if key found)
+ * @param tokenIndice indice of the desired key
+ * @retval -1 configuration file not found
+ * @retval 0 OK
+ * @retval 1 key not found
+ */
+int LTPBundleFindOptionalValueWithKey(const char *fileName,
+	const char *tokenKey, char *tokenValue, int tokenIndice)
+{
+	FILE *file = NULL;
+	int ret = 0;
+
+	desiredIndex  = tokenIndice;
+	pcDesiredKey  = tokenKey;
+	pcFinValue[0] = '\0';
+
+	file = fopen(fileName, "r");
+
+	if (!file)
+		return 1;
+
+	yyin = file;
+
+	do
+	{
+		(void)yylex();
+	} while (!feof(file));
+
+	if (pcFinValue[0] == 0)
+		ret = -1;
+	else
+		(void)strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
+
+	(void)fclose(file);
+	return ret;
+}
+
+
+/**
  * Find a key in a configuration file
  *
  * @param fileName file name
@@ -115,43 +159,20 @@ void tperrorCheck (char *token_error)
 int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
                               char *tokenValue, int tokenIndice)
 {
-	FILE *file = NULL;
 	int ret = 0;
 
-	desiredIndex  = tokenIndice;
-	pcDesiredKey  = tokenKey;
-	pcFinValue[0] = '\0';
+	ret = LTPBundleFindOptionalValueWithKey(fileName, tokenKey, tokenValue,
+		tokenIndice);
 
-	file = fopen(fileName, "r");
-
-	if (!file)
-	{
+	if (1 == ret)
 		Log3(PCSC_LOG_CRITICAL, "Could not open bundle file %s: %s",
 			fileName, strerror(errno));
-		return 1;
-	}
 
-	yyin = file;
+	if (-1 == ret)
+		/* Not defined at all */
+		Log3(PCSC_LOG_CRITICAL, "Value/Key not defined for: %s in %s",
+			tokenKey, fileName);
 
-	do
-	{
-		(void)yylex();
-	} while (!feof(file));
-
-	if (pcFinValue[0] == 0)
-	{
-		if (tokenIndice == 0)
-		{
-			/* Not defined at all */
-			Log3(PCSC_LOG_CRITICAL, "Value/Key not defined for: %s in %s",
-				tokenKey, fileName);
-		}
-		ret = -1;
-	}
-	else
-		(void)strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
-
-	(void)fclose(file);
 	return ret;
 }
 

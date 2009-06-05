@@ -30,6 +30,9 @@ extern "C"
 int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
                               /*@out@*/ char *tokenValue, int tokenIndice);
 
+int LTPBundleFindOptionalValueWithKey(const char *fileName,
+	const char *tokenKey, /*@out@*/ char *tokenValue, int tokenIndice);
+
 #ifdef __cplusplus
 }
 #endif
