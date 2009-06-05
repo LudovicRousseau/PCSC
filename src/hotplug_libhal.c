@@ -61,6 +61,7 @@ static struct _driverTracker
 	char *libraryPath;
 	char *readerName;
 	int ifdCapabilities;
+	char *CFBundleName;
 } *driverTracker = NULL;
 #define DRIVER_TRACKER_SIZE_STEP 8
 
@@ -176,6 +177,12 @@ static LONG HPReadBundleValues(void)
 					driverTracker[listCount].ifdCapabilities = strtol(keyValue,
 						NULL, 16);
 
+				/* Get CFBundleName */
+				rv = LTPBundleFindOptionalValueWithKey(fullPath,
+					PCSCLITE_HP_CFBUNDLE_NAME, keyValue, 0);
+				if (0 == rv)
+					driverTracker[listCount].CFBundleName = strdup(keyValue);
+
 #ifdef DEBUG_HOTPLUG
 				Log2(PCSC_LOG_INFO, "Found driver for: %s",
 					driverTracker[listCount].readerName);
@@ -214,6 +221,7 @@ static LONG HPReadBundleValues(void)
 						driverTracker[i].libraryPath = NULL;
 						driverTracker[i].readerName = NULL;
 						driverTracker[i].ifdCapabilities = 0;
+						driverTracker[i].CFBundleName = NULL;
 					}
 				}
 			}
@@ -276,6 +284,7 @@ LONG HPStopHotPluggables(void)
 	DBusError error;
 	int i;
 	unsigned int idVendor, idProduct;
+	static struct _driverTracker *classdriver, *driver;
 
 	if (!libhal_device_property_exists(ctx, udi, "usb.vendor_id", NULL))
 		return NULL;
@@ -306,6 +315,8 @@ LONG HPStopHotPluggables(void)
 
 	Log3(PCSC_LOG_DEBUG, "Looking a driver for VID: 0x%04X, PID: 0x%04X", idVendor, idProduct);
 
+	classdriver = NULL;
+	driver = NULL;
 	/* check if the device is supported by one driver */
 	for (i=0; i<driverSize; i++)
 	{
@@ -313,11 +324,21 @@ LONG HPStopHotPluggables(void)
 			idVendor == driverTracker[i].manuID &&
 			idProduct == driverTracker[i].productID)
 		{
-			return &driverTracker[i];
+			if ((driverTracker[i].CFBundleName != NULL)
+				&& (0 == strcmp(driverTracker[i].CFBundleName, "CCIDCLASSDRIVER")))
+				classdriver = &driverTracker[i];
+			else
+				/* it is not a CCID Class driver */
+				driver = &driverTracker[i];
 		}
 	}
 
-	return NULL;
+	/* if we found a specific driver */
+	if (driver)
+		return driver;
+
+	/* else return the Class driver */
+	return classdriver;
 }
 
 
