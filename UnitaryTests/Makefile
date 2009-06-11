@@ -9,6 +9,11 @@ endif
 CFLAGS := -Wall -O2 -g -DVERSION=\"$(VERSION)\" $(PCSC_CFLAGS)
 LDLIBS := $(PCSC_LDLIBS)
 
-all: SCardBeginTransaction \
+PROGRAMS := SCardBeginTransaction \
 	BufferOverflow \
 	pcsc_demo
+
+all: $(PROGRAMS)
+
+clean:
+	rm -f $(PROGRAMS)
