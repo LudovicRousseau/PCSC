@@ -2078,8 +2078,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/* Now we check all the Reader States */
 				dwState = rContext->readerState;
 
-				/* only if current state is not SCARD_STATE_EMPTY */
-				if (!(currReader->dwCurrentState & SCARD_STATE_EMPTY))
+				/* only if current state has an non null event counter */
+				if (currReader->dwCurrentState & 0xFFFF0000)
 				{
 					int currentCounter, stateCounter;
 
