@@ -2066,6 +2066,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				{
 					currReader->dwEventState |= SCARD_STATE_CHANGED;
 					currReader->dwEventState &= ~SCARD_STATE_UNKNOWN;
+					Log0(PCSC_LOG_DEBUG);
 					dwBreakFlag = 1;
 				}
 
@@ -2089,6 +2090,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (stateCounter != currentCounter)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 
@@ -2107,6 +2109,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					{
 						/* App thinks reader is in good state and it is not */
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 				}
@@ -2117,6 +2120,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					{
 						currReader->dwEventState &= ~SCARD_STATE_UNAVAILABLE;
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 				}
@@ -2154,6 +2158,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (currReader->dwCurrentState & SCARD_STATE_PRESENT)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 				}
@@ -2171,6 +2176,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (currReader->dwCurrentState & SCARD_STATE_EMPTY)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 
@@ -2180,6 +2186,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						if (!(currReader->dwCurrentState & SCARD_STATE_MUTE))
 						{
 							currReader->dwEventState |= SCARD_STATE_CHANGED;
+							Log0(PCSC_LOG_DEBUG);
 							dwBreakFlag = 1;
 						}
 					}
@@ -2189,6 +2196,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						if (currReader->dwCurrentState & SCARD_STATE_MUTE)
 						{
 							currReader->dwEventState |= SCARD_STATE_CHANGED;
+							Log0(PCSC_LOG_DEBUG);
 							dwBreakFlag = 1;
 						}
 					}
@@ -2202,6 +2210,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (currReader->dwCurrentState & SCARD_STATE_INUSE)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 				}
@@ -2215,6 +2224,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						if (currReader-> dwCurrentState & SCARD_STATE_EXCLUSIVE)
 						{
 							currReader->dwEventState |= SCARD_STATE_CHANGED;
+							Log0(PCSC_LOG_DEBUG);
 							dwBreakFlag = 1;
 						}
 					}
@@ -2227,12 +2237,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					if (currReader->dwCurrentState & SCARD_STATE_INUSE)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 					else if (currReader-> dwCurrentState
 						& SCARD_STATE_EXCLUSIVE)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
+						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
 				}
@@ -2244,6 +2256,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					 * once all the status's for all readers is met
 					 */
 					currReader->dwEventState |= SCARD_STATE_CHANGED;
+					Log0(PCSC_LOG_DEBUG);
 					dwBreakFlag = 1;
 				}
 			}	/* End of SCARD_STATE_UNKNOWN */
