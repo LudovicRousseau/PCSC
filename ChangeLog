@@ -1,3 +1,21 @@
+pcsc-lite-1.5.4: Ludovic Rousseau
+24 June 2009
+- SCardGetStatusChange() works again. It was broken in some cases since
+  version 1.5.2
+- detect buffer overflows if pcscd if used by a rogue client
+- force access rights on /var/run/pcscd to be sure it can be used by a
+  libpcsclite client without privileges
+- create the PCSCLITE_EVENTS_DIR directory with the sticky bit so only
+  root or the owner of the event files can remove them
+- if RFAddReader() fails with the libhal scheme then we try with the
+  (old) libusb scheme.  This patch should allow proprietary drivers to
+  work even if pcsc-lite is compiled with libhal support.
+- give a higher priority to a specific driver over the CCID Class
+  driver. This should allow proprietary drivers to be used instead of
+  libccid when possible
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.3: Ludovic Rousseau
 29 April 2009
 - SCardEstablishContext(): check we do not reuse an already allocated
