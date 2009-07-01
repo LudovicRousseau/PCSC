@@ -30,8 +30,8 @@ extern "C"
 		struct _ATR
 		{
 			DWORD Length;
-			UCHAR Value[MAX_ATR_SIZE];
 			DWORD HistoryLength;
+			UCHAR Value[MAX_ATR_SIZE];
 			UCHAR HistoryValue[MAX_ATR_SIZE];
 		}
 		ATR;
