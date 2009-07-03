@@ -1050,7 +1050,10 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 			rContext->dwPort, rContext->lpcDevice);
 		(void)RFUnBindFunctions(rContext);
 		(void)RFUnloadReader(rContext);
-		return SCARD_E_INVALID_TARGET;
+		if (IFD_NO_SUCH_DEVICE == rv)
+			return SCARD_E_UNKNOWN_READER;
+		else
+			return SCARD_E_INVALID_TARGET;
 	}
 
 	return SCARD_S_SUCCESS;

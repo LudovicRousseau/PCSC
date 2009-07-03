@@ -426,7 +426,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 
 	ret = RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName);
-	if (SCARD_S_SUCCESS != ret)
+	if ((SCARD_S_SUCCESS != ret) && (SCARD_E_UNKNOWN_READER != ret))
 	{
 		char *parent, *device_file;
 
