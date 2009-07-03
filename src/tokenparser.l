@@ -135,7 +135,7 @@ int LTPBundleFindOptionalValueWithKey(const char *fileName,
 		(void)yylex();
 	} while (!feof(file));
 
-	if (pcFinValue[0] == 0)
+	if ('\0' == pcFinValue[0])
 		ret = -1;
 	else
 		(void)strlcpy(tokenValue, pcFinValue, TOKEN_MAX_VALUE_SIZE);
