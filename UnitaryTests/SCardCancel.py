@@ -54,7 +54,10 @@ t.start()
 
 hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
 if hresult!=SCARD_S_SUCCESS and hresult!=SCARD_E_TIMEOUT:
-    raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
+    if SCARD_E_CANCELLED == hresult:
+        print "SCardGetStatusChange() cancelled"
+    else:
+        raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardReleaseContext(hcontext)
 if hresult!=SCARD_S_SUCCESS:
