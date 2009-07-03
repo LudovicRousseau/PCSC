@@ -168,7 +168,7 @@ int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
 		Log3(PCSC_LOG_CRITICAL, "Could not open bundle file %s: %s",
 			fileName, strerror(errno));
 
-	if (-1 == ret)
+	if ((-1 == ret) && (0 == tokenIndice))
 		/* Not defined at all */
 		Log3(PCSC_LOG_CRITICAL, "Value/Key not defined for: %s in %s",
 			tokenKey, fileName);
