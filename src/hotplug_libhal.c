@@ -31,9 +31,11 @@
 #include "hotplug.h"
 #include "thread_generic.h"
 #include "utils.h"
+#include "strlcpycat.h"
 
 #undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
+#define ADD_INTERFACE_NAME
 
 #define FALSE			0
 #define TRUE			1
@@ -347,6 +349,8 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	int i;
 	char deviceName[MAX_DEVICENAME];
 	struct _driverTracker *driver;
+	char *sSerialNumber = NULL, *sInterfaceName = NULL;
+	char fullname[MAX_READERNAME];
 	LONG ret;
 
 	driver = get_driver(ctx, udi);
@@ -387,22 +391,38 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 
 	readerTracker[i].udi = strdup(udi);
 
+#ifdef ADD_INTERFACE_NAME
+	if (libhal_device_property_exists(ctx, udi, "usb.interface.description", NULL))
+		sInterfaceName = libhal_device_get_property_string(ctx, udi,
+			"usb.interface.description", NULL);
+#endif
+
 #ifdef ADD_SERIAL_NUMBER
 	if (libhal_device_property_exists(ctx, udi, "usb.serial", NULL))
-	{
-		char fullname[MAX_READERNAME];
-		char *sSerialNumber;
-
 		sSerialNumber = libhal_device_get_property_string(ctx, udi,
 			"usb.serial", NULL);
-
-		(void)snprintf(fullname, sizeof(fullname), "%s (%s)",
-			driver->readerName, sSerialNumber);
-		readerTracker[i].fullName = strdup(fullname);
-	}
-	else
 #endif
-		readerTracker[i].fullName = strdup(driver->readerName);
+	
+	/* name from the Info.plist file */
+	strlcpy(fullname, driver->readerName, sizeof(fullname));
+
+	/* interface name from the device (if any) */
+	if (sInterfaceName)
+	{
+		strlcat(fullname, " [", sizeof(fullname));
+		strlcat(fullname, sInterfaceName, sizeof(fullname));
+		strlcat(fullname, "]", sizeof(fullname));
+	}
+
+	/* serial number from the device (if any) */
+	if (sSerialNumber)
+	{
+		strlcat(fullname, " (", sizeof(fullname));
+		strlcat(fullname, sSerialNumber, sizeof(fullname));
+		strlcat(fullname, ")", sizeof(fullname));
+	}
+
+	readerTracker[i].fullName = strdup(fullname);
 
 	ret = RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName);
