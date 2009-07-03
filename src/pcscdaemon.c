@@ -561,6 +561,7 @@ static void clean_temp_files(void)
 			strerror(errno));
 
 	(void)StatSynchronize(NULL);
+	SYS_Sleep(1);
 	rv = SYS_RemoveFile(PCSCLITE_EVENTS_DIR);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_EVENTS_DIR ": %s",
