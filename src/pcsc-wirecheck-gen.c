@@ -148,7 +148,7 @@ check_types (void)
     BLANK_LINE ();
     CHECK_STRUCT (establish_struct);
     CHECK_MEMBER (establish_struct, dwScope);
-    CHECK_MEMBER (establish_struct, phContext);
+    CHECK_MEMBER (establish_struct, hContext);
     CHECK_MEMBER (establish_struct, rv);
 
     BLANK_LINE ();
@@ -162,7 +162,7 @@ check_types (void)
     CHECK_MEMBER (connect_struct, szReader);
     CHECK_MEMBER (connect_struct, dwShareMode);
     CHECK_MEMBER (connect_struct, dwPreferredProtocols);
-    CHECK_MEMBER (connect_struct, phCard);
+    CHECK_MEMBER (connect_struct, hCard);
     CHECK_MEMBER (connect_struct, pdwActiveProtocol);
     CHECK_MEMBER (connect_struct, rv);
 

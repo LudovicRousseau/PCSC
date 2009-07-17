@@ -122,7 +122,7 @@ extern "C"
 	struct establish_struct
 	{
 		uint32_t dwScope;
-		uint32_t phContext;
+		uint32_t hContext;
 		uint32_t rv;
 	};
 	typedef struct establish_struct establish_struct;
@@ -150,7 +150,7 @@ extern "C"
 		char szReader[MAX_READERNAME];
 		uint32_t dwShareMode;
 		uint32_t dwPreferredProtocols;
-		int32_t phCard;
+		int32_t hCard;
 		uint32_t pdwActiveProtocol;
 		uint32_t rv;
 	};

@@ -513,7 +513,7 @@ again:
 	 * Try to establish an Application Context with the server
 	 */
 	scEstablishStruct.dwScope = dwScope;
-	scEstablishStruct.phContext = 0;
+	scEstablishStruct.hContext = 0;
 	scEstablishStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_ESTABLISH_CONTEXT, dwClientID,
@@ -537,12 +537,12 @@ again:
 		return scEstablishStruct.rv;
 
 	/* check we do not reuse an existing phContext */
-	if (-1 != SCardGetContextIndiceTH(scEstablishStruct.phContext))
+	if (-1 != SCardGetContextIndiceTH(scEstablishStruct.hContext))
 		/* we do not need to release the allocated context since
 		 * SCardReleaseContext() does nothing on the server side */
 		goto again;
 
-	*phContext = scEstablishStruct.phContext;
+	*phContext = scEstablishStruct.hContext;
 
 	/*
 	 * Allocate the new hContext - if allocator full return an error
@@ -784,7 +784,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.hContext = hContext;
 	scConnectStruct.dwShareMode = dwShareMode;
 	scConnectStruct.dwPreferredProtocols = dwPreferredProtocols;
-	scConnectStruct.phCard = 0;
+	scConnectStruct.hCard = 0;
 	scConnectStruct.pdwActiveProtocol = 0;
 	scConnectStruct.rv = SCARD_S_SUCCESS;
 
@@ -812,7 +812,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_F_COMM_ERROR;
 	}
 
-	*phCard = scConnectStruct.phCard;
+	*phCard = scConnectStruct.hCard;
 	*pdwActiveProtocol = scConnectStruct.pdwActiveProtocol;
 
 	if (scConnectStruct.rv == SCARD_S_SUCCESS)

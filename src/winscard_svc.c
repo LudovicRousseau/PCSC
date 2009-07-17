@@ -295,13 +295,13 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 	case SCARD_ESTABLISH_CONTEXT:
 		esStr = ((establish_struct *) msgStruct->data);
 
-		hContext = esStr->phContext;
+		hContext = esStr->hContext;
 		esStr->rv = SCardEstablishContext(esStr->dwScope, 0, 0, &hContext);
-		esStr->phContext = hContext;
+		esStr->hContext = hContext;
 
 		if (esStr->rv == SCARD_S_SUCCESS)
 			esStr->rv =
-				MSGAddContext(esStr->phContext, dwContextIndex);
+				MSGAddContext(esStr->hContext, dwContextIndex);
 		break;
 
 	case SCARD_RELEASE_CONTEXT:
@@ -317,19 +317,19 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 	case SCARD_CONNECT:
 		coStr = ((connect_struct *) msgStruct->data);
 
-		hCard = coStr->phCard;
+		hCard = coStr->hCard;
 		dwActiveProtocol = coStr->pdwActiveProtocol;
 
 		coStr->rv = SCardConnect(coStr->hContext, coStr->szReader,
 			coStr->dwShareMode, coStr->dwPreferredProtocols,
 			&hCard, &dwActiveProtocol);
 
-		coStr->phCard = hCard;
+		coStr->hCard = hCard;
 		coStr->pdwActiveProtocol = dwActiveProtocol;
 
 		if (coStr->rv == SCARD_S_SUCCESS)
 			coStr->rv =
-				MSGAddHandle(coStr->hContext, coStr->phCard, dwContextIndex);
+				MSGAddHandle(coStr->hContext, coStr->hCard, dwContextIndex);
 
 		break;
 
