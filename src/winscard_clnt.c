@@ -785,7 +785,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.dwShareMode = dwShareMode;
 	scConnectStruct.dwPreferredProtocols = dwPreferredProtocols;
 	scConnectStruct.hCard = 0;
-	scConnectStruct.pdwActiveProtocol = 0;
+	scConnectStruct.dwActiveProtocol = 0;
 	scConnectStruct.rv = SCARD_S_SUCCESS;
 
 	rv = WrapSHMWrite(SCARD_CONNECT, psContextMap[dwContextIndex].dwClientID,
@@ -813,7 +813,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	}
 
 	*phCard = scConnectStruct.hCard;
-	*pdwActiveProtocol = scConnectStruct.pdwActiveProtocol;
+	*pdwActiveProtocol = scConnectStruct.dwActiveProtocol;
 
 	if (scConnectStruct.rv == SCARD_S_SUCCESS)
 	{
@@ -959,7 +959,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		scReconnectStruct.dwShareMode = dwShareMode;
 		scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
 		scReconnectStruct.dwInitialization = dwInitialization;
-		scReconnectStruct.pdwActiveProtocol = *pdwActiveProtocol;
+		scReconnectStruct.dwActiveProtocol = *pdwActiveProtocol;
 		scReconnectStruct.rv = SCARD_S_SUCCESS;
 
 		rv = WrapSHMWrite(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
@@ -987,7 +987,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 	} while (SCARD_E_SHARING_VIOLATION == scReconnectStruct.rv);
 
-	*pdwActiveProtocol = scReconnectStruct.pdwActiveProtocol;
+	*pdwActiveProtocol = scReconnectStruct.dwActiveProtocol;
 
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
@@ -2431,7 +2431,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		scControlStructExtended->dwControlCode = dwControlCode;
 		scControlStructExtended->cbSendLength = cbSendLength;
 		scControlStructExtended->cbRecvLength = cbRecvLength;
-		scControlStructExtended->pdwBytesReturned = 0;
+		scControlStructExtended->dwBytesReturned = 0;
 		scControlStructExtended->rv = SCARD_S_SUCCESS;
 		/* The size of data to send is the size of
 		 * struct control_struct_extended WITHOUT the data[] field
@@ -2488,13 +2488,13 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 			 * Copy and zero it so any secret information is not leaked
 			 */
 			memcpy(pbRecvBuffer, scControlStructExtended -> data,
-				scControlStructExtended -> pdwBytesReturned);
+				scControlStructExtended -> dwBytesReturned);
 			memset(scControlStructExtended -> data, 0x00,
-				scControlStructExtended -> pdwBytesReturned);
+				scControlStructExtended -> dwBytesReturned);
 		}
 
 		if (NULL != lpBytesReturned)
-			*lpBytesReturned = scControlStructExtended -> pdwBytesReturned;
+			*lpBytesReturned = scControlStructExtended -> dwBytesReturned;
 
 		rv = scControlStructExtended -> rv;
 	}

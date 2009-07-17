@@ -163,7 +163,7 @@ check_types (void)
     CHECK_MEMBER (connect_struct, dwShareMode);
     CHECK_MEMBER (connect_struct, dwPreferredProtocols);
     CHECK_MEMBER (connect_struct, hCard);
-    CHECK_MEMBER (connect_struct, pdwActiveProtocol);
+    CHECK_MEMBER (connect_struct, dwActiveProtocol);
     CHECK_MEMBER (connect_struct, rv);
 
     BLANK_LINE ();
@@ -172,7 +172,7 @@ check_types (void)
     CHECK_MEMBER (reconnect_struct, dwShareMode);
     CHECK_MEMBER (reconnect_struct, dwPreferredProtocols);
     CHECK_MEMBER (reconnect_struct, dwInitialization);
-    CHECK_MEMBER (reconnect_struct, pdwActiveProtocol);
+    CHECK_MEMBER (reconnect_struct, dwActiveProtocol);
     CHECK_MEMBER (reconnect_struct, rv);
 
     BLANK_LINE ();
@@ -202,8 +202,8 @@ check_types (void)
     CHECK_MEMBER (status_struct, hCard);
     CHECK_MEMBER (status_struct, mszReaderNames);
     CHECK_MEMBER (status_struct, pcchReaderLen);
-    CHECK_MEMBER (status_struct, pdwState);
-    CHECK_MEMBER (status_struct, pdwProtocol);
+    CHECK_MEMBER (status_struct, dwState);
+    CHECK_MEMBER (status_struct, dwProtocol);
     CHECK_MEMBER (status_struct, pbAtr);
     CHECK_MEMBER (status_struct, pcbAtrLen);
     CHECK_MEMBER (status_struct, rv);

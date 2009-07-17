@@ -318,14 +318,14 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		coStr = ((connect_struct *) msgStruct->data);
 
 		hCard = coStr->hCard;
-		dwActiveProtocol = coStr->pdwActiveProtocol;
+		dwActiveProtocol = coStr->dwActiveProtocol;
 
 		coStr->rv = SCardConnect(coStr->hContext, coStr->szReader,
 			coStr->dwShareMode, coStr->dwPreferredProtocols,
 			&hCard, &dwActiveProtocol);
 
 		coStr->hCard = hCard;
-		coStr->pdwActiveProtocol = dwActiveProtocol;
+		coStr->dwActiveProtocol = dwActiveProtocol;
 
 		if (coStr->rv == SCARD_S_SUCCESS)
 			coStr->rv =
@@ -341,7 +341,7 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		rcStr->rv = SCardReconnect(rcStr->hCard, rcStr->dwShareMode,
 			rcStr->dwPreferredProtocols,
 			rcStr->dwInitialization, &dwActiveProtocol);
-		rcStr->pdwActiveProtocol = dwActiveProtocol;
+		rcStr->dwActiveProtocol = dwActiveProtocol;
 		break;
 
 	case SCARD_DISCONNECT:
@@ -383,8 +383,8 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		if (rv != 0) return rv;
 
 		cchReaderLen = stStr->pcchReaderLen;
-		dwState = stStr->pdwState;
-		dwProtocol = stStr->pdwProtocol;
+		dwState = stStr->dwState;
+		dwProtocol = stStr->dwProtocol;
 		cbAtrLen = stStr->pcbAtrLen;
 
 		/* avoids buffer overflow */
@@ -400,8 +400,8 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			&dwProtocol, stStr->pbAtr, &cbAtrLen);
 
 		stStr->pcchReaderLen = cchReaderLen;
-		stStr->pdwState = dwState;
-		stStr->pdwProtocol = dwProtocol;
+		stStr->dwState = dwState;
+		stStr->dwProtocol = dwProtocol;
 		stStr->pcbAtrLen = cbAtrLen;
 		break;
 
@@ -626,16 +626,16 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			else
 				memcpy(pbSendBuffer, cteStr->data, cteStr->cbSendLength);
 
-			dwBytesReturned = cteStr->pdwBytesReturned;
+			dwBytesReturned = cteStr->dwBytesReturned;
 
 			cteStr->rv = SCardControl(cteStr->hCard, cteStr->dwControlCode,
 				pbSendBuffer, cteStr->cbSendLength,
 				pbRecvBuffer, cteStr->cbRecvLength,
 				&dwBytesReturned);
 
-			cteStr->pdwBytesReturned = dwBytesReturned;
+			cteStr->dwBytesReturned = dwBytesReturned;
 
-			cteStr->size = sizeof(*cteStr) + cteStr->pdwBytesReturned;
+			cteStr->size = sizeof(*cteStr) + cteStr->dwBytesReturned;
 			if (cteStr->size > PCSCLITE_MAX_MESSAGE_SIZE)
 			{
 				/* two blocks */
@@ -659,7 +659,7 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			else
 			{
 				/* one block only */
-				memcpy(cteStr->data, pbRecvBuffer, cteStr->pdwBytesReturned);
+				memcpy(cteStr->data, pbRecvBuffer, cteStr->dwBytesReturned);
 
 				rv = SHMMessageSend(msgStruct, sizeof(*msgStruct),
 					psContext[dwContextIndex].dwClientID,

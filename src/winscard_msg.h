@@ -151,7 +151,7 @@ extern "C"
 		uint32_t dwShareMode;
 		uint32_t dwPreferredProtocols;
 		int32_t hCard;
-		uint32_t pdwActiveProtocol;
+		uint32_t dwActiveProtocol;
 		uint32_t rv;
 	};
 	typedef struct connect_struct connect_struct;
@@ -167,7 +167,7 @@ extern "C"
 		uint32_t dwShareMode;
 		uint32_t dwPreferredProtocols;
 		uint32_t dwInitialization;
-		uint32_t pdwActiveProtocol;
+		uint32_t dwActiveProtocol;
 		uint32_t rv;
 	};
 	typedef struct reconnect_struct reconnect_struct;
@@ -232,8 +232,8 @@ extern "C"
 		int32_t hCard;
 		char mszReaderNames[MAX_READERNAME];
 		uint32_t pcchReaderLen;
-		uint32_t pdwState;
-		uint32_t pdwProtocol;
+		uint32_t dwState;
+		uint32_t dwProtocol;
 		uint8_t pbAtr[MAX_ATR_SIZE];
 		uint32_t pcbAtrLen;
 		uint32_t rv;
@@ -309,7 +309,7 @@ extern "C"
 		uint32_t dwControlCode;
 		uint32_t cbSendLength;
 		uint32_t cbRecvLength;
-		uint32_t pdwBytesReturned;
+		uint32_t dwBytesReturned;
 		uint32_t rv;
 		uint64_t size;
 		uint8_t data[1];
