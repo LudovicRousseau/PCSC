@@ -248,12 +248,12 @@ extern "C"
 	struct transmit_struct
 	{
 		int32_t hCard;
-		uint32_t pioSendPciProtocol;
-		uint32_t pioSendPciLength;
+		uint32_t ioSendPciProtocol;
+		uint32_t ioSendPciLength;
 		uint8_t pbSendBuffer[MAX_BUFFER_SIZE];
 		uint32_t cbSendLength;
-		uint32_t pioRecvPciProtocol;
-		uint32_t pioRecvPciLength;
+		uint32_t ioRecvPciProtocol;
+		uint32_t ioRecvPciLength;
 		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
 		uint32_t pcbRecvLength;
 		uint32_t rv;
@@ -268,11 +268,11 @@ extern "C"
 	struct transmit_struct_extended
 	{
 		int32_t hCard;
-		uint32_t pioSendPciProtocol;
-		uint32_t pioSendPciLength;
+		uint32_t ioSendPciProtocol;
+		uint32_t ioSendPciLength;
 		uint32_t cbSendLength;
-		uint32_t pioRecvPciProtocol;
-		uint32_t pioRecvPciLength;
+		uint32_t ioRecvPciProtocol;
+		uint32_t ioRecvPciLength;
 		uint32_t pcbRecvLength;
 		uint32_t rv;
 		uint64_t size;

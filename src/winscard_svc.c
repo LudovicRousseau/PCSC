@@ -418,10 +418,10 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			break;
 		}
 
-		ioSendPci.dwProtocol = trStr->pioSendPciProtocol;
-		ioSendPci.cbPciLength = trStr->pioSendPciLength;
-		ioRecvPci.dwProtocol = trStr->pioRecvPciProtocol;
-		ioRecvPci.cbPciLength = trStr->pioRecvPciLength;
+		ioSendPci.dwProtocol = trStr->ioSendPciProtocol;
+		ioSendPci.cbPciLength = trStr->ioSendPciLength;
+		ioRecvPci.dwProtocol = trStr->ioRecvPciProtocol;
+		ioRecvPci.cbPciLength = trStr->ioRecvPciLength;
 		cbRecvLength = trStr->pcbRecvLength;
 
 		trStr->rv = SCardTransmit(trStr->hCard, &ioSendPci,
@@ -429,10 +429,10 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			&ioRecvPci, trStr->pbRecvBuffer,
 			&cbRecvLength);
 
-		trStr->pioSendPciProtocol = ioSendPci.dwProtocol;
-		trStr->pioSendPciLength = ioSendPci.cbPciLength;
-		trStr->pioRecvPciProtocol = ioRecvPci.dwProtocol;
-		trStr->pioRecvPciLength = ioRecvPci.cbPciLength;
+		trStr->ioSendPciProtocol = ioSendPci.dwProtocol;
+		trStr->ioSendPciLength = ioSendPci.cbPciLength;
+		trStr->ioRecvPciProtocol = ioRecvPci.dwProtocol;
+		trStr->ioRecvPciLength = ioRecvPci.cbPciLength;
 		trStr->pcbRecvLength = cbRecvLength;
 
 		break;
@@ -536,10 +536,10 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 			else
 				memcpy(pbSendBuffer, treStr->data, treStr->cbSendLength);
 
-			ioSendPci.dwProtocol = treStr->pioSendPciProtocol;
-			ioSendPci.cbPciLength = treStr->pioSendPciLength;
-			ioRecvPci.dwProtocol = treStr->pioRecvPciProtocol;
-			ioRecvPci.cbPciLength = treStr->pioRecvPciLength;
+			ioSendPci.dwProtocol = treStr->ioSendPciProtocol;
+			ioSendPci.cbPciLength = treStr->ioSendPciLength;
+			ioRecvPci.dwProtocol = treStr->ioRecvPciProtocol;
+			ioRecvPci.cbPciLength = treStr->ioRecvPciLength;
 			cbRecvLength = treStr->pcbRecvLength;
 
 			treStr->rv = SCardTransmit(treStr->hCard, &ioSendPci,
@@ -547,10 +547,10 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 				&ioRecvPci, pbRecvBuffer,
 				&cbRecvLength);
 
-			treStr->pioSendPciProtocol = ioSendPci.dwProtocol;
-			treStr->pioSendPciLength = ioSendPci.cbPciLength;
-			treStr->pioRecvPciProtocol = ioRecvPci.dwProtocol;
-			treStr->pioRecvPciLength = ioRecvPci.cbPciLength;
+			treStr->ioSendPciProtocol = ioSendPci.dwProtocol;
+			treStr->ioSendPciLength = ioSendPci.cbPciLength;
+			treStr->ioRecvPciProtocol = ioRecvPci.dwProtocol;
+			treStr->ioRecvPciLength = ioRecvPci.cbPciLength;
 			treStr->pcbRecvLength = cbRecvLength;
 
 			treStr->size = offsetof(transmit_struct_extended, data) + treStr->pcbRecvLength;

@@ -211,12 +211,12 @@ check_types (void)
     BLANK_LINE ();
     CHECK_STRUCT (transmit_struct);
     CHECK_MEMBER (transmit_struct, hCard);
-    CHECK_MEMBER (transmit_struct, pioSendPciProtocol);
-    CHECK_MEMBER (transmit_struct, pioSendPciLength);
+    CHECK_MEMBER (transmit_struct, ioSendPciProtocol);
+    CHECK_MEMBER (transmit_struct, ioSendPciLength);
     CHECK_MEMBER (transmit_struct, pbSendBuffer);
     CHECK_MEMBER (transmit_struct, cbSendLength);
-    CHECK_MEMBER (transmit_struct, pioRecvPciProtocol);
-    CHECK_MEMBER (transmit_struct, pioRecvPciLength);
+    CHECK_MEMBER (transmit_struct, ioRecvPciProtocol);
+    CHECK_MEMBER (transmit_struct, ioRecvPciLength);
     CHECK_MEMBER (transmit_struct, pbRecvBuffer);
     CHECK_MEMBER (transmit_struct, pcbRecvLength);
     CHECK_MEMBER (transmit_struct, rv);
