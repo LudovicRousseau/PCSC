@@ -224,6 +224,9 @@ wait_for_card_again:
 		case SCARD_PROTOCOL_T1:
 			pioSendPci = *SCARD_PCI_T1;
 			break;
+		case SCARD_PROTOCOL_RAW:
+			pioSendPci = *SCARD_PCI_RAW;
+			break;
 		default:
 			printf("Unknown protocol\n");
 			return -1;
