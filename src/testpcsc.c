@@ -241,7 +241,7 @@ wait_for_card_again:
 	printf("Testing SCardTransmit\t\t: ");
 	rv = SCardTransmit(hCard, &pioSendPci, bSendBuffer, send_length,
 		&pioRecvPci, bRecvBuffer, &length);
-	printf("%s\n", pcsc_stringify_error(rv));
+	test_rv(rv, hContext, PANIC);
 	printf(" card response:" GREEN);
 	for (i=0; i<length; i++)
 		printf(" %02X", bRecvBuffer[i]);
