@@ -443,7 +443,7 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 		if (rv != 0) return rv;
 
 		/* avoids buffer overflow */
-		if ((ctStr->dwBytesReturned > sizeof(ctStr->cbRecvLength))
+		if ((ctStr->cbRecvLength > sizeof(ctStr->pbRecvBuffer))
 			|| (ctStr->cbSendLength > sizeof(ctStr->pbSendBuffer)))
 		{
 			ctStr->rv = SCARD_E_INSUFFICIENT_BUFFER;
