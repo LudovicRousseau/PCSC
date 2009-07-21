@@ -434,6 +434,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					return SCARD_E_PROTO_MISMATCH;
 			}
 		}
+		else
+			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
 
 	*pdwActiveProtocol = rContext->readerState->cardProtocol;
@@ -762,6 +764,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					return SCARD_E_PROTO_MISMATCH;
 			}
 		}
+		else
+			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
 
 	*pdwActiveProtocol = rContext->readerState->cardProtocol;
