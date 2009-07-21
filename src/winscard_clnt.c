@@ -695,7 +695,8 @@ LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
  * - \ref SCARD_SHARE_DIRECT - Direct control of the reader, even without a
  *   card.  \ref SCARD_SHARE_DIRECT can be used before using SCardControl() to
  *   send control commands to the reader even if a card is not present in the
- *   reader.
+ *   reader. Contrary to Windows winscard behavior, the reader is accessed in
+ *   shared mode and not exclusive mode.
  * @param[in] dwPreferredProtocols Desired protocol use.
  * - \ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
  * - \ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
