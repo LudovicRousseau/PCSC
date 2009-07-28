@@ -1,3 +1,17 @@
+pcsc-lite-1.5.5: Ludovic Rousseau
+28 July 2009
+- add the reader interface name if provided by the device
+- SCardTransmit(): return SCARD_E_UNSUPPORTED_FEATURE if
+  SCARD_PROTOCOL_RAW is requested by unsupported
+- SCardConnect() and SCardReconnect(): set dwActiveProtocol to
+  SCARD_PROTOCOL_UNDEFINED if SCARD_SHARE_DIRECT is used (conform to
+  MSDN). Contrary to Windows winscard behavior, the reader is accessed in
+  shared mode and not exclusive mode if SCARD_SHARE_DIRECT is used.
+- SCardControl(): correctly check for buffer overflow (bug introduced in
+  pcsc-lite 1.5.4)
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.4: Ludovic Rousseau
 24 June 2009
 - SCardGetStatusChange() works again. It was broken in some cases since
