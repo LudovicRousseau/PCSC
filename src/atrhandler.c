@@ -250,4 +250,3 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 
 	return 1; /** @retval 1 Success */
 }
-
