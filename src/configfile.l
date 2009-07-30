@@ -68,7 +68,7 @@ int evaluatetoken(char *pcToken)
 	unsigned int n = 0;
 
 	if (pcPrevious == NULL)
-	{							/* This is the key */
+	{	/* This is the key */
 		pcPrevious = strdup(pcToken);
 		iOldLinenumber = iLinenumber;
 	}
@@ -92,7 +92,7 @@ int evaluatetoken(char *pcToken)
 				for (n = 0; n < strlen(pcCurrent); n++)
 				{
 					if (pcCurrent[n] != '"')
-					{			/* Strip off the quotes */
+					{	/* Strip off the quotes */
 						pcFriendlyname[p++] = pcCurrent[n];
 					}
 				}
@@ -255,5 +255,5 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 		return -1;
 	else
 		return 0;
-}								/* End of configfile.c */
+} /* End of configfile.c */
 
