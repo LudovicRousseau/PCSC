@@ -433,7 +433,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 		IFDH_icc_presence = rContext->psFunctions.psFunctions_v2.pvfICCPresence;
 #endif
 
-	/* LOCK THIS CODE REGION */ 
+	/* LOCK THIS CODE REGION */
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -492,7 +492,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 
 			dwTag = TAG_IFD_ATR;
 
-			/* LOCK THIS CODE REGION */ 
+			/* LOCK THIS CODE REGION */
 			(void)SYS_MutexLock(rContext->mMutex);
 
 			ucValue[0] = rContext->dwSlot;
@@ -617,7 +617,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 	IFDH_control = rContext->psFunctions.psFunctions_v3.pvfControl;
 #endif
 
-	/* LOCK THIS CODE REGION */ 
+	/* LOCK THIS CODE REGION */
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -680,7 +680,7 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 			rContext->psFunctions.psFunctions_v2.pvfTransmitToICC;
 #endif
 
-	/* LOCK THIS CODE REGION */ 
+	/* LOCK THIS CODE REGION */
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
