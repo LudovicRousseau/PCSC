@@ -42,10 +42,10 @@ void tok_error(char *pcToken_error);
 
 #.*                                       {}
 "\n"                                      { iLinenumber++; }
-(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { (void)evaluatetoken( yytext); }
+(\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { (void)evaluatetoken(yytext); }
 [ \t]                                     {}
-([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { (void)evaluatetoken( yytext ); }
-.                                         { tok_error( yytext ); }
+([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { (void)evaluatetoken(yytext); }
+.                                         { tok_error(yytext); }
 %%
 
 #include <stdio.h>
