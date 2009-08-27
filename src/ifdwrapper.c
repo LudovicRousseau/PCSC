@@ -647,6 +647,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 			return SCARD_E_READER_UNAVAILABLE;
 		}
 
+		if ((IFD_ERROR_NOT_SUPPORTED == rv) || (IFD_NOT_SUPPORTED == rv))
+			return SCARD_E_UNSUPPORTED_FEATURE;
+
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
