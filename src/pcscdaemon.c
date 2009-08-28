@@ -67,8 +67,6 @@ static void signal_trap(int);
 static void print_version (void);
 static void print_usage (char const * const);
 
-PCSCLITE_MUTEX usbNotifierMutex;
-
 /**
  * @brief The Server's Message Queue Listener function.
  *
@@ -116,11 +114,6 @@ static void SVCServiceRunLoop(void)
 	(void)signal(SIGPIPE, SIG_IGN);
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is existed */
-
-	/*
-	 * This function always returns zero
-	 */
-	rsp = SYS_MutexInit(&usbNotifierMutex);
 
 	/*
 	 * Set up the search for USB/PCMCIA devices

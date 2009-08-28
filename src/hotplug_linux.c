@@ -44,7 +44,7 @@
 #define TRUE			1
 
 char ReCheckSerialReaders = FALSE;
-extern PCSCLITE_MUTEX usbNotifierMutex;
+PCSCLITE_MUTEX usbNotifierMutex;
 
 struct usb_device_descriptor
 {
@@ -423,6 +423,7 @@ static LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
+	(void)SYS_MutexInit(&usbNotifierMutex);
 	return 0;
 }
 

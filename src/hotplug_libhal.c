@@ -42,7 +42,7 @@
 
 #define UDI_BASE "/org/freedesktop/Hal/devices/"
 
-extern PCSCLITE_MUTEX usbNotifierMutex;
+PCSCLITE_MUTEX usbNotifierMutex;
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
@@ -521,6 +521,8 @@ ULONG HPRegisterForHotplugEvents(void)
 	char **device_names;
     int i, num_devices;
 	DBusError error;
+
+	(void)SYS_MutexInit(&usbNotifierMutex);
 
 	if (driverSize <= 0)
 	{

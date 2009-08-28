@@ -52,7 +52,7 @@
 #define FALSE			0
 #define TRUE			1
 
-extern PCSCLITE_MUTEX usbNotifierMutex;
+PCSCLITE_MUTEX usbNotifierMutex;
 
 static PCSCLITE_THREAD_T usbNotifyThread;
 static int driverSize = -1;
@@ -570,6 +570,7 @@ static LONG HPRemoveHotPluggable(int reader_index)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
+	(void)SYS_MutexInit(&usbNotifierMutex);
 	return 0;
 }
 
