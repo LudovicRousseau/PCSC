@@ -421,7 +421,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
-				/* use negociated protocol */
+				/* use negotiated protocol */
 				rContext->readerState->cardProtocol = ret;
 
 				(void)SYS_MutexUnLock(rContext->mMutex);
@@ -751,7 +751,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
-				/* use negociated protocol */
+				/* use negotiated protocol */
 				rContext->readerState->cardProtocol = ret;
 
 				(void)SYS_MutexUnLock(rContext->mMutex);

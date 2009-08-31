@@ -67,7 +67,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 	/*
 	 * Locking is done in winscard.c SCardConnect() and SCardReconnect()
 	 *
-	 * This avoids to renegociate the protocol and confuse the card
+	 * This avoids to renegotiate the protocol and confuse the card
 	 * Error returned by CCID driver is: CCID_Receive Procedure byte conflict
 	 */
 
