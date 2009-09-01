@@ -563,6 +563,8 @@ static void clean_temp_files(void)
 
 static void signal_reload(/*@unused@*/ int sig)
 {
+	(void)signal(SIGUSR1, signal_reload);
+
 	(void)sig;
 
 	if (AraKiri)
