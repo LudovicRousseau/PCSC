@@ -206,8 +206,6 @@ typedef struct
 /** structure used with \ref FEATURE_IFD_PIN_PROPERTIES */
 typedef struct {
 	uint16_t wLcdLayout; /**< display characteristics */
-	uint16_t wLcdMaxCharacters;
-	uint16_t wLcdMaxLines;
 	uint8_t bEntryValidationCondition;
 	uint8_t bTimeOut2;
 } PIN_PROPERTIES_STRUCTURE;
