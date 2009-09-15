@@ -588,7 +588,10 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 */
 	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
+	{
+		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
+	}
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
@@ -2387,7 +2390,10 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	 */
 	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
 	if (rv == -1)
+	{
+		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
+	}
 
 	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
@@ -2938,6 +2944,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (rv == -1)
 	{
 		*pcbRecvLength = 0;
+		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
@@ -3226,7 +3233,10 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	 */
 	dwContextIndex = SCardGetContextIndice(hContext);
 	if (dwContextIndex == -1)
+	{
+		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
+	}
 
 	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
 
