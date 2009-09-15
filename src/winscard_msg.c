@@ -133,7 +133,7 @@ INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
  * @param[in] buffer_void Message to be sent.
  * @param[in] buffer_size Size of the message to send
  * @param[in] filedes Socket handle.
- * @param[in] blockAmount Timeout in milliseconds.
+ * @param[in] timeOut Timeout in milliseconds.
  *
  * @retval 0 Success
  * @retval -1 Timeout.
@@ -141,7 +141,7 @@ INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
  * @retval -1 A signal was received.
  */
 INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
-	int32_t filedes, int32_t blockAmount)
+	int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
 
@@ -171,7 +171,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 		FD_SET(filedes, &write_fd);
 
 		timeout.tv_usec = 0;
-		if ((timeout.tv_sec = start + blockAmount - time(0)) < 0)
+		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
 		{
 			/*
 			 * we already timed out
@@ -258,7 +258,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  * @param[out] buffer_void Message read.
  * @param[in] buffer_size Size to read
  * @param[in] filedes Socket handle.
- * @param[in] blockAmount Timeout in milliseconds.
+ * @param[in] timeOut Timeout in milliseconds.
  *
  * @retval 0 Success.
  * @retval -1 Timeout.
@@ -266,7 +266,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  * @retval -1 A signal was received.
  */
 INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
-	int32_t filedes, int32_t blockAmount)
+	int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
 
@@ -296,7 +296,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 		FD_SET(filedes, &read_fd);
 
 		timeout.tv_usec = 0;
-		if ((timeout.tv_sec = start + blockAmount - time(0)) < 0)
+		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
 		{
 			/*
 			 * we already timed out
@@ -404,13 +404,13 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
  * @param[in] command Command to be sent.
  * @param[in] dwClientID Client socket handle.
  * @param[in] size Size of the message (\p data).
- * @param[in] blockAmount Timeout to the operation in ms.
+ * @param[in] timeOut Timeout to the operation in ms.
  * @param[in] data_void Data to be sent.
  *
  * @return Same error codes as SHMMessageSend().
  */
 INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
-	uint64_t size, uint32_t blockAmount, void *data_void)
+	uint64_t size, uint32_t timeOut, void *data_void)
 {
 	char *data = data_void;
 
@@ -441,14 +441,14 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
 		}
 
 		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
-			blockAmount);
+			timeOut);
 
 		/* do not send an empty second block */
 		if ((0 == ret) && (size > sizeof(msgStruct.data)))
 		{
 			/* second block */
 			ret = SHMMessageSend(data+sizeof(msgStruct.data),
-				size-sizeof(msgStruct.data), dwClientID, blockAmount);
+				size-sizeof(msgStruct.data), dwClientID, timeOut);
 		}
 	}
 	else
@@ -456,7 +456,7 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
 		memcpy(msgStruct.data, data, size);
 
 		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
-			blockAmount);
+			timeOut);
 	}
 
 	if (SCARD_TRANSMIT == command)
