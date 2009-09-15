@@ -239,7 +239,7 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 
 	*phContext = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
 
-	Log2(PCSC_LOG_DEBUG, "Establishing Context: %d", *phContext);
+	Log2(PCSC_LOG_DEBUG, "Establishing Context: 0x%X", *phContext);
 
 	return SCARD_S_SUCCESS;
 }
@@ -250,7 +250,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 * Nothing to do here RPC layer will handle this
 	 */
 
-	Log2(PCSC_LOG_DEBUG, "Releasing Context: %d", hContext);
+	Log2(PCSC_LOG_DEBUG, "Releasing Context: 0x%X", hContext);
 
 	return SCARD_S_SUCCESS;
 }
