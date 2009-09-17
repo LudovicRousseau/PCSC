@@ -1840,7 +1840,7 @@ exit:
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
- * @param[in] dwTimeout Maximum waiting time (in miliseconds) for status
+ * @param[in] dwTimeout Maximum waiting time (in milliseconds) for status
  *            change, zero (or \ref INFINITE) for infinite.
  * @param rgReaderStates [inout] Structures of readers with current states.
  * @param[in] cReaders Number of structures.
