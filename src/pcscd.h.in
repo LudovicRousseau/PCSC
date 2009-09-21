@@ -44,7 +44,6 @@
 #define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
 #define PCSCLITE_LOCK_POLL_RATE		100000		/**< Lock polling rate */
 #define PCSCLITE_MSG_KEY_LEN		16		/**< App ID key length */
-#define PCSCLITE_RW_ATTEMPTS		100		/**< Attempts to rd/wrt */
 
 /** Maximum applications */
 #define PCSCLITE_MAX_APPLICATIONS			16
