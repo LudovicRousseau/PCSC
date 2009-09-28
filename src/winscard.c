@@ -1652,7 +1652,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	tempRxLength = dwRxLength;
 
-	if (pioSendPci->dwProtocol == SCARD_PROTOCOL_RAW)
+	if ((pioSendPci->dwProtocol == SCARD_PROTOCOL_RAW)
+		&& (rContext->dwVersion == IFD_HVERSION_2_0))
 	{
 		rv = IFDControl_v2(rContext, (PUCHAR) pbSendBuffer, cbSendLength,
 			pbRecvBuffer, &dwRxLength);
