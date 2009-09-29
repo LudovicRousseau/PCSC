@@ -26,5 +26,7 @@ int StatSynchronizeContext(SCARDCONTEXT hContext);
 
 int CheckForOpenCT(void);
 
+long int time_sub(struct timeval *a, struct timeval *b);
+
 #endif
 

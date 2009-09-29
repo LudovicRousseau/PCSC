@@ -50,21 +50,6 @@
 #define FALSE 0
 #endif
 
-/* r = a - b */
-static long int time_sub(struct timeval *a, struct timeval *b)
-{
-	struct timeval r;
-	r.tv_sec = a -> tv_sec - b -> tv_sec;
-	r.tv_usec = a -> tv_usec - b -> tv_usec;
-	if (r.tv_usec < 0)
-	{
-		r.tv_sec--;
-		r.tv_usec += 1000000;
-	}
-
-	return r.tv_sec * 1000000 + r.tv_usec;
-} /* time_sub */
-
 
 #undef DO_PROFILE
 #ifdef DO_PROFILE
