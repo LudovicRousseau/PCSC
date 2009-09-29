@@ -56,10 +56,6 @@
 /** Maximum channels on an application context */
 #define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS	16
 
-/* PCSCLITE_MAX_READERS is deprecated
- * use PCSCLITE_MAX_READERS_CONTEXTS instead */
-/* extern int PCSCLITE_MAX_READERS __attribute__ ((deprecated)); */
-
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
 #define MAX_LIBNAME			100
 #define MAX_DEVICENAME		255
