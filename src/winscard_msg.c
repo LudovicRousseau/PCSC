@@ -427,7 +427,6 @@ INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
 	msgStruct.group_id = SYS_GetGID();
 	msgStruct.command = command;
 	msgStruct.date = time(NULL);
-	memset(msgStruct.key, 0, sizeof(msgStruct.key));
 	if ((SCARD_TRANSMIT_EXTENDED == command)
 		|| (SCARD_CONTROL_EXTENDED == command))
 	{

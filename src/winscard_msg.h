@@ -59,7 +59,6 @@ extern "C"
 		uint32_t group_id;
 		uint32_t command;	/** one of the \c pcsc_msg_commands */
 		uint64_t date;
-		unsigned char key[PCSCLITE_MSG_KEY_LEN]; /* 16 bytes */
 		union
 		{
 			unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];

@@ -81,7 +81,6 @@ check_constants (void)
     CHECK_DEFINE (PROTOCOL_VERSION_MINOR);
 
     BLANK_LINE ();
-    CHECK_DEFINE (PCSCLITE_MSG_KEY_LEN);
     CHECK_DEFINE (PCSCLITE_MAX_MESSAGE_SIZE);
 
     BLANK_LINE ();
@@ -132,7 +131,6 @@ check_types (void)
     CHECK_MEMBER (rxSharedSegment, group_id);
     CHECK_MEMBER (rxSharedSegment, command);
     CHECK_MEMBER (rxSharedSegment, date);
-    CHECK_MEMBER (rxSharedSegment, key);
     CHECK_MEMBER (rxSharedSegment, data);
 
     BLANK_LINE ();
