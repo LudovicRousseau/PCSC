@@ -1895,6 +1895,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		if (0 == nbNonIgnoredReaders)
 			return SCARD_S_SUCCESS;
 	}
+	else
+		/* reader list is empty */
+		return SCARD_S_SUCCESS;
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
@@ -1916,55 +1919,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/*
-	 * Application is waiting for a reader - return the first available
-	 * reader
-	 * This is DEPRECATED. Use the special reader name \\?PnP?\Notification
-	 * instead
-	 */
-	if (cReaders == 0)
-	{
-		while (1)
-		{
-			int i;
-
-			rv = SCardCheckDaemonAvailability();
-			if (rv != SCARD_S_SUCCESS)
-				goto end;
-
-			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-			{
-				if ((readerStates[i])->readerID != 0)
-				{
-					/* Reader was found */
-					rv = SCARD_S_SUCCESS;
-					goto end;
-				}
-			}
-
-			if (dwTimeout == 0)
-			{
-				/* return immediately - no reader available */
-				rv = SCARD_E_READER_UNAVAILABLE;
-				goto end;
-			}
-
-			dwTime = WaitForPcscdEvent(hContext, dwTime);
-			if (dwTimeout != INFINITE)
-			{
-				if (dwTime <= 0)
-				{
-					rv = SCARD_E_TIMEOUT;
-					goto end;
-				}
-			}
-		}
-	}
-
-	/*
-	 * End of search for readers
-	 */
 
 	/* Clear the event state for all readers */
 	for (j = 0; j < cReaders; j++)
