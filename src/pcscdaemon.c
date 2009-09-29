@@ -457,7 +457,9 @@ int main(int argc, char **argv)
 	/*
 	 * Allocate memory for reader structures
 	 */
-	(void)RFAllocateReaderSpace();
+	rv = RFAllocateReaderSpace();
+	if (SCARD_S_SUCCESS != rv)
+		at_exit();
 
 	/*
 	 * Grab the information from the reader.conf
