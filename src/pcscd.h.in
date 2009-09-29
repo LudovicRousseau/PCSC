@@ -62,7 +62,6 @@
 
 #define PCSCLITE_MAX_THREADS		16	/**< Stat change threads */
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
-#define PCSCLITE_TRANSACTION_TIMEOUT	40	/**< Transaction timeout */
 #define MAX_LIBNAME			100
 #define MAX_DEVICENAME		255
 
