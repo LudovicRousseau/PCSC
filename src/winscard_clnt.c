@@ -16,6 +16,33 @@
  * forwarding requests over message queues.
  *
  * Here is exposed the API for client applications.
+ *
+ * @attention
+ * Known differences with Microsoft Windows WinSCard implementation:
+ *
+ * -# SCardStatus()
+ *    @par
+ *    SCardStatus() returns a bit field on pcsc-lite but a enumeration on
+ *    Windows.
+ *    @par
+ *    This difference may be resolved in a future version of pcsc-lite.
+ *    The bit-fields would then only contain one bit set.
+ *    @par
+ *    You can have a @b portable code using:
+ *    @code
+ *    if (dwState & SCARD_PRESENT)
+ *    {
+ *      // card is present 
+ *    }
+ *    @endcode
+ * -# \ref SCARD_E_UNSUPPORTED_FEATURE
+ *    @par
+ *    Windows may return ERROR_NOT_SUPPORTED instead of
+ *    SCARD_E_UNSUPPORTED_FEATURE
+ *    @par
+ *    This difference will not be corrected. pcsc-lite only uses
+ *    SCARD_E_* error codes.
+ *
  */
 
 #include "config.h"
