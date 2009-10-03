@@ -42,7 +42,12 @@
  *    @par
  *    This difference will not be corrected. pcsc-lite only uses
  *    SCARD_E_* error codes.
- *
+ * -# SCardConnect()
+ *    @par
+ *    If \ref SCARD_SHARE_DIRECT is used the reader is accessed in
+ *    shared mode (like with \ref SCARD_SHARE_SHARED) and not in
+ *    exclusive mode (like with \ref SCARD_SHARE_EXCLUSIVE) as on
+ *    Windows.
  */
 
 #include "config.h"
