@@ -53,13 +53,15 @@ t = threading.Thread(target=cancel)
 t.start()
 
 hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
+print "SCardGetStatusChange()", SCardGetErrorMessage(hresult)
 if hresult!=SCARD_S_SUCCESS and hresult!=SCARD_E_TIMEOUT:
     if SCARD_E_CANCELLED == hresult:
-        print "SCardGetStatusChange() cancelled"
+        pass
     else:
         raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardReleaseContext(hcontext)
+print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
 if hresult!=SCARD_S_SUCCESS:
 	raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
 
