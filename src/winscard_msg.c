@@ -167,9 +167,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 		timeout.tv_usec = 0;
 		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
 		{
-			/*
-			 * we already timed out
-			 */
+			/* we already timed out */
 			retval = -1;
 			break;
 		}
@@ -272,9 +270,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 		timeout.tv_usec = 0;
 		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
 		{
-			/*
-			 * we already timed out
-			 */
+			/* we already timed out */
 			retval = -1;
 			break;
 		}
