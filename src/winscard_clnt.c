@@ -368,7 +368,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 {
 	LONG rv;
 	int i;
-	establish_struct scEstablishStruct;
+	struct establish_struct scEstablishStruct;
 	uint32_t dwClientID = 0;
 
 	(void)pvReserved1;
@@ -441,7 +441,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	}
 
 	{	/* exchange client/server protocol versions */
-		version_struct veStr;
+		struct version_struct veStr;
 
 		veStr.major = PROTOCOL_VERSION_MAJOR;
 		veStr.minor = PROTOCOL_VERSION_MINOR;
@@ -533,7 +533,7 @@ again:
 LONG SCardReleaseContext(SCARDCONTEXT hContext)
 {
 	LONG rv;
-	release_struct scReleaseStruct;
+	struct release_struct scReleaseStruct;
 	LONG dwContextIndex;
 
 	PROFILE_START
@@ -695,7 +695,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	connect_struct scConnectStruct;
+	struct connect_struct scConnectStruct;
 	LONG dwContextIndex;
 
 	PROFILE_START
@@ -865,7 +865,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	reconnect_struct scReconnectStruct;
+	struct reconnect_struct scReconnectStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
@@ -993,7 +993,7 @@ end:
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	disconnect_struct scDisconnectStruct;
+	struct disconnect_struct scDisconnectStruct;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -1095,7 +1095,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
 
 	LONG rv;
-	begin_struct scBeginStruct;
+	struct begin_struct scBeginStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
@@ -1230,7 +1230,7 @@ end:
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	end_struct scEndStruct;
+	struct end_struct scEndStruct;
 	int randnum, i;
 	DWORD dwContextIndex, dwChannelIndex;
 
@@ -1334,7 +1334,7 @@ end:
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
-	cancel_transaction_struct scCancelStruct;
+	struct cancel_transaction_struct scCancelStruct;
 	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
@@ -1510,7 +1510,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	DWORD dwReaderLen, dwAtrLen;
 	LONG rv;
 	int i;
-	status_struct scStatusStruct;
+	struct status_struct scStatusStruct;
 	DWORD dwContextIndex, dwChannelIndex;
 	char *r;
 	char *bufReader = NULL;

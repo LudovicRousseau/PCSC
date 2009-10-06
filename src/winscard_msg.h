@@ -39,7 +39,6 @@ extern "C"
 		int32_t minor;	/**< IPC minor \ref PROTOCOL_VERSION_MINOR */
 		uint32_t rv;
 	};
-	typedef struct version_struct version_struct;
 
 	/**
 	 * @brief header structure for client/server message data exchange.
@@ -81,7 +80,6 @@ extern "C"
 	{
 		uint32_t hContext;
 	};
-	typedef struct client_struct client_struct;
 
 	/**
 	 * @brief Information contained in \ref CMD_WAIT_READER_STATE_CHANGE Messages.
@@ -103,7 +101,6 @@ extern "C"
 		uint32_t hContext;
 		uint32_t rv;
 	};
-	typedef struct establish_struct establish_struct;
 
 	/**
 	 * @brief Information contained in \ref SCARD_RELEASE_CONTEXT Messages.
@@ -115,7 +112,6 @@ extern "C"
 		uint32_t hContext;
 		uint32_t rv;
 	};
-	typedef struct release_struct release_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_CONNECT Messages.
@@ -132,7 +128,6 @@ extern "C"
 		uint32_t dwActiveProtocol;
 		uint32_t rv;
 	};
-	typedef struct connect_struct connect_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_RECONNECT Messages.
@@ -148,7 +143,6 @@ extern "C"
 		uint32_t dwActiveProtocol;
 		uint32_t rv;
 	};
-	typedef struct reconnect_struct reconnect_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_DISCONNECT Messages.
@@ -161,7 +155,6 @@ extern "C"
 		uint32_t dwDisposition;
 		uint32_t rv;
 	};
-	typedef struct disconnect_struct disconnect_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_BEGIN_TRANSACTION Messages.
@@ -173,7 +166,6 @@ extern "C"
 		int32_t hCard;
 		uint32_t rv;
 	};
-	typedef struct begin_struct begin_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_END_TRANSACTION Messages.
@@ -186,7 +178,6 @@ extern "C"
 		uint32_t dwDisposition;
 		uint32_t rv;
 	};
-	typedef struct end_struct end_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_CANCEL Messages.
@@ -198,7 +189,6 @@ extern "C"
 		int32_t hContext;
 		uint32_t rv;
 	};
-	typedef struct cancel_struct cancel_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_CANCEL_TRANSACTION Messages.
@@ -210,7 +200,6 @@ extern "C"
 		int32_t hCard;
 		uint32_t rv;
 	};
-	typedef struct cancel_transaction_struct cancel_transaction_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_STATUS Messages.
@@ -228,7 +217,6 @@ extern "C"
 		uint32_t pcbAtrLen;
 		uint32_t rv;
 	};
-	typedef struct status_struct status_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_TRANSMIT Messages.
@@ -246,7 +234,6 @@ extern "C"
 		uint32_t pcbRecvLength;
 		uint32_t rv;
 	};
-	typedef struct transmit_struct transmit_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_CONTROL Messages.
@@ -262,7 +249,6 @@ extern "C"
 		uint32_t dwBytesReturned;
 		uint32_t rv;
 	};
-	typedef struct control_struct_extended control_struct_extended;
 
 	/**
 	 * @brief contained in \ref SCARD_GET_ATTRIB and \c  Messages.
@@ -277,7 +263,6 @@ extern "C"
 		uint32_t cbAttrLen;
 		uint32_t rv;
 	};
-	typedef struct getset_struct getset_struct;
 
 	/*
 	 * Now some function definitions
