@@ -114,6 +114,15 @@ extern "C"
 	typedef struct client_struct client_struct;
 
 	/**
+	 * @brief Information contained in \ref CMD_WAIT_READER_STATE_CHANGE Messages.
+	 */
+	struct wait_reader_state_change
+	{
+		uint32_t timeOut;	/**< timeout in ms */
+		uint32_t rv;
+	};
+
+	/**
 	 * @brief Information contained in \ref SCARD_ESTABLISH_CONTEXT Messages.
 	 *
 	 * These data are passed throw the field \c sharedSegmentMsg.data.
