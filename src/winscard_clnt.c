@@ -216,13 +216,6 @@ static pid_t daemon_pid = 0;
 static pid_t client_pid = 0;
 
 /**
- * Memory mapped address used to read status information about the readers.
- * Each element in the vector \ref readerStates makes references to a part of
- * the memory mapped.
- */
-static int mapAddr = 0;
-
-/**
  * Ensure that some functions be accessed in thread-safe mode.
  * These function's names finishes with "TH".
  */
@@ -3713,37 +3706,6 @@ LONG SCardCheckDaemonAvailability(void)
 	client_pid = getpid();
 
 	return SCARD_S_SUCCESS;
-}
-
-/**
- * @brief Free resources allocated by the library
- *
- * You _shall_ call this function if you use dlopen/dlclose to load/unload the
- * library. Otherwise you will exhaust the ressources available.
- */
-#ifdef __SUNPRO_C
-#pragma fini (SCardUnload)
-#endif
-
-void DESTRUCTOR SCardUnload(void)
-{
-	int i;
-
-	if (!isExecuted)
-		return;
-
-	/* unmap public shared file from memory */
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
-	{
-		if (readerStates[i] != NULL)
-		{
-			SYS_PublicMemoryUnmap(readerStates[i], sizeof(READER_STATE));
-			readerStates[i] = NULL;
-		}
-	}
-
-	(void)SYS_CloseFile(mapAddr);
-	isExecuted = 0;
 }
 
 static LONG getReaderStates(LONG dwContextIndex)
