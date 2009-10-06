@@ -36,10 +36,71 @@
 #include "prothandler.h"
 #include "strlcpycat.h"
 #include "utils.h"
+#include "winscard_svc.h"
+#include "simclist.h"
 
 static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
+PCSCLITE_MUTEX_T ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
 static void EHStatusHandlerThread(PREADER_CONTEXT);
+
+LONG EHRegisterClientForEvent(int32_t filedes)
+{
+	SYS_MutexLock(ClientsWaitingForEvent_lock);
+
+	list_append(&ClientsWaitingForEvent, &filedes);
+	
+	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+
+	return SCARD_S_SUCCESS;
+} /* EHRegisterClientForEvent */
+
+LONG EHUnregisterClientForEvent(int32_t filedes)
+{
+	LONG rv = SCARD_S_SUCCESS;
+	int pos, ret;
+
+	SYS_MutexLock(ClientsWaitingForEvent_lock);
+
+	pos = list_locate(&ClientsWaitingForEvent, &filedes);
+	ret = list_delete_at(&ClientsWaitingForEvent, pos);
+	
+	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+	
+	if (ret < 0)
+	{
+		Log2(PCSC_LOG_ERROR, "Can't remove client: %d", filedes);
+		rv = SCARD_F_INTERNAL_ERROR;
+	}
+
+	return rv;
+} /* EHUnregisterClientForEvent */
+
+/**
+ * Sends an asynchronous event to any waiting client
+ */
+LONG EHSignalEventToClients(void)
+{
+	LONG rv = SCARD_S_SUCCESS;
+	int32_t filedes;
+
+	SYS_MutexLock(ClientsWaitingForEvent_lock);
+
+	list_iterator_start(&ClientsWaitingForEvent);
+	while (list_iterator_hasnext(&ClientsWaitingForEvent))
+	{
+        filedes = *(int32_t *)list_iterator_next(&ClientsWaitingForEvent);
+		rv = MSGSignalClient(filedes, SCARD_S_SUCCESS);
+	}
+	list_iterator_stop(&ClientsWaitingForEvent);
+
+	list_clear(&ClientsWaitingForEvent);
+
+	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+
+	return rv;
+} /* EHSignalEventToClients */
 
 LONG EHInitializeEventStructures(void)
 {

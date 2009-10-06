@@ -42,6 +42,9 @@ extern "C"
 	}
 	READER_STATE, *PREADER_STATE;
 
+	LONG EHRegisterClientForEvent(int32_t filedes);
+	LONG EHUnregisterClientForEvent(int32_t filedes); 
+	LONG EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
 	LONG EHSpawnEventHandler(PREADER_CONTEXT,
 		/*@null@*/ RESPONSECODE (*)(DWORD));
