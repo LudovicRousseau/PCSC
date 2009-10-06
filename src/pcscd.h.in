@@ -39,6 +39,8 @@
 #define PCSCLITE_INFINITE_TIMEOUT	4320000		/**< 50 day infinite t/o */
 
 #define PCSCLITE_VERSION_NUMBER		"@VERSION@"	/**< Current version */
+#define PCSCLITE_WRITE_TIMEOUT	1000			/**< write timeout */
+#define PCSCLITE_READ_TIMEOUT	120*1000		/**< read timeout */
 #define PCSCLITE_CLIENT_ATTEMPTS	120		/**< Attempts to reach sv */
 #define PCSCLITE_MCLIENT_ATTEMPTS	20		/**< Attempts to reach sv */
 #define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
