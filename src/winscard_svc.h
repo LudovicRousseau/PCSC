@@ -23,6 +23,7 @@ extern "C"
 #endif
 	LONG ContextsInitialize(void);
 	LONG CreateContextThread(uint32_t *);
+	LONG MSGSignalClient(uint32_t filedes, LONG rv);
 #ifdef __cplusplus
 }
 #endif

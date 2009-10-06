@@ -115,6 +115,14 @@ LONG CreateContextThread(uint32_t *pdwClientID)
  * connections
  */
 
+#define READ_BODY(v) \
+	if (header.size != sizeof(v)) {printf("%d %d\n", header.size, sizeof(v)); goto wrong_length;} \
+	ret = SHMMessageReceive(&v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
+	if (-1 == ret) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
+
+#define WRITE_BODY(v) \
+	ret = SHMMessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
+
 /**
  * @brief Handles messages received from Clients.
  *
@@ -677,6 +685,19 @@ static LONG MSGFunctionDemarshall(psharedSegmentMsg msgStruct,
 
 	return 0;
 }
+
+LONG MSGSignalClient(uint32_t filedes, LONG rv)
+{
+	uint32_t ret;
+	struct wait_reader_state_change waStr;
+
+	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
+
+	waStr.rv = rv;
+	WRITE_BODY(waStr)
+
+	return ret;
+} /* MSGSignalClient */
 
 static LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
 {
