@@ -72,6 +72,8 @@ pcscd_SOURCES = \
 	prothandler.h \
 	readerfactory.c \
 	readerfactory.h \
+	simclist.c \
+	simclist.h \
 	strlcat.c \
 	strlcpy.c \
 	strlcpycat.h \
@@ -89,7 +91,7 @@ pcscd_SOURCES = \
 	winscard_svc.c \
 	winscard_svc.h
 pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBHAL_CFLAGS) \
-	-DPCSCD
+	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
