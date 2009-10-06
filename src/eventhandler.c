@@ -39,7 +39,7 @@
 #include "winscard_svc.h"
 #include "simclist.h"
 
-static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 PCSCLITE_MUTEX_T ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
@@ -104,59 +104,29 @@ LONG EHSignalEventToClients(void)
 
 LONG EHInitializeEventStructures(void)
 {
-	int fd, i, pageSize;
-	int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+	int i;
 
-	fd = 0;
-	i = 0;
-	pageSize = 0;
-
-	(void)SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
-
-	fd = SYS_OpenFile(PCSCLITE_PUBSHM_FILE, O_RDWR | O_CREAT, mode);
-	if (fd < 0)
-	{
-		Log3(PCSC_LOG_CRITICAL, "Cannot create public shared file %s: %s",
-			PCSCLITE_PUBSHM_FILE, strerror(errno));
-		exit(1);
-	}
-
-	/* set correct mode even is umask is too restictive */
-	(void)SYS_Chmod(PCSCLITE_PUBSHM_FILE, mode);
-
-	pageSize = SYS_GetPageSize();
-
-	/*
-	 * Jump to end of file space and allocate zero's
-	 */
-	(void)SYS_SeekFile(fd, pageSize * PCSCLITE_MAX_READERS_CONTEXTS);
-	(void)SYS_WriteFile(fd, "", 1);
-
-	/*
-	 * Allocate each reader structure
-	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		readerStates[i] = (PREADER_STATE)
-			SYS_MemoryMap(sizeof(READER_STATE), fd, (i * pageSize));
-		if (readerStates[i] == MAP_FAILED)
-		{
-			Log3(PCSC_LOG_CRITICAL, "Cannot memory map public shared file %s: %s",
-				PCSCLITE_PUBSHM_FILE, strerror(errno));
-			exit(1);
-		}
-
-		/*
-		 * Zero out each value in the struct
-		 */
-		memset((readerStates[i])->readerName, 0, MAX_READERNAME);
-		memset((readerStates[i])->cardAtr, 0, MAX_ATR_SIZE);
-		(readerStates[i])->readerID = 0;
-		(readerStates[i])->readerState = 0;
-		(readerStates[i])->readerSharing = 0;
-		(readerStates[i])->cardAtrLength = 0;
-		(readerStates[i])->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		/* Zero out each value in the struct */
+		memset(readerStates[i].readerName, 0, MAX_READERNAME);
+		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
+		readerStates[i].readerID = 0;
+		readerStates[i].readerState = 0;
+		readerStates[i].readerSharing = 0;
+		readerStates[i].cardAtrLength = 0;
+		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
+
+	list_init(&ClientsWaitingForEvent);
+
+	/* request to store copies, and provide the metric function */
+    list_attributes_copy(&ClientsWaitingForEvent, list_meter_int32_t, 1);
+
+	/* setting the comparator, so the list can sort, find the min, max etc */
+    list_attributes_comparator(&ClientsWaitingForEvent, list_comparator_int32_t);
+
+	SYS_MutexInit(ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;
 }
@@ -247,7 +217,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	 */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((readerStates[i])->readerID == 0)
+		if (readerStates[i].readerID == 0)
 			break;
 	}
 
@@ -257,7 +227,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	/*
 	 * Set all the attributes to this reader
 	 */
-	rContext->readerState = readerStates[i];
+	rContext->readerState = &readerStates[i];
 	(void)strlcpy(rContext->readerState->readerName, rContext->lpcReader,
 		sizeof(rContext->readerState->readerName));
 	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
@@ -377,7 +347,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	rContext->readerState->readerSharing = dwReaderSharing =
 		rContext->dwContexts;
 
-	(void)StatSynchronize(rContext->readerState);
+	(void)EHSignalEventToClients();
 
 	while (1)
 	{
@@ -408,7 +378,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 			dwCurrentState = SCARD_UNKNOWN;
 
-			(void)StatSynchronize(rContext->readerState);
+			(void)EHSignalEventToClients();
 		}
 
 		if (dwStatus & SCARD_ABSENT)
@@ -438,7 +408,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				(void)StatSynchronize(rContext->readerState);
+				(void)EHSignalEventToClients();
 			}
 
 		}
@@ -485,7 +455,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				(void)StatSynchronize(rContext->readerState);
+				(void)EHSignalEventToClients();
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
 
@@ -512,7 +482,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		{
 			dwReaderSharing = rContext->dwContexts;
 			rContext->readerState->readerSharing = dwReaderSharing;
-			(void)StatSynchronize(rContext->readerState);
+			(void)EHSignalEventToClients();
 		}
 
 		if (rContext->pthCardEvent)
@@ -531,7 +501,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 			/*
 			 * Exit and notify the caller
 			 */
-			(void)StatSynchronize(rContext->readerState);
+			(void)EHSignalEventToClients();
 			Log1(PCSC_LOG_INFO, "Die");
 			rContext->dwLockId = 0;
 			(void)SYS_ThreadExit(NULL);

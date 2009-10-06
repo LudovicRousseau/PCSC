@@ -499,10 +499,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	}
 
 	/*
-	 * Propagate new state to Shared Memory
+	 * Propagate new state to reader state
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	(void)StatSynchronize(rContext->readerState);
 
 	PROFILE_END
 
@@ -812,10 +811,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	(void)RFClearReaderEventState(rContext, hCard);
 
 	/*
-	 * Propagate new state to Shared Memory
+	 * Propagate new state to reader state
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	(void)StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }
@@ -995,10 +993,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 
 	/*
-	 * Propagate new state to Shared Memory
+	 * Propagate new state to reader state
 	 */
 	rContext->readerState->readerSharing = rContext->dwContexts;
-	(void)StatSynchronize(rContext->readerState);
 
 	return SCARD_S_SUCCESS;
 }

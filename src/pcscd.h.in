@@ -30,19 +30,13 @@
 #define PCSCLITE_RUN_PID		PCSCLITE_IPC_DIR "/pcscd.pid"
 
 #define PCSCLITE_READER_CONFIG		PCSCLITE_CONFIG_DIR "/reader.conf"
-#define PCSCLITE_PUBSHM_FILE		PCSCLITE_IPC_DIR "/pcscd.pub"
 #define PCSCLITE_CSOCK_NAME		PCSCLITE_IPC_DIR "/pcscd.comm"
-#define PCSCLITE_EVENTS_DIR		PCSCLITE_IPC_DIR "/pcscd.events"
 
 #define PCSCLITE_SVC_IDENTITY		0x01030000	/**< Service ID */
-
-#define PCSCLITE_INFINITE_TIMEOUT	4320000		/**< 50 day infinite t/o */
 
 #define PCSCLITE_VERSION_NUMBER		"@VERSION@"	/**< Current version */
 #define PCSCLITE_WRITE_TIMEOUT	1000			/**< write timeout */
 #define PCSCLITE_READ_TIMEOUT	120*1000		/**< read timeout */
-#define PCSCLITE_CLIENT_ATTEMPTS	120		/**< Attempts to reach sv */
-#define PCSCLITE_MCLIENT_ATTEMPTS	20		/**< Attempts to reach sv */
 #define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
 #define PCSCLITE_LOCK_POLL_RATE		100000		/**< Lock polling rate */
 
@@ -62,14 +56,7 @@
 #define MAX_LIBNAME			100
 #define MAX_DEVICENAME		255
 
-/*
- * The message and buffer sizes must be multiples of 16.
- * The max message size must be at least large enough
- * to accomodate the transmit_struct
- */
-#define PCSCLITE_MAX_MESSAGE_SIZE	2048	/**< Transport msg len */
-#define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for short APDU */
-#define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/**< enhanced (64K + APDU + Lc + Le) Tx/Rx Buffer */
-#define PCSCLITE_SERVER_ATTEMPTS	5	/**< Attempts to reach cl */
+#define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for get/set attributes */
+#define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/**< max APDU (64K + APDU + Lc + Le) Tx/Rx Buffer */
 
 #endif

@@ -470,7 +470,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		dwNumReadersContexts -= 1;
 
 		/* signal an event to clients */
-		StatSynchronize(NULL);
+		(void)EHSignalEventToClients();
 	}
 
 	return SCARD_S_SUCCESS;

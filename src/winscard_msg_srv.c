@@ -49,29 +49,6 @@ static int commonSocket = 0;
 extern char AraKiri;
 extern char ReCheckSerialReaders;
 
-static const char *CommandsText[] = {
-	"CMD_VERSION",	/* mtype = 0xF8 and command = 0x00 */
-	"ESTABLISH_CONTEXT",	/* mtype = 0xF1 */
-	"RELEASE_CONTEXT",
-	"LIST_READERS",
-	"CONNECT",
-	"RECONNECT",
-	"DISCONNECT",
-	"BEGIN_TRANSACTION",
-	"END_TRANSACTION",
-	"TRANSMIT",
-	"CONTROL",
-	"STATUS",
-	"GET_STATUS_CHANGE",
-	"CANCEL",
-	"CANCEL_TRANSACTION",
-	"GET_ATTRIB",
-	"SET_ATTRIB",
-	"TRANSMIT_EXTENDED",
-	"CONTROL_EXTENDED",
-	"NULL"
-};
-
 /**
  * @brief Accepts a Client connection.
  *
@@ -82,14 +59,12 @@ static const char *CommandsText[] = {
  * @return Error code.
  * @retval 0 Success.
  * @retval -1 Can not establish the connection.
- * @retval -1 Can not set the connection to non-blocking mode.
  */
 static int SHMProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
 {
 	socklen_t clnt_len;
 	int new_sock;
 	struct sockaddr_un clnt_addr;
-	int one;
 
 	clnt_len = sizeof(clnt_addr);
 
@@ -102,16 +77,6 @@ static int SHMProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
 	}
 
 	*pdwClientID = new_sock;
-
-	one = 1;
-	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
-	{
-		Log2(PCSC_LOG_CRITICAL, "Error: cannot set socket nonblocking: %s",
-			strerror(errno));
-		(void)SYS_CloseFile(*pdwClientID);
-		*pdwClientID = -1;
-		return -1;
-	}
 
 	return 0;
 }
@@ -184,7 +149,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
  * @return Error code.
  * @retval 0 Success.
  * @retval -1 Error accessing the communication channel.
- * @retval -1 Can not set the connection to non-blocking mode.
+ * @retval -2 EINTR
  * @retval 2 Timeout.
  */
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
@@ -242,82 +207,14 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID)
 			Log2(PCSC_LOG_ERROR,
 				"error in SHMProcessCommonChannelRequest: %d", *pdwClientID);
 			return -1;
-		} else
-		{
-			Log2(PCSC_LOG_DEBUG,
-				"SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
-			return 0;
 		}
 	}
-
-	return -1;
-}
-
-/**
- * @brief
- *
- * Called by \c ContextThread().
- */
-INTERNAL int32_t SHMProcessEventsContext(uint32_t dwClientID,
-	psharedSegmentMsg msgStruct)
-{
-	fd_set read_fd;
-	int selret, rv;
-#ifdef DO_TIMEOUT
-	struct timeval tv;
-
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
-#endif
-
-	FD_ZERO(&read_fd);
-	FD_SET(dwClientID, &read_fd);
-
-	selret = select(dwClientID + 1, &read_fd, (fd_set *) NULL,
-		(fd_set *) NULL,
-#ifdef DO_TIMEOUT
-		&tv
-#else
-		NULL
-#endif
-		);
-
-	if (selret < 0)
-	{
-		Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
-			strerror(errno));
+	else
 		return -1;
-	}
 
-	if (selret == 0)
-		/* timeout */
-		return 2;
+	Log2(PCSC_LOG_DEBUG,
+		"SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
 
-	if (FD_ISSET(dwClientID, &read_fd))
-	{
-		/*
-		 * Return the current handle
-		 */
-		rv = SHMMessageReceive(msgStruct, sizeof(*msgStruct), dwClientID,
-				       PCSCLITE_SERVER_ATTEMPTS);
-
-		if (rv == -1)
-		{	/* The client has died */
-			Log2(PCSC_LOG_DEBUG, "Client has disappeared: %d", dwClientID);
-			msgStruct->mtype = CMD_CLIENT_DIED;
-			msgStruct->command = 0;
-			(void)SYS_CloseFile(dwClientID);
-
-			return 0;
-		}
-
-		/*
-		 * Set the identifier handle
-		 */
-		Log3(PCSC_LOG_DEBUG, "command %s received by client %d", CommandsText[msgStruct->command], dwClientID);
-		return 1;
-	}
-
-	return -1;
+	return 0;
 }
 

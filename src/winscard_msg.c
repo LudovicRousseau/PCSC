@@ -44,22 +44,6 @@
 #include "utils.h"
 
 /**
- * @brief Wrapper for the SHMMessageReceive() function.
- *
- * Called by clients to read the server responses.
- *
- * @param[out] msgStruct Message read.
- * @param[in] dwClientID Client socket handle.
- * @param[in] blockamount Timeout in milliseconds.
- *
- * @return Same error codes as SHMMessageReceive().
- */
-INTERNAL int32_t SHMClientRead(psharedSegmentMsg msgStruct, uint32_t dwClientID, int32_t blockamount)
-{
-	return SHMMessageReceive(msgStruct, sizeof(*msgStruct), dwClientID, blockamount);
-}
-
-/**
  * @brief Prepares a communication channel for the client to talk to the server.
  *
  * This is called by the application to create a socket for local IPC with the
@@ -149,28 +133,39 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 	int retval = 0;
 
 	/* record the time when we started */
-	time_t start = time(0);
+	struct timeval start;
 
 	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
+
+	gettimeofday(&start, NULL);
 
 	/* repeat until all data is written */
 	while (remaining > 0)
 	{
 		fd_set write_fd;
-		struct timeval timeout;
+		struct timeval timeout, now;
 		int selret;
+		long delta;
 
-		FD_ZERO(&write_fd);
-		FD_SET(filedes, &write_fd);
+		gettimeofday(&now, NULL);
+		delta = time_sub(&now, &start);
 
-		timeout.tv_usec = 0;
-		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
+		if (delta > timeOut*1000)
 		{
 			/* we already timed out */
 			retval = -1;
 			break;
 		}
+
+		/* remaining time to wait */
+		delta = timeOut*1000 - delta;
+
+		FD_ZERO(&write_fd);
+		FD_SET(filedes, &write_fd);
+
+		timeout.tv_sec = delta/1000000;
+		timeout.tv_usec = delta - timeout.tv_sec*1000000;
 
 		selret = select(filedes + 1, NULL, &write_fd, NULL, &timeout);
 
@@ -252,28 +247,39 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 	int retval = 0;
 
 	/* record the time when we started */
-	time_t start = time(0);
+	struct timeval start;
 
 	/* how many bytes we must read */
 	size_t remaining = buffer_size;
+
+	gettimeofday(&start, NULL);
 
 	/* repeat until we get the whole message */
 	while (remaining > 0)
 	{
 		fd_set read_fd;
-		struct timeval timeout;
+		struct timeval timeout, now;
 		int selret;
+		long delta;
 
-		FD_ZERO(&read_fd);
-		FD_SET(filedes, &read_fd);
+		gettimeofday(&now, NULL);
+		delta = time_sub(&now, &start);
 
-		timeout.tv_usec = 0;
-		if ((timeout.tv_sec = start + timeOut - time(0)) < 0)
+		if (delta > timeOut*1000)
 		{
 			/* we already timed out */
 			retval = -1;
 			break;
 		}
+
+		/* remaining time to wait */
+		delta = timeOut*1000 - delta;
+
+		FD_ZERO(&read_fd);
+		FD_SET(filedes, &read_fd);
+
+		timeout.tv_sec = delta/1000000;
+		timeout.tv_usec = delta - timeout.tv_sec*1000000;
 
 		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
 
@@ -297,9 +303,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 				remaining -= readed;
 			} else if (readed == 0)
 			{
-				/*
-				 * peer closed the socket
-				 */
+				/* peer closed the socket */
 				retval = -1;
 				break;
 			} else
@@ -326,9 +330,6 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 				retval = -1;
 				break;
 			}
-
-			/* the command is extra slow so we keep waiting */
-			start = time(0);
 
 			/* you need to set the env variable PCSCLITE_DEBUG=0 since
 			 * this is logged on the client side and not on the pcscd
@@ -366,58 +367,19 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
  *
  * @return Same error codes as SHMMessageSend().
  */
-INTERNAL int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID,
+INTERNAL int32_t SHMMessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	uint64_t size, uint32_t timeOut, void *data_void)
 {
-	char *data = data_void;
-
-	sharedSegmentMsg msgStruct;
+	struct rxHeader header;
 	int ret;
 
-	/*
-	 * Set the appropriate packet parameters
-	 */
+	/* header */
+	header.command = command;
+	header.size = size;
+	ret = SHMMessageSend(&header, sizeof(header), dwClientID, timeOut);
 
-	memset(&msgStruct, 0, sizeof(msgStruct));
-	msgStruct.mtype = CMD_FUNCTION;
-	msgStruct.user_id = SYS_GetUID();
-	msgStruct.group_id = SYS_GetGID();
-	msgStruct.command = command;
-	msgStruct.date = time(NULL);
-	if ((SCARD_TRANSMIT_EXTENDED == command)
-		|| (SCARD_CONTROL_EXTENDED == command))
-	{
-		/* first block */
-		if (size > sizeof(msgStruct.data))
-			memcpy(msgStruct.data, data, sizeof(msgStruct.data));
-		else
-		{
-			memcpy(msgStruct.data, data, size);
-			memset(msgStruct.data+size, 0, sizeof(msgStruct.data)-size);
-		}
-
-		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
-			timeOut);
-
-		/* do not send an empty second block */
-		if ((0 == ret) && (size > sizeof(msgStruct.data)))
-		{
-			/* second block */
-			ret = SHMMessageSend(data+sizeof(msgStruct.data),
-				size-sizeof(msgStruct.data), dwClientID, timeOut);
-		}
-	}
-	else
-	{
-		memcpy(msgStruct.data, data, size);
-
-		ret = SHMMessageSend(&msgStruct, sizeof(msgStruct), dwClientID,
-			timeOut);
-	}
-
-	if (SCARD_TRANSMIT == command)
-		/* clean APDU buffer to remove any possible PIN or secret value */
-		memset(msgStruct.data, 0, min(size, sizeof(msgStruct.data)));
+	/* command */
+	ret = SHMMessageSend(data_void, size, dwClientID, timeOut);
 
 	return ret;
 }

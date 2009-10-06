@@ -21,7 +21,7 @@
 #include <stdint.h>
 
 /** Major version of the current message protocol */
-#define PROTOCOL_VERSION_MAJOR 3
+#define PROTOCOL_VERSION_MAJOR 4
 /** Minor version of the current message protocol */
 #define PROTOCOL_VERSION_MINOR 0
 
@@ -42,44 +42,12 @@ extern "C"
 	typedef struct version_struct version_struct;
 
 	/**
-	 * @brief General structure for client/serve message data exchange.
-	 *
-	 * It is used in the calls of \c SHMMessageSend and \c SHMMessageReceive.
-	 * The field \c data is interpreted according to the values of the fields
-	 * \c mtype and \c command. The possible structs the \c data field can
-	 * represent are: \c version_struct \c client_struct \c establish_struct
-	 * \c release_struct \c connect_struct \c reconnect_struct
-	 * \c disconnect_struct \c begin_struct \c end_struct \c cancel_struct
-	 * \c status_struct \c transmit_struct \c control_struct \c getset_struct
+	 * @brief header structure for client/server message data exchange.
 	 */
-	typedef struct rxSharedSegment
+	struct rxHeader
 	{
-		uint32_t mtype;		/** one of the \c pcsc_adm_commands */
-		uint32_t user_id;
-		uint32_t group_id;
-		uint32_t command;	/** one of the \c pcsc_msg_commands */
-		uint64_t date;
-		union
-		{
-			unsigned char data[PCSCLITE_MAX_MESSAGE_SIZE];
-			struct version_struct veStr;
-		};
-	}
-	sharedSegmentMsg, *psharedSegmentMsg;
-
-	/**
-	 * Command types available to use in the field \c sharedSegmentMsg.mtype.
-	 */
-	enum pcsc_adm_commands
-	{
-		CMD_FUNCTION = 0xF1,
-		CMD_FAILED = 0xF2,
-		CMD_SERVER_DIED = 0xF3,
-		CMD_CLIENT_DIED = 0xF4,
-		CMD_READER_EVENT = 0xF5,
-		CMD_SYN = 0xF6,
-		CMD_ACK = 0xF7,
-		CMD_VERSION = 0xF8	/**< version of the IPC */
+		uint32_t size;		/**< size of the message expluding this header */
+		uint32_t command;	/**< one of the \c pcsc_msg_commands */
 	};
 
 	/**
@@ -100,11 +68,13 @@ extern "C"
 		SCARD_STATUS = 0x0B,			/**< used by SCardStatus() */
 		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< used by SCardGetStatusChange() */
 		SCARD_CANCEL = 0x0D,			/**< used by SCardCancel() */
-		SCARD_CANCEL_TRANSACTION = 0x0E,
+		SCARD_CANCEL_TRANSACTION = 0x0E,	/**< used by SCardCancelTransaction() */
 		SCARD_GET_ATTRIB = 0x0F,		/**< used by SCardGetAttrib() */
 		SCARD_SET_ATTRIB = 0x10,		/**< used by SCardSetAttrib() */
-		SCARD_TRANSMIT_EXTENDED = 0x11,	/**< used by SCardTransmit() */
-		SCARD_CONTROL_EXTENDED = 0x12	/**< used by SCardControl() */
+		CMD_VERSION = 0x11,				/**< get the client/server protocol version */
+		CMD_GET_READERS_STATE = 0x12,	/**< get the readers state */
+		CMD_WAIT_READER_STATE_CHANGE = 0x13,	/**< wait for a reader state change */
+		CMD_STOP_WAITING_READER_STATE_CHANGE = 0x14	/**< stop waiting for a reader state change */
 	};
 
 	struct client_struct
@@ -225,10 +195,22 @@ extern "C"
 	 */
 	struct cancel_struct
 	{
-		int32_t hCard;
+		int32_t hContext;
 		uint32_t rv;
 	};
 	typedef struct cancel_struct cancel_struct;
+
+	/**
+	 * @brief contained in \ref SCARD_CANCEL_TRANSACTION Messages.
+	 *
+	 * These data are passed throw the field \c sharedSegmentMsg.data.
+	 */
+	struct cancel_transaction_struct
+	{
+		int32_t hCard;
+		uint32_t rv;
+	};
+	typedef struct cancel_transaction_struct cancel_transaction_struct;
 
 	/**
 	 * @brief contained in \ref SCARD_STATUS Messages.
@@ -258,35 +240,13 @@ extern "C"
 		int32_t hCard;
 		uint32_t ioSendPciProtocol;
 		uint32_t ioSendPciLength;
-		uint8_t pbSendBuffer[MAX_BUFFER_SIZE];
 		uint32_t cbSendLength;
 		uint32_t ioRecvPciProtocol;
 		uint32_t ioRecvPciLength;
-		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
 		uint32_t pcbRecvLength;
 		uint32_t rv;
 	};
 	typedef struct transmit_struct transmit_struct;
-
-	/**
-	 * @brief contained in \ref SCARD_TRANSMIT_EXTENDED Messages.
-	 *
-	 * These data are passed throw the field \c sharedSegmentMsg.data.
-	 */
-	struct transmit_struct_extended
-	{
-		int32_t hCard;
-		uint32_t ioSendPciProtocol;
-		uint32_t ioSendPciLength;
-		uint32_t cbSendLength;
-		uint32_t ioRecvPciProtocol;
-		uint32_t ioRecvPciLength;
-		uint32_t pcbRecvLength;
-		uint32_t rv;
-		uint64_t size;
-		uint8_t data[1];
-	};
-	typedef struct transmit_struct_extended transmit_struct_extended;
 
 	/**
 	 * @brief contained in \ref SCARD_CONTROL Messages.
@@ -297,30 +257,10 @@ extern "C"
 	{
 		int32_t hCard;
 		uint32_t dwControlCode;
-		uint8_t pbSendBuffer[MAX_BUFFER_SIZE];
-		uint32_t cbSendLength;
-		uint8_t pbRecvBuffer[MAX_BUFFER_SIZE];
-		uint32_t cbRecvLength;
-		uint32_t dwBytesReturned;
-		uint32_t rv;
-	};
-	typedef struct control_struct control_struct;
-
-	/**
-	 * @brief contained in \ref SCARD_CONTROL_EXTENDED Messages.
-	 *
-	 * These data are passed throw the field \c sharedSegmentMsg.data.
-	 */
-	struct control_struct_extended
-	{
-		int32_t hCard;
-		uint32_t dwControlCode;
 		uint32_t cbSendLength;
 		uint32_t cbRecvLength;
 		uint32_t dwBytesReturned;
 		uint32_t rv;
-		uint64_t size;
-		uint8_t data[1];
 	};
 	typedef struct control_struct_extended control_struct_extended;
 
@@ -343,17 +283,15 @@ extern "C"
 	 * Now some function definitions
 	 */
 
-	int32_t SHMClientRead(psharedSegmentMsg, uint32_t, int32_t);
 	int32_t SHMClientSetupSession(uint32_t *);
 	int32_t SHMClientCloseSession(uint32_t);
 	int32_t SHMInitializeCommonSegment(void);
-	int32_t SHMProcessEventsContext(uint32_t, /*@out@*/ psharedSegmentMsg);
 	int32_t SHMProcessEventsServer(/*@out@*/ uint32_t *);
 	int32_t SHMMessageSend(void *buffer, uint64_t buffer_size, int32_t filedes,
 		int32_t blockAmount);
 	int32_t SHMMessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
 		int32_t filedes, int32_t blockAmount);
-	int32_t WrapSHMWrite(uint32_t command, uint32_t dwClientID, uint64_t size,
+	int32_t SHMMessageSendWithHeader(uint32_t command, uint32_t dwClientID, uint64_t size,
 		uint32_t blockAmount, void *data);
 	void SHMCleanupSharedSegment(int32_t, const char *);
 

@@ -305,10 +305,10 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * test the presence of /var/run/pcscd/pcsc.pub
+	 * test the presence of /var/run/pcscd/pcscd.comm
 	 */
 
-	rv = SYS_Stat(PCSCLITE_PUBSHM_FILE, &fStatBuf);
+	rv = SYS_Stat(PCSCLITE_CSOCK_NAME, &fStatBuf);
 
 	if (rv == 0)
 	{
@@ -327,7 +327,7 @@ int main(int argc, char **argv)
 			if (kill(pid, 0) == 0)
 			{
 				Log1(PCSC_LOG_CRITICAL,
-					"file " PCSCLITE_PUBSHM_FILE " already exists.");
+					"file " PCSCLITE_CSOCK_NAME " already exists.");
 				Log2(PCSC_LOG_CRITICAL,
 					"Another pcscd (pid: %d) seems to be running.", pid);
 				return EXIT_FAILURE;
@@ -346,13 +346,12 @@ int main(int argc, char **argv)
 			}
 
 			Log1(PCSC_LOG_CRITICAL,
-				"file " PCSCLITE_PUBSHM_FILE " already exists.");
+				"file " PCSCLITE_CSOCK_NAME " already exists.");
 			Log1(PCSC_LOG_CRITICAL,
 				"Maybe another pcscd is running?");
 			Log1(PCSC_LOG_CRITICAL,
 				"I can't read process pid from " PCSCLITE_RUN_PID);
-			Log1(PCSC_LOG_CRITICAL,
-				"Remove " PCSCLITE_PUBSHM_FILE " and " PCSCLITE_CSOCK_NAME);
+			Log1(PCSC_LOG_CRITICAL, "Remove " PCSCLITE_CSOCK_NAME);
 			Log1(PCSC_LOG_CRITICAL,
 				"if pcscd is not running to clear this message.");
 			return EXIT_FAILURE;
@@ -429,25 +428,6 @@ int main(int argc, char **argv)
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
 				strerror(errno));
-	}
-
-	/*
-	 * If PCSCLITE_EVENTS does not exist then create it
-	 */
-	rv = SYS_Stat(PCSCLITE_EVENTS_DIR, &fStatBuf);
-	if (rv < 0)
-	{
-		/* 1733 : world writable + sticky bit */
-		int mode = S_IRWXU | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH | S_ISVTX;
-
-		rv = SYS_Mkdir(PCSCLITE_EVENTS_DIR, mode);
-		if (rv != 0)
-		{
-			Log2(PCSC_LOG_CRITICAL,
-				"cannot create " PCSCLITE_EVENTS_DIR ": %s", strerror(errno));
-			return EXIT_FAILURE;
-		}
-		(void)SYS_Chmod(PCSCLITE_EVENTS_DIR, mode);
 	}
 
 	/* cleanly remove /var/run/pcscd/pcsc.* files when exiting */
@@ -540,11 +520,6 @@ static void clean_temp_files(void)
 {
 	int rv;
 
-	rv = SYS_RemoveFile(PCSCLITE_PUBSHM_FILE);
-	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_PUBSHM_FILE ": %s",
-			strerror(errno));
-
 	rv = SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_CSOCK_NAME ": %s",
@@ -553,13 +528,6 @@ static void clean_temp_files(void)
 	rv = SYS_RemoveFile(PCSCLITE_RUN_PID);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_RUN_PID ": %s",
-			strerror(errno));
-
-	(void)StatSynchronize(NULL);
-	SYS_Sleep(1);
-	rv = SYS_RemoveFile(PCSCLITE_EVENTS_DIR);
-	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_EVENTS_DIR ": %s",
 			strerror(errno));
 }
 
