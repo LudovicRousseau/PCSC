@@ -145,22 +145,16 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 {
 	char *buffer = buffer_void;
 
-	/*
-	 * default is success
-	 */
+	/* default is success */
 	int retval = 0;
-	/*
-	 * record the time when we started
-	 */
+
+	/* record the time when we started */
 	time_t start = time(0);
-	/*
-	 * how many bytes remains to be written
-	 */
+
+	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
 
-	/*
-	 * repeat until all data is written
-	 */
+	/* repeat until all data is written */
 	while (remaining > 0)
 	{
 		fd_set write_fd;
@@ -182,18 +176,14 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 
 		selret = select(filedes + 1, NULL, &write_fd, NULL, &timeout);
 
-		/*
-		 * try to write only when the file descriptor is writable
-		 */
+		/* try to write only when the file descriptor is writable */
 		if (selret > 0)
 		{
 			int written;
 
 			if (!FD_ISSET(filedes, &write_fd))
 			{
-				/*
-				 * very strange situation. it should be an assert really
-				 */
+				/* very strange situation. it should be an assert really */
 				retval = -1;
 				break;
 			}
@@ -201,24 +191,18 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 
 			if (written > 0)
 			{
-				/*
-				 * we wrote something
-				 */
+				/* we wrote something */
 				buffer += written;
 				remaining -= written;
 			} else if (written == 0)
 			{
-				/*
-				 * peer closed the socket
-				 */
+				/* peer closed the socket */
 				retval = -1;
 				break;
 			} else
 			{
-				/*
-				 * we ignore the signals and socket full situations, all
-				 * other errors are fatal
-				 */
+				/* we ignore the signals and socket full situations, all
+				 * other errors are fatal */ 
 				if (errno != EINTR && errno != EAGAIN)
 				{
 					retval = -1;
@@ -227,16 +211,12 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 			}
 		} else if (selret == 0)
 		{
-			/*
-			 * timeout
-			 */
+			/* timeout */
 			retval = -1;
 			break;
 		} else
 		{
-			/*
-			 * ignore signals
-			 */
+			/* ignore signals */
 			if (errno != EINTR)
 			{
 				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
@@ -270,22 +250,16 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 {
 	char *buffer = buffer_void;
 
-	/*
-	 * default is success
-	 */
+	/* default is success */
 	int retval = 0;
-	/*
-	 * record the time when we started
-	 */
+
+	/* record the time when we started */
 	time_t start = time(0);
-	/*
-	 * how many bytes we must read
-	 */
+
+	/* how many bytes we must read */
 	size_t remaining = buffer_size;
 
-	/*
-	 * repeat until we get the whole message
-	 */
+	/* repeat until we get the whole message */
 	while (remaining > 0)
 	{
 		fd_set read_fd;
@@ -307,18 +281,14 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 
 		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
 
-		/*
-		 * try to read only when socket is readable
-		 */
+		/* try to read only when socket is readable */
 		if (selret > 0)
 		{
 			int readed;
 
 			if (!FD_ISSET(filedes, &read_fd))
 			{
-				/*
-				 * very strange situation. it should be an assert really
-				 */
+				/* very strange situation. it should be an assert really */
 				retval = -1;
 				break;
 			}
@@ -326,9 +296,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 
 			if (readed > 0)
 			{
-				/*
-				 * we got something
-				 */
+				/* we got something */
 				buffer += readed;
 				remaining -= readed;
 			} else if (readed == 0)
@@ -340,10 +308,8 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 				break;
 			} else
 			{
-				/*
-				 * we ignore the signals and empty socket situations, all
-				 * other errors are fatal
-				 */
+				/* we ignore the signals and empty socket situations, all
+				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
 					retval = -1;
@@ -353,18 +319,14 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 		} else if (selret == 0)
 		{
 #ifdef PCSCD
-			/*
-			 * timeout
-			 */
+			/* timeout */
 			retval = -1;
 			break;
 #else
 			/* is the daemon still there? */
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 			{
-				/*
-				 * timeout
-				 */
+				/* timeout */
 				retval = -1;
 				break;
 			}
@@ -372,15 +334,14 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 			/* the command is extra slow so we keep waiting */
 			start = time(0);
 
-			/* you need to set the env variable PCSCLITE_DEBUG=0 since this is
-			 * logged on the client side and not on the pcscd side*/
+			/* you need to set the env variable PCSCLITE_DEBUG=0 since
+			 * this is logged on the client side and not on the pcscd
+			 * side*/
 			Log1(PCSC_LOG_INFO, "Command not yet finished");
 #endif
 		} else
 		{
-			/*
-			 * we ignore signals, all other errors are fatal
-			 */
+			/* we ignore signals, all other errors are fatal */
 			if (errno != EINTR)
 			{
 				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
