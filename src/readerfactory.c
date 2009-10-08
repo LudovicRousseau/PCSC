@@ -999,16 +999,6 @@ LONG RFUnlockAllSharing(DWORD hCard)
 	return rv;
 }
 
-LONG RFUnblockContext(SCARDCONTEXT hContext)
-{
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		(sReadersContexts[i])->dwBlockStatus = hContext;
-
-	return SCARD_S_SUCCESS;
-}
-
 LONG RFInitializeReader(PREADER_CONTEXT rContext)
 {
 	LONG rv;
