@@ -142,7 +142,6 @@ extern "C"
 	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
 	LONG RFRemoveReader(LPSTR, DWORD);
 	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
-	LONG RFListReaders(LPSTR, LPDWORD);
 	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoNamePort(DWORD, LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
