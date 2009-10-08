@@ -39,8 +39,6 @@ extern "C"
 
 	int SYS_Chdir(const char *);
 
-	int SYS_ChangePermissions(const char *, int);
-
 	int SYS_SeekFile(int, int);
 
 	int SYS_ReadFile(int, /*@out@*/ char *, int);
