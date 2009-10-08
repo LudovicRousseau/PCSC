@@ -1471,13 +1471,22 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 		return rv;
 
 	rv = IFDGetCapabilities(rContext, dwAttrId, pcbAttrLen, pbAttr);
-	if (rv == IFD_SUCCESS)
-		return SCARD_S_SUCCESS;
-	else
-		if (rv == IFD_ERROR_TAG)
-			return SCARD_E_UNSUPPORTED_FEATURE;
-		else
-			return SCARD_E_NOT_TRANSACTED;
+	switch(rv)
+	{
+		case IFD_SUCCESS:
+			rv = SCARD_S_SUCCESS;
+			break;
+		case IFD_ERROR_TAG:
+			rv = SCARD_E_UNSUPPORTED_FEATURE;
+			break;
+		case IFD_ERROR_INSUFFICIENT_BUFFER:
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+			break;
+		default:
+			rv = SCARD_E_NOT_TRANSACTED;
+	}
+
+	return rv;
 }
 
 LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
