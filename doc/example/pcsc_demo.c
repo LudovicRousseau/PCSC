@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
             break;
         default:
             printf("Unknown protocol\n");
-            return -1;
+            goto end;
     }
 
 	/* exchange APDU */
