@@ -1334,6 +1334,7 @@ void RFReCheckReaderConf(void)
 	free(reader_list);
 }
 
+#if 0
 void RFSuspendAllReaders(void)
 {
 	int i;
@@ -1389,4 +1390,5 @@ void RFAwakeAllReaders(void)
 		}
 	}
 }
+#endif
 
