@@ -142,11 +142,6 @@ INTERNAL int SYS_Chdir(const char *path)
 	return chdir(path);
 }
 
-INTERNAL int SYS_ReadFile(int iHandle, char *pcBuffer, int iLength)
-{
-	return read(iHandle, pcBuffer, iLength);
-}
-
 INTERNAL int SYS_WriteFile(int iHandle, const char *pcBuffer, int iLength)
 {
 	return write(iHandle, pcBuffer, iLength);
