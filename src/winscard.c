@@ -565,10 +565,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	/*
-	 * RFUnblockReader( rContext ); FIX - this doesn't work
-	 */
-
 	if (dwInitialization == SCARD_RESET_CARD ||
 		dwInitialization == SCARD_UNPOWER_CARD)
 	{

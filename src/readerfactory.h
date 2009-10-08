@@ -150,7 +150,6 @@ extern "C"
 	LONG RFLockSharing(DWORD);
 	LONG RFUnlockSharing(DWORD);
 	LONG RFUnlockAllSharing(DWORD);
-	LONG RFUnblockReader(PREADER_CONTEXT);
 	LONG RFUnblockContext(SCARDCONTEXT);
 	LONG RFLoadReader(PREADER_CONTEXT);
 	LONG RFBindFunctions(PREADER_CONTEXT);

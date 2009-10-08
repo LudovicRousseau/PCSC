@@ -1009,11 +1009,6 @@ LONG RFUnblockContext(SCARDCONTEXT hContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFUnblockReader(PREADER_CONTEXT rContext)
-{
-	return SCARD_S_SUCCESS;
-}
-
 LONG RFInitializeReader(PREADER_CONTEXT rContext)
 {
 	LONG rv;
