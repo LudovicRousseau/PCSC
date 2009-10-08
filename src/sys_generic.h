@@ -41,16 +41,6 @@ extern "C"
 
 	int SYS_WriteFile(int, const char *, int);
 
-	int SYS_GetPageSize(void);
-
-	void *SYS_MemoryMap(int, int, int);
-
-	void *SYS_PublicMemoryMap(int, int, int);
-
-	void SYS_PublicMemoryUnmap(void *, int);
-
-	int SYS_MMapSynchronize(void *, int);
-
 	int SYS_Fork(void);
 
 	int SYS_Daemon(int, int);
