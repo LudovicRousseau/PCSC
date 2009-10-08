@@ -33,6 +33,7 @@ if hresult!=SCARD_S_SUCCESS:
 	raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
 print 'PC/SC Readers:', readers
 
+# Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult!=SCARD_S_SUCCESS:
@@ -40,11 +41,13 @@ if hresult!=SCARD_S_SUCCESS:
 
 print "dwActiveProtocol:", dwActiveProtocol
 
+# Reconnect in SCARD_SHARE_DIRECT mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult!=SCARD_S_SUCCESS:
 	raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
 
+# ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print "dwActiveProtocol:", dwActiveProtocol
 if SCARD_PROTOCOL_UNDEFINED != dwActiveProtocol:
     raise Exception('dwActiveProtocol should be SCARD_PROTOCOL_UNDEFINED')
