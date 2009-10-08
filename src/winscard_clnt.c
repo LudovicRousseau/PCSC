@@ -915,39 +915,36 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		goto end;
 	}
 
-	do
-	{
-		scReconnectStruct.hCard = hCard;
-		scReconnectStruct.dwShareMode = dwShareMode;
-		scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
-		scReconnectStruct.dwInitialization = dwInitialization;
-		scReconnectStruct.dwActiveProtocol = *pdwActiveProtocol;
-		scReconnectStruct.rv = SCARD_S_SUCCESS;
+	scReconnectStruct.hCard = hCard;
+	scReconnectStruct.dwShareMode = dwShareMode;
+	scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
+	scReconnectStruct.dwInitialization = dwInitialization;
+	scReconnectStruct.dwActiveProtocol = *pdwActiveProtocol;
+	scReconnectStruct.rv = SCARD_S_SUCCESS;
 
-		rv = SHMMessageSendWithHeader(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
+	rv = SHMMessageSendWithHeader(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
 			sizeof(scReconnectStruct),
 			PCSCLITE_READ_TIMEOUT, (void *) &scReconnectStruct);
 
-		if (rv == -1)
-		{
-			(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-			return SCARD_E_NO_SERVICE;
-		}
+	if (rv == -1)
+	{
+		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+		return SCARD_E_NO_SERVICE;
+	}
 
-		/*
-		 * Read a message from the server
-		 */
-		rv = SHMMessageReceive(&scReconnectStruct,
+	/*
+	 * Read a message from the server
+	 */
+	rv = SHMMessageReceive(&scReconnectStruct,
 			sizeof(scReconnectStruct),
 			psContextMap[dwContextIndex].dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
-		if (rv == -1)
-		{
-			rv = SCARD_F_COMM_ERROR;
-			goto end;
-		}
-	} while (SCARD_E_SHARING_VIOLATION == scReconnectStruct.rv);
+	if (rv == -1)
+	{
+		rv = SCARD_F_COMM_ERROR;
+		goto end;
+	}
 
 	*pdwActiveProtocol = scReconnectStruct.dwActiveProtocol;
 	rv = scReconnectStruct.rv;
