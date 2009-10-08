@@ -2,7 +2,7 @@
 
 SUBDIRS = . example
 
-doc_DATA = pcsc-lite.tex pcsc-lite.bib \
+doc_DATA = \
 			ifdhandler-3.tex \
 			README.DAEMON
 
@@ -13,11 +13,9 @@ EXTRA_DIST = $(doc_DATA) $(man_in) doxygen.conf.in formaticc.1
 
 CLEANFILES = ifdhandler-3.aux ifdhandler-3.bbl ifdhandler-3.blg \
 	ifdhandler-3.dvi ifdhandler-3.log ifdhandler-3.out \
-	ifdhandler-3.toc \
-	pcsc-lite.aux pcsc-lite.bbl pcsc-lite.blg pcsc-lite.log \
-	pcsc-lite.out pcsc-lite.toc
+	ifdhandler-3.toc
 
-DISTCLEANFILES = ifdhandler-3.pdf pcsc-lite.pdf
+DISTCLEANFILES = ifdhandler-3.pdf
 
 # name of commands
 LATEX = latex
