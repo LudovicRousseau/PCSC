@@ -39,10 +39,6 @@ extern "C"
 
 	int SYS_Chdir(const char *);
 
-	int SYS_GetUID(void);
-
-	int SYS_GetGID(void);
-
 	int SYS_ChangePermissions(const char *, int);
 
 	int SYS_SeekFile(int, int);

@@ -142,16 +142,6 @@ INTERNAL int SYS_Chdir(const char *path)
 	return chdir(path);
 }
 
-INTERNAL int SYS_GetUID(void)
-{
-	return getuid();
-}
-
-INTERNAL int SYS_GetGID(void)
-{
-	return getgid();
-}
-
 INTERNAL int SYS_SeekFile(int iHandle, int iSeekLength)
 {
 	int iOffset;
