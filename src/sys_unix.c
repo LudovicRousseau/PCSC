@@ -147,10 +147,12 @@ INTERNAL int SYS_WriteFile(int iHandle, const char *pcBuffer, int iLength)
 	return write(iHandle, pcBuffer, iLength);
 }
 
-INTERNAL int SYS_Fork(void)
+#ifndef HAVE_DAEMON
+static INTERNAL int SYS_Fork(void)
 {
 	return fork();
 }
+#endif
 
 /**
  * @brief put the process to run in the background.

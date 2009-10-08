@@ -41,8 +41,6 @@ extern "C"
 
 	int SYS_WriteFile(int, const char *, int);
 
-	int SYS_Fork(void);
-
 	int SYS_Daemon(int, int);
 
 	int SYS_Stat(const char *pcFile, /*@out@*/ struct stat *psStatus);
