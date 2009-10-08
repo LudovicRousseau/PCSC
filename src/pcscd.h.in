@@ -21,9 +21,6 @@
 #define SCARD_INSERTED			0x0002	/**< Card was inserted */
 #define SCARD_REMOVED			0x0004	/**< Card was removed */
 
-#define BLOCK_STATUS_RESUME		0x00FF	/**< Normal resume */
-#define BLOCK_STATUS_BLOCKING		0x00FA	/**< Function is blocking */
-
 #define PCSCLITE_CONFIG_DIR		"@confdir_exp@"
 
 #define PCSCLITE_IPC_DIR		USE_IPCDIR

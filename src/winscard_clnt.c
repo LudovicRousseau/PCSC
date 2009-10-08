@@ -193,7 +193,6 @@ static struct _psContextMap
 {
 	DWORD dwClientID;				/**< Client Connection ID */
 	SCARDCONTEXT hContext;			/**< Application Context ID */
-	DWORD contextBlockStatus;
 	PCSCLITE_MUTEX_T mMutex;		/**< Mutex for this context */
 	CHANNEL_MAP psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 } psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
@@ -404,7 +403,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			 */
 			psContextMap[i].dwClientID = 0;
 			psContextMap[i].hContext = 0;
-			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
 			psContextMap[i].mMutex = NULL;
 
 			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
@@ -1861,8 +1859,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/* Now is where we start our event checking loop */
 	Log1(PCSC_LOG_DEBUG, "Event Loop Start");
 
-	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_BLOCKING;
-
 	/* Get the initial reader count on the system */
 	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 		if (readerStates[j].readerID != 0)
@@ -2157,10 +2153,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (dwBreakFlag == 1)
 				break;
 
-			if (BLOCK_STATUS_RESUME
-				== psContextMap[dwContextIndex].contextBlockStatus)
-				break;
-
 			/* Only sleep once for each cycle of reader checks. */
 			{
 				struct wait_reader_state_change waitStatusStruct;
@@ -2251,9 +2243,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		}
 	}
 	while (1);
-
-	if (psContextMap[dwContextIndex].contextBlockStatus == BLOCK_STATUS_RESUME)
-		rv = SCARD_E_CANCELLED;
 
 end:
 	Log1(PCSC_LOG_DEBUG, "Event Loop End");
@@ -3325,12 +3314,6 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	if (dwContextIndex == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	/*
-	 * Set the block status for this Context so blocking calls will
-	 * complete
-	 */
-	psContextMap[dwContextIndex].contextBlockStatus = BLOCK_STATUS_RESUME;
-
 	/* create a new connection to the server */
 	if (SHMClientSetupSession(&dwClientID) != 0)
 	{
@@ -3449,7 +3432,6 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 		{
 			psContextMap[i].hContext = hContext;
 			psContextMap[i].dwClientID = dwClientID;
-			psContextMap[i].contextBlockStatus = BLOCK_STATUS_RESUME;
 			psContextMap[i].mMutex = malloc(sizeof(PCSCLITE_MUTEX));
 			(void)SYS_MutexInit(psContextMap[i].mMutex);
 			return SCARD_S_SUCCESS;
@@ -3540,7 +3522,6 @@ static LONG SCardCleanContext(LONG indice)
 	psContextMap[indice].dwClientID = 0;
 	free(psContextMap[indice].mMutex);
 	psContextMap[indice].mMutex = NULL;
-	psContextMap[indice].contextBlockStatus = BLOCK_STATUS_RESUME;
 
 	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
 	{

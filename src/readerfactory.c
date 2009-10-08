@@ -1011,7 +1011,6 @@ LONG RFUnblockContext(SCARDCONTEXT hContext)
 
 LONG RFUnblockReader(PREADER_CONTEXT rContext)
 {
-	rContext->dwBlockStatus = BLOCK_STATUS_RESUME;
 	return SCARD_S_SUCCESS;
 }
 
