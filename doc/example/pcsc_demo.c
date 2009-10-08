@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2003-2007
+ * Copyright (C) 2003-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	DWORD dwSendLength, dwRecvLength;
 
 	printf("PC/SC sample code\n");
-	printf("V 1.3 2003-2007, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
+	printf("V 1.4 2003-2009, Ludovic Rousseau <ludovic.rousseau@free.fr>\n");
 
 	printf("\nTHIS PROGRAM IS NOT DESIGNED AS A TESTING TOOL FOR END USERS!\n");
 	printf("Do NOT use it unless you really know what you do.\n\n");
@@ -82,23 +82,9 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	/* Retrieve the available readers list.
-	 *
-	 * 1. Call with a null buffer to get the number of bytes to allocate
-	 * 2. malloc the necessary storage
-	 * 3. call with the real allocated buffer
-	 */
-	rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
-	PCSC_ERROR(rv, "SCardListReaders")
-
-	mszReaders = malloc(sizeof(char)*dwReaders);
-	if (mszReaders == NULL)
-	{
-		printf("malloc: not enough memory\n");
-		goto end;
-	}
-
-	rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
+	/* Retrieve the available readers list. */
+	dwReaders = SCARD_AUTOALLOCATE;
+	rv = SCardListReaders(hContext, NULL, (LPSTR)&mszReaders, &dwReaders);
 	PCSC_ERROR(rv, "SCardListReaders")
 
 	/* Extract readers from the null separated string and get the total
@@ -284,15 +270,16 @@ int main(int argc, char *argv[])
 	PCSC_ERROR(rv, "SCardDisconnect")
 
 end:
+	/* free allocated memory */
+	if (mszReaders)
+		SCardFreeMemory(hContext, mszReaders);
+
 	/* We try to leave things as clean as possible */
 	rv = SCardReleaseContext(hContext);
 	if (rv != SCARD_S_SUCCESS)
 		printf("SCardReleaseContext: %s (0x%lX)\n", pcsc_stringify_error(rv),
 			rv);
 
-	/* free allocated memory */
-	if (mszReaders)
-		free(mszReaders);
 	if (readers)
 		free(readers);
 
