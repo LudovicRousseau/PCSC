@@ -39,8 +39,6 @@ extern "C"
 
 	int SYS_Chdir(const char *);
 
-	int SYS_SeekFile(int, int);
-
 	int SYS_ReadFile(int, /*@out@*/ char *, int);
 
 	int SYS_WriteFile(int, const char *, int);

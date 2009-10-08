@@ -142,13 +142,6 @@ INTERNAL int SYS_Chdir(const char *path)
 	return chdir(path);
 }
 
-INTERNAL int SYS_SeekFile(int iHandle, int iSeekLength)
-{
-	int iOffset;
-	iOffset = lseek(iHandle, iSeekLength, SEEK_SET);
-	return iOffset;
-}
-
 INTERNAL int SYS_ReadFile(int iHandle, char *pcBuffer, int iLength)
 {
 	return read(iHandle, pcBuffer, iLength);
