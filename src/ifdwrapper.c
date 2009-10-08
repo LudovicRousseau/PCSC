@@ -650,6 +650,9 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 		if ((IFD_ERROR_NOT_SUPPORTED == rv) || (IFD_NOT_SUPPORTED == rv))
 			return SCARD_E_UNSUPPORTED_FEATURE;
 
+        if (IFD_ERROR_INSUFFICIENT_BUFFER ==rv)
+            return SCARD_E_INSUFFICIENT_BUFFER;
+
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
