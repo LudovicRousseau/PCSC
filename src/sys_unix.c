@@ -50,16 +50,6 @@ INTERNAL int SYS_Mkdir(const char *path, int perms)
 }
 
 /**
- * @brief Gets the running process's ID.
- *
- * @return PID.
- */
-INTERNAL int SYS_GetPID(void)
-{
-	return getpid();
-}
-
-/**
  * @brief Makes the current process sleep for some seconds.
  *
  * @param[in] iTimeVal Number of seconds to sleep.

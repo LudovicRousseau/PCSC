@@ -25,8 +25,6 @@ extern "C"
 
 	int SYS_Mkdir(const char *, int);
 
-	int SYS_GetPID(void);
-
 	int SYS_Sleep(int);
 
 	int SYS_USleep(int);
