@@ -35,20 +35,6 @@
 #include "debug.h"
 
 /**
- * @brief Make system wide initialization.
- *
- * @return Eror code.
- * @retval 0 Success.
- */
-INTERNAL int SYS_Initialize(void)
-{
-	/*
-	 * Nothing special
-	 */
-	return 0;
-}
-
-/**
  * @brief Attempts to create a directory with some permissions.
  *
  * @param[in] path Path of the directory to be created.

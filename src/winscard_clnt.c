@@ -387,11 +387,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	if (isExecuted == 0)
 	{
 		/*
-		 * Do any system initilization here
-		 */
-		(void)SYS_Initialize();
-
-		/*
 		 * Initializes the application contexts and all channels for each one
 		 */
 		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)

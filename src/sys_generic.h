@@ -23,8 +23,6 @@ extern "C"
 #include <sys/stat.h>
 #include <sys/mman.h>
 
-	int SYS_Initialize(void);
-
 	int SYS_Mkdir(const char *, int);
 
 	int SYS_GetPID(void);
