@@ -754,6 +754,19 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	*pdwActiveProtocol = rContext->readerState->cardProtocol;
 
+	if (dwShareMode != SCARD_SHARE_DIRECT)
+	{
+		if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
+			&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
+			Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+				*pdwActiveProtocol);
+		else
+			Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
+				(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+	}
+	else
+		Log1(PCSC_LOG_DEBUG, "Direct access: no protocol selected");
+
 	if (dwShareMode == SCARD_SHARE_EXCLUSIVE)
 	{
 		if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
