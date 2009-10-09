@@ -10,6 +10,7 @@
 
 /**
  * @file
+ * @defgroup IFDHandler
  * @brief This provides reader specific low-level calls.
 
 The routines specified hereafter will allow you to write an IFD handler
@@ -371,6 +372,7 @@ listed by @p DeviceName.
 Once the channel is opened the reader must be in a state in which it is
 possible to query IFDHICCPresence() for card status.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number\n
   Use this for multiple card slots or multiple readers. 0xXXXXYYYY -
   XXXX multiple readers, YYYY multiple slots. The resource manager will
@@ -460,6 +462,7 @@ CTBCS specifications for a list of accepted commands to implement. This
 function is fully voluntary and does not have to be implemented unless
 you want extended functionality.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] dwControlCode Control code for the operation\n
   This value identifies the specific operation to be performed. This
@@ -517,6 +520,7 @@ possible to query IFDHICCPresence() for card status.
 USB readers can ignore the @p Channel parameter and query the USB bus
 for the particular reader by manufacturer and product id. 
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number\n
   Use this for multiple card slots or multiple readers. 0xXXXXYYYY -
   XXXX multiple readers, YYYY multiple slots. The resource manager will
@@ -550,6 +554,7 @@ particular reader. Prior to closing the communication channel the reader
 should make sure the card is powered down and the terminal is also
 powered down.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 
 @return Error codes
@@ -564,6 +569,7 @@ This function should get the slot/card capabilities for a particular
 slot/card specified by Lun. Again, if you have only 1 card slot and
 don't mind loading a new driver for each reader then ignore Lun.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] Tag Tag of the desired data value
 - \ref TAG_IFD_ATR
@@ -608,6 +614,7 @@ This function should set the slot/card capabilities for a particular
 slot/card specified by @p Lun. Again, if you have only 1 card slot and
 don't mind loading a new driver for each reader then ignore @p Lun. 
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] Tag Tag of the desired data value
 - \ref TAG_IFD_SLOTNUM
@@ -633,6 +640,7 @@ RESPONSECODE IFDHSetCapabilities(DWORD Lun, DWORD Tag, DWORD Length, PUCHAR Valu
 This function should set the Protocol Type Selection (PTS) of a
 particular card/slot using the three PTS parameters sent 
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] Protocol Desired protocol
 - \ref SCARD_PROTOCOL_T0
@@ -663,6 +671,7 @@ RESPONSECODE IFDHSetProtocolParameters(DWORD Lun, DWORD Protocol, UCHAR Flags,
 This function controls the power and reset signals of the smart card
 reader at the particular reader/slot specified by @p Lun.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] Action Action to be taken on the card
 - \ref IFD_POWER_UP
@@ -699,6 +708,7 @@ Lun. The driver is responsible for performing any protocol specific
 exchanges such as T=0, 1, etc. differences. Calling this function will
 abstract all protocol differences.
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] SendPci contains two structure members
 - Protocol 0, 1, ... 14\n
@@ -754,6 +764,7 @@ card insertion/removal detection, it is advised that the driver manages
 this through a thread so the driver does not have to send and receive a
 command each time this function is called. 
 
+@ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 
 @return Error codes
