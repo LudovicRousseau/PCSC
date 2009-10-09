@@ -193,25 +193,6 @@ extern "C"
 		DWORD, PUCHAR, PDWORD, PSCARD_IO_HEADER);
 	RESPONSECODE IFDHICCPresence(DWORD);
 
-	/*
-	 * List of Defined Functions Available to IFD_Handler 1.0
-	 */
-
-	RESPONSECODE IO_Create_Channel(DWORD);
-	RESPONSECODE IO_Close_Channel(void);
-	RESPONSECODE IFD_Get_Capabilities(DWORD, PUCHAR);
-	RESPONSECODE IFD_Set_Capabilities(DWORD, PUCHAR);
-	RESPONSECODE IFD_Set_Protocol_Parameters(DWORD, UCHAR, UCHAR,
-		UCHAR, UCHAR);
-	RESPONSECODE IFD_Power_ICC(DWORD);
-	RESPONSECODE IFD_Swallow_ICC(void);
-	RESPONSECODE IFD_Eject_ICC(void);
-	RESPONSECODE IFD_Confiscate_ICC(void);
-	RESPONSECODE IFD_Transmit_to_ICC(SCARD_IO_HEADER, PUCHAR, DWORD,
-		PUCHAR, PDWORD, PSCARD_IO_HEADER);
-	RESPONSECODE IFD_Is_ICC_Present(void);
-	RESPONSECODE IFD_Is_ICC_Absent(void);
-
 #ifdef __cplusplus
 }
 #endif
