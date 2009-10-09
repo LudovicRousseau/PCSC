@@ -1428,8 +1428,8 @@ end:
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param mszReaderName [inout] Friendly name of this reader.
- * @param pcchReaderLen [inout] Size of the \p szReaderName multistring.
+ * @param[in,out] mszReaderName Friendly name of this reader.
+ * @param[in,out] pcchReaderLen Size of the \p szReaderName multistring.
  * @param[out] pdwState Current state of this reader. \p pdwState
  * is a DWORD possibly OR'd with the following values:
  * - \ref SCARD_ABSENT - There is no card in the reader.
@@ -1749,7 +1749,7 @@ end:
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout Maximum waiting time (in milliseconds) for status
  *            change, zero (or \ref INFINITE) for infinite.
- * @param rgReaderStates [inout] Structures of readers with current states.
+ * @param[in,out] rgReaderStates Structures of readers with current states.
  * @param[in] cReaders Number of structures.
  *
  * @return Error code.
@@ -2491,7 +2491,7 @@ end:
  * implemented.
  *
  * @param[out] pbAttr Pointer to a buffer that receives the attribute.
- * @param pcbAttrLen [inout] Length of the \p pbAttr buffer in bytes.
+ * @param[in,out] pcbAttrLen Length of the \p pbAttr buffer in bytes.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
@@ -2752,15 +2752,15 @@ end:
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param pioSendPci [inout] Structure of Protocol Control Information.
+ * @param[in,out] pioSendPci Structure of Protocol Control Information.
  * - \ref SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
  * - \ref SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
  * - \ref SCARD_PCI_RAW - Pre-defined RAW PCI structure.
  * @param[in] pbSendBuffer APDU to send to the card.
  * @param[in] cbSendLength Length of the APDU.
- * @param pioRecvPci [inout] Structure of protocol information.
+ * @param[in,out] pioRecvPci Structure of protocol information.
  * @param[out] pbRecvBuffer Response from the card.
- * @param pcbRecvLength [inout] Length of the response.
+ * @param[in,out] pcbRecvLength Length of the response.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
@@ -2959,7 +2959,7 @@ end:
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] mszGroups List of groups to list readers (not used).
  * @param[out] mszReaders Multi-string with list of readers.
- * @param pcchReaders [inout] Size of multi-string buffer including NULL's.
+ * @param[in,out] pcchReaders Size of multi-string buffer including NULL's.
  *
  * @return Connection status.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
@@ -3161,7 +3161,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
- * @param pcchGroups [inout] Size of multi-string buffer including NUL's.
+ * @param[in,out] pcchGroups Size of multi-string buffer including NUL's.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
