@@ -2442,7 +2442,10 @@ end:
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param[in] dwAttrId Identifier for the attribute to get.
+ * @param[in] dwAttrId Identifier for the attribute to get.\n
+ * Not all the \p dwAttrId values listed above may be implemented in the IFD
+ * Handler you are using. And some \p dwAttrId values not listed here may be
+ * implemented.
  * - \ref SCARD_ATTR_ASYNC_PROTOCOL_TYPES
  * - \ref SCARD_ATTR_ATR_STRING
  * - \ref SCARD_ATTR_CHANNEL_ID
@@ -2485,11 +2488,6 @@ end:
  * - \ref SCARD_ATTR_VENDOR_IFD_TYPE
  * - \ref SCARD_ATTR_VENDOR_IFD_VERSION
  * - \ref SCARD_ATTR_VENDOR_NAME
- *
- * Not all the \p dwAttrId values listed above may be implemented in the IFD
- * Handler you are using. And some \p dwAttrId values not listed here may be
- * implemented.
- *
  * @param[out] pbAttr Pointer to a buffer that receives the attribute.
  * @param[in,out] pcbAttrLen Length of the \p pbAttr buffer in bytes.
  *
