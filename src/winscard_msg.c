@@ -180,7 +180,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 				retval = -1;
 				break;
 			}
-			written = write(filedes, buffer, remaining);
+			written = send(filedes, buffer, remaining, MSG_NOSIGNAL);
 
 			if (written > 0)
 			{
