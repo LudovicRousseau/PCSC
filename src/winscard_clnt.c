@@ -859,7 +859,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 {
 	LONG rv;
 	struct reconnect_struct scReconnectStruct;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -887,26 +886,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	scReconnectStruct.hCard = hCard;
 	scReconnectStruct.dwShareMode = dwShareMode;
@@ -1086,7 +1065,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	LONG rv;
 	struct begin_struct scBeginStruct;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -1111,26 +1089,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	scBeginStruct.hCard = hCard;
 	scBeginStruct.rv = SCARD_S_SUCCESS;
@@ -1221,7 +1179,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	struct end_struct scEndStruct;
-	int randnum, i;
+	int randnum;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -1251,26 +1209,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	scEndStruct.hCard = hCard;
 	scEndStruct.dwDisposition = dwDisposition;
@@ -1325,7 +1263,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
 	struct cancel_transaction_struct scCancelStruct;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -1350,26 +1287,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	scCancelStruct.hCard = hCard;
 
@@ -2306,7 +2223,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 {
 	LONG rv;
 	struct control_struct scControlStruct;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	PROFILE_START
@@ -2338,26 +2254,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
 		|| (cbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
@@ -2627,7 +2523,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 {
 	LONG rv;
 	struct getset_struct scGetSetStruct;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 
 	rv = SCardCheckDaemonAvailability();
@@ -2650,26 +2545,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	if (*pcbAttrLen > MAX_BUFFER_SIZE)
 	{
@@ -2798,7 +2673,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;
-	int i;
 	DWORD dwContextIndex, dwChannelIndex;
 	struct transmit_struct scTransmitStruct;
 
@@ -2832,26 +2706,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
-	if (rv != SCARD_S_SUCCESS)
-		goto end;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		char *r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
-
-		/* by default r == NULL */
-		if (r && strcmp(r, readerStates[i].readerName) == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-	{
-		rv = SCARD_E_READER_UNAVAILABLE;
-		goto end;
-	}
 
 	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
 		|| (*pcbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
