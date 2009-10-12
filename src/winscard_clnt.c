@@ -575,8 +575,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
+		rv = SCARD_E_NO_SERVICE;
+		goto end;
 	}
 
 	/*
@@ -588,10 +588,12 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
+		rv = SCARD_F_COMM_ERROR;
+		goto end;
 	}
 
+	rv = scReleaseStruct.rv;
+end:
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	/*
@@ -603,7 +605,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	PROFILE_END(scReleaseStruct.rv)
 
-	return scReleaseStruct.rv;
+	return rv;
 }
 
 /**
