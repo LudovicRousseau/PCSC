@@ -748,8 +748,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
+		rv = SCARD_E_NO_SERVICE;
+		goto end;
 	}
 
 	/*
@@ -761,8 +761,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
+		rv = SCARD_F_COMM_ERROR;
+		goto end;
 	}
 
 	*phCard = scConnectStruct.hCard;
@@ -774,18 +774,16 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		 * Keep track of the handle locally
 		 */
 		rv = SCardAddHandle(*phCard, dwContextIndex, szReader);
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-
-		PROFILE_END(rv)
-
-		return rv;
 	}
+	else
+		rv = scConnectStruct.rv;
 
+end:
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(scConnectStruct.rv)
 
-	return scConnectStruct.rv;
+	return rv;
 }
 
 /**
