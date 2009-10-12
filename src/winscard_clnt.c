@@ -998,8 +998,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_E_NO_SERVICE;
+		rv = SCARD_E_NO_SERVICE;
+		goto end;
 	}
 
 	/*
@@ -1012,12 +1012,13 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (rv == -1)
 	{
-		(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
-		return SCARD_F_COMM_ERROR;
+		rv = SCARD_F_COMM_ERROR;
+		goto end;
 	}
 
 	(void)SCardRemoveHandle(hCard);
 
+end:
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
 	PROFILE_END(scDisconnectStruct.rv)
