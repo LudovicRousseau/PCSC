@@ -3468,6 +3468,10 @@ static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard,
 /**
  * @brief Checks if the server is running.
  *
+ * If the server has been restarted or the client has forked we
+ * invalidate all the PC/SC handles. The client has to call
+ * SCardEstablishContext() again.
+ *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_NO_SERVICE Server is not running (\ref SCARD_E_NO_SERVICE)
