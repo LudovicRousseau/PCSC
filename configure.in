@@ -264,23 +264,6 @@ if test x${debugatr} = xtrue ; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} debugatr"
 fi
 
-# --enable-scf
-AC_ARG_ENABLE(scf,
-  AC_HELP_STRING([--enable-scf],[use SCF for reader support]),
-[ case "${enableval}" in
-  yes)	scf=true ;;
-  no)	scf=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-scf]) ;;
-esac], [scf=false])
-
-AC_SUBST(LIBSMARTCARD)
-if test x$scf = xtrue -a x$ac_cv_header_smartcard_scf_h = xyes; then
-  AC_CHECK_LIB(smartcard, SCF_strerror, [LIBSMARTCARD="$LIBSMARTCARD -lsmartcard" scf=true], scf=false)
-else
-  scf=false
-fi
-AM_CONDITIONAL(HAVE_SCF, test x$scf = xtrue)
-
 # --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
 AC_HELP_STRING([--enable-confdir=DIR],[directory containing reader.conf
@@ -352,7 +335,6 @@ PCSC_ARCH:           ${PCSC_ARCH}
 
 libhal support:       ${use_libhal}
 libusb support:       ${use_libusb}
-SCF reader support:   ${scf}
 USB drop directory:   ${usbdropdir}
 ATR parsing messages: ${debugatr}
 confdir:              ${confdir}

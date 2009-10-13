@@ -5,16 +5,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 
 lib_LTLIBRARIES = libpcsclite.la
 
-if !HAVE_SCF
 sbin_PROGRAMS = pcscd
-endif
 noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
 
-if HAVE_SCF
-PCSC_CLIENT_SRC  = winscard_scf.c
-else
 PCSC_CLIENT_SRC  = winscard_clnt.c
-endif
 
 libpcsclite_la_SOURCES = \
 	debug.c \
@@ -151,5 +145,5 @@ pc_DATA = libpcsclite.pc
 tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
-EXTRA_DIST = README_INTERNALS.txt winscard_scf.c
+EXTRA_DIST = README_INTERNALS.txt
 
