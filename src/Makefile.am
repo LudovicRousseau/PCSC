@@ -8,13 +8,11 @@ lib_LTLIBRARIES = libpcsclite.la
 sbin_PROGRAMS = pcscd
 noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
 
-PCSC_CLIENT_SRC  = winscard_clnt.c
-
 libpcsclite_la_SOURCES = \
 	debug.c \
 	debug.h \
 	error.c \
-	$(PCSC_CLIENT_SRC) \
+	winscard_clnt.c \
 	strlcat.c \
 	strlcpy.c \
 	sys_unix.c \
