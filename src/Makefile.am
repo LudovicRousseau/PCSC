@@ -13,9 +13,6 @@ PCSC_CLIENT_SRC  = winscard_clnt.c
 libpcsclite_la_SOURCES = \
 	debug.c \
 	debug.h \
-	dyn_hpux.c \
-	dyn_macosx.c \
-	dyn_unix.c \
 	error.c \
 	$(PCSC_CLIENT_SRC) \
 	strlcat.c \
