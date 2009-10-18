@@ -180,7 +180,16 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
 				retval = -1;
 				break;
 			}
+			/* since we are a user library we can't play with signals
+			 * The signals may already be used by the application */
+#ifdef MSG_NOSIGNAL
+			/* Get EPIPE return code instead of SIGPIPE signal
+			 * Works on Linux */
 			written = send(filedes, buffer, remaining, MSG_NOSIGNAL);
+#else
+			/* we may get a SIGPIPE signal if the other side has closed */
+			written = write(filedes, buffer, remaining);
+#endif
 
 			if (written > 0)
 			{
