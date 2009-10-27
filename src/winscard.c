@@ -166,13 +166,6 @@ static void profile_end(const char *f, int line)
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	 0x1000
 
-/** Some defines for context stack. */
-#define SCARD_LAST_CONTEXT       1
-/** Some defines for context stack. */
-#define SCARD_NO_CONTEXT         0
-/** Some defines for context stack. */
-#define SCARD_EXCLUSIVE_CONTEXT -1
-
 SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, sizeof(SCARD_IO_REQUEST) };
 SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, sizeof(SCARD_IO_REQUEST) };
 SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(SCARD_IO_REQUEST) };

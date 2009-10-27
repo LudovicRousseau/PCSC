@@ -51,6 +51,13 @@ extern "C"
 		/*@null@*/ RESPONSECODE (*)(DWORD));
 	LONG EHDestroyEventHandler(PREADER_CONTEXT);
 
+/** Some defines for context stack. */
+#define SCARD_LAST_CONTEXT       1
+/** Some defines for context stack. */
+#define SCARD_NO_CONTEXT         0
+/** Some defines for context stack. */
+#define SCARD_EXCLUSIVE_CONTEXT -1
+
 #ifdef __cplusplus
 }
 #endif
