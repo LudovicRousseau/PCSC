@@ -277,7 +277,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 		if (delta > timeOut*1000)
 		{
 			/* we already timed out */
-			retval = -1;
+			retval = -2;
 			break;
 		}
 

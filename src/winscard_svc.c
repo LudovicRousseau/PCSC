@@ -119,7 +119,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) {printf("%d %d\n", header.size, sizeof(v)); goto wrong_length;} \
 	ret = SHMMessageReceive(&v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
-	if (-1 == ret) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
+	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
 	ret = SHMMessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
@@ -160,7 +160,7 @@ static const char *CommandsText[] = {
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) {printf("%d %d\n", header.size, sizeof(v)); goto wrong_length;} \
 	ret = SHMMessageReceive(&v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
-	if (-1 == ret) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
+	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
 	ret = SHMMessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
@@ -178,7 +178,7 @@ static void ContextThread(LPVOID dwIndex)
 		struct rxHeader header;
 		int32_t ret = SHMMessageReceive(&header, sizeof(header), filedes, PCSCLITE_READ_TIMEOUT);
 
-		if (-1 == ret)
+		if (ret < 0)
 		{
 			/* Clean up the dead client */
 			Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
@@ -507,7 +507,7 @@ static void ContextThread(LPVOID dwIndex)
 				/* read sent buffer */
 				ret = SHMMessageReceive(pbSendBuffer, trStr.cbSendLength,
 					filedes, PCSCLITE_READ_TIMEOUT);
-				if (-1 == ret)
+				if (ret < 0)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
 					goto exit;
@@ -560,7 +560,7 @@ static void ContextThread(LPVOID dwIndex)
 				/* read sent buffer */
 				ret = SHMMessageReceive(pbSendBuffer, ctStr.cbSendLength,
 					filedes, PCSCLITE_READ_TIMEOUT);
-				if (-1 == ret)
+				if (ret < 0)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
 					goto exit;

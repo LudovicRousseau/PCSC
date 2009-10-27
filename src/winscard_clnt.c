@@ -444,8 +444,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			return SCARD_E_NO_SERVICE;
 
 		/* Read a message from the server */
-		if (-1 == SHMMessageReceive(&veStr, sizeof(veStr), dwClientID,
-			PCSCLITE_READ_TIMEOUT))
+		if (SHMMessageReceive(&veStr, sizeof(veStr), dwClientID,
+			PCSCLITE_READ_TIMEOUT) < 0)
 		{
 			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");
 			return SCARD_F_COMM_ERROR;
@@ -480,7 +480,7 @@ again:
 	 */
 	rv = SHMMessageReceive(&scEstablishStruct, sizeof(scEstablishStruct), dwClientID, PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 		return SCARD_F_COMM_ERROR;
 
 	if (scEstablishStruct.rv != SCARD_S_SUCCESS)
@@ -586,7 +586,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -759,7 +759,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -912,7 +912,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			psContextMap[dwContextIndex].dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -1010,7 +1010,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -1118,7 +1118,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 			psContextMap[dwContextIndex].dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
-		if (rv == -1)
+		if (rv < 0)
 		{
 			rv = SCARD_F_COMM_ERROR;
 			goto end;
@@ -1233,7 +1233,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -1309,7 +1309,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -1513,7 +1513,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -1770,7 +1770,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		rgReaderStates[j].dwEventState = 0;
 
 	/* Now is where we start our event checking loop */
-	Log1(PCSC_LOG_DEBUG, "Event Loop Start");
+	Log2(PCSC_LOG_DEBUG, "Event Loop Start, dwTimeout: %ld", dwTimeout);
 
 	/* Get the initial reader count on the system */
 	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
@@ -2094,9 +2094,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					dwTime);
 
 				/* timeout */
-				if (-1 == rv)
+				if (-2 == rv)
 				{
-					/* aask server to remove us from the event list */
+					/* ask server to remove us from the event list */
 					rv = SHMMessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
 						psContextMap[dwContextIndex].dwClientID,
 						sizeof(waitStatusStruct), PCSCLITE_WRITE_TIMEOUT,
@@ -2111,13 +2111,19 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/* Read a message from the server */
 					rv = SHMMessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
 						psContextMap[dwContextIndex].dwClientID,
-						dwTime);
+						PCSCLITE_READ_TIMEOUT);
 
 					if (rv == -1)
 					{
 						rv = SCARD_E_NO_SERVICE;
 						goto end;
 					}
+				}
+
+				if (rv < 0)
+				{
+					rv = SCARD_E_NO_SERVICE;
+					goto end;
 				}
 
 				/* an event occurs or SCardCancel() was called */
@@ -2295,7 +2301,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -2308,7 +2314,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 			psContextMap[dwContextIndex].dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
-		if (rv == -1)
+		if (rv < 0)
 		{
 			rv = SCARD_E_NO_SERVICE;
 			goto end;
@@ -2578,7 +2584,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -2760,7 +2766,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		psContextMap[dwContextIndex].dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -2773,7 +2779,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			psContextMap[dwContextIndex].dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
-		if (rv == -1)
+		if (rv < 0)
 		{
 			rv = SCARD_E_NO_SERVICE;
 			goto end;
@@ -3189,7 +3195,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	rv = SHMMessageReceive(&scCancelStruct, sizeof(scCancelStruct),
 		dwClientID, PCSCLITE_READ_TIMEOUT);
 
-	if (rv == -1)
+	if (rv < 0)
 	{
 		rv = SCARD_F_COMM_ERROR;
 		goto end;
@@ -3547,8 +3553,8 @@ static LONG getReaderStates(LONG dwContextIndex)
 		return SCARD_E_NO_SERVICE;
 
 	/* Read a message from the server */
-	if (-1 == SHMMessageReceive(&readerStates, sizeof(readerStates), dwClientID,
-		PCSCLITE_READ_TIMEOUT))
+	if (SHMMessageReceive(&readerStates, sizeof(readerStates), dwClientID,
+		PCSCLITE_READ_TIMEOUT) < 0)
 		return SCARD_F_COMM_ERROR;
 
 	return SCARD_S_SUCCESS;
