@@ -182,6 +182,7 @@ static void ContextThread(LPVOID dwIndex)
 		{
 			/* Clean up the dead client */
 			Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
+			EHTryToUnregisterClientForEvent(filedes);
 			goto exit;
 		}
 
