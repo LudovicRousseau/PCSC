@@ -76,7 +76,7 @@ LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 		rv = SCARD_F_INTERNAL_ERROR;
 
 	return rv;
-} /* EHUnregisterClientForEvent */
+} /* EHTryToUnregisterClientForEvent */
 
 /**
  * Unregister a client and log an error if the client is not found
