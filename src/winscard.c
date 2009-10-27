@@ -172,8 +172,6 @@ static void profile_end(const char *f, int line)
 #define SCARD_NO_CONTEXT         0
 /** Some defines for context stack. */
 #define SCARD_EXCLUSIVE_CONTEXT -1
-/** Some defines for context stack. */
-#define SCARD_NO_LOCK            0
 
 SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, sizeof(SCARD_IO_REQUEST) };
 SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, sizeof(SCARD_IO_REQUEST) };
