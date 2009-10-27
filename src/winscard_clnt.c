@@ -1994,7 +1994,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 
 				/* Now figure out sharing modes */
-				if (rContext->readerSharing == -1)
+				if (rContext->readerSharing == SCARD_EXCLUSIVE_CONTEXT)
 				{
 					currReader->dwEventState |= SCARD_STATE_EXCLUSIVE;
 					currReader->dwEventState &= ~SCARD_STATE_INUSE;
@@ -2005,7 +2005,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						dwBreakFlag = 1;
 					}
 				}
-				else if (rContext->readerSharing >= 1)
+				else if (rContext->readerSharing >= SCARD_LAST_CONTEXT)
 				{
 					/* A card must be inserted for it to be INUSE */
 					if (dwState & SCARD_PRESENT)
@@ -2020,7 +2020,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						}
 					}
 				}
-				else if (rContext->readerSharing == 0)
+				else if (rContext->readerSharing == SCARD_NO_CONTEXT)
 				{
 					currReader->dwEventState &= ~SCARD_STATE_INUSE;
 					currReader->dwEventState &= ~SCARD_STATE_EXCLUSIVE;
