@@ -186,7 +186,8 @@ static void ContextThread(LPVOID dwIndex)
 			goto exit;
 		}
 
-		Log2(PCSC_LOG_DEBUG, "Received command: %s", CommandsText[header.command]);
+		Log3(PCSC_LOG_DEBUG, "Received command: %s from client %d",
+			CommandsText[header.command], filedes);
 
 		switch (header.command)
 		{
