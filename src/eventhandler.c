@@ -469,9 +469,9 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				(void)EHSignalEventToClients();
-
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
+
+				(void)EHSignalEventToClients();
 
 				if (rv == IFD_SUCCESS)
 				{
