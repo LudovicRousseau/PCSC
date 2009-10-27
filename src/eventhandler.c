@@ -56,7 +56,11 @@ LONG EHRegisterClientForEvent(int32_t filedes)
 	return SCARD_S_SUCCESS;
 } /* EHRegisterClientForEvent */
 
-LONG EHUnregisterClientForEvent(int32_t filedes)
+/**
+ * Try to unregisted a client
+ * If no client is found then do no log an error
+ */
+LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 {
 	LONG rv = SCARD_S_SUCCESS;
 	int pos, ret;
@@ -69,10 +73,20 @@ LONG EHUnregisterClientForEvent(int32_t filedes)
 	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
 	
 	if (ret < 0)
-	{
-		Log2(PCSC_LOG_ERROR, "Can't remove client: %d", filedes);
 		rv = SCARD_F_INTERNAL_ERROR;
-	}
+
+	return rv;
+} /* EHUnregisterClientForEvent */
+
+/**
+ * Unregister a client and log an error if the client is not found
+ */
+LONG EHUnregisterClientForEvent(int32_t filedes)
+{
+	LONG rv = EHTryToUnregisterClientForEvent(filedes);
+	
+	if (rv < 0)
+		Log2(PCSC_LOG_ERROR, "Can't remove client: %d", filedes);
 
 	return rv;
 } /* EHUnregisterClientForEvent */

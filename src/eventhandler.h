@@ -42,6 +42,7 @@ extern "C"
 	}
 	READER_STATE, *PREADER_STATE;
 
+	LONG EHTryToUnregisterClientForEvent(int32_t filedes);
 	LONG EHRegisterClientForEvent(int32_t filedes);
 	LONG EHUnregisterClientForEvent(int32_t filedes); 
 	LONG EHSignalEventToClients(void);
