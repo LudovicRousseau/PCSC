@@ -20,7 +20,7 @@
 #include "thread_generic.h"
 #include "misc.h"
 
-INTERNAL int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexInit(PCSCLITE_MUTEX * mMutex)
 {
 	if (mMutex)
 		return pthread_mutex_init(mMutex, NULL);
@@ -28,7 +28,7 @@ INTERNAL int SYS_MutexInit(PCSCLITE_MUTEX_T mMutex)
 		return -1;
 }
 
-INTERNAL int SYS_MutexDestroy(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexDestroy(PCSCLITE_MUTEX * mMutex)
 {
 	if (mMutex)
 		return pthread_mutex_destroy(mMutex);
@@ -36,7 +36,7 @@ INTERNAL int SYS_MutexDestroy(PCSCLITE_MUTEX_T mMutex)
 		return -1;
 }
 
-INTERNAL int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexLock(PCSCLITE_MUTEX * mMutex)
 {
 	if (mMutex)
 		return pthread_mutex_lock(mMutex);
@@ -44,7 +44,7 @@ INTERNAL int SYS_MutexLock(PCSCLITE_MUTEX_T mMutex)
 		return -1;
 }
 
-INTERNAL int SYS_MutexTryLock(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexTryLock(PCSCLITE_MUTEX * mMutex)
 {
 	if (mMutex)
 		return pthread_mutex_trylock(mMutex);
@@ -52,7 +52,7 @@ INTERNAL int SYS_MutexTryLock(PCSCLITE_MUTEX_T mMutex)
 		return -1;
 }
 
-INTERNAL int SYS_MutexUnLock(PCSCLITE_MUTEX_T mMutex)
+INTERNAL int SYS_MutexUnLock(PCSCLITE_MUTEX * mMutex)
 {
 	if (mMutex)
 		return pthread_mutex_unlock(mMutex);

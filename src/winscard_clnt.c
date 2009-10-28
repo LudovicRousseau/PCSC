@@ -193,7 +193,7 @@ static struct _psContextMap
 {
 	DWORD dwClientID;				/**< Client Connection ID */
 	SCARDCONTEXT hContext;			/**< Application Context ID */
-	PCSCLITE_MUTEX_T mMutex;		/**< Mutex for this context */
+	PCSCLITE_MUTEX * mMutex;		/**< Mutex for this context */
 	CHANNEL_MAP psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
 } psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
 
