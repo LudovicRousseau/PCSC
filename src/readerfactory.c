@@ -692,7 +692,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 		/* Neither version of the IFD Handler was found - exit */
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 
-		exit(1);
+		return SCARD_F_UNKNOWN_ERROR;
 	} else if (rv1 == SCARD_S_SUCCESS)
 	{
 		/* Ifd Handler 1.0 found */
@@ -716,7 +716,8 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
 	void *f1 = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function)) \
+	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function); \
+	if (SCARD_S_SUCCESS != rv) \
 	{ \
 		code \
 	} \
@@ -726,7 +727,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESSv1(field, function) \
 	GET_ADDRESS_OPTIONALv1(field, function, \
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #function ); \
-		exit(1); )
+		return(rv); )
 
 		(void)DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
 		rContext->psFunctions.psFunctions_v1.pvfCreateChannel = f;
@@ -735,7 +736,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 			"IO_Close_Channel"))
 		{
 			Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
-			exit(1);
+			return SCARD_F_UNKNOWN_ERROR;
 		}
 		rContext->psFunctions.psFunctions_v1.pvfCloseChannel = f;
 
@@ -753,7 +754,8 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
 	void *f1 = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s)) \
+	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	if (SCARD_S_SUCCESS != rv) \
 	{ \
 		code \
 	} \
@@ -763,7 +765,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESSv2(s) \
 	GET_ADDRESS_OPTIONALv2(s, \
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #s ); \
-		exit(1); )
+		return(rv); )
 
 		Log1(PCSC_LOG_INFO, "Loading IFD Handler 2.0");
 
@@ -784,7 +786,8 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
 	void *f1 = NULL; \
-	if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s)) \
+	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	if (SCARD_S_SUCCESS != rv) \
 	{ \
 		code \
 	} \
@@ -794,7 +797,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 #define GET_ADDRESSv3(s) \
 	GET_ADDRESS_OPTIONALv3(s, \
 		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #s ); \
-		exit(1); )
+		return(rv); )
 
 		Log1(PCSC_LOG_INFO, "Loading IFD Handler 3.0");
 
@@ -814,7 +817,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	{
 		/* Who knows what could have happenned for it to get here. */
 		Log1(PCSC_LOG_CRITICAL, "IFD Handler not 1.0/2.0 or 3.0");
-		exit(1);
+		return SCARD_F_UNKNOWN_ERROR;
 	}
 
 	return SCARD_S_SUCCESS;
