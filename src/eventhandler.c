@@ -47,11 +47,11 @@ static void EHStatusHandlerThread(PREADER_CONTEXT);
 
 LONG EHRegisterClientForEvent(int32_t filedes)
 {
-	SYS_MutexLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexLock(ClientsWaitingForEvent_lock);
 
-	list_append(&ClientsWaitingForEvent, &filedes);
+	(void)list_append(&ClientsWaitingForEvent, &filedes);
 	
-	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexUnLock(ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;
 } /* EHRegisterClientForEvent */
@@ -65,12 +65,12 @@ LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 	LONG rv = SCARD_S_SUCCESS;
 	int pos, ret;
 
-	SYS_MutexLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexLock(ClientsWaitingForEvent_lock);
 
 	pos = list_locate(&ClientsWaitingForEvent, &filedes);
 	ret = list_delete_at(&ClientsWaitingForEvent, pos);
 	
-	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexUnLock(ClientsWaitingForEvent_lock);
 	
 	if (ret < 0)
 		rv = SCARD_F_INTERNAL_ERROR;
@@ -99,19 +99,19 @@ LONG EHSignalEventToClients(void)
 	LONG rv = SCARD_S_SUCCESS;
 	int32_t filedes;
 
-	SYS_MutexLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexLock(ClientsWaitingForEvent_lock);
 
-	list_iterator_start(&ClientsWaitingForEvent);
+	(void)list_iterator_start(&ClientsWaitingForEvent);
 	while (list_iterator_hasnext(&ClientsWaitingForEvent))
 	{
         filedes = *(int32_t *)list_iterator_next(&ClientsWaitingForEvent);
 		rv = MSGSignalClient(filedes, SCARD_S_SUCCESS);
 	}
-	list_iterator_stop(&ClientsWaitingForEvent);
+	(void)list_iterator_stop(&ClientsWaitingForEvent);
 
-	list_clear(&ClientsWaitingForEvent);
+	(void)list_clear(&ClientsWaitingForEvent);
 
-	SYS_MutexUnLock(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexUnLock(ClientsWaitingForEvent_lock);
 
 	return rv;
 } /* EHSignalEventToClients */
@@ -132,15 +132,15 @@ LONG EHInitializeEventStructures(void)
 		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
 
-	list_init(&ClientsWaitingForEvent);
+	(void)list_init(&ClientsWaitingForEvent);
 
 	/* request to store copies, and provide the metric function */
-    list_attributes_copy(&ClientsWaitingForEvent, list_meter_int32_t, 1);
+    (void)list_attributes_copy(&ClientsWaitingForEvent, list_meter_int32_t, 1);
 
 	/* setting the comparator, so the list can sort, find the min, max etc */
-    list_attributes_comparator(&ClientsWaitingForEvent, list_comparator_int32_t);
+    (void)list_attributes_comparator(&ClientsWaitingForEvent, list_comparator_int32_t);
 
-	SYS_MutexInit(ClientsWaitingForEvent_lock);
+	(void)SYS_MutexInit(ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;
 }
