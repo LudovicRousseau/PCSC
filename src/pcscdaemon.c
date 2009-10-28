@@ -175,7 +175,8 @@ static void SVCServiceRunLoop(void)
 			(void)SYS_Sleep(1);
 
 			/* now stop all the drivers */
-			RFCleanupReaders(1);
+			RFCleanupReaders();
+			exit(0);
 		}
 	}
 }

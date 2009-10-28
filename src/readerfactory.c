@@ -1172,7 +1172,7 @@ LONG RFCheckReaderStatus(PREADER_CONTEXT rContext)
 		return SCARD_S_SUCCESS;
 }
 
-void RFCleanupReaders(int shouldExit)
+void RFCleanupReaders(void)
 {
 	int i;
 
@@ -1198,10 +1198,6 @@ void RFCleanupReaders(int shouldExit)
 				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08X", rv);
 		}
 	}
-
-	/* exit() will call at_exit() */
-	if (shouldExit)
-		exit(0);
 }
 
 int RFStartSerialReaders(const char *readerconf)
