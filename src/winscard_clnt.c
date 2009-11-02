@@ -603,7 +603,7 @@ end:
 	(void)SCardRemoveContext(hContext);
 	(void)SCardUnlockThread();
 
-	PROFILE_END(scReleaseStruct.rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -781,7 +781,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 end:
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END(scConnectStruct.rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -1017,13 +1017,14 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 
 	(void)SCardRemoveHandle(hCard);
+	rv = scDisconnectStruct.rv;
 
 end:
 	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
 
-	PROFILE_END(scDisconnectStruct.rv)
+	PROFILE_END(rv)
 
-	return scDisconnectStruct.rv;
+	return rv;
 }
 
 /**
