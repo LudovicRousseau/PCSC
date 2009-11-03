@@ -50,7 +50,7 @@ extern "C"
 		RESPONSECODE (*pvfICCPresence)(void);
 	};
 
-	typedef struct FctMap_V1 FCT_MAP_V1, *PFCT_MAP_V1;
+	typedef struct FctMap_V1 FCT_MAP_V1;
 
 	struct FctMap_V2
 	{
@@ -70,7 +70,7 @@ extern "C"
 		RESPONSECODE (*pvfControl)(DWORD, PUCHAR, DWORD, PUCHAR, PDWORD);
 	};
 
-	typedef struct FctMap_V2 FCT_MAP_V2, *PFCT_MAP_V2;
+	typedef struct FctMap_V2 FCT_MAP_V2;
 
 	struct FctMap_V3
 	{
@@ -92,7 +92,7 @@ extern "C"
 		RESPONSECODE (*pvfCreateChannelByName)(DWORD, LPSTR);
 	};
 
-	typedef struct FctMap_V3 FCT_MAP_V3, *PFCT_MAP_V3;
+	typedef struct FctMap_V3 FCT_MAP_V3;
 
 	struct RdrCliHandles
 	{
@@ -100,7 +100,7 @@ extern "C"
 		DWORD dwEventStatus;	/**< Recent event that must be sent */
 	};
 
-	typedef struct RdrCliHandles RDR_CLIHANDLES, *PRDR_CLIHANDLES;
+	typedef struct RdrCliHandles RDR_CLIHANDLES;
 
 	struct ReaderContext
 	{
