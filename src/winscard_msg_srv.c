@@ -102,7 +102,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	/*
 	 * Create the common shared connection socket
 	 */
-	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+	if ((commonSocket = socket(PF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to create common socket: %s",
 			strerror(errno));

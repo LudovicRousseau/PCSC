@@ -62,7 +62,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	int one;
 	int ret;
 
-	ret = socket(AF_UNIX, SOCK_STREAM, 0);
+	ret = socket(PF_UNIX, SOCK_STREAM, 0);
 	if (ret < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Error: create on client socket: %s",
