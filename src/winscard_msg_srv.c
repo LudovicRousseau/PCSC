@@ -102,14 +102,14 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	/*
 	 * Create the common shared connection socket
 	 */
-	if ((commonSocket = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
+	if ((commonSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to create common socket: %s",
 			strerror(errno));
 		return -1;
 	}
 
-	serv_adr.sun_family = AF_LOCAL;
+	serv_adr.sun_family = AF_UNIX;
 	strncpy(serv_adr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(serv_adr.sun_path));
 	(void)SYS_RemoveFile(PCSCLITE_CSOCK_NAME);

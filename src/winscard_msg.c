@@ -62,7 +62,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	int one;
 	int ret;
 
-	ret = socket(AF_LOCAL, SOCK_STREAM, 0);
+	ret = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (ret < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Error: create on client socket: %s",
@@ -71,7 +71,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
 	}
 	*pdwClientID = ret;
 
-	svc_addr.sun_family = AF_LOCAL;
+	svc_addr.sun_family = AF_UNIX;
 	strncpy(svc_addr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(svc_addr.sun_path));
 
