@@ -182,7 +182,7 @@ struct _psChannelMap
 	LPSTR readerName;
 };
 
-typedef struct _psChannelMap CHANNEL_MAP, *PCHANNEL_MAP;
+typedef struct _psChannelMap CHANNEL_MAP;
 
 /**
  * @brief Represents the an Application Context on the Client side.
