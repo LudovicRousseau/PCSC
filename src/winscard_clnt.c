@@ -32,7 +32,7 @@
  *    @code
  *    if (dwState & SCARD_PRESENT)
  *    {
- *      // card is present 
+ *      // card is present
  *    }
  *    @endcode
  * -# \ref SCARD_E_UNSUPPORTED_FEATURE
@@ -1435,10 +1435,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	if (pdwProtocol)
 		*pdwProtocol = 0;
 
-	/* Check for NULL parameters */ 
+	/* Check for NULL parameters */
 	if (pcchReaderLen == NULL)
 		pcchReaderLen = &dummy;
-	
+
 	if (pcbAtrLen == NULL)
 		pcbAtrLen = &dummy;
 
