@@ -185,7 +185,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContext])->pdwMutex =
 		  (sReadersContexts[parentNode])->pdwMutex;
 
-		/* Call on the driver to see if it is thread safe */
+		/* Call on the parent driver to see if it is thread safe */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[parentNode]),
 			TAG_IFD_THREAD_SAFE, &dwGetSize, ucThread);
