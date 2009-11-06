@@ -383,7 +383,7 @@ LONG HPSearchHotPluggables(void)
 		bundleTracker[i].manuID     = 0;
 
 		for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
-			 bundleTracker[i].deviceNumber[j].id = 0;
+			bundleTracker[i].deviceNumber[j].id = 0;
 	}
 
 	HPReadBundleValues();
