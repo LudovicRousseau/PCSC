@@ -76,23 +76,21 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        (void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
-	        rv = (*IFD_set_protocol_parameters) (dwProtocol,
+		ucValue[0] = rContext->dwSlot;
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		rv = (*IFD_set_protocol_parameters) (dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 	else
 	{
 		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot,
-						      dwProtocol,
-						      ucFlags, ucPTS1,
-						      ucPTS2, ucPTS3);
+			dwProtocol, ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 #else
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-	        ucValue[0] = rContext->dwSlot;
-	        (void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
+		ucValue[0] = rContext->dwSlot;
+		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
 	}
