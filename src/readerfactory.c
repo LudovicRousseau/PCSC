@@ -347,7 +347,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
 			(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
 
-		/* Call on the driver to see if the slots are thread safe */
+		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
 			TAG_IFD_SLOT_THREAD_SAFE, &dwGetSize, ucThread);
