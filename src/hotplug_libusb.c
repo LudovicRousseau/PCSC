@@ -326,7 +326,7 @@ static void HPRescanUsbBus(void)
 		 *	check for this explicitly.
 		 */
 		if (readerTracker[i].status == READER_PRESENT ||
-			 readerTracker[i].fullName == NULL)
+			readerTracker[i].fullName == NULL)
 			continue;
 
 		sscanf(readerTracker[i].bus_device, "%*[^:]%*[:]%s", filename);
@@ -425,7 +425,7 @@ static void HPEstablishUSBNotifications(void)
 	{
 		char dummy;
 
-	  	pipe(rescan_pipe);
+		pipe(rescan_pipe);
 		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
 		{
 			Log1(PCSC_LOG_INFO, "Reload serial configuration");
@@ -461,7 +461,7 @@ LONG HPStopHotPluggables(void)
 	AraKiriHotPlug = TRUE;
 	if (rescan_pipe[1] >= 0)
 	{
-	  	close(rescan_pipe[1]);
+		close(rescan_pipe[1]);
 		rescan_pipe[1] = -1;
 	}
 
