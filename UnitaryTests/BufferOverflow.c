@@ -1,3 +1,9 @@
+/*
+ * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ *
+ * Copyright (C) 2009
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ */
 #include <stdio.h>
 #ifdef __APPLE__
 #include <PCSC/winscard.h>

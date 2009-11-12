@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2007
+ *  Jacob Berkman
+ * Copyright (C) 2008
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ */
+
 #ifndef LASSERT_H
 #define LASSERT_H
 

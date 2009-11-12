@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2007
+ *  Jacob Berkman
+ * Copyright (C) 2007-2009
+ *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>

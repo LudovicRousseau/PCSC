@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2001-2003
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2003-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$

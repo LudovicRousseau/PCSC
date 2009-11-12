@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2008
+ * Copyright (C) 2006-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This file is dual licenced:

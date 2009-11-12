@@ -3,9 +3,11 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 1999-2004
+ * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2004
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ * Copyright (C) 2004-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$

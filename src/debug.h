@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2005
+ * Copyright (C) 2006-2008
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id: debuglog.h 1835 2006-01-25 10:42:23Z rousseau $
