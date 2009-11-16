@@ -152,7 +152,7 @@ static const char *CommandsText[] = {
 };
 
 #define READ_BODY(v) \
-	if (header.size != sizeof(v)) {printf("%d %d\n", header.size, sizeof(v)); goto wrong_length;} \
+	if (header.size != sizeof(v)) { goto wrong_length; } \
 	ret = SHMMessageReceive(&v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
 	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
