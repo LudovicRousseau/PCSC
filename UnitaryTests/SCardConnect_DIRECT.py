@@ -45,7 +45,7 @@ print "dwActiveProtocol:", dwActiveProtocol
 hresult, dwActiveProtocol = SCardReconnect(hcard,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+	raise Exception('Failed to SCardReconnect: ' + SCardGetErrorMessage(hresult))
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print "dwActiveProtocol:", dwActiveProtocol
