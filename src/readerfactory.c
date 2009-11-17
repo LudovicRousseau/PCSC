@@ -996,6 +996,9 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 
 	/* Create a random handle with 16 bits check to see if it already is
 	 * used. */
+	/* FIXME: THIS IS NOT STRONG ENOUGH: A 128-bit token should be
+	 * generated.  The client and server would associate token and hCard
+	 * for authentication. */
 	randHandle = SYS_RandomInt(10, 65000);
 
 	while (1)
