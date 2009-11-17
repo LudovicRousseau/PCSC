@@ -13,6 +13,7 @@ libpcsclite_la_SOURCES = \
 	debug.h \
 	error.c \
 	winscard_clnt.c \
+	simclist.c \
 	strlcat.c \
 	strlcpy.c \
 	sys_unix.c \
@@ -20,7 +21,7 @@ libpcsclite_la_SOURCES = \
 	utils.c \
 	winscard_msg.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
-libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE
+libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
 libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) $(LIBDL) \
 	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 

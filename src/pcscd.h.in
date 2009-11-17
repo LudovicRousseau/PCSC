@@ -37,17 +37,9 @@
 #define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
 #define PCSCLITE_LOCK_POLL_RATE		100000		/**< Lock polling rate */
 
-/** Maximum applications */
-#define PCSCLITE_MAX_APPLICATIONS			16
-/** Maximum contexts by application */
-#define PCSCLITE_MAX_APPLICATION_CONTEXTS		16
-/** Maximum of applications contexts that pcscd can accept */
-#define PCSCLITE_MAX_APPLICATIONS_CONTEXTS \
-	PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
-/** Maximum channels on a reader context */
-#define PCSCLITE_MAX_READER_CONTEXT_CHANNELS		16
-/** Maximum channels on an application context */
-#define PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS	16
+#define PCSC_MAX_CONTEXT_THREADS 200
+#define PCSC_MAX_CONTEXT_CARD_HANDLES 200
+#define PCSC_MAX_READER_HANDLES 200
 
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
 #define MAX_LIBNAME			100

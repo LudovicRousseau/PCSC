@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -36,36 +37,87 @@
 #include "thread_generic.h"
 #include "readerfactory.h"
 #include "eventhandler.h"
+#include "simclist.h"
 
 /**
  * @brief Represents an Application Context on the Server side.
  *
  * An Application Context contains Channels (\c hCard).
  */
-static struct _psContext
+
+static unsigned int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
+static unsigned int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
+
+/* Context tracking list */
+static list_t contextsList;
+
+struct _psContext
 {
 	uint32_t hContext;
-	uint32_t hCard[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
+	list_t cardsList;
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
 	PCSCLITE_THREAD_T pthThread;		/**< Event polling thread's ID */
 	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
-} psContext[PCSCLITE_MAX_APPLICATIONS_CONTEXTS];
+};
+typedef struct _psContext SCONTEXT;
 
-static LONG MSGCheckHandleAssociation(SCARDHANDLE, DWORD);
-static LONG MSGAddContext(SCARDCONTEXT, DWORD);
-static LONG MSGRemoveContext(SCARDCONTEXT, DWORD);
-static LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, DWORD);
-static LONG MSGRemoveHandle(SCARDHANDLE, DWORD);
-static LONG MSGCleanupClient(DWORD);
+static LONG MSGCheckHandleAssociation(SCARDHANDLE, SCONTEXT *);
+static LONG MSGAddContext(SCARDCONTEXT, SCONTEXT *);
+static LONG MSGRemoveContext(SCARDCONTEXT, SCONTEXT *);
+static LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, SCONTEXT *);
+static LONG MSGRemoveHandle(SCARDHANDLE, SCONTEXT *);
+static LONG MSGCleanupClient(SCONTEXT *);
 
 static void ContextThread(LPVOID pdwIndex);
 
 extern READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
-LONG ContextsInitialize(void)
+static int contextsListhContext_seeker(const void *el, const void *key)
 {
-	memset(psContext, 0, sizeof(struct _psContext)*PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
+	const SCONTEXT * currentContext = (SCONTEXT *)el;
+
+	if ((el == NULL) || (key == NULL))
+	{
+		Log3(PCSC_LOG_CRITICAL, "contextsListhContext_seeker called with NULL pointer: el=%X, key=%X", el, key);
+	}
+
+	if (currentContext->hContext == *(uint32_t *)key)
+		return 1;
+	return 0;
+}
+
+LONG ContextsInitialize(unsigned int customMaxThreadCounter, unsigned int customMaxThreadCardHandles)
+{
+	int lrv = 0;
+
+	if (customMaxThreadCounter != 0)
+		contextMaxThreadCounter = customMaxThreadCounter;
+
+	if (customMaxThreadCardHandles != 0)
+		contextMaxCardHandles = customMaxThreadCardHandles;
+
+	lrv = list_init(&contextsList);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		return -1;
+	}
+	lrv = list_attributes_seeker(& contextsList, contextsListhContext_seeker);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_attributes_seeker failed with return value: %X", lrv);
+		return -1;
+	}
+
 	return 1;
+}
+
+void ContextsDeinitialize(void)
+{
+	int listSize;
+	listSize = list_size(&contextsList);
+	Log2(PCSC_LOG_DEBUG, "remaining threads: %d", listSize);
+	/* This is currently a no-op. It should terminate the threads properly. */
 }
 
 /**
@@ -80,37 +132,93 @@ LONG ContextsInitialize(void)
  */
 LONG CreateContextThread(uint32_t *pdwClientID)
 {
-	long i;
 	int rv;
+	int lrv;
+	int listSize;
+	SCONTEXT * newContext = NULL;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+	listSize = list_size(&contextsList);
+
+	if (listSize >= contextMaxThreadCounter)
 	{
-		if (psContext[i].dwClientID == 0)
-		{
-			psContext[i].dwClientID = *pdwClientID;
-			*pdwClientID = 0;
-			break;
-		}
+		Log2(PCSC_LOG_CRITICAL, "Too many context running: %d", listSize);
+		goto error;
 	}
 
-	if (i == PCSCLITE_MAX_APPLICATIONS_CONTEXTS)
+	/* Create the context for this thread. */
+	newContext = malloc(sizeof(*newContext));
+	if (NULL == newContext)
 	{
-		Log2(PCSC_LOG_CRITICAL, "No more context available (max: %d)",
-			PCSCLITE_MAX_APPLICATIONS_CONTEXTS);
-		return SCARD_F_INTERNAL_ERROR;
+		Log1(PCSC_LOG_CRITICAL, "Could not allocate new context");
+		goto error;
+	}
+	memset(newContext, 0, sizeof(*newContext));
+
+	newContext->dwClientID = *pdwClientID;
+
+	/* Initialise the list of card contexts */
+	lrv = list_init(&(newContext->cardsList));
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		goto error;
 	}
 
-	rv = SYS_ThreadCreate(&psContext[i].pthThread, THREAD_ATTR_DETACHED,
-		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) i);
+	/* request to store copies, and provide the metric function */
+	list_attributes_copy(&(newContext->cardsList), list_meter_int32_t, 1);
+
+	/* Adding a comparator
+	 * The stored type is SCARDHANDLE (long) but has only 32 bits
+	 * usefull even on a 64-bit CPU since the API between pcscd and
+	 * libpcscliter uses "int32_t hCard;"
+	 */
+	lrv = list_attributes_comparator(&(newContext->cardsList), list_comparator_int32_t);
+	if (lrv != 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_attributes_comparator failed with return value: %X", lrv);
+		list_destroy(&(newContext->cardsList));
+		goto error;
+	}
+
+	lrv = list_append(&contextsList, newContext);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
+		list_destroy(&(newContext->cardsList));
+		goto error;
+	}
+
+	rv = SYS_ThreadCreate(&(newContext->pthThread), THREAD_ATTR_DETACHED,
+		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) newContext);
 	if (rv)
 	{
-		(void)SYS_CloseFile(psContext[i].dwClientID);
-		psContext[i].dwClientID = 0;
+		int list_index;
+
 		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
-		return SCARD_E_NO_MEMORY;
+		list_index = list_locate(&contextsList, (const void *) newContext);
+		if (list_index >= 0)
+		{
+			int lrv2 = list_delete_at(&contextsList, list_index);
+			if (lrv2 < 0)
+				Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %X", lrv2);
+		}
+		else
+		{
+			Log3(PCSC_LOG_CRITICAL,
+				"list_locate() failed with error %X when looking for threadContext %X",
+				list_index, newContext);
+		}
+		list_destroy(&(newContext->cardsList));
+		goto error;
 	}
 
 	return SCARD_S_SUCCESS;
+
+error:
+	if (newContext)
+		free(newContext);
+	(void)SYS_CloseFile(*pdwClientID);
+	return SCARD_E_NO_MEMORY;
 }
 
 /*
@@ -124,7 +232,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
  * For each Client message a new instance of this thread is created.
  *
  * @param[in] dwIndex Index of an avaiable Application Context slot in
- * \c psContext.
+ * \c SCONTEXT *.
  */
 static const char *CommandsText[] = {
 	"NULL",
@@ -159,13 +267,13 @@ static const char *CommandsText[] = {
 #define WRITE_BODY(v) \
 	ret = SHMMessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
 
-static void ContextThread(LPVOID dwIndex)
+static void ContextThread(LPVOID newContext)
 {
-	DWORD dwContextIndex = (DWORD)dwIndex;
-	int32_t filedes = psContext[dwContextIndex].dwClientID;
+	SCONTEXT * threadContext = (SCONTEXT *) newContext;
+	int32_t filedes = threadContext->dwClientID;
 
-	Log2(PCSC_LOG_DEBUG, "Thread is started: %d",
-		psContext[dwContextIndex].dwClientID);
+	Log3(PCSC_LOG_DEBUG, "Thread is started: dwClientID=%d, threadContext @%X",
+		threadContext->dwClientID, threadContext);
 
 	while (1)
 	{
@@ -193,8 +301,8 @@ static void ContextThread(LPVOID dwIndex)
 				READ_BODY(veStr)
 
 				/* get the client protocol version */
-				psContext[dwContextIndex].protocol_major = veStr.major;
-				psContext[dwContextIndex].protocol_minor = veStr.minor;
+				threadContext->protocol_major = veStr.major;
+				threadContext->protocol_minor = veStr.minor;
 
 				Log3(PCSC_LOG_DEBUG,
 						"Client is protocol version %d:%d",
@@ -275,7 +383,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				if (esStr.rv == SCARD_S_SUCCESS)
 					esStr.rv =
-						MSGAddContext(esStr.hContext, dwContextIndex);
+						MSGAddContext(esStr.hContext, threadContext);
 
 				WRITE_BODY(esStr)
 			}
@@ -291,7 +399,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				if (reStr.rv == SCARD_S_SUCCESS)
 					reStr.rv =
-						MSGRemoveContext(reStr.hContext, dwContextIndex);
+						MSGRemoveContext(reStr.hContext, threadContext);
 
 				WRITE_BODY(reStr)
 			}
@@ -317,7 +425,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				if (coStr.rv == SCARD_S_SUCCESS)
 					coStr.rv =
-						MSGAddHandle(coStr.hContext, coStr.hCard, dwContextIndex);
+						MSGAddHandle(coStr.hContext, coStr.hCard, threadContext);
 
 				WRITE_BODY(coStr)
 			}
@@ -330,7 +438,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(rcStr)
 
-				if (MSGCheckHandleAssociation(rcStr.hCard, dwContextIndex))
+				if (MSGCheckHandleAssociation(rcStr.hCard, threadContext))
 					goto exit;
 
 				rcStr.rv = SCardReconnect(rcStr.hCard, rcStr.dwShareMode,
@@ -349,14 +457,14 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(diStr)
 
-				rv = MSGCheckHandleAssociation(diStr.hCard, dwContextIndex);
+				rv = MSGCheckHandleAssociation(diStr.hCard, threadContext);
 				if (0 == rv)
 				{
 					diStr.rv = SCardDisconnect(diStr.hCard, diStr.dwDisposition);
 
 					if (SCARD_S_SUCCESS == diStr.rv)
 						diStr.rv =
-							MSGRemoveHandle(diStr.hCard, dwContextIndex);
+							MSGRemoveHandle(diStr.hCard, threadContext);
 				}
 
 				WRITE_BODY(diStr)
@@ -370,7 +478,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(beStr)
 
-				rv = MSGCheckHandleAssociation(beStr.hCard, dwContextIndex);
+				rv = MSGCheckHandleAssociation(beStr.hCard, threadContext);
 				if (0 == rv)
 					beStr.rv = SCardBeginTransaction(beStr.hCard);
 
@@ -385,7 +493,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(enStr)
 
-				rv = MSGCheckHandleAssociation(enStr.hCard, dwContextIndex);
+				rv = MSGCheckHandleAssociation(enStr.hCard, threadContext);
 				if (0 == rv)
 					enStr.rv =
 						SCardEndTransaction(enStr.hCard, enStr.dwDisposition);
@@ -401,7 +509,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(caStr)
 
-				rv = MSGCheckHandleAssociation(caStr.hCard, dwContextIndex);
+				rv = MSGCheckHandleAssociation(caStr.hCard, threadContext);
 				if (0 == rv)
 					caStr.rv = SCardCancelTransaction(caStr.hCard);
 
@@ -412,23 +520,17 @@ static void ContextThread(LPVOID dwIndex)
 			case SCARD_CANCEL:
 			{
 				struct cancel_struct caStr;
-				uint32_t fd = 0;
-				int i;
-
+				SCONTEXT * psTargetContext = NULL;
 				READ_BODY(caStr)
 
 				/* find the client */
-				for (i=0; i<PCSCLITE_MAX_APPLICATIONS_CONTEXTS; i++)
+				psTargetContext = (SCONTEXT *) list_seek(&contextsList,
+					&(caStr.hContext));
+				if (psTargetContext != NULL)
 				{
-					if (psContext[i].hContext == caStr.hContext)
-					{
-						fd = psContext[i].dwClientID;
-						break;
-					}
-				}
-
-				if (fd)
+					uint32_t fd = psTargetContext->dwClientID;
 					caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
+				}
 				else
 					caStr.rv = SCARD_E_INVALID_VALUE;
 
@@ -443,7 +545,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(stStr)
 
-				rv = MSGCheckHandleAssociation(stStr.hCard, dwContextIndex);
+				rv = MSGCheckHandleAssociation(stStr.hCard, threadContext);
 				if (0 == rv)
 				{
 					DWORD cchReaderLen;
@@ -491,7 +593,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(trStr)
 
-				if (MSGCheckHandleAssociation(trStr.hCard, dwContextIndex))
+				if (MSGCheckHandleAssociation(trStr.hCard, threadContext))
 					goto exit;
 
 				/* avoids buffer overflow */
@@ -542,7 +644,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(ctStr)
 
-				if (MSGCheckHandleAssociation(ctStr.hCard, dwContextIndex))
+				if (MSGCheckHandleAssociation(ctStr.hCard, threadContext))
 					goto exit;
 
 				/* avoids buffer overflow */
@@ -586,7 +688,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(gsStr)
 
-				if (MSGCheckHandleAssociation(gsStr.hCard, dwContextIndex))
+				if (MSGCheckHandleAssociation(gsStr.hCard, threadContext))
 					goto exit;
 
 				/* avoids buffer overflow */
@@ -610,7 +712,7 @@ static void ContextThread(LPVOID dwIndex)
 
 				READ_BODY(gsStr)
 
-				if (MSGCheckHandleAssociation(gsStr.hCard, dwContextIndex))
+				if (MSGCheckHandleAssociation(gsStr.hCard, threadContext))
 					goto buffer_overflow;
 
 				/* avoids buffer overflow */
@@ -645,7 +747,7 @@ wrong_length:
 	Log2(PCSC_LOG_DEBUG, "Wrong length: %d", filedes);
 exit:
 	(void)SYS_CloseFile(filedes);
-	(void)MSGCleanupClient(dwContextIndex);
+	(void)MSGCleanupClient(threadContext);
 	(void)SYS_ThreadExit((LPVOID) NULL);
 }
 
@@ -662,139 +764,148 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 	return ret;
 } /* MSGSignalClient */
 
-static LONG MSGAddContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+static LONG MSGAddContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 {
-	psContext[dwContextIndex].hContext = hContext;
+	threadContext->hContext = hContext;
 	return SCARD_S_SUCCESS;
 }
 
-static LONG MSGRemoveContext(SCARDCONTEXT hContext, DWORD dwContextIndex)
+static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 {
-	int i;
 	LONG rv;
+	int lrv;
 
-	if (psContext[dwContextIndex].hContext == hContext)
+	if (threadContext->hContext != hContext)
+		return SCARD_E_INVALID_VALUE;
+
+	while (list_size(&(threadContext->cardsList)) != 0)
 	{
-		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+		PREADER_CONTEXT rContext = NULL;
+		DWORD dwLockId;
+		SCARDHANDLE hCard;
+		void *ptr;
+
+		/*
+		 * Disconnect each of these just in case
+		 */
+		ptr = list_get_at(&(threadContext->cardsList), 0);
+		if (NULL == ptr)
+		{
+			Log1(PCSC_LOG_CRITICAL, "list_get_at failed");
+			continue;
+		}
+		hCard = *(int32_t *)ptr;
+
+		/*
+		 * Unlock the sharing
+		 */
+		rv = RFReaderInfoById(hCard, &rContext);
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
+
+		dwLockId = rContext->dwLockId;
+		rContext->dwLockId = 0;
+
+		if (hCard != dwLockId)
 		{
 			/*
-			 * Disconnect each of these just in case
+			 * if the card is locked by someone else we do not reset it
+			 * and simulate a card removal
 			 */
-
-			if (psContext[dwContextIndex].hCard[i] != 0)
-			{
-				PREADER_CONTEXT rContext = NULL;
-				DWORD dwLockId;
-
-				/*
-				 * Unlock the sharing
-				 */
-				rv = RFReaderInfoById(psContext[dwContextIndex].hCard[i],
-					&rContext);
-				if (rv != SCARD_S_SUCCESS)
-					return rv;
-
-				dwLockId = rContext->dwLockId;
-				rContext->dwLockId = 0;
-
-				if (psContext[dwContextIndex].hCard[i] != dwLockId)
-				{
-					/*
-					 * if the card is locked by someone else we do not reset it
-					 * and simulate a card removal
-					 */
-					rv = SCARD_W_REMOVED_CARD;
-				}
-				else
-				{
-					/*
-					 * We will use SCardStatus to see if the card has been
-					 * reset there is no need to reset each time
-					 * Disconnect is called
-					 */
-					rv = SCardStatus(psContext[dwContextIndex].hCard[i], NULL,
-						NULL, NULL, NULL, NULL, NULL);
-				}
-
-				if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
-					(void)SCardDisconnect(psContext[dwContextIndex].hCard[i],
-						SCARD_LEAVE_CARD);
-				else
-					(void)SCardDisconnect(psContext[dwContextIndex].hCard[i],
-						SCARD_RESET_CARD);
-
-				psContext[dwContextIndex].hCard[i] = 0;
-			}
+			rv = SCARD_W_REMOVED_CARD;
+		}
+		else
+		{
+			/*
+			 * We will use SCardStatus to see if the card has been
+			 * reset there is no need to reset each time
+			 * Disconnect is called
+			 */
+			rv = SCardStatus(hCard, NULL, NULL, NULL, NULL, NULL, NULL);
 		}
 
-		psContext[dwContextIndex].hContext = 0;
+		if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
+			(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
+		else
+			(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+
+		/* Remove entry from the list */
+		lrv = list_delete_at(&(threadContext->cardsList), 0);
+		if (lrv < 0)
+			Log2(PCSC_LOG_CRITICAL,
+				"list_delete_at failed with return value: %X", lrv);
+	}
+	list_destroy(&(threadContext->cardsList))	;
+
+	/* We only mark the context as no longer in use.
+	 * The memory is freed in MSGCleanupCLient() */
+	threadContext->hContext = 0;
+
+	return SCARD_S_SUCCESS;
+}
+
+static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
+	SCONTEXT * threadContext)
+{
+	if (threadContext->hContext == hContext)
+	{
+		/*
+		 * Find an empty spot to put the hCard value
+		 */
+		int listLength, lrv;
+
+		listLength = list_size(&(threadContext->cardsList));
+		if (listLength >= contextMaxCardHandles)
+		{
+			Log4(PCSC_LOG_DEBUG, "Too many card handles for thread context @%X: %d (max is %d)"
+				"Restart pcscd with --max-card-handle-per-thread value",
+				threadContext, listLength, contextMaxCardHandles);
+			return SCARD_E_NO_MEMORY;
+		}
+
+		lrv = list_append(&(threadContext->cardsList), &hCard);
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+				lrv);
+			return SCARD_E_NO_MEMORY;
+		}
 		return SCARD_S_SUCCESS;
 	}
 
 	return SCARD_E_INVALID_VALUE;
 }
 
-static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
-	DWORD dwContextIndex)
+static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
-	int i;
+	int list_index = 0;
 
-	if (psContext[dwContextIndex].hContext == hContext)
+	list_index = list_locate(&(threadContext->cardsList), &hCard);
+	if (list_index >= 0)
 	{
+		int lrv;
 
-		/*
-		 * Find an empty spot to put the hCard value
-		 */
-		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
-		{
-			if (psContext[dwContextIndex].hCard[i] == 0)
-			{
-				psContext[dwContextIndex].hCard[i] = hCard;
-				break;
-			}
-		}
+		lrv = list_delete_at(&(threadContext->cardsList), list_index);
+		if (lrv < 0)
+			Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %X", lrv);
 
-		if (i == PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS)
-		{
-			return SCARD_F_INTERNAL_ERROR;
-		} else
-		{
-			return SCARD_S_SUCCESS;
-		}
-
+		return SCARD_S_SUCCESS;
 	}
-
-	return SCARD_E_INVALID_VALUE;
-}
-
-static LONG MSGRemoveHandle(SCARDHANDLE hCard, DWORD dwContextIndex)
-{
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+	else
 	{
-		if (psContext[dwContextIndex].hCard[i] == hCard)
-		{
-			psContext[dwContextIndex].hCard[i] = 0;
-			return SCARD_S_SUCCESS;
-		}
+		Log3(PCSC_LOG_CRITICAL, "list_locate() failed with error %X when looking for hCard %X",
+			list_index, hCard);
 	}
-
 	return SCARD_E_INVALID_VALUE;
 }
 
 
-static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
+static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
-	{
-		if (psContext[dwContextIndex].hCard[i] == hCard)
-		{
-			return 0;
-		}
-	}
+	int list_index = 0;
+	list_index = list_locate(&(threadContext->cardsList), &hCard);
+	if (list_index >= 0)
+		return 0;
 
 	/* Must be a rogue client, debug log and sleep a couple of seconds */
 	Log1(PCSC_LOG_ERROR, "Client failed to authenticate");
@@ -803,18 +914,44 @@ static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, DWORD dwContextIndex)
 	return -1;
 }
 
-static LONG MSGCleanupClient(DWORD dwContextIndex)
+
+/* Should be called just prior to exiting the thread as it de-allocates
+ * the thread memory strucutres
+ */
+static LONG MSGCleanupClient(SCONTEXT * threadContext)
 {
-	if (psContext[dwContextIndex].hContext != 0)
+	int list_index = 0;
+	if (threadContext->hContext != 0)
 	{
-		(void)SCardReleaseContext(psContext[dwContextIndex].hContext);
-		(void)MSGRemoveContext(psContext[dwContextIndex].hContext,
-			dwContextIndex);
+		(void)SCardReleaseContext(threadContext->hContext);
+		(void)MSGRemoveContext(threadContext->hContext, threadContext);
 	}
 
-	psContext[dwContextIndex].dwClientID = 0;
-	psContext[dwContextIndex].protocol_major = 0;
-	psContext[dwContextIndex].protocol_minor = 0;
+	Log3(PCSC_LOG_DEBUG,
+		"Thread is stopping: dwClientID=%d, threadContext @%X",
+		threadContext->dwClientID, threadContext);
+
+	/* Clear the struct to ensure that we detect
+	 * access to de-allocated memory
+	 * Hopefully the compiler won't optimise it out */
+	memset((void*) threadContext, 0, sizeof(SCONTEXT));
+	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%X", threadContext);
+	list_index = list_locate(&contextsList, (const void *) threadContext);
+	if (list_index >= 0)
+	{
+		int lrv = list_delete_at(&contextsList, list_index);
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %x", lrv);
+		}
+	}
+	else
+	{
+		Log3(PCSC_LOG_CRITICAL, "list_locate() failed with error %X when looking for threadContext %X",
+			list_index, threadContext);
+	}
+
+	free(threadContext);
 
 	return 0;
 }

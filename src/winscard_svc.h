@@ -24,7 +24,8 @@
 extern "C"
 {
 #endif
-	LONG ContextsInitialize(void);
+	LONG ContextsInitialize(unsigned int, unsigned int);
+	void ContextsDeinitialize(void);
 	LONG CreateContextThread(uint32_t *);
 	LONG MSGSignalClient(uint32_t filedes, LONG rv);
 #ifdef __cplusplus

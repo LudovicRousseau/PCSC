@@ -75,7 +75,8 @@ static void print_usage (char const * const);
  * If the message is valid, \c CreateContextThread() is called to serve this
  * request.
  */
-static void SVCServiceRunLoop(void)
+static void SVCServiceRunLoop(int customMaxThreadCounter,
+	int customMaxThreadCardHandles)
 {
 	int rsp;
 	LONG rv;
@@ -98,7 +99,7 @@ static void SVCServiceRunLoop(void)
 	/*
 	 * Initialize the contexts structure
 	 */
-	rv = ContextsInitialize();
+	rv = ContextsInitialize(customMaxThreadCounter, customMaxThreadCardHandles);
 
 	if (rv == -1)
 	{
@@ -176,6 +177,7 @@ static void SVCServiceRunLoop(void)
 
 			/* now stop all the drivers */
 			RFCleanupReaders();
+			ContextsDeinitialize();
 			exit(0);
 		}
 	}
@@ -188,6 +190,9 @@ int main(int argc, char **argv)
 	char HotPlug;
 	char *newReaderConfig;
 	struct stat fStatBuf;
+	unsigned int customMaxThreadCounter = 0;
+	unsigned int customMaxReaderHandles = 0;
+	unsigned int customMaxThreadCardHandles = 0;
 	int opt;
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
@@ -203,10 +208,13 @@ int main(int argc, char **argv)
 		{"critical", 0, NULL, 'C'},
 		{"hotplug", 0, NULL, 'H'},
 		{"force-reader-polling", optional_argument, NULL, 0},
+		{"max-thread", 1, NULL, 't'},
+		{"max-card-handle-per-thread", 1, NULL, 's'},
+		{"max-card-handle-per-reader", 1, NULL, 'r'},
 		{NULL, 0, NULL, 0}
 	};
 #endif
-#define OPT_STRING "c:fdhvaeCH"
+#define OPT_STRING "c:fdhvaeCHt:r:s:"
 
 	rv = 0;
 	newReaderConfig = NULL;
@@ -289,6 +297,24 @@ int main(int argc, char **argv)
 				/* debug to stderr instead of default syslog */
 				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
 				HotPlug = TRUE;
+				break;
+
+			case 't':
+				customMaxThreadCounter = optarg ? atoi(optarg) : 0; 
+				Log2(PCSC_LOG_INFO, "setting customMaxThreadCounter to: %d",
+					customMaxThreadCounter);
+				break;
+
+			case 'r':
+				customMaxReaderHandles = optarg ? atoi(optarg) : 0; 
+				Log2(PCSC_LOG_INFO, "setting customMaxReaderHandles to: %d",
+					customMaxReaderHandles);
+				break;
+
+			case 's':
+				customMaxThreadCardHandles = optarg ? atoi(optarg) : 0; 
+				Log2(PCSC_LOG_INFO, "setting customMaxThreadCardHandles to: %d",
+					customMaxThreadCardHandles);
 				break;
 
 			default:
@@ -438,7 +464,7 @@ int main(int argc, char **argv)
 	/*
 	 * Allocate memory for reader structures
 	 */
-	rv = RFAllocateReaderSpace();
+	rv = RFAllocateReaderSpace(customMaxReaderHandles);
 	if (SCARD_S_SUCCESS != rv)
 		at_exit();
 
@@ -502,7 +528,7 @@ int main(int argc, char **argv)
 
 	(void)signal(SIGUSR1, signal_reload);
 
-	SVCServiceRunLoop();
+	SVCServiceRunLoop(customMaxThreadCounter, customMaxThreadCardHandles);
 
 	Log1(PCSC_LOG_ERROR, "SVCServiceRunLoop returned");
 	return EXIT_FAILURE;
@@ -593,6 +619,9 @@ static void print_usage (char const * const progname)
 	printf("  -e  --error	 	display error level debug messages\n");
 	printf("  -C  --critical 	display critical only level debug messages\n");
 	printf("  --force-reader-polling ignore the IFD_GENERATE_HOTPLUG reader capability\n");
+	printf("  -t, --max-thread	maximum number of threads (default %d)\n", PCSC_MAX_CONTEXT_THREADS);
+	printf("  -s, --max-card-handle-per-thread	maximum number of card handle per thread (default: %d)\n", PCSC_MAX_CONTEXT_CARD_HANDLES);
+	printf("  -r, --max-card-handle-per-reader	maximum number of card handle per reader (default: %d)\n", PCSC_MAX_READER_HANDLES);
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
@@ -601,6 +630,9 @@ static void print_usage (char const * const progname)
 	printf("  -h 	display usage information\n");
 	printf("  -H	ask the daemon to rescan the available readers\n");
 	printf("  -v 	display the program version number\n");
+	printf("  -t    maximum number of threads\n");
+	printf("  -s    maximum number of card handle per thread\n");
+	printf("  -r    maximum number of card handle per reader\n");
 #endif
 }
 

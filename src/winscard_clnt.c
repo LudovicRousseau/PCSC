@@ -186,18 +186,55 @@ struct _psChannelMap
 
 typedef struct _psChannelMap CHANNEL_MAP;
 
+static int CHANNEL_MAP_seeker(const void *el, const void *key)
+{
+	const CHANNEL_MAP * channelMap = el;
+
+	if ((el == NULL) || (key == NULL))
+	{
+		Log3(PCSC_LOG_CRITICAL,
+			"CHANNEL_MAP_seeker called with NULL pointer: el=%X, key=%X",
+			el, key);
+	}
+
+	if (channelMap->hCard == *(SCARDHANDLE *)key)
+		return 1;
+
+	return 0;
+}
+
 /**
  * @brief Represents the an Application Context on the Client side.
  *
  * An Application Context contains Channels (\c _psChannelMap).
  */
-static struct _psContextMap
+struct _psContextMap
 {
 	DWORD dwClientID;				/**< Client Connection ID */
 	SCARDCONTEXT hContext;			/**< Application Context ID */
 	PCSCLITE_MUTEX * mMutex;		/**< Mutex for this context */
-	CHANNEL_MAP psChannelMap[PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS];
-} psContextMap[PCSCLITE_MAX_APPLICATION_CONTEXTS];
+	list_t channelMapList;
+};
+typedef struct _psContextMap SCONTEXTMAP;
+
+static list_t contextMapList;
+
+static int SCONTEXTMAP_seeker(const void *el, const void *key)
+{
+	const SCONTEXTMAP * contextMap = el;
+
+	if ((el == NULL) || (key == NULL))
+	{
+		Log3(PCSC_LOG_CRITICAL,
+			"SCONTEXTMAP_seeker called with NULL pointer: el=%X, key=%X",
+			el, key);
+	}
+
+	if (contextMap->hContext == *(SCARDCONTEXT *) key)
+		return 1;
+
+	return 0;
+}
 
 /**
  * Make sure the initialization code is executed only once.
@@ -233,23 +270,21 @@ PCSC_API SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, 8 };	/**< Prot
 
 
 static LONG SCardAddContext(SCARDCONTEXT, DWORD);
-static LONG SCardGetContextIndice(SCARDCONTEXT);
-static LONG SCardGetContextIndiceTH(SCARDCONTEXT);
+static SCONTEXTMAP * SCardGetContext(SCARDCONTEXT);
+static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
-static LONG SCardCleanContext(LONG indice);
+static LONG SCardCleanContext(SCONTEXTMAP *);
 
-static LONG SCardAddHandle(SCARDHANDLE, DWORD, LPCSTR);
-static LONG SCardGetIndicesFromHandle(SCARDHANDLE, /*@out@*/ PDWORD,
-	/*@out@*/ PDWORD);
-static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE, /*@out@*/ PDWORD,
-	/*@out@*/ PDWORD);
+static LONG SCardAddHandle(SCARDHANDLE, SCONTEXTMAP *, LPCSTR);
+static LONG SCardGetContextAndChannelFromHandle(SCARDHANDLE, /*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
+static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE, /*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
 static LONG SCardRemoveHandle(SCARDHANDLE);
 
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
 void DESTRUCTOR SCardUnload(void);
-static LONG getReaderStates(LONG dwContextIndex);
+static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 
 /*
  * Thread safety functions
@@ -368,7 +403,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
-	int i;
 	struct establish_struct scEstablishStruct;
 	uint32_t dwClientID = 0;
 
@@ -381,53 +415,36 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 
 	/*
 	 * Do this only once:
-	 * - Initialize debug of need.
-	 * - Set up the memory mapped structures for reader states.
-	 * - Allocate each reader structure.
-	 * - Initialize context struct.
+	 * - Initialize context list.
 	 */
 	if (isExecuted == 0)
 	{
-		/*
-		 * Initializes the application contexts and all channels for each one
-		 */
-		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+		int lrv;
+
+		/* NOTE: The list will never be freed (No API call exists to
+		 * "close all contexts".
+		 * Applications which load and unload the library will leak
+		 * the list's internal structures. */
+		lrv = list_init(&contextMapList);
+		if (lrv < 0)
 		{
-			int j;
-
-			/*
-			 * Initially set the context struct to zero
-			 */
-			psContextMap[i].dwClientID = 0;
-			psContextMap[i].hContext = 0;
-			psContextMap[i].mMutex = NULL;
-
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				/*
-				 * Initially set the hcard structs to zero
-				 */
-				psContextMap[i].psChannelMap[j].hCard = 0;
-				psContextMap[i].psChannelMap[j].readerName = NULL;
-			}
+			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+			return SCARD_E_NO_MEMORY;
 		}
 
+		lrv = list_attributes_seeker(&contextMapList,
+				SCONTEXTMAP_seeker);
+		if (lrv <0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+				"list_attributes_seeker failed with return value: %X", lrv);
+			list_destroy(&contextMapList);
+			return SCARD_E_NO_MEMORY;
+		}
+
+		isExecuted = 1;
 	}
 
-	/*
-	 * Is there a free slot for this connection ?
-	 */
-
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
-	{
-		if (psContextMap[i].dwClientID == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_APPLICATION_CONTEXTS)
-	{
-		return SCARD_E_NO_MEMORY;
-	}
 
 	/* Establishes a connection to the server */
 	if (SHMClientSetupSession(&dwClientID) != 0)
@@ -458,8 +475,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 
 		if (veStr.rv != SCARD_S_SUCCESS)
 			return veStr.rv;
-
-		isExecuted = 1;
 	}
 
 again:
@@ -488,8 +503,8 @@ again:
 	if (scEstablishStruct.rv != SCARD_S_SUCCESS)
 		return scEstablishStruct.rv;
 
-	/* check we do not reuse an existing phContext */
-	if (-1 != SCardGetContextIndiceTH(scEstablishStruct.hContext))
+	/* check we do not reuse an existing hContext */
+	if (NULL != SCardGetContextTH(scEstablishStruct.hContext))
 		/* we do not need to release the allocated context since
 		 * SCardReleaseContext() does nothing on the server side */
 		goto again;
@@ -529,16 +544,16 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 {
 	LONG rv;
 	struct release_struct scReleaseStruct;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 
 	/*
 	 * Make sure this context has been opened
-	 * and get dwContextIndex
+	 * and get currentContextMap
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 	{
 		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
@@ -557,11 +572,11 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		return rv;
 	}
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
@@ -571,7 +586,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	scReleaseStruct.rv = SCARD_S_SUCCESS;
 
 	rv = SHMMessageSendWithHeader(SCARD_RELEASE_CONTEXT,
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		sizeof(scReleaseStruct),
 		PCSCLITE_WRITE_TIMEOUT, (void *) &scReleaseStruct);
 
@@ -585,7 +600,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scReleaseStruct, sizeof(scReleaseStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -596,7 +611,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	rv = scReleaseStruct.rv;
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	/*
 	 * Remove the local context from the stack
@@ -693,7 +708,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 {
 	LONG rv;
 	struct connect_struct scConnectStruct;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 
@@ -721,15 +736,15 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
@@ -744,7 +759,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.dwActiveProtocol = 0;
 	scConnectStruct.rv = SCARD_S_SUCCESS;
 
-	rv = SHMMessageSendWithHeader(SCARD_CONNECT, psContextMap[dwContextIndex].dwClientID,
+	rv = SHMMessageSendWithHeader(SCARD_CONNECT, currentContextMap->dwClientID,
 		sizeof(scConnectStruct),
 		PCSCLITE_READ_TIMEOUT, (void *) &scConnectStruct);
 
@@ -758,7 +773,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scConnectStruct, sizeof(scConnectStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -775,13 +790,13 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Keep track of the handle locally
 		 */
-		rv = SCardAddHandle(*phCard, dwContextIndex, szReader);
+		rv = SCardAddHandle(*phCard, currentContextMap, szReader);
 	}
 	else
 		rv = scConnectStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -861,7 +876,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 {
 	LONG rv;
 	struct reconnect_struct scReconnectStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -875,14 +891,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -896,9 +914,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	scReconnectStruct.dwActiveProtocol = *pdwActiveProtocol;
 	scReconnectStruct.rv = SCARD_S_SUCCESS;
 
-	rv = SHMMessageSendWithHeader(SCARD_RECONNECT, psContextMap[dwContextIndex].dwClientID,
-			sizeof(scReconnectStruct),
-			PCSCLITE_READ_TIMEOUT, (void *) &scReconnectStruct);
+	rv = SHMMessageSendWithHeader(SCARD_RECONNECT,
+		currentContextMap->dwClientID,
+		sizeof(scReconnectStruct),
+		PCSCLITE_READ_TIMEOUT, (void *) &scReconnectStruct);
 
 	if (rv == -1)
 	{
@@ -910,9 +929,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scReconnectStruct,
-			sizeof(scReconnectStruct),
-			psContextMap[dwContextIndex].dwClientID,
-			PCSCLITE_READ_TIMEOUT);
+		sizeof(scReconnectStruct),
+		currentContextMap->dwClientID,
+		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
 	{
@@ -924,7 +943,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	rv = scReconnectStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -965,7 +984,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	struct disconnect_struct scDisconnectStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -976,14 +996,16 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -994,7 +1016,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	scDisconnectStruct.dwDisposition = dwDisposition;
 	scDisconnectStruct.rv = SCARD_S_SUCCESS;
 
-	rv = SHMMessageSendWithHeader(SCARD_DISCONNECT, psContextMap[dwContextIndex].dwClientID,
+	rv = SHMMessageSendWithHeader(SCARD_DISCONNECT,
+		currentContextMap->dwClientID,
 		sizeof(scDisconnectStruct),
 		PCSCLITE_READ_TIMEOUT, (void *) &scDisconnectStruct);
 
@@ -1009,7 +1032,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	rv = SHMMessageReceive(&scDisconnectStruct,
 		sizeof(scDisconnectStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -1022,7 +1045,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = scDisconnectStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -1069,7 +1092,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	LONG rv;
 	struct begin_struct scBeginStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -1080,14 +1104,16 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -1104,7 +1130,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	do
 	{
-		rv = SHMMessageSendWithHeader(SCARD_BEGIN_TRANSACTION, psContextMap[dwContextIndex].dwClientID,
+		rv = SHMMessageSendWithHeader(SCARD_BEGIN_TRANSACTION,
+			currentContextMap->dwClientID,
 			sizeof(scBeginStruct),
 			PCSCLITE_READ_TIMEOUT, (void *) &scBeginStruct);
 
@@ -1118,7 +1145,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		 * Read a message from the server
 		 */
 		rv = SHMMessageReceive(&scBeginStruct, sizeof(scBeginStruct),
-			psContextMap[dwContextIndex].dwClientID,
+			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
 		if (rv < 0)
@@ -1132,7 +1159,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	rv = scBeginStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv);
 
@@ -1184,7 +1211,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	LONG rv;
 	struct end_struct scEndStruct;
 	int randnum;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -1200,14 +1228,16 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -1219,7 +1249,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	scEndStruct.rv = SCARD_S_SUCCESS;
 
 	rv = SHMMessageSendWithHeader(SCARD_END_TRANSACTION,
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		sizeof(scEndStruct),
 		PCSCLITE_READ_TIMEOUT, (void *) &scEndStruct);
 
@@ -1233,7 +1263,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scEndStruct, sizeof(scEndStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -1250,7 +1280,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = scEndStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -1267,7 +1297,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
 	struct cancel_transaction_struct scCancelStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -1278,14 +1309,16 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -1295,7 +1328,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	scCancelStruct.hCard = hCard;
 
 	rv = SHMMessageSendWithHeader(SCARD_CANCEL_TRANSACTION,
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		sizeof(scCancelStruct),
 		PCSCLITE_READ_TIMEOUT, (void *) &scCancelStruct);
 
@@ -1309,7 +1342,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scCancelStruct, sizeof(scCancelStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -1320,7 +1353,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	rv = scCancelStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -1422,7 +1455,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	LONG rv;
 	int i;
 	struct status_struct scStatusStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 	char *r;
 	char *bufReader = NULL;
 	LPBYTE bufAtr = NULL;
@@ -1458,14 +1492,16 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -1473,11 +1509,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		return SCARD_E_INVALID_HANDLE;
 
 	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
+	rv = getReaderStates(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
-	r = psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName;
+	r = pChannelMap->readerName;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		/* by default r == NULL */
@@ -1499,7 +1535,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	scStatusStruct.pcchReaderLen = sizeof(scStatusStruct.mszReaderNames);
 	scStatusStruct.pcbAtrLen = sizeof(scStatusStruct.pbAtr);
 
-	rv = SHMMessageSendWithHeader(SCARD_STATUS, psContextMap[dwContextIndex].dwClientID,
+	rv = SHMMessageSendWithHeader(SCARD_STATUS, currentContextMap->dwClientID,
 		sizeof(scStatusStruct),
 		PCSCLITE_READ_TIMEOUT, (void *) &scStatusStruct);
 
@@ -1513,7 +1549,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scStatusStruct, sizeof(scStatusStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -1535,7 +1571,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	 * Now continue with the client side SCardStatus
 	 */
 
-	*pcchReaderLen = strlen(psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName) + 1;
+	*pcchReaderLen = strlen(pChannelMap->readerName) + 1;
 	*pcbAtrLen = readerStates[i].cardAtrLength;
 
 	if (pdwState)
@@ -1570,7 +1606,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
 		strncpy(bufReader,
-			psContextMap[dwContextIndex].psChannelMap[dwChannelIndex].readerName,
+			pChannelMap->readerName,
 			dwReaderLen);
 	}
 
@@ -1602,7 +1638,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	}
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -1709,7 +1745,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	DWORD dwState;
 	DWORD dwBreakFlag = 0;
 	int j;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 	int currentReaderCount = 0;
 	LONG rv = SCARD_S_SUCCESS;
 
@@ -1749,22 +1785,22 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
 	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
+	rv = getReaderStates(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
@@ -1791,8 +1827,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		rv = SCardCheckDaemonAvailability();
 		if (rv != SCARD_S_SUCCESS)
 		{
-			if (psContextMap[dwContextIndex].mMutex)
-				(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+			if (currentContextMap->mMutex)
+				(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 			PROFILE_END(rv)
 
@@ -2079,7 +2115,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				waitStatusStruct.timeOut = dwTime;
 
 				rv = SHMMessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
-					psContextMap[dwContextIndex].dwClientID,
+					currentContextMap->dwClientID,
 					sizeof(waitStatusStruct), PCSCLITE_WRITE_TIMEOUT,
 					&waitStatusStruct);
 
@@ -2093,7 +2129,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				 * Read a message from the server
 				 */
 				rv = SHMMessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
-					psContextMap[dwContextIndex].dwClientID,
+					currentContextMap->dwClientID,
 					dwTime);
 
 				/* timeout */
@@ -2101,7 +2137,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				{
 					/* ask server to remove us from the event list */
 					rv = SHMMessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
-						psContextMap[dwContextIndex].dwClientID,
+						currentContextMap->dwClientID,
 						sizeof(waitStatusStruct), PCSCLITE_WRITE_TIMEOUT,
 						&waitStatusStruct);
 
@@ -2113,7 +2149,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 					/* Read a message from the server */
 					rv = SHMMessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
-						psContextMap[dwContextIndex].dwClientID,
+						currentContextMap->dwClientID,
 						PCSCLITE_READ_TIMEOUT);
 
 					if (rv == -1)
@@ -2137,7 +2173,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 
 				/* synchronize reader states with daemon */
-				rv = getReaderStates(dwContextIndex);
+				rv = getReaderStates(currentContextMap);
 				if (rv != SCARD_S_SUCCESS)
 					goto end;
 
@@ -2169,7 +2205,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 end:
 	Log1(PCSC_LOG_DEBUG, "Event Loop End");
 
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -2233,7 +2269,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 {
 	LONG rv;
 	struct control_struct scControlStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
 
@@ -2248,17 +2285,19 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 	{
 		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -2278,7 +2317,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	scControlStruct.cbRecvLength = cbRecvLength;
 
 	rv = SHMMessageSendWithHeader(SCARD_CONTROL,
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		sizeof(scControlStruct), PCSCLITE_READ_TIMEOUT, &scControlStruct);
 
 	if (rv == -1)
@@ -2289,7 +2328,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	/* write the sent buffer */
 	rv = SHMMessageSend((char *)pbSendBuffer, cbSendLength,
-		psContextMap[dwContextIndex].dwClientID, PCSCLITE_WRITE_TIMEOUT);
+		currentContextMap->dwClientID, PCSCLITE_WRITE_TIMEOUT);
 
 	if (rv == -1)
 	{
@@ -2301,7 +2340,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scControlStruct, sizeof(scControlStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -2314,7 +2353,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	{
 		/* read the received buffer */
 		rv = SHMMessageReceive(pbRecvBuffer, scControlStruct.dwBytesReturned,
-			psContextMap[dwContextIndex].dwClientID,
+			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
 		if (rv < 0)
@@ -2331,7 +2370,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	rv = scControlStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -2533,7 +2572,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 {
 	LONG rv;
 	struct getset_struct scGetSetStruct;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 
 	rv = SCardCheckDaemonAvailability();
 	if (rv != SCARD_S_SUCCESS)
@@ -2542,14 +2582,16 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -2571,7 +2613,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
 
 	rv = SHMMessageSendWithHeader(command,
-		psContextMap[dwContextIndex].dwClientID, sizeof(scGetSetStruct),
+		currentContextMap->dwClientID, sizeof(scGetSetStruct),
 		PCSCLITE_READ_TIMEOUT, &scGetSetStruct);
 
 	if (rv == -1)
@@ -2584,7 +2626,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scGetSetStruct, sizeof(scGetSetStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -2614,7 +2656,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	rv = scGetSetStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	return rv;
 }
@@ -2683,7 +2725,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;
-	DWORD dwContextIndex, dwChannelIndex;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * pChannelMap;
 	struct transmit_struct scTransmitStruct;
 
 	PROFILE_START
@@ -2699,7 +2742,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	/*
 	 * Make sure this handle has been opened
 	 */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 	{
 		*pcbRecvLength = 0;
@@ -2707,10 +2751,11 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndex, &dwChannelIndex);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&pChannelMap);
 	if (rv == -1)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
@@ -2743,7 +2788,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	}
 
 	rv = SHMMessageSendWithHeader(SCARD_TRANSMIT,
-		psContextMap[dwContextIndex].dwClientID, sizeof(scTransmitStruct),
+		currentContextMap->dwClientID, sizeof(scTransmitStruct),
 		PCSCLITE_WRITE_TIMEOUT, (void *) &scTransmitStruct);
 
 	if (rv == -1)
@@ -2754,7 +2799,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 
 	/* write the sent buffer */
 	rv = SHMMessageSend((void *)pbSendBuffer, cbSendLength,
-		psContextMap[dwContextIndex].dwClientID, PCSCLITE_WRITE_TIMEOUT);
+		currentContextMap->dwClientID, PCSCLITE_WRITE_TIMEOUT);
 
 	if (rv == -1)
 	{
@@ -2766,7 +2811,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	 * Read a message from the server
 	 */
 	rv = SHMMessageReceive(&scTransmitStruct, sizeof(scTransmitStruct),
-		psContextMap[dwContextIndex].dwClientID,
+		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -2779,7 +2824,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	{
 		/* read the received buffer */
 		rv = SHMMessageReceive(pbRecvBuffer, scTransmitStruct.pcbRecvLength,
-			psContextMap[dwContextIndex].dwClientID,
+			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
 		if (rv < 0)
@@ -2799,7 +2844,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	rv = scTransmitStruct.rv;
 
 end:
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -2859,7 +2904,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 {
 	DWORD dwReadersLen = 0;
 	int i;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 	LONG rv = SCARD_S_SUCCESS;
 	char *buf = NULL;
 
@@ -2879,25 +2924,25 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 	{
 		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
 	/* synchronize reader states with daemon */
-	rv = getReaderStates(dwContextIndex);
+	rv = getReaderStates(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
@@ -2962,7 +3007,7 @@ end:
 	/* set the reader names length */
 	*pcchReaders = dwReadersLen;
 
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -2984,7 +3029,7 @@ end:
 LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 {
 	LONG rv = SCARD_S_SUCCESS;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 
@@ -2995,8 +3040,8 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
 	free((void *)pvMem);
@@ -3059,7 +3104,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	LPDWORD pcchGroups)
 {
 	LONG rv = SCARD_S_SUCCESS;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 	char *buf = NULL;
 
 	PROFILE_START
@@ -3075,15 +3120,15 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)SYS_MutexLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexLock(currentContextMap->mMutex);
 
 	/* check the context is still opened */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
@@ -3121,7 +3166,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 end:
 	*pcchGroups = dwGroups;
 
-	(void)SYS_MutexUnLock(psContextMap[dwContextIndex].mMutex);
+	(void)SYS_MutexUnLock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
 
@@ -3157,7 +3202,7 @@ end:
  */
 LONG SCardCancel(SCARDCONTEXT hContext)
 {
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 	LONG rv = SCARD_S_SUCCESS;
 	uint32_t dwClientID = 0;
 	struct cancel_struct scCancelStruct;
@@ -3167,8 +3212,8 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
 	/* create a new connection to the server */
@@ -3240,7 +3285,7 @@ error:
 LONG SCardIsValidContext(SCARDCONTEXT hContext)
 {
 	LONG rv;
-	LONG dwContextIndex;
+	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 
@@ -3254,8 +3299,8 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	dwContextIndex = SCardGetContextIndice(hContext);
-	if (dwContextIndex == -1)
+	currentContextMap = SCardGetContext(hContext);
+	if (currentContextMap == NULL)
 		rv = SCARD_E_INVALID_HANDLE;
 
 	PROFILE_END(rv)
@@ -3281,19 +3326,59 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
  */
 static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 {
-	int i;
+	int lrv;
+	SCONTEXTMAP * newContextMap;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+	newContextMap = malloc(sizeof(SCONTEXTMAP));
+	if (NULL == newContextMap)
+		return SCARD_E_NO_MEMORY;
+
+	Log2(PCSC_LOG_DEBUG, "Allocating new SCONTEXTMAP @%X", newContextMap);
+	newContextMap->hContext = hContext;
+	newContextMap->dwClientID = dwClientID;
+
+	newContextMap->mMutex = malloc(sizeof(PCSCLITE_MUTEX));
+	if (NULL == newContextMap->mMutex)
 	{
-		if (psContextMap[i].hContext == 0)
-		{
-			psContextMap[i].hContext = hContext;
-			psContextMap[i].dwClientID = dwClientID;
-			psContextMap[i].mMutex = malloc(sizeof(PCSCLITE_MUTEX));
-			(void)SYS_MutexInit(psContextMap[i].mMutex);
-			return SCARD_S_SUCCESS;
-		}
+		Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXTMAP @%X", newContextMap);
+		free(newContextMap);
+		return SCARD_E_NO_MEMORY;
 	}
+	(void)SYS_MutexInit(newContextMap->mMutex);
+
+	lrv = list_init(&(newContextMap->channelMapList));
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		goto error;
+	}
+
+	lrv = list_attributes_seeker(&(newContextMap->channelMapList),
+		CHANNEL_MAP_seeker);
+	if (lrv <0)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"list_attributes_seeker failed with return value: %X", lrv);
+		list_destroy(&(newContextMap->channelMapList));
+		goto error;
+	}
+
+	lrv = list_append(&contextMapList, newContextMap);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+			lrv);
+		list_destroy(&(newContextMap->channelMapList));
+		goto error;
+	}
+
+	return SCARD_S_SUCCESS;
+
+error:
+
+	(void)SYS_MutexDestroy(newContextMap->mMutex);
+	free(newContextMap->mMutex);
+	free(newContextMap);
 
 	return SCARD_E_NO_MEMORY;
 }
@@ -3303,50 +3388,39 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
  * for the passed context.
  *
  * This function is a thread-safe wrapper to the function
- * SCardGetContextIndiceTH().
+ * SCardGetContextTH().
  *
  * @param[in] hContext Application Context whose index will be find.
  *
  * @return Index corresponding to the Application Context or -1 if it is
  * not found.
  */
-static LONG SCardGetContextIndice(SCARDCONTEXT hContext)
+static SCONTEXTMAP * SCardGetContext(SCARDCONTEXT hContext)
 {
-	LONG rv;
+	SCONTEXTMAP * currentContextMap;
 
 	(void)SCardLockThread();
-	rv = SCardGetContextIndiceTH(hContext);
+	currentContextMap = SCardGetContextTH(hContext);
 	(void)SCardUnlockThread();
 
-	return rv;
+	return currentContextMap;
 }
 
 /**
- * @brief Get the index from the Application Context vector \c _psContextMap
+ * @brief Get the address from the Application Context list \c _psContextMap
  * for the passed context.
  *
  * This functions is not thread-safe and should not be called. Instead, call
- * the function SCardGetContextIndice().
+ * the function SCardGetContext().
  *
  * @param[in] hContext Application Context whose index will be find.
  *
- * @return Index corresponding to the Application Context or -1 if it is
+ * @return Address corresponding to the Application Context or NULL if it is
  * not found.
  */
-static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
+static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT hContext)
 {
-	int i;
-
-	/*
-	 * Find this context and return its spot in the array
-	 */
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
-	{
-		if ((hContext == psContextMap[i].hContext) && (hContext != 0))
-			return i;
-	}
-
-	return -1;
+	return list_seek(&contextMapList, &hContext);
 }
 
 /**
@@ -3360,34 +3434,63 @@ static LONG SCardGetContextIndiceTH(SCARDCONTEXT hContext)
  */
 static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 {
-	LONG  retIndice;
+	SCONTEXTMAP * currentContextMap;
+	currentContextMap = SCardGetContextTH(hContext);
 
-	retIndice = SCardGetContextIndiceTH(hContext);
-
-	if (retIndice == -1)
+	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 	else
-		return SCardCleanContext(retIndice);
+		return SCardCleanContext(currentContextMap);
 }
 
-static LONG SCardCleanContext(LONG indice)
+static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 {
-	int i;
+	int list_index;
+	int listSize;
+	CHANNEL_MAP * currentChannelMap;
 
-	psContextMap[indice].hContext = 0;
-	(void)SHMClientCloseSession(psContextMap[indice].dwClientID);
-	psContextMap[indice].dwClientID = 0;
-	free(psContextMap[indice].mMutex);
-	psContextMap[indice].mMutex = NULL;
+	targetContextMap->hContext = 0;
+	(void)SHMClientCloseSession(targetContextMap->dwClientID);
+	targetContextMap->dwClientID = 0;
+	(void)SYS_MutexDestroy(targetContextMap->mMutex);
+	free(targetContextMap->mMutex);
+	targetContextMap->mMutex = NULL;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+	listSize = list_size(&(targetContextMap->channelMapList));
+	for (list_index = 0; list_index < listSize; list_index++)
 	{
-		/*
-		 * Reset the \c hCard structs to zero
-		 */
-		psContextMap[indice].psChannelMap[i].hCard = 0;
-		free(psContextMap[indice].psChannelMap[i].readerName);
-		psContextMap[indice].psChannelMap[i].readerName = NULL;
+		currentChannelMap = list_get_at(&(targetContextMap->channelMapList),
+			list_index);
+		if (NULL == currentChannelMap)
+		{
+			Log2(PCSC_LOG_CRITICAL, "list_get_at failed for index %d",
+				list_index);
+			continue;
+		}
+		else
+		{
+			free(currentChannelMap->readerName);
+			free(currentChannelMap);
+		}
+
+	}
+	list_destroy(&(targetContextMap->channelMapList));
+	list_index = list_locate(&contextMapList, targetContextMap);
+	if (list_index < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"list_locate failed with return value: %X", list_index);
+	}
+	else
+	{
+		int lrv;
+
+		lrv = list_delete_at(&contextMapList, list_index);
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+				"list_delete_at failed with return value: %X", lrv);
+		}
 	}
 
 	return SCARD_S_SUCCESS;
@@ -3397,43 +3500,71 @@ static LONG SCardCleanContext(LONG indice)
  * Functions for managing hCard values returned from SCardConnect.
  */
 
-static LONG SCardAddHandle(SCARDHANDLE hCard, DWORD dwContextIndex,
+static LONG SCardAddHandle(SCARDHANDLE hCard, SCONTEXTMAP * currentContextMap,
 	LPCSTR readerName)
 {
-	int i;
+	CHANNEL_MAP * newChannelMap;
+	int lrv = -1;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; i++)
+	newChannelMap = malloc(sizeof(CHANNEL_MAP));
+	if (NULL == newChannelMap)
+		return SCARD_E_NO_MEMORY;
+
+	newChannelMap->hCard = hCard;
+	newChannelMap->readerName = strdup(readerName);
+
+	lrv = list_append(&(currentContextMap->channelMapList), newChannelMap);
+	if (lrv < 0)
 	{
-		if (psContextMap[dwContextIndex].psChannelMap[i].hCard == 0)
-		{
-			psContextMap[dwContextIndex].psChannelMap[i].hCard = hCard;
-			psContextMap[dwContextIndex].psChannelMap[i].readerName = strdup(readerName);
-			return SCARD_S_SUCCESS;
-		}
+		free(newChannelMap->readerName);
+		free(newChannelMap);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
+		return SCARD_E_NO_MEMORY;
 	}
 
-	return SCARD_E_NO_MEMORY;
+	return SCARD_S_SUCCESS;
 }
 
 static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 {
-	DWORD dwContextIndice, dwChannelIndice;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * currentChannelMap;
+	int list_index = 0;
 	LONG rv;
 
-	rv = SCardGetIndicesFromHandle(hCard, &dwContextIndice, &dwChannelIndice);
+	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+		&currentChannelMap);
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
+
+	free(currentChannelMap->readerName);
+
+	list_index = list_locate(&(currentContextMap->channelMapList),
+		currentChannelMap);
+	if (list_index < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"list_locate failed with return value: %X", list_index);
+	}
 	else
 	{
-		psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].hCard = 0;
-		free(psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].readerName);
-		psContextMap[dwContextIndice].psChannelMap[dwChannelIndice].readerName = NULL;
-		return SCARD_S_SUCCESS;
+		int lrv;
+
+		lrv = list_delete_at(&(currentContextMap->channelMapList), list_index);
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+				"list_delete_at failed with return value: %X", lrv);
+		}
 	}
+
+	free(currentChannelMap);
+
+	return SCARD_S_SUCCESS;
 }
 
-static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard,
-	PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
+static LONG SCardGetContextAndChannelFromHandle(SCARDHANDLE hCard,
+	SCONTEXTMAP **targetContextMap, CHANNEL_MAP ** targetChannelMap)
 {
 	LONG rv;
 
@@ -3441,33 +3572,41 @@ static LONG SCardGetIndicesFromHandle(SCARDHANDLE hCard,
 		return -1;
 
 	(void)SCardLockThread();
-	rv = SCardGetIndicesFromHandleTH(hCard, pdwContextIndice, pdwChannelIndice);
+	rv = SCardGetContextAndChannelFromHandleTH(hCard, targetContextMap, targetChannelMap);
 	(void)SCardUnlockThread();
 
 	return rv;
 }
 
-static LONG SCardGetIndicesFromHandleTH(SCARDHANDLE hCard,
-	PDWORD pdwContextIndice, PDWORD pdwChannelIndice)
+static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
+	SCONTEXTMAP **targetContextMap, CHANNEL_MAP ** targetChannelMap)
 {
-	int i;
+	int listSize;
+	int list_index;
+	SCONTEXTMAP * currentContextMap;
+	CHANNEL_MAP * currentChannelMap;
 
-	for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
+	/* Best to get the caller a crash early if we fail unsafely */
+	*targetContextMap = NULL;
+	*targetChannelMap = NULL;
+
+	listSize = list_size(&contextMapList);
+
+	for (list_index = 0; list_index < listSize; list_index++)
 	{
-		if (psContextMap[i].hContext != 0)
+		currentContextMap = list_get_at(&contextMapList, list_index);
+		if (currentContextMap == NULL)
 		{
-			int j;
-
-			for (j = 0; j < PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS; j++)
-			{
-				if (psContextMap[i].psChannelMap[j].hCard == hCard)
-				{
-					*pdwContextIndice = i;
-					*pdwChannelIndice = j;
-					return SCARD_S_SUCCESS;
-				}
-			}
-
+			Log2(PCSC_LOG_CRITICAL, "list_get_at failed for index %d", list_index);
+			continue;
+		}
+		currentChannelMap = list_seek(&(currentContextMap->channelMapList),
+			&hCard);
+		if (currentChannelMap != NULL)
+		{
+			*targetContextMap = currentContextMap;
+			*targetChannelMap = currentChannelMap;
+			return SCARD_S_SUCCESS;
 		}
 	}
 
@@ -3522,14 +3661,29 @@ LONG SCardCheckDaemonAvailability(void)
 
 	if (need_restart)
 	{
-		int i;
-
 		/* invalid all handles */
 		(void)SCardLockThread();
 
-		for (i = 0; i < PCSCLITE_MAX_APPLICATION_CONTEXTS; i++)
-			if (psContextMap[i].hContext)
-				(void)SCardCleanContext(i);
+		while (list_size(&contextMapList) != 0)
+		{
+			int lrv;
+			SCONTEXTMAP * currentContextMap;
+
+			currentContextMap = list_get_at(&contextMapList, 0);
+			if (currentContextMap != NULL)
+				(void)SCardCleanContext(currentContextMap);
+			else
+				Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
+
+			lrv = list_delete_at(&contextMapList, 0);
+			if (lrv < 0)
+			{
+				Log2(PCSC_LOG_CRITICAL,
+						"list_delete_at failed with return value: %X", lrv);
+			}
+			/* man free says it is OK to call free(NULL) */
+			free(currentContextMap);
+		}
 
 		(void)SCardUnlockThread();
 
@@ -3547,9 +3701,9 @@ LONG SCardCheckDaemonAvailability(void)
 	return SCARD_S_SUCCESS;
 }
 
-static LONG getReaderStates(LONG dwContextIndex)
+static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 {
-	int32_t dwClientID = psContextMap[dwContextIndex].dwClientID;
+	int32_t dwClientID = currentContextMap->dwClientID;
 
 	if (-1 == SHMMessageSendWithHeader(CMD_GET_READERS_STATE, dwClientID, 0,
 		PCSCLITE_WRITE_TIMEOUT, NULL))

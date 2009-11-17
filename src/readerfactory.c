@@ -47,6 +47,7 @@
 #endif
 
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
+static unsigned int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
@@ -54,9 +55,28 @@ static PCSCLITE_MUTEX LockMutex = PTHREAD_MUTEX_INITIALIZER;
 
 #define IDENTITY_SHIFT 16
 
-LONG RFAllocateReaderSpace(void)
+static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
+{
+	const RDR_CLIHANDLES *rdrCliHandles = el;
+
+	if ((el == NULL) || (key == NULL))
+		Log3(PCSC_LOG_CRITICAL,
+			"RDR_CLIHANDLES_seeker called with NULL pointer: el=%X, key=%X",
+			el, key);
+
+	if (rdrCliHandles->hCard == *(SCARDHANDLE *)key)
+		return 1;
+
+	return 0;
+}
+
+
+LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 {
 	int i;	/* Counter */
+
+	if (customMaxReaderHandles != 0)
+		maxReaderHandles = customMaxReaderHandles;
 
 	/* Allocate each reader structure */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -76,6 +96,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	UCHAR ucGetData[1], ucThread[1];
 	LONG rv, parentNode;
 	int i, j;
+	int lrv = 0;
 
 	if ((lpcReader == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
 		return SCARD_E_INVALID_VALUE;
@@ -171,8 +192,21 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(dwContext + 1) << IDENTITY_SHIFT;
 	(sReadersContexts[dwContext])->readerState = NULL;
 
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
-		(sReadersContexts[dwContext])->psHandles[i].hCard = 0;
+	lrv = list_init(&((sReadersContexts[dwContext])->handlesList));
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		return SCARD_E_NO_MEMORY;
+	}
+
+	lrv = list_attributes_seeker(&((sReadersContexts[dwContext])->handlesList),
+		RDR_CLIHANDLES_seeker);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"list_attributes_seeker failed with return value: %X", lrv);
+		return SCARD_E_NO_MEMORY;
+	}
 
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
@@ -346,8 +380,21 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		(sReadersContexts[dwContextB])->dwIdentity =
 			(dwContextB + 1) << IDENTITY_SHIFT;
 
-		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
-			(sReadersContexts[dwContextB])->psHandles[i].hCard = 0;
+		lrv = list_init(&((sReadersContexts[dwContextB])->handlesList));
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+			return SCARD_E_NO_MEMORY;
+		}
+
+		lrv = list_attributes_seeker(&((sReadersContexts[dwContextB])->handlesList),
+			RDR_CLIHANDLES_seeker);
+		if (lrv < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL,
+					"list_attributes_seeker failed with return value: %X", lrv);
+			return SCARD_E_NO_MEMORY;
+		}
 
 		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);
@@ -412,7 +459,6 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	while (SCARD_S_SUCCESS ==
 		RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
 	{
-		int i;
 
 		/* Try to destroy the thread */
 		rv = EHDestroyEventHandler(sContext);
@@ -466,9 +512,20 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		sContext->dwIdentity = 0;
 		sContext->readerState = NULL;
 
-		for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
-			sContext->psHandles[i].hCard = 0;
+		while (list_size(&(sContext->handlesList)) != 0)
+		{
+			int lrv;
+			RDR_CLIHANDLES *currentHandle;
 
+			currentHandle = list_get_at(&(sContext->handlesList), 0);
+			lrv = list_delete_at(&(sContext->handlesList), 0);
+			if (lrv < 0)
+				Log2(PCSC_LOG_CRITICAL,
+					"list_delete_at failed with return value: %X", lrv);
+
+			free(currentHandle);
+		}
+		list_destroy(&(sContext->handlesList));
 		dwNumReadersContexts -= 1;
 
 		/* signal an event to clients */
@@ -1001,35 +1058,34 @@ SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
 	 * for authentication. */
 	randHandle = SYS_RandomInt(10, 65000);
 
-	while (1)
+	int i;
+again:
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		int i;
-
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		if ((sReadersContexts[i])->vHandle != 0)
 		{
-			if ((sReadersContexts[i])->vHandle != 0)
-			{
-				int j;
+			RDR_CLIHANDLES *currentHandle;
+			list_t * l = &((sReadersContexts[i])->handlesList);
 
-				for (j = 0; j < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; j++)
+			list_iterator_start(l);
+			while (list_iterator_hasnext(l))
+			{
+				currentHandle = list_iterator_next(l);
+				if ((rContext->dwIdentity + randHandle) ==
+					(currentHandle->hCard))
 				{
-					if ((rContext->dwIdentity + randHandle) ==
-						(sReadersContexts[i])->psHandles[j].hCard)
-					{
-						/* Get a new handle and loop again */
-						randHandle = SYS_RandomInt(10, 65000);
-						continue;
-					}
+					/* Get a new handle and loop again */
+					randHandle = SYS_RandomInt(10, 65000);
+					list_iterator_stop(l);
+					goto again;
 				}
 			}
+			list_iterator_stop(l);
 		}
-
-		/* Once the for loop is completed w/o restart a good handle was
-		 * found and the loop can be exited. */
-		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-			break;
 	}
 
+	/* Once the for loop is completed w/o restart a good handle was
+	 * found and the loop can be exited. */
 	return rContext->dwIdentity + randHandle;
 }
 
@@ -1041,13 +1097,11 @@ LONG RFFindReaderHandle(SCARDHANDLE hCard)
 	{
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
-			int j;
-
-			for (j = 0; j < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; j++)
-			{
-				if (hCard == (sReadersContexts[i])->psHandles[j].hCard)
-					return SCARD_S_SUCCESS;
-			}
+			RDR_CLIHANDLES * currentHandle;
+			currentHandle = list_seek(&((sReadersContexts[i])->handlesList),
+				&hCard);
+			if (currentHandle != NULL)
+				return SCARD_S_SUCCESS;
 		}
 	}
 
@@ -1062,55 +1116,89 @@ LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
 
 LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 {
-	int i;
+	int listLength, lrv;
+	RDR_CLIHANDLES *newHandle;
 
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
+	listLength = list_size(&(rContext->handlesList));
+
+	/* Throttle the number of possible handles */
+	if (listLength >= maxReaderHandles)
 	{
-		if (rContext->psHandles[i].hCard == 0)
-		{
-			rContext->psHandles[i].hCard = hCard;
-			rContext->psHandles[i].dwEventStatus = 0;
-			break;
-		}
+		Log2(PCSC_LOG_CRITICAL,
+			"Too many handles opened, exceeding configured max (%d)",
+			maxReaderHandles);
+		return SCARD_E_NO_MEMORY;
 	}
 
-	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
-		/* List is full */
-		return SCARD_E_INSUFFICIENT_BUFFER;
+	newHandle = malloc(sizeof(RDR_CLIHANDLES));
+	if (NULL == newHandle)
+	{
+		Log1(PCSC_LOG_CRITICAL, "malloc failed");
+		return SCARD_E_NO_MEMORY;
+	}
 
+	newHandle->hCard = hCard;
+	newHandle->dwEventStatus = 0;
+
+	lrv = list_append(&(rContext->handlesList), newHandle);
+	if (lrv < 0)
+	{
+		free(newHandle);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+			lrv);
+		return SCARD_E_NO_MEMORY;
+	}
 	return SCARD_S_SUCCESS;
 }
 
 LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 {
-	int i;
+	RDR_CLIHANDLES *currentHandle;
+	int list_index, lrv;
 
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
+	currentHandle = list_seek(&(rContext->handlesList), &hCard);
+	if (NULL == currentHandle)
 	{
-		if (rContext->psHandles[i].hCard == hCard)
-		{
-			rContext->psHandles[i].hCard = 0;
-			rContext->psHandles[i].dwEventStatus = 0;
-			break;
-		}
+		Log2(PCSC_LOG_CRITICAL, "list_seek failed to locate hCard=%X", hCard);
+		return SCARD_E_INVALID_HANDLE;
 	}
 
-	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
-		/* Not Found */
-		return SCARD_E_INVALID_HANDLE;
+	list_index = list_locate(&(rContext->handlesList), currentHandle);
+	if (list_index < 0)
+		Log2(PCSC_LOG_CRITICAL,
+			"list_locate failed with return value: %X", list_index);
+	else
+	{
+		lrv = list_delete_at(&(rContext->handlesList), list_index);
+		if (lrv < 0)
+			Log2(PCSC_LOG_CRITICAL,
+				"list_delete_at failed with return value: %X", lrv);
+	}
+	free(currentHandle);
 
+	/* Not Found */
 	return SCARD_S_SUCCESS;
 }
 
 LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 {
-	int i;
-
 	/* Set all the handles for that reader to the event */
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
+	int list_index, listSize;
+	RDR_CLIHANDLES *currentHandle;
+
+	listSize = list_size(&(rContext->handlesList));
+
+	for (list_index = 0; list_index < listSize; list_index++)
 	{
-		if (rContext->psHandles[i].hCard != 0)
-			rContext->psHandles[i].dwEventStatus = dwEvent;
+		currentHandle = list_get_at(&(rContext->handlesList), list_index);
+		if (NULL == currentHandle)
+		{
+			Log2(PCSC_LOG_CRITICAL, "list_get_at failed at index %s",
+				list_index);
+			continue;
+		}
+
+		currentHandle->dwEventStatus = dwEvent;
 	}
 
 	if (SCARD_REMOVED == dwEvent)
@@ -1125,46 +1213,52 @@ LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 
 LONG RFCheckReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 {
-	int i;
+	LONG rv;
+	RDR_CLIHANDLES *currentHandle;
 
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
+	currentHandle = list_seek(&(rContext->handlesList), &hCard);
+	if (NULL == currentHandle)
 	{
-		if (rContext->psHandles[i].hCard == hCard)
-		{
-			if (rContext->psHandles[i].dwEventStatus == SCARD_REMOVED)
-				return SCARD_W_REMOVED_CARD;
-			else
-			{
-				if (rContext->psHandles[i].dwEventStatus == SCARD_RESET)
-					return SCARD_W_RESET_CARD;
-				else
-				{
-					if (rContext->psHandles[i].dwEventStatus == 0)
-						return SCARD_S_SUCCESS;
-					else
-						return SCARD_E_INVALID_VALUE;
-				}
-			}
-		}
+		/* Not Found */
+		Log2(PCSC_LOG_CRITICAL, "list_seek failed for hCard %X", hCard);
+		return SCARD_E_INVALID_HANDLE;
 	}
 
-	return SCARD_E_INVALID_HANDLE;
+	switch(currentHandle->dwEventStatus)
+	{
+		case 0:
+			rv = SCARD_S_SUCCESS;
+			break;
+
+		case SCARD_REMOVED:
+			rv = SCARD_W_REMOVED_CARD;
+			break;
+
+		case SCARD_RESET:
+			rv = SCARD_W_RESET_CARD;
+			break;
+
+		default:
+			rv = SCARD_E_INVALID_VALUE;
+	}
+
+	return rv;
 }
 
 LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 {
-	int i;
+	RDR_CLIHANDLES *currentHandle;
 
-	for (i = 0; i < PCSCLITE_MAX_READER_CONTEXT_CHANNELS; i++)
-	{
-		if (rContext->psHandles[i].hCard == hCard)
-			rContext->psHandles[i].dwEventStatus = 0;
-	}
-
-	if (i == PCSCLITE_MAX_READER_CONTEXT_CHANNELS)
+	currentHandle = list_seek(&(rContext->handlesList), &hCard);
+	if (NULL == currentHandle)
 		/* Not Found */
 		return SCARD_E_INVALID_HANDLE;
 
+	currentHandle->dwEventStatus = 0;
+
+	/* hCards should be unique so we
+	 * should be able to return
+	 * as soon as we have a hit */
 	return SCARD_S_SUCCESS;
 }
 
