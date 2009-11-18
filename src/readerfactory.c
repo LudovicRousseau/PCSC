@@ -7,6 +7,8 @@
  *  Damien Sauveron <damien.sauveron@labri.fr>
  * Copyright (C) 2002-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ * Copyright (C) 2009
+ *  Jean-Luc Giraud <jlgiraud@googlemail.com>
  *
  * $Id$
  */
