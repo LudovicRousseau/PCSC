@@ -22,39 +22,40 @@ from smartcard.scard import *
 import threading
 import time
 
+
 def cancel():
     time.sleep(1)
     print "cancel"
     hresult = SCardCancel(hcontext)
-    if hresult!=0:
+    if hresult != 0:
         print 'Failed to SCardCancel: ' + SCardGetErrorMessage(hresult)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
 
 hresult, readers = SCardListReaders(hcontext, [])
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
 print 'PC/SC Readers:', readers
 
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 hresult, newstates = SCardGetStatusChange(hcontext, 0, readerstates.values())
-if hresult!=SCARD_S_SUCCESS:
+if hresult != SCARD_S_SUCCESS:
     raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
 print newstates
 for state in newstates:
     readername, eventstate, atr = state
-    readerstates[readername] = ( readername, eventstate )
+    readerstates[readername] = (readername, eventstate)
 
 t = threading.Thread(target=cancel)
 t.start()
 
 hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
 print "SCardGetStatusChange()", SCardGetErrorMessage(hresult)
-if hresult!=SCARD_S_SUCCESS and hresult!=SCARD_E_TIMEOUT:
+if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
     if SCARD_E_CANCELLED == hresult:
         pass
     else:
@@ -62,6 +63,5 @@ if hresult!=SCARD_S_SUCCESS and hresult!=SCARD_E_TIMEOUT:
 
 hresult = SCardReleaseContext(hcontext)
 print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
-
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))

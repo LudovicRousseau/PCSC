@@ -25,9 +25,9 @@ for reader in readers():
     cardConnection = reader.createConnection()
     cardConnection.connect(mode=SCARD_SHARE_DIRECT)
 
-    get_firmware = [ 0x02 ]
+    get_firmware = [0x02]
     IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
-    res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE, get_firmware)
+    res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
+        get_firmware)
     print "Reader:", reader
     print "Firmware:", "".join(map(chr, res))
-

@@ -21,16 +21,18 @@ from smartcard.pcsc.PCSCReader import readers
 from smartcard.pcsc.PCSCPart10 import *
 from smartcard.util import toHexString
 
+
 def switch_interface(interface):
     for reader in readers():
         cardConnection = reader.createConnection()
         cardConnection.connect(mode=SCARD_SHARE_DIRECT)
 
-        switch_interface = [ 0x52, 0xF8, 0x04, 0x01, 0x00, interface ]
+        switch_interface = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
         IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
         print "Reader:", reader,
         try:
-            res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE, switch_interface)
+            res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
+                switch_interface)
         except:
             print "FAILED"
         else:

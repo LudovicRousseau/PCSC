@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-#   SCardBeginTransaction_Disconnect.py : Unitary test for #   SCardDisconnect()
+#   SCardBeginTransaction_Disconnect.py : Unitary test for SCardDisconnect()
 #   Copyright (C) 2009  Ludovic Rousseau
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -25,31 +25,30 @@
 from smartcard.scard import *
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
 
 hresult, readers = SCardListReaders(hcontext, [])
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
 print 'PC/SC Readers:', readers
 
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0], SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardBeginTransaction(hcard)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardBeginTransaction(hcard)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardReleaseContext(hcontext)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
-
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))

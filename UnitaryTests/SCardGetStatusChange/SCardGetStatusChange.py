@@ -30,7 +30,7 @@ hresult, readers = SCardListReaders(hcontext, [])
 # initialise the states of the readers
 readerstates = {}
 for reader in readers:
-    readerstates[reader] = ( reader, SCARD_STATE_UNAWARE )
+    readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 print "values", readerstates.values()
 (hresult, states) = SCardGetStatusChange(hcontext, 0, readerstates.values())
 print SCardGetErrorMessage(hresult)
@@ -41,7 +41,7 @@ for state in states:
     print "readername:", readername
     print "eventstate:", hex(eventstate)
     print "atr:", atr
-    readerstates[readername] = ( readername, eventstate )
+    readerstates[readername] = (readername, eventstate)
 print "values", readerstates.values()
 
 # wait for a change with a 10s timeout
@@ -54,8 +54,7 @@ for state in states:
     print "readername:", readername
     print "eventstate:", hex(eventstate)
     print "atr:", atr
-    readerstates[readername] = ( readername, eventstate )
+    readerstates[readername] = (readername, eventstate)
 print "values", readerstates.values()
 
 hresult = SCardReleaseContext(hcontext)
-

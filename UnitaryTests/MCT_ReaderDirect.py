@@ -21,6 +21,7 @@ from smartcard.pcsc.PCSCReader import readers
 from smartcard.pcsc.PCSCPart10 import *
 from smartcard.util import toHexString
 
+
 def parse_info(bytes):
     """ parse the SECODER INFO answer """
     print "parse the SECODER INFO answer:", toHexString(bytes)
@@ -31,7 +32,7 @@ def parse_info(bytes):
     while len(bytes):
         tag = bytes[0]
         length = bytes[1]
-        data = bytes[2:2+length]
+        data = bytes[2:2 + length]
 
         print "tag: %02X, length: %2d:" % (tag, length),
         if tag in [0x40, 0x80, 0x81, 0x83, 0x84]:
@@ -39,7 +40,7 @@ def parse_info(bytes):
         else:
             print toHexString(data)
 
-        del bytes[:2+length]
+        del bytes[:2 + length]
     print "SW:", toHexString(sw)
 
 
@@ -65,13 +66,12 @@ mct_readerDirect = hasFeature(featureList, FEATURE_MCT_READERDIRECT)
 if mct_readerDirect is None:
     raise Exception("The reader does not support MCT_READERDIRECT")
 
-secoder_info = [ 0x20, 0x70, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 ]
+secoder_info = [0x20, 0x70, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]
 res = cardConnection.control(mct_readerDirect, secoder_info)
 parse_info(res)
 
-secoder_select = [ 0x20, 0x71, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x80,
-        0x05, 0x31, 0x2E, 0x31, 0x2E, 0x30, 0x84, 0x02, 0x64, 0x65,
-        0x90, 0x01, 0x01, 0x85, 0x03, ord('g'), ord('k'), ord('p'), 0x00, 0x00 ]
+secoder_select = [0x20, 0x71, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x80,
+    0x05, 0x31, 0x2E, 0x31, 0x2E, 0x30, 0x84, 0x02, 0x64, 0x65,
+    0x90, 0x01, 0x01, 0x85, 0x03, ord('g'), ord('k'), ord('p'), 0x00, 0x00]
 res = cardConnection.control(mct_readerDirect, secoder_select)
 parse_select(res)
-

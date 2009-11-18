@@ -25,6 +25,7 @@ from smartcard.util import toHexString
 
 import sys
 
+
 def scardstate2text(cardstate):
     state = list()
     states_dict = {
@@ -39,8 +40,7 @@ def scardstate2text(cardstate):
         SCARD_STATE_EXCLUSIVE: "SCARD_STATE_EXCLUSIVE",
         SCARD_STATE_INUSE: "SCARD_STATE_INUSE",
         SCARD_STATE_MUTE: "SCARD_STATE_MUTE",
-        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED"
-        }
+        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED"}
     for s in states_dict.keys():
         if (cardstate & s):
             state.append(states_dict[s])
@@ -52,7 +52,7 @@ hresult, readers = SCardListReaders(hcontext, [])
 # initialise the states of the readers
 readerstates = {}
 for reader in readers:
-    readerstates[reader] = ( reader, SCARD_STATE_UNAWARE )
+    readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 print "values", readerstates.values()
 (hresult, states) = SCardGetStatusChange(hcontext, 0, readerstates.values())
 print SCardGetErrorMessage(hresult)
@@ -63,12 +63,12 @@ for state in states:
     print "readername:", readername
     print "eventstate:", scardstate2text(eventstate)
     print "atr:", toHexString(atr)
-    readerstates[readername] = ( readername, eventstate )
+    readerstates[readername] = (readername, eventstate)
 print "values", readerstates.values()
 
 # wait for a change with a 10s timeout
 reader = "\\\\?PnP?\\Notification"
-readerstates[reader] = ( reader, SCARD_STATE_UNAWARE )
+readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 
 (hresult, states) = SCardGetStatusChange(hcontext, 10000, readerstates.values())
 print SCardGetErrorMessage(hresult)
@@ -79,8 +79,7 @@ for state in states:
     print "readername:", readername
     print "eventstate:", scardstate2text(eventstate)
     print "atr:", toHexString(atr)
-    readerstates[readername] = ( readername, eventstate )
+    readerstates[readername] = (readername, eventstate)
 print "values", readerstates.values()
 
 hresult = SCardReleaseContext(hcontext)
-

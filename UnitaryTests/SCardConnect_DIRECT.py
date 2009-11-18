@@ -25,27 +25,27 @@
 from smartcard.scard import *
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
 
 hresult, readers = SCardListReaders(hcontext, [])
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
 print 'PC/SC Readers:', readers
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
 
 print "dwActiveProtocol:", dwActiveProtocol
 
 # Reconnect in SCARD_SHARE_DIRECT mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardReconnect: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardReconnect: ' + SCardGetErrorMessage(hresult))
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print "dwActiveProtocol:", dwActiveProtocol
@@ -53,9 +53,9 @@ if SCARD_PROTOCOL_UNDEFINED != dwActiveProtocol:
     raise Exception('dwActiveProtocol should be SCARD_PROTOCOL_UNDEFINED')
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
 
 hresult = SCardReleaseContext(hcontext)
-if hresult!=SCARD_S_SUCCESS:
-	raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+if hresult != SCARD_S_SUCCESS:
+    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
