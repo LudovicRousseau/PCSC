@@ -443,6 +443,22 @@ int list_insert_at(list_t *restrict l, const void *data, unsigned int pos) {
     return 1;
 }
 
+int list_delete(list_t *restrict l, const void *data) {
+	int pos, r;
+
+	pos = list_locate(l, data);
+	if (pos < 0)
+		return pos;
+
+	r = list_delete_at(l, pos);
+	if (r < 0)
+		return r;
+
+    assert(list_repOk(l));
+
+	return 0;
+}
+
 int list_delete_at(list_t *restrict l, unsigned int pos) {
     struct list_entry_s *delendo;
 
