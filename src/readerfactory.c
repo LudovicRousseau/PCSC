@@ -1156,7 +1156,7 @@ LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 {
 	RDR_CLIHANDLES *currentHandle;
-	int list_index, lrv;
+	int lrv;
 
 	currentHandle = list_seek(&(rContext->handlesList), &hCard);
 	if (NULL == currentHandle)
@@ -1165,17 +1165,11 @@ LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	list_index = list_locate(&(rContext->handlesList), currentHandle);
-	if (list_index < 0)
+	lrv = list_delete(&(rContext->handlesList), currentHandle);
+	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL,
-			"list_locate failed with return value: %X", list_index);
-	else
-	{
-		lrv = list_delete_at(&(rContext->handlesList), list_index);
-		if (lrv < 0)
-			Log2(PCSC_LOG_CRITICAL,
-				"list_delete_at failed with return value: %X", lrv);
-	}
+			"list_delete failed with return value: %X", lrv);
+
 	free(currentHandle);
 
 	/* Not Found */

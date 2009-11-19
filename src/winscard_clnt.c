@@ -3446,7 +3446,7 @@ static LONG SCardRemoveContext(SCARDCONTEXT hContext)
 
 static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 {
-	int list_index;
+	int list_index, lrv;
 	int listSize;
 	CHANNEL_MAP * currentChannelMap;
 
@@ -3476,22 +3476,12 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 
 	}
 	list_destroy(&(targetContextMap->channelMapList));
-	list_index = list_locate(&contextMapList, targetContextMap);
-	if (list_index < 0)
+
+	lrv = list_delete(&contextMapList, targetContextMap);
+	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_locate failed with return value: %X", list_index);
-	}
-	else
-	{
-		int lrv;
-
-		lrv = list_delete_at(&contextMapList, list_index);
-		if (lrv < 0)
-		{
-			Log2(PCSC_LOG_CRITICAL,
-				"list_delete_at failed with return value: %X", lrv);
-		}
+			"list_delete failed with return value: %X", lrv);
 	}
 
 	return SCARD_S_SUCCESS;
@@ -3530,7 +3520,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 {
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * currentChannelMap;
-	int list_index = 0;
+	int lrv;
 	LONG rv;
 
 	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
@@ -3540,23 +3530,11 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 
 	free(currentChannelMap->readerName);
 
-	list_index = list_locate(&(currentContextMap->channelMapList),
-		currentChannelMap);
-	if (list_index < 0)
+	lrv = list_delete(&(currentContextMap->channelMapList), currentChannelMap);
+	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_locate failed with return value: %X", list_index);
-	}
-	else
-	{
-		int lrv;
-
-		lrv = list_delete_at(&(currentContextMap->channelMapList), list_index);
-		if (lrv < 0)
-		{
-			Log2(PCSC_LOG_CRITICAL,
-				"list_delete_at failed with return value: %X", lrv);
-		}
+			"list_delete failed with return value: %X", lrv);
 	}
 
 	free(currentChannelMap);

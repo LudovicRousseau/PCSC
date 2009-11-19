@@ -63,12 +63,11 @@ LONG EHRegisterClientForEvent(int32_t filedes)
 LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 {
 	LONG rv = SCARD_S_SUCCESS;
-	int pos, ret;
+	int ret;
 
 	(void)SYS_MutexLock(&ClientsWaitingForEvent_lock);
 
-	pos = list_locate(&ClientsWaitingForEvent, &filedes);
-	ret = list_delete_at(&ClientsWaitingForEvent, pos);
+	ret = list_delete(&ClientsWaitingForEvent, &filedes);
 	
 	(void)SYS_MutexUnLock(&ClientsWaitingForEvent_lock);
 	

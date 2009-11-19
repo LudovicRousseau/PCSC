@@ -194,22 +194,12 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) newContext);
 	if (rv)
 	{
-		int list_index;
+		int lrv2;
 
 		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
-		list_index = list_locate(&contextsList, (const void *) newContext);
-		if (list_index >= 0)
-		{
-			int lrv2 = list_delete_at(&contextsList, list_index);
-			if (lrv2 < 0)
-				Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %X", lrv2);
-		}
-		else
-		{
-			Log3(PCSC_LOG_CRITICAL,
-				"list_locate() failed with error %X when looking for threadContext %X",
-				list_index, newContext);
-		}
+		lrv2 = list_delete(&contextsList, newContext);
+		if (lrv2 < 0)
+			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv2);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -880,25 +870,16 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 
 static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
-	int list_index = 0;
+	int lrv;
 
-	list_index = list_locate(&(threadContext->cardsList), &hCard);
-	if (list_index >= 0)
+	lrv = list_delete(&(threadContext->cardsList), &hCard);
+	if (lrv < 0)
 	{
-		int lrv;
-
-		lrv = list_delete_at(&(threadContext->cardsList), list_index);
-		if (lrv < 0)
-			Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %X", lrv);
-
-		return SCARD_S_SUCCESS;
+		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv);
+		return SCARD_E_INVALID_VALUE;
 	}
-	else
-	{
-		Log3(PCSC_LOG_CRITICAL, "list_locate() failed with error %X when looking for hCard %X",
-			list_index, hCard);
-	}
-	return SCARD_E_INVALID_VALUE;
+
+	return SCARD_S_SUCCESS;
 }
 
 
@@ -922,7 +903,8 @@ static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContex
  */
 static LONG MSGCleanupClient(SCONTEXT * threadContext)
 {
-	int list_index = 0;
+	int lrv;
+
 	if (threadContext->hContext != 0)
 	{
 		(void)SCardReleaseContext(threadContext->hContext);
@@ -938,20 +920,10 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 	 * Hopefully the compiler won't optimise it out */
 	memset((void*) threadContext, 0, sizeof(SCONTEXT));
 	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%X", threadContext);
-	list_index = list_locate(&contextsList, (const void *) threadContext);
-	if (list_index >= 0)
-	{
-		int lrv = list_delete_at(&contextsList, list_index);
-		if (lrv < 0)
-		{
-			Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %x", lrv);
-		}
-	}
-	else
-	{
-		Log3(PCSC_LOG_CRITICAL, "list_locate() failed with error %X when looking for threadContext %X",
-			list_index, threadContext);
-	}
+
+	lrv = list_delete(&contextsList, threadContext);
+	if (lrv < 0)
+		Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %x", lrv);
 
 	free(threadContext);
 
