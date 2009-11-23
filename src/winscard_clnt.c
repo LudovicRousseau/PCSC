@@ -2245,6 +2245,8 @@ end:
  * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed(\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
+ * @retval SCARD_W_REMOVED_CARD The card has been removed from the reader(\ref SCARD_W_REMOVED_CARD)
+ * @retval SCARD_W_RESET_CARD The card has been reset by another application (\ref SCARD_W_RESET_CARD)
  * @retval SCARD_E_INVALID_PARAMETER \p pbSendBuffer is NULL or \p cbSendLength is null and the IFDHandler is version 2.0 (without \p dwControlCode) (\ref SCARD_E_INVALID_PARAMETER)
  *
  * @code
