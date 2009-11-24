@@ -3596,6 +3596,31 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 	return -1;
 }
 
+static LONG SCardInvalidateHandles(void)
+{
+	/* invalid all handles */
+	(void)SCardLockThread();
+
+	while (list_size(&contextMapList) != 0)
+	{
+		SCONTEXTMAP * currentContextMap;
+
+		currentContextMap = list_get_at(&contextMapList, 0);
+		if (currentContextMap != NULL)
+			(void)SCardCleanContext(currentContextMap);
+		else
+			Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
+	}
+
+	(void)SCardUnlockThread();
+
+	/* reset pcscd status */
+	daemon_ctime = 0;
+	client_pid = 0;
+
+	return SCARD_E_INVALID_HANDLE;
+}
+
 /**
  * @brief Checks if the server is running.
  *
@@ -3643,29 +3668,7 @@ LONG SCardCheckDaemonAvailability(void)
 	}
 
 	if (need_restart)
-	{
-		/* invalid all handles */
-		(void)SCardLockThread();
-
-		while (list_size(&contextMapList) != 0)
-		{
-			SCONTEXTMAP * currentContextMap;
-
-			currentContextMap = list_get_at(&contextMapList, 0);
-			if (currentContextMap != NULL)
-				(void)SCardCleanContext(currentContextMap);
-			else
-				Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
-		}
-
-		(void)SCardUnlockThread();
-
-		/* reset pcscd status */
-		daemon_ctime = 0;
-		client_pid = 0;
-
-		return SCARD_E_INVALID_HANDLE;
-	}
+		return SCardInvalidateHandles();
 
 	daemon_ctime = statBuffer.st_ctime;
 	daemon_pid = GetDaemonPid();
