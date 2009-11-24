@@ -285,7 +285,6 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
-void DESTRUCTOR SCardUnload(void);
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 
 /*
