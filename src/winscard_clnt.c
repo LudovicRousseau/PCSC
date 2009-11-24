@@ -3649,7 +3649,6 @@ LONG SCardCheckDaemonAvailability(void)
 
 		while (list_size(&contextMapList) != 0)
 		{
-			int lrv;
 			SCONTEXTMAP * currentContextMap;
 
 			currentContextMap = list_get_at(&contextMapList, 0);
@@ -3657,15 +3656,6 @@ LONG SCardCheckDaemonAvailability(void)
 				(void)SCardCleanContext(currentContextMap);
 			else
 				Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
-
-			lrv = list_delete_at(&contextMapList, 0);
-			if (lrv < 0)
-			{
-				Log2(PCSC_LOG_CRITICAL,
-						"list_delete_at failed with return value: %X", lrv);
-			}
-			/* man free says it is OK to call free(NULL) */
-			free(currentContextMap);
 		}
 
 		(void)SCardUnlockThread();
