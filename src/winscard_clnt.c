@@ -3486,6 +3486,8 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 			"list_delete failed with return value: %X", lrv);
 	}
 
+	free(targetContextMap);
+
 	return SCARD_S_SUCCESS;
 }
 
