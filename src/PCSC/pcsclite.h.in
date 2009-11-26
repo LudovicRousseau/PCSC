@@ -177,7 +177,6 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_STATE_UNPOWERED		0x0400	/**< Unpowered card */
 
 /** PC/SC Lite specific extensions */
-#define SCARD_W_INSERTED_CARD		0x8010006A
 #define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F /**< feature not supported. */
 
 #ifndef INFINITE

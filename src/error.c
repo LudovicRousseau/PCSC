@@ -181,9 +181,6 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 	/* case SCARD_W_CANCELLED_BY_USER: */
 	/* case SCARD_W_CARD_NOT_AUTHENTICATED: */
 
-	case SCARD_W_INSERTED_CARD:
-		(void)strlcpy(strError, "Card was inserted.", sizeof(strError));
-		break;
 	case SCARD_E_UNSUPPORTED_FEATURE:
 		(void)strlcpy(strError, "Feature not supported.", sizeof(strError));
 		break;
