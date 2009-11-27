@@ -365,23 +365,71 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
+	int daemon_launched = FALSE;
+	int retries = 0;
 
 	PROFILE_START
 
+again:
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
 	if (SCARD_E_INVALID_HANDLE == rv)
 		/* we reconnected to a daemon or we got called from a forked child */
 		rv = SCardCheckDaemonAvailability();
 
+	if (SCARD_E_NO_SERVICE == rv)
+	{
+		if (daemon_launched)
+		{
+			retries++;
+			if (retries < 50)	/* 50 x 100ms = 5 seconds */
+			{
+				/* give some more time to the server to start */
+				SYS_USleep(100*1000);	/* 100 ms */
+				goto again;
+			}
+
+			/* the server failed to start (in time) */
+			goto end;
+		}
+		else
+		{
+			int pid;
+
+			pid = fork();
+
+			if (pid < 0)
+			{
+				Log2(PCSC_LOG_CRITICAL, "fork failed: %s", strerror(errno));
+				rv = SCARD_F_INTERNAL_ERROR;
+				goto end;
+			}
+
+			if (0 == pid)
+			{
+				int ret;
+
+				/* son process */
+				ret = execl(PCSCD_BINARY, "pcscd", (char *)NULL);
+				Log2(PCSC_LOG_CRITICAL, "exec failed: %s", strerror(errno));
+				exit(1);
+			}
+
+			/* father process */
+			daemon_launched = TRUE;
+			goto again;
+		}
+	}
+
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto end;
 
 	(void)SCardLockThread();
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
 		pvReserved2, phContext);
 	(void)SCardUnlockThread();
 
+end:
 	PROFILE_END(rv)
 
 	return rv;
