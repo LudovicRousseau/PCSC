@@ -42,10 +42,24 @@
  * -# \ref SCARD_E_UNSUPPORTED_FEATURE
  *    @par
  *    Windows may return ERROR_NOT_SUPPORTED instead of
- *    SCARD_E_UNSUPPORTED_FEATURE
+ *    \ref SCARD_E_UNSUPPORTED_FEATURE
  *    @par
  *    This difference will not be corrected. pcsc-lite only uses
  *    SCARD_E_* error codes.
+ * -# \ref SCARD_E_UNSUPPORTED_FEATURE
+ *	  @par
+ *	  For historical reasons the value of \ref SCARD_E_UNSUPPORTED_FEATURE
+ *	  is \p 0x8010001F in pcsc-lite but \p 0x80100022 in Windows WinSCard.
+ *	  You should not have any problem if you always use the symbolic name.
+ *	  @par
+ *	  The value \p 0x8010001F is also used by \ref SCARD_E_UNEXPECTED on
+ *	  pcsc-lite but \ref SCARD_E_UNEXPECTED is never returned by
+ *	  pcsc-lite. So \p 0x8010001F does always means
+ *	  \ref SCARD_E_UNSUPPORTED_FEATURE.
+ *	  @par
+ *	  Applications like rdekstop that allow a Windows application to
+ *	  talk to pcsc-lite should take care of this difference and convert
+ *	  the value between the two worlds.
  * -# SCardConnect()
  *    @par
  *    If \ref SCARD_SHARE_DIRECT is used the reader is accessed in
