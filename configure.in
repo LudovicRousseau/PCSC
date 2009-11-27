@@ -311,6 +311,8 @@ AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
 AC_DEFINE_UNQUOTED([PCSCLITE_FEATURES], ["${PCSCLITE_FEATURES}"], [Enabled PC/SC lite features])
+PCSCD_BINARY="${sbindir_exp}/pcscd"
+AC_DEFINE_UNQUOTED([PCSCD_BINARY], ["$PCSCD_BINARY"], [pcscd filename])
 
 cat << EOF
 
@@ -333,6 +335,7 @@ PTHREAD_CFLAGS:      ${PTHREAD_CFLAGS}
 PTHREAD_LIBS:        ${PTHREAD_LIBS}
 PCSC_ARCH:           ${PCSC_ARCH}
 
+pcscd binary          ${PCSCD_BINARY}
 libhal support:       ${use_libhal}
 libusb support:       ${use_libusb}
 USB drop directory:   ${usbdropdir}
