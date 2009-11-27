@@ -100,6 +100,7 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_E_NO_SERVICE		0x8010001D /**< The Smart card resource manager is not running. */
 #define SCARD_E_SERVICE_STOPPED		0x8010001E /**< The Smart card resource manager has shut down. */
 #define SCARD_E_UNEXPECTED		0x8010001F /**< An unexpected card error has occurred. */
+#define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F /**< This smart card does not support the requested feature. */
 #define SCARD_E_ICC_INSTALLATION	0x80100020 /**< No primary provider can be found for the smart card. */
 #define SCARD_E_ICC_CREATEORDER		0x80100021 /**< The requested order of object creation is not supported. */
 /* #define SCARD_E_UNSUPPORTED_FEATURE	0x80100022 / **< This smart card does not support the requested feature. */
@@ -175,9 +176,6 @@ extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
 #define SCARD_STATE_INUSE		0x0100	/**< Shared Mode */
 #define SCARD_STATE_MUTE		0x0200	/**< Unresponsive card */
 #define SCARD_STATE_UNPOWERED		0x0400	/**< Unpowered card */
-
-/** PC/SC Lite specific extensions */
-#define SCARD_E_UNSUPPORTED_FEATURE	0x8010001F /**< feature not supported. */
 
 #ifndef INFINITE
 #define INFINITE			0xFFFFFFFF	/**< Infinite timeout */
