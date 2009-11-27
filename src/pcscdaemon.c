@@ -351,7 +351,8 @@ int main(int argc, char **argv)
 			if (HotPlug)
 				return SendHotplugSignal();
 
-			if (kill(pid, 0) == 0)
+			rv = kill(pid, 0);
+			if (0 == rv)
 			{
 				Log1(PCSC_LOG_CRITICAL,
 					"file " PCSCLITE_CSOCK_NAME " already exists.");
@@ -360,8 +361,17 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 			}
 			else
-				/* the old pcscd is dead. make some cleanup */
-				clean_temp_files();
+				if (ESRCH == errno)
+				{
+					/* the old pcscd is dead. make some cleanup */
+					clean_temp_files();
+				}
+				else
+				{
+					/* permission denied or other error */
+					Log2(PCSC_LOG_CRITICAL, "kill failed: %s", strerror(errno));
+					return EXIT_FAILURE;
+				}
 		}
 		else
 		{
