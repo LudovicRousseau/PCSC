@@ -66,6 +66,11 @@
  *    shared mode (like with \ref SCARD_SHARE_SHARED) and not in
  *    exclusive mode (like with \ref SCARD_SHARE_EXCLUSIVE) as on
  *    Windows.
+ * -# SCardEstablishContext()
+ *    @par
+ *    Each thread of an application shall use its own SCARDCONTEXT. On
+ *    Windows the same SCARDCONTEXT can be shared by different threads
+ *    of same application.
  */
 
 #include "config.h"
