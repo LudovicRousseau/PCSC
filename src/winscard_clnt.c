@@ -304,6 +304,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
+static LONG SCardCheckSameProcess(void);
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 
 /*
@@ -627,7 +628,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 	{
 		/*
@@ -797,7 +798,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	if (strlen(szReader) > MAX_READERNAME)
 		return SCARD_E_INVALID_VALUE;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -952,7 +953,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1057,7 +1058,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	PROFILE_START
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1165,7 +1166,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	PROFILE_START
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1289,7 +1290,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	randnum = 0;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1370,7 +1371,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	PROFILE_START
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1553,7 +1554,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	*pcchReaderLen = 0;
 	*pcbAtrLen = 0;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1846,7 +1847,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/* reader list is empty */
 		return SCARD_S_SUCCESS;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1892,7 +1893,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	j = 0;
 	do
 	{
-		rv = SCardCheckDaemonAvailability();
+		rv = SCardCheckSameProcess();
 		if (rv != SCARD_S_SUCCESS)
 		{
 			if (currentContextMap->mMutex)
@@ -2347,7 +2348,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -2644,7 +2645,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -2804,7 +2805,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			pcbRecvLength == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -2986,7 +2987,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	if (pcchReaders == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3102,7 +3103,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 
 	PROFILE_START
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3182,7 +3183,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	const char ReaderGroup[] = "SCard$DefaultReaders\0";
 	const int dwGroups = sizeof(ReaderGroup);
 
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3361,7 +3362,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	rv = SCARD_S_SUCCESS;
 
 	/* Check if the _same_ server is running */
-	rv = SCardCheckDaemonAvailability();
+	rv = SCardCheckSameProcess();
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3738,6 +3739,20 @@ LONG SCardCheckDaemonAvailability(void)
 
 	daemon_ctime = statBuffer.st_ctime;
 	daemon_pid = GetDaemonPid();
+	client_pid = getpid();
+
+	return SCARD_S_SUCCESS;
+}
+
+static LONG SCardCheckSameProcess(void)
+{
+	/* after fork() need to restart */
+	if ((client_pid && client_pid != getpid()))
+	{
+		Log1(PCSC_LOG_INFO, "Client forked");
+		return SCardInvalidateHandles();
+	}
+
 	client_pid = getpid();
 
 	return SCARD_S_SUCCESS;
