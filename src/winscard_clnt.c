@@ -738,6 +738,7 @@ LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
  *   reader. Contrary to Windows winscard behavior, the reader is accessed in
  *   shared mode and not exclusive mode.
  * @param[in] dwPreferredProtocols Desired protocol use.
+ * - 0 - valid only if dwShareMode is SCARD_SHARE_DIRECT
  * - \ref SCARD_PROTOCOL_T0 - Use the T=0 protocol.
  * - \ref SCARD_PROTOCOL_T1 - Use the T=1 protocol.
  * - \ref SCARD_PROTOCOL_RAW - Use with memory type cards.
