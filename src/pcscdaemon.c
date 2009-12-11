@@ -412,6 +412,15 @@ int main(int argc, char **argv)
 	}
 
 	/*
+	 * cleanly remove /var/run/pcscd/files when exiting
+	 * signal_trap() does just set a global variable used by the main loop
+	 */
+	(void)signal(SIGQUIT, signal_trap);
+	(void)signal(SIGTERM, signal_trap);
+	(void)signal(SIGINT, signal_trap);
+	(void)signal(SIGHUP, signal_trap);
+
+	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
 	 */
 	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
@@ -521,13 +530,8 @@ int main(int argc, char **argv)
 	Init = FALSE;
 
 	/*
-	 * signal_trap() does just set a global variable used by the main loop
+	 * Hotplug rescan
 	 */
-	(void)signal(SIGQUIT, signal_trap);
-	(void)signal(SIGTERM, signal_trap);
-	(void)signal(SIGINT, signal_trap);
-	(void)signal(SIGHUP, signal_trap);
-
 	(void)signal(SIGUSR1, signal_reload);
 
 	SVCServiceRunLoop(customMaxThreadCounter, customMaxThreadCardHandles);
