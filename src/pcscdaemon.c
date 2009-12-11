@@ -412,14 +412,6 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * cleanly remove /var/run/pcscd/files when exiting
-	 */
-	(void)signal(SIGQUIT, signal_trap);
-	(void)signal(SIGTERM, signal_trap);
-	(void)signal(SIGINT, signal_trap);
-	(void)signal(SIGHUP, signal_trap);
-
-	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
 	 */
 	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
