@@ -59,8 +59,7 @@ SCARD_IO_REQUEST, *PSCARD_IO_REQUEST, *LPSCARD_IO_REQUEST;
 
 typedef const SCARD_IO_REQUEST *LPCSCARD_IO_REQUEST;
 
-extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci,
-	g_rgSCardRawPci;
+extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 
 #define SCARD_PCI_T0	(&g_rgSCardT0Pci) /**< protocol control information (PCI) for T=0 */
 #define SCARD_PCI_T1	(&g_rgSCardT1Pci) /**< protocol control information (PCI) for T=1 */
