@@ -514,13 +514,6 @@ int main(int argc, char **argv)
 			}
 	}
 
-	/*
-	 * Set the default globals
-	 */
-	g_rgSCardT0Pci.dwProtocol = SCARD_PROTOCOL_T0;
-	g_rgSCardT1Pci.dwProtocol = SCARD_PROTOCOL_T1;
-	g_rgSCardRawPci.dwProtocol = SCARD_PROTOCOL_RAW;
-
 	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
 	/*
