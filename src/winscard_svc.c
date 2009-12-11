@@ -524,7 +524,7 @@ static void ContextThread(LPVOID newContext)
 					caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
 				}
 				else
-					caStr.rv = SCARD_E_INVALID_VALUE;
+					caStr.rv = SCARD_E_INVALID_HANDLE;
 
 				WRITE_BODY(caStr)
 			}
