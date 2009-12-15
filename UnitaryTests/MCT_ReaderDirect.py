@@ -62,9 +62,9 @@ cardConnection.connect(mode=SCARD_SHARE_DIRECT)
 featureList = getFeatureRequest(cardConnection)
 #print getPinProperties(cardConnection)
 
-mct_readerDirect = hasFeature(featureList, FEATURE_MCT_READERDIRECT)
+mct_readerDirect = hasFeature(featureList, FEATURE_MCT_READER_DIRECT)
 if mct_readerDirect is None:
-    raise Exception("The reader does not support MCT_READERDIRECT")
+    raise Exception("The reader does not support MCT_READER_DIRECT")
 
 secoder_info = [0x20, 0x70, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]
 res = cardConnection.control(mct_readerDirect, secoder_info)
