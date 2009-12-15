@@ -176,34 +176,35 @@ short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
 						 * supported at this time
 						 */
 					}
-		} else
+		}
+		else
 			Y1i = 0;
 
-			/* test presence of TA2 */
-			if ((2 == i) && (TAi >= 0))
-			{
-				T = TAi & 0x0F;
+		/* test presence of TA2 */
+		if ((2 == i) && (TAi >= 0))
+		{
+			T = TAi & 0x0F;
 #ifdef ATR_DEBUG
-				Log2(PCSC_LOG_DEBUG, "Specific mode: T=%d", T);
+			Log2(PCSC_LOG_DEBUG, "Specific mode: T=%d", T);
 #endif
-				switch (T)
-				{
-					case 0:
-						psExtension->CardCapabilities.CurrentProtocol =
-							psExtension->CardCapabilities.AvailableProtocols =
-							SCARD_PROTOCOL_T0;
-						break;
+			switch (T)
+			{
+				case 0:
+					psExtension->CardCapabilities.CurrentProtocol =
+						psExtension->CardCapabilities.AvailableProtocols =
+						SCARD_PROTOCOL_T0;
+					break;
 
-					case 1:
-						psExtension->CardCapabilities.CurrentProtocol =
-							psExtension->CardCapabilities.AvailableProtocols =
-							SCARD_PROTOCOL_T1;
-						break;
+				case 1:
+					psExtension->CardCapabilities.CurrentProtocol =
+						psExtension->CardCapabilities.AvailableProtocols =
+						SCARD_PROTOCOL_T1;
+					break;
 
-					default:
-						return 0; /** @retval 0 Unable do decode T protocol */
-				}
+				default:
+					return 0; /** @retval 0 Unable do decode T protocol */
 			}
+		}
 
 		if (p > MAX_ATR_SIZE)
 		{
