@@ -923,7 +923,7 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 
 	lrv = list_delete(&contextsList, threadContext);
 	if (lrv < 0)
-		Log2(PCSC_LOG_CRITICAL, "list_delete_at() failed with error %x", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %x", lrv);
 
 	free(threadContext);
 
