@@ -17,6 +17,7 @@
  */
 
 #include <errno.h>
+#include <unistd.h>
 #include "config.h"
 #include "misc.h"
 #include "pcscd.h"
