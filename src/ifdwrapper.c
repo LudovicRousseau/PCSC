@@ -29,8 +29,6 @@
 #include "sys_generic.h"
 #include "utils.h"
 
-#undef PCSCLITE_STATIC_DRIVER
-
 /**
  * Set the protocol type selection (PTS).
  * This function sets the appropriate protocol to be used on the card.

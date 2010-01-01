@@ -29,6 +29,7 @@
 INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
 	*pvLHandle = NULL;
+#ifndef PCSCLITE_STATIC_DRIVER
 	*pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
 
 	if (*pvLHandle == NULL)
@@ -36,6 +37,7 @@ INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 		Log3(PCSC_LOG_CRITICAL, "%s: %s", pcLibrary, dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
+#endif
 
 	return SCARD_S_SUCCESS;
 }
@@ -44,6 +46,7 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 {
 	int ret;
 
+#ifndef PCSCLITE_STATIC_DRIVER
 	ret = dlclose(*pvLHandle);
 	*pvLHandle = NULL;
 
@@ -52,6 +55,7 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 		Log2(PCSC_LOG_CRITICAL, "%s", dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
+#endif
 
 	return SCARD_S_SUCCESS;
 }
@@ -59,12 +63,13 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction)
 {
 	char pcFunctionName[256];
-	int rv;
+	int rv = SCARD_S_SUCCESS;
 
 	/* Some platforms might need a leading underscore for the symbol */
 	(void)snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);
 
 	*pvFHandle = NULL;
+#ifndef PCSCLITE_STATIC_DRIVER
 	*pvFHandle = dlsym(pvLHandle, pcFunctionName);
 
 	/* Failed? Try again without the leading underscore */
@@ -75,8 +80,8 @@ INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFun
 	{
 		Log3(PCSC_LOG_CRITICAL, "%s: %s", pcFunction, dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
-	} else
-		rv = SCARD_S_SUCCESS;
+	}
+#endif
 
 	return rv;
 }

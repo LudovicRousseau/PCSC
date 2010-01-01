@@ -116,6 +116,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is existed */
 
+#ifndef PCSCLITE_STATIC_DRIVER
 	/*
 	 * Set up the search for USB/PCMCIA devices
 	 */
@@ -126,6 +127,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	rsp = HPRegisterForHotplugEvents();
 	if (rsp)
 		return;
+#endif
 
 	/*
 	 * Set up the power management callback routine
