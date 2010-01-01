@@ -49,7 +49,6 @@
  */
 static int commonSocket = 0;
 extern char AraKiri;
-extern char ReCheckSerialReaders;
 
 /**
  * @brief Accepts a Client connection.
