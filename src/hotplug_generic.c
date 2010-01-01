@@ -27,8 +27,6 @@
 
 #if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__) && !defined(HAVE_LIBHAL)
 
-char ReCheckSerialReaders = FALSE;
-
 LONG HPSearchHotPluggables(void)
 {
 	return 0;
@@ -46,7 +44,6 @@ LONG HPStopHotPluggables(void)
 
 void HPReCheckSerialReaders(void)
 {
-	ReCheckSerialReaders = TRUE;
 }
 
 #endif

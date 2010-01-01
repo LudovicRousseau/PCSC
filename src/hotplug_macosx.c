@@ -35,8 +35,6 @@
 
 #undef DEBUG_HOTPLUG
 
-char ReCheckSerialReaders = FALSE;
-
 /*
  * An aggregation of useful information on a driver bundle in the
  * drop directory.
