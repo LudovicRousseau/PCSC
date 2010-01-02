@@ -185,7 +185,7 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 		(void)strlcpy(strError, "Feature not supported.", sizeof(strError));
 		break;
 	default:
-		(void)snprintf(strError, sizeof(strError)-1, "Unkown error: 0x%08lX",
+		(void)snprintf(strError, sizeof(strError)-1, "Unknown error: 0x%08lX",
 			pcscError);
 	};
 
