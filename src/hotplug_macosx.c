@@ -72,6 +72,8 @@ static void HPDeviceAppeared(void *refCon, io_iterator_t iterator)
 	kern_return_t kret;
 	io_service_t obj;
 
+	(void)refCon;
+
 	while ((obj = IOIteratorNext(iterator)))
 		kret = IOObjectRelease(obj);
 
@@ -86,6 +88,8 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
 {
 	kern_return_t kret;
 	io_service_t obj;
+
+	(void)refCon;
 
 	while ((obj = IOIteratorNext(iterator)))
 		kret = IOObjectRelease(obj);
