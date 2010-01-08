@@ -44,9 +44,9 @@ INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 
 INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 {
+#ifndef PCSCLITE_STATIC_DRIVER
 	int ret;
 
-#ifndef PCSCLITE_STATIC_DRIVER
 	ret = dlclose(*pvLHandle);
 	*pvLHandle = NULL;
 
