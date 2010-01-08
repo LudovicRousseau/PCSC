@@ -88,18 +88,17 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 			dwProtocol, ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+#ifdef IFDHANDLERv1
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
 	}
-	else
-	{
-		rv = IFDHSetProtocolParameters(rContext->dwSlot, dwProtocol,
-			ucFlags, ucPTS1, ucPTS2, ucPTS3);
-	}
+#else
+	rv = IFDHSetProtocolParameters(rContext->dwSlot, dwProtocol, ucFlags,
+		ucPTS1, ucPTS2, ucPTS3); 
+#endif
 #endif
 
 	return rv;
@@ -152,13 +151,11 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
 	}
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
-	{
-		rv = IO_Create_Channel(rContext->dwPort);
-	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
-	{
-		rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
-	} else
+#ifdef IFDHANDLERv1
+	rv = IO_Create_Channel(rContext->dwPort);
+#elif IFDHANDLERv2
+	rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
+#else
 	{
 		/* Use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
@@ -166,6 +163,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 		else
 			rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
 	}
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
@@ -214,10 +212,11 @@ again:
 	else
 		rv = (*IFDH_close_channel) (rContext->dwSlot);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		rv = IO_Close_Channel();
-	else
-		rv = IFDHCloseChannel(rContext->dwSlot);
+#ifdef IFDHANDLERv1
+	rv = IO_Close_Channel();
+#else
+	rv = IFDHCloseChannel(rContext->dwSlot);
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
@@ -256,11 +255,11 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 		rv = (*IFDH_set_capabilities) (rContext->dwSlot, dwTag,
 			dwLength, pucValue);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		rv = IFD_Set_Capabilities(dwTag, pucValue);
-	else
-		rv = IFDHSetCapabilities(rContext->dwSlot, dwTag, dwLength,
-			pucValue);
+#ifdef IFDHANDLERv1
+	rv = IFD_Set_Capabilities(dwTag, pucValue);
+#else
+	rv = IFDHSetCapabilities(rContext->dwSlot, dwTag, dwLength, pucValue);
+#endif
 #endif
 
 	return rv;
@@ -298,11 +297,11 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 		rv = (*IFDH_get_capabilities) (rContext->dwSlot, dwTag,
 			pdwLength, pucValue);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
-		rv = IFD_Get_Capabilities(dwTag, pucValue);
-	else
-		rv = IFDHGetCapabilities(rContext->dwSlot, dwTag, pdwLength,
-			pucValue);
+#ifdef IFDHANDLERv1
+	rv = IFD_Get_Capabilities(dwTag, pucValue);
+#else
+	rv = IFDHGetCapabilities(rContext->dwSlot, dwTag, pdwLength, pucValue);
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
@@ -318,8 +317,10 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv;
+#ifndef PCSCLITE_STATIC_DRIVER
 	short ret;
 	SMARTCARD_EXTENSION sSmartCard;
+#endif
 	DWORD dwStatus;
 	UCHAR ucValue[1];
 
@@ -367,14 +368,15 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
 		ret = ATRDecodeAtr(&sSmartCard, pucAtr, *pdwAtrLen);
 	}
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+#ifdef IFDHANDLERv1
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
 	}
-	else
-		rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, pdwAtrLen);
+#else
+	rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, pdwAtrLen);
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
@@ -445,14 +447,15 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 	else
 		rv = (*IFDH_icc_presence) (rContext->dwSlot);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+#ifdef IFDHANDLERv1
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
 	}
-	else
-		rv = IFDHICCPresence(rContext->dwSlot);
+#else
+	rv = IFDHICCPresence(rContext->dwSlot);
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
@@ -500,7 +503,9 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
 #ifndef PCSCLITE_STATIC_DRIVER
 			rv = (*IFD_get_capabilities) (dwTag, pucAtr);
 #else
+#ifdef IFDHANDLERv1
 			rv = IFD_Get_Capabilities(dwTag, pucAtr);
+#endif
 #endif
 
 			/* END OF LOCKED REGION */
@@ -571,8 +576,8 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
-#else
-	rv = IFDHControl_v2(rContext->dwSlot, TxBuffer, TxLength,
+#elif IFDHANDLERv2
+	rv = IFDHControl(rContext->dwSlot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
 #endif
 
@@ -622,7 +627,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
-#else
+#elif IFDHANDLERv3
 	rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
@@ -664,7 +669,6 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
-	UCHAR ucValue[1] = "\x00";
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_transmit_to_icc) (SCARD_IO_HEADER, PUCHAR, DWORD,
@@ -691,6 +695,8 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
+		UCHAR ucValue[1];
+
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_transmit_to_icc) (pioTxPci, (LPBYTE) pucTxBuffer,
@@ -701,17 +707,20 @@ LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
 			(LPBYTE) pucTxBuffer, dwTxLength,
 			pucRxBuffer, pdwRxLength, pioRxPci);
 #else
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+#ifdef IFDHANDLERv1
 	{
+		UCHAR ucValue[1];
+
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Transmit_to_ICC(pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	}
-	else
-		rv = IFDHTransmitToICC(rContext->dwSlot, pioTxPci,
-			(LPBYTE) pucTxBuffer, dwTxLength,
-			pucRxBuffer, pdwRxLength, pioRxPci);
+#else
+	rv = IFDHTransmitToICC(rContext->dwSlot, pioTxPci,
+		(LPBYTE) pucTxBuffer, dwTxLength,
+		pucRxBuffer, pdwRxLength, pioRxPci);
+#endif
 #endif
 
 	/* END OF LOCKED REGION */
