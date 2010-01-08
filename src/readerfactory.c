@@ -993,6 +993,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
 		rContext->lpcReader, rContext->lpcLibrary);
 
+#ifndef PCSCLITE_STATIC_DRIVER
 	/* loads the library */
 	rv = RFLoadReader(rContext);
 	if (rv != SCARD_S_SUCCESS)
@@ -1010,6 +1011,10 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 		(void)RFUnloadReader(rContext);
 		return rv;
 	}
+#else
+	/* define a fake vHandle. Can be any value except NULL */
+	rContext->vHandle = RFInitializeReader;
+#endif
 
 	/* tries to open the port */
 	rv = IFDOpenIFD(rContext);
