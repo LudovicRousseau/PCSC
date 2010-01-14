@@ -1733,10 +1733,13 @@ end:
 }
 
 /**
- * @brief This function receives a structure or list of structures containing
- * reader names. It then blocks for a change in state to occur on any of the
- * OR'd values contained in \p dwCurrentState for a maximum blocking time of
- * \p dwTimeout or forever if \ref INFINITE is used.
+ * @brief This function blocks execution until the current availability
+ * of the cards in a specific set of readers changes. 
+ *
+ * This function receives a structure or list of structures containing
+ * reader names. It then blocks for a change in state to occur for a
+ * maximum blocking time of \p dwTimeout or forever if \ref INFINITE is
+ * used.
  *
  * The new event state will be contained in \p dwEventState. A status change
  * might be a card insertion or removal event, a change in ATR, etc.
