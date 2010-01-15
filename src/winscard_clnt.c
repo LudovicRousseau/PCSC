@@ -307,11 +307,15 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
+#ifdef DO_CHECK_SAME_PROCESS
 static LONG SCardCheckSameProcess(void);
 #define CHECK_SAME_PROCESS \
 	rv = SCardCheckSameProcess(); \
 	if (rv != SCARD_S_SUCCESS) \
 		return rv;
+#else
+#define CHECK_SAME_PROCESS
+#endif
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 
@@ -3731,6 +3735,7 @@ LONG SCardCheckDaemonAvailability(void)
 	return SCARD_S_SUCCESS;
 }
 
+#ifdef DO_CHECK_SAME_PROCESS
 static LONG SCardCheckSameProcess(void)
 {
 	/* after fork() need to restart */
@@ -3744,6 +3749,7 @@ static LONG SCardCheckSameProcess(void)
 
 	return SCARD_S_SUCCESS;
 }
+#endif
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 {
