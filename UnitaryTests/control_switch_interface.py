@@ -29,20 +29,25 @@ def switch_interface(interface):
 
         switch_interface = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
         IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
-        print "Reader:", reader,
+        print "Reader:", reader, "=>",
         try:
             res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
                 switch_interface)
         except:
             print "FAILED"
         else:
-            print res
+            if res != [0, 0, 0, 0]:
+                print "Failed: ", map(hex, res)
+            else:
+                print "Success"
 
 if __name__ == "__main__":
     import sys
 
+    # 01h = Switch to contactless interface
+    # 02h = Switch to contact interface
+
     # switch to contactless by default
-    # use 2 as argument on the command line to switch to contact
     interface = 0x01
     if len(sys.argv) > 1:
         interface = int(sys.argv[1])
