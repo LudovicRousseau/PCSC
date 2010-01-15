@@ -37,7 +37,14 @@ def switch_interface(interface):
             print "FAILED"
         else:
             if res != [0, 0, 0, 0]:
-                print "Failed: ", map(hex, res)
+                print "Failed: ",
+                err = res[0] * 256 + res[1]
+                if err == 0xFF83:
+                    print "Wrong data parameters"
+                elif err == 0xFF84:
+                    print "Wrong command bytes"
+                else:
+                    print "Unknown error:", map(hex, res)
             else:
                 print "Success"
 
