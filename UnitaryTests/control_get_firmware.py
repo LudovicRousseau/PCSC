@@ -23,7 +23,7 @@ from smartcard.util import toHexString
 
 for reader in readers():
     cardConnection = reader.createConnection()
-    cardConnection.connect(mode=SCARD_SHARE_DIRECT)
+    cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
     get_firmware = [0x02]
     IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)

@@ -25,7 +25,7 @@ from smartcard.util import toHexString
 def switch_interface(interface):
     for reader in readers():
         cardConnection = reader.createConnection()
-        cardConnection.connect(mode=SCARD_SHARE_DIRECT)
+        cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
         switch_interface = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
         IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)

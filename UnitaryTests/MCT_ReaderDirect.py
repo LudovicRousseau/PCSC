@@ -57,7 +57,7 @@ def parse_select(bytes):
 
 
 cardConnection = readers()[0].createConnection()
-cardConnection.connect(mode=SCARD_SHARE_DIRECT)
+cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
 featureList = getFeatureRequest(cardConnection)
 #print getPinProperties(cardConnection)
