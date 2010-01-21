@@ -20,7 +20,7 @@ libpcsclite_la_SOURCES = \
 	thread_unix.c \
 	utils.c \
 	winscard_msg.c
-libpcsclite_la_LDFLAGS = -version-info 1:0:0 -shared
+libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
 libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) $(LIBDL) \
 	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
