@@ -134,7 +134,7 @@ SunOS)
 	;;
 esac
 AC_DEFINE_UNQUOTED(PCSC_ARCH, "$PCSC_ARCH", [PC/SC target architecture])
-PCSCLITE_FEATURES="${PCSCLITE_FEATURES} $PCSC_ARCH"
+PCSCLITE_FEATURES="${PCSCLITE_FEATURES} $PCSC_ARCH $host"
 
 # See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
