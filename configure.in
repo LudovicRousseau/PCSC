@@ -78,7 +78,7 @@ AC_SUBST(PTHREAD_CFLAGS)
 
 # Add libtool support
 # Static lib is disabled by default. Use --enable-static if needed
-AM_DISABLE_STATIC
+LT_INIT(disable-static)
 AM_PROG_LIBTOOL
 # Automatically update the libtool script if it becomes out-of-date
 #AC_SUBST(LIBTOOL_DEPS)
