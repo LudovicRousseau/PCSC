@@ -278,6 +278,36 @@ wait_for_card_again:
 	printf("Testing SCardGetAttrib\t\t: ");
 #ifdef USE_AUTOALLOCATE
 	pcbAttrLen = SCARD_AUTOALLOCATE;
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_DEVICE_FRIENDLY_NAME, (unsigned char *)&pbAttr,
+		&pcbAttrLen);
+#else
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_DEVICE_FRIENDLY_NAME, NULL, &pcbAttrLen);
+	test_rv(rv, hContext, DONT_PANIC);
+	if (rv == SCARD_S_SUCCESS)
+	{
+		printf("SCARD_ATTR_DEVICE_FRIENDLY_NAME length: " GREEN "%ld\n" NORMAL, pcbAttrLen);
+		pbAttr = malloc(pcbAttrLen);
+	}
+
+	printf("Testing SCardGetAttrib\t\t: ");
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_DEVICE_FRIENDLY_NAME, pbAttr, &pcbAttrLen);
+#endif
+	test_rv(rv, hContext, DONT_PANIC);
+	if (rv == SCARD_S_SUCCESS)
+		printf("SCARD_ATTR_DEVICE_FRIENDLY_NAME: " GREEN "%s\n" NORMAL, pbAttr);
+
+#ifdef USE_AUTOALLOCATE
+	printf("Testing SCardFreeMemory\t\t: ");
+	rv = SCardFreeMemory(hContext, pbAttr);
+	test_rv(rv, hContext, PANIC);
+#else
+	if (pbAttr)
+		free(pbAttr);
+#endif
+
+	printf("Testing SCardGetAttrib\t\t: ");
+#ifdef USE_AUTOALLOCATE
+	pcbAttrLen = SCARD_AUTOALLOCATE;
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, (unsigned char *)&pbAttr,
 		&pcbAttrLen);
 #else
