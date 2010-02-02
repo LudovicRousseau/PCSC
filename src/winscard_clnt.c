@@ -426,9 +426,11 @@ again:
 			if (0 == pid)
 			{
 				int ret;
+				char *param = getenv("PCSCLITE_PCSCD_ARGS");
 
 				/* son process */
-				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", (char *)NULL);
+				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
+					(char *)NULL);
 				Log2(PCSC_LOG_CRITICAL, "exec failed: %s", strerror(errno));
 				exit(1);
 			}
