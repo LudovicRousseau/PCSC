@@ -107,11 +107,6 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 		exit(-1);
 	}
 
-	/*
-	 * Solaris sends a SIGALRM and it is annoying
-	 */
-
-	(void)signal(SIGALRM, SIG_IGN);
 	(void)signal(SIGPIPE, SIG_IGN);
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is existed */
