@@ -161,7 +161,7 @@ tests_Linux = {
 tests = tests_Win7
 
 
-def Connect():
+def Connect(index=0):
     """docstring for Connect"""
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
@@ -173,15 +173,16 @@ def Connect():
     print 'PC/SC Readers:', readers
     if (len(readers) <= 0):
         raise Exception('Reader list is empty, check that a reader is connected')
-    print "Using reader:", readers[0]
+    reader = readers[index]
+    print "Using reader:", reader
 
     # Connect in SCARD_SHARE_SHARED mode
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
     if hresult != SCARD_S_SUCCESS:
         print "SCardConnect failed"
         raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
-    return hcontext, hcard, readers[0]
+    return hcontext, hcard, reader
 
 
 def ConnectWithReader(readerName):
@@ -214,7 +215,10 @@ def main():
     # Options:
     #   -m : run manually (independent processes)
 
-    hcontext, hcard, readerName = Connect()
+    index = 0
+    if len(sys.argv) > 1:
+        index = int(sys.argv[1])
+    hcontext, hcard, readerName = Connect(index)
     # Creating the test handles here:
     # the test thread can't created them as
     # doing it may block on another call
