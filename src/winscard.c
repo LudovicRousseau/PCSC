@@ -95,6 +95,8 @@
 #include "sys_generic.h"
 #include "eventhandler.h"
 #include "utils.h"
+#include "reader.h"
+#include "strlcpycat.h"
 
 #undef DO_PROFILE
 #ifdef DO_PROFILE
@@ -1461,7 +1463,18 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			rv = SCARD_S_SUCCESS;
 			break;
 		case IFD_ERROR_TAG:
-			rv = SCARD_E_UNSUPPORTED_FEATURE;
+			/* Special case SCARD_ATTR_DEVICE_FRIENDLY_NAME as it is better
+			 * implemented in pcscd (it knows the friendly name)
+			 */
+			if (dwAttrId == SCARD_ATTR_DEVICE_FRIENDLY_NAME)
+			{
+				*pcbAttrLen = strlen(rContext->lpcReader)+1;
+
+				(void)strlcpy((char *)pbAttr, rContext->lpcReader, *pcbAttrLen);
+				rv = SCARD_S_SUCCESS;
+			}
+			else 
+				rv = SCARD_E_UNSUPPORTED_FEATURE;
 			break;
 		case IFD_ERROR_INSUFFICIENT_BUFFER:
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
