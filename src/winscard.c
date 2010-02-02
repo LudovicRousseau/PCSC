@@ -1241,6 +1241,12 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
+	/*
+	 * Make sure no one has a lock on this reader
+	 */
+	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+		return rv;
+
 	rv = RFReaderInfoById(hCard, &rContext);
 
 	/*
