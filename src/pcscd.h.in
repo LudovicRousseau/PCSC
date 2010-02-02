@@ -15,6 +15,8 @@
 #ifndef __pcscd_h__
 #define __pcscd_h__
 
+#define TIME_BEFORE_SUICIDE 60
+
 #define SCARD_SCOPE_GLOBAL		0x0003	/**< Scope is global */
 
 #define SCARD_RESET			0x0001	/**< Card was reset */

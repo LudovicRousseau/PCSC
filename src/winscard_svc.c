@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -47,6 +48,7 @@
  * An Application Context contains Channels (\c hCard).
  */
 
+extern char AutoExit;
 static unsigned int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 static unsigned int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 
@@ -203,6 +205,10 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
+
+	/* disable any suicide alarm */
+	if (AutoExit)
+		alarm(0);
 
 	return SCARD_S_SUCCESS;
 
@@ -926,6 +932,14 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %x", lrv);
 
 	free(threadContext);
+
+	/* start a suicide alarm */
+	if (AutoExit && (list_size(&contextsList) < 1))
+	{
+		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
+			TIME_BEFORE_SUICIDE);
+		alarm(TIME_BEFORE_SUICIDE);
+	}
 
 	return 0;
 }

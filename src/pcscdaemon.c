@@ -54,6 +54,7 @@
 
 char AraKiri = FALSE;
 static char Init = TRUE;
+char AutoExit = FALSE;
 static int ExitValue = EXIT_SUCCESS;
 int HPForceReaderPolling = 0;
 
@@ -208,10 +209,11 @@ int main(int argc, char **argv)
 		{"max-thread", 1, NULL, 't'},
 		{"max-card-handle-per-thread", 1, NULL, 's'},
 		{"max-card-handle-per-reader", 1, NULL, 'r'},
+		{"auto-exit", 0, NULL, 'x'},
 		{NULL, 0, NULL, 0}
 	};
 #endif
-#define OPT_STRING "c:fdhvaeCHt:r:s:"
+#define OPT_STRING "c:fdhvaeCHt:r:s:x"
 
 	rv = 0;
 	newReaderConfig = NULL;
@@ -312,6 +314,12 @@ int main(int argc, char **argv)
 				customMaxThreadCardHandles = optarg ? atoi(optarg) : 0; 
 				Log2(PCSC_LOG_INFO, "setting customMaxThreadCardHandles to: %d",
 					customMaxThreadCardHandles);
+				break;
+
+			case 'x':
+				AutoExit = TRUE;
+				Log2(PCSC_LOG_INFO, "Auto exit after %d seconds of inactivity",
+					TIME_BEFORE_SUICIDE);
 				break;
 
 			default:
@@ -415,6 +423,9 @@ int main(int argc, char **argv)
 	(void)signal(SIGQUIT, signal_trap);
 	(void)signal(SIGTERM, signal_trap);
 	(void)signal(SIGINT, signal_trap);
+
+	/* exits on SIGALARM to allow pcscd to suicide if not used */
+	(void)signal(SIGALRM, signal_trap);
 
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
@@ -565,9 +576,9 @@ static void signal_reload(/*@unused@*/ int sig)
 	HPReCheckSerialReaders();
 } /* signal_reload */
 
-static void signal_trap(/*@unused@*/ int sig)
+static void signal_trap(int sig)
 {
-	(void)sig;
+	Log2(PCSC_LOG_INFO, "Received signal: %d", sig);
 
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)

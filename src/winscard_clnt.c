@@ -428,7 +428,7 @@ again:
 				int ret;
 
 				/* son process */
-				ret = execl(PCSCD_BINARY, "pcscd", (char *)NULL);
+				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", (char *)NULL);
 				Log2(PCSC_LOG_CRITICAL, "exec failed: %s", strerror(errno));
 				exit(1);
 			}
