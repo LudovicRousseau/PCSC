@@ -322,7 +322,7 @@ PC/SC lite has been configured with following options:
 
 Version:             ${PACKAGE_VERSION}
 System binaries:     $(eval eval eval echo "${sbindir_exp}")
-Configuration files: $(eval eval eval echo "${sysconfdir_exp}")
+Configuration dir:   $(eval eval eval echo "${sysconfdir_exp}")
 
 
 Host:                ${host}
