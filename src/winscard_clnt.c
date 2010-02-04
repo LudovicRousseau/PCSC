@@ -5,6 +5,8 @@
  *  David Corcoran <corcoran@linuxnet.com>
  * Copyright (C) 2003-2004
  *  Damien Sauveron <damien.sauveron@labri.fr>
+ * Copyright (C) 2005
+ *  Martin Paljak <martin@paljak.pri.ee>
  * Copyright (C) 2002-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  * Copyright (C) 2009
