@@ -1474,10 +1474,18 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			 */
 			if (dwAttrId == SCARD_ATTR_DEVICE_FRIENDLY_NAME)
 			{
-				*pcbAttrLen = strlen(rContext->lpcReader)+1;
+				int len = strlen(rContext->lpcReader)+1;
 
-				(void)strlcpy((char *)pbAttr, rContext->lpcReader, *pcbAttrLen);
-				rv = SCARD_S_SUCCESS;
+				*pcbAttrLen = len;
+				if (len > pcbAttrLen)
+					rv = SCARD_E_INSUFFICIENT_BUFFER;
+				else
+				{
+					(void)strlcpy((char *)pbAttr, rContext->lpcReader,
+						*pcbAttrLen);
+					rv = SCARD_S_SUCCESS;
+				}
+
 			}
 			else 
 				rv = SCARD_E_UNSUPPORTED_FEATURE;
