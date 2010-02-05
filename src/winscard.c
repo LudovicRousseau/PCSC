@@ -1474,10 +1474,10 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			 */
 			if (dwAttrId == SCARD_ATTR_DEVICE_FRIENDLY_NAME)
 			{
-				int len = strlen(rContext->lpcReader)+1;
+				unsigned int len = strlen(rContext->lpcReader)+1;
 
 				*pcbAttrLen = len;
-				if (len > pcbAttrLen)
+				if (len > *pcbAttrLen)
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
