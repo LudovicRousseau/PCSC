@@ -249,8 +249,8 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
-	int32_t filedes, int32_t timeOut)
+INTERNAL int32_t SHMMessageReceive(uint32_t command, void *buffer_void,
+	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
 
@@ -345,7 +345,7 @@ INTERNAL int32_t SHMMessageReceive(void *buffer_void, uint64_t buffer_size,
 			/* you need to set the env variable PCSCLITE_DEBUG=0 since
 			 * this is logged on the client side and not on the pcscd
 			 * side*/
-			Log1(PCSC_LOG_INFO, "Command not yet finished");
+			Log2(PCSC_LOG_INFO, "Command 0x%X not yet finished", command);
 #endif
 		} else
 		{

@@ -548,7 +548,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			return SCARD_E_NO_SERVICE;
 
 		/* Read a message from the server */
-		if (SHMMessageReceive(&veStr, sizeof(veStr), dwClientID,
+		if (SHMMessageReceive(CMD_VERSION, &veStr, sizeof(veStr), dwClientID,
 			PCSCLITE_READ_TIMEOUT) < 0)
 		{
 			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");
@@ -580,7 +580,7 @@ again:
 	/*
 	 * Read the response from the server
 	 */
-	rv = SHMMessageReceive(&scEstablishStruct, sizeof(scEstablishStruct), dwClientID, PCSCLITE_READ_TIMEOUT);
+	rv = SHMMessageReceive(SCARD_ESTABLISH_CONTEXT, &scEstablishStruct, sizeof(scEstablishStruct), dwClientID, PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
 		return SCARD_F_COMM_ERROR;
@@ -673,7 +673,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scReleaseStruct, sizeof(scReleaseStruct),
+	rv = SHMMessageReceive(SCARD_RELEASE_CONTEXT, &scReleaseStruct, sizeof(scReleaseStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -850,7 +850,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scConnectStruct, sizeof(scConnectStruct),
+	rv = SHMMessageReceive(SCARD_CONNECT, &scConnectStruct, sizeof(scConnectStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -1010,7 +1010,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scReconnectStruct,
+	rv = SHMMessageReceive(SCARD_RECONNECT, &scReconnectStruct,
 		sizeof(scReconnectStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
@@ -1111,7 +1111,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scDisconnectStruct,
+	rv = SHMMessageReceive(SCARD_DISCONNECT, &scDisconnectStruct,
 		sizeof(scDisconnectStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
@@ -1223,7 +1223,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		/*
 		 * Read a message from the server
 		 */
-		rv = SHMMessageReceive(&scBeginStruct, sizeof(scBeginStruct),
+		rv = SHMMessageReceive(SCARD_BEGIN_TRANSACTION, &scBeginStruct, sizeof(scBeginStruct),
 			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
@@ -1339,7 +1339,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scEndStruct, sizeof(scEndStruct),
+	rv = SHMMessageReceive(SCARD_END_TRANSACTION, &scEndStruct, sizeof(scEndStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -1416,7 +1416,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scCancelStruct, sizeof(scCancelStruct),
+	rv = SHMMessageReceive(SCARD_CANCEL_TRANSACTION, &scCancelStruct, sizeof(scCancelStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -1623,7 +1623,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scStatusStruct, sizeof(scStatusStruct),
+	rv = SHMMessageReceive(SCARD_STATUS, &scStatusStruct, sizeof(scStatusStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -2193,7 +2193,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/*
 				 * Read a message from the server
 				 */
-				rv = SHMMessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
+				rv = SHMMessageReceive(CMD_WAIT_READER_STATE_CHANGE, &waitStatusStruct, sizeof(waitStatusStruct),
 					currentContextMap->dwClientID,
 					dwTime);
 
@@ -2213,7 +2213,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 
 					/* Read a message from the server */
-					rv = SHMMessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
+					rv = SHMMessageReceive(CMD_STOP_WAITING_READER_STATE_CHANGE, &waitStatusStruct, sizeof(waitStatusStruct),
 						currentContextMap->dwClientID,
 						PCSCLITE_READ_TIMEOUT);
 
@@ -2404,7 +2404,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scControlStruct, sizeof(scControlStruct),
+	rv = SHMMessageReceive(SCARD_CONTROL, &scControlStruct, sizeof(scControlStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -2417,7 +2417,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (SCARD_S_SUCCESS == scControlStruct.rv)
 	{
 		/* read the received buffer */
-		rv = SHMMessageReceive(pbRecvBuffer, scControlStruct.dwBytesReturned,
+		rv = SHMMessageReceive(SCARD_CONTROL, pbRecvBuffer, scControlStruct.dwBytesReturned,
 			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
@@ -2693,7 +2693,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scGetSetStruct, sizeof(scGetSetStruct),
+	rv = SHMMessageReceive(command, &scGetSetStruct, sizeof(scGetSetStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -2876,7 +2876,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scTransmitStruct, sizeof(scTransmitStruct),
+	rv = SHMMessageReceive(SCARD_TRANSMIT, &scTransmitStruct, sizeof(scTransmitStruct),
 		currentContextMap->dwClientID,
 		PCSCLITE_READ_TIMEOUT);
 
@@ -2889,7 +2889,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	if (SCARD_S_SUCCESS == scTransmitStruct.rv)
 	{
 		/* read the received buffer */
-		rv = SHMMessageReceive(pbRecvBuffer, scTransmitStruct.pcbRecvLength,
+		rv = SHMMessageReceive(SCARD_TRANSMIT, pbRecvBuffer, scTransmitStruct.pcbRecvLength,
 			currentContextMap->dwClientID,
 			PCSCLITE_READ_TIMEOUT);
 
@@ -3307,7 +3307,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = SHMMessageReceive(&scCancelStruct, sizeof(scCancelStruct),
+	rv = SHMMessageReceive(SCARD_CANCEL, &scCancelStruct, sizeof(scCancelStruct),
 		dwClientID, PCSCLITE_READ_TIMEOUT);
 
 	if (rv < 0)
@@ -3764,7 +3764,7 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 		return SCARD_E_NO_SERVICE;
 
 	/* Read a message from the server */
-	if (SHMMessageReceive(&readerStates, sizeof(readerStates), dwClientID,
+	if (SHMMessageReceive(CMD_GET_READERS_STATE, &readerStates, sizeof(readerStates), dwClientID,
 		PCSCLITE_READ_TIMEOUT) < 0)
 		return SCARD_F_COMM_ERROR;
 

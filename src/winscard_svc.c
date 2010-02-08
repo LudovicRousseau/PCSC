@@ -259,7 +259,7 @@ static const char *CommandsText[] = {
 
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) { goto wrong_length; } \
-	ret = SHMMessageReceive(&v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
+	ret = SHMMessageReceive(header.command, &v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
 	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
@@ -276,7 +276,7 @@ static void ContextThread(LPVOID newContext)
 	while (1)
 	{
 		struct rxHeader header;
-		int32_t ret = SHMMessageReceive(&header, sizeof(header), filedes, PCSCLITE_READ_TIMEOUT);
+		int32_t ret = SHMMessageReceive(0, &header, sizeof(header), filedes, PCSCLITE_READ_TIMEOUT);
 
 		if (ret < 0)
 		{
@@ -600,7 +600,7 @@ static void ContextThread(LPVOID newContext)
 					goto exit;
 
 				/* read sent buffer */
-				ret = SHMMessageReceive(pbSendBuffer, trStr.cbSendLength,
+				ret = SHMMessageReceive(SCARD_TRANSMIT, pbSendBuffer, trStr.cbSendLength,
 					filedes, PCSCLITE_READ_TIMEOUT);
 				if (ret < 0)
 				{
@@ -653,7 +653,7 @@ static void ContextThread(LPVOID newContext)
 				}
 
 				/* read sent buffer */
-				ret = SHMMessageReceive(pbSendBuffer, ctStr.cbSendLength,
+				ret = SHMMessageReceive(SCARD_CONTROL, pbSendBuffer, ctStr.cbSendLength,
 					filedes, PCSCLITE_READ_TIMEOUT);
 				if (ret < 0)
 				{
