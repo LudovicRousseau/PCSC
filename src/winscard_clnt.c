@@ -107,6 +107,7 @@
 #define FALSE 0
 #endif
 
+static char sharing_shall_block = TRUE;
 
 #undef DO_PROFILE
 #ifdef DO_PROFILE
@@ -527,6 +528,12 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			return SCARD_E_NO_MEMORY;
 		}
 
+		if (getenv("PCSCLITE_NO_BLOCKING"))
+		{
+			Log1(PCSC_LOG_INFO, "Disable shared blocking");
+			sharing_shall_block = FALSE;
+		}
+		
 		isExecuted = 1;
 	}
 
@@ -989,6 +996,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
+	/* Retry loop for blocking behaviour */
+retry:
+	
 	scReconnectStruct.hCard = hCard;
 	scReconnectStruct.dwShareMode = dwShareMode;
 	scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
@@ -1021,6 +1031,13 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		goto end;
 	}
 
+	if (sharing_shall_block
+		&& (SCARD_E_SHARING_VIOLATION == scReconnectStruct.rv))
+	{
+		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+		goto retry;
+	}
+	
 	*pdwActiveProtocol = scReconnectStruct.dwActiveProtocol;
 	rv = scReconnectStruct.rv;
 
@@ -1602,6 +1619,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		goto end;
 	}
 
+	/* Retry loop for blocking behaviour */
+retry:
+
 	/* initialise the structure */
 	memset(&scStatusStruct, 0, sizeof(scStatusStruct));
 	scStatusStruct.hCard = hCard;
@@ -1633,6 +1653,13 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		goto end;
 	}
 
+	if (sharing_shall_block
+		&& (SCARD_E_SHARING_VIOLATION == scStatusStruct.rv))
+	{
+		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+		goto retry;
+	}
+	
 	rv = scStatusStruct.rv;
 	if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INSUFFICIENT_BUFFER)
 	{
@@ -2835,6 +2862,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 		goto end;
 	}
 
+	/* Retry loop for blocking behaviour */
+retry:
+	
 	scTransmitStruct.hCard = hCard;
 	scTransmitStruct.cbSendLength = cbSendLength;
 	scTransmitStruct.pcbRecvLength = *pcbRecvLength;
@@ -2905,6 +2935,13 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 			pioRecvPci->cbPciLength = scTransmitStruct.ioRecvPciLength;
 		}
 	}
+	if (sharing_shall_block
+		&& (SCARD_E_SHARING_VIOLATION == scTransmitStruct.rv))
+	{
+		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
+		goto retry;
+	}
+	
 
 	*pcbRecvLength = scTransmitStruct.pcbRecvLength;
 	rv = scTransmitStruct.rv;
