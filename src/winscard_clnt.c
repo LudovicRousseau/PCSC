@@ -1849,7 +1849,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	long dwTime;
 	DWORD dwState;
 	DWORD dwBreakFlag = 0;
-	int j;
+	unsigned int j;
 	SCONTEXTMAP * currentContextMap;
 	int currentReaderCount = 0;
 	LONG rv = SCARD_S_SUCCESS;
