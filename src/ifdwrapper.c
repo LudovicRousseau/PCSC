@@ -72,31 +72,31 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	 * Error returned by CCID driver is: CCID_Receive Procedure byte conflict
 	 */
 
-	ucValue[0] = rContext->dwSlot;
+	ucValue[0] = rContext->slot;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_set_protocol_parameters) (dwProtocol,
 			ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 	else
 	{
-		rv = (*IFDH_set_protocol_parameters) (rContext->dwSlot,
+		rv = (*IFDH_set_protocol_parameters) (rContext->slot,
 			dwProtocol, ucFlags, ucPTS1, ucPTS2, ucPTS3);
 	}
 #else
 #ifdef IFDHANDLERv1
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Set_Protocol_Parameters(dwProtocol, ucFlags, ucPTS1,
 			ucPTS2, ucPTS3);
 	}
 #else
-	rv = IFDHSetProtocolParameters(rContext->dwSlot, dwProtocol, ucFlags,
+	rv = IFDHSetProtocolParameters(rContext->slot, dwProtocol, ucFlags,
 		ucPTS1, ucPTS2, ucPTS3); 
 #endif
 #endif
@@ -141,27 +141,27 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 		rv = (*IO_create_channel) (rContext->port);
 	} else if (rContext->version == IFD_HVERSION_2_0)
 	{
-		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->port);
+		rv = (*IFDH_create_channel) (rContext->slot, rContext->port);
 	} else
 	{
 		/* use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
-			rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
+			rv = (*IFDH_create_channel_by_name) (rContext->slot, rContext->lpcDevice);
 		else
-			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->port);
+			rv = (*IFDH_create_channel) (rContext->slot, rContext->port);
 	}
 #else
 #ifdef IFDHANDLERv1
 	rv = IO_Create_Channel(rContext->port);
 #elif IFDHANDLERv2
-	rv = IFDHCreateChannel(rContext->dwSlot, rContext->port);
+	rv = IFDHCreateChannel(rContext->slot, rContext->port);
 #else
 	{
 		/* Use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
-			rv = IFDHCreateChannelByName(rContext->dwSlot, rContext->lpcDevice);
+			rv = IFDHCreateChannelByName(rContext->slot, rContext->lpcDevice);
 		else
-			rv = IFDHCreateChannel(rContext->dwSlot, rContext->port);
+			rv = IFDHCreateChannel(rContext->slot, rContext->port);
 	}
 #endif
 #endif
@@ -210,12 +210,12 @@ again:
 
 		rv = (*IO_close_channel) ();
 	else
-		rv = (*IFDH_close_channel) (rContext->dwSlot);
+		rv = (*IFDH_close_channel) (rContext->slot);
 #else
 #ifdef IFDHANDLERv1
 	rv = IO_Close_Channel();
 #else
-	rv = IFDHCloseChannel(rContext->dwSlot);
+	rv = IFDHCloseChannel(rContext->slot);
 #endif
 #endif
 
@@ -252,13 +252,13 @@ LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	if (rContext->version == IFD_HVERSION_1_0)
 		rv = (*IFD_set_capabilities) (dwTag, pucValue);
 	else
-		rv = (*IFDH_set_capabilities) (rContext->dwSlot, dwTag,
+		rv = (*IFDH_set_capabilities) (rContext->slot, dwTag,
 			dwLength, pucValue);
 #else
 #ifdef IFDHANDLERv1
 	rv = IFD_Set_Capabilities(dwTag, pucValue);
 #else
-	rv = IFDHSetCapabilities(rContext->dwSlot, dwTag, dwLength, pucValue);
+	rv = IFDHSetCapabilities(rContext->slot, dwTag, dwLength, pucValue);
 #endif
 #endif
 
@@ -294,13 +294,13 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	if (rContext->version == IFD_HVERSION_1_0)
 		rv = (*IFD_get_capabilities) (dwTag, pucValue);
 	else
-		rv = (*IFDH_get_capabilities) (rContext->dwSlot, dwTag,
+		rv = (*IFDH_get_capabilities) (rContext->slot, dwTag,
 			pdwLength, pucValue);
 #else
 #ifdef IFDHANDLERv1
 	rv = IFD_Get_Capabilities(dwTag, pucValue);
 #else
-	rv = IFDHGetCapabilities(rContext->dwSlot, dwTag, pdwLength, pucValue);
+	rv = IFDHGetCapabilities(rContext->slot, dwTag, pdwLength, pucValue);
 #endif
 #endif
 
@@ -356,13 +356,13 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_power_icc) (dwAction);
 	}
 	else
 	{
-		rv = (*IFDH_power_icc) (rContext->dwSlot, dwAction,
+		rv = (*IFDH_power_icc) (rContext->slot, dwAction,
 			pucAtr, pdwAtrLen);
 
 		ret = ATRDecodeAtr(&sSmartCard, pucAtr, *pdwAtrLen);
@@ -370,12 +370,12 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 #else
 #ifdef IFDHANDLERv1
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Power_ICC(dwAction);
 	}
 #else
-	rv = IFDHPowerICC(rContext->dwSlot, dwAction, pucAtr, pdwAtrLen);
+	rv = IFDHPowerICC(rContext->slot, dwAction, pucAtr, pdwAtrLen);
 #endif
 #endif
 
@@ -440,21 +440,21 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_is_icc_present) ();
 	}
 	else
-		rv = (*IFDH_icc_presence) (rContext->dwSlot);
+		rv = (*IFDH_icc_presence) (rContext->slot);
 #else
 #ifdef IFDHANDLERv1
 	{
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Is_ICC_Present();
 	}
 #else
-	rv = IFDHICCPresence(rContext->dwSlot);
+	rv = IFDHICCPresence(rContext->slot);
 #endif
 #endif
 
@@ -497,7 +497,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 			/* LOCK THIS CODE REGION */
 			(void)SYS_MutexLock(rContext->mMutex);
 
-			ucValue[0] = rContext->dwSlot;
+			ucValue[0] = rContext->slot;
 			(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -574,10 +574,10 @@ LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	rv = (*IFDH_control_v2) (rContext->dwSlot, TxBuffer, TxLength,
+	rv = (*IFDH_control_v2) (rContext->slot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
 #elif IFDHANDLERv2
-	rv = IFDHControl(rContext->dwSlot, TxBuffer, TxLength,
+	rv = IFDHControl(rContext->slot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
 #endif
 
@@ -625,10 +625,10 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	rv = (*IFDH_control) (rContext->dwSlot, ControlCode, TxBuffer,
+	rv = (*IFDH_control) (rContext->slot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
 #elif IFDHANDLERv3
-	rv = IFDHControl(rContext->dwSlot, ControlCode, TxBuffer,
+	rv = IFDHControl(rContext->slot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
 
@@ -697,13 +697,13 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 	{
 		UCHAR ucValue[1];
 
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = (*IFD_transmit_to_icc) (pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	}
 	else
-		rv = (*IFDH_transmit_to_icc) (rContext->dwSlot, pioTxPci,
+		rv = (*IFDH_transmit_to_icc) (rContext->slot, pioTxPci,
 			(LPBYTE) pucTxBuffer, dwTxLength,
 			pucRxBuffer, pdwRxLength, pioRxPci);
 #else
@@ -711,13 +711,13 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 	{
 		UCHAR ucValue[1];
 
-		ucValue[0] = rContext->dwSlot;
+		ucValue[0] = rContext->slot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
 		rv = IFD_Transmit_to_ICC(pioTxPci, (LPBYTE) pucTxBuffer,
 			dwTxLength, pucRxBuffer, pdwRxLength, pioRxPci);
 	}
 #else
-	rv = IFDHTransmitToICC(rContext->dwSlot, pioTxPci,
+	rv = IFDHTransmitToICC(rContext->slot, pioTxPci,
 		(LPBYTE) pucTxBuffer, dwTxLength,
 		pucRxBuffer, pdwRxLength, pioRxPci);
 #endif

@@ -123,7 +123,7 @@ extern "C"
 		LPVOID vHandle;			/**< Dlopen handle */
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
-		DWORD dwSlot;			/**< Current Reader Slot */
+		int slot;				/**< Current Reader Slot */
 		DWORD dwBlockStatus;	/**< Current blocking status */
 		SCARDHANDLE hLockId;	/**< Lock Id */
 		DWORD dwIdentity;		/**< Shared ID High Nibble */

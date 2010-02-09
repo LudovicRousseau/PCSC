@@ -503,7 +503,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		{
 			int ret;
 
-			ret = rContext->pthCardEvent(rContext->dwSlot);
+			ret = rContext->pthCardEvent(rContext->slot);
 			if (IFD_NO_SUCH_DEVICE == ret)
 				(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 		}

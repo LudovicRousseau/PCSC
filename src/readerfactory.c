@@ -352,8 +352,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		  (sReadersContexts[dwContext])->mMutex;
 		(sReadersContexts[dwContextB])->pdwMutex =
 		  (sReadersContexts[dwContext])->pdwMutex;
-		sReadersContexts[dwContextB]->dwSlot =
-			sReadersContexts[dwContext]->dwSlot + j;
+		sReadersContexts[dwContextB]->slot =
+			sReadersContexts[dwContext]->slot + j;
 
 		/*
 		 * Added by Dave - slots did not have a pdwFeeds
@@ -500,7 +500,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		sContext->mMutex = NULL;
 		sContext->dwBlockStatus = 0;
 		sContext->contexts = 0;
-		sContext->dwSlot = 0;
+		sContext->slot = 0;
 		sContext->hLockId = 0;
 		sContext->LockCount = 0;
 		sContext->vHandle = NULL;
@@ -531,7 +531,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 }
 
 LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
-	LPSTR libraryName, int port, DWORD dwSlot)
+	LPSTR libraryName, int port, DWORD slot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
 	DWORD valueLength;
@@ -544,7 +544,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		usedDigits[i] = FALSE;
 
-	if ((0 == dwSlot) && (dwNumReadersContexts != 0))
+	if ((0 == slot) && (dwNumReadersContexts != 0))
 	{
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
@@ -630,10 +630,10 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 	}
 
 	snprintf(rContext->lpcReader, sizeof(rContext->lpcReader), "%s %02X %02lX",
-		readerName, i, dwSlot);
+		readerName, i, slot);
 
 	/* Set the slot in 0xDDDDCCCC */
-	rContext->dwSlot = (i << 16) + dwSlot;
+	rContext->slot = (i << 16) + slot;
 
 	return parent;
 }

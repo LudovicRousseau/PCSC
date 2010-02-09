@@ -939,7 +939,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		 */
 		controlBuffer[0] = 0x20;
 		controlBuffer[1] = 0x15;
-		controlBuffer[2] = (rContext->dwSlot & 0x0000FFFF) + 1;
+		controlBuffer[2] = (rContext->slot & 0x0000FFFF) + 1;
 		controlBuffer[3] = 0x00;
 		controlBuffer[4] = 0x00;
 		receiveLength = 2;
@@ -1155,7 +1155,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		 */
 		controlBuffer[0] = 0x20;
 		controlBuffer[1] = 0x15;
-		controlBuffer[2] = (rContext->dwSlot & 0x0000FFFF) + 1;
+		controlBuffer[2] = (rContext->slot & 0x0000FFFF) + 1;
 		controlBuffer[3] = 0x00;
 		controlBuffer[4] = 0x00;
 		receiveLength = 2;
