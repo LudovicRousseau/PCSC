@@ -330,6 +330,8 @@ INTERNAL int32_t SHMMessageReceive(uint32_t command, void *buffer_void,
 		} else if (selret == 0)
 		{
 #ifdef PCSCD
+			(void)command;
+
 			/* timeout */
 			retval = -1;
 			break;
