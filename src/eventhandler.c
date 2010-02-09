@@ -276,7 +276,8 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
 	LPCSTR lpcReader;
-	DWORD dwStatus, dwReaderSharing;
+	DWORD dwStatus;
+	int32_t readerSharing;
 	DWORD dwCurrentState;
 	DWORD dwAtrLen;
 
@@ -284,7 +285,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	 * Zero out everything
 	 */
 	dwStatus = 0;
-	dwReaderSharing = 0;
+	readerSharing = 0;
 	dwCurrentState = 0;
 
 	lpcReader = rContext->lpcReader;
@@ -357,7 +358,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	 * Set all the public attributes to this reader
 	 */
 	rContext->readerState->readerState = dwStatus;
-	rContext->readerState->readerSharing = dwReaderSharing =
+	rContext->readerState->readerSharing = readerSharing =
 		rContext->contexts;
 
 	(void)EHSignalEventToClients();
@@ -491,10 +492,10 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		/*
 		 * Sharing may change w/o an event pass it on
 		 */
-		if (dwReaderSharing != rContext->contexts)
+		if (readerSharing != rContext->contexts)
 		{
-			dwReaderSharing = rContext->contexts;
-			rContext->readerState->readerSharing = dwReaderSharing;
+			readerSharing = rContext->contexts;
+			rContext->readerState->readerSharing = readerSharing;
 			(void)EHSignalEventToClients();
 		}
 
