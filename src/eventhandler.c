@@ -165,7 +165,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	/*
 	 * Set the thread to 0 to exit thread
 	 */
-	rContext->dwLockId = 0xFFFF;
+	rContext->hLockId = 0xFFFF;
 
 	Log1(PCSC_LOG_INFO, "Stomping thread.");
 
@@ -509,14 +509,14 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		else
 			(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 
-		if (rContext->dwLockId == 0xFFFF)
+		if (rContext->hLockId == 0xFFFF)
 		{
 			/*
 			 * Exit and notify the caller
 			 */
 			(void)EHSignalEventToClients();
 			Log1(PCSC_LOG_INFO, "Die");
-			rContext->dwLockId = 0;
+			rContext->hLockId = 0;
 			(void)SYS_ThreadExit(NULL);
 		}
 	}

@@ -779,8 +779,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 	while (list_size(&(threadContext->cardsList)) != 0)
 	{
 		READER_CONTEXT * rContext = NULL;
-		DWORD dwLockId;
-		SCARDHANDLE hCard;
+		SCARDHANDLE hCard, hLockId;
 		void *ptr;
 
 		/*
@@ -801,10 +800,10 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		if (rv != SCARD_S_SUCCESS)
 			return rv;
 
-		dwLockId = rContext->dwLockId;
-		rContext->dwLockId = 0;
+		hLockId = rContext->hLockId;
+		rContext->hLockId = 0;
 
-		if (hCard != dwLockId)
+		if (hCard != hLockId)
 		{
 			/*
 			 * if the card is locked by someone else we do not reset it

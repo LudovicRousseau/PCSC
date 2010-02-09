@@ -310,10 +310,10 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * wait until a possible transaction is finished
 	 */
-	if (rContext->dwLockId != 0)
+	if (rContext->hLockId != 0)
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
-		while (rContext->dwLockId != 0)
+		while (rContext->hLockId != 0)
 			(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}
@@ -843,11 +843,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * wait until a possible transaction is finished
 	 */
-	if ((dwDisposition != SCARD_LEAVE_CARD) && (rContext->dwLockId != 0)
-		&& (rContext->dwLockId != hCard))
+	if ((dwDisposition != SCARD_LEAVE_CARD) && (rContext->hLockId != 0)
+		&& (rContext->hLockId != hCard))
 	{
 		Log1(PCSC_LOG_INFO, "Waiting for release of lock");
-		while (rContext->dwLockId != 0)
+		while (rContext->hLockId != 0)
 			(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		Log1(PCSC_LOG_INFO, "Lock released");
 	}

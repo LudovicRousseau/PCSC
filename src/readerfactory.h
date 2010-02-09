@@ -125,7 +125,7 @@ extern "C"
 		DWORD dwPort;			/**< Port ID */
 		DWORD dwSlot;			/**< Current Reader Slot */
 		DWORD dwBlockStatus;	/**< Current blocking status */
-		DWORD dwLockId;			/**< Lock Id */
+		SCARDHANDLE hLockId;	/**< Lock Id */
 		DWORD dwIdentity;		/**< Shared ID High Nibble */
 		int LockCount;			/**< number of recursive locks */
 		int32_t contexts;		/**< Number of open contexts */
@@ -146,10 +146,10 @@ extern "C"
 	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoNamePort(DWORD, LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
-	LONG RFCheckSharing(DWORD);
-	LONG RFLockSharing(DWORD);
-	LONG RFUnlockSharing(DWORD);
-	LONG RFUnlockAllSharing(DWORD);
+	LONG RFCheckSharing(SCARDHANDLE);
+	LONG RFLockSharing(SCARDHANDLE);
+	LONG RFUnlockSharing(SCARDHANDLE);
+	LONG RFUnlockAllSharing(SCARDHANDLE);
 	LONG RFLoadReader(READER_CONTEXT *);
 	LONG RFBindFunctions(READER_CONTEXT *);
 	LONG RFUnBindFunctions(READER_CONTEXT *);
