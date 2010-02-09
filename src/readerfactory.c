@@ -230,7 +230,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 
 	if ((sReadersContexts[dwContext])->pFeeds == NULL)
 	{
-		(sReadersContexts[dwContext])->pFeeds = malloc(sizeof(DWORD));
+		(sReadersContexts[dwContext])->pFeeds = malloc(sizeof(int));
 
 		/* Initialize pFeeds to 1, otherwise multiple
 		   cloned readers will cause pcscd to crash when
