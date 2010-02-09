@@ -1845,7 +1845,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
 {
 	PSCARD_READERSTATE_A currReader;
-	PREADER_STATE rContext;
+	READER_STATE *rContext;
 	long dwTime;
 	DWORD dwState;
 	DWORD dwBreakFlag = 0;

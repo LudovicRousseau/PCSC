@@ -40,7 +40,7 @@ extern "C"
 		uint32_t cardAtrLength;
 		uint32_t cardProtocol;
 	}
-	READER_STATE, *PREADER_STATE;
+	READER_STATE;
 
 	LONG EHTryToUnregisterClientForEvent(int32_t filedes);
 	LONG EHRegisterClientForEvent(int32_t filedes);
