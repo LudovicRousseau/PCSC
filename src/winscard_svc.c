@@ -57,7 +57,7 @@ static list_t contextsList;
 
 struct _psContext
 {
-	uint32_t hContext;
+	int32_t hContext;
 	list_t cardsList;
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
 	PCSCLITE_THREAD_T pthThread;		/**< Event polling thread's ID */
@@ -85,7 +85,7 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 		Log3(PCSC_LOG_CRITICAL, "contextsListhContext_seeker called with NULL pointer: el=%X, key=%X", el, key);
 	}
 
-	if (currentContext->hContext == *(uint32_t *)key)
+	if (currentContext->hContext == *(int32_t *)key)
 		return 1;
 	return 0;
 }
