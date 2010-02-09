@@ -107,7 +107,7 @@ extern "C"
 	{
 		char lpcReader[MAX_READERNAME];	/**< Reader Name */
 		char *lpcLibrary;	/**< Library Path */
-		char lpcDevice[MAX_DEVICENAME];	/**< Device Name */
+		char *lpcDevice;	/**< Device Name */
 		PCSCLITE_THREAD_T pthThread;	/**< Event polling thread */
 		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
 		PCSCLITE_MUTEX *mMutex;	/**< Mutex for this connection */
