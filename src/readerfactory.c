@@ -111,14 +111,6 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		return SCARD_E_INVALID_VALUE;
 	}
 
-	/* Library name too long? */
-	if (strlen(lpcLibrary) >= MAX_LIBNAME)
-	{
-		Log3(PCSC_LOG_ERROR, "Library name too long: %d chars instead of max %d",
-			strlen(lpcLibrary), MAX_LIBNAME);
-		return SCARD_E_INVALID_VALUE;
-	}
-
 	/* Device name too long? */
 	if (strlen(lpcDevice) >= MAX_DEVICENAME)
 	{
@@ -175,8 +167,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	if (parentNode < -1)
 		return SCARD_E_NO_MEMORY;
 
-	(void)strlcpy((sReadersContexts[dwContext])->lpcLibrary, lpcLibrary,
-		sizeof((sReadersContexts[dwContext])->lpcLibrary));
+	sReadersContexts[dwContext]->lpcLibrary = strdup(lpcLibrary);
 	(void)strlcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice,
 		sizeof((sReadersContexts[dwContext])->lpcDevice));
 	(sReadersContexts[dwContext])->dwVersion = 0;
@@ -347,8 +338,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			sizeof(sReadersContexts[dwContextB]->lpcReader));
 		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
-		(void)strlcpy((sReadersContexts[dwContextB])->lpcLibrary, lpcLibrary,
-			sizeof((sReadersContexts[dwContextB])->lpcLibrary));
+		sReadersContexts[dwContextB]->lpcLibrary =
+			sReadersContexts[dwContext]->lpcLibrary;
 		(void)strlcpy((sReadersContexts[dwContextB])->lpcDevice, lpcDevice,
 			sizeof((sReadersContexts[dwContextB])->lpcDevice));
 		(sReadersContexts[dwContextB])->dwVersion =
@@ -477,10 +468,12 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 			return SCARD_E_INVALID_VALUE;
 		}
 
+		/* free shared resources when the last slot is closed */
 		if (*sContext->pdwMutex == 1)
 		{
 			(void)SYS_MutexDestroy(sContext->mMutex);
 			free(sContext->mMutex);
+			free(sContext->lpcLibrary);
 		}
 
 		*sContext->pdwMutex -= 1;

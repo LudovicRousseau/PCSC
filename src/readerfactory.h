@@ -106,7 +106,7 @@ extern "C"
 	struct ReaderContext
 	{
 		char lpcReader[MAX_READERNAME];	/**< Reader Name */
-		char lpcLibrary[MAX_LIBNAME];	/**< Library Path */
+		char *lpcLibrary;	/**< Library Path */
 		char lpcDevice[MAX_DEVICENAME];	/**< Device Name */
 		PCSCLITE_THREAD_T pthThread;	/**< Event polling thread */
 		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */

@@ -44,7 +44,6 @@
 #define PCSC_MAX_READER_HANDLES 200
 
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
-#define MAX_LIBNAME			100
 #define MAX_DEVICENAME		255
 
 #define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for get/set attributes */
