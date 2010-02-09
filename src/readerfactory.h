@@ -124,7 +124,6 @@ extern "C"
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
-		DWORD dwBlockStatus;	/**< Current blocking status */
 		SCARDHANDLE hLockId;	/**< Lock Id */
 		DWORD dwIdentity;		/**< Shared ID High Nibble */
 		int LockCount;			/**< number of recursive locks */

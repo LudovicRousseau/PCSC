@@ -173,7 +173,6 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	(sReadersContexts[dwContext])->version = 0;
 	(sReadersContexts[dwContext])->port = port;
 	(sReadersContexts[dwContext])->mMutex = NULL;
-	(sReadersContexts[dwContext])->dwBlockStatus = 0;
 	(sReadersContexts[dwContext])->contexts = 0;
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->hLockId = 0;
@@ -365,7 +364,6 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		/* Added by Dave for multiple slots */
 		*(sReadersContexts[dwContextB])->pdwFeeds += 1;
 
-		(sReadersContexts[dwContextB])->dwBlockStatus = 0;
 		(sReadersContexts[dwContextB])->contexts = 0;
 		(sReadersContexts[dwContextB])->hLockId = 0;
 		(sReadersContexts[dwContextB])->LockCount = 0;
@@ -498,7 +496,6 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		sContext->version = 0;
 		sContext->port = 0;
 		sContext->mMutex = NULL;
-		sContext->dwBlockStatus = 0;
 		sContext->contexts = 0;
 		sContext->slot = 0;
 		sContext->hLockId = 0;
