@@ -778,7 +778,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 
 	while (list_size(&(threadContext->cardsList)) != 0)
 	{
-		PREADER_CONTEXT rContext = NULL;
+		READER_CONTEXT * rContext = NULL;
 		DWORD dwLockId;
 		SCARDHANDLE hCard;
 		void *ptr;

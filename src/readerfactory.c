@@ -48,7 +48,7 @@
 #define FALSE 0
 #endif
 
-static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
+static READER_CONTEXT * sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 static char *ConfigFile = NULL;
@@ -444,7 +444,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 {
 	LONG rv;
-	PREADER_CONTEXT sContext;
+	READER_CONTEXT * sContext;
 
 	if (lpcReader == 0)
 		return SCARD_E_INVALID_VALUE;
@@ -530,7 +530,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
+LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 	LPSTR libraryName, DWORD dwPort, DWORD dwSlot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
@@ -638,7 +638,7 @@ LONG RFSetReaderName(PREADER_CONTEXT rContext, LPSTR readerName,
 	return parent;
 }
 
-LONG RFReaderInfo(LPSTR lpcReader, PREADER_CONTEXT * sReader)
+LONG RFReaderInfo(LPSTR lpcReader, READER_CONTEXT ** sReader)
 {
 	int i;
 
@@ -661,7 +661,7 @@ LONG RFReaderInfo(LPSTR lpcReader, PREADER_CONTEXT * sReader)
 }
 
 LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
-	PREADER_CONTEXT * sReader)
+	READER_CONTEXT * * sReader)
 {
 	char lpcStripReader[MAX_READERNAME];
 	int i;
@@ -689,7 +689,7 @@ LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG RFReaderInfoById(DWORD dwIdentity, PREADER_CONTEXT * sReader)
+LONG RFReaderInfoById(DWORD dwIdentity, READER_CONTEXT * * sReader)
 {
 	int i;
 
@@ -709,7 +709,7 @@ LONG RFReaderInfoById(DWORD dwIdentity, PREADER_CONTEXT * sReader)
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG RFLoadReader(PREADER_CONTEXT rContext)
+LONG RFLoadReader(READER_CONTEXT * rContext)
 {
 	if (rContext->vHandle != 0)
 	{
@@ -722,7 +722,7 @@ LONG RFLoadReader(PREADER_CONTEXT rContext)
 	return DYN_LoadLibrary(&rContext->vHandle, rContext->lpcLibrary);
 }
 
-LONG RFBindFunctions(PREADER_CONTEXT rContext)
+LONG RFBindFunctions(READER_CONTEXT * rContext)
 {
 	int rv1, rv2, rv3;
 	void *f;
@@ -877,7 +877,7 @@ LONG RFBindFunctions(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
+LONG RFUnBindFunctions(READER_CONTEXT * rContext)
 {
 	/* Zero out everything */
 	memset(&rContext->psFunctions, 0, sizeof(rContext->psFunctions));
@@ -885,7 +885,7 @@ LONG RFUnBindFunctions(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFUnloadReader(PREADER_CONTEXT rContext)
+LONG RFUnloadReader(READER_CONTEXT * rContext)
 {
 	/* Make sure no one else is using this library */
 	if (*rContext->pdwFeeds == 1)
@@ -902,7 +902,7 @@ LONG RFUnloadReader(PREADER_CONTEXT rContext)
 LONG RFCheckSharing(DWORD hCard)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	rv = RFReaderInfoById(hCard, &rContext);
 
@@ -917,7 +917,7 @@ LONG RFCheckSharing(DWORD hCard)
 
 LONG RFLockSharing(DWORD hCard)
 {
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
 	(void)RFReaderInfoById(hCard, &rContext);
@@ -936,7 +936,7 @@ LONG RFLockSharing(DWORD hCard)
 
 LONG RFUnlockSharing(DWORD hCard)
 {
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -959,7 +959,7 @@ LONG RFUnlockSharing(DWORD hCard)
 
 LONG RFUnlockAllSharing(DWORD hCard)
 {
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -978,7 +978,7 @@ LONG RFUnlockAllSharing(DWORD hCard)
 	return rv;
 }
 
-LONG RFInitializeReader(PREADER_CONTEXT rContext)
+LONG RFInitializeReader(READER_CONTEXT * rContext)
 {
 	LONG rv;
 
@@ -1027,7 +1027,7 @@ LONG RFInitializeReader(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFUnInitializeReader(PREADER_CONTEXT rContext)
+LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 {
 	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
 		rContext->lpcReader);
@@ -1047,7 +1047,7 @@ LONG RFUnInitializeReader(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT rContext)
+SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 {
 	USHORT randHandle;
 
@@ -1114,7 +1114,7 @@ LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
+LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	int listLength, lrv;
 	RDR_CLIHANDLES *newHandle;
@@ -1151,7 +1151,7 @@ LONG RFAddReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
+LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	RDR_CLIHANDLES *currentHandle;
 	int lrv;
@@ -1174,7 +1174,7 @@ LONG RFRemoveReaderHandle(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
+LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 {
 	/* Set all the handles for that reader to the event */
 	int list_index, listSize;
@@ -1205,7 +1205,7 @@ LONG RFSetReaderEventState(PREADER_CONTEXT rContext, DWORD dwEvent)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFCheckReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
+LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	LONG rv;
 	RDR_CLIHANDLES *currentHandle;
@@ -1239,7 +1239,7 @@ LONG RFCheckReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	return rv;
 }
 
-LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
+LONG RFClearReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	RDR_CLIHANDLES *currentHandle;
 
@@ -1256,7 +1256,7 @@ LONG RFClearReaderEventState(PREADER_CONTEXT rContext, SCARDHANDLE hCard)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFCheckReaderStatus(PREADER_CONTEXT rContext)
+LONG RFCheckReaderStatus(READER_CONTEXT * rContext)
 {
 	if ((rContext->readerState == NULL)
 		|| (rContext->readerState->readerState & SCARD_UNKNOWN))

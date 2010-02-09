@@ -34,7 +34,7 @@
  * Set the protocol type selection (PTS).
  * This function sets the appropriate protocol to be used on the card.
  */
-LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
+LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -107,7 +107,7 @@ LONG IFDSetPTS(PREADER_CONTEXT rContext, DWORD dwProtocol, UCHAR ucFlags,
 /**
  * Open a communication channel to the IFD.
  */
-LONG IFDOpenIFD(PREADER_CONTEXT rContext)
+LONG IFDOpenIFD(READER_CONTEXT * rContext)
 {
 	RESPONSECODE rv = 0;
 
@@ -175,7 +175,7 @@ LONG IFDOpenIFD(PREADER_CONTEXT rContext)
 /**
  * Close a communication channel to the IFD.
  */
-LONG IFDCloseIFD(PREADER_CONTEXT rContext)
+LONG IFDCloseIFD(READER_CONTEXT * rContext)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
 	int repeat;
@@ -228,7 +228,7 @@ again:
 /**
  * Set capabilities in the reader.
  */
-LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
+LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -270,7 +270,7 @@ LONG IFDSetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
  * Other functions int this file will call
  * the driver directly to not cause a deadlock.
  */
-LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
+LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -313,7 +313,7 @@ LONG IFDGetCapabilities(PREADER_CONTEXT rContext, DWORD dwTag,
 /**
  * Power up/down or reset's an ICC located in the IFD.
  */
-LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
+LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv;
@@ -410,7 +410,7 @@ LONG IFDPowerICC(PREADER_CONTEXT rContext, DWORD dwAction,
  * Provide statistical information about the IFD and ICC including insertions,
  * atr, powering status/etc.
  */
-LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
+LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -553,7 +553,7 @@ LONG IFDStatusICC(PREADER_CONTEXT rContext, PDWORD pdwStatus,
  * Valid only for IFDHandler version 2.0
  */
 
-LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
+LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 	DWORD TxLength, PUCHAR RxBuffer, PDWORD RxLength)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
@@ -604,7 +604,7 @@ LONG IFDControl_v2(PREADER_CONTEXT rContext, PUCHAR TxBuffer,
  * Valid only for IFDHandler version 3.0 and up
  */
 
-LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
+LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 	LPCVOID TxBuffer, DWORD TxLength, LPVOID RxBuffer, DWORD RxLength,
 	LPDWORD BytesReturned)
 {
@@ -664,7 +664,7 @@ LONG IFDControl(PREADER_CONTEXT rContext, DWORD ControlCode,
 /**
  * Transmit an APDU to the ICC.
  */
-LONG IFDTransmit(PREADER_CONTEXT rContext, SCARD_IO_HEADER pioTxPci,
+LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 	PUCHAR pucTxBuffer, DWORD dwTxLength, PUCHAR pucRxBuffer,
 	PDWORD pdwRxLength, PSCARD_IO_HEADER pioRxPci)
 {

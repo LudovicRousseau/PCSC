@@ -133,16 +133,16 @@ extern "C"
 		PDWORD pdwMutex;		/**< Number of client to mutex */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
-		/* we can't use PREADER_STATE here since eventhandler.h can't be
+		/* we can't use READER_CONTEXT * here since eventhandler.h can't be
 		 * included because of circular dependencies */
 	};
 
-	typedef struct ReaderContext READER_CONTEXT, *PREADER_CONTEXT;
+	typedef struct ReaderContext READER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(unsigned int);
 	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
 	LONG RFRemoveReader(LPSTR, DWORD);
-	LONG RFSetReaderName(PREADER_CONTEXT, LPSTR, LPSTR, DWORD, DWORD);
+	LONG RFSetReaderName(READER_CONTEXT *, LPSTR, LPSTR, DWORD, DWORD);
 	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoNamePort(DWORD, LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
@@ -150,21 +150,21 @@ extern "C"
 	LONG RFLockSharing(DWORD);
 	LONG RFUnlockSharing(DWORD);
 	LONG RFUnlockAllSharing(DWORD);
-	LONG RFLoadReader(PREADER_CONTEXT);
-	LONG RFBindFunctions(PREADER_CONTEXT);
-	LONG RFUnBindFunctions(PREADER_CONTEXT);
-	LONG RFUnloadReader(PREADER_CONTEXT);
-	LONG RFInitializeReader(PREADER_CONTEXT);
-	LONG RFUnInitializeReader(PREADER_CONTEXT);
-	SCARDHANDLE RFCreateReaderHandle(PREADER_CONTEXT);
+	LONG RFLoadReader(READER_CONTEXT *);
+	LONG RFBindFunctions(READER_CONTEXT *);
+	LONG RFUnBindFunctions(READER_CONTEXT *);
+	LONG RFUnloadReader(READER_CONTEXT *);
+	LONG RFInitializeReader(READER_CONTEXT *);
+	LONG RFUnInitializeReader(READER_CONTEXT *);
+	SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT *);
 	LONG RFDestroyReaderHandle(SCARDHANDLE hCard);
-	LONG RFAddReaderHandle(PREADER_CONTEXT, SCARDHANDLE);
+	LONG RFAddReaderHandle(READER_CONTEXT *, SCARDHANDLE);
 	LONG RFFindReaderHandle(SCARDHANDLE);
-	LONG RFRemoveReaderHandle(PREADER_CONTEXT, SCARDHANDLE);
-	LONG RFSetReaderEventState(PREADER_CONTEXT, DWORD);
-	LONG RFCheckReaderEventState(PREADER_CONTEXT, SCARDHANDLE);
-	LONG RFClearReaderEventState(PREADER_CONTEXT, SCARDHANDLE);
-	LONG RFCheckReaderStatus(PREADER_CONTEXT);
+	LONG RFRemoveReaderHandle(READER_CONTEXT *, SCARDHANDLE);
+	LONG RFSetReaderEventState(READER_CONTEXT *, DWORD);
+	LONG RFCheckReaderEventState(READER_CONTEXT *, SCARDHANDLE);
+	LONG RFClearReaderEventState(READER_CONTEXT *, SCARDHANDLE);
+	LONG RFCheckReaderStatus(READER_CONTEXT *);
 	void RFCleanupReaders(void);
 	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);

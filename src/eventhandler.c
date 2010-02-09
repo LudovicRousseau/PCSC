@@ -43,7 +43,7 @@ READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 PCSCLITE_MUTEX ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
-static void EHStatusHandlerThread(PREADER_CONTEXT);
+static void EHStatusHandlerThread(READER_CONTEXT *);
 
 LONG EHRegisterClientForEvent(int32_t filedes)
 {
@@ -144,7 +144,7 @@ LONG EHInitializeEventStructures(void)
 	return SCARD_S_SUCCESS;
 }
 
-LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
+LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 {
 	int rv;
 	DWORD dwGetSize;
@@ -209,7 +209,7 @@ LONG EHDestroyEventHandler(PREADER_CONTEXT rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
+LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 	RESPONSECODE (*card_event)(DWORD))
 {
 	LONG rv;
@@ -272,7 +272,7 @@ static void incrementEventCounter(struct pubReaderStatesList *readerState)
 		+ (counter << 16);
 }
 
-static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
+static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
 	LPCSTR lpcReader;

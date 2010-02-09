@@ -248,7 +248,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	DWORD dwStatus;
 
 	(void)hContext;
@@ -503,7 +503,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	LPDWORD pdwActiveProtocol)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	Log1(PCSC_LOG_DEBUG, "Attempting reconnect to token.");
 
@@ -820,7 +820,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	DWORD dwAtrLen;
 
 	if (hCard == 0)
@@ -1002,7 +1002,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext;
+	READER_CONTEXT * rContext;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -1047,7 +1047,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	DWORD dwAtrLen;
 
 	/*
@@ -1198,7 +1198,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 LONG SCardCancelTransaction(SCARDHANDLE hCard)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	/*
 	 * Ignoring dwDisposition for now
@@ -1236,7 +1236,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -1372,7 +1372,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	/* 0 bytes returned by default */
 	*lpBytesReturned = 0;
@@ -1430,7 +1430,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	if (0 == hCard)
 		return SCARD_E_INVALID_HANDLE;
@@ -1504,7 +1504,7 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	LPCBYTE pbAttr, DWORD cbAttrLen)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 
 	if (0 == hCard)
 		return SCARD_E_INVALID_HANDLE;
@@ -1552,7 +1552,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;
-	PREADER_CONTEXT rContext = NULL;
+	READER_CONTEXT * rContext = NULL;
 	SCARD_IO_HEADER sSendPci, sRecvPci;
 	DWORD dwRxLength, tempRxLength;
 

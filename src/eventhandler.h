@@ -47,9 +47,9 @@ extern "C"
 	LONG EHUnregisterClientForEvent(int32_t filedes); 
 	LONG EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
-	LONG EHSpawnEventHandler(PREADER_CONTEXT,
+	LONG EHSpawnEventHandler(READER_CONTEXT *,
 		/*@null@*/ RESPONSECODE (*)(DWORD));
-	LONG EHDestroyEventHandler(PREADER_CONTEXT);
+	LONG EHDestroyEventHandler(READER_CONTEXT *);
 
 /** Some defines for context stack. */
 #define SCARD_LAST_CONTEXT       1
