@@ -1031,15 +1031,15 @@ retry:
 		goto end;
 	}
 
-	if (sharing_shall_block
-		&& (SCARD_E_SHARING_VIOLATION == scReconnectStruct.rv))
+	rv = scReconnectStruct.rv;
+
+	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
 	
 	*pdwActiveProtocol = scReconnectStruct.dwActiveProtocol;
-	rv = scReconnectStruct.rv;
 
 end:
 	(void)SYS_MutexUnLock(currentContextMap->mMutex);
@@ -1250,9 +1250,9 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 			goto end;
 		}
 
+		rv = scBeginStruct.rv;
 	}
-	while (scBeginStruct.rv == SCARD_E_SHARING_VIOLATION);
-	rv = scBeginStruct.rv;
+	while (SCARD_E_SHARING_VIOLATION == rv);
 
 end:
 	(void)SYS_MutexUnLock(currentContextMap->mMutex);
@@ -1653,14 +1653,14 @@ retry:
 		goto end;
 	}
 
-	if (sharing_shall_block
-		&& (SCARD_E_SHARING_VIOLATION == scStatusStruct.rv))
+	rv = scStatusStruct.rv;
+
+	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
 	
-	rv = scStatusStruct.rv;
 	if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INSUFFICIENT_BUFFER)
 	{
 		/*
@@ -2935,16 +2935,16 @@ retry:
 			pioRecvPci->cbPciLength = scTransmitStruct.ioRecvPciLength;
 		}
 	}
-	if (sharing_shall_block
-		&& (SCARD_E_SHARING_VIOLATION == scTransmitStruct.rv))
+
+	rv = scTransmitStruct.rv;
+
+	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
-	
 
 	*pcbRecvLength = scTransmitStruct.pcbRecvLength;
-	rv = scTransmitStruct.rv;
 
 end:
 	(void)SYS_MutexUnLock(currentContextMap->mMutex);
