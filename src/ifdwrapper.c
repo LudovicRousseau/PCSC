@@ -46,7 +46,7 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	RESPONSECODE(*IFDH_set_protocol_parameters) (DWORD, DWORD, UCHAR,
 		UCHAR, UCHAR, UCHAR) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		IFD_set_protocol_parameters = (RESPONSECODE(*)(DWORD, UCHAR, UCHAR,
 			UCHAR, UCHAR)) rContext->psFunctions.psFunctions_v1.pvfSetProtocolParameters;
@@ -75,7 +75,7 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	ucValue[0] = rContext->dwSlot;
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -116,11 +116,11 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
 	RESPONSECODE(*IFDH_create_channel_by_name) (DWORD, LPSTR) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IO_create_channel =
 			rContext->psFunctions.psFunctions_v1.pvfCreateChannel;
 	else
-		if (rContext->dwVersion == IFD_HVERSION_2_0)
+		if (rContext->version == IFD_HVERSION_2_0)
 			IFDH_create_channel =
 				rContext->psFunctions.psFunctions_v2.pvfCreateChannel;
 		else
@@ -136,10 +136,10 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		rv = (*IO_create_channel) (rContext->port);
-	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
+	} else if (rContext->version == IFD_HVERSION_2_0)
 	{
 		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->port);
 	} else
@@ -184,7 +184,7 @@ LONG IFDCloseIFD(READER_CONTEXT * rContext)
 	RESPONSECODE(*IO_close_channel) (void) = NULL;
 	RESPONSECODE(*IFDH_close_channel) (DWORD) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IO_close_channel = rContext->psFunctions.psFunctions_v1.pvfCloseChannel;
 	else
 		IFDH_close_channel = rContext->psFunctions.psFunctions_v2.pvfCloseChannel;
@@ -206,7 +206,7 @@ again:
 	}
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 
 		rv = (*IO_close_channel) ();
 	else
@@ -237,7 +237,7 @@ LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	RESPONSECODE(*IFD_set_capabilities) (DWORD, PUCHAR) = NULL;
 	RESPONSECODE(*IFDH_set_capabilities) (DWORD, DWORD, DWORD, PUCHAR) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IFD_set_capabilities = rContext->psFunctions.psFunctions_v1.pvfSetCapabilities;
 	else
 		IFDH_set_capabilities = rContext->psFunctions.psFunctions_v2.pvfSetCapabilities;
@@ -249,7 +249,7 @@ LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	 */
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		rv = (*IFD_set_capabilities) (dwTag, pucValue);
 	else
 		rv = (*IFDH_set_capabilities) (rContext->dwSlot, dwTag,
@@ -279,7 +279,7 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, /*@out@*/ PUCHAR) = NULL;
 	RESPONSECODE(*IFDH_get_capabilities) (DWORD, DWORD, PDWORD, /*@out@*/ PUCHAR) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IFD_get_capabilities =
 			rContext->psFunctions.psFunctions_v1.pvfGetCapabilities;
 	else
@@ -291,7 +291,7 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		rv = (*IFD_get_capabilities) (dwTag, pucValue);
 	else
 		rv = (*IFDH_get_capabilities) (rContext->dwSlot, dwTag,
@@ -344,7 +344,7 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	if (dwStatus & SCARD_ABSENT)
 		return SCARD_W_REMOVED_CARD;
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IFD_power_icc = rContext->psFunctions.psFunctions_v1.pvfPowerICC;
 	else
 		IFDH_power_icc = rContext->psFunctions.psFunctions_v2.pvfPowerICC;
@@ -354,7 +354,7 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -400,7 +400,7 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	/*
 	 * Get the ATR and it's length
 	 */
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		(void)IFDStatusICC(rContext, &dwStatus, pucAtr, pdwAtrLen);
 
 	return rv;
@@ -423,7 +423,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 	RESPONSECODE(*IFDH_icc_presence) (DWORD) = NULL;
 	RESPONSECODE(*IFD_get_capabilities) (DWORD, /*@out@*/ PUCHAR) = NULL;
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		IFD_is_icc_present =
 			rContext->psFunctions.psFunctions_v1.pvfICCPresence;
@@ -438,7 +438,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		ucValue[0] = rContext->dwSlot;
 		(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -486,7 +486,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 	 * to conserve resources
 	 */
 
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		{
@@ -563,7 +563,7 @@ LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 		PDWORD);
 #endif
 
-	if (rContext->dwVersion != IFD_HVERSION_2_0)
+	if (rContext->version != IFD_HVERSION_2_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -614,7 +614,7 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 	RESPONSECODE(*IFDH_control) (DWORD, DWORD, LPCVOID, DWORD, LPVOID, DWORD, LPDWORD);
 #endif
 
-	if (rContext->dwVersion < IFD_HVERSION_3_0)
+	if (rContext->version < IFD_HVERSION_3_0)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -681,7 +681,7 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 	DebugLogCategory(DEBUG_CATEGORY_APDU, pucTxBuffer, dwTxLength);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 		IFD_transmit_to_icc =
 			rContext->psFunctions.psFunctions_v1.pvfTransmitToICC;
 	else
@@ -693,7 +693,7 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 	(void)SYS_MutexLock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		UCHAR ucValue[1];
 

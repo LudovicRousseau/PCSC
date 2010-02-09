@@ -121,7 +121,7 @@ extern "C"
 		} psFunctions;	/**< driver functions */
 
 		LPVOID vHandle;			/**< Dlopen handle */
-		DWORD dwVersion;		/**< IFD Handler version number */
+		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		DWORD dwSlot;			/**< Current Reader Slot */
 		DWORD dwBlockStatus;	/**< Current blocking status */

@@ -170,7 +170,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	sReadersContexts[dwContext]->lpcLibrary = strdup(lpcLibrary);
 	(void)strlcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice,
 		sizeof((sReadersContexts[dwContext])->lpcDevice));
-	(sReadersContexts[dwContext])->dwVersion = 0;
+	(sReadersContexts[dwContext])->version = 0;
 	(sReadersContexts[dwContext])->port = port;
 	(sReadersContexts[dwContext])->mMutex = NULL;
 	(sReadersContexts[dwContext])->dwBlockStatus = 0;
@@ -342,8 +342,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 			sReadersContexts[dwContext]->lpcLibrary;
 		(void)strlcpy((sReadersContexts[dwContextB])->lpcDevice, lpcDevice,
 			sizeof((sReadersContexts[dwContextB])->lpcDevice));
-		(sReadersContexts[dwContextB])->dwVersion =
-		  (sReadersContexts[dwContext])->dwVersion;
+		(sReadersContexts[dwContextB])->version =
+		  (sReadersContexts[dwContext])->version;
 		(sReadersContexts[dwContextB])->port =
 		  (sReadersContexts[dwContext])->port;
 		(sReadersContexts[dwContextB])->vHandle =
@@ -495,7 +495,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		}
 
 		sContext->lpcDevice[0] = 0;
-		sContext->dwVersion = 0;
+		sContext->version = 0;
 		sContext->port = 0;
 		sContext->mMutex = NULL;
 		sContext->dwBlockStatus = 0;
@@ -750,20 +750,20 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	} else if (rv1 == SCARD_S_SUCCESS)
 	{
 		/* Ifd Handler 1.0 found */
-		rContext->dwVersion = IFD_HVERSION_1_0;
+		rContext->version = IFD_HVERSION_1_0;
 	} else if (rv3 == SCARD_S_SUCCESS)
 	{
 		/* Ifd Handler 3.0 found */
-		rContext->dwVersion = IFD_HVERSION_3_0;
+		rContext->version = IFD_HVERSION_3_0;
 	}
 	else
 	{
 		/* Ifd Handler 2.0 found */
-		rContext->dwVersion = IFD_HVERSION_2_0;
+		rContext->version = IFD_HVERSION_2_0;
 	}
 
 	/* The following binds version 1.0 of the IFD Handler specs */
-	if (rContext->dwVersion == IFD_HVERSION_1_0)
+	if (rContext->version == IFD_HVERSION_1_0)
 	{
 		Log1(PCSC_LOG_INFO, "Loading IFD Handler 1.0");
 
@@ -802,7 +802,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 
 		GET_ADDRESS_OPTIONALv1(SetProtocolParameters, Set_Protocol_Parameters, )
 	}
-	else if (rContext->dwVersion == IFD_HVERSION_2_0)
+	else if (rContext->version == IFD_HVERSION_2_0)
 	{
 		/* The following binds version 2.0 of the IFD Handler specs */
 #define GET_ADDRESS_OPTIONALv2(s, code) \
@@ -834,7 +834,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 
 		GET_ADDRESSv2(Control)
 	}
-	else if (rContext->dwVersion == IFD_HVERSION_3_0)
+	else if (rContext->version == IFD_HVERSION_3_0)
 	{
 		/* The following binds version 3.0 of the IFD Handler specs */
 #define GET_ADDRESS_OPTIONALv3(s, code) \

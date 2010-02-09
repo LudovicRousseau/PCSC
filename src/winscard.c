@@ -1390,7 +1390,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	if (IFD_HVERSION_2_0 == rContext->dwVersion)
+	if (IFD_HVERSION_2_0 == rContext->version)
 		if (NULL == pbSendBuffer || 0 == cbSendLength)
 			return SCARD_E_INVALID_PARAMETER;
 
@@ -1411,7 +1411,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
 		return rv;
 
-	if (IFD_HVERSION_2_0 == rContext->dwVersion)
+	if (IFD_HVERSION_2_0 == rContext->version)
 	{
 		/* we must wrap a API 3.0 client in an API 2.0 driver */
 		*lpBytesReturned = cbRecvLength;
@@ -1419,7 +1419,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 			cbSendLength, pbRecvBuffer, lpBytesReturned);
 	}
 	else
-		if (IFD_HVERSION_3_0 == rContext->dwVersion)
+		if (IFD_HVERSION_3_0 == rContext->version)
 			return IFDControl(rContext, dwControlCode, pbSendBuffer,
 				cbSendLength, pbRecvBuffer, cbRecvLength, lpBytesReturned);
 		else
@@ -1662,7 +1662,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	tempRxLength = dwRxLength;
 
 	if ((pioSendPci->dwProtocol == SCARD_PROTOCOL_RAW)
-		&& (rContext->dwVersion == IFD_HVERSION_2_0))
+		&& (rContext->version == IFD_HVERSION_2_0))
 	{
 		rv = IFDControl_v2(rContext, (PUCHAR) pbSendBuffer, cbSendLength,
 			pbRecvBuffer, &dwRxLength);
