@@ -129,7 +129,7 @@ extern "C"
 		int LockCount;			/**< number of recursive locks */
 		int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */
-		PDWORD pdwMutex;		/**< Number of client to mutex */
+		int * pMutex;			/**< Number of client to mutex */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use READER_CONTEXT * here since eventhandler.h can't be

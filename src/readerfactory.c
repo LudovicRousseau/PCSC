@@ -179,7 +179,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	(sReadersContexts[dwContext])->LockCount = 0;
 	(sReadersContexts[dwContext])->vHandle = NULL;
 	(sReadersContexts[dwContext])->pFeeds = NULL;
-	(sReadersContexts[dwContext])->pdwMutex = NULL;
+	(sReadersContexts[dwContext])->pMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << IDENTITY_SHIFT;
 	(sReadersContexts[dwContext])->readerState = NULL;
@@ -210,8 +210,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		  (sReadersContexts[parentNode])->vHandle;
 		(sReadersContexts[dwContext])->mMutex =
 		  (sReadersContexts[parentNode])->mMutex;
-		(sReadersContexts[dwContext])->pdwMutex =
-		  (sReadersContexts[parentNode])->pdwMutex;
+		(sReadersContexts[dwContext])->pMutex =
+		  (sReadersContexts[parentNode])->pMutex;
 
 		/* Call on the parent driver to see if it is thread safe */
 		dwGetSize = sizeof(ucThread);
@@ -222,10 +222,10 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		{
 			Log1(PCSC_LOG_INFO, "Driver is thread safe");
 			(sReadersContexts[dwContext])->mMutex = NULL;
-			(sReadersContexts[dwContext])->pdwMutex = NULL;
+			(sReadersContexts[dwContext])->pMutex = NULL;
 		}
 		else
-			*(sReadersContexts[dwContext])->pdwMutex += 1;
+			*(sReadersContexts[dwContext])->pMutex += 1;
 	}
 
 	if ((sReadersContexts[dwContext])->pFeeds == NULL)
@@ -246,10 +246,10 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		(void)SYS_MutexInit((sReadersContexts[dwContext])->mMutex);
 	}
 
-	if ((sReadersContexts[dwContext])->pdwMutex == NULL)
+	if ((sReadersContexts[dwContext])->pMutex == NULL)
 	{
-		(sReadersContexts[dwContext])->pdwMutex = malloc(sizeof(DWORD));
-		*(sReadersContexts[dwContext])->pdwMutex = 1;
+		(sReadersContexts[dwContext])->pMutex = malloc(sizeof(int));
+		*(sReadersContexts[dwContext])->pMutex = 1;
 	}
 
 	dwNumReadersContexts += 1;
@@ -349,8 +349,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		  (sReadersContexts[dwContext])->vHandle;
 		(sReadersContexts[dwContextB])->mMutex =
 		  (sReadersContexts[dwContext])->mMutex;
-		(sReadersContexts[dwContextB])->pdwMutex =
-		  (sReadersContexts[dwContext])->pdwMutex;
+		(sReadersContexts[dwContextB])->pMutex =
+		  (sReadersContexts[dwContext])->pMutex;
 		sReadersContexts[dwContextB]->slot =
 			sReadersContexts[dwContext]->slot + j;
 
@@ -398,11 +398,11 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 				malloc(sizeof(PCSCLITE_MUTEX));
 			(void)SYS_MutexInit((sReadersContexts[dwContextB])->mMutex);
 
-			(sReadersContexts[dwContextB])->pdwMutex = malloc(sizeof(DWORD));
-			*(sReadersContexts[dwContextB])->pdwMutex = 1;
+			(sReadersContexts[dwContextB])->pMutex = malloc(sizeof(int));
+			*(sReadersContexts[dwContextB])->pMutex = 1;
 		}
 		else
-			*(sReadersContexts[dwContextB])->pdwMutex += 1;
+			*(sReadersContexts[dwContextB])->pMutex += 1;
 
 		dwNumReadersContexts += 1;
 
@@ -459,7 +459,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 			return rv;
 
 		/* Destroy and free the mutex */
-		if ((NULL == sContext->pdwMutex) || (NULL == sContext->pFeeds))
+		if ((NULL == sContext->pMutex) || (NULL == sContext->pFeeds))
 		{
 			Log1(PCSC_LOG_ERROR,
 				"Trying to remove an already removed driver");
@@ -467,19 +467,19 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		}
 
 		/* free shared resources when the last slot is closed */
-		if (*sContext->pdwMutex == 1)
+		if (*sContext->pMutex == 1)
 		{
 			(void)SYS_MutexDestroy(sContext->mMutex);
 			free(sContext->mMutex);
 			free(sContext->lpcLibrary);
 		}
 
-		*sContext->pdwMutex -= 1;
+		*sContext->pMutex -= 1;
 
-		if (*sContext->pdwMutex == 0)
+		if (*sContext->pMutex == 0)
 		{
-			free(sContext->pdwMutex);
-			sContext->pdwMutex = NULL;
+			free(sContext->pMutex);
+			sContext->pMutex = NULL;
 		}
 
 		*sContext->pFeeds -= 1;
