@@ -90,7 +90,7 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 	return 0;
 }
 
-LONG ContextsInitialize(unsigned int customMaxThreadCounter, unsigned int customMaxThreadCardHandles)
+LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandles)
 {
 	int lrv = 0;
 

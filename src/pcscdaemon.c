@@ -188,9 +188,9 @@ int main(int argc, char **argv)
 	char HotPlug;
 	char *newReaderConfig;
 	struct stat fStatBuf;
-	unsigned int customMaxThreadCounter = 0;
-	unsigned int customMaxReaderHandles = 0;
-	unsigned int customMaxThreadCardHandles = 0;
+	int customMaxThreadCounter = 0;
+	int customMaxReaderHandles = 0;
+	int customMaxThreadCardHandles = 0;
 	int opt;
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
