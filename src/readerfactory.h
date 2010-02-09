@@ -34,7 +34,7 @@ extern "C"
 		char *pcFriendlyname;	/**< FRIENDLYNAME */
 		char *pcDevicename;		/**< DEVICENAME */
 		char *pcLibpath;		/**< LIBPATH */
-		int dwChannelId;		/**< CHANNELID */
+		int channelId;		/**< CHANNELID */
 	} SerialReader;
 
 	struct FctMap_V1

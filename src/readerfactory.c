@@ -1312,7 +1312,7 @@ int RFStartSerialReaders(const char *readerconf)
 		int j;
 
 		(void)RFAddReader(reader_list[i].pcFriendlyname,
-			reader_list[i].dwChannelId,
+			reader_list[i].channelId,
 			reader_list[i].pcLibpath, reader_list[i].pcDevicename);
 
 		/* update the ConfigFileCRC (this false "CRC" is very weak) */
@@ -1390,7 +1390,7 @@ void RFReCheckReaderConf(void)
 				lpcStripReader[tmplen - 6] = 0;
 
 				if ((strcmp(reader_list[i].pcFriendlyname, lpcStripReader) == 0)
-					&& (reader_list[r].dwChannelId == sReadersContexts[i]->dwPort))
+					&& (reader_list[r].channelId == sReadersContexts[i]->dwPort))
 				{
 					DWORD dwStatus = 0, dwAtrLen = 0;
 					UCHAR ucAtr[MAX_ATR_SIZE];
@@ -1405,7 +1405,7 @@ void RFReCheckReaderConf(void)
 						Log2(PCSC_LOG_INFO, "Reader %s disappeared",
 							reader_list[i].pcFriendlyname);
 						(void)RFRemoveReader(reader_list[i].pcFriendlyname,
-							reader_list[r].dwChannelId);
+							reader_list[r].channelId);
 					}
 				}
 			}
@@ -1415,7 +1415,7 @@ void RFReCheckReaderConf(void)
 		if (!present)
 			/* we try to add it */
 			(void)RFAddReader(reader_list[i].pcFriendlyname,
-				reader_list[i].dwChannelId, reader_list[i].pcLibpath,
+				reader_list[i].channelId, reader_list[i].pcLibpath,
 				reader_list[i].pcDevicename);
 
 		/* free strings allocated by DBGetReaderList() */

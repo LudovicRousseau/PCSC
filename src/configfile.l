@@ -65,7 +65,7 @@ void tok_error(char *pcToken_error);
 int evaluatetoken(char *pcToken)
 {
 
-	DWORD dwChannelId = 0;
+	int channelId = 0;
 	int p = 0;
 	unsigned int n = 0;
 
@@ -196,11 +196,11 @@ int evaluatetoken(char *pcToken)
 		/* end marker */
 		reader_list[reader_list_size-1].pcFriendlyname = NULL;
 
-		dwChannelId = strtoul(pcChannelid, 0, 16);
+		channelId = strtoul(pcChannelid, 0, 16);
 		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);
 		reader_list[reader_list_size-2].pcDevicename = strdup(pcDevicename);
 		reader_list[reader_list_size-2].pcLibpath = strdup(pcLibpath),
-		reader_list[reader_list_size-2].dwChannelId = dwChannelId;
+		reader_list[reader_list_size-2].channelId = channelId;
 
 		pcFriendlyname = NULL;
 		pcDevicename = NULL;
