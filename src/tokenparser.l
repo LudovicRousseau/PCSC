@@ -100,6 +100,7 @@ void tpevalToken(char *pcToken, int tokType)
 
 void tperrorCheck (char *token_error)
 {
+    (void)token_error;
 }
 
 /**
