@@ -3215,7 +3215,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 
 	/* Multi-string with two trailing \0 */
 	const char ReaderGroup[] = "SCard$DefaultReaders\0";
-	const int dwGroups = sizeof(ReaderGroup);
+	const unsigned int dwGroups = sizeof(ReaderGroup);
 
 	CHECK_SAME_PROCESS
 
