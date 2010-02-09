@@ -49,8 +49,8 @@
  */
 
 extern char AutoExit;
-static unsigned int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
-static unsigned int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
+static int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
+static int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 
 /* Context tracking list */
 static list_t contextsList;
