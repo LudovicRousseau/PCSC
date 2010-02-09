@@ -128,7 +128,7 @@ extern "C"
 		DWORD dwLockId;			/**< Lock Id */
 		DWORD dwIdentity;		/**< Shared ID High Nibble */
 		int LockCount;			/**< number of recursive locks */
-		int32_t dwContexts;		/**< Number of open contexts */
+		int32_t contexts;		/**< Number of open contexts */
 		PDWORD pdwFeeds;		/**< Number of shared client to lib */
 		PDWORD pdwMutex;		/**< Number of client to mutex */
 

@@ -174,7 +174,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	(sReadersContexts[dwContext])->dwPort = dwPort;
 	(sReadersContexts[dwContext])->mMutex = NULL;
 	(sReadersContexts[dwContext])->dwBlockStatus = 0;
-	(sReadersContexts[dwContext])->dwContexts = 0;
+	(sReadersContexts[dwContext])->contexts = 0;
 	(sReadersContexts[dwContext])->pthThread = 0;
 	(sReadersContexts[dwContext])->dwLockId = 0;
 	(sReadersContexts[dwContext])->LockCount = 0;
@@ -366,7 +366,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		*(sReadersContexts[dwContextB])->pdwFeeds += 1;
 
 		(sReadersContexts[dwContextB])->dwBlockStatus = 0;
-		(sReadersContexts[dwContextB])->dwContexts = 0;
+		(sReadersContexts[dwContextB])->contexts = 0;
 		(sReadersContexts[dwContextB])->dwLockId = 0;
 		(sReadersContexts[dwContextB])->LockCount = 0;
 		(sReadersContexts[dwContextB])->readerState = NULL;
@@ -499,7 +499,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		sContext->dwPort = 0;
 		sContext->mMutex = NULL;
 		sContext->dwBlockStatus = 0;
-		sContext->dwContexts = 0;
+		sContext->contexts = 0;
 		sContext->dwSlot = 0;
 		sContext->dwLockId = 0;
 		sContext->LockCount = 0;

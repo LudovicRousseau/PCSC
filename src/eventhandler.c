@@ -246,7 +246,7 @@ LONG EHSpawnEventHandler(PREADER_CONTEXT rContext,
 	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
 	rContext->readerState->readerID = i + 100;
 	rContext->readerState->readerState = dwStatus;
-	rContext->readerState->readerSharing = rContext->dwContexts;
+	rContext->readerState->readerSharing = rContext->contexts;
 	rContext->readerState->cardAtrLength = dwAtrLen;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
@@ -358,7 +358,7 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 	 */
 	rContext->readerState->readerState = dwStatus;
 	rContext->readerState->readerSharing = dwReaderSharing =
-		rContext->dwContexts;
+		rContext->contexts;
 
 	(void)EHSignalEventToClients();
 
@@ -491,9 +491,9 @@ static void EHStatusHandlerThread(PREADER_CONTEXT rContext)
 		/*
 		 * Sharing may change w/o an event pass it on
 		 */
-		if (dwReaderSharing != rContext->dwContexts)
+		if (dwReaderSharing != rContext->contexts)
 		{
-			dwReaderSharing = rContext->dwContexts;
+			dwReaderSharing = rContext->contexts;
 			rContext->readerState->readerSharing = dwReaderSharing;
 			(void)EHSignalEventToClients();
 		}

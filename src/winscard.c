@@ -301,7 +301,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Connect if not exclusive mode
 	 */
-	if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
+	if (rContext->contexts == SCARD_EXCLUSIVE_CONTEXT)
 	{
 		Log1(PCSC_LOG_ERROR, "Error Reader Exclusive");
 		return SCARD_E_SHARING_VIOLATION;
@@ -444,9 +444,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (dwShareMode == SCARD_SHARE_EXCLUSIVE)
 	{
-		if (rContext->dwContexts == SCARD_NO_CONTEXT)
+		if (rContext->contexts == SCARD_NO_CONTEXT)
 		{
-			rContext->dwContexts = SCARD_EXCLUSIVE_CONTEXT;
+			rContext->contexts = SCARD_EXCLUSIVE_CONTEXT;
 			(void)RFLockSharing(*phCard);
 		}
 		else
@@ -461,7 +461,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Add a connection to the context stack
 		 */
-		rContext->dwContexts += 1;
+		rContext->contexts += 1;
 	}
 
 	/*
@@ -475,11 +475,11 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		 * Clean up - there is no more room
 		 */
 		(void)RFDestroyReaderHandle(*phCard);
-		if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
-			rContext->dwContexts = SCARD_NO_CONTEXT;
+		if (rContext->contexts == SCARD_EXCLUSIVE_CONTEXT)
+			rContext->contexts = SCARD_NO_CONTEXT;
 		else
-			if (rContext->dwContexts > SCARD_NO_CONTEXT)
-				rContext->dwContexts -= 1;
+			if (rContext->contexts > SCARD_NO_CONTEXT)
+				rContext->contexts -= 1;
 
 		*phCard = 0;
 
@@ -491,7 +491,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->dwContexts;
+	rContext->readerState->readerSharing = rContext->contexts;
 
 	PROFILE_END
 
@@ -755,16 +755,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	if (dwShareMode == SCARD_SHARE_EXCLUSIVE)
 	{
-		if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
+		if (rContext->contexts == SCARD_EXCLUSIVE_CONTEXT)
 		{
 			/*
 			 * Do nothing - we are already exclusive
 			 */
 		} else
 		{
-			if (rContext->dwContexts == SCARD_LAST_CONTEXT)
+			if (rContext->contexts == SCARD_LAST_CONTEXT)
 			{
-				rContext->dwContexts = SCARD_EXCLUSIVE_CONTEXT;
+				rContext->contexts = SCARD_EXCLUSIVE_CONTEXT;
 				(void)RFLockSharing(hCard);
 			} else
 			{
@@ -773,7 +773,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 	} else if (dwShareMode == SCARD_SHARE_SHARED)
 	{
-		if (rContext->dwContexts != SCARD_EXCLUSIVE_CONTEXT)
+		if (rContext->contexts != SCARD_EXCLUSIVE_CONTEXT)
 		{
 			/*
 			 * Do nothing - in sharing mode already
@@ -784,11 +784,11 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			 * We are in exclusive mode but want to share now
 			 */
 			(void)RFUnlockSharing(hCard);
-			rContext->dwContexts = SCARD_LAST_CONTEXT;
+			rContext->contexts = SCARD_LAST_CONTEXT;
 		}
 	} else if (dwShareMode == SCARD_SHARE_DIRECT)
 	{
-		if (rContext->dwContexts != SCARD_EXCLUSIVE_CONTEXT)
+		if (rContext->contexts != SCARD_EXCLUSIVE_CONTEXT)
 		{
 			/*
 			 * Do nothing - in sharing mode already
@@ -799,7 +799,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			 * We are in exclusive mode but want to share now
 			 */
 			(void)RFUnlockSharing(hCard);
-			rContext->dwContexts = SCARD_LAST_CONTEXT;
+			rContext->contexts = SCARD_LAST_CONTEXT;
 		}
 	} else
 		return SCARD_E_INVALID_VALUE;
@@ -812,7 +812,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->dwContexts;
+	rContext->readerState->readerSharing = rContext->contexts;
 
 	return SCARD_S_SUCCESS;
 }
@@ -863,7 +863,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->dwContexts);
+	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->contexts);
 
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
@@ -978,23 +978,23 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * For exclusive connection reset it to no connections
 	 */
-	if (rContext->dwContexts == SCARD_EXCLUSIVE_CONTEXT)
-		rContext->dwContexts = SCARD_NO_CONTEXT;
+	if (rContext->contexts == SCARD_EXCLUSIVE_CONTEXT)
+		rContext->contexts = SCARD_NO_CONTEXT;
 	else
 	{
 		/*
 		 * Remove a connection from the context stack
 		 */
-		rContext->dwContexts -= 1;
+		rContext->contexts -= 1;
 
-		if (rContext->dwContexts < 0)
-			rContext->dwContexts = 0;
+		if (rContext->contexts < 0)
+			rContext->contexts = 0;
 	}
 
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->dwContexts;
+	rContext->readerState->readerSharing = rContext->contexts;
 
 	return SCARD_S_SUCCESS;
 }
