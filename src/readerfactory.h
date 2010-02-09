@@ -122,7 +122,7 @@ extern "C"
 
 		LPVOID vHandle;			/**< Dlopen handle */
 		DWORD dwVersion;		/**< IFD Handler version number */
-		DWORD dwPort;			/**< Port ID */
+		int port;				/**< Port ID */
 		DWORD dwSlot;			/**< Current Reader Slot */
 		DWORD dwBlockStatus;	/**< Current blocking status */
 		SCARDHANDLE hLockId;	/**< Lock Id */
@@ -140,11 +140,11 @@ extern "C"
 	typedef struct ReaderContext READER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(unsigned int);
-	LONG RFAddReader(LPSTR, DWORD, LPSTR, LPSTR);
-	LONG RFRemoveReader(LPSTR, DWORD);
-	LONG RFSetReaderName(READER_CONTEXT *, LPSTR, LPSTR, DWORD, DWORD);
+	LONG RFAddReader(LPSTR, int, LPSTR, LPSTR);
+	LONG RFRemoveReader(LPSTR, int);
+	LONG RFSetReaderName(READER_CONTEXT *, LPSTR, LPSTR, int, DWORD);
 	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
-	LONG RFReaderInfoNamePort(DWORD, LPSTR, /*@out@*/ struct ReaderContext **);
+	LONG RFReaderInfoNamePort(int, LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
 	LONG RFCheckSharing(SCARDHANDLE);
 	LONG RFLockSharing(SCARDHANDLE);

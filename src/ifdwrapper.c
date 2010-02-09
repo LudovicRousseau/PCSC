@@ -138,30 +138,30 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->dwVersion == IFD_HVERSION_1_0)
 	{
-		rv = (*IO_create_channel) (rContext->dwPort);
+		rv = (*IO_create_channel) (rContext->port);
 	} else if (rContext->dwVersion == IFD_HVERSION_2_0)
 	{
-		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
+		rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->port);
 	} else
 	{
 		/* use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
 			rv = (*IFDH_create_channel_by_name) (rContext->dwSlot, rContext->lpcDevice);
 		else
-			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->dwPort);
+			rv = (*IFDH_create_channel) (rContext->dwSlot, rContext->port);
 	}
 #else
 #ifdef IFDHANDLERv1
-	rv = IO_Create_Channel(rContext->dwPort);
+	rv = IO_Create_Channel(rContext->port);
 #elif IFDHANDLERv2
-	rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
+	rv = IFDHCreateChannel(rContext->dwSlot, rContext->port);
 #else
 	{
 		/* Use device name only if defined */
 		if (rContext->lpcDevice[0] != '\0')
 			rv = IFDHCreateChannelByName(rContext->dwSlot, rContext->lpcDevice);
 		else
-			rv = IFDHCreateChannel(rContext->dwSlot, rContext->dwPort);
+			rv = IFDHCreateChannel(rContext->dwSlot, rContext->port);
 	}
 #endif
 #endif

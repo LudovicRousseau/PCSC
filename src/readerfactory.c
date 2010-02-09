@@ -92,7 +92,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	return EHInitializeEventStructures();
 }
 
-LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevice)
+LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 {
 	DWORD dwContext = 0, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
@@ -136,7 +136,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 				lpcStripReader[tmplen - 6] = 0;
 
 				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
-					(dwPort == (sReadersContexts[i])->dwPort))
+					(port == (sReadersContexts[i])->port))
 				{
 					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
 					return SCARD_E_DUPLICATE_READER;
@@ -163,7 +163,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 
 	/* Check and set the readername to see if it must be enumerated */
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], lpcReader,
-		lpcLibrary, dwPort, 0);
+		lpcLibrary, port, 0);
 	if (parentNode < -1)
 		return SCARD_E_NO_MEMORY;
 
@@ -171,7 +171,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	(void)strlcpy((sReadersContexts[dwContext])->lpcDevice, lpcDevice,
 		sizeof((sReadersContexts[dwContext])->lpcDevice));
 	(sReadersContexts[dwContext])->dwVersion = 0;
-	(sReadersContexts[dwContext])->dwPort = dwPort;
+	(sReadersContexts[dwContext])->port = port;
 	(sReadersContexts[dwContext])->mMutex = NULL;
 	(sReadersContexts[dwContext])->dwBlockStatus = 0;
 	(sReadersContexts[dwContext])->contexts = 0;
@@ -260,7 +260,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	{
 		/* Cannot connect to reader. Exit gracefully */
 		Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-		(void)RFRemoveReader(lpcReader, dwPort);
+		(void)RFRemoveReader(lpcReader, port);
 		return rv;
 	}
 
@@ -284,7 +284,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-			(void)RFRemoveReader(lpcReader, dwPort);
+			(void)RFRemoveReader(lpcReader, port);
 			return rv;
 		}
 	}
@@ -328,7 +328,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/* No more slot left return */
-			rv = RFRemoveReader(lpcReader, dwPort);
+			rv = RFRemoveReader(lpcReader, port);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -344,8 +344,8 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 			sizeof((sReadersContexts[dwContextB])->lpcDevice));
 		(sReadersContexts[dwContextB])->dwVersion =
 		  (sReadersContexts[dwContext])->dwVersion;
-		(sReadersContexts[dwContextB])->dwPort =
-		  (sReadersContexts[dwContext])->dwPort;
+		(sReadersContexts[dwContextB])->port =
+		  (sReadersContexts[dwContext])->port;
 		(sReadersContexts[dwContextB])->vHandle =
 		  (sReadersContexts[dwContext])->vHandle;
 		(sReadersContexts[dwContextB])->mMutex =
@@ -412,7 +412,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv != SCARD_S_SUCCESS)
 		{
 			/* Cannot connect to slot. Exit gracefully */
-			(void)RFRemoveReader(lpcReader, dwPort);
+			(void)RFRemoveReader(lpcReader, port);
 			return rv;
 		}
 
@@ -433,7 +433,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-			(void)RFRemoveReader(lpcReader, dwPort);
+			(void)RFRemoveReader(lpcReader, port);
 			return rv;
 		}
 	}
@@ -441,7 +441,7 @@ LONG RFAddReader(LPSTR lpcReader, DWORD dwPort, LPSTR lpcLibrary, LPSTR lpcDevic
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
+LONG RFRemoveReader(LPSTR lpcReader, int port)
 {
 	LONG rv;
 	READER_CONTEXT * sContext;
@@ -450,7 +450,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 		return SCARD_E_INVALID_VALUE;
 
 	while (SCARD_S_SUCCESS ==
-		RFReaderInfoNamePort(dwPort, lpcReader, &sContext))
+		RFReaderInfoNamePort(port, lpcReader, &sContext))
 	{
 
 		/* Try to destroy the thread */
@@ -496,7 +496,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 
 		sContext->lpcDevice[0] = 0;
 		sContext->dwVersion = 0;
-		sContext->dwPort = 0;
+		sContext->port = 0;
 		sContext->mMutex = NULL;
 		sContext->dwBlockStatus = 0;
 		sContext->contexts = 0;
@@ -531,7 +531,7 @@ LONG RFRemoveReader(LPSTR lpcReader, DWORD dwPort)
 }
 
 LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
-	LPSTR libraryName, DWORD dwPort, DWORD dwSlot)
+	LPSTR libraryName, int port, DWORD dwSlot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
 	DWORD valueLength;
@@ -572,9 +572,9 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 						supportedChannels = 1;
 
 					/* Check to see if it is a hotplug reader and different */
-					if (((((sReadersContexts[i])->dwPort & 0xFFFF0000) ==
+					if (((((sReadersContexts[i])->port & 0xFFFF0000) ==
 							PCSCLITE_HP_BASE_PORT)
-						&& ((sReadersContexts[i])->dwPort != dwPort))
+						&& ((sReadersContexts[i])->port != port))
 						|| (supportedChannels > 1))
 					{
 						char *lpcReader = sReadersContexts[i]->lpcReader;
@@ -660,7 +660,7 @@ LONG RFReaderInfo(LPSTR lpcReader, READER_CONTEXT ** sReader)
 	return SCARD_E_UNKNOWN_READER;
 }
 
-LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
+LONG RFReaderInfoNamePort(int port, LPSTR lpcReader,
 	READER_CONTEXT * * sReader)
 {
 	char lpcStripReader[MAX_READERNAME];
@@ -678,7 +678,7 @@ LONG RFReaderInfoNamePort(DWORD dwPort, LPSTR lpcReader,
 			lpcStripReader[tmplen - 6] = 0;
 
 			if ((strcmp(lpcReader, lpcStripReader) == 0) &&
-				(dwPort == (sReadersContexts[i])->dwPort))
+				(port == (sReadersContexts[i])->port))
 			{
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
@@ -1015,7 +1015,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 	if (rv != IFD_SUCCESS)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Open Port %X Failed (%s)",
-			rContext->dwPort, rContext->lpcDevice);
+			rContext->port, rContext->lpcDevice);
 		(void)RFUnBindFunctions(rContext);
 		(void)RFUnloadReader(rContext);
 		if (IFD_NO_SUCH_DEVICE == rv)
@@ -1285,7 +1285,7 @@ void RFCleanupReaders(void)
 			/* strip the 6 last char ' 00 00' */
 			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
 
-			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->dwPort);
+			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->port);
 
 			if (rv != SCARD_S_SUCCESS)
 				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08X", rv);
@@ -1390,7 +1390,7 @@ void RFReCheckReaderConf(void)
 				lpcStripReader[tmplen - 6] = 0;
 
 				if ((strcmp(reader_list[i].pcFriendlyname, lpcStripReader) == 0)
-					&& (reader_list[r].channelId == sReadersContexts[i]->dwPort))
+					&& (reader_list[r].channelId == sReadersContexts[i]->port))
 				{
 					DWORD dwStatus = 0, dwAtrLen = 0;
 					UCHAR ucAtr[MAX_ATR_SIZE];
@@ -1460,7 +1460,7 @@ void RFAwakeAllReaders(void)
 			for (j=0; j < i; j++)
 			{
 				if (((sReadersContexts[j])->vHandle == (sReadersContexts[i])->vHandle)&&
-					((sReadersContexts[j])->dwPort == (sReadersContexts[i])->dwPort))
+					((sReadersContexts[j])->port == (sReadersContexts[i])->port))
 				{
 					initFlag = 1;
 				}
@@ -1474,7 +1474,7 @@ void RFAwakeAllReaders(void)
 			if (rv != IFD_SUCCESS)
 			{
 				Log3(PCSC_LOG_ERROR, "Open Port %X Failed (%s)",
-					(sReadersContexts[i])->dwPort, (sReadersContexts[i])->lpcDevice);
+					(sReadersContexts[i])->port, (sReadersContexts[i])->lpcDevice);
 			}
 
 			(void)EHSpawnEventHandler(sReadersContexts[i], NULL);
