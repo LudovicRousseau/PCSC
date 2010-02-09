@@ -49,7 +49,7 @@
 #endif
 
 static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
-static unsigned int maxReaderHandles = PCSC_MAX_READER_HANDLES;
+static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
