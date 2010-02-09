@@ -178,7 +178,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	(sReadersContexts[dwContext])->hLockId = 0;
 	(sReadersContexts[dwContext])->LockCount = 0;
 	(sReadersContexts[dwContext])->vHandle = NULL;
-	(sReadersContexts[dwContext])->pdwFeeds = NULL;
+	(sReadersContexts[dwContext])->pFeeds = NULL;
 	(sReadersContexts[dwContext])->pdwMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << IDENTITY_SHIFT;
@@ -203,9 +203,9 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		(sReadersContexts[dwContext])->pdwFeeds =
-		  (sReadersContexts[parentNode])->pdwFeeds;
-		*(sReadersContexts[dwContext])->pdwFeeds += 1;
+		(sReadersContexts[dwContext])->pFeeds =
+		  (sReadersContexts[parentNode])->pFeeds;
+		*(sReadersContexts[dwContext])->pFeeds += 1;
 		(sReadersContexts[dwContext])->vHandle =
 		  (sReadersContexts[parentNode])->vHandle;
 		(sReadersContexts[dwContext])->mMutex =
@@ -228,15 +228,15 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 			*(sReadersContexts[dwContext])->pdwMutex += 1;
 	}
 
-	if ((sReadersContexts[dwContext])->pdwFeeds == NULL)
+	if ((sReadersContexts[dwContext])->pFeeds == NULL)
 	{
-		(sReadersContexts[dwContext])->pdwFeeds = malloc(sizeof(DWORD));
+		(sReadersContexts[dwContext])->pFeeds = malloc(sizeof(DWORD));
 
-		/* Initialize pdwFeeds to 1, otherwise multiple
+		/* Initialize pFeeds to 1, otherwise multiple
 		   cloned readers will cause pcscd to crash when
 		   RFUnloadReader unloads the driver library
 		   and there are still devices attached using it --mikeg*/
-		*(sReadersContexts[dwContext])->pdwFeeds = 1;
+		*(sReadersContexts[dwContext])->pFeeds = 1;
 	}
 
 	if ((sReadersContexts[dwContext])->mMutex == 0)
@@ -355,14 +355,14 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 			sReadersContexts[dwContext]->slot + j;
 
 		/*
-		 * Added by Dave - slots did not have a pdwFeeds
+		 * Added by Dave - slots did not have a pFeeds
 		 * parameter so it was by luck they were working
 		 */
-		(sReadersContexts[dwContextB])->pdwFeeds =
-		  (sReadersContexts[dwContext])->pdwFeeds;
+		(sReadersContexts[dwContextB])->pFeeds =
+		  (sReadersContexts[dwContext])->pFeeds;
 
 		/* Added by Dave for multiple slots */
-		*(sReadersContexts[dwContextB])->pdwFeeds += 1;
+		*(sReadersContexts[dwContextB])->pFeeds += 1;
 
 		(sReadersContexts[dwContextB])->contexts = 0;
 		(sReadersContexts[dwContextB])->hLockId = 0;
@@ -459,7 +459,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 			return rv;
 
 		/* Destroy and free the mutex */
-		if ((NULL == sContext->pdwMutex) || (NULL == sContext->pdwFeeds))
+		if ((NULL == sContext->pdwMutex) || (NULL == sContext->pFeeds))
 		{
 			Log1(PCSC_LOG_ERROR,
 				"Trying to remove an already removed driver");
@@ -482,14 +482,14 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 			sContext->pdwMutex = NULL;
 		}
 
-		*sContext->pdwFeeds -= 1;
+		*sContext->pFeeds -= 1;
 
-		/* Added by Dave to free the pdwFeeds variable */
+		/* Added by Dave to free the pFeeds variable */
 
-		if (*sContext->pdwFeeds == 0)
+		if (*sContext->pFeeds == 0)
 		{
-			free(sContext->pdwFeeds);
-			sContext->pdwFeeds = NULL;
+			free(sContext->pFeeds);
+			sContext->pFeeds = NULL;
 		}
 
 		sContext->lpcDevice[0] = 0;
@@ -885,7 +885,7 @@ LONG RFUnBindFunctions(READER_CONTEXT * rContext)
 LONG RFUnloadReader(READER_CONTEXT * rContext)
 {
 	/* Make sure no one else is using this library */
-	if (*rContext->pdwFeeds == 1)
+	if (*rContext->pFeeds == 1)
 	{
 		Log1(PCSC_LOG_INFO, "Unloading reader driver.");
 		(void)DYN_CloseLibrary(&rContext->vHandle);
