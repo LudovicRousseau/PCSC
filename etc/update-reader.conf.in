@@ -3,8 +3,8 @@
 # Merge all reader config file snippets for pcsc-lite from a reader.conf.d
 # directory into a reader.conf.
 
-CONF=@confdir@/reader.conf
-CONFDIR=@confdir@/reader.conf.d
+CONF=@sysconfdir@/reader.conf
+CONFDIR=@sysconfdir@/reader.conf.d
 
 umask 0022
 set -e
