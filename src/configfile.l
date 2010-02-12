@@ -38,6 +38,7 @@ void tok_error(char *pcToken_error);
 %}
 
 %option nounput
+%option noinput
 %option noyywrap
 
 %%
