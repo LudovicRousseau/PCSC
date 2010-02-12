@@ -457,19 +457,15 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 			return SCARD_E_INVALID_VALUE;
 		}
 
+		*sContext->pMutex -= 1;
+
 		/* free shared resources when the last slot is closed */
-		if (*sContext->pMutex == 1)
+		if (0 == *sContext->pMutex)
 		{
 			(void)SYS_MutexDestroy(sContext->mMutex);
 			free(sContext->mMutex);
 			free(sContext->lpcLibrary);
 			free(sContext->lpcDevice);
-		}
-
-		*sContext->pMutex -= 1;
-
-		if (*sContext->pMutex == 0)
-		{
 			free(sContext->pMutex);
 			sContext->pMutex = NULL;
 		}
@@ -477,7 +473,6 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		*sContext->pFeeds -= 1;
 
 		/* Added by Dave to free the pFeeds variable */
-
 		if (*sContext->pFeeds == 0)
 		{
 			free(sContext->pFeeds);
