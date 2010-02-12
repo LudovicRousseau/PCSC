@@ -412,6 +412,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		strlcat(fullname, " [", sizeof(fullname));
 		strlcat(fullname, sInterfaceName, sizeof(fullname));
 		strlcat(fullname, "]", sizeof(fullname));
+		libhal_free_string(sInterfaceName);
 	}
 
 	/* serial number from the device (if any) */
@@ -420,6 +421,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		strlcat(fullname, " (", sizeof(fullname));
 		strlcat(fullname, sSerialNumber, sizeof(fullname));
 		strlcat(fullname, ")", sizeof(fullname));
+		libhal_free_string(sSerialNumber);
 	}
 
 	readerTracker[i].fullName = strdup(fullname);
