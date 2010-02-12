@@ -1281,7 +1281,7 @@ int RFStartSerialReaders(const char *readerconf)
 	SerialReader *reader_list;
 	int i, rv;
 
-	/* remember the ocnfiguration filename for RFReCheckReaderConf() */
+	/* remember the configuration filename for RFReCheckReaderConf() */
 	ConfigFile = strdup(readerconf);
 
 	rv = DBGetReaderList(readerconf, &reader_list);
