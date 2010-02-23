@@ -549,6 +549,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 
 		veStr.major = PROTOCOL_VERSION_MAJOR;
 		veStr.minor = PROTOCOL_VERSION_MINOR;
+		veStr.rv = SCARD_S_SUCCESS;
 
 		if (-1 == SHMMessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
 			PCSCLITE_WRITE_TIMEOUT, &veStr))
@@ -2205,6 +2206,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				gettimeofday(&before, NULL);
 
 				waitStatusStruct.timeOut = dwTime;
+				waitStatusStruct.rv = SCARD_S_SUCCESS;
 
 				rv = SHMMessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
 					currentContextMap->dwClientID,
