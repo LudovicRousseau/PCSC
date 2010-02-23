@@ -149,16 +149,10 @@ tests_Win7 = {
         'SCardConnect'          : [SCardConnectTest, True],
         'SCardBeginTransaction' : [SCardBeginTransactionTest, True]}
 
-tests_Linux = {
-        'SCardReconnect'        : [SCardReconnectTest, False],
-        'SCardGetAttrib'        : [SCardGetAttribTest, False],
-        'SCardTransmit'         : [SCardTransmitTest, False],
-        'SCardStatus'           : [SCardStatusTest, False],
-        'SCardConnect'          : [SCardConnectTest, True],
-        'SCardBeginTransaction' : [SCardBeginTransactionTest, True]}
+tests_Linux = tests_Win7
 
 # Windows should be the reference implementation
-tests = tests_Win7
+tests = tests_Linux
 
 
 def Connect(index=0):
