@@ -344,12 +344,10 @@ doc/Makefile
 doc/doxygen.conf
 doc/pcscd.8
 doc/reader.conf.5
-doc/update-reader.conf.8
 doc/example/Makefile
 etc/Makefile
 etc/pcscd.init
 etc/reader.conf
-etc/update-reader.conf
 src/Makefile
 src/libpcsclite.pc
 src/pcscd.h

@@ -1284,7 +1284,7 @@ int RFStartSerialReaders(const char *readerconf)
 	/* remember the configuration filename for RFReCheckReaderConf() */
 	ConfigFile = strdup(readerconf);
 
-	rv = DBGetReaderList(readerconf, &reader_list);
+	rv = DBGetReaderListDir(readerconf, &reader_list);
 
 	/* the list is empty */
 	if (NULL == reader_list)
@@ -1306,7 +1306,7 @@ int RFStartSerialReaders(const char *readerconf)
 		for (j=0; j<reader_list[i].pcDevicename[j]; j++)
 			ConfigFileCRC += reader_list[i].pcDevicename[j];
 
-		/* free strings allocated by DBGetReaderList() */
+		/* free strings allocated by DBGetReaderListDir() */
 		free(reader_list[i].pcFriendlyname);
 		free(reader_list[i].pcLibpath);
 		free(reader_list[i].pcDevicename);
@@ -1321,7 +1321,7 @@ void RFReCheckReaderConf(void)
 	SerialReader *reader_list;
 	int i, crc;
 
-	(void)DBGetReaderList(ConfigFile, &reader_list);
+	(void)DBGetReaderListDir(ConfigFile, &reader_list);
 
 	/* the list is empty */
 	if (NULL == reader_list)
@@ -1401,7 +1401,7 @@ void RFReCheckReaderConf(void)
 				reader_list[i].channelId, reader_list[i].pcLibpath,
 				reader_list[i].pcDevicename);
 
-		/* free strings allocated by DBGetReaderList() */
+		/* free strings allocated by DBGetReaderListDir() */
 		free(reader_list[i].pcFriendlyname);
 		free(reader_list[i].pcLibpath);
 		free(reader_list[i].pcDevicename);

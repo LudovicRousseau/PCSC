@@ -14,6 +14,8 @@
  */
 
 %{
+#include <dirent.h>
+
 #include "wintypes.h"
 #include "pcscd.h"
 #include "readerfactory.h"
@@ -32,6 +34,7 @@ static char *pcChannelid;
 static int badError;
 static SerialReader *reader_list;
 static int reader_list_size;
+const char *ConfFile;
 
 void tok_error(char *pcToken_error);
 
@@ -214,8 +217,56 @@ int evaluatetoken(char *pcToken)
 
 void tok_error(char *token_error)
 {
-	Log3(PCSC_LOG_ERROR, "tok_error: invalid value line %d in " PCSCLITE_READER_CONFIG ": %s", iOldLinenumber, token_error);
+	Log4(PCSC_LOG_ERROR, "tok_error: invalid value line %d in %s: %s",
+		iOldLinenumber, ConfFile, token_error);
 	badError = 1;
+}
+
+int DBGetReaderListDir(const char *readerconf_dir,
+	SerialReader **caller_reader_list)
+{
+	DIR *dir;
+	int ret = 0;
+
+	/* (re)start with an empty list */
+	reader_list = NULL;
+	reader_list_size = 0;
+
+	dir = opendir(readerconf_dir);
+	if (dir)
+	{
+		/* the configuration file is a directory */
+		struct dirent *direntry;
+
+		/* for each configuration file */
+		while ((direntry = readdir(dir)) != NULL)
+		{
+			char filename[FILENAME_MAX];
+			int r;
+
+			/* skip . and .. */
+			if ((strcmp(direntry->d_name, ".") == 0) ||
+				(strcmp(direntry->d_name, "..") == 0))
+				continue;
+
+			snprintf(filename, sizeof(filename), "%s/%s",
+				readerconf_dir, direntry->d_name);
+
+			/* each call to DBGetReaderList() will append to the list */
+			r = DBGetReaderList(filename, caller_reader_list);
+
+			/* set the global return value to the latest error */
+			if (r)
+				ret = r;
+		}
+
+		closedir(dir);
+	}
+	else
+		/* the configuration file is really a file */
+		ret = DBGetReaderList(readerconf_dir, caller_reader_list);
+
+	return ret;
 }
 
 int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
@@ -223,6 +274,11 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 	FILE *configFile = NULL;
 
 	*caller_reader_list = NULL;	/* no list by default */
+
+	/* used by tok_error() */
+	ConfFile = readerconf;
+
+	Log2(PCSC_LOG_DEBUG, "Parsing conf file: %s", ConfFile);
 
 	configFile = fopen(readerconf, "r");
 
@@ -234,8 +290,6 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 	/* (re)start with a clean state */
 	iLinenumber = 1;
 	iOldLinenumber = -1;
-	reader_list = NULL;
-	reader_list_size = 0;
 	pcFriendlyname = NULL;
 	pcDevicename = NULL;
 	pcLibpath = NULL;
