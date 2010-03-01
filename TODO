@@ -26,7 +26,7 @@
   http://www.opensc-project.org/pipermail/opensc-devel/2009-February/011801.html
 
 
-For embedded/constained systems
+For embedded/constrained systems
 
 - remove as much text messages (logs) as possible to limit the size of
   the binaries (pcscd and libpcsclite)
