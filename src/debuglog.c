@@ -165,12 +165,10 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	log_xxd_always(priority, msg, buffer, len);
 } /* log_xxd */
 
-#ifdef PCSCD
 void DebugLogSuppress(const int lSType)
 {
 	LogSuppress = lSType;
 }
-#endif
 
 void DebugLogSetLogType(const int dbgtype)
 {
