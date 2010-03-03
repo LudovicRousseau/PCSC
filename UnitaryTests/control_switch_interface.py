@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
+"""
 #   control_switch_interface.py: switch interface on the GemProx DU
-#   Copyright (C) 2009  Ludovic Rousseau
+#   Copyright (C) 2009-2010  Ludovic Rousseau
+"""
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,21 +20,25 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from smartcard.pcsc.PCSCReader import readers
-from smartcard.pcsc.PCSCPart10 import *
-from smartcard.util import toHexString
+from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
+    SCARD_LEAVE_CARD, SCARD_CTL_CODE)
+
+IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
 
 
 def switch_interface(interface):
+    """
+    switch from contact to contactless (or reverse) on a GemProx DU reader
+    """
     for reader in readers():
         cardConnection = reader.createConnection()
         cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
-        switch_interface = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
-        IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
+        switch_interface_cmd = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
         print "Reader:", reader, "=>",
         try:
             res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
-                switch_interface)
+                switch_interface_cmd)
         except:
             print "FAILED"
         else:
