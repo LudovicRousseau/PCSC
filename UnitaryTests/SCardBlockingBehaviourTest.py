@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+"""
 # Copyright (c) 2010 Jean-Luc Giraud (jlgiraud@mac.com)
 # All rights reserved.
-#
+"""
+
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -42,6 +44,7 @@ unblocked = False
 
 
 def check(testFunctionName, hresult, duration):
+    """ check """
     if hresult != SCARD_S_SUCCESS:
         print "%s failed: %s" % (testFunctionName, SCardGetErrorMessage(hresult))
         print 'Failure for "Sharing violation" are OK for non blocking calls'
@@ -49,6 +52,7 @@ def check(testFunctionName, hresult, duration):
 
 
 def SCardReconnectTest(hcontextTest, hcardTest, readerName):
+    """ SCardReconnectTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -59,6 +63,7 @@ def SCardReconnectTest(hcontextTest, hcardTest, readerName):
 
 
 def SCardGetAttribTest(hcontextTest, hcardTest, readerName):
+    """ SCardGetAttribTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -69,6 +74,7 @@ def SCardGetAttribTest(hcontextTest, hcardTest, readerName):
 
 
 def SCardTransmitTest(hcontextTest, hcardTest, readerName):
+    """ SCardTransmitTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -81,6 +87,7 @@ def SCardTransmitTest(hcontextTest, hcardTest, readerName):
 
 
 def SCardStatusTest(hcontextTest, hcardTest, readerName):
+    """ SCardStatusTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -91,6 +98,7 @@ def SCardStatusTest(hcontextTest, hcardTest, readerName):
 
 
 def SCardConnectTest(hcontextTest, hcardTest, readerName):
+    """ SCardConnectTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -107,6 +115,7 @@ def SCardConnectTest(hcontextTest, hcardTest, readerName):
 
 
 def SCardBeginTransactionTest(hcontextTest, hcardTest, readerName):
+    """ SCardBeginTransactionTest """
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
     print "Test thread for %s" % testFunctionName
@@ -120,14 +129,14 @@ def SCardBeginTransactionTest(hcontextTest, hcardTest, readerName):
     unblocked = True
 
 
-def TemplateTest(hcontextTest, hcardTest, readerName):
-    global unblocked
-    testFunctionName = sys._getframe().f_code.co_name
-    print "Test thread for %s" % testFunctionName
-    before = time.time()
-    hresult, attrib = Template(hcardTest, SCARD_ATTR_DEVICE_FRIENDLY_NAME_A)
-    check(testFunctionName, hresult, time.time() - before)
-    unblocked = True
+#def TemplateTest(hcontextTest, hcardTest, readerName):
+#    global unblocked
+#    testFunctionName = sys._getframe().f_code.co_name
+#    print "Test thread for %s" % testFunctionName
+#    before = time.time()
+#    hresult, attrib = Template(hcardTest, SCARD_ATTR_DEVICE_FRIENDLY_NAME_A)
+#    check(testFunctionName, hresult, time.time() - before)
+#    unblocked = True
 
 
 # Format:

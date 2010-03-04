@@ -3,9 +3,11 @@
 # Check the return value of SCardConnect() on a reader already used in
 # SCARD_SHARE_EXCLUSIVE mode
 
+"""
 # Copyright (c) 2010 Jean-Luc Giraud (jlgiraud@mac.com)
 # All rights reserved.
-#
+"""
+
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -34,9 +36,11 @@
 
 
 from smartcard.scard import *
+import sys
 
 
 def Connect(mode):
+    """ Connect """
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
         raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
@@ -55,6 +59,7 @@ def Connect(mode):
 
 
 def ConnectWithReader(readerName, mode):
+    """ ConnectWithReader """
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
         raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
