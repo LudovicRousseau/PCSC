@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 
+"""
 #   control_get_firmware.py: get firmware version of Gemalto readers
-#   Copyright (C) 2009  Ludovic Rousseau
-#
+#   Copyright (C) 2009-2010  Ludovic Rousseau
+"""
+
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 2 of the License, or
@@ -18,11 +20,13 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from smartcard.pcsc.PCSCReader import readers
-from smartcard.pcsc.PCSCPart10 import *
+from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
+    SCARD_LEAVE_CARD, SCARD_CTL_CODE)
 
 for reader in readers():
     cardConnection = reader.createConnection()
-    cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
+    cardConnection.connect(mode=SCARD_SHARE_DIRECT,
+        disposition=SCARD_LEAVE_CARD)
 
     get_firmware = [0x02]
     IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
