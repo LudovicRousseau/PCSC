@@ -19,7 +19,6 @@
 
 from smartcard.pcsc.PCSCReader import readers
 from smartcard.pcsc.PCSCPart10 import *
-from smartcard.util import toHexString
 
 for reader in readers():
     cardConnection = reader.createConnection()
