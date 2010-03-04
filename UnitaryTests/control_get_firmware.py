@@ -30,4 +30,4 @@ for reader in readers():
     res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
         get_firmware)
     print "Reader:", reader
-    print "Firmware:", "".join(map(chr, res))
+    print "Firmware:", "".join([chr(x) for x in res])

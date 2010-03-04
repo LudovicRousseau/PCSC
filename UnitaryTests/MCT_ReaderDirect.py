@@ -36,7 +36,7 @@ def parse_info(bytes):
 
         print "tag: %02X, length: %2d:" % (tag, length),
         if tag in [0x40, 0x80, 0x81, 0x83, 0x84]:
-            print "'%s'" % ''.join(map(chr, data))
+            print "'%s'" % ''.join([chr(x) for x in data])
         else:
             print toHexString(data)
 
@@ -49,7 +49,7 @@ def parse_select(bytes):
     print "parse the SECODER SELECT APPLICATION answer:", toHexString(bytes)
 
     print "Activation ID:", toHexString(bytes[0:4])
-    print "Interface Version: '%s'" % ''.join(map(chr, bytes[5:11]))
+    print "Interface Version: '%s'" % ''.join([chr(x) for x in bytes[5:11]])
     print "Language Code:", toHexString(bytes[11:15])
     print "CSI:", toHexString(bytes[15:18])
     print "Application Identifier:", toHexString(bytes[18:23])

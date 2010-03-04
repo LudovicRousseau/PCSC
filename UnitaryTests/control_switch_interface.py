@@ -50,7 +50,7 @@ def switch_interface(interface):
                 elif err == 0xFF84:
                     print "Wrong command bytes"
                 else:
-                    print "Unknown error:", map(hex, res)
+                    print "Unknown error:", [hex(x) for x in res]
             else:
                 print "Success"
 
