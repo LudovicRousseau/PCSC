@@ -840,7 +840,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			Log2(PCSC_LOG_CRITICAL,
 				"list_delete_at failed with return value: %X", lrv);
 	}
-	list_destroy(&(threadContext->cardsList))	;
+	list_destroy(&(threadContext->cardsList));
 
 	/* We only mark the context as no longer in use.
 	 * The memory is freed in MSGCleanupCLient() */
