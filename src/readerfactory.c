@@ -1090,8 +1090,10 @@ LONG RFFindReaderHandle(SCARDHANDLE hCard)
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
 			RDR_CLIHANDLES * currentHandle;
+			(void)SYS_MutexLock(&(sReadersContexts[i])->handlesList_lock);
 			currentHandle = list_seek(&((sReadersContexts[i])->handlesList),
 				&hCard);
+			(void)SYS_MutexUnLock(&(sReadersContexts[i])->handlesList_lock);
 			if (currentHandle != NULL)
 				return SCARD_S_SUCCESS;
 		}
@@ -1110,7 +1112,9 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	int listLength, lrv;
 	RDR_CLIHANDLES *newHandle;
+	LONG rv = SCARD_S_SUCCESS;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	listLength = list_size(&(rContext->handlesList));
 
 	/* Throttle the number of possible handles */
@@ -1119,29 +1123,31 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 		Log2(PCSC_LOG_CRITICAL,
 			"Too many handles opened, exceeding configured max (%d)",
 			maxReaderHandles);
-		return SCARD_E_NO_MEMORY;
+		rv = SCARD_E_NO_MEMORY;
+		goto end;
 	}
 
 	newHandle = malloc(sizeof(RDR_CLIHANDLES));
 	if (NULL == newHandle)
 	{
 		Log1(PCSC_LOG_CRITICAL, "malloc failed");
-		return SCARD_E_NO_MEMORY;
+		rv = SCARD_E_NO_MEMORY;
+		goto end;
 	}
 
 	newHandle->hCard = hCard;
 	newHandle->dwEventStatus = 0;
 
-	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	lrv = list_append(&(rContext->handlesList), newHandle);
-	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (lrv < 0)
 	{
 		free(newHandle);
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
 			lrv);
-		return SCARD_E_NO_MEMORY;
+		rv = SCARD_E_NO_MEMORY;
 	}
+end:
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	return SCARD_S_SUCCESS;
 }
 
@@ -1149,25 +1155,29 @@ LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	RDR_CLIHANDLES *currentHandle;
 	int lrv;
+	LONG rv = SCARD_S_SUCCESS;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	currentHandle = list_seek(&(rContext->handlesList), &hCard);
 	if (NULL == currentHandle)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_seek failed to locate hCard=%X", hCard);
-		return SCARD_E_INVALID_HANDLE;
+		rv = SCARD_E_INVALID_HANDLE;
+		goto end;
 	}
 
-	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	lrv = list_delete(&(rContext->handlesList), currentHandle);
-	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL,
 			"list_delete failed with return value: %X", lrv);
 
 	free(currentHandle);
 
+end:
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
+
 	/* Not Found */
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
@@ -1176,6 +1186,7 @@ LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 	int list_index, listSize;
 	RDR_CLIHANDLES *currentHandle;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	listSize = list_size(&(rContext->handlesList));
 
 	for (list_index = 0; list_index < listSize; list_index++)
@@ -1190,6 +1201,7 @@ LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 
 		currentHandle->dwEventStatus = dwEvent;
 	}
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 
 	if (SCARD_REMOVED == dwEvent)
 	{
@@ -1206,7 +1218,9 @@ LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	LONG rv;
 	RDR_CLIHANDLES *currentHandle;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	currentHandle = list_seek(&(rContext->handlesList), &hCard);
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (NULL == currentHandle)
 	{
 		/* Not Found */
@@ -1239,7 +1253,9 @@ LONG RFClearReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	RDR_CLIHANDLES *currentHandle;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	currentHandle = list_seek(&(rContext->handlesList), &hCard);
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (NULL == currentHandle)
 		/* Not Found */
 		return SCARD_E_INVALID_HANDLE;
