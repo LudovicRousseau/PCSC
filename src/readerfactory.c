@@ -191,6 +191,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		return SCARD_E_NO_MEMORY;
 	}
 
+	(void)SYS_MutexInit(&(sReadersContexts[dwContext])->handlesList_lock);
+
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
@@ -378,6 +380,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 			return SCARD_E_NO_MEMORY;
 		}
 
+		(void)SYS_MutexInit(&(sReadersContexts[dwContextB])->handlesList_lock);
+
 		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
@@ -490,6 +494,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		sContext->dwIdentity = 0;
 		sContext->readerState = NULL;
 
+		(void)SYS_MutexLock(&sContext->handlesList_lock);
 		while (list_size(&(sContext->handlesList)) != 0)
 		{
 			int lrv;
@@ -503,6 +508,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 
 			free(currentHandle);
 		}
+		(void)SYS_MutexUnLock(&sContext->handlesList_lock);
 		list_destroy(&(sContext->handlesList));
 		dwNumReadersContexts -= 1;
 
@@ -1050,6 +1056,7 @@ again:
 			RDR_CLIHANDLES *currentHandle;
 			list_t * l = &((sReadersContexts[i])->handlesList);
 
+			(void)SYS_MutexLock(&(sReadersContexts[i])->handlesList_lock);
 			list_iterator_start(l);
 			while (list_iterator_hasnext(l))
 			{
@@ -1060,10 +1067,12 @@ again:
 					/* Get a new handle and loop again */
 					randHandle = SYS_RandomInt(10, 65000);
 					list_iterator_stop(l);
+					(void)SYS_MutexUnLock(&(sReadersContexts[i])->handlesList_lock);
 					goto again;
 				}
 			}
 			list_iterator_stop(l);
+			(void)SYS_MutexUnLock(&(sReadersContexts[i])->handlesList_lock);
 		}
 	}
 
@@ -1123,7 +1132,9 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	newHandle->hCard = hCard;
 	newHandle->dwEventStatus = 0;
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	lrv = list_append(&(rContext->handlesList), newHandle);
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (lrv < 0)
 	{
 		free(newHandle);
@@ -1146,7 +1157,9 @@ LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
+	(void)SYS_MutexLock(&rContext->handlesList_lock);
 	lrv = list_delete(&(rContext->handlesList), currentHandle);
+	(void)SYS_MutexUnLock(&rContext->handlesList_lock);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL,
 			"list_delete failed with return value: %X", lrv);

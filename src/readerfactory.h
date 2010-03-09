@@ -112,6 +112,7 @@ extern "C"
 		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
 		PCSCLITE_MUTEX *mMutex;	/**< Mutex for this connection */
 		list_t handlesList;
+		PCSCLITE_MUTEX handlesList_lock;	/**< lock for the above list */
                                          /**< Structure of connected handles */
 		union
 		{
