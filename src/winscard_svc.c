@@ -847,7 +847,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			Log2(PCSC_LOG_CRITICAL,
 				"list_delete_at failed with return value: %X", lrv);
 	}
- 	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 	list_destroy(&(threadContext->cardsList));
 
 	/* We only mark the context as no longer in use.
