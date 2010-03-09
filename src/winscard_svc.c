@@ -59,6 +59,7 @@ struct _psContext
 {
 	int32_t hContext;
 	list_t cardsList;
+	PCSCLITE_MUTEX cardsList_lock;	/**< lock for the above list */
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
 	PCSCLITE_THREAD_T pthThread;		/**< Event polling thread's ID */
 	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
@@ -185,6 +186,8 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
+
+	(void)SYS_MutexInit(&newContext->cardsList_lock);
 
 	(void)SYS_MutexLock(&contextsList_lock);
 	lrv = list_append(&contextsList, newContext);
@@ -784,6 +787,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 	if (threadContext->hContext != hContext)
 		return SCARD_E_INVALID_VALUE;
 
+	(void)SYS_MutexLock(&threadContext->cardsList_lock);
 	while (list_size(&(threadContext->cardsList)) != 0)
 	{
 		READER_CONTEXT * rContext = NULL;
@@ -806,7 +810,10 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		 */
 		rv = RFReaderInfoById(hCard, &rContext);
 		if (rv != SCARD_S_SUCCESS)
+		{
+			(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 			return rv;
+		}
 
 		hLockId = rContext->hLockId;
 		rContext->hLockId = 0;
@@ -840,6 +847,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			Log2(PCSC_LOG_CRITICAL,
 				"list_delete_at failed with return value: %X", lrv);
 	}
+ 	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 	list_destroy(&(threadContext->cardsList));
 
 	/* We only mark the context as no longer in use.
@@ -868,7 +876,9 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 			return SCARD_E_NO_MEMORY;
 		}
 
+		(void)SYS_MutexLock(&threadContext->cardsList_lock);
 		lrv = list_append(&(threadContext->cardsList), &hCard);
+		(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 		if (lrv < 0)
 		{
 			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
@@ -885,7 +895,9 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int lrv;
 
+	(void)SYS_MutexLock(&threadContext->cardsList_lock);
 	lrv = list_delete(&(threadContext->cardsList), &hCard);
+	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv);
@@ -899,7 +911,9 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int list_index = 0;
+	(void)SYS_MutexLock(&threadContext->cardsList_lock);
 	list_index = list_locate(&(threadContext->cardsList), &hCard);
+	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
 	if (list_index >= 0)
 		return 0;
 
