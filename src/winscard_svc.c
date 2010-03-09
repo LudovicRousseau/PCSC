@@ -144,7 +144,9 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	int listSize;
 	SCONTEXT * newContext = NULL;
 
+	(void)SYS_MutexLock(&contextsList_lock);
 	listSize = list_size(&contextsList);
+	(void)SYS_MutexUnLock(&contextsList_lock);
 
 	if (listSize >= contextMaxThreadCounter)
 	{
@@ -931,6 +933,7 @@ static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContex
 static LONG MSGCleanupClient(SCONTEXT * threadContext)
 {
 	int lrv;
+	int listSize;
 
 	if (threadContext->hContext != 0)
 	{
@@ -950,6 +953,7 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 
 	(void)SYS_MutexLock(&contextsList_lock);
 	lrv = list_delete(&contextsList, threadContext);
+	listSize = list_size(&contextsList);
 	(void)SYS_MutexUnLock(&contextsList_lock);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %x", lrv);
@@ -957,7 +961,7 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 	free(threadContext);
 
 	/* start a suicide alarm */
-	if (AutoExit && (list_size(&contextsList) < 1))
+	if (AutoExit && (listSize < 1))
 	{
 		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
 			TIME_BEFORE_SUICIDE);
