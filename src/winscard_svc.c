@@ -52,8 +52,8 @@ extern char AutoExit;
 static int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 static int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 
-/* Context tracking list */
-static list_t contextsList;
+static list_t contextsList;	/**< Context tracking list */
+PCSCLITE_MUTEX contextsList_lock;	/**< lock for the above list */
 
 struct _psContext
 {
@@ -112,6 +112,8 @@ LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandl
 		Log2(PCSC_LOG_CRITICAL, "list_attributes_seeker failed with return value: %X", lrv);
 		return -1;
 	}
+
+	(void)SYS_MutexInit(&contextsList_lock);
 
 	return 1;
 }
@@ -184,7 +186,9 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		goto error;
 	}
 
+	(void)SYS_MutexLock(&contextsList_lock);
 	lrv = list_append(&contextsList, newContext);
+	(void)SYS_MutexUnLock(&contextsList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
@@ -199,7 +203,9 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		int lrv2;
 
 		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
+		(void)SYS_MutexLock(&contextsList_lock);
 		lrv2 = list_delete(&contextsList, newContext);
+		(void)SYS_MutexUnLock(&contextsList_lock);
 		if (lrv2 < 0)
 			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv2);
 		list_destroy(&(newContext->cardsList));
@@ -522,8 +528,10 @@ static void ContextThread(LPVOID newContext)
 				READ_BODY(caStr)
 
 				/* find the client */
+				(void)SYS_MutexLock(&contextsList_lock);
 				psTargetContext = (SCONTEXT *) list_seek(&contextsList,
 					&(caStr.hContext));
+				(void)SYS_MutexUnLock(&contextsList_lock);
 				if (psTargetContext != NULL)
 				{
 					uint32_t fd = psTargetContext->dwClientID;
@@ -926,7 +934,9 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 	memset((void*) threadContext, 0, sizeof(SCONTEXT));
 	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%X", threadContext);
 
+	(void)SYS_MutexLock(&contextsList_lock);
 	lrv = list_delete(&contextsList, threadContext);
+	(void)SYS_MutexUnLock(&contextsList_lock);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %x", lrv);
 
