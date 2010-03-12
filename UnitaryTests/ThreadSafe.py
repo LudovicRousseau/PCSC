@@ -49,12 +49,6 @@ def main():
     main
     """
 
-    hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-    if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: '
-            + SCardGetErrorMessage(hresult))
-    hresult = SCardReleaseContext(hcontext+1)
-
     threads = list()
 
     for i in range(1, MAX_THREADS):
