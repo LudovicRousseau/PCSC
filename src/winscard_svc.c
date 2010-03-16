@@ -243,6 +243,7 @@ error:
  * @param[in] dwIndex Index of an avaiable Application Context slot in
  * \c SCONTEXT *.
  */
+#ifndef NO_LOG
 static const char *CommandsText[] = {
 	"NULL",
 	"ESTABLISH_CONTEXT",	/* 0x01 */
@@ -267,6 +268,7 @@ static const char *CommandsText[] = {
 	"CMD_STOP_WAITING_READER_STATE_CHANGE",	/* 0x14 */
 	"NULL"
 };
+#endif
 
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) { goto wrong_length; } \

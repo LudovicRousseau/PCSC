@@ -34,6 +34,55 @@
 #include "sys_generic.h"
 #include "strlcpycat.h"
 
+#ifdef NO_LOG
+
+void log_msg(const int priority, const char *fmt, ...)
+{
+	(void)priority;
+	(void)fmt;
+}
+
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
+	const int len)
+{
+	(void)priority;
+	(void)msg;
+	(void)buffer;
+	(void)len;
+}
+
+void DebugLogSuppress(const int lSType)
+{
+	(void)lSType;
+}
+
+void DebugLogSetLogType(const int dbgtype)
+{
+	(void)dbgtype;
+}
+
+void DebugLogSetLevel(const int level)
+{
+	(void)level;
+}
+
+INTERNAL int DebugLogSetCategory(const int dbginfo)
+{
+	(void)dbginfo;
+
+	return 0;
+}
+
+INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
+	const int len)
+{
+	(void)category;
+	(void)buffer;
+	(void)len;
+}
+
+#else
+
 /**
  * Max string size when dumping a 256 bytes longs APDU
  * Should be bigger than 256*3+30
@@ -302,4 +351,6 @@ void debug_xxd(const char *msg, const unsigned char *buffer, const int len)
 	log_xxd(PCSC_LOG_ERROR, msg, buffer, len);
 } /* debug_xxd */
 #endif
+
+#endif	/* NO_LOG */
 

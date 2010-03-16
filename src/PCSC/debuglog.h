@@ -67,6 +67,22 @@ enum {
 #define __FUNCTION__ ""
 #endif
 
+#ifdef NO_LOG
+
+#define Log0(priority) do { } while(0)
+#define Log1(priority, fmt) do { } while(0)
+#define Log2(priority, fmt, data) do { } while(0)
+#define Log3(priority, fmt, data1, data2) do { } while(0)
+#define Log4(priority, fmt, data1, data2, data3) do { } while(0)
+#define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) do { } while(0)
+#define LogXxd(priority, msg, buffer, size) do { } while(0)
+
+#define DebugLogA(a) 
+#define DebugLogB(a, b) 
+#define DebugLogC(a, b,c) 
+
+#else
+
 #define Log0(priority) log_msg(priority, "%s:%d:%s()", __FILE__, __LINE__, __FUNCTION__)
 #define Log1(priority, fmt) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__)
 #define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data)
@@ -78,6 +94,8 @@ enum {
 #define DebugLogA(a) Log1(PCSC_LOG_INFO, a)
 #define DebugLogB(a, b) Log2(PCSC_LOG_INFO, a, b)
 #define DebugLogC(a, b,c) Log3(PCSC_LOG_INFO, a, b, c)
+
+#endif	/* NO_LOG */
 
 PCSC_API void log_msg(const int priority, const char *fmt, ...);
 PCSC_API void log_xxd(const int priority, const char *msg,

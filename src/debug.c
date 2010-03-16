@@ -26,6 +26,25 @@
 
 #define DEBUG_BUF_SIZE 2048
 
+#ifdef NO_LOG
+
+void log_msg(const int priority, const char *fmt, ...)
+{
+	(void)priority;
+	(void)fmt;
+}
+
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
+	const int len)
+{
+	(void)priority;
+	(void)msg;
+	(void)buffer;
+	(void)len;
+}
+
+#else
+
 /** default level is quiet to avoid polluting fd 2 (possibly NOT stderr) */
 static char LogLevel = PCSC_LOG_CRITICAL+1;
 
@@ -142,4 +161,6 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 
 	fprintf(stderr, "%s\n", DebugBuffer);
 } /* log_xxd */
+
+#endif
 

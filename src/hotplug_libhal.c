@@ -86,10 +86,12 @@ static void HPEstablishUSBNotifications(void);
  *
  * @param  udi                 Universal Device Id
  */
+#ifndef NO_LOG
 static const char *short_name(const char *udi)
 {
 	return &udi[sizeof(UDI_BASE) - 1];
 } /* short_name */
+#endif
 
 
 static LONG HPReadBundleValues(void)
