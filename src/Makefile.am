@@ -87,6 +87,9 @@ pcscd_LDADD = \
 	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) $(LIBHAL_LIBS) \
 	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS)
 
+install-exec-hook:
+	chmod u+s $(DESTDIR)$(sbindir)/pcscd
+
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
 
