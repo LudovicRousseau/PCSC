@@ -21,7 +21,7 @@
 #include <errno.h>
 
 #include "pcsclite.h"
-#include "debug.h"
+#include "debuglog.h"
 #include "dyn_generic.h"
 
 int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)

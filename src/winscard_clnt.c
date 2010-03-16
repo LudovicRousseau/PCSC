@@ -89,7 +89,7 @@
 #include "misc.h"
 #include "pcscd.h"
 #include "winscard.h"
-#include "debug.h"
+#include "debuglog.h"
 #include "thread_generic.h"
 #include "strlcpycat.h"
 

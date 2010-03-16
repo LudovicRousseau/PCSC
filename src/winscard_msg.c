@@ -40,7 +40,7 @@
 #include "misc.h"
 #include "pcscd.h"
 #include "winscard.h"
-#include "debug.h"
+#include "debuglog.h"
 #include "winscard_msg.h"
 #include "sys_generic.h"
 #include "utils.h"

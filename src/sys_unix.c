@@ -34,7 +34,7 @@
 
 #include "misc.h"
 #include "sys_generic.h"
-#include "debug.h"
+#include "debuglog.h"
 
 /**
  * @brief Attempts to create a directory with some permissions.

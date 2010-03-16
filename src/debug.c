@@ -19,8 +19,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 
-#include "debug.h"
+#include "debuglog.h"
 #include "strlcpycat.h"
 
 #define DEBUG_BUF_SIZE 2048

@@ -10,7 +10,6 @@ noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
 
 libpcsclite_la_SOURCES = \
 	debug.c \
-	debug.h \
 	error.c \
 	winscard_clnt.c \
 	simclist.c \

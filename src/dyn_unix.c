@@ -23,7 +23,7 @@
 
 #include "misc.h"
 #include "pcsclite.h"
-#include "debug.h"
+#include "debuglog.h"
 #include "dyn_generic.h"
 
 INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)

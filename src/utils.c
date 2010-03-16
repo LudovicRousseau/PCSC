@@ -22,7 +22,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 
-#include "debug.h"
+#include "debuglog.h"
 #include "config.h"
 #include "utils.h"
 #include "pcscd.h"
