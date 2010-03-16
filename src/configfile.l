@@ -58,11 +58,11 @@ void tok_error(char *pcToken_error);
 #include <string.h>
 #include <errno.h>
 
+#include "config.h"
 #include "misc.h"
 #include "pcsclite.h"
 #include "pcscd.h"
 #include "debuglog.h"
-#include "config.h"
 #include "sys_generic.h"
 #include "readerfactory.h"
 
