@@ -22,8 +22,8 @@
 #include <dirent.h>
 #include <fcntl.h>
 
-#include "debuglog.h"
 #include "config.h"
+#include "debuglog.h"
 #include "utils.h"
 #include "pcscd.h"
 #include "sys_generic.h"
