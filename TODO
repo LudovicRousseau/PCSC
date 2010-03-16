@@ -28,9 +28,6 @@
 
 For embedded/constrained systems
 
-- remove as much text messages (logs) as possible to limit the size of
-  the binaries (pcscd and libpcsclite)
-
 - use static driver instead of reader polling and dynamic driver loading
 
-January 2010
+March 2010
