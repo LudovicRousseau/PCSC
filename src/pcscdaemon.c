@@ -340,7 +340,7 @@ int main(int argc, char **argv)
 	 * test the presence of /var/run/pcscd/pcscd.comm
 	 */
 
-	rv = SYS_Stat(PCSCLITE_CSOCK_NAME, &fStatBuf);
+	rv = stat(PCSCLITE_CSOCK_NAME, &fStatBuf);
 
 	if (rv == 0)
 	{
@@ -430,12 +430,12 @@ int main(int argc, char **argv)
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
 	 */
-	rv = SYS_Stat(PCSCLITE_IPC_DIR, &fStatBuf);
+	rv = stat(PCSCLITE_IPC_DIR, &fStatBuf);
 	if (rv < 0)
 	{
 		int mode = S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU;
 
-		rv = SYS_Mkdir(PCSCLITE_IPC_DIR, mode);
+		rv = mkdir(PCSCLITE_IPC_DIR, mode);
 		if (rv != 0)
 		{
 			Log2(PCSC_LOG_CRITICAL,
@@ -446,7 +446,7 @@ int main(int argc, char **argv)
 		/* set mode so that the directory is world readable and
 		 * executable even is umask is restrictive
 		 * The directory containes files used by libpcsclite */
-		(void)SYS_Chmod(PCSCLITE_IPC_DIR, mode);
+		(void)chmod(PCSCLITE_IPC_DIR, mode);
 	}
 
 	/*
@@ -457,18 +457,18 @@ int main(int argc, char **argv)
 		int f;
 		int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-		if ((f = SYS_OpenFile(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode)) != -1)
+		if ((f = open(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode)) != -1)
 		{
 			char pid[PID_ASCII_SIZE];
 
 			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			(void)SYS_WriteFile(f, pid, strlen(pid));
-			(void)SYS_CloseFile(f);
+			(void)write(f, pid, strlen(pid));
+			(void)close(f);
 
 			/* set mode so that the file is world readable even is umask is
 			 * restrictive
 			 * The file is used by libpcsclite */
-			(void)SYS_Chmod(PCSCLITE_RUN_PID, mode);
+			(void)chmod(PCSCLITE_RUN_PID, mode);
 		}
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
@@ -546,19 +546,19 @@ static void at_exit(void)
 
 	clean_temp_files();
 
-	SYS_Exit(ExitValue);
+	_exit(ExitValue);
 }
 
 static void clean_temp_files(void)
 {
 	int rv;
 
-	rv = SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
+	rv = remove(PCSCLITE_CSOCK_NAME);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_CSOCK_NAME ": %s",
 			strerror(errno));
 
-	rv = SYS_RemoveFile(PCSCLITE_RUN_PID);
+	rv = remove(PCSCLITE_RUN_PID);
 	if (rv != 0)
 		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_RUN_PID ": %s",
 			strerror(errno));

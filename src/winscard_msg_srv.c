@@ -42,7 +42,6 @@
 #include "winscard.h"
 #include "debuglog.h"
 #include "winscard_msg.h"
-#include "sys_generic.h"
 
 /**
  * Socket to a file, used for clients-server comminication.
@@ -113,7 +112,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	serv_adr.sun_family = AF_UNIX;
 	strncpy(serv_adr.sun_path, PCSCLITE_CSOCK_NAME,
 		sizeof(serv_adr.sun_path));
-	(void)SYS_RemoveFile(PCSCLITE_CSOCK_NAME);
+	(void)remove(PCSCLITE_CSOCK_NAME);
 
 	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
 			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
@@ -135,7 +134,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	/*
 	 * Chmod the public entry channel
 	 */
-	(void)SYS_Chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
+	(void)chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
 
 	return 0;
 }

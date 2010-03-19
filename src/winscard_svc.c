@@ -226,7 +226,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 error:
 	if (newContext)
 		free(newContext);
-	(void)SYS_CloseFile(*pdwClientID);
+	(void)close(*pdwClientID);
 	return SCARD_E_NO_MEMORY;
 }
 
@@ -759,7 +759,7 @@ buffer_overflow:
 wrong_length:
 	Log2(PCSC_LOG_DEBUG, "Wrong length: %d", filedes);
 exit:
-	(void)SYS_CloseFile(filedes);
+	(void)close(filedes);
 	(void)MSGCleanupClient(threadContext);
 	(void)SYS_ThreadExit((LPVOID) NULL);
 }

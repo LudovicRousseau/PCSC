@@ -118,7 +118,7 @@ int evaluatetoken(char *pcToken)
 
 				pcDevicename = strdup(pcCurrent);
 				if ((NULL == strchr(pcDevicename, ':'))
-					&& (SYS_Stat(pcDevicename, &fStatBuf) != 0))
+					&& (stat(pcDevicename, &fStatBuf) != 0))
 				{
 					Log3(PCSC_LOG_CRITICAL, "Error with device %s: %s",
 						pcDevicename, strerror(errno));
@@ -139,7 +139,7 @@ int evaluatetoken(char *pcToken)
 				struct stat fStatBuf;
 
 				pcLibpath = strdup(pcCurrent);
-				if (SYS_Stat(pcLibpath, &fStatBuf) != 0)
+				if (stat(pcLibpath, &fStatBuf) != 0)
 				{
 					Log3(PCSC_LOG_CRITICAL, "Error with library %s: %s",
 						pcLibpath, strerror(errno));

@@ -37,21 +37,6 @@
 #include "debuglog.h"
 
 /**
- * @brief Attempts to create a directory with some permissions.
- *
- * @param[in] path Path of the directory to be created.
- * @param[in] perms Permissions to the new directory.
- *
- * @return Eror code.
- * @retval 0 Success.
- * @retval -1 An error occurred.
- */
-INTERNAL int SYS_Mkdir(const char *path, int perms)
-{
-	return mkdir(path, perms);
-}
-
-/**
  * @brief Makes the current process sleep for some seconds.
  *
  * @param[in] iTimeVal Number of seconds to sleep.
@@ -88,65 +73,6 @@ INTERNAL int SYS_USleep(int iTimeVal)
 	tv.tv_usec = iTimeVal - (tv.tv_sec * 1000000);
 	return select(0, NULL, NULL, NULL, &tv);
 #endif
-}
-
-/**
- * @brief Opens/creates a file.
- *
- * @param[in] pcFile path to the file.
- * @param[in] flags Open and read/write choices.
- * @param[in] mode Permissions to the file.
- *
- * @return File descriptor.
- * @retval >0 The file descriptor.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_OpenFile(const char *pcFile, int flags, int mode)
-{
-	return open(pcFile, flags, mode);
-}
-
-/**
- * @brief Opens/creates a file.
- *
- * @param[in] iHandle File descriptor.
- *
- * @return Error code.
- * @retval 0 Success.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_CloseFile(int iHandle)
-{
-	return close(iHandle);
-}
-
-/**
- * @brief Removes a file.
- *
- * @param[in] pcFile path to the file.
- *
- * @return Error code.
- * @retval 0 Success.
- * @retval -1 An error ocurred.
- */
-INTERNAL int SYS_RemoveFile(const char *pcFile)
-{
-	return remove(pcFile);
-}
-
-INTERNAL int SYS_Chmod(const char *path, int mode)
-{
-	return chmod(path, mode);
-}
-
-INTERNAL int SYS_Chdir(const char *path)
-{
-	return chdir(path);
-}
-
-INTERNAL int SYS_WriteFile(int iHandle, const char *pcBuffer, int iLength)
-{
-	return write(iHandle, pcBuffer, iLength);
 }
 
 #ifndef HAVE_DAEMON
@@ -235,11 +161,6 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #endif
 }
 
-INTERNAL int SYS_Stat(const char *pcFile, struct stat *psStatus)
-{
-	return stat(pcFile, psStatus);
-}
-
 INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 {
 	static int iInitialized = 0;
@@ -272,10 +193,5 @@ INTERNAL int SYS_GetSeed(void)
 		myseed = (long) time(NULL);
 	}
 	return myseed;
-}
-
-INTERNAL void SYS_Exit(int iRetVal)
-{
-	_exit(iRetVal);
 }
 
