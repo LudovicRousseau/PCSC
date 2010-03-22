@@ -3740,7 +3740,7 @@ LONG SCardCheckDaemonAvailability(void)
 	struct stat statBuffer;
 	int need_restart = 0;
 
-	rv = SYS_Stat(PCSCLITE_CSOCK_NAME, &statBuffer);
+	rv = stat(PCSCLITE_CSOCK_NAME, &statBuffer);
 
 	if (rv != 0)
 	{
