@@ -94,7 +94,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	if (rsp == -1)
 	{
 		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
-		exit(-1);
+		at_exit();
 	}
 
 	/*
@@ -105,7 +105,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	if (rv == -1)
 	{
 		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
-		exit(-1);
+		at_exit();
 	}
 
 	(void)signal(SIGPIPE, SIG_IGN);
@@ -176,7 +176,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 			/* now stop all the drivers */
 			RFCleanupReaders();
 			ContextsDeinitialize();
-			exit(0);
+			at_exit();
 		}
 	}
 }
