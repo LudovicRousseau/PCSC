@@ -97,7 +97,7 @@
 #define SCARD_CTL_CODE(code) (0x42000000 + (code))
 
 /**
- * PC/SC v2.02.05 part 10 reader tags
+ * PC/SC part 10 v2.02.07 March 2010 reader tags
  */
 #define CM_IOCTL_GET_FEATURE_REQUEST SCARD_CTL_CODE(3400)
 
@@ -119,8 +119,10 @@
 #define FEATURE_WRITE_DISPLAY            0x0F
 #define FEATURE_GET_KEY                  0x10
 #define FEATURE_IFD_DISPLAY_PROPERTIES   0x11
+#define FEATURE_GET_TLV_PROPERTIES       0x12
+#define FEATURE_CCID_ESC_COMMAND         0x13
 
-/* structures used (but not defined) in PC/SC Part 10 revision 2.02.05:
+/* structures used (but not defined) in PC/SC Part 10:
  * "IFDs with Secure Pin Entry Capabilities" */
 
 #include <inttypes.h>
