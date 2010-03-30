@@ -400,6 +400,7 @@ again:
 
 	if (SCARD_E_NO_SERVICE == rv)
 	{
+launch:
 		if (daemon_launched)
 		{
 			retries++;
@@ -451,6 +452,15 @@ again:
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
 		pvReserved2, phContext);
 	(void)SCardUnlockThread();
+
+	/* SCardEstablishContextTH may fail if the previous pcscd crashed
+	 * without cleaning /var/run/pcscd/pcscd.comm */
+	if (SCARD_E_NO_SERVICE == rv)
+	{
+		retries++;
+		if (retries <= 1)
+			goto launch;
+	}
 
 end:
 	PROFILE_END(rv)
