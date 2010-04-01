@@ -220,5 +220,15 @@ typedef struct {
 #pragma pack(pop)
 #endif
 
+/* properties returned by FEATURE_GET_TLV_PROPERTIES */
+#define PCSCv2_PART10_PROPERTY_wLcdLayout 1
+#define PCSCv2_PART10_PROPERTY_bEntryValidationCondition 2
+#define PCSCv2_PART10_PROPERTY_bTimeOut2 3
+#define PCSCv2_PART10_PROPERTY_wLcdMaxCharacters 4
+#define PCSCv2_PART10_PROPERTY_wLcdMaxLines 5
+#define PCSCv2_PART10_PROPERTY_bMinPINSize 6
+#define PCSCv2_PART10_PROPERTY_bMaxPINSize 7
+#define PCSCv2_PART10_PROPERTY_sFirmwareID 8
+
 #endif
 
