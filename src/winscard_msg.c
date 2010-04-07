@@ -238,6 +238,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  *
  * Reads the message from the file \c filedes.
  *
+ * @param[in] command one of the \ref pcsc_msg_commands commands
  * @param[out] buffer_void Message read.
  * @param[in] buffer_size Size to read
  * @param[in] filedes Socket handle.
