@@ -568,6 +568,12 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		dwInitialization == SCARD_UNPOWER_CARD)
 	{
 		DWORD dwAtrLen;
+
+		/*
+		 * Notify the card has been reset
+		 */
+		(void)RFSetReaderEventState(rContext, SCARD_RESET);
+
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
@@ -591,87 +597,48 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
-		 * Notify the card has been reset
-		 * Not doing this could result in deadlock
+		 * Set up the status bit masks on dwStatus
 		 */
-		rv = RFCheckReaderEventState(rContext, hCard);
-		switch(rv)
+		if (rv == SCARD_S_SUCCESS)
 		{
-			/* avoid deadlock */
-			case SCARD_W_RESET_CARD:
-				break;
+			rContext->readerState->readerState |= SCARD_PRESENT;
+			rContext->readerState->readerState &= ~SCARD_ABSENT;
+			rContext->readerState->readerState |= SCARD_POWERED;
+			rContext->readerState->readerState |= SCARD_NEGOTIABLE;
+			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
+			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+		}
+		else
+		{
+			rContext->readerState->readerState |= SCARD_PRESENT;
+			rContext->readerState->readerState &= ~SCARD_ABSENT;
+			rContext->readerState->readerState |= SCARD_SWALLOWED;
+			rContext->readerState->readerState &= ~SCARD_POWERED;
+			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
+			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+			rContext->readerState->cardAtrLength = 0;
+		}
 
-			case SCARD_W_REMOVED_CARD:
-				Log1(PCSC_LOG_ERROR, "card removed");
-				return SCARD_W_REMOVED_CARD;
+		if (rContext->readerState->cardAtrLength > 0)
+		{
+			Log1(PCSC_LOG_DEBUG, "Reset complete.");
+			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
+				rContext->readerState->cardAtr,
+				rContext->readerState->cardAtrLength);
+		}
+		else
+		{
+			DWORD dwStatus, dwAtrLen2;
+			UCHAR ucAtr[MAX_ATR_SIZE];
 
-			/* invalid EventStatus */
-			case SCARD_E_INVALID_VALUE:
-				Log1(PCSC_LOG_ERROR, "invalid EventStatus");
-				return SCARD_F_INTERNAL_ERROR;
-
-			/* invalid hCard, but hCard was widely used some lines above :( */
-			case SCARD_E_INVALID_HANDLE:
-				Log1(PCSC_LOG_ERROR, "invalid handle");
-				return SCARD_F_INTERNAL_ERROR;
-
-			case SCARD_S_SUCCESS:
-				/*
-				 * Notify the card has been reset
-				 */
-				(void)RFSetReaderEventState(rContext, SCARD_RESET);
-
-				/*
-				 * Set up the status bit masks on dwStatus
-				 */
-				if (rv == SCARD_S_SUCCESS)
-				{
-					rContext->readerState->readerState |= SCARD_PRESENT;
-					rContext->readerState->readerState &= ~SCARD_ABSENT;
-					rContext->readerState->readerState |= SCARD_POWERED;
-					rContext->readerState->readerState |= SCARD_NEGOTIABLE;
-					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-					rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-				}
-				else
-				{
-					rContext->readerState->readerState |= SCARD_PRESENT;
-					rContext->readerState->readerState &= ~SCARD_ABSENT;
-					rContext->readerState->readerState |= SCARD_SWALLOWED;
-					rContext->readerState->readerState &= ~SCARD_POWERED;
-					rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-					rContext->readerState->cardAtrLength = 0;
-				}
-
-				if (rContext->readerState->cardAtrLength > 0)
-				{
-					Log1(PCSC_LOG_DEBUG, "Reset complete.");
-					LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-						rContext->readerState->cardAtr,
-						rContext->readerState->cardAtrLength);
-				}
-				else
-				{
-					DWORD dwStatus, dwAtrLen2;
-					UCHAR ucAtr[MAX_ATR_SIZE];
-
-					Log1(PCSC_LOG_ERROR, "Error resetting card.");
-					(void)IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
-					if (dwStatus & SCARD_PRESENT)
-						return SCARD_W_UNRESPONSIVE_CARD;
-					else
-						return SCARD_E_NO_SMARTCARD;
-				}
-				break;
-
-			default:
-				Log2(PCSC_LOG_ERROR,
-					"invalid retcode from RFCheckReaderEventState (%X)", rv);
-				return SCARD_F_INTERNAL_ERROR;
-				break;
+			Log1(PCSC_LOG_ERROR, "Error resetting card.");
+			(void)IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
+			if (dwStatus & SCARD_PRESENT)
+				return SCARD_W_UNRESPONSIVE_CARD;
+			else
+				return SCARD_E_NO_SMARTCARD;
 		}
 	}
 	else
