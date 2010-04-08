@@ -887,6 +887,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
 		/*
+		 * Notify the card has been reset
+		 */
+		(void)RFSetReaderEventState(rContext, SCARD_RESET);
+
+		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
 		dwAtrLen = rContext->readerState->cardAtrLength;
@@ -907,11 +912,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-
-		/*
-		 * Notify the card has been reset
-		 */
-		(void)RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
 		 * Set up the status bit masks on dwStatus
