@@ -417,13 +417,22 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
-		if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
-			&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
-			Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
-				*pdwActiveProtocol);
-		else
-			Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
-				(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+		switch (*pdwActiveProtocol)
+		{
+			case SCARD_PROTOCOL_T0:
+			case SCARD_PROTOCOL_T1:
+				Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
+					(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+				break;
+
+			case SCARD_PROTOCOL_RAW:
+				Log1(PCSC_LOG_DEBUG, "Active Protocol: RAW");
+				break;
+
+			default:
+				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+					*pdwActiveProtocol);
+		}
 	}
 	else
 		Log1(PCSC_LOG_DEBUG, "Direct access: no protocol selected");
@@ -742,13 +751,22 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
-		if ((*pdwActiveProtocol != SCARD_PROTOCOL_T0)
-			&& (*pdwActiveProtocol != SCARD_PROTOCOL_T1))
-			Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
-				*pdwActiveProtocol);
-		else
-			Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
-				(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+		switch (*pdwActiveProtocol)
+		{
+			case SCARD_PROTOCOL_T0:
+			case SCARD_PROTOCOL_T1:
+				Log2(PCSC_LOG_DEBUG, "Active Protocol: T=%d",
+					(*pdwActiveProtocol == SCARD_PROTOCOL_T0) ? 0 : 1);
+				break;
+
+			case SCARD_PROTOCOL_RAW:
+				Log1(PCSC_LOG_DEBUG, "Active Protocol: RAW");
+				break;
+
+			default:
+				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+					*pdwActiveProtocol);
+		}
 	}
 	else
 		Log1(PCSC_LOG_DEBUG, "Direct access: no protocol selected");
