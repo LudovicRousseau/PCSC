@@ -276,6 +276,9 @@ static const char *CommandsText[] = {
 	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
+	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
+#define WRITE_BODY_WITH_COMMAND(command, v) \
+	Log4(SCARD_S_SUCCESS == v.rv ? PCSC_LOG_DEBUG : PCSC_LOG_ERROR, "%s rv=0x%X for client %d", command, v.rv, filedes); \
 	ret = SHMMessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
 
 static void ContextThread(LPVOID newContext)
@@ -772,7 +775,7 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
 
 	waStr.rv = rv;
-	WRITE_BODY(waStr)
+	WRITE_BODY_WITH_COMMAND("SIGNAL", waStr)
 
 	return ret;
 } /* MSGSignalClient */
