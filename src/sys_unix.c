@@ -75,13 +75,6 @@ INTERNAL int SYS_USleep(int iTimeVal)
 #endif
 }
 
-#ifndef HAVE_DAEMON
-static INTERNAL int SYS_Fork(void)
-{
-	return fork();
-}
-#endif
-
 /**
  * @brief put the process to run in the background.
  *
@@ -101,10 +94,10 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #if defined(__SVR4) && defined(__sun)
 	pid_t pid;
 
-	pid = SYS_Fork();
+	pid = fork();
 	if (-1 == pid)
 	{
-		Log2(PCSC_LOG_CRITICAL, "main: SYS_Fork() failed: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "main: fork() failed: %s", strerror(errno));
 		return -1;
 	}
 	else
@@ -116,10 +109,10 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 
 	setsid();
 
-	pid = SYS_Fork();
+	pid = fork();
 	if (-1 == pid)
 	{
-		Log2(PCSC_LOG_CRITICAL, "main: SYS_Fork() failed: %s", strerror(errno));
+		Log2(PCSC_LOG_CRITICAL, "main: fork() failed: %s", strerror(errno));
 		exit(1);
 	}
 	else
@@ -129,7 +122,7 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 			exit(0);
 	}
 #else
-	switch (SYS_Fork())
+	switch (fork())
 	{
 	case -1:
 		return (-1);
@@ -141,21 +134,21 @@ INTERNAL int SYS_Daemon(int nochdir, int noclose)
 #endif
 
 	if (!noclose) {
-		if (SYS_CloseFile(0))
-			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(0) failed: %s",
+		if (close(0))
+			Log2(PCSC_LOG_ERROR, "close(0) failed: %s",
 				strerror(errno));
 
-		if (SYS_CloseFile(1))
-			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(1) failed: %s",
+		if (close(1))
+			Log2(PCSC_LOG_ERROR, "close(1) failed: %s",
 				strerror(errno));
 
-		if (SYS_CloseFile(2))
-			Log2(PCSC_LOG_ERROR, "SYS_CloseFile(2) failed: %s",
+		if (close(2))
+			Log2(PCSC_LOG_ERROR, "close(2) failed: %s",
 				strerror(errno));
 	}
 	if (!nochdir) {
-		if (SYS_Chdir("/"))
-			Log2(PCSC_LOG_ERROR, "SYS_Chdir() failed: %s", strerror(errno));
+		if (chdir("/"))
+			Log2(PCSC_LOG_ERROR, "chdir() failed: %s", strerror(errno));
 	}
 	return 0;
 #endif
