@@ -1314,54 +1314,54 @@ static int list_drop_elem(list_t *restrict l, struct list_entry_s *tmp, unsigned
 /* ready-made comparators and meters */
 #define SIMCLIST_NUMBER_COMPARATOR(type)     int list_comparator_##type(const void *a, const void *b) { return( *(type *)a < *(type *)b) - (*(type *)a > *(type *)b); } 
 
-SIMCLIST_NUMBER_COMPARATOR(int8_t);
-SIMCLIST_NUMBER_COMPARATOR(int16_t);
-SIMCLIST_NUMBER_COMPARATOR(int32_t);
-SIMCLIST_NUMBER_COMPARATOR(int64_t);
+SIMCLIST_NUMBER_COMPARATOR(int8_t)
+SIMCLIST_NUMBER_COMPARATOR(int16_t)
+SIMCLIST_NUMBER_COMPARATOR(int32_t)
+SIMCLIST_NUMBER_COMPARATOR(int64_t)
 
-SIMCLIST_NUMBER_COMPARATOR(uint8_t);
-SIMCLIST_NUMBER_COMPARATOR(uint16_t);
-SIMCLIST_NUMBER_COMPARATOR(uint32_t);
-SIMCLIST_NUMBER_COMPARATOR(uint64_t);
+SIMCLIST_NUMBER_COMPARATOR(uint8_t)
+SIMCLIST_NUMBER_COMPARATOR(uint16_t)
+SIMCLIST_NUMBER_COMPARATOR(uint32_t)
+SIMCLIST_NUMBER_COMPARATOR(uint64_t)
 
-SIMCLIST_NUMBER_COMPARATOR(float);
-SIMCLIST_NUMBER_COMPARATOR(double);
+SIMCLIST_NUMBER_COMPARATOR(float)
+SIMCLIST_NUMBER_COMPARATOR(double)
 
 int list_comparator_string(const void *a, const void *b) { return strcmp((const char *)b, (const char *)a); }
 
 /* ready-made metric functions */
 #define SIMCLIST_METER(type)        size_t list_meter_##type(const void *el) { (void)el; return sizeof(type); }
 
-SIMCLIST_METER(int8_t);
-SIMCLIST_METER(int16_t);
-SIMCLIST_METER(int32_t);
-SIMCLIST_METER(int64_t);
+SIMCLIST_METER(int8_t)
+SIMCLIST_METER(int16_t)
+SIMCLIST_METER(int32_t)
+SIMCLIST_METER(int64_t)
 
-SIMCLIST_METER(uint8_t);
-SIMCLIST_METER(uint16_t);
-SIMCLIST_METER(uint32_t);
-SIMCLIST_METER(uint64_t);
+SIMCLIST_METER(uint8_t)
+SIMCLIST_METER(uint16_t)
+SIMCLIST_METER(uint32_t)
+SIMCLIST_METER(uint64_t)
 
-SIMCLIST_METER(float);
-SIMCLIST_METER(double);
+SIMCLIST_METER(float)
+SIMCLIST_METER(double)
 
 size_t list_meter_string(const void *el) { return strlen((const char *)el) + 1; }
 
 /* ready-made hashing functions */
 #define SIMCLIST_HASHCOMPUTER(type)    list_hash_t list_hashcomputer_##type(const void *el) { return (list_hash_t)(*(type *)el); }
 
-SIMCLIST_HASHCOMPUTER(int8_t);
-SIMCLIST_HASHCOMPUTER(int16_t);
-SIMCLIST_HASHCOMPUTER(int32_t);
-SIMCLIST_HASHCOMPUTER(int64_t);
+SIMCLIST_HASHCOMPUTER(int8_t)
+SIMCLIST_HASHCOMPUTER(int16_t)
+SIMCLIST_HASHCOMPUTER(int32_t)
+SIMCLIST_HASHCOMPUTER(int64_t)
 
-SIMCLIST_HASHCOMPUTER(uint8_t);
-SIMCLIST_HASHCOMPUTER(uint16_t);
-SIMCLIST_HASHCOMPUTER(uint32_t);
-SIMCLIST_HASHCOMPUTER(uint64_t);
+SIMCLIST_HASHCOMPUTER(uint8_t)
+SIMCLIST_HASHCOMPUTER(uint16_t)
+SIMCLIST_HASHCOMPUTER(uint32_t)
+SIMCLIST_HASHCOMPUTER(uint64_t)
 
-SIMCLIST_HASHCOMPUTER(float);
-SIMCLIST_HASHCOMPUTER(double);
+SIMCLIST_HASHCOMPUTER(float)
+SIMCLIST_HASHCOMPUTER(double)
 
 list_hash_t list_hashcomputer_string(const void *el) {
     size_t l;
