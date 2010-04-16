@@ -105,7 +105,6 @@ INTERNAL int SYS_ThreadJoin(PCSCLITE_THREAD_T pthThread, LPVOID* pvRetVal)
 INTERNAL int SYS_ThreadExit(LPVOID pvRetVal)
 {
 	pthread_exit(pvRetVal);
-	return 1;
 }
 
 INTERNAL PCSCLITE_THREAD_T SYS_ThreadSelf(void)
