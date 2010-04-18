@@ -61,7 +61,7 @@ struct _psContext
 	list_t cardsList;
 	PCSCLITE_MUTEX cardsList_lock;	/**< lock for the above list */
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
-	PCSCLITE_THREAD_T pthThread;		/**< Event polling thread's ID */
+	pthread_t pthThread;		/**< Event polling thread's ID */
 	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
 };
 typedef struct _psContext SCONTEXT;

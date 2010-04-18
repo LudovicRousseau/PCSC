@@ -797,7 +797,7 @@ LONG HPSearchHotPluggables(void)
 }
 
 
-PCSCLITE_THREAD_T sHotplugWatcherThread;
+pthread_t sHotplugWatcherThread;
 
 /*
  * Sets up callbacks for device hotplug events.

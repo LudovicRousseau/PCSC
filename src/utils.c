@@ -116,7 +116,7 @@ long int time_sub(struct timeval *a, struct timeval *b)
 	return r.tv_sec * 1000000 + r.tv_usec;
 } /* time_sub */
 
-int ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
+int ThreadCreate(pthread_t * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 	pthread_attr_t attr;

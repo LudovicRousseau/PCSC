@@ -70,7 +70,7 @@ static LONG HPRemoveHotPluggable(int, unsigned long);
 static LONG HPReadBundleValues(void);
 static void HPEstablishUSBNotifications(void);
 
-static PCSCLITE_THREAD_T usbNotifyThread;
+static pthread_t usbNotifyThread;
 static int AraKiriHotPlug = FALSE;
 static int bundleSize = 0;
 

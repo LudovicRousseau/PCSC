@@ -44,7 +44,7 @@
 
 PCSCLITE_MUTEX usbNotifierMutex;
 
-static PCSCLITE_THREAD_T usbNotifyThread;
+static pthread_t usbNotifyThread;
 static int driverSize = -1;
 static char AraKiriHotPlug = FALSE;
 
