@@ -25,7 +25,13 @@ int CheckForOpenCT(void);
 
 long int time_sub(struct timeval *a, struct timeval *b);
 
-int ThreadCreate(PCSCLITE_THREAD_T *, int, PCSCLITE_THREAD_FUNCTION( ),
+/* thread attributes */
+#define THREAD_ATTR_DEFAULT			0
+#define THREAD_ATTR_DETACHED		1
+
+#define PCSCLITE_THREAD_FUNCTION(f)      void *(*f)(void *)
+
+int ThreadCreate(pthread_t *, int, PCSCLITE_THREAD_FUNCTION( ),
 	/*@null@*/ LPVOID);
 
 #endif

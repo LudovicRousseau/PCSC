@@ -27,13 +27,7 @@ extern "C"
 {
 #endif
 
-#define PCSCLITE_THREAD_T                pthread_t
 #define PCSCLITE_MUTEX                   pthread_mutex_t
-#define PCSCLITE_THREAD_FUNCTION(f)      void *(*f)(void *)
-
-/* thread attributes */
-#define THREAD_ATTR_DEFAULT			0
-#define THREAD_ATTR_DETACHED		1
 
 	int SYS_MutexInit(PCSCLITE_MUTEX *);
 	int SYS_MutexDestroy(PCSCLITE_MUTEX *);
