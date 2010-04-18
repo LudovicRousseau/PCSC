@@ -37,7 +37,7 @@
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"
-#include "thread_generic.h"
+#include "utils.h"
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "simclist.h"
@@ -201,13 +201,13 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		goto error;
 	}
 
-	rv = SYS_ThreadCreate(&(newContext->pthThread), THREAD_ATTR_DETACHED,
+	rv = ThreadCreate(&(newContext->pthThread), THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( )) ContextThread, (LPVOID) newContext);
 	if (rv)
 	{
 		int lrv2;
 
-		Log2(PCSC_LOG_CRITICAL, "SYS_ThreadCreate failed: %s", strerror(rv));
+		Log2(PCSC_LOG_CRITICAL, "ThreadCreate failed: %s", strerror(rv));
 		(void)SYS_MutexLock(&contextsList_lock);
 		lrv2 = list_delete(&contextsList, newContext);
 		(void)SYS_MutexUnLock(&contextsList_lock);
@@ -764,7 +764,7 @@ wrong_length:
 exit:
 	(void)close(filedes);
 	(void)MSGCleanupClient(threadContext);
-	(void)SYS_ThreadExit((LPVOID) NULL);
+	(void)pthread_exit((LPVOID) NULL);
 }
 
 LONG MSGSignalClient(uint32_t filedes, LONG rv)

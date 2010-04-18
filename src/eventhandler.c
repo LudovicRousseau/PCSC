@@ -177,15 +177,15 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	if ((IFD_SUCCESS == rv) && (1 == dwGetSize) && ucGetData[0])
 	{
 		Log1(PCSC_LOG_INFO, "Killing polling thread");
-		(void)SYS_ThreadCancel(rContext->pthThread);
+		(void)pthread_cancel(rContext->pthThread);
 	}
 	else
 		Log1(PCSC_LOG_INFO, "Waiting polling thread");
 
 	/* wait for the thread to finish */
-	rv = SYS_ThreadJoin(rContext->pthThread, NULL);
+	rv = pthread_join(rContext->pthThread, NULL);
 	if (rv)
-		Log2(PCSC_LOG_ERROR, "SYS_ThreadJoin failed: %s", strerror(rv));
+		Log2(PCSC_LOG_ERROR, "pthread_join failed: %s", strerror(rv));
 
 	/*
 	 * Zero out the public status struct to allow it to be recycled and
@@ -251,11 +251,11 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	rContext->pthCardEvent = card_event;
-	rv = SYS_ThreadCreate(&rContext->pthThread, 0,
+	rv = ThreadCreate(&rContext->pthThread, 0,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv)
 	{
-		Log2(PCSC_LOG_ERROR, "SYS_ThreadCreate failed: %s", strerror(rv));
+		Log2(PCSC_LOG_ERROR, "ThreadCreate failed: %s", strerror(rv));
 		return SCARD_E_NO_MEMORY;
 	}
 	else
@@ -518,7 +518,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			(void)EHSignalEventToClients();
 			Log1(PCSC_LOG_INFO, "Die");
 			rContext->hLockId = 0;
-			(void)SYS_ThreadExit(NULL);
+			(void)pthread_exit(NULL);
 		}
 	}
 }

@@ -30,7 +30,7 @@
 #include "parser.h"
 #include "readerfactory.h"
 #include "winscard_msg.h"
-#include "sys_generic.h"
+#include "utils.h"
 #include "hotplug.h"
 
 #undef DEBUG_HOTPLUG
@@ -804,7 +804,7 @@ PCSCLITE_THREAD_T sHotplugWatcherThread;
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
-	SYS_ThreadCreate(&sHotplugWatcherThread,
+	ThreadCreate(&sHotplugWatcherThread,
 		THREAD_ATTR_DEFAULT,
 		(PCSCLITE_THREAD_FUNCTION( )) HPDeviceNotificationThread, NULL);
 

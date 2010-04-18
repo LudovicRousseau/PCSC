@@ -21,6 +21,7 @@
 #include <signal.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 #include "config.h"
 #include "debuglog.h"
@@ -115,3 +116,28 @@ long int time_sub(struct timeval *a, struct timeval *b)
 	return r.tv_sec * 1000000 + r.tv_usec;
 } /* time_sub */
 
+int ThreadCreate(PCSCLITE_THREAD_T * pthThread, int attributes,
+	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
+{
+	pthread_attr_t attr;
+	int ret;
+
+	ret = pthread_attr_init(&attr);
+	if (ret)
+		return ret;
+
+	ret = pthread_attr_setdetachstate(&attr,
+		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
+	if (ret)
+	{
+		(void)pthread_attr_destroy(&attr);
+		return ret;
+	}
+
+	ret = pthread_create(pthThread, &attr, pvFunction, pvArg);
+	if (ret)
+		return ret;
+
+	ret = pthread_attr_destroy(&attr);
+	return ret;
+}

@@ -453,7 +453,7 @@ LONG HPSearchHotPluggables(void)
 	}
 
 	if (HPReadBundleValues())
-		SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
 			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL);
 
 	return 0;

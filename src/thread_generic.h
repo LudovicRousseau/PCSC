@@ -40,15 +40,6 @@ extern "C"
 	int SYS_MutexLock(PCSCLITE_MUTEX *);
 	int SYS_MutexTryLock(PCSCLITE_MUTEX *);
 	int SYS_MutexUnLock(PCSCLITE_MUTEX *);
-	int SYS_ThreadCreate(PCSCLITE_THREAD_T *, int, PCSCLITE_THREAD_FUNCTION( ),
-		/*@null@*/ LPVOID);
-	int SYS_ThreadCancel(PCSCLITE_THREAD_T);
-	int SYS_ThreadDetach(PCSCLITE_THREAD_T);
-	int SYS_ThreadJoin(PCSCLITE_THREAD_T, /*@null@*/ LPVOID*);
-	int SYS_ThreadExit(/*@null@*/ LPVOID);
-	PCSCLITE_THREAD_T SYS_ThreadSelf(void);
-	int SYS_ThreadEqual(PCSCLITE_THREAD_T *, PCSCLITE_THREAD_T *);
-	int SYS_ThreadSetCancelType(int, int *);
 
 #ifdef __cplusplus
 }

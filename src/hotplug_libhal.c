@@ -591,7 +591,7 @@ ULONG HPRegisterForHotplugEvents(void)
 
 	libhal_free_string_array(device_names);
 
-	(void)SYS_ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+	(void)ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
 		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL);
 
 	return 0;
