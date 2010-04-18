@@ -30,6 +30,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -53,13 +54,13 @@ static int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 static int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 
 static list_t contextsList;	/**< Context tracking list */
-PCSCLITE_MUTEX contextsList_lock;	/**< lock for the above list */
+pthread_mutex_t contextsList_lock;	/**< lock for the above list */
 
 struct _psContext
 {
 	int32_t hContext;
 	list_t cardsList;
-	PCSCLITE_MUTEX cardsList_lock;	/**< lock for the above list */
+	pthread_mutex_t cardsList_lock;	/**< lock for the above list */
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
 	pthread_t pthThread;		/**< Event polling thread's ID */
 	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
@@ -114,7 +115,7 @@ LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandl
 		return -1;
 	}
 
-	(void)SYS_MutexInit(&contextsList_lock);
+	(void)pthread_mutex_init(&contextsList_lock, NULL);
 
 	return 1;
 }
@@ -144,9 +145,9 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	int listSize;
 	SCONTEXT * newContext = NULL;
 
-	(void)SYS_MutexLock(&contextsList_lock);
+	(void)pthread_mutex_lock(&contextsList_lock);
 	listSize = list_size(&contextsList);
-	(void)SYS_MutexUnLock(&contextsList_lock);
+	(void)pthread_mutex_unlock(&contextsList_lock);
 
 	if (listSize >= contextMaxThreadCounter)
 	{
@@ -189,11 +190,11 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		goto error;
 	}
 
-	(void)SYS_MutexInit(&newContext->cardsList_lock);
+	(void)pthread_mutex_init(&newContext->cardsList_lock, NULL);
 
-	(void)SYS_MutexLock(&contextsList_lock);
+	(void)pthread_mutex_lock(&contextsList_lock);
 	lrv = list_append(&contextsList, newContext);
-	(void)SYS_MutexUnLock(&contextsList_lock);
+	(void)pthread_mutex_unlock(&contextsList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
@@ -208,9 +209,9 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		int lrv2;
 
 		Log2(PCSC_LOG_CRITICAL, "ThreadCreate failed: %s", strerror(rv));
-		(void)SYS_MutexLock(&contextsList_lock);
+		(void)pthread_mutex_lock(&contextsList_lock);
 		lrv2 = list_delete(&contextsList, newContext);
-		(void)SYS_MutexUnLock(&contextsList_lock);
+		(void)pthread_mutex_unlock(&contextsList_lock);
 		if (lrv2 < 0)
 			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv2);
 		list_destroy(&(newContext->cardsList));
@@ -538,10 +539,10 @@ static void ContextThread(LPVOID newContext)
 				READ_BODY(caStr)
 
 				/* find the client */
-				(void)SYS_MutexLock(&contextsList_lock);
+				(void)pthread_mutex_lock(&contextsList_lock);
 				psTargetContext = (SCONTEXT *) list_seek(&contextsList,
 					&(caStr.hContext));
-				(void)SYS_MutexUnLock(&contextsList_lock);
+				(void)pthread_mutex_unlock(&contextsList_lock);
 				if (psTargetContext != NULL)
 				{
 					uint32_t fd = psTargetContext->dwClientID;
@@ -794,7 +795,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 	if (threadContext->hContext != hContext)
 		return SCARD_E_INVALID_VALUE;
 
-	(void)SYS_MutexLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 	while (list_size(&(threadContext->cardsList)) != 0)
 	{
 		READER_CONTEXT * rContext = NULL;
@@ -818,7 +819,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		rv = RFReaderInfoById(hCard, &rContext);
 		if (rv != SCARD_S_SUCCESS)
 		{
-			(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+			(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 			return rv;
 		}
 
@@ -854,7 +855,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			Log2(PCSC_LOG_CRITICAL,
 				"list_delete_at failed with return value: %X", lrv);
 	}
-	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 	list_destroy(&(threadContext->cardsList));
 
 	/* We only mark the context as no longer in use.
@@ -883,9 +884,9 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 			return SCARD_E_NO_MEMORY;
 		}
 
-		(void)SYS_MutexLock(&threadContext->cardsList_lock);
+		(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 		lrv = list_append(&(threadContext->cardsList), &hCard);
-		(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+		(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 		if (lrv < 0)
 		{
 			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
@@ -902,9 +903,9 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int lrv;
 
-	(void)SYS_MutexLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 	lrv = list_delete(&(threadContext->cardsList), &hCard);
-	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv);
@@ -918,9 +919,9 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int list_index = 0;
-	(void)SYS_MutexLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 	list_index = list_locate(&(threadContext->cardsList), &hCard);
-	(void)SYS_MutexUnLock(&threadContext->cardsList_lock);
+	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 	if (list_index >= 0)
 		return 0;
 
@@ -956,10 +957,10 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 	memset((void*) threadContext, 0, sizeof(SCONTEXT));
 	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%X", threadContext);
 
-	(void)SYS_MutexLock(&contextsList_lock);
+	(void)pthread_mutex_lock(&contextsList_lock);
 	lrv = list_delete(&contextsList, threadContext);
 	listSize = list_size(&contextsList);
-	(void)SYS_MutexUnLock(&contextsList_lock);
+	(void)pthread_mutex_unlock(&contextsList_lock);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %x", lrv);
 

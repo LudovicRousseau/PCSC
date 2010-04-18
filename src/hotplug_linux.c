@@ -44,7 +44,7 @@
 #define FALSE			0
 #define TRUE			1
 
-PCSCLITE_MUTEX usbNotifierMutex;
+pthread_mutex_t usbNotifierMutex;
 
 struct usb_device_descriptor
 {
@@ -314,7 +314,7 @@ static void HPEstablishUSBNotifications(void)
 
 			if (usbDeviceStatus == 1)
 			{
-				SYS_MutexLock(&usbNotifierMutex);
+				pthread_mutex_lock(&usbNotifierMutex);
 
 				for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
 				{
@@ -331,7 +331,7 @@ static void HPEstablishUSBNotifications(void)
 					bundleTracker[i].deviceNumber[j].id = suspectDeviceNumber;
 				}
 
-				SYS_MutexUnLock(&usbNotifierMutex);
+				pthread_mutex_unlock(&usbNotifierMutex);
 			}
 			else
 				if (usbDeviceStatus == 0)
@@ -342,10 +342,10 @@ static void HPEstablishUSBNotifications(void)
 						if (bundleTracker[i].deviceNumber[j].id != 0 &&
 							bundleTracker[i].deviceNumber[j].status == 0)
 						{
-							SYS_MutexLock(&usbNotifierMutex);
+							pthread_mutex_lock(&usbNotifierMutex);
 							HPRemoveHotPluggable(i, j+1);
 							bundleTracker[i].deviceNumber[j].id = 0;
-							SYS_MutexUnLock(&usbNotifierMutex);
+							pthread_mutex_unlock(&usbNotifierMutex);
 						}
 					}
 				}
@@ -423,7 +423,7 @@ static LONG HPRemoveHotPluggable(int i, unsigned long usbAddr)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
-	(void)SYS_MutexInit(&usbNotifierMutex);
+	(void)pthread_mutex_init(&usbNotifierMutex, NULL);
 	return 0;
 }
 

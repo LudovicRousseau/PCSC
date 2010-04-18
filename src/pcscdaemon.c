@@ -40,7 +40,6 @@
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"
-#include "thread_generic.h"
 #include "hotplug.h"
 #include "readerfactory.h"
 #include "configfile.h"

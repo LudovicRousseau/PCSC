@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <usb.h>
+#include <pthread.h>
 
 #include "misc.h"
 #include "wintypes.h"
@@ -55,7 +56,7 @@
 #define FALSE			0
 #define TRUE			1
 
-PCSCLITE_MUTEX usbNotifierMutex;
+pthread_mutex_t usbNotifierMutex;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
@@ -483,7 +484,7 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
 	deviceName[sizeof(deviceName) -1] = '\0';
 
-	SYS_MutexLock(&usbNotifierMutex);
+	pthread_mutex_lock(&usbNotifierMutex);
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -496,7 +497,7 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", i);
-		SYS_MutexUnLock(&usbNotifierMutex);
+		pthread_mutex_unlock(&usbNotifierMutex);
 		return 0;
 	}
 
@@ -544,14 +545,14 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 		(void)CheckForOpenCT();
 	}
 
-	SYS_MutexUnLock(&usbNotifierMutex);
+	pthread_mutex_unlock(&usbNotifierMutex);
 
 	return 1;
 }	/* End of function */
 
 static LONG HPRemoveHotPluggable(int reader_index)
 {
-	SYS_MutexLock(&usbNotifierMutex);
+	pthread_mutex_lock(&usbNotifierMutex);
 
 	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", reader_index,
 		readerTracker[reader_index].bus_device);
@@ -563,7 +564,7 @@ static LONG HPRemoveHotPluggable(int reader_index)
 	readerTracker[reader_index].bus_device[0] = '\0';
 	readerTracker[reader_index].fullName = NULL;
 
-	SYS_MutexUnLock(&usbNotifierMutex);
+	pthread_mutex_unlock(&usbNotifierMutex);
 
 	return 1;
 }	/* End of function */
@@ -573,7 +574,7 @@ static LONG HPRemoveHotPluggable(int reader_index)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
-	(void)SYS_MutexInit(&usbNotifierMutex);
+	(void)pthread_mutex_init(&usbNotifierMutex, NULL);
 	return 0;
 }
 

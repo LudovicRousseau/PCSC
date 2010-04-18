@@ -22,12 +22,12 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "misc.h"
 #include "pcscd.h"
 #include "ifdhandler.h"
 #include "debuglog.h"
-#include "thread_generic.h"
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "dyn_generic.h"
@@ -41,17 +41,17 @@
 
 READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
-PCSCLITE_MUTEX ClientsWaitingForEvent_lock;	/**< lock for the above list */
+pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
 static void EHStatusHandlerThread(READER_CONTEXT *);
 
 LONG EHRegisterClientForEvent(int32_t filedes)
 {
-	(void)SYS_MutexLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
 	(void)list_append(&ClientsWaitingForEvent, &filedes);
 	
-	(void)SYS_MutexUnLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;
 } /* EHRegisterClientForEvent */
@@ -65,11 +65,11 @@ LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 	LONG rv = SCARD_S_SUCCESS;
 	int ret;
 
-	(void)SYS_MutexLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
 	ret = list_delete(&ClientsWaitingForEvent, &filedes);
 	
-	(void)SYS_MutexUnLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 	
 	if (ret < 0)
 		rv = SCARD_F_INTERNAL_ERROR;
@@ -98,7 +98,7 @@ LONG EHSignalEventToClients(void)
 	LONG rv = SCARD_S_SUCCESS;
 	int32_t filedes;
 
-	(void)SYS_MutexLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
 	(void)list_iterator_start(&ClientsWaitingForEvent);
 	while (list_iterator_hasnext(&ClientsWaitingForEvent))
@@ -110,7 +110,7 @@ LONG EHSignalEventToClients(void)
 
 	(void)list_clear(&ClientsWaitingForEvent);
 
-	(void)SYS_MutexUnLock(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 
 	return rv;
 } /* EHSignalEventToClients */
@@ -139,7 +139,7 @@ LONG EHInitializeEventStructures(void)
 	/* setting the comparator, so the list can sort, find the min, max etc */
     (void)list_attributes_comparator(&ClientsWaitingForEvent, list_comparator_int32_t);
 
-	(void)SYS_MutexInit(&ClientsWaitingForEvent_lock);
+	(void)pthread_mutex_init(&ClientsWaitingForEvent_lock, NULL);
 
 	return SCARD_S_SUCCESS;
 }

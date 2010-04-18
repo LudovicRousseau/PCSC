@@ -16,7 +16,6 @@ libpcsclite_la_SOURCES = \
 	strlcat.c \
 	strlcpy.c \
 	sys_unix.c \
-	thread_unix.c \
 	utils.c \
 	winscard_msg.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
@@ -68,8 +67,6 @@ pcscd_SOURCES = \
 	strlcpycat.h \
 	sys_generic.h \
 	sys_unix.c \
-	thread_generic.h \
-	thread_unix.c \
 	tokenparser.l \
 	utils.c \
 	utils.h \

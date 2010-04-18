@@ -83,6 +83,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -360,7 +361,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
 			 * setting rContext->readerState->cardProtocol */
-			(void)SYS_MutexLock(rContext->mMutex);
+			(void)pthread_mutex_lock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
@@ -386,24 +387,24 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
-					(void)SYS_MutexUnLock(rContext->mMutex);
+					(void)pthread_mutex_unlock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
-					(void)SYS_MutexUnLock(rContext->mMutex);
+					(void)pthread_mutex_unlock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
 				/* use negotiated protocol */
 				rContext->readerState->cardProtocol = ret;
 
-				(void)SYS_MutexUnLock(rContext->mMutex);
+				(void)pthread_mutex_unlock(rContext->mMutex);
 			}
 			else
 			{
-				(void)SYS_MutexUnLock(rContext->mMutex);
+				(void)pthread_mutex_unlock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;
@@ -663,7 +664,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
 			 * setting rContext->readerState->cardProtocol */
-			(void)SYS_MutexLock(rContext->mMutex);
+			(void)pthread_mutex_lock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
@@ -687,24 +688,24 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
-					(void)SYS_MutexUnLock(rContext->mMutex);
+					(void)pthread_mutex_unlock(rContext->mMutex);
 					return SCARD_W_UNRESPONSIVE_CARD;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
-					(void)SYS_MutexUnLock(rContext->mMutex);
+					(void)pthread_mutex_unlock(rContext->mMutex);
 					return SCARD_E_PROTO_MISMATCH;
 				}
 
 				/* use negotiated protocol */
 				rContext->readerState->cardProtocol = ret;
 
-				(void)SYS_MutexUnLock(rContext->mMutex);
+				(void)pthread_mutex_unlock(rContext->mMutex);
 			}
 			else
 			{
-				(void)SYS_MutexUnLock(rContext->mMutex);
+				(void)pthread_mutex_unlock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
 					return SCARD_E_PROTO_MISMATCH;

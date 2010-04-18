@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <libhal.h>
+#include <pthread.h>
 
 #include "misc.h"
 #include "wintypes.h"
@@ -29,7 +30,6 @@
 #include "readerfactory.h"
 #include "sys_generic.h"
 #include "hotplug.h"
-#include "thread_generic.h"
 #include "utils.h"
 #include "strlcpycat.h"
 
@@ -42,7 +42,7 @@
 
 #define UDI_BASE "/org/freedesktop/Hal/devices/"
 
-PCSCLITE_MUTEX usbNotifierMutex;
+pthread_mutex_t usbNotifierMutex;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
@@ -374,7 +374,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	/* wait until the device is visible by libusb/etc.  */
 	(void)SYS_Sleep(1);
 
-	(void)SYS_MutexLock(&usbNotifierMutex);
+	(void)pthread_mutex_lock(&usbNotifierMutex);
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -387,7 +387,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", i);
-		(void)SYS_MutexUnLock(&usbNotifierMutex);
+		(void)pthread_mutex_unlock(&usbNotifierMutex);
 		return;
 	}
 
@@ -479,7 +479,7 @@ error:
 		}
 	}
 
-	(void)SYS_MutexUnLock(&usbNotifierMutex);
+	(void)pthread_mutex_unlock(&usbNotifierMutex);
 } /* HPAddDevice */
 
 
@@ -503,7 +503,7 @@ static void HPRemoveDevice(/*@unused@*/ LibHalContext *ctx, const char *udi)
 	Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", i,
 		short_name(readerTracker[i].udi));
 
-	(void)SYS_MutexLock(&usbNotifierMutex);
+	(void)pthread_mutex_lock(&usbNotifierMutex);
 
 	(void)RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
 	free(readerTracker[i].fullName);
@@ -511,7 +511,7 @@ static void HPRemoveDevice(/*@unused@*/ LibHalContext *ctx, const char *udi)
 	free(readerTracker[i].udi);
 	readerTracker[i].udi = NULL;
 
-	(void)SYS_MutexUnLock(&usbNotifierMutex);
+	(void)pthread_mutex_unlock(&usbNotifierMutex);
 
 	return;
 } /* HPRemoveDevice */
@@ -526,7 +526,7 @@ ULONG HPRegisterForHotplugEvents(void)
     int i, num_devices;
 	DBusError error;
 
-	(void)SYS_MutexInit(&usbNotifierMutex);
+	(void)pthread_mutex_init(&usbNotifierMutex, NULL);
 
 	if (driverSize <= 0)
 	{

@@ -18,6 +18,8 @@
 
 #include <errno.h>
 #include <unistd.h>
+#include <pthread.h>
+
 #include "config.h"
 #include "misc.h"
 #include "pcscd.h"
@@ -133,7 +135,7 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
@@ -167,7 +169,7 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	return rv;
 }
@@ -193,7 +195,7 @@ LONG IFDCloseIFD(READER_CONTEXT * rContext)
 	/* TRY TO LOCK THIS CODE REGION */
 	repeat = 5;
 again:
-	rv = SYS_MutexTryLock(rContext->mMutex);
+	rv = pthread_mutex_trylock(rContext->mMutex);
 	if (EBUSY == rv)
 	{
 		Log1(PCSC_LOG_ERROR, "Locking failed");
@@ -220,7 +222,7 @@ again:
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	return rv;
 }
@@ -288,7 +290,7 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
@@ -305,7 +307,7 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	return rv;
 }
@@ -351,7 +353,7 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
@@ -380,7 +382,7 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	/* use clean values in case of error */
 	if (rv != IFD_SUCCESS)
@@ -435,7 +437,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
@@ -459,7 +461,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS || rv == IFD_ICC_PRESENT)
 		dwCardStatus |= SCARD_PRESENT;
@@ -495,7 +497,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 			dwTag = TAG_IFD_ATR;
 
 			/* LOCK THIS CODE REGION */
-			(void)SYS_MutexLock(rContext->mMutex);
+			(void)pthread_mutex_lock(rContext->mMutex);
 
 			ucValue[0] = rContext->slot;
 			(void)IFDSetCapabilities(rContext, TAG_IFD_SLOTNUM, 1, ucValue);
@@ -509,7 +511,7 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus,
 #endif
 
 			/* END OF LOCKED REGION */
-			(void)SYS_MutexUnLock(rContext->mMutex);
+			(void)pthread_mutex_unlock(rContext->mMutex);
 
 			/*
 			 * FIX :: This is a temporary way to return the correct size
@@ -571,7 +573,7 @@ LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control_v2) (rContext->slot, TxBuffer, TxLength,
@@ -582,7 +584,7 @@ LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -622,7 +624,7 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control) (rContext->slot, ControlCode, TxBuffer,
@@ -633,7 +635,7 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	if (rv == IFD_SUCCESS)
 		return SCARD_S_SUCCESS;
@@ -690,7 +692,7 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 #endif
 
 	/* LOCK THIS CODE REGION */
-	(void)SYS_MutexLock(rContext->mMutex);
+	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	if (rContext->version == IFD_HVERSION_1_0)
@@ -724,7 +726,7 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)SYS_MutexUnLock(rContext->mMutex);
+	(void)pthread_mutex_unlock(rContext->mMutex);
 
 	/* log the returned status word */
 	DebugLogCategory(DEBUG_CATEGORY_SW, pucRxBuffer, *pdwRxLength);

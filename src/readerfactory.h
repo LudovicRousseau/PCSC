@@ -19,7 +19,6 @@
 
 #include <inttypes.h>
 
-#include "thread_generic.h"
 #include "ifdhandler.h"
 #include "pcscd.h"
 #include "simclist.h"
@@ -110,9 +109,9 @@ extern "C"
 		char *lpcDevice;	/**< Device Name */
 		pthread_t pthThread;	/**< Event polling thread */
 		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
-		PCSCLITE_MUTEX *mMutex;	/**< Mutex for this connection */
+		pthread_mutex_t *mMutex;	/**< Mutex for this connection */
 		list_t handlesList;
-		PCSCLITE_MUTEX handlesList_lock;	/**< lock for the above list */
+		pthread_mutex_t handlesList_lock;	/**< lock for the above list */
                                          /**< Structure of connected handles */
 		union
 		{
