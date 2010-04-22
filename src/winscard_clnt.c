@@ -86,6 +86,7 @@
 #include <stddef.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <sys/wait.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -441,6 +442,10 @@ launch:
 
 			/* father process */
 			daemon_launched = TRUE;
+
+			if (waitpid(pid, NULL, 0) < 0)
+				Log2(PCSC_LOG_CRITICAL, "waitpid failed: %s", strerror(errno));
+
 			goto again;
 		}
 	}
