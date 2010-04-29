@@ -38,6 +38,7 @@
 #include "winscard_msg.h"
 #include "sys_generic.h"
 #include "hotplug.h"
+#include "utils.h"
 
 #define PCSCLITE_USB_PATH		"/proc/bus/usb"
 
