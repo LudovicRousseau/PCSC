@@ -434,7 +434,9 @@ static void HPEstablishUSBNotifications(void)
 		{
 			Log1(PCSC_LOG_INFO, "Reload serial configuration");
 			HPRescanUsbBus();
+#ifdef USE_SERIAL
 			RFReCheckReaderConf();
+#endif
 			Log1(PCSC_LOG_INFO, "End reload serial configuration");
 		}
 		close(rescan_pipe[0]);
