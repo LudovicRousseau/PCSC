@@ -405,11 +405,12 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-	/* fork() so that pcscd always return in --auto-exit mode
-	 * but do not close stdout yet since we may need to send logs */
-	if (SYS_Daemon(1, 1))
-		Log2(PCSC_LOG_CRITICAL, "SYS_Daemon() failed: %s",
-			strerror(errno));
+	if (AutoExit)
+		/* fork() so that pcscd always return in --auto-exit mode
+		 * but do not close stdout yet since we may need to send logs */
+		if (SYS_Daemon(1, 1))
+			Log2(PCSC_LOG_CRITICAL, "SYS_Daemon() failed: %s",
+					strerror(errno));
 
 	/*
 	 * If this is set to one the user has asked it not to fork
