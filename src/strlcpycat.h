@@ -12,7 +12,9 @@
  * @brief prototypes of strlcpy()/strlcat() imported from OpenBSD
  */
 
-#ifndef HAVE_STRLCPY
+#ifdef HAVE_STRLCPY
+#include <string.h>
+#else
 size_t strlcpy(char *dst, const char *src, size_t siz);
 #endif
 
