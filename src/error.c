@@ -21,10 +21,21 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+#include "config.h"
 #include "misc.h"
 #include "pcsclite.h"
 #include "strlcpycat.h"
 
+#ifdef NO_LOG
+PCSC_API char* pcsc_stringify_error(const long pcscError)
+{
+	static char strError[] = "0x12345678";
+
+	snprintf(strError, sizeof(strError), "0x%08lX", pcscError);
+
+	return strError;
+}
+#else
 /**
  * @brief This function return a human readable text for the given PC/SC error
  * code.
@@ -194,4 +205,5 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 
 	return strError;
 }
+#endif
 
