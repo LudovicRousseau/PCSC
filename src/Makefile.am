@@ -8,6 +8,18 @@ lib_LTLIBRARIES = libpcsclite.la
 sbin_PROGRAMS = pcscd
 noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
 
+if ENABLE_SERIAL
+SERIAL_CONFIG = configfile.l
+endif
+
+if ENABLE_USB
+USB_CONFIG = tokenparser.l \
+	hotplug_libhal.c \
+	hotplug_libusb.c \
+	hotplug_linux.c \
+	hotplug_macosx.c
+endif
+
 libpcsclite_la_SOURCES = \
 	debug.c \
 	error.c \
@@ -27,7 +39,7 @@ pcscd_SOURCES = \
 	atrhandler.c \
 	atrhandler.h \
 	configfile.h \
-	configfile.l \
+	$(SERIAL_CONFIG) \
 	debuglog.c \
 	dyn_generic.h \
 	dyn_hpux.c \
@@ -37,10 +49,6 @@ pcscd_SOURCES = \
 	eventhandler.h \
 	hotplug_generic.c \
 	hotplug.h \
-	hotplug_libhal.c \
-	hotplug_libusb.c \
-	hotplug_linux.c \
-	hotplug_macosx.c \
 	ifdwrapper.c \
 	ifdwrapper.h \
 	misc.h \
@@ -67,7 +75,7 @@ pcscd_SOURCES = \
 	strlcpycat.h \
 	sys_generic.h \
 	sys_unix.c \
-	tokenparser.l \
+	$(USB_CONFIG) \
 	utils.c \
 	utils.h \
 	winscard.c \

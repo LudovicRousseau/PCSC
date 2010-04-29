@@ -111,7 +111,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is existed */
 
-#ifndef PCSCLITE_STATIC_DRIVER
+#if !defined(PCSCLITE_STATIC_DRIVER) && defined(USE_USB)
 	/*
 	 * Set up the search for USB/PCMCIA devices
 	 */
@@ -169,7 +169,9 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 		if (AraKiri)
 		{
 			/* stop the hotpug thread and waits its exit */
+#ifdef USE_USB
 			(void)HPStopHotPluggables();
+#endif
 			(void)SYS_Sleep(1);
 
 			/* now stop all the drivers */
@@ -492,6 +494,7 @@ int main(int argc, char **argv)
 	if (SCARD_S_SUCCESS != rv)
 		at_exit();
 
+#ifdef USE_SERIAL
 	/*
 	 * Grab the information from the reader.conf
 	 */
@@ -527,6 +530,7 @@ int main(int argc, char **argv)
 				at_exit();
 			}
 	}
+#endif
 
 	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
@@ -579,7 +583,9 @@ static void signal_reload(/*@unused@*/ int sig)
 	if (AraKiri)
 		return;
 
+#ifdef USE_USB
 	HPReCheckSerialReaders();
+#endif
 } /* signal_reload */
 
 static void signal_trap(int sig)

@@ -13,7 +13,7 @@
  */
 
 #include "config.h"
-#ifdef HAVE_LIBHAL
+#if defined(HAVE_LIBHAL) && defined(USE_USB)
 
 #include <string.h>
 #include <stdio.h>

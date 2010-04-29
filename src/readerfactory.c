@@ -51,8 +51,10 @@
 static READER_CONTEXT * sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
+#ifdef USE_SERIAL
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
+#endif
 static pthread_mutex_t LockMutex = PTHREAD_MUTEX_INITIALIZER;
 
 #define IDENTITY_SHIFT 16
@@ -1307,6 +1309,7 @@ void RFCleanupReaders(void)
 	}
 }
 
+#ifdef USE_SERIAL
 int RFStartSerialReaders(const char *readerconf)
 {
 	SerialReader *reader_list;
@@ -1439,6 +1442,7 @@ void RFReCheckReaderConf(void)
 	}
 	free(reader_list);
 }
+#endif
 
 #if 0
 void RFSuspendAllReaders(void)
