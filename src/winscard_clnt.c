@@ -436,7 +436,8 @@ launch:
 				/* son process */
 				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
 					(char *)NULL);
-				Log2(PCSC_LOG_CRITICAL, "exec failed: %s", strerror(errno));
+				Log2(PCSC_LOG_CRITICAL, "exec " PCSCD_BINARY " failed: %s",
+					strerror(errno));
 				exit(1);
 			}
 
