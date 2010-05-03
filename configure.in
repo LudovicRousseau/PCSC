@@ -76,6 +76,12 @@ CC="$PTHREAD_CC"
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
 
+# check for pthread_cancel()
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+AC_CHECK_FUNC(pthread_cancel)
+CFLAGS="$saved_CFLAGS"
+
 # Add libtool support
 # Static lib is disabled by default. Use --enable-static if needed
 LT_INIT(disable-static)
