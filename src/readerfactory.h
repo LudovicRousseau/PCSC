@@ -18,6 +18,7 @@
 #define __readerfactory_h__
 
 #include <inttypes.h>
+#include <pthread.h>
 
 #include "ifdhandler.h"
 #include "pcscd.h"
