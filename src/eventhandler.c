@@ -174,12 +174,14 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	rv = IFDGetCapabilities(rContext, TAG_IFD_POLLING_THREAD_KILLABLE,
 		&dwGetSize, ucGetData);
 
+#ifdef HAVE_PTHREAD_CANCEL
 	if ((IFD_SUCCESS == rv) && (1 == dwGetSize) && ucGetData[0])
 	{
 		Log1(PCSC_LOG_INFO, "Killing polling thread");
 		(void)pthread_cancel(rContext->pthThread);
 	}
 	else
+#endif
 		Log1(PCSC_LOG_INFO, "Waiting polling thread");
 
 	/* wait for the thread to finish */
