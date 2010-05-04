@@ -512,23 +512,11 @@ int main(int argc, char **argv)
 	else
 	{
 		rv = RFStartSerialReaders(PCSCLITE_READER_CONFIG);
-
-#if 0
-		if (rv == 1)
+		if (rv == -1)
 		{
-			Log1(PCSC_LOG_INFO,
-				"warning: no " PCSCLITE_READER_CONFIG " found");
-			/*
-			 * Token error in file
-			 */
+			ExitValue = EXIT_FAILURE;
+			at_exit();
 		}
-		else
-#endif
-			if (rv == -1)
-			{
-				ExitValue = EXIT_FAILURE;
-				at_exit();
-			}
 	}
 #endif
 
