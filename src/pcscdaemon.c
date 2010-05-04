@@ -54,7 +54,7 @@
 char AraKiri = FALSE;
 static char Init = TRUE;
 char AutoExit = FALSE;
-static int ExitValue = EXIT_SUCCESS;
+static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
 
 /*
@@ -505,7 +505,6 @@ int main(int argc, char **argv)
 		{
 			Log3(PCSC_LOG_CRITICAL, "invalid file %s: %s", newReaderConfig,
 				strerror(errno));
-			ExitValue = EXIT_FAILURE;
 			at_exit();
 		}
 	}
@@ -513,10 +512,7 @@ int main(int argc, char **argv)
 	{
 		rv = RFStartSerialReaders(PCSCLITE_READER_CONFIG);
 		if (rv == -1)
-		{
-			ExitValue = EXIT_FAILURE;
 			at_exit();
-		}
 	}
 #endif
 
