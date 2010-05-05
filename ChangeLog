@@ -1,3 +1,105 @@
+pcsc-lite-2.0.0 BETA: Ludovic Rousseau
+18 Apr 2010
+- redesign the client/server communication:
+  * no more shared memory used (allow pcscd and libpcsclite1.so to be on
+  different computer and talk over a network)
+  * no more difference between short and extended APDU
+  * no more use of a /var/run/pcscd/pcscd.events/ directory. events are
+  sent through the socket
+  * simpler command format between client and server
+  The side effect is that you are not able to mix an old pcscd with a
+  new libpcsclite1.so or the reverse. SCardEstablishContext() will fail
+  unless you update both sides of the communication.
+- Use lists instead of fixed size arrays to store handles.
+  It is now possible to have:
+  - 200 simultaneous PC/SC clients instead of 16
+  - 200 SCardConnect per client instead of 16
+  - 200 clients per reader instead of 16
+  The default value of 200 can be changed by giving an argument to pcscd
+  --max-thread --max-card-handle-per-thread --max-card-handle-per-reader
+  Thanks to Jean-Luc Giraud for the big patch
+- Make SCardReconnect(), SCardStatus() and SCardTransmit() block instead
+  of returning SCARD_E_SHARING_VIOLATION immediately. These functions
+  will then behave like on Windows.
+  This can happen if these functions are called when the reader is
+  locked by a PCSC transaction
+  (SCardBeginTransaction/SCardEndTransaction).
+  You can define the environment variable PCSCLITE_NO_BLOCKING to use
+  the old behavior.
+  Thanks to Jean-Luc Giraud for the patch.
+  http://archives.neohapsis.com/archives/dev/muscle/2010-q1/0041.html
+- SCardEstablishContext(): try to start the pcscd daemon if not already
+  running.
+  . pcscd will suicide itself after 60 seconds of inactivity if it is
+  started using --auto-exit. This is the default behavior when pcscd is
+  started by libpcsclite
+  . Set PCSCLITE_PCSCD_ARGS with the argument you want to pass to pcscd in
+  autostart Only one argument is passed. The space character is not a
+  separator. example: export PCSCLITE_PCSCD_ARGS=-dfa
+- SCardListReaders(): can use SCARD_AUTOALLOCATE
+- SCardGetAttrib(): return SCARD_E_INSUFFICIENT_BUFFER if the driver
+  returns IFD_ERROR_INSUFFICIENT_BUFFER
+  . add support of SCARD_ATTR_DEVICE_FRIENDLY_NAME as it is better
+  implemented in pcscd (it knows the friendly name)
+- SCardGetStatusChange(): Calling with cReaders == 0 will now just
+  return SCARD_S_SUCCESS
+  . Use the special reader name "\\?PnP?\Notification" to wait for a
+  reader event notification
+- SCardTransmit(): do not limit the minimum size of an APDU to 4 bytes.
+  non ISO 7816-4 compliant cards (like Mifare DESFIRE) may use shorter
+  commands
+- SCardStatus(): returns SCARD_E_SHARING_VIOLATION if the reader is
+  already used More conform to Windows
+- PCSC/reader.h: update sruct PIN_PROPERTIES_STRUCTURE to be conform
+  with Revision 2.02.06, April 2009 of PCSCv2 part 10 Fields
+  wLcdMaxCharacters and wLcdMaxLines have been removed
+  . rename FEATURE_MCT_READERDIRECT in FEATURE_MCT_READER_DIRECT to be
+  conform with ch. 2.3 of PCSC v2 part 10
+  . add FEATURE_GET_TLV_PROPERTIES and FEATURE_CCID_ESC_COMMAND from
+  PC/SC part 10 v2.02.07 March 2010
+  . Add PCSCv2_PART10_PROPERTY_* defines
+- SCardControl() return SCARD_E_UNSUPPORTED_FEATURE if the driver
+  returned IFD_ERROR_NOT_SUPPORTED or IFD_NOT_SUPPORTED This is used to
+  separate an unsupported value of ControlCode from a general error
+- Use the standard --sysconfdir=DIR ($prefix/etc by default) instead of
+  --enable-confdir=DIR for defining the directory containing reader.conf
+- remove SCF support (PC/SC over Smart Card Framework). I never used
+  this feature and SCF is now dead and replaced by JSR 268
+  (javax.smartcardio)
+- Better handling of PCSCLITE_STATIC_DRIVER as can be used on platforms
+  using µClinux (without dynamic loader).  This is used to statically
+  link the reader driver to pcscd. Since the link is static you must
+  define the IFDHandler API version at compilation time. Either define
+  IFDHANDLERv1, IFDHANDLERv2 or IFDHANDLERv3
+- Use dynamic instead of static allocation for the driver library
+  filename. The filename is no more limited to 100 characters.
+  Closes: [#312332] MAX_LIBNAME too short?
+- force the return codes SCARD_* to be long since the SCard* functions
+  return a LONG type
+- Add the ability to parse all the configuration files of a directory
+  instead of just one configuration file. update-reader.conf is then now
+  obsolete.
+- Add --enable-embedded (default is no) to build pcsc-lite for an
+  embedded system. This will activate the NO_LOG option to disable
+  logging and limit RAM and disk consumption.
+- If NO_LOG is defined then no log are displayed. The idea is to limit
+  the binaries size on disk and RAM consumption at execution time.
+  With NO_LOG defined we gain 26% (17 kB) for the .text segment of pcscd
+  and 15% (4 kB) for the .text segment of libpcsclite.so (for i386)
+- Define a minimal pcsc_stringify_error() if NO_LOG is defined. Only the
+  error code in hex is displayed in this case.
+  Gain: 2kB of .text (10%) for libpcsclite
+- Add --disable-serial and --disable-usb options
+  --disable-serial removes support of /etc/reader.conf gain: 8.0kB of
+  .text (12%) and 160 bytes of .bss (4%) for pcscd
+  --disable-usb removes support of USB hotplug gain: 9.7kB of .text
+  (14%) and 960 bytes of .bss (23%) for pcscd
+  If you use both options (and use a static driver configuration) gain:
+  17.7kB of .text (26%) and 1152 bytes of .bss (28%) for pcscd
+- Better support of Android
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.5.5: Ludovic Rousseau
 28 July 2009
 - add the reader interface name if provided by the device
@@ -40,7 +142,7 @@ pcsc-lite-1.5.3: Ludovic Rousseau
 - reader.h: add PIN_PROPERTIES_STRUCTURE structure and FEATURE_IFD_PIN_PROPERTIES
   Thanks to Martin Paljak for the patch
 - remove powermgt_macosx.c since it is using APSL version 1.1 instead of
-  the BSD-like licence like the other files 
+  the BSD-like licence like the other files
   Thanks to Stanislav Brabec for the bug report
 - avoid a possible crash due to a race condition
   Thanks to Matheus Ribeiro for the patch
@@ -65,7 +167,7 @@ pcsc-lite-1.5.2: Ludovic Rousseau
 - log TxBuffer and RxBuffer if the SCardControl() command failed.
   Closes: [#311376] PCSC_LOG_VERBOSE via -dd; print details of "Card not
   transacted"
-- add a mutex to avoid a race condition 
+- add a mutex to avoid a race condition
   Closes: [#311377] Race condition in SCardBeginTransaction
 - SCardGetStatusChange() may not return if the reader was removed.
 - some other minor improvements and bug corrections
@@ -105,7 +207,7 @@ pcsc-lite-1.5.0: Ludovic Rousseau
 
 pcsc-lite-1.4.102: Ludovic Rousseau
 27 June 2008
-- pcscd -v now displays the enabled features 
+- pcscd -v now displays the enabled features
 - add support of SCARD_AUTOALLOCATE in SCardListReaders(),
   SCardListReaderGroups() and SCardGetAttrib
 - add SCardFreeMemory()
@@ -148,7 +250,7 @@ pcsc-lite-1.4.100: Ludovic Rousseau
   in case of "PCSC Not Running" or "PCSC restarted" so that nothing is
   logged by default.  PCSCLITE_DEBUG can be defined to see the message.
   Programs linked with libpcsclite will not display anything if pcscd is
-  not running. Solves Red Hat bug 428299. 
+  not running. Solves Red Hat bug 428299.
 - default log level is PCSC_LOG_CRITICAL+1 so that NO log is sent to
   stderr by default. You need to explicitly set PCSCLITE_DEBUG to have
   logs. (in a library stderr(2) can be any file opened with fd=2 so
