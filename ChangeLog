@@ -1,5 +1,5 @@
-pcsc-lite-2.0.0 BETA: Ludovic Rousseau
-18 Apr 2010
+pcsc-lite-1.6.0: Ludovic Rousseau
+5 May 2010
 - redesign the client/server communication:
   * no more shared memory used (allow pcscd and libpcsclite1.so to be on
   different computer and talk over a network)
