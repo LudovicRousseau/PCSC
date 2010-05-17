@@ -1,4 +1,4 @@
-SUBDIRS = m4 src etc doc
+SUBDIRS = m4 src doc
 
 ACLOCAL_AMFLAGS = -I m4
 

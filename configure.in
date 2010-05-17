@@ -384,9 +384,6 @@ doc/doxygen.conf
 doc/pcscd.8
 doc/reader.conf.5
 doc/example/Makefile
-etc/Makefile
-etc/pcscd.init
-etc/reader.conf
 src/Makefile
 src/libpcsclite.pc
 src/pcscd.h
