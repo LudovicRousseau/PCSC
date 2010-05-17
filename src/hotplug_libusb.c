@@ -97,7 +97,7 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 static void HPRescanUsbBus(void);
-static void HPEstablishUSBNotifications(void);
+static void HPEstablishUSBNotifications(int pipefd[2]);
 
 static LONG HPReadBundleValues(void)
 {
@@ -383,9 +383,10 @@ static void HPRescanUsbBus(void)
 	}
 }
 
-static void HPEstablishUSBNotifications(void)
+static void HPEstablishUSBNotifications(int pipefd[2])
 {
 	int i, do_polling;
+	char c = 42;	/* magic value */
 
 	/* libusb default is /dev/bus/usb but the devices are not yet visible there
 	 * when a hotplug is requested */
@@ -395,6 +396,10 @@ static void HPEstablishUSBNotifications(void)
 
 	/* scan the USB bus for devices at startup */
 	HPRescanUsbBus();
+
+	/* signal that the initially connected readers are now visible */
+	write(pipefd[1], &c, 1);
+	close(pipefd[1]);
 
 	/* if at least one driver do not have IFD_GENERATE_HOTPLUG */
 	do_polling = FALSE;
@@ -447,6 +452,8 @@ static void HPEstablishUSBNotifications(void)
 LONG HPSearchHotPluggables(void)
 {
 	int i;
+	int pipefd[2];
+	char c;
 
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -455,9 +462,19 @@ LONG HPSearchHotPluggables(void)
 		readerTracker[i].fullName = NULL;
 	}
 
+	if (pipe(pipefd) == -1)
+	{
+		Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
+		return -1;
+	}
+
 	if (HPReadBundleValues())
 		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
-			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL);
+			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, pipefd);
+
+	/* Wait for initial readers to setup */
+	read(pipefd[0], &c, 1);
+	close(pipefd[0]);
 
 	return 0;
 }
