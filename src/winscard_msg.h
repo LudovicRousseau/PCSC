@@ -274,12 +274,12 @@ extern "C"
 	int32_t ClientCloseSession(uint32_t);
 	int32_t InitializeSocket(void);
 	int32_t ProcessEventsServer(/*@out@*/ uint32_t *);
-	int32_t MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes,
-		int32_t blockAmount);
-	int32_t MessageReceive(uint32_t command, /*@out@*/ void *buffer,
-		uint64_t buffer_size, int32_t filedes, int32_t blockAmount);
-	int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID, uint64_t size,
-		uint32_t blockAmount, void *data);
+	int32_t MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes);
+	int32_t MessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
+		int32_t filedes);
+	int32_t MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
+		uint64_t buffer_size, int32_t filedes, int32_t timeOut);
+	int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID, uint64_t size, void *data);
 	void CleanupSharedSegment(int32_t, const char *);
 
 #ifdef __cplusplus

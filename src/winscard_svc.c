@@ -273,14 +273,14 @@ static const char *CommandsText[] = {
 
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) { goto wrong_length; } \
-	ret = MessageReceive(header.command, &v, sizeof(v), filedes, PCSCLITE_READ_TIMEOUT); \
+	ret = MessageReceive(&v, sizeof(v), filedes); \
 	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
 	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
 #define WRITE_BODY_WITH_COMMAND(command, v) \
 	Log4(SCARD_S_SUCCESS == v.rv ? PCSC_LOG_DEBUG : PCSC_LOG_ERROR, "%s rv=0x%X for client %d", command, v.rv, filedes); \
-	ret = MessageSend(&v, sizeof(v), filedes, PCSCLITE_WRITE_TIMEOUT);
+	ret = MessageSend(&v, sizeof(v), filedes);
 
 static void ContextThread(LPVOID newContext)
 {
@@ -293,7 +293,7 @@ static void ContextThread(LPVOID newContext)
 	while (1)
 	{
 		struct rxHeader header;
-		int32_t ret = MessageReceive(0, &header, sizeof(header), filedes, PCSCLITE_READ_TIMEOUT);
+		int32_t ret = MessageReceive(&header, sizeof(header), filedes);
 
 		if (ret < 0)
 		{
@@ -353,7 +353,7 @@ static void ContextThread(LPVOID newContext)
 				/* nothing to read */
 
 				/* dump the readers state */
-				ret = MessageSend(readerStates, sizeof(readerStates), filedes, PCSCLITE_WRITE_TIMEOUT);
+				ret = MessageSend(readerStates, sizeof(readerStates), filedes);
 			}
 			break;
 
@@ -619,8 +619,7 @@ static void ContextThread(LPVOID newContext)
 					goto exit;
 
 				/* read sent buffer */
-				ret = MessageReceive(SCARD_TRANSMIT, pbSendBuffer, trStr.cbSendLength,
-					filedes, PCSCLITE_READ_TIMEOUT);
+				ret = MessageReceive(pbSendBuffer, trStr.cbSendLength, filedes);
 				if (ret < 0)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
@@ -647,8 +646,7 @@ static void ContextThread(LPVOID newContext)
 
 				/* write received buffer */
 				if (SCARD_S_SUCCESS == trStr.rv)
-					ret = MessageSend(pbRecvBuffer, cbRecvLength,
-						filedes, PCSCLITE_WRITE_TIMEOUT);
+					ret = MessageSend(pbRecvBuffer, cbRecvLength, filedes);
 			}
 			break;
 
@@ -672,8 +670,7 @@ static void ContextThread(LPVOID newContext)
 				}
 
 				/* read sent buffer */
-				ret = MessageReceive(SCARD_CONTROL, pbSendBuffer, ctStr.cbSendLength,
-					filedes, PCSCLITE_READ_TIMEOUT);
+				ret = MessageReceive(pbSendBuffer, ctStr.cbSendLength, filedes);
 				if (ret < 0)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
@@ -693,8 +690,7 @@ static void ContextThread(LPVOID newContext)
 
 				/* write received buffer */
 				if (SCARD_S_SUCCESS == ctStr.rv)
-					ret = MessageSend(pbRecvBuffer, dwBytesReturned,
-						filedes, PCSCLITE_WRITE_TIMEOUT);
+					ret = MessageSend(pbRecvBuffer, dwBytesReturned, filedes);
 			}
 			break;
 

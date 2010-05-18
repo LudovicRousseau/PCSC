@@ -126,49 +126,26 @@ INTERNAL int ClientCloseSession(uint32_t dwClientID)
  * @retval -1 A signal was received.
  */
 INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
-	int32_t filedes, int32_t timeOut)
+	int32_t filedes)
 {
 	char *buffer = buffer_void;
 
 	/* default is success */
 	int retval = 0;
 
-	/* record the time when we started */
-	struct timeval start;
-
 	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
-
-	gettimeofday(&start, NULL);
 
 	/* repeat until all data is written */
 	while (remaining > 0)
 	{
 		fd_set write_fd;
-		struct timeval timeout, now;
 		int selret;
-		long delta;
-
-		gettimeofday(&now, NULL);
-		delta = time_sub(&now, &start);
-
-		if (delta > timeOut*1000)
-		{
-			/* we already timed out */
-			retval = -1;
-			break;
-		}
-
-		/* remaining time to wait */
-		delta = timeOut*1000 - delta;
 
 		FD_ZERO(&write_fd);
 		FD_SET(filedes, &write_fd);
 
-		timeout.tv_sec = delta/1000000;
-		timeout.tv_usec = delta - timeout.tv_sec*1000000;
-
-		selret = select(filedes + 1, NULL, &write_fd, NULL, &timeout);
+		selret = select(filedes + 1, NULL, &write_fd, NULL, NULL);
 
 		/* try to write only when the file descriptor is writable */
 		if (selret > 0)
@@ -238,6 +215,91 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
  *
  * Reads the message from the file \c filedes.
  *
+ * @param[out] buffer_void Message read.
+ * @param[in] buffer_size Size to read
+ * @param[in] filedes Socket handle.
+ *
+ * @retval 0 Success.
+ * @retval -1 Socket is closed.
+ * @retval -1 A signal was received.
+ */
+INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
+	int32_t filedes)
+{
+	char *buffer = buffer_void;
+
+	/* default is success */
+	int retval = 0;
+
+	/* how many bytes we must read */
+	size_t remaining = buffer_size;
+
+	/* repeat until we get the whole message */
+	while (remaining > 0)
+	{
+		fd_set read_fd;
+		int selret;
+
+		FD_ZERO(&read_fd);
+		FD_SET(filedes, &read_fd);
+
+		selret = select(filedes + 1, &read_fd, NULL, NULL, NULL);
+
+		/* try to read only when socket is readable */
+		if (selret > 0)
+		{
+			int readed;
+
+			if (!FD_ISSET(filedes, &read_fd))
+			{
+				/* very strange situation. it should be an assert really */
+				retval = -1;
+				break;
+			}
+			readed = read(filedes, buffer, remaining);
+
+			if (readed > 0)
+			{
+				/* we got something */
+				buffer += readed;
+				remaining -= readed;
+			} else if (readed == 0)
+			{
+				/* peer closed the socket */
+				retval = -1;
+				break;
+			} else
+			{
+				/* we ignore the signals and empty socket situations, all
+				 * other errors are fatal */
+				if (errno != EINTR && errno != EAGAIN)
+				{
+					retval = -1;
+					break;
+				}
+			}
+		}
+		else
+		{
+			/* we ignore signals, all other errors are fatal */
+			if (errno != EINTR)
+			{
+				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
+					strerror(errno));
+				retval = -1;
+				break;
+			}
+		}
+	}
+
+	return retval;
+}
+
+/**
+ * @brief Called by the Client to get the reponse from the server or vice-versa.
+ *
+ * Reads the message from the file \c filedes.
+ *
  * @param[in] command one of the \ref pcsc_msg_commands commands
  * @param[out] buffer_void Message read.
  * @param[in] buffer_size Size to read
@@ -249,7 +311,7 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int32_t MessageReceive(uint32_t command, void *buffer_void,
+INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
@@ -381,7 +443,7 @@ INTERNAL int32_t MessageReceive(uint32_t command, void *buffer_void,
  * @return Same error codes as MessageSend().
  */
 INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
-	uint64_t size, uint32_t timeOut, void *data_void)
+	uint64_t size, void *data_void)
 {
 	struct rxHeader header;
 	int ret;
@@ -389,10 +451,10 @@ INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	/* header */
 	header.command = command;
 	header.size = size;
-	ret = MessageSend(&header, sizeof(header), dwClientID, timeOut);
+	ret = MessageSend(&header, sizeof(header), dwClientID);
 
 	/* command */
-	ret = MessageSend(data_void, size, dwClientID, timeOut);
+	ret = MessageSend(data_void, size, dwClientID);
 
 	return ret;
 }

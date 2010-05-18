@@ -568,12 +568,11 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		veStr.rv = SCARD_S_SUCCESS;
 
 		if (-1 == MessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
-			PCSCLITE_WRITE_TIMEOUT, &veStr))
+			&veStr))
 			return SCARD_E_NO_SERVICE;
 
 		/* Read a message from the server */
-		if (MessageReceive(CMD_VERSION, &veStr, sizeof(veStr), dwClientID,
-			PCSCLITE_READ_TIMEOUT) < 0)
+		if (MessageReceive(&veStr, sizeof(veStr), dwClientID) < 0)
 		{
 			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");
 			return SCARD_F_COMM_ERROR;
@@ -595,8 +594,7 @@ again:
 	scEstablishStruct.rv = SCARD_S_SUCCESS;
 
 	rv = MessageSendWithHeader(SCARD_ESTABLISH_CONTEXT, dwClientID,
-		sizeof(scEstablishStruct), PCSCLITE_WRITE_TIMEOUT,
-		(void *) &scEstablishStruct);
+		sizeof(scEstablishStruct), (void *) &scEstablishStruct);
 
 	if (rv == -1)
 		return SCARD_E_NO_SERVICE;
@@ -604,7 +602,7 @@ again:
 	/*
 	 * Read the response from the server
 	 */
-	rv = MessageReceive(SCARD_ESTABLISH_CONTEXT, &scEstablishStruct, sizeof(scEstablishStruct), dwClientID, PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scEstablishStruct, sizeof(scEstablishStruct), dwClientID);
 
 	if (rv < 0)
 		return SCARD_F_COMM_ERROR;
@@ -686,7 +684,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	rv = MessageSendWithHeader(SCARD_RELEASE_CONTEXT,
 		currentContextMap->dwClientID,
 		sizeof(scReleaseStruct),
-		PCSCLITE_WRITE_TIMEOUT, (void *) &scReleaseStruct);
+		(void *) &scReleaseStruct);
 
 	if (rv == -1)
 	{
@@ -697,9 +695,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_RELEASE_CONTEXT, &scReleaseStruct, sizeof(scReleaseStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scReleaseStruct, sizeof(scReleaseStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -863,7 +860,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 	rv = MessageSendWithHeader(SCARD_CONNECT, currentContextMap->dwClientID,
 		sizeof(scConnectStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scConnectStruct);
+		(void *) &scConnectStruct);
 
 	if (rv == -1)
 	{
@@ -874,9 +871,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_CONNECT, &scConnectStruct, sizeof(scConnectStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scConnectStruct, sizeof(scConnectStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -1026,7 +1022,7 @@ retry:
 	rv = MessageSendWithHeader(SCARD_RECONNECT,
 		currentContextMap->dwClientID,
 		sizeof(scReconnectStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scReconnectStruct);
+		(void *) &scReconnectStruct);
 
 	if (rv == -1)
 	{
@@ -1037,10 +1033,9 @@ retry:
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_RECONNECT, &scReconnectStruct,
+	rv = MessageReceive(&scReconnectStruct,
 		sizeof(scReconnectStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -1134,7 +1129,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = MessageSendWithHeader(SCARD_DISCONNECT,
 		currentContextMap->dwClientID,
 		sizeof(scDisconnectStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scDisconnectStruct);
+		(void *) &scDisconnectStruct);
 
 	if (rv == -1)
 	{
@@ -1145,10 +1140,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_DISCONNECT, &scDisconnectStruct,
+	rv = MessageReceive(&scDisconnectStruct,
 		sizeof(scDisconnectStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -1246,7 +1240,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		rv = MessageSendWithHeader(SCARD_BEGIN_TRANSACTION,
 			currentContextMap->dwClientID,
 			sizeof(scBeginStruct),
-			PCSCLITE_READ_TIMEOUT, (void *) &scBeginStruct);
+			(void *) &scBeginStruct);
 
 		if (rv == -1)
 		{
@@ -1257,9 +1251,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		/*
 		 * Read a message from the server
 		 */
-		rv = MessageReceive(SCARD_BEGIN_TRANSACTION, &scBeginStruct, sizeof(scBeginStruct),
-			currentContextMap->dwClientID,
-			PCSCLITE_READ_TIMEOUT);
+		rv = MessageReceive(&scBeginStruct, sizeof(scBeginStruct),
+			currentContextMap->dwClientID);
 
 		if (rv < 0)
 		{
@@ -1362,7 +1355,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = MessageSendWithHeader(SCARD_END_TRANSACTION,
 		currentContextMap->dwClientID,
 		sizeof(scEndStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scEndStruct);
+		(void *) &scEndStruct);
 
 	if (rv == -1)
 	{
@@ -1373,9 +1366,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_END_TRANSACTION, &scEndStruct, sizeof(scEndStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scEndStruct, sizeof(scEndStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -1438,8 +1430,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 	rv = MessageSendWithHeader(SCARD_CANCEL_TRANSACTION,
 		currentContextMap->dwClientID,
-		sizeof(scCancelStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scCancelStruct);
+		sizeof(scCancelStruct), (void *) &scCancelStruct);
 
 	if (rv == -1)
 	{
@@ -1450,9 +1441,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_CANCEL_TRANSACTION, &scCancelStruct, sizeof(scCancelStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scCancelStruct, sizeof(scCancelStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -1649,7 +1639,7 @@ retry:
 
 	rv = MessageSendWithHeader(SCARD_STATUS, currentContextMap->dwClientID,
 		sizeof(scStatusStruct),
-		PCSCLITE_READ_TIMEOUT, (void *) &scStatusStruct);
+		(void *) &scStatusStruct);
 
 	if (rv == -1)
 	{
@@ -1660,9 +1650,8 @@ retry:
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_STATUS, &scStatusStruct, sizeof(scStatusStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scStatusStruct, sizeof(scStatusStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -2226,7 +2215,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				rv = MessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
 					currentContextMap->dwClientID,
-					sizeof(waitStatusStruct), PCSCLITE_WRITE_TIMEOUT,
+					sizeof(waitStatusStruct),
 					&waitStatusStruct);
 
 				if (rv == -1)
@@ -2238,9 +2227,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/*
 				 * Read a message from the server
 				 */
-				rv = MessageReceive(CMD_WAIT_READER_STATE_CHANGE, &waitStatusStruct, sizeof(waitStatusStruct),
-					currentContextMap->dwClientID,
-					dwTime);
+				rv = MessageReceiveTimeout(CMD_WAIT_READER_STATE_CHANGE,
+					&waitStatusStruct, sizeof(waitStatusStruct),
+					currentContextMap->dwClientID, dwTime);
 
 				/* timeout */
 				if (-2 == rv)
@@ -2248,7 +2237,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/* ask server to remove us from the event list */
 					rv = MessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
 						currentContextMap->dwClientID,
-						sizeof(waitStatusStruct), PCSCLITE_WRITE_TIMEOUT,
+						sizeof(waitStatusStruct),
 						&waitStatusStruct);
 
 					if (rv == -1)
@@ -2258,9 +2247,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 
 					/* Read a message from the server */
-					rv = MessageReceive(CMD_STOP_WAITING_READER_STATE_CHANGE, &waitStatusStruct, sizeof(waitStatusStruct),
-						currentContextMap->dwClientID,
-						PCSCLITE_READ_TIMEOUT);
+					rv = MessageReceive(&waitStatusStruct,
+						sizeof(waitStatusStruct),
+						currentContextMap->dwClientID);
 
 					if (rv == -1)
 					{
@@ -2428,7 +2417,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	rv = MessageSendWithHeader(SCARD_CONTROL,
 		currentContextMap->dwClientID,
-		sizeof(scControlStruct), PCSCLITE_READ_TIMEOUT, &scControlStruct);
+		sizeof(scControlStruct), &scControlStruct);
 
 	if (rv == -1)
 	{
@@ -2438,7 +2427,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	/* write the sent buffer */
 	rv = MessageSend((char *)pbSendBuffer, cbSendLength,
-		currentContextMap->dwClientID, PCSCLITE_WRITE_TIMEOUT);
+		currentContextMap->dwClientID);
 
 	if (rv == -1)
 	{
@@ -2449,9 +2438,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_CONTROL, &scControlStruct, sizeof(scControlStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scControlStruct, sizeof(scControlStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -2462,9 +2450,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (SCARD_S_SUCCESS == scControlStruct.rv)
 	{
 		/* read the received buffer */
-		rv = MessageReceive(SCARD_CONTROL, pbRecvBuffer, scControlStruct.dwBytesReturned,
-			currentContextMap->dwClientID,
-			PCSCLITE_READ_TIMEOUT);
+		rv = MessageReceive(pbRecvBuffer, scControlStruct.dwBytesReturned,
+			currentContextMap->dwClientID);
 
 		if (rv < 0)
 		{
@@ -2730,7 +2717,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	rv = MessageSendWithHeader(command,
 		currentContextMap->dwClientID, sizeof(scGetSetStruct),
-		PCSCLITE_READ_TIMEOUT, &scGetSetStruct);
+		&scGetSetStruct);
 
 	if (rv == -1)
 	{
@@ -2741,9 +2728,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(command, &scGetSetStruct, sizeof(scGetSetStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scGetSetStruct, sizeof(scGetSetStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -2906,7 +2892,7 @@ retry:
 
 	rv = MessageSendWithHeader(SCARD_TRANSMIT,
 		currentContextMap->dwClientID, sizeof(scTransmitStruct),
-		PCSCLITE_WRITE_TIMEOUT, (void *) &scTransmitStruct);
+		(void *) &scTransmitStruct);
 
 	if (rv == -1)
 	{
@@ -2916,7 +2902,7 @@ retry:
 
 	/* write the sent buffer */
 	rv = MessageSend((void *)pbSendBuffer, cbSendLength,
-		currentContextMap->dwClientID, PCSCLITE_WRITE_TIMEOUT);
+		currentContextMap->dwClientID);
 
 	if (rv == -1)
 	{
@@ -2927,9 +2913,8 @@ retry:
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_TRANSMIT, &scTransmitStruct, sizeof(scTransmitStruct),
-		currentContextMap->dwClientID,
-		PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scTransmitStruct, sizeof(scTransmitStruct),
+		currentContextMap->dwClientID);
 
 	if (rv < 0)
 	{
@@ -2940,9 +2925,8 @@ retry:
 	if (SCARD_S_SUCCESS == scTransmitStruct.rv)
 	{
 		/* read the received buffer */
-		rv = MessageReceive(SCARD_TRANSMIT, pbRecvBuffer, scTransmitStruct.pcbRecvLength,
-			currentContextMap->dwClientID,
-			PCSCLITE_READ_TIMEOUT);
+		rv = MessageReceive(pbRecvBuffer, scTransmitStruct.pcbRecvLength,
+			currentContextMap->dwClientID);
 
 		if (rv < 0)
 		{
@@ -3353,8 +3337,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 
 	rv = MessageSendWithHeader(SCARD_CANCEL,
 		dwClientID,
-		sizeof(scCancelStruct), PCSCLITE_READ_TIMEOUT, (void *)
-		&scCancelStruct);
+		sizeof(scCancelStruct), (void *) &scCancelStruct);
 
 	if (rv == -1)
 	{
@@ -3365,8 +3348,8 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(SCARD_CANCEL, &scCancelStruct, sizeof(scCancelStruct),
-		dwClientID, PCSCLITE_READ_TIMEOUT);
+	rv = MessageReceive(&scCancelStruct, sizeof(scCancelStruct),
+		dwClientID);
 
 	if (rv < 0)
 	{
@@ -3817,13 +3800,11 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 {
 	int32_t dwClientID = currentContextMap->dwClientID;
 
-	if (-1 == MessageSendWithHeader(CMD_GET_READERS_STATE, dwClientID, 0,
-		PCSCLITE_WRITE_TIMEOUT, NULL))
+	if (-1 == MessageSendWithHeader(CMD_GET_READERS_STATE, dwClientID, 0, NULL))
 		return SCARD_E_NO_SERVICE;
 
 	/* Read a message from the server */
-	if (MessageReceive(CMD_GET_READERS_STATE, &readerStates, sizeof(readerStates), dwClientID,
-		PCSCLITE_READ_TIMEOUT) < 0)
+	if (MessageReceive(&readerStates, sizeof(readerStates), dwClientID) < 0)
 		return SCARD_F_COMM_ERROR;
 
 	return SCARD_S_SUCCESS;
