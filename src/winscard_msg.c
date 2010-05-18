@@ -58,7 +58,7 @@
  * @retval -1 The socket can not open a connection.
  * @retval -1 Can not set the socket to non-blocking.
  */
-INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
+INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 {
 	struct sockaddr_un svc_addr;
 	int one;
@@ -105,7 +105,7 @@ INTERNAL int SHMClientSetupSession(uint32_t *pdwClientID)
  *
  * @retval 0 Success.
  */
-INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
+INTERNAL int ClientCloseSession(uint32_t dwClientID)
 {
 	return close(dwClientID);
 }
@@ -125,7 +125,7 @@ INTERNAL int SHMClientCloseSession(uint32_t dwClientID)
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
+INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
@@ -249,7 +249,7 @@ INTERNAL int32_t SHMMessageSend(void *buffer_void, uint64_t buffer_size,
  * @retval -1 Socket is closed.
  * @retval -1 A signal was received.
  */
-INTERNAL int32_t SHMMessageReceive(uint32_t command, void *buffer_void,
+INTERNAL int32_t MessageReceive(uint32_t command, void *buffer_void,
 	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
@@ -366,7 +366,7 @@ INTERNAL int32_t SHMMessageReceive(uint32_t command, void *buffer_void,
 }
 
 /**
- * @brief Wrapper for the SHMMessageSend() function.
+ * @brief Wrapper for the MessageSend() function.
  *
  * Called by clients to send messages to the server.
  * The parameters \p command and \p data are set in the \c sharedSegmentMsg
@@ -378,9 +378,9 @@ INTERNAL int32_t SHMMessageReceive(uint32_t command, void *buffer_void,
  * @param[in] timeOut Timeout to the operation in ms.
  * @param[in] data_void Data to be sent.
  *
- * @return Same error codes as SHMMessageSend().
+ * @return Same error codes as MessageSend().
  */
-INTERNAL int32_t SHMMessageSendWithHeader(uint32_t command, uint32_t dwClientID,
+INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	uint64_t size, uint32_t timeOut, void *data_void)
 {
 	struct rxHeader header;
@@ -389,10 +389,10 @@ INTERNAL int32_t SHMMessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	/* header */
 	header.command = command;
 	header.size = size;
-	ret = SHMMessageSend(&header, sizeof(header), dwClientID, timeOut);
+	ret = MessageSend(&header, sizeof(header), dwClientID, timeOut);
 
 	/* command */
-	ret = SHMMessageSend(data_void, size, dwClientID, timeOut);
+	ret = MessageSend(data_void, size, dwClientID, timeOut);
 
 	return ret;
 }
@@ -406,7 +406,7 @@ INTERNAL int32_t SHMMessageSendWithHeader(uint32_t command, uint32_t dwClientID,
  * @param[in] sockValue Socket to be closed.
  * @param[in] pcFilePath File used by the socket.
  */
-INTERNAL void SHMCleanupSharedSegment(int sockValue, const char *pcFilePath)
+INTERNAL void CleanupSharedSegment(int sockValue, const char *pcFilePath)
 {
 	(void)close(sockValue);
 	(void)remove(pcFilePath);

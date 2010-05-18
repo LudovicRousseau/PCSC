@@ -52,7 +52,7 @@ extern char AraKiri;
 /**
  * @brief Accepts a Client connection.
  *
- * Called by \c SHMProcessEventsServer().
+ * Called by \c ProcessEventsServer().
  *
  * @param[out] pdwClientID Connection ID used to reference the Client.
  *
@@ -60,7 +60,7 @@ extern char AraKiri;
  * @retval 0 Success.
  * @retval -1 Can not establish the connection.
  */
-static int SHMProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
+static int ProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
 {
 	socklen_t clnt_len;
 	int new_sock;
@@ -95,7 +95,7 @@ static int SHMProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
  * @retval -1 Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME.
  * @retval -1 Can not put the socket in listen mode.
  */
-INTERNAL int32_t SHMInitializeCommonSegment(void)
+INTERNAL int32_t InitializeSocket(void)
 {
 	static struct sockaddr_un serv_adr;
 
@@ -119,7 +119,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to bind common socket: %s",
 			strerror(errno));
-		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
+		CleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
 
@@ -127,7 +127,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to listen common socket: %s",
 			strerror(errno));
-		SHMCleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
+		CleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
 
@@ -155,7 +155,7 @@ INTERNAL int32_t SHMInitializeCommonSegment(void)
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define DO_TIMEOUT
 #endif
-INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID)
+INTERNAL int32_t ProcessEventsServer(uint32_t *pdwClientID)
 {
 	fd_set read_fd;
 	int selret;
@@ -202,10 +202,10 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID)
 	if (FD_ISSET(commonSocket, &read_fd))
 	{
 		Log1(PCSC_LOG_DEBUG, "Common channel packet arrival");
-		if (SHMProcessCommonChannelRequest(pdwClientID) == -1)
+		if (ProcessCommonChannelRequest(pdwClientID) == -1)
 		{
 			Log2(PCSC_LOG_ERROR,
-				"error in SHMProcessCommonChannelRequest: %d", *pdwClientID);
+				"error in ProcessCommonChannelRequest: %d", *pdwClientID);
 			return -1;
 		}
 	}
@@ -213,7 +213,7 @@ INTERNAL int32_t SHMProcessEventsServer(uint32_t *pdwClientID)
 		return -1;
 
 	Log2(PCSC_LOG_DEBUG,
-		"SHMProcessCommonChannelRequest detects: %d", *pdwClientID);
+		"ProcessCommonChannelRequest detects: %d", *pdwClientID);
 
 	return 0;
 }

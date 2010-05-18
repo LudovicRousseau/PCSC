@@ -70,7 +70,7 @@ static void print_usage (char const * const);
 /**
  * @brief The Server's Message Queue Listener function.
  *
- * An endless loop calls the function \c SHMProcessEventsServer() to check for
+ * An endless loop calls the function \c ProcessEventsServer() to check for
  * messages sent by clients.
  * If the message is valid, \c CreateContextThread() is called to serve this
  * request.
@@ -88,7 +88,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 	/*
 	 * Initialize the comm structure
 	 */
-	rsp = SHMInitializeCommonSegment();
+	rsp = InitializeSocket();
 
 	if (rsp == -1)
 	{
@@ -131,7 +131,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 
 	while (TRUE)
 	{
-		switch (rsp = SHMProcessEventsServer(&dwClientID))
+		switch (rsp = ProcessEventsServer(&dwClientID))
 		{
 
 		case 0:
@@ -144,14 +144,14 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 
 		case 2:
 			/*
-			 * timeout in SHMProcessEventsServer(): do nothing
+			 * timeout in ProcessEventsServer(): do nothing
 			 * this is used to catch the Ctrl-C signal at some time when
 			 * nothing else happens
 			 */
 			break;
 
 		case -1:
-			Log1(PCSC_LOG_ERROR, "Error in SHMProcessEventsServer");
+			Log1(PCSC_LOG_ERROR, "Error in ProcessEventsServer");
 			break;
 
 		case -2:
@@ -161,7 +161,7 @@ static void SVCServiceRunLoop(int customMaxThreadCounter,
 			break;
 
 		default:
-			Log2(PCSC_LOG_ERROR, "SHMProcessEventsServer unknown retval: %d",
+			Log2(PCSC_LOG_ERROR, "ProcessEventsServer unknown retval: %d",
 				rsp);
 			break;
 		}
