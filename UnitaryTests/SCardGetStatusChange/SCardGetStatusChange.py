@@ -58,3 +58,4 @@ for state in states:
 print "values", readerstates.values()
 
 hresult = SCardReleaseContext(hcontext)
+print SCardGetErrorMessage(hresult)
