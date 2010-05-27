@@ -1387,12 +1387,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	/*
-	 * Make sure some event has not occurred
-	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
-		return rv;
-
 	if (IFD_HVERSION_2_0 == rContext->version)
 	{
 		/* we must wrap a API 3.0 client in an API 2.0 driver */
