@@ -56,6 +56,7 @@ extern "C"
 	 */
 	enum pcsc_msg_commands
 	{
+		CMD_ENUM_FIRST,
 		SCARD_ESTABLISH_CONTEXT = 0x01,	/**< used by SCardEstablishContext() */
 		SCARD_RELEASE_CONTEXT = 0x02,	/**< used by SCardReleaseContext() */
 		SCARD_LIST_READERS = 0x03,		/**< used by SCardListReaders() */
@@ -75,7 +76,8 @@ extern "C"
 		CMD_VERSION = 0x11,				/**< get the client/server protocol version */
 		CMD_GET_READERS_STATE = 0x12,	/**< get the readers state */
 		CMD_WAIT_READER_STATE_CHANGE = 0x13,	/**< wait for a reader state change */
-		CMD_STOP_WAITING_READER_STATE_CHANGE = 0x14	/**< stop waiting for a reader state change */
+		CMD_STOP_WAITING_READER_STATE_CHANGE = 0x14,	/**< stop waiting for a reader state change */
+		CMD_ENUM_LAST
 	};
 
 	struct client_struct

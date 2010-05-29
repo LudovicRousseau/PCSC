@@ -303,8 +303,10 @@ static void ContextThread(LPVOID newContext)
 			goto exit;
 		}
 
-		Log3(PCSC_LOG_DEBUG, "Received command: %s from client %d",
-			CommandsText[header.command], filedes);
+		if ((header.command > CMD_ENUM_FIRST)
+			&& (header.command < CMD_ENUM_LAST))
+			Log3(PCSC_LOG_DEBUG, "Received command: %s from client %d",
+				CommandsText[header.command], filedes);
 
 		switch (header.command)
 		{
