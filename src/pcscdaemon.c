@@ -332,9 +332,9 @@ int main(int argc, char **argv)
 
 	if (argv[optind])
 	{
-		printf("Unknown option: %s\n\n", argv[optind]);
+		printf("Unknown option: %s\n", argv[optind]);
 		print_usage(argv[0]);
-		return EXIT_SUCCESS;
+		return EXIT_FAILURE;
 	}
 
 	/*
