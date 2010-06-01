@@ -56,6 +56,7 @@ static char Init = TRUE;
 char AutoExit = FALSE;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
+static int pipefd[] = {-1, -1};
 
 /*
  * Some internal functions
@@ -75,59 +76,13 @@ static void print_usage (char const * const);
  * If the message is valid, \c CreateContextThread() is called to serve this
  * request.
  */
-static void SVCServiceRunLoop(int customMaxThreadCounter,
-	int customMaxThreadCardHandles)
+static void SVCServiceRunLoop(void)
 {
 	int rsp;
 	LONG rv;
 	uint32_t dwClientID;	/* Connection ID used to reference the Client */
 
-	rsp = 0;
 	rv = 0;
-
-	/*
-	 * Initialize the comm structure
-	 */
-	rsp = InitializeSocket();
-
-	if (rsp == -1)
-	{
-		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
-		at_exit();
-	}
-
-	/*
-	 * Initialize the contexts structure
-	 */
-	rv = ContextsInitialize(customMaxThreadCounter, customMaxThreadCardHandles);
-
-	if (rv == -1)
-	{
-		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
-		at_exit();
-	}
-
-	(void)signal(SIGPIPE, SIG_IGN);
-	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
-				 * when the shell is existed */
-
-#if !defined(PCSCLITE_STATIC_DRIVER) && defined(USE_USB)
-	/*
-	 * Set up the search for USB/PCMCIA devices
-	 */
-	rsp = HPSearchHotPluggables();
-	if (rsp)
-		return;
-
-	rsp = HPRegisterForHotplugEvents();
-	if (rsp)
-		return;
-#endif
-
-	/*
-	 * Set up the power management callback routine
-	 */
-	(void)PMRegisterForPowerEvents();
 
 	while (TRUE)
 	{
@@ -407,21 +362,75 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
+	/* like in daemon(3): changes the current working directory to the
+	 * root ("/") */
+	(void)chdir("/");
+
 	if (AutoExit)
-		/* fork() so that pcscd always return in --auto-exit mode
-		 * but do not close stdout yet since we may need to send logs */
-		if (SYS_Daemon(1, 1))
-			Log2(PCSC_LOG_CRITICAL, "SYS_Daemon() failed: %s",
-					strerror(errno));
+	{
+		int pid;
+
+		/* fork() so that pcscd always return in --auto-exit mode */
+		pid = fork();
+		if (-1 == pid )
+			Log2(PCSC_LOG_CRITICAL, "fork() failed: %s", strerror(errno));
+
+		if (pid)
+			/* father */
+			return EXIT_SUCCESS;
+	}
 
 	/*
 	 * If this is set to one the user has asked it not to fork
 	 */
 	if (!setToForeground)
 	{
-		if (SYS_Daemon(0, 0))
-			Log2(PCSC_LOG_CRITICAL, "SYS_Daemon() failed: %s",
-				strerror(errno));
+		int pid;
+
+		if (pipe(pipefd) == -1)
+		{
+			Log2(PCSC_LOG_CRITICAL, "pipe() failed: %s", strerror(errno));
+			return EXIT_FAILURE;
+		}
+
+		pid = fork();
+		if (-1 == pid)
+		{
+			Log2(PCSC_LOG_CRITICAL, "fork() failed: %s", strerror(errno));
+			return EXIT_FAILURE;
+		}
+
+		/* like in daemon(3): redirect standard input, standard output
+		 * and standard error to /dev/null */
+		(void)close(0);
+		(void)close(1);
+		(void)close(2);
+
+		if (pid)
+		/* in the father */
+		{
+			char buf;
+			int ret;
+
+			/* close write side */
+			close(pipefd[1]);
+
+			/* wait for the son to write the return code */
+			ret = read(pipefd[0], &buf, 1);
+			if (ret <= 0)
+				return 2;
+
+			close(pipefd[0]);
+
+			/* exit code */
+			return buf;
+		}
+		else
+		/* in the son */
+		{
+			/* close read side */
+			close(pipefd[0]);
+		}
 	}
 
 	/*
@@ -528,7 +537,60 @@ int main(int argc, char **argv)
 	 */
 	(void)signal(SIGUSR1, signal_reload);
 
-	SVCServiceRunLoop(customMaxThreadCounter, customMaxThreadCardHandles);
+	/*
+	 * Initialize the comm structure
+	 */
+	rv = InitializeSocket();
+	if (rv)
+	{
+		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
+		at_exit();
+	}
+
+	/*
+	 * Initialize the contexts structure
+	 */
+	rv = ContextsInitialize(customMaxThreadCounter, customMaxThreadCardHandles);
+
+	if (rv == -1)
+	{
+		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
+		at_exit();
+	}
+
+	(void)signal(SIGPIPE, SIG_IGN);
+	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
+				 * when the shell is existed */
+
+#if !defined(PCSCLITE_STATIC_DRIVER) && defined(USE_USB)
+	/*
+	 * Set up the search for USB/PCMCIA devices
+	 */
+	rv = HPSearchHotPluggables();
+	if (rv)
+		at_exit();
+
+	rv = HPRegisterForHotplugEvents();
+	if (rv)
+		at_exit();
+#endif
+
+	/*
+	 * Set up the power management callback routine
+	 */
+	(void)PMRegisterForPowerEvents();
+
+	/* initialisation succeeded */
+	if (pipefd[1] >= 0)
+	{
+		char buf = 0;
+
+		/* write a 0 (success) to father process */
+		write(pipefd[1], &buf, 1);
+		close(pipefd[1]);
+	}
+
+	SVCServiceRunLoop();
 
 	Log1(PCSC_LOG_ERROR, "SVCServiceRunLoop returned");
 	return EXIT_FAILURE;
@@ -539,6 +601,16 @@ static void at_exit(void)
 	Log1(PCSC_LOG_INFO, "cleaning " PCSCLITE_IPC_DIR);
 
 	clean_temp_files();
+
+	if (pipefd[1] >= 0)
+	{
+		char buf;
+
+		/* write the error code to father process */
+		buf = ExitValue;
+		write(pipefd[1], &buf, 1);
+		close(pipefd[1]);
+	}
 
 	_exit(ExitValue);
 }
