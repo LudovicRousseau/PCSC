@@ -1,3 +1,39 @@
+pcsc-lite-1.6.1: Ludovic Rousseau
+4 June 2010
+- SCardControl(): do not check for card events since we are talking to
+  the reader not the card. A smart card removal should not make
+  SCardControl() fail with SCARD_W_REMOVED_CARD
+- pcscd do not timeout any more after 2 minutes of inactivity. If the
+  other side of the socket dies we will get an error from the kernel.
+  The problem was that if a client does nothing during
+  PCSCLITE_READ_TIMEOUT (120 seconds by default) then pcscd considers it
+  as a dead client and closes the connection. I guess this problem was
+  present since the first version of pcsc-lite but nobody complained
+  before.
+- pcscd: do not return before most of the initialisation are done
+  correctly. The idea is that pcscd can return an error code if the
+  daemon fails to start correctly (hald not started for example).
+  Before the patch pcscd became a daemon, then returned 0 (success) and
+  then continued with the initialisation. If the initialisation failed
+  it was too late to return an error code. The /etc/init.d/pcscd script
+  was not aware of the failure.
+  Closes https://bugzilla.redhat.com/show_bug.cgi?id=580321
+  "/usr/sbin/pcscd exit codes broken"
+- src/hotplug_libusb.c: Add a synchronisation so that if pcscd is auto
+  started the initial reader list is available before the server takes
+  commands from clients.
+  Before the change early calls of SCardListReaders() returned an empty
+  list of readers even if a reader was connected.
+  Thanks to Patrice Angelini for the bug report
+- SCardConnect() & SCardReconnect(): do not reset the cardProtocol in
+  SCARD_SHARE_DIRECT case since the card have _not_ been reseted. A new
+  PPS negociation would fail.
+- Do not install files in /etc any more. Serial drivers are rare now.
+- Avoids a crash if a client sends a unknown command.
+  Thanks to Martin Vogt for the bug report
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.6.0: Ludovic Rousseau
 5 May 2010
 - redesign the client/server communication:
