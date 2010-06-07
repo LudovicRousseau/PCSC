@@ -430,8 +430,17 @@ launch:
 
 			if (0 == pid)
 			{
-				int ret;
+				int ret, i, max;
 				char *param = getenv("PCSCLITE_PCSCD_ARGS");
+
+				/* close all file handles except stdin, stdout and
+				 * stderr so that pcscd does not confiscate ressources
+				 * allocated by the application */
+				max = sysconf(_SC_OPEN_MAX);
+				if (-1 == max)
+					max = 1024;
+				for (i=3; i<max; i++)
+					(void)close(i);
 
 				/* son process */
 				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
