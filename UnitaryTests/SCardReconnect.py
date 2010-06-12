@@ -20,15 +20,16 @@
 # SCardReconnect() should block instead of returning SCARD_E_SHARING_VIOLATION
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 import sys
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 print "Using reader:", readers[0]
@@ -37,7 +38,7 @@ print "Using reader:", readers[0]
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 print "Press enter"
 sys.stdin.read(1)
@@ -46,13 +47,12 @@ sys.stdin.read(1)
 hresult, dwActiveProtocol = SCardReconnect(hcard,
     SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardReconnect: ' +
-        SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)

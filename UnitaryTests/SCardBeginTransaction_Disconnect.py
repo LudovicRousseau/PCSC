@@ -23,32 +23,33 @@
 # such a behavior.
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0], SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardBeginTransaction(hcard)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardBeginTransaction(hcard)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardBeginTransaction: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)

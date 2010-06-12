@@ -22,6 +22,7 @@
 
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
+from smartcard.pcsc.PCSCExceptions import *
 import threading
 
 MAX_THREADS = 100
@@ -35,14 +36,12 @@ def stress():
     for j in range(1, MAX_ITER):
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to establish context: '
-                + SCardGetErrorMessage(hresult))
+            raise EstablishContextException(hresult)
 
         hresult = SCardReleaseContext(hcontext)
         #print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to release context: '
-                + SCardGetErrorMessage(hresult))
+            raise ReleaseContextException(hresult)
 
 def main():
     """

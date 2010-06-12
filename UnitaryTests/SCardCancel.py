@@ -19,6 +19,7 @@
 
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 import threading
 import time
 
@@ -32,11 +33,11 @@ def cancel():
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 readerstates = {}
@@ -44,7 +45,7 @@ for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 hresult, newstates = SCardGetStatusChange(hcontext, 0, readerstates.values())
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 print newstates
 for state in newstates:
     readername, eventstate, atr = state
@@ -59,9 +60,9 @@ if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
     if SCARD_E_CANCELLED == hresult:
         pass
     else:
-        raise Exception('Failed to SCardGetStatusChange: ' + SCardGetErrorMessage(hresult))
+        raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)

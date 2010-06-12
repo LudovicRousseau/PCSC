@@ -19,14 +19,14 @@
 
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 import time
 import os
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' +
-        SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 pid = os.fork()
 if pid == 0:
@@ -39,8 +39,7 @@ if pid == 0:
     if hresult == SCARD_E_INVALID_HANDLE:
         print "test passed"
     elif hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to list readers: ' +
-            SCardGetErrorMessage(hresult))
+        raise ListReadersException(hresult)
     else:
         print "test failed"
 else:
@@ -52,5 +51,4 @@ else:
     hresult = SCardReleaseContext(hcontext)
     print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to release context: ' +
-            SCardGetErrorMessage(hresult))
+        raise ReleaseContextException(hresult)

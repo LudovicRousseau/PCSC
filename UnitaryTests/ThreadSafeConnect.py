@@ -25,6 +25,7 @@ from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardListReaders, SCardConnect, SCardDisconnect,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD,
     SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
+from smartcard.pcsc.PCSCExceptions import *
 import threading
 
 MAX_THREADS = 10
@@ -40,36 +41,31 @@ def stress(*args):
 
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: '
-            + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     hresult, readers = SCardListReaders(hcontext, [])
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to list readers: '
-            + SCardGetErrorMessage(hresult))
+        raise ListReadersException(hresult)
 
     for j in range(0, MAX_ITER):
         # Connect in SCARD_SHARE_SHARED mode
         hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
                SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to SCardConnect: '
-                + SCardGetErrorMessage(hresult))
+            raise BaseSCardException(hresult)
 
         log = "%d:%d" % (thread, j)
         print log,
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to SCardDisconnect: '
-                + SCardGetErrorMessage(hresult))
+            raise BaseSCardException(hresult)
 
     print
 
     hresult = SCardReleaseContext(hcontext)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to release context: '
-            + SCardGetErrorMessage(hresult))
+        raise ReleaseContextException(hresult)
 
     print "Exiting thread:", thread
 

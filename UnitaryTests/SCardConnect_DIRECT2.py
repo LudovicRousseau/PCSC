@@ -30,17 +30,18 @@
 # bug fixed in revision 4940
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 import sys
 
 SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 print "Using reader:", readers[0]
@@ -49,61 +50,61 @@ print "Using reader:", readers[0]
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardTransmit: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 print response
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_DIRECT mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
     SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardTransmit: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 print response
 
 # Reconnect in SCARD_SHARE_DIRECT mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardReconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardTransmit: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 print response
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)

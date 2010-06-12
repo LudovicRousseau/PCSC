@@ -36,6 +36,8 @@ import sys
 import thread
 import time
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
+from smartcard.Exceptions import NoReadersException
 
 
 # Global variable used by test functions to acknowledge
@@ -104,7 +106,7 @@ def SCardConnectTest(hcontextTest, hcardTest, readerName):
     print "Test thread for %s" % testFunctionName
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     before = time.time()
     # Connect in SCARD_SHARE_SHARED mode
@@ -168,14 +170,14 @@ def Connect(index=0):
     """docstring for Connect"""
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     hresult, readers = SCardListReaders(hcontext, [])
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+        raise ListReadersException(hresult)
     print 'PC/SC Readers:', readers
     if (len(readers) <= 0):
-        raise Exception('Reader list is empty, check that a reader is connected')
+        raise NoReadersException()
     reader = readers[index]
     print "Using reader:", reader
 
@@ -184,7 +186,7 @@ def Connect(index=0):
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
     if hresult != SCARD_S_SUCCESS:
         print "SCardConnect failed"
-        raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+        raise BaseSCardException(hresult)
     return hcontext, hcard, reader
 
 
@@ -192,14 +194,14 @@ def ConnectWithReader(readerName):
     """docstring for Connect"""
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     # Connect in SCARD_SHARE_SHARED mode
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readerName,
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
     if hresult != SCARD_S_SUCCESS:
         print "SCardConnect failed"
-        raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+        raise BaseSCardException(hresult)
     return hcontext, hcard
 
 

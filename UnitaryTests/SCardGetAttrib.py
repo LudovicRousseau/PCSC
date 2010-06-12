@@ -22,22 +22,23 @@
 # SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in revision 4956
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 import sys
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 for reader in readers:
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+        raise BaseSCardException(hresult)
 
     hresult, attrib = SCardGetAttrib(hcard, SCARD_ATTR_VENDOR_IFD_SERIAL_NO)
     print reader, ":",
@@ -46,8 +47,8 @@ for reader in readers:
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+        raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)

@@ -36,6 +36,8 @@
 
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
+from smartcard.Exceptions import NoReadersException
 import sys
 
 
@@ -43,14 +45,14 @@ def Connect(mode):
     """ Connect """
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     hresult, readers = SCardListReaders(hcontext, [])
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+        raise ListReadersException(hresult)
     print 'PC/SC Readers:', readers
     if (len(readers) <= 0):
-        raise Exception('Reader list is empty, check that a reader is connected')
+        raise NoReadersException()
     print "Using reader:", readers[0]
 
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
@@ -62,7 +64,7 @@ def ConnectWithReader(readerName, mode):
     """ ConnectWithReader """
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+        raise EstablishContextException(hresult)
 
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readerName,
         mode, SCARD_PROTOCOL_ANY)

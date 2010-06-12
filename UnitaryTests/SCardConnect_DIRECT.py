@@ -23,21 +23,22 @@
 # such a behavior.
 
 from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to establish context: ' + SCardGetErrorMessage(hresult))
+    raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to list readers: ' + SCardGetErrorMessage(hresult))
+    raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
         SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardConnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 print "dwActiveProtocol:", dwActiveProtocol
 
@@ -45,7 +46,7 @@ print "dwActiveProtocol:", dwActiveProtocol
 hresult, dwActiveProtocol = SCardReconnect(hcard,
         SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardReconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print "dwActiveProtocol:", dwActiveProtocol
@@ -54,8 +55,8 @@ if SCARD_PROTOCOL_UNDEFINED != dwActiveProtocol:
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to SCardDisconnect: ' + SCardGetErrorMessage(hresult))
+    raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
+    raise ReleaseContextException(hresult)
