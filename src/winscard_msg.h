@@ -47,7 +47,7 @@ extern "C"
 	 */
 	struct rxHeader
 	{
-		uint32_t size;		/**< size of the message expluding this header */
+		uint32_t size;		/**< size of the message excluding this header */
 		uint32_t command;	/**< one of the \c pcsc_msg_commands */
 	};
 
