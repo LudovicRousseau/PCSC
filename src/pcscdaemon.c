@@ -370,6 +370,10 @@ int main(int argc, char **argv)
 	{
 		int pid;
 
+		/* create a new session so that Ctrl-C on the application will
+		 * not also quit pcscd */
+		setsid();
+
 		/* fork() so that pcscd always return in --auto-exit mode */
 		pid = fork();
 		if (-1 == pid )
