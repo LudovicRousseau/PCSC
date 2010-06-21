@@ -79,7 +79,7 @@ AC_SUBST(PTHREAD_CFLAGS)
 # check for pthread_cancel()
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-AC_CHECK_FUNC(pthread_cancel)
+AC_CHECK_FUNCS(pthread_cancel)
 CFLAGS="$saved_CFLAGS"
 
 # Add libtool support
