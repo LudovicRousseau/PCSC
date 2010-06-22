@@ -182,7 +182,22 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	}
 	else
 #endif
-		Log1(PCSC_LOG_INFO, "Waiting polling thread");
+	{
+		/* ask to stop the "polling" thread */
+		RESPONSECODE (*fct)(DWORD) = NULL;
+
+		dwGetSize = sizeof(fct);
+		rv = IFDGetCapabilities(rContext, TAG_IFD_STOP_POLLING_THREAD,
+			&dwGetSize, (PUCHAR)&fct);
+
+		if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
+		{
+			Log1(PCSC_LOG_INFO, "Request stoping of polling thread");
+			fct(rContext->slot);
+		}
+		else
+			Log1(PCSC_LOG_INFO, "Waiting polling thread");
+	}
 
 	/* wait for the thread to finish */
 	rv = pthread_join(rContext->pthThread, NULL);

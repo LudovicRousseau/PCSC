@@ -304,6 +304,7 @@ extern "C"
 #define TAG_IFD_SIMULTANEOUS_ACCESS     0x0FAF	/**< number of reader the driver can manage */
 #define TAG_IFD_POLLING_THREAD          0x0FB0	/**< driver uses a polling thread */
 #define TAG_IFD_POLLING_THREAD_KILLABLE 0x0FB1	/**< the polling thread can be killed */
+#define TAG_IFD_STOP_POLLING_THREAD     0x0FB2	/**< method used to stop the polling thread (instead of just pthread_kill() */
 
 	/*
 	 * IFD Handler version number enummerations
