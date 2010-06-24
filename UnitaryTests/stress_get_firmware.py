@@ -22,6 +22,7 @@
 from smartcard.pcsc.PCSCReader import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE)
+from time import time, ctime
 
 
 def stress(reader):
@@ -33,10 +34,15 @@ def stress(reader):
     IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
     i = 0
     while True:
+        before = time()
         res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
             get_firmware)
-        print "%d Reader: %s" % (i, reader)
+        after = time()
+        delta = after - before
+        print "%d Reader: %s, delta: %d" % (i, reader, delta)
         print "Firmware:", "".join([chr(x) for x in res])
+        if delta > 1:
+            sys.stderr.write(ctime() + " %f\n" % delta)
         i += 1
 
 if __name__ == "__main__":
@@ -44,7 +50,11 @@ if __name__ == "__main__":
 
     # get all the available readers
     readers = readers()
-    print "Available readers:", readers
+    print "Available readers:"
+    i = 0
+    for r in readers:
+        print "%d: %s" % (i, r)
+        i += 1
 
     try:
         i = int(sys.argv[1])

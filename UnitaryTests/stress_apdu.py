@@ -20,6 +20,7 @@
 #   51 franklin street, fifth floor, boston, ma 02110-1301 usa.
 
 from smartcard.System import readers
+from time import time, ctime
 
 
 def stress(reader):
@@ -37,9 +38,14 @@ def stress(reader):
 
     i = 0
     while True:
+        before = time()
         data, sw1, sw2 = connection.transmit(COMMAND)
+        after = time()
         print data
-        print "%d Command: %02X %02X" % (i, sw1, sw2)
+        delta = after - before
+        print "%d Command: %02X %02X, delta: %f" % (i, sw1, sw2,  delta)
+        if delta > 1:
+            sys.stderr.write(ctime() + " %f\n" % delta)
         i += 1
 
 if __name__ == "__main__":
@@ -47,7 +53,11 @@ if __name__ == "__main__":
 
     # get all the available readers
     readers = readers()
-    print "Available readers:", readers
+    print "Available readers:"
+    i = 0
+    for r in readers:
+        print "%d: %s" % (i, r)
+        i += 1
 
     try:
         i = int(sys.argv[1])
