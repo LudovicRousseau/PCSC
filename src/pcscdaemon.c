@@ -667,6 +667,19 @@ static void signal_trap(int sig)
 			at_exit();
 		}
 	}
+	else
+	{
+		/* if pcscd do not want to die */
+		static int lives = 2;
+
+		lives--;
+		/* no live left. Something is blocking the normal death. */
+		if (0 == lives)
+		{
+			Log1(PCSC_LOG_INFO, "Forced suicide");
+			at_exit();
+		}
+	}
 }
 
 static void print_version (void)
