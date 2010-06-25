@@ -19,7 +19,7 @@
 #   with this program; if not, write to the free software foundation, inc.,
 #   51 franklin street, fifth floor, boston, ma 02110-1301 usa.
 
-from smartcard.pcsc.PCSCReader import readers
+from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE)
 from time import time, ctime
