@@ -217,7 +217,7 @@ if test "x$use_libusb" != xno ; then
 		AC_MSG_ERROR([You can't use libhal _and_ libusb. Select only one.])
 	fi
 
-	PKG_CHECK_MODULES(LIBUSB, libusb, [],
+	PKG_CHECK_MODULES(LIBUSB, libusb-1.0, [],
 		[
 			AC_MSG_RESULT([no])
 			AC_CHECK_PROG([LIBUSBCONFIG], [libusb-config], [yes])
@@ -236,18 +236,14 @@ if test "x$use_libusb" != xno ; then
 	CPPFLAGS="$CPPFLAGS $LIBUSB_CFLAGS"
 	LIBS="$LDFLAGS $LIBUSB_LIBS"
 
-	AC_CHECK_HEADERS(usb.h, [],
-		[ AC_MSG_ERROR([usb.h not found, use ./configure LIBUSB_CFLAGS=...]) ])
+	AC_CHECK_HEADERS(libusb-1.0/libusb.h, [],
+		[ AC_MSG_ERROR([libusb.h not found, use ./configure LIBUSB_CFLAGS=...]) ])
 
 	LIBS="$LIBS $COREFOUNDATION $IOKIT"
 
-	AC_MSG_CHECKING([for usb_init])
-	AC_TRY_LINK_FUNC(usb_init, [ AC_MSG_RESULT([yes]) ],
+	AC_MSG_CHECKING([for libusb_init])
+	AC_TRY_LINK_FUNC(libusb_init, [ AC_MSG_RESULT([yes]) ],
 		[ AC_MSG_ERROR([libusb not found, use ./configure LIBUSB_LIBS=...]) ])
-
-	AC_MSG_CHECKING([for usb_get_string_simple])
-	AC_TRY_LINK_FUNC(usb_get_string_simple, [ AC_MSG_RESULT([yes]) ],
-		[ AC_MSG_ERROR([your libusb is too old. install version 0.1.7 or above]) ])
 
 	# everything needed for libusb support is present
 	use_libusb=yes
