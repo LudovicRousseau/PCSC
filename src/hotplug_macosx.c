@@ -3,8 +3,12 @@
  *
  * Copyright (C) 2002-2004
  *  Stephen M. Webb <stephenw@cryptocard.com>
+ * Copyright (C) 2002-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ * Copyright (C) 2002
  *  David Corcoran <corcoran@linuxnet.com>
+ * Copyright (C) 2003
+ *  Antti Tapaninen 
  *
  * $Id$
  */

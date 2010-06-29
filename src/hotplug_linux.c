@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2001-2003
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2002-2009
+ * Copyright (C) 2002-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * The USB code was based partly on Johannes Erdfelt

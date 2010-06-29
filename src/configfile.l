@@ -7,7 +7,7 @@
  *  David Corcoran <corcoran@linuxnet.com>
  * Copyright (C) 2004
  *  Damien Sauveron <damien.sauveron@labri.fr>
- * Copyright (C) 2004-2009
+ * Copyright (C) 2004-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$

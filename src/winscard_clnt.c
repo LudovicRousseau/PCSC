@@ -7,7 +7,7 @@
  *  Damien Sauveron <damien.sauveron@labri.fr>
  * Copyright (C) 2005
  *  Martin Paljak <martin@paljak.pri.ee>
- * Copyright (C) 2002-2009
+ * Copyright (C) 2002-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  * Copyright (C) 2009
  *  Jean-Luc Giraud <jlgiraud@googlemail.com>

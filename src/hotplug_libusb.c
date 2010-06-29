@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2003-2009
+ * Copyright (C) 2003-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  * Copyright (C) 2003
  *  Toni Andjelkovic <toni@soth.at>
