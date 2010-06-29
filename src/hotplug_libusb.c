@@ -96,13 +96,10 @@ static struct _readerTracker
 	char *fullName;	/**< full reader name (including serial number) */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
-static LONG HPReadBundleValues(void);
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
 	const char bus_device[], struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
-static void HPRescanUsbBus(void);
-static void HPEstablishUSBNotifications(int pipefd[2]);
 
 static LONG HPReadBundleValues(void)
 {
