@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <usb.h>
+#include <libusb-1.0/libusb.h>
 #include <pthread.h>
 
 #include "misc.h"
@@ -47,7 +47,8 @@
 #undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
 
-#define BUS_DEVICE_STRSIZE	256
+/* format is "%d:%d", bus_number, device_address */
+#define BUS_DEVICE_STRSIZE	10+1+10+1
 
 #define READER_ABSENT		0
 #define READER_PRESENT		1
@@ -55,6 +56,9 @@
 
 #define FALSE			0
 #define TRUE			1
+
+/* we use the default libusb context */
+#define ctx NULL
 
 pthread_mutex_t usbNotifierMutex;
 
@@ -93,8 +97,9 @@ static struct _readerTracker
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 static LONG HPReadBundleValues(void);
-static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
-	struct _driverTracker *driver);
+static LONG HPAddHotPluggable(struct libusb_device *dev,
+	struct libusb_device_descriptor desc,
+	const char bus_device[], struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 static void HPRescanUsbBus(void);
 static void HPEstablishUSBNotifications(int pipefd[2]);
@@ -251,115 +256,85 @@ static LONG HPReadBundleValues(void)
 static void HPRescanUsbBus(void)
 {
 	int i, j;
-	struct usb_bus *bus;
-	struct usb_device *dev;
 	char bus_device[BUS_DEVICE_STRSIZE];
-
-	usb_find_busses();
-	usb_find_devices();
+	libusb_device **devs, *dev;
+	ssize_t cnt;
 
 	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		/* clear rollcall */
 		readerTracker[i].status = READER_ABSENT;
 
-	/* For each USB bus */
-	for (bus = usb_get_busses(); bus; bus = bus->next)
+	cnt = libusb_get_device_list(ctx, &devs);
+	if (cnt < 0)
 	{
-		/* For each USB device */
-		for (dev = bus->devices; dev; dev = dev->next)
+		Log1(PCSC_LOG_CRITICAL, "libusb_get_device_list() failed\n");
+		return;
+	}
+
+	/* For each USB device */
+	cnt = 0;
+	while ((dev = devs[cnt++]) != NULL)
+	{
+		struct libusb_device_descriptor desc;
+		uint8_t bus_number = libusb_get_bus_number(dev);
+		uint8_t device_address = libusb_get_device_address(dev);
+
+		int r = libusb_get_device_descriptor(dev, &desc);
+		if (r < 0)
 		{
-			/* check if the device is supported by one driver */
-			for (i=0; i<driverSize; i++)
+			Log3(PCSC_LOG_ERROR, "failed to get device descriptor for %d/%d",
+				bus_number, device_address);
+			continue;
+		}
+
+		/* check if the device is supported by one driver */
+		for (i=0; i<driverSize; i++)
+		{
+			if (driverTracker[i].libraryPath != NULL &&
+				desc.idVendor == driverTracker[i].manuID &&
+				desc.idProduct == driverTracker[i].productID)
 			{
-				if (driverTracker[i].libraryPath != NULL &&
-					dev->descriptor.idVendor == driverTracker[i].manuID &&
-					dev->descriptor.idProduct == driverTracker[i].productID)
+				int newreader;
+
+				/* A known device has been found */
+				snprintf(bus_device, BUS_DEVICE_STRSIZE, "%d:%d",
+					bus_number, device_address);
+				bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+#ifdef DEBUG_HOTPLUG
+				Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s",
+					bus_device);
+#endif
+				newreader = TRUE;
+
+				/* Check if the reader is a new one */
+				for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
 				{
-					int newreader;
-
-					/* A known device has been found */
-					snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s",
-						bus->dirname, dev->filename);
-					bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-#ifdef DEBUG_HOTPLUG
-					Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s",
-						bus_device);
-#endif
-					newreader = TRUE;
-
-					/* Check if the reader is a new one */
-					for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
+					if (strncmp(readerTracker[j].bus_device,
+						bus_device, BUS_DEVICE_STRSIZE) == 0)
 					{
-						if (strncmp(readerTracker[j].bus_device,
-							bus_device, BUS_DEVICE_STRSIZE) == 0)
-						{
-							/* The reader is already known */
-							readerTracker[j].status = READER_PRESENT;
-							newreader = FALSE;
+						/* The reader is already known */
+						readerTracker[j].status = READER_PRESENT;
+						newreader = FALSE;
 #ifdef DEBUG_HOTPLUG
-							Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
-								bus_device);
+						Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
+							bus_device);
 #endif
-							break;
-						}
+						break;
 					}
-
-					/* New reader found */
-					if (newreader)
-						HPAddHotPluggable(dev, bus_device, &driverTracker[i]);
 				}
-			}
-		} /* End of USB device for..loop */
 
-	} /* End of USB bus for..loop */
+				/* New reader found */
+				if (newreader)
+					HPAddHotPluggable(dev, desc, bus_device, &driverTracker[i]);
+			}
+		}
+	}
 
 	/*
 	 * check if all the previously found readers are still present
 	 */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-		int fd;
-		char filename[BUS_DEVICE_STRSIZE];
-
-		/*	BSD workaround:
-		 *	ugenopen() in sys/dev/usb/ugen.c returns EBUSY
-		 *	when the character device file is already open.
-		 *	Because of this, open usb devices will not be
-		 *	detected by usb_find_devices(), so we have to
-		 *	check for this explicitly.
-		 */
-		if (readerTracker[i].status == READER_PRESENT ||
-			readerTracker[i].fullName == NULL)
-			continue;
-
-		sscanf(readerTracker[i].bus_device, "%*[^:]%*[:]%s", filename);
-		fd = open(filename, O_RDONLY);
-		if (fd == -1)
-		{
-			if (errno == EBUSY)
-			{
-				/* The device is present */
-#ifdef DEBUG_HOTPLUG
-				Log2(PCSC_LOG_DEBUG, "BSD: EBUSY on %s", filename);
-#endif
-				readerTracker[i].status = READER_PRESENT;
-			}
-#ifdef DEBUG_HOTPLUG
-			else
-				Log3(PCSC_LOG_DEBUG, "BSD: %s error: %s", filename,
-					strerror(errno));
-#endif
-		}
-		else
-		{
-#ifdef DEBUG_HOTPLUG
-			Log2(PCSC_LOG_DEBUG, "BSD: %s still present", filename);
-#endif
-			readerTracker[i].status = READER_PRESENT;
-			close(fd);
-		}
-#endif
 		if ((readerTracker[i].status == READER_ABSENT) &&
 			(readerTracker[i].fullName != NULL))
 			HPRemoveHotPluggable(i);
@@ -381,6 +356,9 @@ static void HPRescanUsbBus(void)
 		Log1(PCSC_LOG_INFO, "Hotplug stopped");
 		pthread_exit(&retval);
 	}
+
+	/* free the libusb allocated list & devices */
+	libusb_free_device_list(devs, 1);
 }
 
 static void HPEstablishUSBNotifications(int pipefd[2])
@@ -388,11 +366,7 @@ static void HPEstablishUSBNotifications(int pipefd[2])
 	int i, do_polling;
 	char c = 42;	/* magic value */
 
-	/* libusb default is /dev/bus/usb but the devices are not yet visible there
-	 * when a hotplug is requested */
-	setenv("USB_DEVFS_PATH", "/proc/bus/usb", 0);
-
-	usb_init();
+	libusb_init(ctx);
 
 	/* scan the USB bus for devices at startup */
 	HPRescanUsbBus();
@@ -491,16 +465,17 @@ LONG HPStopHotPluggables(void)
 	return 0;
 }
 
-static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
-	struct _driverTracker *driver)
+static LONG HPAddHotPluggable(struct libusb_device *dev,
+	struct libusb_device_descriptor desc,
+	const char bus_device[], struct _driverTracker *driver)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
-	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb:%s",
-		dev->descriptor.idVendor, dev->descriptor.idProduct, bus_device);
+	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
+		desc.idVendor, desc.idProduct, bus_device);
 	deviceName[sizeof(deviceName) -1] = '\0';
 
 	pthread_mutex_lock(&usbNotifierMutex);
@@ -525,29 +500,37 @@ static LONG HPAddHotPluggable(struct usb_device *dev, const char bus_device[],
 	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
 
 #ifdef ADD_SERIAL_NUMBER
-	if (dev->descriptor.iSerialNumber)
+	if (desc.iSerialNumber)
 	{
-		usb_dev_handle *device;
-		char serialNumber[MAX_READERNAME];
+		libusb_device_handle *device;
+		unsigned char serialNumber[MAX_READERNAME];
 		char fullname[MAX_READERNAME];
 		int ret;
 
-		device = usb_open(dev);
-		ret = usb_get_string_simple(device, dev->descriptor.iSerialNumber,
-			serialNumber, MAX_READERNAME);
-		usb_close(device);
-
+		ret = libusb_open(dev, &device);
 		if (ret < 0)
 		{
-			Log2(PCSC_LOG_ERROR, "usb_get_string_simple failed: %s",
-				usb_strerror());
-			readerTracker[i].fullName = strdup(driver->readerName);
+			Log2(PCSC_LOG_ERROR, "libusb_open failed: %s",
+				libusb_strerror(ret));
 		}
 		else
 		{
-			snprintf(fullname, sizeof(fullname), "%s (%s)",
-				driver->readerName, serialNumber);
-			readerTracker[i].fullName = strdup(fullname);
+			ret = libusb_get_string_descriptor_ascii(device, desc.iSerialNumber,
+				serialNumber, MAX_READERNAME);
+			libusb_close(device);
+
+			if (ret < 0)
+			{
+				Log2(PCSC_LOG_ERROR, "libusb_get_string_descriptor_ascii failed: %s",
+					libusb_strerror(ret));
+				readerTracker[i].fullName = strdup(driver->readerName);
+			}
+			else
+			{
+				snprintf(fullname, sizeof(fullname), "%s (%s)",
+					driver->readerName, serialNumber);
+				readerTracker[i].fullName = strdup(fullname);
+			}
 		}
 	}
 	else
