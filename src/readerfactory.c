@@ -892,31 +892,20 @@ LONG RFUnloadReader(READER_CONTEXT * rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFCheckSharing(SCARDHANDLE hCard)
+LONG RFCheckSharing(SCARDHANDLE hCard,READER_CONTEXT * rContext)
 {
-	LONG rv;
-	READER_CONTEXT * rContext = NULL;
-
-	rv = RFReaderInfoById(hCard, &rContext);
-
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	if (rContext->hLockId == 0 || rContext->hLockId == hCard)
 		return SCARD_S_SUCCESS;
 	else
 		return SCARD_E_SHARING_VIOLATION;
 }
 
-LONG RFLockSharing(SCARDHANDLE hCard)
+LONG RFLockSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 {
-	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
-	(void)RFReaderInfoById(hCard, &rContext);
-
 	(void)pthread_mutex_lock(&LockMutex);
-	rv = RFCheckSharing(hCard);
+	rv = RFCheckSharing(hCard, rContext);
 	if (SCARD_S_SUCCESS == rv)
 	{
 		rContext->LockCount += 1;
@@ -927,17 +916,12 @@ LONG RFLockSharing(SCARDHANDLE hCard)
 	return rv;
 }
 
-LONG RFUnlockSharing(SCARDHANDLE hCard)
+LONG RFUnlockSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 {
-	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
-	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	(void)pthread_mutex_lock(&LockMutex);
-	rv = RFCheckSharing(hCard);
+	rv = RFCheckSharing(hCard, rContext);
 	if (SCARD_S_SUCCESS == rv)
 	{
 		if (rContext->LockCount > 0)
@@ -950,17 +934,12 @@ LONG RFUnlockSharing(SCARDHANDLE hCard)
 	return rv;
 }
 
-LONG RFUnlockAllSharing(SCARDHANDLE hCard)
+LONG RFUnlockAllSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 {
-	READER_CONTEXT * rContext = NULL;
 	LONG rv;
 
-	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	(void)pthread_mutex_lock(&LockMutex);
-	rv = RFCheckSharing(hCard);
+	rv = RFCheckSharing(hCard, rContext);
 	if (SCARD_S_SUCCESS == rv)
 	{
 		rContext->LockCount = 0;

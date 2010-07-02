@@ -455,7 +455,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		if (rContext->contexts == SCARD_NO_CONTEXT)
 		{
 			rContext->contexts = SCARD_EXCLUSIVE_CONTEXT;
-			(void)RFLockSharing(*phCard);
+			(void)RFLockSharing(*phCard, rContext);
 		}
 		else
 		{
@@ -559,7 +559,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	rv = RFCheckSharing(hCard);
+	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -747,7 +747,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			if (rContext->contexts == SCARD_LAST_CONTEXT)
 			{
 				rContext->contexts = SCARD_EXCLUSIVE_CONTEXT;
-				(void)RFLockSharing(hCard);
+				(void)RFLockSharing(hCard, rContext);
 			} else
 			{
 				return SCARD_E_SHARING_VIOLATION;
@@ -765,7 +765,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * We are in exclusive mode but want to share now
 			 */
-			(void)RFUnlockSharing(hCard);
+			(void)RFUnlockSharing(hCard, rContext);
 			rContext->contexts = SCARD_LAST_CONTEXT;
 		}
 	} else if (dwShareMode == SCARD_SHARE_DIRECT)
@@ -780,7 +780,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * We are in exclusive mode but want to share now
 			 */
-			(void)RFUnlockSharing(hCard);
+			(void)RFUnlockSharing(hCard, rContext);
 			rContext->contexts = SCARD_LAST_CONTEXT;
 		}
 	} else
@@ -841,7 +841,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Unlock any blocks on this context
 	 */
-	rv = RFUnlockAllSharing(hCard);
+	rv = RFUnlockAllSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1014,7 +1014,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFLockSharing(hCard);
+	rv = RFLockSharing(hCard, rContext);
 
 	/* if the transaction is not yet ready we sleep a bit so the client
 	 * do not retry immediately */
@@ -1170,7 +1170,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Unlock any blocks on this context
 	 */
-	(void)RFUnlockSharing(hCard);
+	(void)RFUnlockSharing(hCard, rContext);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
@@ -1206,7 +1206,7 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFUnlockSharing(hCard);
+	rv = RFUnlockSharing(hCard, rContext);
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
 
@@ -1226,7 +1226,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -1365,7 +1365,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -1414,7 +1414,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -1488,7 +1488,7 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);
@@ -1553,7 +1553,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard)) != SCARD_S_SUCCESS)
+	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFReaderInfoById(hCard, &rContext);

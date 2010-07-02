@@ -146,10 +146,10 @@ extern "C"
 	LONG RFReaderInfo(LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoNamePort(int, LPSTR, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);
-	LONG RFCheckSharing(SCARDHANDLE);
-	LONG RFLockSharing(SCARDHANDLE);
-	LONG RFUnlockSharing(SCARDHANDLE);
-	LONG RFUnlockAllSharing(SCARDHANDLE);
+	LONG RFCheckSharing(SCARDHANDLE, READER_CONTEXT *);
+	LONG RFLockSharing(SCARDHANDLE, READER_CONTEXT *);
+	LONG RFUnlockSharing(SCARDHANDLE, READER_CONTEXT *);
+	LONG RFUnlockAllSharing(SCARDHANDLE, READER_CONTEXT *);
 	LONG RFLoadReader(READER_CONTEXT *);
 	LONG RFBindFunctions(READER_CONTEXT *);
 	LONG RFUnBindFunctions(READER_CONTEXT *);
