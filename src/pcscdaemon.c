@@ -523,7 +523,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		rv = RFStartSerialReaders(PCSCLITE_READER_CONFIG);
+		rv = RFStartSerialReaders(PCSCLITE_CONFIG_DIR);
 		if (rv == -1)
 			at_exit();
 	}
