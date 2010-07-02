@@ -238,6 +238,8 @@ int DBGetReaderListDir(const char *readerconf_dir,
 		/* the configuration file is a directory */
 		struct dirent *direntry;
 
+		Log2(PCSC_LOG_DEBUG, "Parsing conf directory: %s", readerconf_dir);
+
 		/* for each configuration file */
 		while ((direntry = readdir(dir)) != NULL)
 		{
