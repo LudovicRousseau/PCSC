@@ -332,7 +332,9 @@ AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
-PCSCLITE_FEATURES="${PCSCLITE_FEATURES} sysconfdir=${sysconfdir_exp}"
+PCSCLITE_CONFIG_DIR="${sysconfdir_exp}/reader.conf.d"
+AC_SUBST(PCSCLITE_CONFIG_DIR)
+PCSCLITE_FEATURES="${PCSCLITE_FEATURES} configdir=${PCSCLITE_CONFIG_DIR}"
 AC_DEFINE_UNQUOTED([PCSCLITE_FEATURES], ["${PCSCLITE_FEATURES}"], [Enabled PC/SC lite features])
 PCSCD_BINARY="${sbindir_exp}/pcscd"
 AC_DEFINE_UNQUOTED([PCSCD_BINARY], ["$PCSCD_BINARY"], [pcscd filename])
@@ -343,7 +345,7 @@ PC/SC lite has been configured with following options:
 
 Version:             ${PACKAGE_VERSION}
 System binaries:     $(eval eval eval echo "${sbindir_exp}")
-Configuration dir:   $(eval eval eval echo "${sysconfdir_exp}")
+Configuration dir:   ${PCSCLITE_CONFIG_DIR}
 
 
 Host:                ${host}
