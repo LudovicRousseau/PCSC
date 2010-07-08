@@ -1291,7 +1291,7 @@ void RFCleanupReaders(void)
 #ifdef USE_SERIAL
 int RFStartSerialReaders(const char *readerconf)
 {
-	SerialReader *reader_list;
+	SerialReader *reader_list = NULL;
 	int i, rv;
 
 	/* remember the configuration filename for RFReCheckReaderConf() */
@@ -1331,7 +1331,7 @@ int RFStartSerialReaders(const char *readerconf)
 
 void RFReCheckReaderConf(void)
 {
-	SerialReader *reader_list;
+	SerialReader *reader_list = NULL;
 	int i, crc;
 
 	(void)DBGetReaderListDir(ConfigFile, &reader_list);
