@@ -892,7 +892,7 @@ LONG RFUnloadReader(READER_CONTEXT * rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFCheckSharing(SCARDHANDLE hCard,READER_CONTEXT * rContext)
+LONG RFCheckSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 {
 	if (rContext->hLockId == 0 || rContext->hLockId == hCard)
 		return SCARD_S_SUCCESS;
