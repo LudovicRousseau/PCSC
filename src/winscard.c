@@ -1010,7 +1010,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFLockSharing(hCard, rContext);
@@ -1055,7 +1056,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	if (dwDisposition == SCARD_RESET_CARD ||
@@ -1196,7 +1198,8 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = RFUnlockSharing(hCard, rContext);
@@ -1224,7 +1227,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard, rContext);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -1246,7 +1250,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -1366,7 +1371,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard, rContext);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	if (IFD_HVERSION_2_0 == rContext->version)
@@ -1416,7 +1422,8 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard, rContext);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -1433,7 +1440,8 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = IFDGetCapabilities(rContext, dwAttrId, pcbAttrLen, pbAttr);
@@ -1491,7 +1499,8 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard, rContext);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -1508,7 +1517,8 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	rv = IFDSetCapabilities(rContext, dwAttrId, cbAttrLen, (PUCHAR)pbAttr);
@@ -1557,7 +1567,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
-	if ((rv = RFCheckSharing(hCard, rContext)) != SCARD_S_SUCCESS)
+	rv = RFCheckSharing(hCard, rContext);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*
@@ -1574,7 +1585,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
 	/*
 	 * Make sure some event has not occurred
 	 */
-	if ((rv = RFCheckReaderEventState(rContext, hCard)) != SCARD_S_SUCCESS)
+	rv = RFCheckReaderEventState(rContext, hCard);
+	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/*

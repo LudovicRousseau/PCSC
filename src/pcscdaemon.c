@@ -478,7 +478,8 @@ int main(int argc, char **argv)
 		int f;
 		int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-		if ((f = open(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode)) != -1)
+		f = open(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode);
+		if (f != -1)
 		{
 			char pid[PID_ASCII_SIZE];
 

@@ -546,7 +546,8 @@ ULONG HPRegisterForHotplugEvents(void)
 		return 1;
 	}
 
-	if ((hal_ctx = libhal_ctx_new()) == NULL)
+	hal_ctx = libhal_ctx_new();
+	if (hal_ctx == NULL)
 	{
 		Log1(PCSC_LOG_ERROR, "error: libhal_ctx_new");
 		return 1;
