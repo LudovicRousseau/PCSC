@@ -9,7 +9,6 @@ CFLAGS="$CFLAGS -D_REENTRANT"
 ./configure \
         --prefix=/usr \
         --sysconfdir=/etc \
-        --enable-usbdropdir=/usr/lib/pcsc/drivers \
         --enable-muscledropdir=/usr/lib/pcsc/services \
         --enable-maintainer-mode \
         --enable-twinserial \
