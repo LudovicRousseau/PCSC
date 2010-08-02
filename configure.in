@@ -275,12 +275,14 @@ AC_ARG_ENABLE(usbdropdir,
 				  drivers (default /usr/local/lib/pcsc/drivers)]),
 [usbdropdir="${enableval}"], [usbdropdir=false])
 if test x${usbdropdir} = xfalse ; then
-	if test "x$prefix" != xNONE; then
-		usbdropdir="$prefix/lib/pcsc/drivers"
+	if test "x$libdir" != xNONE; then
+		usbdropdir="$libdir/pcsc/drivers"
 	else
-		usbdropdir="$ac_default_prefix/lib/pcsc/drivers"
+		usbdropdir="$ac_default_libdir/pcsc/drivers"
 	fi
 fi
+AS_AC_EXPAND(usbdropdir_exp,$usbdropdir)
+usbdropdir=$usbdropdir_exp
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} usbdropdir=${usbdropdir}"
 
