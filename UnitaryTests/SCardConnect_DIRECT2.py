@@ -44,10 +44,11 @@ if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
 print 'PC/SC Readers:', readers
 
-print "Using reader:", readers[0]
+reader = readers[0]
+print "Using reader:", reader
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -62,7 +63,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_DIRECT mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -72,7 +73,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -92,7 +93,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)

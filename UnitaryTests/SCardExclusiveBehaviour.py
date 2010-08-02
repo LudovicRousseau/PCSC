@@ -53,11 +53,12 @@ def Connect(mode):
     print 'PC/SC Readers:', readers
     if (len(readers) <= 0):
         raise NoReadersException()
-    print "Using reader:", readers[0]
+    reader = readers[0]
+    print "Using reader:", reader
 
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
+    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
         mode, SCARD_PROTOCOL_ANY)
-    return hresult, hcontext, hcard, readers[0]
+    return hresult, hcontext, hcard, reader
 
 
 def ConnectWithReader(readerName, mode):
