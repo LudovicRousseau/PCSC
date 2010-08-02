@@ -56,7 +56,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
 	SCARDHANDLE hCard;
 	SCARDCONTEXT hContext;
-	SCARD_READERSTATE_A rgReaderStates[1];
+	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
 	DWORD dwPref, dwReaders = 0;
 	char *pcReaders = NULL, *mszReaders;

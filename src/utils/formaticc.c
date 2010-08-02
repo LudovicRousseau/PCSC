@@ -30,7 +30,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	SCARDHANDLE hCard;
 	SCARDCONTEXT hContext;
 	SCARD_IO_REQUEST sRecvPci;
-	SCARD_READERSTATE_A rgReaderStates[1];
+	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwSendLength, dwRecvLength, dwPref, dwReaders;
 	LPSTR mszReaders;
 	BYTE s[MAX_BUFFER_SIZE], r[MAX_BUFFER_SIZE];

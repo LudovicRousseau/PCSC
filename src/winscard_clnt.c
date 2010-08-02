@@ -1840,7 +1840,7 @@ end:
  *
  * @code
  * SCARDCONTEXT hContext;
- * SCARD_READERSTATE_A rgReaderStates[2];
+ * SCARD_READERSTATE rgReaderStates[2];
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
@@ -1857,9 +1857,9 @@ end:
  * @endcode
  */
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
-	LPSCARD_READERSTATE_A rgReaderStates, DWORD cReaders)
+	SCARD_READERSTATE *rgReaderStates, DWORD cReaders)
 {
-	PSCARD_READERSTATE_A currReader;
+	SCARD_READERSTATE *currReader;
 	READER_STATE *rContext;
 	long dwTime;
 	DWORD dwState;

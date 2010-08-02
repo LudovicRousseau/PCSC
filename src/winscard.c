@@ -1337,7 +1337,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 LONG SCardGetStatusChange(/*@unused@*/ SCARDCONTEXT hContext,
 	/*@unused@*/ DWORD dwTimeout,
-	/*@unused@*/ LPSCARD_READERSTATE_A rgReaderStates,
+	/*@unused@*/ SCARD_READERSTATE *rgReaderStates,
 	/*@unused@*/ DWORD cReaders)
 {
 	/*

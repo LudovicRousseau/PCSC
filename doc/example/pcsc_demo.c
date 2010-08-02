@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 	/* get card status change */
 	{
 		/* check only one reader */
-		SCARD_READERSTATE_A rgReaderStates[1];
+		SCARD_READERSTATE rgReaderStates[1];
 
 		rgReaderStates[0].szReader = pbReader;
 		rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
