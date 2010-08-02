@@ -2830,9 +2830,9 @@ end:
  *          &pioRecvPci, pbRecvBuffer, &dwRecvLength);
  * @endcode
  */
-LONG SCardTransmit(SCARDHANDLE hCard, LPCSCARD_IO_REQUEST pioSendPci,
+LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	LPCBYTE pbSendBuffer, DWORD cbSendLength,
-	LPSCARD_IO_REQUEST pioRecvPci, LPBYTE pbRecvBuffer,
+	SCARD_IO_REQUEST *pioRecvPci, LPBYTE pbRecvBuffer,
 	LPDWORD pcbRecvLength)
 {
 	LONG rv;

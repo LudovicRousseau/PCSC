@@ -75,9 +75,9 @@ extern "C"
 		LPDWORD lpBytesReturned);
 
 	PCSC_API LONG SCardTransmit(SCARDHANDLE hCard,
-		LPCSCARD_IO_REQUEST pioSendPci,
+		const SCARD_IO_REQUEST *pioSendPci,
 		LPCBYTE pbSendBuffer, DWORD cbSendLength,
-		/*@out@*/ LPSCARD_IO_REQUEST pioRecvPci,
+		/*@out@*/ SCARD_IO_REQUEST *pioRecvPci,
 		/*@out@*/ LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength);
 
 	PCSC_API LONG SCardListReaderGroups(SCARDCONTEXT hContext,
