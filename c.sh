@@ -8,7 +8,6 @@ CFLAGS="$CFLAGS -D_REENTRANT"
 
 ./configure \
         --prefix=/usr \
-        --sysconfdir=/etc \
         --enable-maintainer-mode \
         --enable-twinserial \
         CFLAGS="$CFLAGS" \
