@@ -110,95 +110,6 @@
 
 static char sharing_shall_block = TRUE;
 
-#undef DO_PROFILE
-#ifdef DO_PROFILE
-
-#define PROFILE_FILE "/tmp/pcsc_profile"
-#include <stdio.h>
-#include <sys/time.h>
-
-struct timeval profile_time_start;
-FILE *profile_fd;
-char profile_tty;
-char fct_name[100];
-
-#define PROFILE_START profile_start(__FUNCTION__);
-#define PROFILE_END(rv) profile_end(__FUNCTION__, rv);
-
-static void profile_start(const char *f)
-{
-	static char initialized = FALSE;
-
-	if (!initialized)
-	{
-		char filename[80];
-
-		initialized = TRUE;
-		sprintf(filename, "%s-%d", PROFILE_FILE, getuid());
-		profile_fd = fopen(filename, "a+");
-		if (NULL == profile_fd)
-		{
-			fprintf(stderr, "\33[01;31mCan't open %s: %s\33[0m\n",
-				PROFILE_FILE, strerror(errno));
-			exit(-1);
-		}
-		fprintf(profile_fd, "\nStart a new profile\n");
-
-		if (isatty(fileno(stderr)))
-			profile_tty = TRUE;
-		else
-			profile_tty = FALSE;
-	}
-
-	/* PROFILE_END was not called before? */
-	if (profile_tty && fct_name[0])
-		printf("\33[01;34m WARNING: %s starts before %s finishes\33[0m\n",
-			f, fct_name);
-
-	strlcpy(fct_name, f, sizeof(fct_name));
-
-	gettimeofday(&profile_time_start, NULL);
-} /* profile_start */
-
-static void profile_end(const char *f, LONG rv)
-{
-	struct timeval profile_time_end;
-	long d;
-
-	gettimeofday(&profile_time_end, NULL);
-	d = time_sub(&profile_time_end, &profile_time_start);
-
-	if (profile_tty)
-	{
-		if (fct_name[0])
-		{
-			if (strncmp(fct_name, f, sizeof(fct_name)))
-				printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
-						f, fct_name);
-		}
-		else
-			printf("\33[01;34m WARNING: %s ends but we lost its start\33[0m\n",
-				f);
-
-		/* allow to detect missing PROFILE_END calls */
-		fct_name[0] = '\0';
-
-		if (rv != SCARD_S_SUCCESS)
-			fprintf(stderr,
-				"\33[01;31mRESULT %s \33[35m%ld \33[34m0x%08lX %s\33[0m\n",
-				f, d, rv, pcsc_stringify_error(rv));
-		else
-			fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
-	}
-	fprintf(profile_fd, "%s %ld\n", f, d);
-	fflush(profile_fd);
-} /* profile_end */
-
-#else
-#define PROFILE_START
-#define PROFILE_END(rv)
-#endif
-
 /**
  * Represents an Application Context Channel.
  * A channel belongs to an Application Context (\c _psContextMap).
@@ -390,8 +301,6 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	int daemon_launched = FALSE;
 	int retries = 0;
 
-	PROFILE_START
-
 again:
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
@@ -478,8 +387,6 @@ launch:
 	}
 
 end:
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -662,8 +569,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	struct release_struct scReleaseStruct;
 	SCONTEXTMAP * currentContextMap;
 
-	PROFILE_START
-
 	CHECK_SAME_PROCESS
 
 	/*
@@ -672,10 +577,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 */
 	currentContextMap = SCardGetContext(hContext);
 	if (NULL == currentContextMap)
-	{
-		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
@@ -723,8 +625,6 @@ end:
 	(void)SCardLockThread();
 	(void)SCardRemoveContext(hContext);
 	(void)SCardUnlockThread();
-
-	PROFILE_END(rv)
 
 	return rv;
 }
@@ -820,8 +720,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	struct connect_struct scConnectStruct;
 	SCONTEXTMAP * currentContextMap;
 
-	PROFILE_START
-
 	/*
 	 * Check for NULL parameters
 	 */
@@ -904,8 +802,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
-
-	PROFILE_END(rv)
 
 	return rv;
 }
@@ -992,8 +888,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
 
-	PROFILE_START
-
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
@@ -1065,8 +959,6 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -1107,8 +999,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	struct disconnect_struct scDisconnectStruct;
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
-
-	PROFILE_START
 
 	CHECK_SAME_PROCESS
 
@@ -1165,8 +1055,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -1212,8 +1100,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	struct begin_struct scBeginStruct;
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
-
-	PROFILE_START
 
 	CHECK_SAME_PROCESS
 
@@ -1276,8 +1162,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv);
-
 	return rv;
 }
 
@@ -1328,8 +1212,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	int randnum;
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
-
-	PROFILE_START
 
 	/*
 	 * Zero out everything
@@ -1394,8 +1276,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -1411,8 +1291,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 	struct cancel_transaction_struct scCancelStruct;
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
-
-	PROFILE_START
 
 	CHECK_SAME_PROCESS
 
@@ -1462,8 +1340,6 @@ LONG SCardCancelTransaction(SCARDHANDLE hCard)
 
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
-
-	PROFILE_END(rv)
 
 	return rv;
 }
@@ -1571,8 +1447,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	char *bufReader = NULL;
 	LPBYTE bufAtr = NULL;
 	DWORD dummy;
-
-	PROFILE_START
 
 	/* default output values */
 	if (pdwState)
@@ -1757,8 +1631,6 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -1868,8 +1740,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	SCONTEXTMAP * currentContextMap;
 	int currentReaderCount = 0;
 	LONG rv = SCARD_S_SUCCESS;
-
-	PROFILE_START
 
 	if ((rgReaderStates == NULL && cReaders > 0)
 		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
@@ -2315,8 +2185,6 @@ end:
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -2382,8 +2250,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
 
-	PROFILE_START
-
 	/* 0 bytes received by default */
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
@@ -2396,10 +2262,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
 		&pChannelMap);
 	if (rv == -1)
-	{
-		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
@@ -2477,8 +2340,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
-
-	PROFILE_END(rv)
 
 	return rv;
 }
@@ -2593,8 +2454,6 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 	LONG ret;
 	unsigned char *buf = NULL;
 
-	PROFILE_START
-
 	if (NULL == pcbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
@@ -2622,8 +2481,6 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 
 	ret = SCardGetSetAttrib(hCard, SCARD_GET_ATTRIB, dwAttrId, buf,
 		pcbAttrLen);
-
-	PROFILE_END(ret)
 
 	return ret;
 }
@@ -2668,15 +2525,11 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 {
 	LONG ret;
 
-	PROFILE_START
-
 	if (NULL == pbAttr || 0 == cbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
 	ret = SCardGetSetAttrib(hCard, SCARD_SET_ATTRIB, dwAttrId, (LPBYTE)pbAttr,
 		&cbAttrLen);
-
-	PROFILE_END(ret)
 
 	return ret;
 }
@@ -2840,8 +2693,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	CHANNEL_MAP * pChannelMap;
 	struct transmit_struct scTransmitStruct;
 
-	PROFILE_START
-
 	if (pbSendBuffer == NULL || pbRecvBuffer == NULL ||
 			pcbRecvLength == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
@@ -2856,7 +2707,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	if (rv == -1)
 	{
 		*pcbRecvLength = 0;
-		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
@@ -2963,8 +2813,6 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -3028,7 +2876,6 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	char *buf = NULL;
 
 	(void)mszGroups;
-	PROFILE_START
 
 	/*
 	 * Check for NULL parameters
@@ -3043,10 +2890,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	 */
 	currentContextMap = SCardGetContext(hContext);
 	if (NULL == currentContextMap)
-	{
-		PROFILE_END(SCARD_E_INVALID_HANDLE)
 		return SCARD_E_INVALID_HANDLE;
-	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
@@ -3126,8 +2970,6 @@ end:
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -3149,8 +2991,6 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 	LONG rv = SCARD_S_SUCCESS;
 	SCONTEXTMAP * currentContextMap;
 
-	PROFILE_START
-
 	CHECK_SAME_PROCESS
 
 	/*
@@ -3161,8 +3001,6 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 		return SCARD_E_INVALID_HANDLE;
 
 	free((void *)pvMem);
-
-	PROFILE_END(rv)
 
 	return rv;
 }
@@ -3225,8 +3063,6 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	SCONTEXTMAP * currentContextMap;
 	char *buf = NULL;
 
-	PROFILE_START
-
 	/* Multi-string with two trailing \0 */
 	const char ReaderGroup[] = "SCard$DefaultReaders\0";
 	const unsigned int dwGroups = sizeof(ReaderGroup);
@@ -3284,8 +3120,6 @@ end:
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -3324,8 +3158,6 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	LONG rv = SCARD_S_SUCCESS;
 	uint32_t dwClientID = 0;
 	struct cancel_struct scCancelStruct;
-
-	PROFILE_START
 
 	/*
 	 * Make sure this context has been opened
@@ -3371,8 +3203,6 @@ end:
 	ClientCloseSession(dwClientID);
 
 error:
-	PROFILE_END(rv)
-
 	return rv;
 }
 
@@ -3404,8 +3234,6 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	LONG rv;
 	SCONTEXTMAP * currentContextMap;
 
-	PROFILE_START
-
 	rv = SCARD_S_SUCCESS;
 
 	/* Check if the _same_ server is running */
@@ -3417,8 +3245,6 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	currentContextMap = SCardGetContext(hContext);
 	if (currentContextMap == NULL)
 		rv = SCARD_E_INVALID_HANDLE;
-
-	PROFILE_END(rv)
 
 	return rv;
 }
