@@ -326,8 +326,6 @@ else
 fi
 
 # set sysconfdir to /etc instead of /usr/etc if prefix=/usr
-echo $prefix
-echo $sysconfdir
 if test x${prefix} = x/usr; then
 	sysconfdir="/etc"
 fi
