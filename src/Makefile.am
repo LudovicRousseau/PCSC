@@ -32,8 +32,7 @@ libpcsclite_la_SOURCES = \
 	winscard_msg.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
-libpcsclite_la_LIBADD = $(COREFOUNDATION) $(LIBSMARTCARD) \
-	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
+libpcsclite_la_LIBADD = $(COREFOUNDATION) $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 
 pcscd_SOURCES = \
 	atrhandler.c \
