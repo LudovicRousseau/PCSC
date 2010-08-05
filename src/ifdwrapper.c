@@ -163,7 +163,7 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 #else
 #ifdef IFDHANDLERv1
 	rv = IO_Create_Channel(rContext->port);
-#elif IFDHANDLERv2
+#elif defined(IFDHANDLERv2)
 	rv = IFDHCreateChannel(rContext->slot, rContext->port);
 #else
 	{
@@ -586,7 +586,7 @@ LONG IFDControl_v2(READER_CONTEXT * rContext, PUCHAR TxBuffer,
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control_v2) (rContext->slot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
-#elif IFDHANDLERv2
+#elif defined(IFDHANDLERv2)
 	rv = IFDHControl(rContext->slot, TxBuffer, TxLength,
 		RxBuffer, RxLength);
 #endif
@@ -637,7 +637,7 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_control) (rContext->slot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
-#elif IFDHANDLERv3
+#elif defined(IFDHANDLERv3)
 	rv = IFDHControl(rContext->slot, ControlCode, TxBuffer,
 		TxLength, RxBuffer, RxLength, BytesReturned);
 #endif
