@@ -325,8 +325,6 @@ else
 	AC_MSG_RESULT([plateform endianess           : little endian])
 fi
 
-echo ${sysconfdir}
-
 # default value of sysconfdir
 if test x"${sysconfdir}" == x'${prefix}/etc'; then
 	# set sysconfdir to /etc instead of /usr/etc if prefix=/usr
