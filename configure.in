@@ -325,9 +325,17 @@ else
 	AC_MSG_RESULT([plateform endianess           : little endian])
 fi
 
-# set sysconfdir to /etc instead of /usr/etc if prefix=/usr
-if test x${prefix} = x/usr; then
-	sysconfdir="/etc"
+echo ${sysconfdir}
+
+# default value of sysconfdir
+if test x"${sysconfdir}" == x'${prefix}/etc'; then
+	# set sysconfdir to /etc instead of /usr/etc if prefix=/usr
+	if test x${prefix} = x/usr; then
+		sysconfdir="/etc"
+	fi
+
+	# add "/reader.conf.d" to the default value
+	sysconfdir="${sysconfdir}/reader.conf.d"
 fi
 
 # Setup dist stuff
@@ -339,7 +347,7 @@ AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
 AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
-PCSCLITE_CONFIG_DIR="${sysconfdir_exp}/reader.conf.d"
+PCSCLITE_CONFIG_DIR="${sysconfdir_exp}"
 AC_SUBST(PCSCLITE_CONFIG_DIR)
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} configdir=${PCSCLITE_CONFIG_DIR}"
 AC_DEFINE_UNQUOTED([PCSCLITE_FEATURES], ["${PCSCLITE_FEATURES}"], [Enabled PC/SC lite features])
