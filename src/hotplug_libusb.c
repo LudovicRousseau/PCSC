@@ -507,8 +507,7 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		ret = libusb_open(dev, &device);
 		if (ret < 0)
 		{
-			Log2(PCSC_LOG_ERROR, "libusb_open failed: %s",
-				libusb_strerror(ret));
+			Log2(PCSC_LOG_ERROR, "libusb_open failed: %d", ret);
 		}
 		else
 		{
@@ -518,8 +517,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 
 			if (ret < 0)
 			{
-				Log2(PCSC_LOG_ERROR, "libusb_get_string_descriptor_ascii failed: %s",
-					libusb_strerror(ret));
+				Log2(PCSC_LOG_ERROR,
+					"libusb_get_string_descriptor_ascii failed: %d", ret);
 				readerTracker[i].fullName = strdup(driver->readerName);
 			}
 			else
