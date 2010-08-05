@@ -32,6 +32,14 @@
 #include "sys_generic.h"
 #include "utils.h"
 
+#ifdef PCSCLITE_STATIC_DRIVER
+/* check that either IFDHANDLERv1, IFDHANDLERv2 or IFDHANDLERv3 is
+ * defined */
+  #if ! (defined(IFDHANDLERv1) || defined(IFDHANDLERv2) || defined(IFDHANDLERv3))
+  #error IFDHANDLER version not defined
+  #endif
+#endif
+
 /**
  * Set the protocol type selection (PTS).
  * This function sets the appropriate protocol to be used on the card.
