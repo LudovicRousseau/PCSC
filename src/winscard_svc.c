@@ -728,7 +728,7 @@ static void ContextThread(LPVOID newContext)
 				READ_BODY(gsStr)
 
 				if (MSGCheckHandleAssociation(gsStr.hCard, threadContext))
-					goto buffer_overflow;
+					goto exit;
 
 				/* avoids buffer overflow */
 				if (gsStr.cbAttrLen > sizeof(gsStr.pbAttr))
