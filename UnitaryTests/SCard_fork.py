@@ -28,6 +28,19 @@ hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
     raise EstablishContextException(hresult)
 
+hresult, readers = SCardListReaders(hcontext, [])
+if hresult != SCARD_S_SUCCESS:
+    raise ListReadersException(hresult)
+print 'PC/SC Readers:', readers
+
+reader = readers[0]
+print "Using reader:", reader
+
+hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
+    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+if hresult != SCARD_S_SUCCESS:
+    raise BaseSCardException(hresult)
+
 pid = os.fork()
 if pid == 0:
     # son
@@ -42,11 +55,25 @@ if pid == 0:
         raise ListReadersException(hresult)
     else:
         print "test failed"
+
+    hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
+
+    hresult = SCardReleaseContext(hcontext)
+    print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+    if hresult != SCARD_S_SUCCESS:
+        raise ReleaseContextException(hresult)
+
 else:
     # father
 
     # give some time to the son
     time.sleep(1)
+
+    hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
     hresult = SCardReleaseContext(hcontext)
     print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
