@@ -917,6 +917,15 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int list_index = 0;
+
+	if (0 == threadContext->hContext)
+	{
+		/* the handle is no more valid. After SCardReleaseContext() for
+		 * example */
+		Log1(PCSC_LOG_CRITICAL, "Invalidated handle");
+		return -1;
+	}
+
 	(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 	list_index = list_locate(&(threadContext->cardsList), &hCard);
 	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
