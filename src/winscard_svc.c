@@ -470,19 +470,17 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_DISCONNECT:
 			{
 				struct disconnect_struct diStr;
-				LONG rv;
 
 				READ_BODY(diStr)
 
-				rv = MSGCheckHandleAssociation(diStr.hCard, threadContext);
-				if (0 == rv)
-				{
-					diStr.rv = SCardDisconnect(diStr.hCard, diStr.dwDisposition);
+				if (MSGCheckHandleAssociation(diStr.hCard, threadContext))
+					goto exit;
 
-					if (SCARD_S_SUCCESS == diStr.rv)
-						diStr.rv =
-							MSGRemoveHandle(diStr.hCard, threadContext);
-				}
+				diStr.rv = SCardDisconnect(diStr.hCard, diStr.dwDisposition);
+
+				if (SCARD_S_SUCCESS == diStr.rv)
+					diStr.rv =
+						MSGRemoveHandle(diStr.hCard, threadContext);
 
 				WRITE_BODY(diStr)
 			}
@@ -491,13 +489,13 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_BEGIN_TRANSACTION:
 			{
 				struct begin_struct beStr;
-				LONG rv;
 
 				READ_BODY(beStr)
 
-				rv = MSGCheckHandleAssociation(beStr.hCard, threadContext);
-				if (0 == rv)
-					beStr.rv = SCardBeginTransaction(beStr.hCard);
+				if (MSGCheckHandleAssociation(beStr.hCard, threadContext))
+					goto exit;
+
+				beStr.rv = SCardBeginTransaction(beStr.hCard);
 
 				WRITE_BODY(beStr)
 			}
@@ -506,14 +504,13 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_END_TRANSACTION:
 			{
 				struct end_struct enStr;
-				LONG rv;
 
 				READ_BODY(enStr)
 
-				rv = MSGCheckHandleAssociation(enStr.hCard, threadContext);
-				if (0 == rv)
-					enStr.rv =
-						SCardEndTransaction(enStr.hCard, enStr.dwDisposition);
+				if (MSGCheckHandleAssociation(enStr.hCard, threadContext))
+					goto exit;
+
+				enStr.rv = SCardEndTransaction(enStr.hCard, enStr.dwDisposition);
 
 				WRITE_BODY(enStr)
 			}
@@ -522,13 +519,13 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_CANCEL_TRANSACTION:
 			{
 				struct cancel_transaction_struct caStr;
-				LONG rv;
 
 				READ_BODY(caStr)
 
-				rv = MSGCheckHandleAssociation(caStr.hCard, threadContext);
-				if (0 == rv)
-					caStr.rv = SCardCancelTransaction(caStr.hCard);
+				if (MSGCheckHandleAssociation(caStr.hCard, threadContext))
+					goto exit;
+
+				caStr.rv = SCardCancelTransaction(caStr.hCard);
 
 				WRITE_BODY(caStr)
 			}
@@ -560,41 +557,37 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_STATUS:
 			{
 				struct status_struct stStr;
-				LONG rv;
+				DWORD cchReaderLen;
+				DWORD dwState;
+				DWORD dwProtocol;
+				DWORD cbAtrLen;
 
 				READ_BODY(stStr)
 
-				rv = MSGCheckHandleAssociation(stStr.hCard, threadContext);
-				if (0 == rv)
+				if (MSGCheckHandleAssociation(stStr.hCard, threadContext))
+					goto exit;
+
+				cchReaderLen = stStr.pcchReaderLen;
+				dwState = stStr.dwState;
+				dwProtocol = stStr.dwProtocol;
+				cbAtrLen = stStr.pcbAtrLen;
+
+				/* avoids buffer overflow */
+				if ((cchReaderLen > sizeof(stStr.mszReaderNames))
+					|| (cbAtrLen > sizeof(stStr.pbAtr)))
 				{
-					DWORD cchReaderLen;
-					DWORD dwState;
-					DWORD dwProtocol;
-					DWORD cbAtrLen;
+					stStr.rv = SCARD_E_INSUFFICIENT_BUFFER ;
+				}
+				else
+				{
+					stStr.rv = SCardStatus(stStr.hCard,
+						stStr.mszReaderNames, &cchReaderLen, &dwState,
+						&dwProtocol, stStr.pbAtr, &cbAtrLen);
 
-					cchReaderLen = stStr.pcchReaderLen;
-					dwState = stStr.dwState;
-					dwProtocol = stStr.dwProtocol;
-					cbAtrLen = stStr.pcbAtrLen;
-
-					/* avoids buffer overflow */
-					if ((cchReaderLen > sizeof(stStr.mszReaderNames))
-						|| (cbAtrLen > sizeof(stStr.pbAtr)))
-					{
-						stStr.rv = SCARD_E_INSUFFICIENT_BUFFER ;
-					}
-					else
-					{
-						stStr.rv = SCardStatus(stStr.hCard,
-							stStr.mszReaderNames,
-							&cchReaderLen, &dwState,
-							&dwProtocol, stStr.pbAtr, &cbAtrLen);
-
-						stStr.pcchReaderLen = cchReaderLen;
-						stStr.dwState = dwState;
-						stStr.dwProtocol = dwProtocol;
-						stStr.pcbAtrLen = cbAtrLen;
-					}
+					stStr.pcchReaderLen = cchReaderLen;
+					stStr.dwState = dwState;
+					stStr.dwProtocol = dwProtocol;
+					stStr.pcbAtrLen = cbAtrLen;
 				}
 
 				WRITE_BODY(stStr)
