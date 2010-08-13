@@ -618,7 +618,7 @@ static void ContextThread(LPVOID newContext)
 				/* avoids buffer overflow */
 				if ((trStr.pcbRecvLength > sizeof(pbRecvBuffer))
 					|| (trStr.cbSendLength > sizeof(pbSendBuffer)))
-					goto exit;
+					goto buffer_overflow;
 
 				/* read sent buffer */
 				ret = MessageReceive(pbSendBuffer, trStr.cbSendLength, filedes);
@@ -668,7 +668,7 @@ static void ContextThread(LPVOID newContext)
 				if ((ctStr.cbRecvLength > sizeof(pbRecvBuffer))
 					|| (ctStr.cbSendLength > sizeof(pbSendBuffer)))
 				{
-					goto exit;
+					goto buffer_overflow;
 				}
 
 				/* read sent buffer */
