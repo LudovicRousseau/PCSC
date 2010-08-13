@@ -393,7 +393,10 @@ void *list_extract_at(list_t *restrict l, unsigned int pos) {
     tmp->data = NULL;   /* save data from list_drop_elem() free() */
     list_drop_elem(l, tmp, pos);
     l->numels--;
-    
+
+    if (0 == l->numels)
+        l->mid = NULL;
+
     assert(list_repOk(l));
 
     return data;
@@ -476,6 +479,8 @@ int list_delete_at(list_t *restrict l, unsigned int pos) {
 
     l->numels--;
 
+    if (0 == l->numels)
+        l->mid = NULL;
 
     assert(list_repOk(l));
 
