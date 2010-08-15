@@ -46,7 +46,7 @@ typedef struct
 	unsigned long cbAtr;
 	unsigned char rgbAtr[MAX_ATR_SIZE];
 }
-SCARD_READERSTATE;
+SCARD_READERSTATE, *LPSCARD_READERSTATE;
 
 /** Protocol Control Information (PCI) */
 typedef struct

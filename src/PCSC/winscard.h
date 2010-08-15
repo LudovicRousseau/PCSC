@@ -67,7 +67,7 @@ extern "C"
 
 	PCSC_API LONG SCardGetStatusChange(SCARDCONTEXT hContext,
 		DWORD dwTimeout,
-		SCARD_READERSTATE *rgReaderStates, DWORD cReaders);
+		LPSCARD_READERSTATE rgReaderStates, DWORD cReaders);
 
 	PCSC_API LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 		LPCVOID pbSendBuffer, DWORD cbSendLength,
