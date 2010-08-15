@@ -1,3 +1,11 @@
+pcsc-lite-1.6.4: Ludovic Rousseau
+15 August 2010
+- Do not use sysconfdir as configuration directory but
+  "${sysconfdir}/reader.conf.d" instead.
+  Use --enable-confdir=DIR if you want to set a specific value without
+  the "reader.conf.d" appended.
+
+
 pcsc-lite-1.6.3: Ludovic Rousseau
 15 August 2010
 - "/reader.conf.d" is only appended to sysconfdir if no value of
