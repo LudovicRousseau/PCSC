@@ -148,6 +148,7 @@ int main(int argc, char **argv)
 	int customMaxReaderHandles = 0;
 	int customMaxThreadCardHandles = 0;
 	int opt;
+	int limited_rights = FALSE;
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
 	static struct option long_options[] = {
@@ -195,6 +196,9 @@ int main(int argc, char **argv)
 	 */
 	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
 
+	/* if the process is setuid or setgid it may have some restrictions */
+	limited_rights = (getuid() != geteuid()) || (getgid() != getegid());
+
 	/*
 	 * Handle any command line arguments
 	 */
@@ -212,6 +216,11 @@ int main(int argc, char **argv)
 				break;
 #endif
 			case 'c':
+				if (limited_rights)
+				{
+					Log1(PCSC_LOG_CRITICAL, "Can't use a user specified config file");
+					return EXIT_FAILURE;
+				}
 				Log2(PCSC_LOG_INFO, "using new config file: %s", optarg);
 				newReaderConfig = optarg;
 				break;
