@@ -254,6 +254,11 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 
 			case 'a':
+				if (limited_rights)
+				{
+					Log1(PCSC_LOG_CRITICAL, "Can't log APDU (restricted)");
+					return EXIT_FAILURE;
+				}
 				(void)DebugLogSetCategory(DEBUG_CATEGORY_APDU);
 				break;
 
