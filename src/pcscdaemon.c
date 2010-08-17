@@ -597,7 +597,10 @@ int main(int argc, char **argv)
 
 	rv = HPRegisterForHotplugEvents();
 	if (rv)
+	{
+		Log1(PCSC_LOG_ERROR, "HPRegisterForHotplugEvents failed");
 		at_exit();
+	}
 #endif
 
 	/*
