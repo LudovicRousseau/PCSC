@@ -22,17 +22,17 @@ extern "C"
 {
 #endif
 
-#define TOKEN_MAX_KEY_SIZE   200
-#define TOKEN_MAX_VALUE_SIZE 200
+#include "simclist.h"
 
-#define TOKEN_TYPE_KEY         1
-#define TOKEN_TYPE_STRING      2
+struct bundleElt
+{
+	char *key;
+	list_t values;
+};
 
-int LTPBundleFindValueWithKey(const char *fileName, const char *tokenKey,
-                              /*@out@*/ char *tokenValue, int tokenIndice);
-
-int LTPBundleFindOptionalValueWithKey(const char *fileName,
-	const char *tokenKey, /*@out@*/ char *tokenValue, int tokenIndice);
+int LTPBundleFindValueWithKey(list_t *l, const char *key, list_t **values);
+int bundleParse(const char *fileName, list_t *l);
+void bundleRelease(list_t *l);
 
 #ifdef __cplusplus
 }
