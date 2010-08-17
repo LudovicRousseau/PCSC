@@ -440,12 +440,14 @@ LONG HPSearchHotPluggables(void)
 	}
 
 	if (HPReadBundleValues())
+	{
 		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
 			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, pipefd);
 
-	/* Wait for initial readers to setup */
-	read(pipefd[0], &c, 1);
-	close(pipefd[0]);
+		/* Wait for initial readers to setup */
+		read(pipefd[0], &c, 1);
+		close(pipefd[0]);
+	}
 
 	return 0;
 }
