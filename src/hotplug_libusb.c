@@ -423,8 +423,6 @@ static void HPEstablishUSBNotifications(int pipefd[2])
 LONG HPSearchHotPluggables(void)
 {
 	int i;
-	int pipefd[2];
-	char c;
 
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -433,14 +431,17 @@ LONG HPSearchHotPluggables(void)
 		readerTracker[i].fullName = NULL;
 	}
 
-	if (pipe(pipefd) == -1)
-	{
-		Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
-		return -1;
-	}
-
 	if (HPReadBundleValues())
 	{
+		int pipefd[2];
+		char c;
+
+		if (pipe(pipefd) == -1)
+		{
+			Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
+			return -1;
+		}
+
 		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
 			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, pipefd);
 
