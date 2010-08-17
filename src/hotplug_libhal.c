@@ -532,7 +532,7 @@ ULONG HPRegisterForHotplugEvents(void)
 	{
 		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
 		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
-		return 1;
+		return 0;
 	}
 
 	dbus_error_init(&error);
