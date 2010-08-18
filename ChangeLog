@@ -10,7 +10,7 @@ pcsc-lite-1.6.3: Ludovic Rousseau
 15 August 2010
 - "/reader.conf.d" is only appended to sysconfdir if no value of
   sysconfdir is provided
-- eefine LPSCARD_READERSTATE since this is used in the MSDN prototype.
+- Define LPSCARD_READERSTATE since this is used in the MSDN prototype.
   Use LPSCARD_READERSTATE in winscard.h instead of (SCARD_READERSTATE *)
   to mimic the MSDN API.
 - fix a pcscd crash when the application uses a PCSC handle after a
