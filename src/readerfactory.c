@@ -759,8 +759,8 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv1(field, function, code) \
 { \
 	void *f1 = NULL; \
-	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function); \
-	if (SCARD_S_SUCCESS != rv) \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function); \
+	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
 	} \
@@ -797,8 +797,8 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
 	void *f1 = NULL; \
-	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
-	if (SCARD_S_SUCCESS != rv) \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
 	} \
@@ -829,8 +829,8 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
 	void *f1 = NULL; \
-	DWORD rv = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
-	if (SCARD_S_SUCCESS != rv) \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
 	} \
