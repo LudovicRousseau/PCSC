@@ -76,8 +76,8 @@ extern int HPForceReaderPolling;
  */
 static struct _driverTracker
 {
-	long manuID;
-	long productID;
+	unsigned int manuID;
+	unsigned int productID;
 
 	char *bundleName;
 	char *libraryPath;
@@ -108,7 +108,6 @@ static LONG HPReadBundleValues(void)
 	struct dirent *currFP = NULL;
 	char fullPath[FILENAME_MAX];
 	char fullLibPath[FILENAME_MAX];
-	char keyValue[TOKEN_MAX_VALUE_SIZE];
 	int listCount = 0;
 
 	hpDir = opendir(PCSCLITE_HP_DROPDIR);
@@ -129,11 +128,24 @@ static LONG HPReadBundleValues(void)
 	}
 	driverSize = DRIVER_TRACKER_SIZE_STEP;
 
+#define GET_KEY(key, values) \
+	rv = LTPBundleFindValueWithKey(&plist, key, values); \
+	if (rv) \
+	{ \
+		Log2(PCSC_LOG_ERROR, "Value/Key not defined for " key " in %s", \
+			fullPath); \
+		continue; \
+	}
+
 	while ((currFP = readdir(hpDir)) != 0)
 	{
 		if (strstr(currFP->d_name, ".bundle") != 0)
 		{
-			int alias = 0;
+			unsigned int alias;
+			list_t plist, *values;
+			list_t *manuIDs, *productIDs, *readerNames;
+			char *libraryPath;
+			int ifdCapabilities;
 
 			/*
 			 * The bundle exists - let's form a full path name and get the
@@ -143,60 +155,50 @@ static LONG HPReadBundleValues(void)
 				PCSCLITE_HP_DROPDIR, currFP->d_name);
 			fullPath[sizeof(fullPath) - 1] = '\0';
 
+			rv = bundleParse(fullPath, &plist);
+			if (rv)
+				continue;
+
+			/* get CFBundleExecutable */
+			GET_KEY(PCSCLITE_HP_LIBRKEY_NAME, &values)
+			libraryPath = list_get_at(values, 0);
+			(void)snprintf(fullLibPath, sizeof(fullLibPath),
+				"%s/%s/Contents/%s/%s",
+				PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
+				libraryPath);
+			fullLibPath[sizeof(fullLibPath) - 1] = '\0';
+
+			/* Get ifdCapabilities */
+			GET_KEY(PCSCLITE_HP_CPCTKEY_NAME, &values)
+			ifdCapabilities = strtol(list_get_at(values, 0), NULL, 16);
+
+			GET_KEY(PCSCLITE_HP_MANUKEY_NAME, &manuIDs)
+			GET_KEY(PCSCLITE_HP_PRODKEY_NAME, &productIDs)
+			GET_KEY(PCSCLITE_HP_NAMEKEY_NAME, &readerNames)
+
 			/* while we find a nth ifdVendorID in Info.plist */
-			while (LTPBundleFindValueWithKey(fullPath, PCSCLITE_HP_MANUKEY_NAME,
-				keyValue, alias) == 0)
+			for (alias=0; alias<list_size(manuIDs); alias++)
 			{
+				char *value;
+
+				/* variables entries */
+				value = list_get_at(manuIDs, alias);
+				driverTracker[listCount].manuID = strtol(value, NULL, 16);
+
+				value = list_get_at(productIDs, alias);
+				driverTracker[listCount].productID = strtol(value, NULL, 16);
+
+				driverTracker[listCount].readerName = strdup(list_get_at(readerNames, alias));
+
+				/* constant entries for a same driver */
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
-
-				/* Get ifdVendorID */
-				rv = LTPBundleFindValueWithKey(fullPath,
-					PCSCLITE_HP_MANUKEY_NAME, keyValue, alias);
-				if (rv == 0)
-					driverTracker[listCount].manuID = strtol(keyValue, NULL, 16);
-
-				/* get ifdProductID */
-				rv = LTPBundleFindValueWithKey(fullPath,
-					PCSCLITE_HP_PRODKEY_NAME, keyValue, alias);
-				if (rv == 0)
-					driverTracker[listCount].productID =
-						strtol(keyValue, NULL, 16);
-
-				/* get ifdFriendlyName */
-				rv = LTPBundleFindValueWithKey(fullPath,
-					PCSCLITE_HP_NAMEKEY_NAME, keyValue, alias);
-				if (rv == 0)
-					driverTracker[listCount].readerName = strdup(keyValue);
-
-				/* get CFBundleExecutable */
-				rv = LTPBundleFindValueWithKey(fullPath,
-					PCSCLITE_HP_LIBRKEY_NAME, keyValue, 0);
-				if (rv == 0)
-				{
-					snprintf(fullLibPath, sizeof(fullLibPath),
-						"%s/%s/Contents/%s/%s",
-						PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
-						keyValue);
-					fullLibPath[sizeof(fullLibPath) - 1] = '\0';
-					driverTracker[listCount].libraryPath = strdup(fullLibPath);
-				}
-
-				/* Get ifdCapabilities */
-				rv = LTPBundleFindValueWithKey(fullPath,
-					PCSCLITE_HP_CPCTKEY_NAME, keyValue, 0);
-				if (rv == 0)
-					driverTracker[listCount].ifdCapabilities = strtol(keyValue,
-						NULL, 16);
+				driverTracker[listCount].libraryPath = strdup(fullLibPath);
+				driverTracker[listCount].ifdCapabilities = ifdCapabilities;
 
 #ifdef DEBUG_HOTPLUG
 				Log2(PCSC_LOG_INFO, "Found driver for: %s",
 					driverTracker[listCount].readerName);
 #endif
-				alias++;
-
-				if (NULL == driverTracker[listCount].readerName)
-					continue;
-
 				listCount++;
 				if (listCount >= driverSize)
 				{
@@ -229,6 +231,7 @@ static LONG HPReadBundleValues(void)
 					}
 				}
 			}
+			bundleRelease(&plist);
 		}
 	}
 
