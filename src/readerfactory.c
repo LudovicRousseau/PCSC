@@ -717,42 +717,38 @@ LONG RFLoadReader(READER_CONTEXT * rContext)
 
 LONG RFBindFunctions(READER_CONTEXT * rContext)
 {
-	int rv1, rv2, rv3;
+	int rv;
 	void *f;
 
-	/*
-	 * Use this function as a dummy to determine the IFD Handler version
-	 * type  1.0/2.0/3.0.  Suppress error messaging since it can't be 1.0,
-	 * 2.0 and 3.0.
-	 */
-
-	DebugLogSuppress(DEBUGLOG_IGNORE_ENTRIES);
-
-	rv1 = DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
-	rv2 = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel");
-	rv3 = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName");
-
-	DebugLogSuppress(DEBUGLOG_LOG_ENTRIES);
-
-	if (rv1 != SCARD_S_SUCCESS && rv2 != SCARD_S_SUCCESS && rv3 != SCARD_S_SUCCESS)
-	{
-		/* Neither version of the IFD Handler was found - exit */
-		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
-
-		return SCARD_F_UNKNOWN_ERROR;
-	} else if (rv1 == SCARD_S_SUCCESS)
-	{
-		/* Ifd Handler 1.0 found */
-		rContext->version = IFD_HVERSION_1_0;
-	} else if (rv3 == SCARD_S_SUCCESS)
+	rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName");
+	if (SCARD_S_SUCCESS == rv)
 	{
 		/* Ifd Handler 3.0 found */
 		rContext->version = IFD_HVERSION_3_0;
 	}
 	else
 	{
-		/* Ifd Handler 2.0 found */
-		rContext->version = IFD_HVERSION_2_0;
+		rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel");
+		if (SCARD_S_SUCCESS == rv)
+		{
+			/* Ifd Handler 2.0 found */
+			rContext->version = IFD_HVERSION_2_0;
+		}
+		else
+		{
+			rv = DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
+			if (SCARD_S_SUCCESS == rv)
+			{
+				/* Ifd Handler 1.0 found */
+				rContext->version = IFD_HVERSION_1_0;
+			}
+			else
+			{
+				/* Neither version of the IFD Handler was found - exit */
+				Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
+				return SCARD_F_UNKNOWN_ERROR;
+			}
+		}
 	}
 
 	/* The following binds version 1.0 of the IFD Handler specs */
