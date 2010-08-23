@@ -186,13 +186,13 @@ static LONG HPReadBundleValues(void)
 				value = list_get_at(productIDs, alias);
 				driverTracker[listCount].productID = strtol(value, NULL, 16);
 
-				driverTracker[listCount].readerName = list_get_at(readerNames, alias);
+				driverTracker[listCount].readerName = strdup(list_get_at(readerNames, alias));
 
 				/* constant entries for a same driver */
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 				driverTracker[listCount].libraryPath = strdup(fullLibPath);
 				driverTracker[listCount].ifdCapabilities = ifdCapabilities;
-				driverTracker[listCount].CFBundleName = CFBundleName;
+				driverTracker[listCount].CFBundleName = strdup(CFBundleName);
 
 #ifdef DEBUG_HOTPLUG
 				Log2(PCSC_LOG_INFO, "Found driver for: %s",
