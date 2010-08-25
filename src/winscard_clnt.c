@@ -1764,7 +1764,7 @@ end:
 
 /**
  * @brief This function blocks execution until the current availability
- * of the cards in a specific set of readers changes. 
+ * of the cards in a specific set of readers changes.
  *
  * This function receives a structure or list of structures containing
  * reader names. It then blocks for a change in state to occur for a
@@ -3734,9 +3734,8 @@ static LONG SCardInvalidateHandles(void)
 /**
  * @brief Checks if the server is running.
  *
- * If the server has been restarted or the client has forked we
- * invalidate all the PC/SC handles. The client has to call
- * SCardEstablishContext() again.
+ * If the server has been restarted we invalidate all the PC/SC handles.
+ * The client has to call SCardEstablishContext() again.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Server is running (\ref SCARD_S_SUCCESS)
