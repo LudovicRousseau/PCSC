@@ -31,19 +31,19 @@
 
 pid_t GetDaemonPid(void)
 {
-	FILE *f;
+	int fd;
 	pid_t pid;
 
 	/* pids are only 15 bits but 4294967296
 	 * (32 bits in case of a new system use it) is on 10 bytes
 	 */
-	f = fopen(PCSCLITE_RUN_PID, "rb");
-	if (f != NULL)
+	fd = open(PCSCLITE_RUN_PID, O_RDONLY);
+	if (fd >= 0)
 	{
 		char pid_ascii[PID_ASCII_SIZE];
 
-		(void)fgets(pid_ascii, PID_ASCII_SIZE, f);
-		(void)fclose(f);
+		(void)read(fd, pid_ascii, PID_ASCII_SIZE);
+		(void)close(fd);
 
 		pid = atoi(pid_ascii);
 	}
