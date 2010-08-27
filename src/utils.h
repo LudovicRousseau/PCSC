@@ -4,7 +4,7 @@
  * Copyright (C) 2006-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
- * $Id: pcscdaemon.c 2377 2007-02-05 13:13:56Z rousseau $
+ * $Id$
  */
 
 #ifndef __utils_h__

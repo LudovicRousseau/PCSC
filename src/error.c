@@ -10,7 +10,7 @@
  * - BSD-like, see the COPYING file
  * - GNU Lesser General Licence 2.1 or (at your option) any later version.
  *
- * $Id: debuglog.c 1827 2006-01-24 14:49:52Z rousseau $
+ * $Id$
  */
 
 /**

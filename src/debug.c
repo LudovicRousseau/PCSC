@@ -6,7 +6,7 @@
  * Copyright (C) 2002-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
- * $Id: debuglog.c 1953 2006-03-21 13:46:28Z rousseau $
+ * $Id$
  */
 
 /**
