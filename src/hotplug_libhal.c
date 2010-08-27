@@ -375,7 +375,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 	deviceName[sizeof(deviceName) -1] = '\0';
 
 	/* wait until the device is visible by libusb/etc.  */
-	(void)SYS_Sleep(1);
+	(void)SYS_USleep(1000);
 
 	(void)pthread_mutex_lock(&usbNotifierMutex);
 
