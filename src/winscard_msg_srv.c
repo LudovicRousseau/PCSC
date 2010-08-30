@@ -134,7 +134,7 @@ INTERNAL int32_t InitializeSocket(void)
 	/*
 	 * Chmod the public entry channel
 	 */
-	(void)chmod(PCSCLITE_CSOCK_NAME, S_IRWXO | S_IRWXG | S_IRWXU);
+	(void)chmod(PCSCLITE_CSOCK_NAME, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
 	return 0;
 }
