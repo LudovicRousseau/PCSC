@@ -316,8 +316,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	{
 		dwAtrLen = MAX_ATR_SIZE;
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
-			rContext->readerState->cardAtr,
-			&dwAtrLen);
+			rContext->readerState->cardAtr, &dwAtrLen);
 		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
@@ -375,8 +374,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	 * Set all the public attributes to this reader
 	 */
 	rContext->readerState->readerState = dwStatus;
-	rContext->readerState->readerSharing = readerSharing =
-		rContext->contexts;
+	rContext->readerState->readerSharing = readerSharing = rContext->contexts;
 
 	(void)EHSignalEventToClients();
 
@@ -386,8 +384,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 		dwAtrLen = rContext->readerState->cardAtrLength;
 		rv = IFDStatusICC(rContext, &dwStatus,
-			rContext->readerState->cardAtr,
-			&dwAtrLen);
+			rContext->readerState->cardAtr, &dwAtrLen);
 		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		if (rv != SCARD_S_SUCCESS)
@@ -453,8 +450,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				 */
 				dwAtrLen = MAX_ATR_SIZE;
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
-					rContext->readerState->cardAtr,
-					&dwAtrLen);
+					rContext->readerState->cardAtr, &dwAtrLen);
 				rContext->readerState->cardAtrLength = dwAtrLen;
 
 				/* the protocol is unset after a power on */
