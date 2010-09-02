@@ -105,8 +105,8 @@ extern "C"
 
 	struct ReaderContext
 	{
-		char *lpcLibrary;	/**< Library Path */
-		char *lpcDevice;	/**< Device Name */
+		char *library;	/**< Library Path */
+		char *device;	/**< Device Name */
 		pthread_t pthThread;	/**< Event polling thread */
 		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
 		pthread_mutex_t *mMutex;	/**< Mutex for this connection */
@@ -139,9 +139,9 @@ extern "C"
 	typedef struct ReaderContext READER_CONTEXT;
 
 	LONG RFAllocateReaderSpace(unsigned int);
-	LONG RFAddReader(const char *, int, LPSTR, LPSTR);
+	LONG RFAddReader(const char *, int, const char *, const char *);
 	LONG RFRemoveReader(const char *, int);
-	LONG RFSetReaderName(READER_CONTEXT *, const char *, LPSTR, int, DWORD);
+	LONG RFSetReaderName(READER_CONTEXT *, const char *, const char *, int, DWORD);
 	LONG RFReaderInfo(const char *, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoNamePort(int, const char *, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(DWORD, /*@out@*/ struct ReaderContext **);

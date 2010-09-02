@@ -104,7 +104,8 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	return EHInitializeEventStructures();
 }
 
-LONG RFAddReader(const char *readerName, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
+LONG RFAddReader(const char *readerName, int port, const char *library,
+	const char *device)
 {
 	DWORD dwContext = 0, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
@@ -112,7 +113,7 @@ LONG RFAddReader(const char *readerName, int port, LPSTR lpcLibrary, LPSTR lpcDe
 	int i, j;
 	int lrv = 0;
 
-	if ((readerName == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
+	if ((readerName == NULL) || (library == NULL) || (device == NULL))
 		return SCARD_E_INVALID_VALUE;
 
 	/* Reader name too long? also count " 00 00"*/
@@ -168,12 +169,12 @@ LONG RFAddReader(const char *readerName, int port, LPSTR lpcLibrary, LPSTR lpcDe
 
 	/* Check and set the readername to see if it must be enumerated */
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], readerName,
-		lpcLibrary, port, 0);
+		library, port, 0);
 	if (parentNode < -1)
 		return SCARD_E_NO_MEMORY;
 
-	sReadersContexts[dwContext]->lpcLibrary = strdup(lpcLibrary);
-	sReadersContexts[dwContext]->lpcDevice = strdup(lpcDevice);
+	sReadersContexts[dwContext]->library = strdup(library);
+	sReadersContexts[dwContext]->device = strdup(device);
 	(sReadersContexts[dwContext])->version = 0;
 	(sReadersContexts[dwContext])->port = port;
 	(sReadersContexts[dwContext])->mMutex = NULL;
@@ -344,10 +345,10 @@ LONG RFAddReader(const char *readerName, int port, LPSTR lpcLibrary, LPSTR lpcDe
 			sizeof(sReadersContexts[dwContextB]->readerState->readerName));
 		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
-		sReadersContexts[dwContextB]->lpcLibrary =
-			sReadersContexts[dwContext]->lpcLibrary;
-		sReadersContexts[dwContextB]->lpcDevice =
-			sReadersContexts[dwContext]->lpcDevice;
+		sReadersContexts[dwContextB]->library =
+			sReadersContexts[dwContext]->library;
+		sReadersContexts[dwContextB]->device =
+			sReadersContexts[dwContext]->device;
 		(sReadersContexts[dwContextB])->version =
 		  (sReadersContexts[dwContext])->version;
 		(sReadersContexts[dwContextB])->port =
@@ -482,8 +483,8 @@ LONG RFRemoveReader(const char *readerName, int port)
 		{
 			(void)pthread_mutex_destroy(sContext->mMutex);
 			free(sContext->mMutex);
-			free(sContext->lpcLibrary);
-			free(sContext->lpcDevice);
+			free(sContext->library);
+			free(sContext->device);
 			free(sContext->pMutex);
 			sContext->pMutex = NULL;
 		}
@@ -533,7 +534,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 }
 
 LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
-	LPSTR libraryName, int port, DWORD slot)
+	const char *libraryName, int port, DWORD slot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
 	DWORD valueLength;
@@ -552,7 +553,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 		{
 			if ((sReadersContexts[i])->vHandle != 0)
 			{
-				if (strcmp((sReadersContexts[i])->lpcLibrary, libraryName) == 0)
+				if (strcmp((sReadersContexts[i])->library, libraryName) == 0)
 				{
 					UCHAR tagValue[1];
 					LONG ret;
@@ -719,12 +720,12 @@ LONG RFLoadReader(READER_CONTEXT * rContext)
 	if (rContext->vHandle != 0)
 	{
 		Log2(PCSC_LOG_INFO, "Reusing already loaded driver for %s",
-			rContext->lpcLibrary);
+			rContext->library);
 		/* Another reader exists with this library loaded */
 		return SCARD_S_SUCCESS;
 	}
 
-	return DYN_LoadLibrary(&rContext->vHandle, rContext->lpcLibrary);
+	return DYN_LoadLibrary(&rContext->vHandle, rContext->library);
 }
 
 LONG RFBindFunctions(READER_CONTEXT * rContext)
@@ -964,7 +965,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 
 	/* Spawn the event handler thread */
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
-		rContext->readerState->readerName, rContext->lpcLibrary);
+		rContext->readerState->readerName, rContext->library);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/* loads the library */
@@ -995,7 +996,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 	if (rv != IFD_SUCCESS)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Open Port %X Failed (%s)",
-			rContext->port, rContext->lpcDevice);
+			rContext->port, rContext->device);
 		(void)RFUnBindFunctions(rContext);
 		(void)RFUnloadReader(rContext);
 		if (IFD_NO_SUCH_DEVICE == rv)
