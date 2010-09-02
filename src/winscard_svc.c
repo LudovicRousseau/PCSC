@@ -63,7 +63,6 @@ struct _psContext
 	pthread_mutex_t cardsList_lock;	/**< lock for the above list */
 	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
 	pthread_t pthThread;		/**< Event polling thread's ID */
-	int protocol_major, protocol_minor;	/**< Protocol number agreed between client and server*/
 };
 typedef struct _psContext SCONTEXT;
 
@@ -316,10 +315,6 @@ static void ContextThread(LPVOID newContext)
 				struct version_struct veStr;
 
 				READ_BODY(veStr)
-
-				/* get the client protocol version */
-				threadContext->protocol_major = veStr.major;
-				threadContext->protocol_minor = veStr.minor;
 
 				Log3(PCSC_LOG_DEBUG, "Client is protocol version %d:%d",
 					veStr.major, veStr.minor);
