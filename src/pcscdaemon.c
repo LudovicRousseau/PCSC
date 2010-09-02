@@ -601,6 +601,8 @@ int main(int argc, char **argv)
 		Log1(PCSC_LOG_ERROR, "HPRegisterForHotplugEvents failed");
 		at_exit();
 	}
+
+	RFWaitForReaderInit();
 #endif
 
 	/*

@@ -193,7 +193,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 		sizeof(rContext->readerState->cardAtr));
 	rContext->readerState->readerState = 0;
 	rContext->readerState->readerSharing = 0;
-	rContext->readerState->cardAtrLength = 0;
+	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	/* Zero the thread */

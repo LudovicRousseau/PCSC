@@ -57,6 +57,11 @@ extern "C"
 /** Some defines for context stack. */
 #define SCARD_EXCLUSIVE_CONTEXT -1
 
+/** Special value to indicate that power up has not yet happen
+ * This is used to auto start mode to wait until the reader is
+ * ready and the (possible) card has been powered up */
+#define READER_NOT_INITIALIZED (MAX_ATR_SIZE+1)
+
 #ifdef __cplusplus
 }
 #endif

@@ -94,7 +94,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
 		readerStates[i].readerState = 0;
 		readerStates[i].readerSharing = 0;
-		readerStates[i].cardAtrLength = 0;
+		readerStates[i].cardAtrLength = READER_NOT_INITIALIZED;
 		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		sReadersContexts[i]->readerState = &readerStates[i];
@@ -1295,6 +1295,40 @@ void RFCleanupReaders(void)
 		}
 	}
 }
+
+/**
+ * Wait until all connected readers have a chance to power up a possibly
+ * inserted card.
+ */
+#ifdef USE_USB
+void RFWaitForReaderInit(void)
+{
+	int i, need_to_wait;
+
+	do
+	{
+		need_to_wait = FALSE;
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		{
+			/* reader is present */
+			if (sReadersContexts[i]->vHandle != NULL)
+			{
+				/* but card state is not yet available */
+				if (READER_NOT_INITIALIZED
+					== sReadersContexts[i]->readerState->cardAtrLength)
+				{
+					Log2(PCSC_LOG_DEBUG, "Waiting init for reader: %s",
+						sReadersContexts[i]->readerState->readerName);
+					need_to_wait = TRUE;
+				}
+			}
+		}
+
+		if (need_to_wait)
+			SYS_USleep(10*1000); /* 10 ms */
+	} while (need_to_wait);
+}
+#endif
 
 #ifdef USE_SERIAL
 int RFStartSerialReaders(const char *readerconf)
