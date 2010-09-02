@@ -1229,8 +1229,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	if (strlen(rContext->lpcReader) > MAX_BUFFER_SIZE
-			|| rContext->readerState->cardAtrLength > MAX_ATR_SIZE)
+	if (rContext->readerState->cardAtrLength > MAX_ATR_SIZE)
 		return SCARD_F_INTERNAL_ERROR;
 
 	/*
