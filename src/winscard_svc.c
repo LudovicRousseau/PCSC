@@ -321,23 +321,19 @@ static void ContextThread(LPVOID newContext)
 				threadContext->protocol_major = veStr.major;
 				threadContext->protocol_minor = veStr.minor;
 
-				Log3(PCSC_LOG_DEBUG,
-						"Client is protocol version %d:%d",
-						veStr.major, veStr.minor);
+				Log3(PCSC_LOG_DEBUG, "Client is protocol version %d:%d",
+					veStr.major, veStr.minor);
 
 				veStr.rv = SCARD_S_SUCCESS;
 
-				/* client is newer than server */
-				if ((veStr.major > PROTOCOL_VERSION_MAJOR)
-						|| (veStr.major == PROTOCOL_VERSION_MAJOR
-							&& veStr.minor > PROTOCOL_VERSION_MINOR))
+				/* client and server use different protocol */
+				if ((veStr.major != PROTOCOL_VERSION_MAJOR)
+					|| (veStr.minor != PROTOCOL_VERSION_MINOR))
 				{
-					Log3(PCSC_LOG_CRITICAL,
-							"Client protocol is too new %d:%d",
-							veStr.major, veStr.minor);
-					Log3(PCSC_LOG_CRITICAL,
-							"Server protocol is %d:%d",
-							PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
+					Log3(PCSC_LOG_CRITICAL, "Client protocol is %d:%d",
+						veStr.major, veStr.minor);
+					Log3(PCSC_LOG_CRITICAL, "Server protocol is %d:%d",
+						PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
 					veStr.rv = SCARD_E_NO_SERVICE;
 				}
 
