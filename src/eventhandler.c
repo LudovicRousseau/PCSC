@@ -135,12 +135,6 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	DWORD dwGetSize;
 	UCHAR ucGetData[1];
 
-	if (NULL == rContext->readerState)
-	{
-		Log1(PCSC_LOG_ERROR, "Thread never started (reader init failed?)");
-		return SCARD_S_SUCCESS;
-	}
-
 	if ('\0' == rContext->readerState->readerName[0])
 	{
 		Log1(PCSC_LOG_INFO, "Thread already stomped.");
