@@ -223,7 +223,6 @@ check_types (void)
 
     BLANK_LINE ();
     CHECK_STRUCT (pubReaderStatesList);
-    CHECK_MEMBER (pubReaderStatesList, readerID);
     CHECK_MEMBER (pubReaderStatesList, readerName);
     CHECK_MEMBER (pubReaderStatesList, readerState);
     CHECK_MEMBER (pubReaderStatesList, readerSharing);

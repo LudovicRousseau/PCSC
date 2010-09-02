@@ -39,7 +39,6 @@
 #include "winscard_svc.h"
 #include "simclist.h"
 
-READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
@@ -117,20 +116,6 @@ LONG EHSignalEventToClients(void)
 
 LONG EHInitializeEventStructures(void)
 {
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		/* Zero out each value in the struct */
-		memset(readerStates[i].readerName, 0, MAX_READERNAME);
-		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
-		readerStates[i].readerID = 0;
-		readerStates[i].readerState = 0;
-		readerStates[i].readerSharing = 0;
-		readerStates[i].cardAtrLength = 0;
-		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-	}
-
 	(void)list_init(&ClientsWaitingForEvent);
 
 	/* request to store copies, and provide the metric function */
@@ -212,7 +197,6 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 		sizeof(rContext->readerState->readerName));
 	memset(rContext->readerState->cardAtr, 0,
 		sizeof(rContext->readerState->cardAtr));
-	rContext->readerState->readerID = 0;
 	rContext->readerState->readerState = 0;
 	rContext->readerState->readerSharing = 0;
 	rContext->readerState->cardAtrLength = 0;
@@ -231,7 +215,6 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 {
 	LONG rv;
 	DWORD dwStatus = 0;
-	int i;
 	UCHAR ucAtr[MAX_ATR_SIZE];
 	DWORD dwAtrLen = 0;
 
@@ -242,30 +225,8 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
-	/*
-	 * Find an empty reader slot and insert the new reader
-	 */
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		if (readerStates[i].readerID == 0)
-			break;
-	}
-
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
-		return SCARD_F_INTERNAL_ERROR;
-
-	/*
-	 * Set all the attributes to this reader
-	 */
-	rContext->readerState = &readerStates[i];
 	(void)strlcpy(rContext->readerState->readerName, rContext->lpcReader,
 		sizeof(rContext->readerState->readerName));
-	memcpy(rContext->readerState->cardAtr, ucAtr, dwAtrLen);
-	rContext->readerState->readerID = i + 100;
-	rContext->readerState->readerState = dwStatus;
-	rContext->readerState->readerSharing = rContext->contexts;
-	rContext->readerState->cardAtrLength = dwAtrLen;
-	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	rContext->pthCardEvent = card_event;
 	rv = ThreadCreate(&rContext->pthThread, 0,

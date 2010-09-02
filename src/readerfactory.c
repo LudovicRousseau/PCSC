@@ -49,6 +49,7 @@
 #endif
 
 static READER_CONTEXT * sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
+READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 #ifdef USE_SERIAL
@@ -87,7 +88,16 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	{
 		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
 		(sReadersContexts[i])->vHandle = NULL;
-		(sReadersContexts[i])->readerState = NULL;
+
+		/* Zero out each value in the struct */
+		memset(readerStates[i].readerName, 0, MAX_READERNAME);
+		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
+		readerStates[i].readerState = 0;
+		readerStates[i].readerSharing = 0;
+		readerStates[i].cardAtrLength = 0;
+		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+
+		sReadersContexts[i]->readerState = &readerStates[i];
 	}
 
 	/* Create public event structures */
@@ -175,7 +185,6 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	(sReadersContexts[dwContext])->pMutex = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << IDENTITY_SHIFT;
-	(sReadersContexts[dwContext])->readerState = NULL;
 
 	lrv = list_init(&((sReadersContexts[dwContext])->handlesList));
 	if (lrv < 0)
@@ -363,7 +372,6 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		(sReadersContexts[dwContextB])->contexts = 0;
 		(sReadersContexts[dwContextB])->hLockId = 0;
 		(sReadersContexts[dwContextB])->LockCount = 0;
-		(sReadersContexts[dwContextB])->readerState = NULL;
 		(sReadersContexts[dwContextB])->dwIdentity =
 			(dwContextB + 1) << IDENTITY_SHIFT;
 
@@ -496,7 +504,6 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 		sContext->LockCount = 0;
 		sContext->vHandle = NULL;
 		sContext->dwIdentity = 0;
-		sContext->readerState = NULL;
 
 		(void)pthread_mutex_lock(&sContext->handlesList_lock);
 		while (list_size(&(sContext->handlesList)) != 0)
@@ -1249,8 +1256,7 @@ LONG RFClearReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 
 LONG RFCheckReaderStatus(READER_CONTEXT * rContext)
 {
-	if ((rContext->readerState == NULL)
-		|| (rContext->readerState->readerState & SCARD_UNKNOWN))
+	if (rContext->readerState->readerState & SCARD_UNKNOWN)
 		return SCARD_E_READER_UNAVAILABLE;
 	else
 		return SCARD_S_SUCCESS;

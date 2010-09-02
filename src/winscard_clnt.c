@@ -1931,7 +1931,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	/* Get the initial reader count on the system */
 	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
-		if (readerStates[j].readerID != 0)
+		if (readerStates[j].readerName[0] != '\0')
 			currentReaderCount++;
 
 	if (INFINITE == dwTimeout)
@@ -1969,7 +1969,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					int k, newReaderCount = 0;
 
 					for (k=0; k < PCSCLITE_MAX_READERS_CONTEXTS; k++)
-						if (readerStates[k].readerID != 0)
+						if (readerStates[k].readerName != '\0')
 							newReaderCount++;
 
 					if (newReaderCount != currentReaderCount)
@@ -3063,7 +3063,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 
 	dwReadersLen = 0;
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		if (readerStates[i].readerID != 0)
+		if (readerStates[i].readerName[0] != '\0')
 			dwReadersLen += strlen(readerStates[i].readerName) + 1;
 
 	/* for the last NULL byte */
@@ -3107,7 +3107,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (readerStates[i].readerID != 0)
+		if (readerStates[i].readerName != '\0')
 		{
 			/*
 			 * Build the multi-string
