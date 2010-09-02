@@ -1207,6 +1207,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
+	char *readerName;
+	unsigned int readerLen;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -1252,18 +1254,20 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
+	readerName = rContext->readerState->readerName;
+	readerLen = strlen(readerName);
+
 	if (mszReaderNames)
 	{  /* want reader name */
 		if (pcchReaderLen)
 		{ /* & present reader name length */
-			if (*pcchReaderLen >= strlen(rContext->lpcReader))
+			*pcchReaderLen = readerLen;
+			if (*pcchReaderLen >= readerLen)
 			{ /* & enough room */
-				*pcchReaderLen = strlen(rContext->lpcReader);
-				strncpy(mszReaderNames, rContext->lpcReader, MAX_READERNAME);
+				strncpy(mszReaderNames, readerName, MAX_READERNAME);
 			}
 			else
 			{        /* may report only reader name len */
-				*pcchReaderLen = strlen(rContext->lpcReader);
 				rv = SCARD_E_INSUFFICIENT_BUFFER;
 			}
 		}
@@ -1276,7 +1280,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	{
 		if (pcchReaderLen)
 		{ /* want reader len only */
-			*pcchReaderLen = strlen(rContext->lpcReader);
+			*pcchReaderLen = readerLen;
 		}
 		else
 		{
@@ -1447,15 +1451,15 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			 */
 			if (dwAttrId == SCARD_ATTR_DEVICE_FRIENDLY_NAME)
 			{
-				unsigned int len = strlen(rContext->lpcReader)+1;
+				unsigned int len = strlen(rContext->readerState->readerName)+1;
 
 				*pcbAttrLen = len;
 				if (len > *pcbAttrLen)
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
-					(void)strlcpy((char *)pbAttr, rContext->lpcReader,
-						*pcbAttrLen);
+					(void)strlcpy((char *)pbAttr,
+						rContext->readerState->readerName, *pcbAttrLen);
 					rv = SCARD_S_SUCCESS;
 				}
 

@@ -134,7 +134,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 				int tmplen;
 
 				/* get the reader name without the reader and slot numbers */
-				strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
+				strncpy(lpcStripReader,
+					sReadersContexts[i]->readerState->readerName,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
@@ -337,9 +338,10 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		}
 
 		/* Copy the previous reader name and increment the slot number */
-		tmpReader = sReadersContexts[dwContextB]->lpcReader;
-		(void)strlcpy(tmpReader, sReadersContexts[dwContext]->lpcReader,
-			sizeof(sReadersContexts[dwContextB]->lpcReader));
+		tmpReader = sReadersContexts[dwContextB]->readerState->readerName;
+		(void)strlcpy(tmpReader,
+			sReadersContexts[dwContext]->readerState->readerName,
+			sizeof(sReadersContexts[dwContextB]->readerState->readerName));
 		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
 
 		sReadersContexts[dwContextB]->lpcLibrary =
@@ -577,7 +579,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 						&& ((sReadersContexts[i])->port != port))
 						|| (supportedChannels > 1))
 					{
-						char *lpcReader = sReadersContexts[i]->lpcReader;
+						char *lpcReader = sReadersContexts[i]->readerState->readerName;
 
 						/*
 						 * tells the caller who the parent of this
@@ -629,7 +631,8 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 		}
 	}
 
-	snprintf(rContext->lpcReader, sizeof(rContext->lpcReader), "%s %02X %02lX",
+	snprintf(rContext->readerState->readerName,
+		sizeof(rContext->readerState->readerName), "%s %02X %02lX",
 		readerName, i, slot);
 
 	/* Set the slot in 0xDDDDCCCC */
@@ -649,7 +652,8 @@ LONG RFReaderInfo(LPSTR lpcReader, READER_CONTEXT ** sReader)
 	{
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
-			if (strcmp(lpcReader, (sReadersContexts[i])->lpcReader) == 0)
+			if (strcmp(lpcReader,
+				sReadersContexts[i]->readerState->readerName) == 0)
 			{
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
@@ -672,7 +676,8 @@ LONG RFReaderInfoNamePort(int port, LPSTR lpcReader,
 		{
 			int tmplen;
 
-			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
+			strncpy(lpcStripReader,
+				sReadersContexts[i]->readerState->readerName,
 				sizeof(lpcStripReader));
 			tmplen = strlen(lpcStripReader);
 			lpcStripReader[tmplen - 6] = 0;
@@ -959,7 +964,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 
 	/* Spawn the event handler thread */
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
-		rContext->lpcReader, rContext->lpcLibrary);
+		rContext->readerState->readerName, rContext->lpcLibrary);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/* loads the library */
@@ -1005,7 +1010,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 {
 	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
-		rContext->lpcReader);
+		rContext->readerState->readerName);
 
 	/* Close the port, unbind the functions, and unload the library */
 
@@ -1275,9 +1280,10 @@ void RFCleanupReaders(void)
 			char lpcStripReader[MAX_READERNAME];
 
 			Log2(PCSC_LOG_INFO, "Stopping reader: %s",
-				sReadersContexts[i]->lpcReader);
+				sReadersContexts[i]->readerState->readerName);
 
-			strncpy(lpcStripReader, (sReadersContexts[i])->lpcReader,
+			strncpy(lpcStripReader,
+				sReadersContexts[i]->readerState->readerName,
 				sizeof(lpcStripReader));
 			/* strip the 6 last char ' 00 00' */
 			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
@@ -1382,7 +1388,8 @@ void RFReCheckReaderConf(void)
 				int tmplen;
 
 				/* get the reader name without the reader and slot numbers */
-				strncpy(lpcStripReader, sReadersContexts[i]->lpcReader,
+				strncpy(lpcStripReader,
+					sReadersContexts[i]->readerState->readerName,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;

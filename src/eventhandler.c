@@ -215,12 +215,10 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 	rv = IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
 	if (rv != SCARD_S_SUCCESS)
 	{
-		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s", rContext->lpcReader);
+		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s",
+			rContext->readerState->readerName);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
-
-	(void)strlcpy(rContext->readerState->readerName, rContext->lpcReader,
-		sizeof(rContext->readerState->readerName));
 
 	rContext->pthCardEvent = card_event;
 	rv = ThreadCreate(&rContext->pthThread, 0,
@@ -260,7 +258,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	readerSharing = 0;
 	dwCurrentState = 0;
 
-	lpcReader = rContext->lpcReader;
+	lpcReader = rContext->readerState->readerName;
 
 	dwAtrLen = rContext->readerState->cardAtrLength;
 	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
