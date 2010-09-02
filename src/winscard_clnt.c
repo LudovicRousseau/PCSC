@@ -1969,7 +1969,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					int k, newReaderCount = 0;
 
 					for (k=0; k < PCSCLITE_MAX_READERS_CONTEXTS; k++)
-						if (readerStates[k].readerName != '\0')
+						if (readerStates[k].readerName[0] != '\0')
 							newReaderCount++;
 
 					if (newReaderCount != currentReaderCount)
@@ -3107,7 +3107,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (readerStates[i].readerName != '\0')
+		if (readerStates[i].readerName[0] != '\0')
 		{
 			/*
 			 * Build the multi-string
