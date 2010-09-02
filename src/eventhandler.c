@@ -245,7 +245,7 @@ static void incrementEventCounter(struct pubReaderStatesList *readerState)
 static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
-	LPCSTR lpcReader;
+	const char *readerName;
 	DWORD dwStatus;
 	int32_t readerSharing;
 	DWORD dwCurrentState;
@@ -258,7 +258,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	readerSharing = 0;
 	dwCurrentState = 0;
 
-	lpcReader = rContext->readerState->readerName;
+	readerName = rContext->readerState->readerName;
 
 	dwAtrLen = rContext->readerState->cardAtrLength;
 	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
@@ -342,7 +342,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 		if (rv != SCARD_S_SUCCESS)
 		{
-			Log2(PCSC_LOG_ERROR, "Error communicating to: %s", lpcReader);
+			Log2(PCSC_LOG_ERROR, "Error communicating to: %s", readerName);
 
 			/*
 			 * Set error status on this reader while errors occur
@@ -370,7 +370,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				/*
 				 * Change the status structure
 				 */
-				Log2(PCSC_LOG_INFO, "Card Removed From %s", lpcReader);
+				Log2(PCSC_LOG_INFO, "Card Removed From %s", readerName);
 				/*
 				 * Notify the card has been removed
 				 */
@@ -435,7 +435,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 				incrementEventCounter(rContext->readerState);
 
-				Log2(PCSC_LOG_INFO, "Card inserted into %s", lpcReader);
+				Log2(PCSC_LOG_INFO, "Card inserted into %s", readerName);
 
 				(void)EHSignalEventToClients();
 

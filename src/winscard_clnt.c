@@ -1947,16 +1947,16 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/* Ignore for IGNORED readers */
 		if (!(currReader->dwCurrentState & SCARD_STATE_IGNORE))
 		{
-			LPSTR lpcReaderName;
+			const char *readerName;
 			int i;
 
 	  /************ Looks for correct readernames *********************/
 
-			lpcReaderName = (char *) currReader->szReader;
+			readerName = currReader->szReader;
 
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
-				if (strcmp(lpcReaderName, readerStates[i].readerName) == 0)
+				if (strcmp(readerName, readerStates[i].readerName) == 0)
 					break;
 			}
 
@@ -1964,7 +1964,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 			{
 				/* PnP special reader? */
-				if (strcasecmp(lpcReaderName, "\\\\?PnP?\\Notification") == 0)
+				if (strcasecmp(readerName, "\\\\?PnP?\\Notification") == 0)
 				{
 					int k, newReaderCount = 0;
 

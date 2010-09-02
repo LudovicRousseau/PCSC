@@ -104,7 +104,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	return EHInitializeEventStructures();
 }
 
-LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
+LONG RFAddReader(const char *readerName, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 {
 	DWORD dwContext = 0, dwGetSize;
 	UCHAR ucGetData[1], ucThread[1];
@@ -112,14 +112,14 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	int i, j;
 	int lrv = 0;
 
-	if ((lpcReader == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
+	if ((readerName == NULL) || (lpcLibrary == NULL) || (lpcDevice == NULL))
 		return SCARD_E_INVALID_VALUE;
 
 	/* Reader name too long? also count " 00 00"*/
-	if (strlen(lpcReader) > MAX_READERNAME - sizeof(" 00 00"))
+	if (strlen(readerName) > MAX_READERNAME - sizeof(" 00 00"))
 	{
 		Log3(PCSC_LOG_ERROR, "Reader name too long: %d chars instead of max %d",
-			strlen(lpcReader), MAX_READERNAME - sizeof(" 00 00"));
+			strlen(readerName), MAX_READERNAME - sizeof(" 00 00"));
 		return SCARD_E_INVALID_VALUE;
 	}
 
@@ -140,7 +140,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
 
-				if ((strcmp(lpcReader, lpcStripReader) == 0) &&
+				if ((strcmp(readerName, lpcStripReader) == 0) &&
 					(port == (sReadersContexts[i])->port))
 				{
 					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
@@ -167,7 +167,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	}
 
 	/* Check and set the readername to see if it must be enumerated */
-	parentNode = RFSetReaderName(sReadersContexts[dwContext], lpcReader,
+	parentNode = RFSetReaderName(sReadersContexts[dwContext], readerName,
 		lpcLibrary, port, 0);
 	if (parentNode < -1)
 		return SCARD_E_NO_MEMORY;
@@ -264,8 +264,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		/* Cannot connect to reader. Exit gracefully */
-		Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-		(void)RFRemoveReader(lpcReader, port);
+		Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
+		(void)RFRemoveReader(readerName, port);
 		return rv;
 	}
 
@@ -288,8 +288,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
 		if (rv != SCARD_S_SUCCESS)
 		{
-			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-			(void)RFRemoveReader(lpcReader, port);
+			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
+			(void)RFRemoveReader(readerName, port);
 			return rv;
 		}
 	}
@@ -333,7 +333,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/* No more slot left return */
-			rv = RFRemoveReader(lpcReader, port);
+			rv = RFRemoveReader(readerName, port);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -419,7 +419,7 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		if (rv != SCARD_S_SUCCESS)
 		{
 			/* Cannot connect to slot. Exit gracefully */
-			(void)RFRemoveReader(lpcReader, port);
+			(void)RFRemoveReader(readerName, port);
 			return rv;
 		}
 
@@ -439,8 +439,8 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 		rv = EHSpawnEventHandler(sReadersContexts[dwContextB], fct);
 		if (rv != SCARD_S_SUCCESS)
 		{
-			Log2(PCSC_LOG_ERROR, "%s init failed.", lpcReader);
-			(void)RFRemoveReader(lpcReader, port);
+			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
+			(void)RFRemoveReader(readerName, port);
 			return rv;
 		}
 	}
@@ -448,16 +448,16 @@ LONG RFAddReader(LPSTR lpcReader, int port, LPSTR lpcLibrary, LPSTR lpcDevice)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFRemoveReader(LPSTR lpcReader, int port)
+LONG RFRemoveReader(const char *readerName, int port)
 {
 	LONG rv;
 	READER_CONTEXT * sContext;
 
-	if (lpcReader == 0)
+	if (readerName == NULL)
 		return SCARD_E_INVALID_VALUE;
 
 	while (SCARD_S_SUCCESS ==
-		RFReaderInfoNamePort(port, lpcReader, &sContext))
+		RFReaderInfoNamePort(port, readerName, &sContext))
 	{
 
 		/* Try to destroy the thread */
@@ -532,7 +532,7 @@ LONG RFRemoveReader(LPSTR lpcReader, int port)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
+LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	LPSTR libraryName, int port, DWORD slot)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
@@ -579,7 +579,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 						&& ((sReadersContexts[i])->port != port))
 						|| (supportedChannels > 1))
 					{
-						char *lpcReader = sReadersContexts[i]->readerState->readerName;
+						const char *reader = sReadersContexts[i]->readerState->readerName;
 
 						/*
 						 * tells the caller who the parent of this
@@ -593,7 +593,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 						 * hotplug then we must look for others and
 						 * enumerate the readername
 						 */
-						currentDigit = strtol(lpcReader + strlen(lpcReader) - 5, NULL, 16);
+						currentDigit = strtol(reader + strlen(reader) - 5, NULL, 16);
 
 						/* This spot is taken */
 						usedDigits[currentDigit] = TRUE;
@@ -641,18 +641,18 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, LPSTR readerName,
 	return parent;
 }
 
-LONG RFReaderInfo(LPSTR lpcReader, READER_CONTEXT ** sReader)
+LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 {
 	int i;
 
-	if (lpcReader == 0)
+	if (readerName == NULL)
 		return SCARD_E_UNKNOWN_READER;
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((sReadersContexts[i])->vHandle != 0)
 		{
-			if (strcmp(lpcReader,
+			if (strcmp(readerName,
 				sReadersContexts[i]->readerState->readerName) == 0)
 			{
 				*sReader = sReadersContexts[i];
@@ -664,7 +664,7 @@ LONG RFReaderInfo(LPSTR lpcReader, READER_CONTEXT ** sReader)
 	return SCARD_E_UNKNOWN_READER;
 }
 
-LONG RFReaderInfoNamePort(int port, LPSTR lpcReader,
+LONG RFReaderInfoNamePort(int port, const char *readerName,
 	READER_CONTEXT * * sReader)
 {
 	char lpcStripReader[MAX_READERNAME];
@@ -682,7 +682,7 @@ LONG RFReaderInfoNamePort(int port, LPSTR lpcReader,
 			tmplen = strlen(lpcStripReader);
 			lpcStripReader[tmplen - 6] = 0;
 
-			if ((strcmp(lpcReader, lpcStripReader) == 0) &&
+			if ((strcmp(readerName, lpcStripReader) == 0) &&
 				(port == (sReadersContexts[i])->port))
 			{
 				*sReader = sReadersContexts[i];
