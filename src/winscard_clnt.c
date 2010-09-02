@@ -70,9 +70,10 @@
  *    Windows.
  * -# SCardEstablishContext()
  *    @par
- *    Each thread of an application shall use its own SCARDCONTEXT. On
- *    Windows the same SCARDCONTEXT can be shared by different threads
- *    of same application.
+ *    Each thread of an application shall use its own SCARDCONTEXT.
+ *    SCardCancel() is the only exception to the rule.  On Windows the
+ *    same SCARDCONTEXT can be shared by different threads of same
+ *    application.
  */
 
 #include "config.h"
