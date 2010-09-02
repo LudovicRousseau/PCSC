@@ -168,8 +168,6 @@ extern "C"
 	void RFCleanupReaders(void);
 	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);
-	void RFSuspendAllReaders(void);
-	void RFAwakeAllReaders(void);
 
 #ifdef __cplusplus
 }
