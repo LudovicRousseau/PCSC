@@ -118,7 +118,6 @@ INTERNAL int ClientCloseSession(uint32_t dwClientID)
  * @param[in] buffer_void Message to be sent.
  * @param[in] buffer_size Size of the message to send
  * @param[in] filedes Socket handle.
- * @param[in] timeOut Timeout in milliseconds.
  *
  * @retval 0 Success
  * @retval -1 Timeout.
@@ -437,7 +436,6 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
  * @param[in] command Command to be sent.
  * @param[in] dwClientID Client socket handle.
  * @param[in] size Size of the message (\p data).
- * @param[in] timeOut Timeout to the operation in ms.
  * @param[in] data_void Data to be sent.
  *
  * @return Same error codes as MessageSend().
