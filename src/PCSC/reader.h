@@ -143,10 +143,10 @@ typedef struct
 	uint32_t value;	/**< This value is always in BIG ENDIAN format as documented in PCSC v2 part 10 ch 2.2 page 2. You can use ntohl() for example */
 } PCSC_TLV_STRUCTURE;
 
-/** the wLangId and wPINMaxExtraDigit are 16-bits long so are subject to byte
- * ordering */
-#define HOST_TO_CCID_16(x) @host_to_ccid_16@
-#define HOST_TO_CCID_32(x) @host_to_ccid_32@
+/** Since CCID 1.4.1 (revision 5252) the byte order is no more important
+ * These macros are now deprecated and should be removed in the future */
+#define HOST_TO_CCID_16(x) (x)
+#define HOST_TO_CCID_32(x) (x)
 
 /** structure used with \ref FEATURE_VERIFY_PIN_DIRECT */
 typedef struct
