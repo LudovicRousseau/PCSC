@@ -91,7 +91,7 @@ pcscd_LDADD = \
 	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) $(LIBHAL_LIBS) \
 	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS)
 
-install-exec-hook:
+fix-rights: install-sbinPROGRAMS
 	chgrp pcscd $(DESTDIR)$(sbindir)/pcscd
 	chmod g+s $(DESTDIR)$(sbindir)/pcscd
 
