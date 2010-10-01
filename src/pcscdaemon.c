@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
 
 	/* if the process is setuid or setgid it may have some restrictions */
-	limited_rights = (getuid() != geteuid()) || (getgid() != getegid());
+	limited_rights = (getgid() != getegid()) && (getuid() != 0);
 
 	/*
 	 * Handle any command line arguments
