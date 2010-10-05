@@ -1775,6 +1775,12 @@ end:
  * The new event state will be contained in \p dwEventState. A status change
  * might be a card insertion or removal event, a change in ATR, etc.
  *
+ * \p dwEventState also contains a number of events in the upper 16 bits
+ * (\p dwEventState & 0xFFFF0000). This number of events is incremented
+ * for each card insertion or removal in the specified reader. This can
+ * be used to detect a card removal/insertion between two calls to
+ * SCardGetStatusChange()
+ *
  * To wait for a reader event (reader added or removed) you may use the special
  * reader name \c "\\?PnP?\Notification". If a reader event occurs the state of
  * this reader will change and the bit \ref SCARD_STATE_CHANGED will be set.
@@ -1999,6 +2005,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 			else
 			{
+				int stateCounter;
+
 				/* The reader has come back after being away */
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
@@ -2015,13 +2023,13 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				/* Now we check all the Reader States */
 				dwState = rContext->readerState;
+				stateCounter = (dwState >> 16) & 0xFFFF;
 
 				/* only if current state has an non null event counter */
 				if (currReader->dwCurrentState & 0xFFFF0000)
 				{
-					int currentCounter, stateCounter;
+					int currentCounter;
 
-					stateCounter = (dwState >> 16) & 0xFFFF;
 					currentCounter = (currReader->dwCurrentState >> 16) & 0xFFFF;
 
 					/* has the event counter changed since the last call? */
@@ -2031,12 +2039,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						Log0(PCSC_LOG_DEBUG);
 						dwBreakFlag = 1;
 					}
-
-					/* add an event counter in the upper word of dwEventState */
-					currReader->dwEventState =
-						((currReader->dwEventState & 0xffff )
-						| (stateCounter << 16));
 				}
+
+				/* add an event counter in the upper word of dwEventState */
+				currReader->dwEventState = ((currReader->dwEventState & 0xffff )
+					| (stateCounter << 16));
 
 	/*********** Check if the reader is in the correct state ********/
 				if (dwState & SCARD_UNKNOWN)
