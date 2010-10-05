@@ -1817,10 +1817,6 @@ end:
  * - \ref SCARD_STATE_EMPTY There is no card in the reader. If this bit
  *   is set, all the following bits will be clear
  * - \ref SCARD_STATE_PRESENT There is a card in the reader
- * - \ref SCARD_STATE_ATRMATCH There is a card in the reader with an ATR
- *   matching one of the target cards. If this bit is set,
- *   \ref SCARD_STATE_PRESENT will also be set. This bit is only returned on
- *   the SCardLocateCards() function.
  * - \ref SCARD_STATE_EXCLUSIVE The card in the reader is allocated for
  *   exclusive use by another application. If this bit is set,
  *   \ref SCARD_STATE_PRESENT will also be set.
