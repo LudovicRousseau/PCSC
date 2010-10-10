@@ -41,9 +41,9 @@ typedef struct
 {
 	const char *szReader;
 	void *pvUserData;
-	unsigned long dwCurrentState;
-	unsigned long dwEventState;
-	unsigned long cbAtr;
+	DWORD dwCurrentState;
+	DWORD dwEventState;
+	DWORD cbAtr;
 	unsigned char rgbAtr[MAX_ATR_SIZE];
 }
 SCARD_READERSTATE, *LPSCARD_READERSTATE;
