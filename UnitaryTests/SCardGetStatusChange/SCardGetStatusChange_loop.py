@@ -47,6 +47,8 @@ print "values", readerstates.values()
 while 1:
     # timeout is 1000 ms
     (hresult, states) = SCardGetStatusChange(hcontext, 1000, readerstates.values())
+    if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
+        raise error, "SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult);
     print SCardGetErrorMessage(hresult)
     print states
 
