@@ -1481,6 +1481,12 @@ end:
  * state, and protocol will be stored in pdwState and \p pdwProtocol
  * respectively.
  *
+ * *pdwState also contains a number of events in the upper 16 bits
+ * (*pdwState & 0xFFFF0000). This number of events is incremented
+ * for each card insertion or removal in the specified reader. This can
+ * be used to detect a card removal/insertion between two calls to
+ * SCardStatus()
+ *
  * If \c *pcchReaderLen is equal to \ref SCARD_AUTOALLOCATE then the function
  * will allocate itself the needed memory for mszReaderName. Use
  * SCardFreeMemory() to release it.
