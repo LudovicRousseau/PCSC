@@ -1693,7 +1693,7 @@ retry:
 	*pcbAtrLen = readerStates[i].cardAtrLength;
 
 	if (pdwState)
-		*pdwState = readerStates[i].readerState;
+		*pdwState = (readerStates[i].eventCounter << 16) + readerStates[i].readerState;
 
 	if (pdwProtocol)
 		*pdwProtocol = readerStates[i].cardProtocol;
@@ -2001,8 +2001,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 			else
 			{
-				int stateCounter;
-
 				/* The reader has come back after being away */
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
@@ -2019,7 +2017,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				/* Now we check all the Reader States */
 				dwState = rContext->readerState;
-				stateCounter = (dwState >> 16) & 0xFFFF;
 
 				/* only if current state has an non null event counter */
 				if (currReader->dwCurrentState & 0xFFFF0000)
@@ -2029,7 +2026,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					currentCounter = (currReader->dwCurrentState >> 16) & 0xFFFF;
 
 					/* has the event counter changed since the last call? */
-					if (stateCounter != currentCounter)
+					if (rContext->eventCounter != currentCounter)
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						Log0(PCSC_LOG_DEBUG);
@@ -2039,7 +2036,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				/* add an event counter in the upper word of dwEventState */
 				currReader->dwEventState = ((currReader->dwEventState & 0xffff )
-					| (stateCounter << 16));
+					| (rContext->eventCounter << 16));
 
 	/*********** Check if the reader is in the correct state ********/
 				if (dwState & SCARD_UNKNOWN)

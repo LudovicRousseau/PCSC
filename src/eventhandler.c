@@ -232,16 +232,6 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 		return SCARD_S_SUCCESS;
 }
 
-static void incrementEventCounter(struct pubReaderStatesList *readerState)
-{
-	int counter;
-
-	counter = (readerState -> readerState >> 16) & 0xFFFF;
-	counter++;
-	readerState -> readerState = (readerState -> readerState & 0xFFFF)
-		+ (counter << 16);
-}
-
 static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
@@ -277,13 +267,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 		if (rv == IFD_SUCCESS)
 		{
-			dwStatus |= SCARD_PRESENT;
-			dwStatus &= ~SCARD_ABSENT;
-			dwStatus |= SCARD_POWERED;
-			dwStatus |= SCARD_NEGOTIABLE;
-			dwStatus &= ~SCARD_SPECIFIC;
-			dwStatus &= ~SCARD_SWALLOWED;
-			dwStatus &= ~SCARD_UNKNOWN;
+			dwStatus = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 			if (rContext->readerState->cardAtrLength > 0)
 			{
@@ -296,13 +280,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		}
 		else
 		{
-			dwStatus |= SCARD_PRESENT;
-			dwStatus &= ~SCARD_ABSENT;
-			dwStatus |= SCARD_SWALLOWED;
-			dwStatus &= ~SCARD_POWERED;
-			dwStatus &= ~SCARD_NEGOTIABLE;
-			dwStatus &= ~SCARD_SPECIFIC;
-			dwStatus &= ~SCARD_UNKNOWN;
+			dwStatus = SCARD_PRESENT | SCARD_SWALLOWED;
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
 		}
 
@@ -310,13 +288,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	}
 	else
 	{
-		dwStatus |= SCARD_ABSENT;
-		dwStatus &= ~SCARD_PRESENT;
-		dwStatus &= ~SCARD_POWERED;
-		dwStatus &= ~SCARD_NEGOTIABLE;
-		dwStatus &= ~SCARD_SPECIFIC;
-		dwStatus &= ~SCARD_SWALLOWED;
-		dwStatus &= ~SCARD_UNKNOWN;
+		dwStatus = SCARD_ABSENT;
 		rContext->readerState->cardAtrLength = 0;
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
@@ -347,13 +319,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			/*
 			 * Set error status on this reader while errors occur
 			 */
-			rContext->readerState->readerState &= ~SCARD_ABSENT;
-			rContext->readerState->readerState &= ~SCARD_PRESENT;
-			rContext->readerState->readerState &= ~SCARD_POWERED;
-			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-			rContext->readerState->readerState |= SCARD_UNKNOWN;
+			rContext->readerState->readerState = SCARD_UNKNOWN;
 			rContext->readerState->cardAtrLength = 0;
 			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
@@ -378,16 +344,10 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 				rContext->readerState->cardAtrLength = 0;
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-				rContext->readerState->readerState |= SCARD_ABSENT;
-				rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-				rContext->readerState->readerState &= ~SCARD_PRESENT;
-				rContext->readerState->readerState &= ~SCARD_POWERED;
-				rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-				rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-				rContext->readerState->readerState &= ~SCARD_SPECIFIC;
+				rContext->readerState->readerState = SCARD_ABSENT;
 				dwCurrentState = SCARD_ABSENT;
 
-				incrementEventCounter(rContext->readerState);
+				rContext->readerState->eventCounter++;
 
 				(void)EHSignalEventToClients();
 			}
@@ -411,29 +371,17 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 				if (rv == IFD_SUCCESS)
 				{
-					rContext->readerState->readerState |= SCARD_PRESENT;
-					rContext->readerState->readerState &= ~SCARD_ABSENT;
-					rContext->readerState->readerState |= SCARD_POWERED;
-					rContext->readerState->readerState |= SCARD_NEGOTIABLE;
-					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-					rContext->readerState->readerState &= ~SCARD_SWALLOWED;
+					rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 				}
 				else
 				{
-					rContext->readerState->readerState |= SCARD_PRESENT;
-					rContext->readerState->readerState &= ~SCARD_ABSENT;
-					rContext->readerState->readerState |= SCARD_SWALLOWED;
-					rContext->readerState->readerState &= ~SCARD_POWERED;
-					rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-					rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-					rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+					rContext->readerState->readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 					rContext->readerState->cardAtrLength = 0;
 				}
 
 				dwCurrentState = SCARD_PRESENT;
 
-				incrementEventCounter(rContext->readerState);
+				rContext->readerState->eventCounter++;
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", readerName);
 

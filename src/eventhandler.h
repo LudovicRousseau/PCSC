@@ -32,6 +32,7 @@ extern "C"
 	typedef struct pubReaderStatesList
 	{
 		char readerName[MAX_READERNAME];
+		uint32_t eventCounter;
 		uint32_t readerState;
 		int32_t readerSharing;
 
