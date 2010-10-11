@@ -68,7 +68,6 @@ void tok_error(char *pcToken_error);
 
 int evaluatetoken(char *pcToken)
 {
-
 	int channelId = 0;
 	int p = 0;
 	unsigned int n = 0;
@@ -122,7 +121,7 @@ int evaluatetoken(char *pcToken)
 				{
 					Log3(PCSC_LOG_CRITICAL, "Error with device %s: %s",
 						pcDevicename, strerror(errno));
-					Log1(PCSC_LOG_CRITICAL, "You should use 'DEVICENAME /dev/null' if your driver does not use this field");
+					Log1(PCSC_LOG_CRITICAL, "You should remove the DEVICENAME line if your driver does not use this field");
 					badError = 1;
 				}
 			}
@@ -181,7 +180,7 @@ int evaluatetoken(char *pcToken)
 		pcPrevious = NULL;
 	}
 
-	if (pcFriendlyname != NULL && pcDevicename != NULL &&
+	if (pcFriendlyname != NULL &&
 		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
 	{
 		if (0 == reader_list_size)
@@ -199,6 +198,10 @@ int evaluatetoken(char *pcToken)
 
 		/* end marker */
 		reader_list[reader_list_size-1].pcFriendlyname = NULL;
+
+		/* the DEVICENAME parameter is optional */
+		if (NULL == pcDevicename)
+			pcDevicename = "";
 
 		channelId = strtoul(pcChannelid, 0, 16);
 		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);

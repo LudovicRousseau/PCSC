@@ -202,18 +202,23 @@ the device name of this port. It is dependent of the OS kernel. For
 example the first serial port device is called @c /dev/ttyS0 under Linux
 and @c /dev/cuaa0 under FreeBSD.
 
+If you want to use IFDHCreateChannel() instead of
+IFDHCreateChannelByName() then do not use any DEVICENAME line in the
+configuration file.  IFDHCreateChannel() will then be called with the
+CHANNELID parameter.
+
 @subsection LIBPATH
 The LIBPATH field is the filename of the driver code. The driver is a
 dynamically loaded piece of code (generally a @c drivername.so* file).
 
 @subsection CHANNELID
 The CHANNELID is no more used for recent drivers (IFD handler 3.0) and
-has been superseded by DEVICENAME. If you have an old driver this field
-is used to indicate the port to use. You should read your driver
-documentation to know what information is needed here. It should be the
-serial port number for a serial reader.
+has been superseded by DEVICENAME.
 
-@subsection CHANNELID
+If you have an old driver this field is used to indicate the port to
+use. You should read your driver documentation to know what information
+is needed here. It should be the serial port number for a serial reader.
+
 CHANNELID was the numeric version of the port in which the reader will
 be located. This may be done by a symbolic link where @c /dev/pcsc/1 is
 the first device which may be a symbolic link to @c /dev/ttyS0 or
