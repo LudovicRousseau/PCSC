@@ -203,7 +203,7 @@ int evaluatetoken(char *pcToken)
 		if (NULL == pcDevicename)
 			pcDevicename = "";
 
-		channelId = strtoul(pcChannelid, 0, 16);
+		channelId = strtoul(pcChannelid, NULL, 0);
 		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);
 		reader_list[reader_list_size-2].pcDevicename = strdup(pcDevicename);
 		reader_list[reader_list_size-2].pcLibpath = strdup(pcLibpath),
