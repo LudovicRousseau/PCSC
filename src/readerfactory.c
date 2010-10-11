@@ -191,7 +191,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	lrv = list_init(&((sReadersContexts[dwContext])->handlesList));
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		return SCARD_E_NO_MEMORY;
 	}
 
@@ -200,7 +200,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_attributes_seeker failed with return value: %X", lrv);
+			"list_attributes_seeker failed with return value: %d", lrv);
 		return SCARD_E_NO_MEMORY;
 	}
 
@@ -381,7 +381,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		lrv = list_init(&((sReadersContexts[dwContextB])->handlesList));
 		if (lrv < 0)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -390,7 +390,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		if (lrv < 0)
 		{
 			Log2(PCSC_LOG_CRITICAL,
-					"list_attributes_seeker failed with return value: %X", lrv);
+					"list_attributes_seeker failed with return value: %d", lrv);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -518,7 +518,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 			lrv = list_delete_at(&(sContext->handlesList), 0);
 			if (lrv < 0)
 				Log2(PCSC_LOG_CRITICAL,
-					"list_delete_at failed with return value: %X", lrv);
+					"list_delete_at failed with return value: %d", lrv);
 
 			free(currentHandle);
 		}
@@ -1134,7 +1134,7 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	if (lrv < 0)
 	{
 		free(newHandle);
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
 			lrv);
 		rv = SCARD_E_NO_MEMORY;
 	}
@@ -1161,7 +1161,7 @@ LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	lrv = list_delete(&(rContext->handlesList), currentHandle);
 	if (lrv < 0)
 		Log2(PCSC_LOG_CRITICAL,
-			"list_delete failed with return value: %X", lrv);
+			"list_delete failed with return value: %d", lrv);
 
 	free(currentHandle);
 

@@ -540,7 +540,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		lrv = list_init(&contextMapList);
 		if (lrv < 0)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -549,7 +549,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		if (lrv <0)
 		{
 			Log2(PCSC_LOG_CRITICAL,
-				"list_attributes_seeker failed with return value: %X", lrv);
+				"list_attributes_seeker failed with return value: %d", lrv);
 			list_destroy(&contextMapList);
 			return SCARD_E_NO_MEMORY;
 		}
@@ -3469,7 +3469,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	lrv = list_init(&(newContextMap->channelMapList));
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		goto error;
 	}
 
@@ -3478,7 +3478,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	if (lrv <0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_attributes_seeker failed with return value: %X", lrv);
+			"list_attributes_seeker failed with return value: %d", lrv);
 		list_destroy(&(newContextMap->channelMapList));
 		goto error;
 	}
@@ -3486,7 +3486,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	lrv = list_append(&contextMapList, newContextMap);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
 			lrv);
 		list_destroy(&(newContextMap->channelMapList));
 		goto error;
@@ -3600,7 +3600,7 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_delete failed with return value: %X", lrv);
+			"list_delete failed with return value: %d", lrv);
 	}
 
 	free(targetContextMap);
@@ -3630,7 +3630,7 @@ static LONG SCardAddHandle(SCARDHANDLE hCard, SCONTEXTMAP * currentContextMap,
 	{
 		free(newChannelMap->readerName);
 		free(newChannelMap);
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d", lrv);
 		return SCARD_E_NO_MEMORY;
 	}
 
@@ -3655,7 +3655,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
-			"list_delete failed with return value: %X", lrv);
+			"list_delete failed with return value: %d", lrv);
 	}
 
 	free(currentChannelMap);

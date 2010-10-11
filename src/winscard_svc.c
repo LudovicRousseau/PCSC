@@ -104,13 +104,13 @@ LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandl
 	lrv = list_init(&contextsList);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		return -1;
 	}
 	lrv = list_attributes_seeker(& contextsList, contextsListhContext_seeker);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_attributes_seeker failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_attributes_seeker failed with return value: %d", lrv);
 		return -1;
 	}
 
@@ -169,7 +169,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	lrv = list_init(&(newContext->cardsList));
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		goto error;
 	}
 
@@ -184,7 +184,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	lrv = list_attributes_comparator(&(newContext->cardsList), list_comparator_int32_t);
 	if (lrv != 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_attributes_comparator failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_attributes_comparator failed with return value: %d", lrv);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -196,7 +196,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	(void)pthread_mutex_unlock(&contextsList_lock);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d", lrv);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -212,7 +212,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		lrv2 = list_delete(&contextsList, newContext);
 		(void)pthread_mutex_unlock(&contextsList_lock);
 		if (lrv2 < 0)
-			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv2);
+			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %d", lrv2);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -835,7 +835,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		lrv = list_delete_at(&(threadContext->cardsList), 0);
 		if (lrv < 0)
 			Log2(PCSC_LOG_CRITICAL,
-				"list_delete_at failed with return value: %X", lrv);
+				"list_delete_at failed with return value: %d", lrv);
 	}
 	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 	list_destroy(&(threadContext->cardsList));
@@ -871,7 +871,7 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 		if (lrv < 0)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %X",
+			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
 				lrv);
 			return SCARD_E_NO_MEMORY;
 		}
@@ -890,7 +890,7 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %X", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %d", lrv);
 		return SCARD_E_INVALID_VALUE;
 	}
 
