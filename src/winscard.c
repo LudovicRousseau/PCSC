@@ -597,28 +597,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 */
 		if (rv == SCARD_S_SUCCESS)
 		{
-			rContext->readerState->readerState |= SCARD_PRESENT;
-			rContext->readerState->readerState &= ~SCARD_ABSENT;
-			rContext->readerState->readerState |= SCARD_POWERED;
-			rContext->readerState->readerState |= SCARD_NEGOTIABLE;
-			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-		}
-		else
-		{
-			rContext->readerState->readerState |= SCARD_PRESENT;
-			rContext->readerState->readerState &= ~SCARD_ABSENT;
-			rContext->readerState->readerState |= SCARD_SWALLOWED;
-			rContext->readerState->readerState &= ~SCARD_POWERED;
-			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
-			rContext->readerState->cardAtrLength = 0;
-		}
+			rContext->readerState->cardAtrLength = dwAtrLen;
+			rContext->readerState->readerState =
+				SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
-		if (rContext->readerState->cardAtrLength > 0)
-		{
 			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
 				rContext->readerState->cardAtr,
@@ -626,15 +608,20 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 		else
 		{
-			DWORD dwStatus, dwAtrLen2;
-			UCHAR ucAtr[MAX_ATR_SIZE];
-
+			rContext->readerState->cardAtrLength = 0;
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
-			(void)IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen2);
-			if (dwStatus & SCARD_PRESENT)
-				return SCARD_W_UNRESPONSIVE_CARD;
-			else
+
+			if (rv == SCARD_W_REMOVED_CARD)
+			{
+				rContext->readerState->readerState = SCARD_ABSENT;
 				return SCARD_E_NO_SMARTCARD;
+			}
+			else
+			{
+				rContext->readerState->readerState =
+					SCARD_PRESENT | SCARD_SWALLOWED;
+				return SCARD_W_UNRESPONSIVE_CARD;
+			}
 		}
 	}
 	else
@@ -871,7 +858,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
 		}
-		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -881,33 +867,26 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		 */
 		if (rv == SCARD_S_SUCCESS)
 		{
-			rContext->readerState->readerState |= SCARD_PRESENT;
-			rContext->readerState->readerState &= ~SCARD_ABSENT;
-			rContext->readerState->readerState |= SCARD_POWERED;
-			rContext->readerState->readerState |= SCARD_NEGOTIABLE;
-			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-			rContext->readerState->readerState &= ~SCARD_SWALLOWED;
-			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
+			rContext->readerState->cardAtrLength = dwAtrLen;
+			rContext->readerState->readerState =
+				SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+
+			Log1(PCSC_LOG_DEBUG, "Reset complete.");
+			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
+				rContext->readerState->cardAtr,
+				rContext->readerState->cardAtrLength);
 		}
 		else
 		{
-			if (rContext->readerState->readerState & SCARD_ABSENT)
-				rContext->readerState->readerState &= ~SCARD_PRESENT;
-			else
-				rContext->readerState->readerState |= SCARD_PRESENT;
-			/* SCARD_ABSENT flag is already set */
-			rContext->readerState->readerState |= SCARD_SWALLOWED;
-			rContext->readerState->readerState &= ~SCARD_POWERED;
-			rContext->readerState->readerState &= ~SCARD_NEGOTIABLE;
-			rContext->readerState->readerState &= ~SCARD_SPECIFIC;
-			rContext->readerState->readerState &= ~SCARD_UNKNOWN;
 			rContext->readerState->cardAtrLength = 0;
-		}
-
-		if (rContext->readerState->cardAtrLength > 0)
-			Log1(PCSC_LOG_DEBUG, "Reset complete.");
-		else
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
+
+			if (rv == SCARD_W_REMOVED_CARD)
+				rContext->readerState->readerState = SCARD_ABSENT;
+			else
+				rContext->readerState->readerState =
+					SCARD_PRESENT | SCARD_SWALLOWED;
+		}
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
