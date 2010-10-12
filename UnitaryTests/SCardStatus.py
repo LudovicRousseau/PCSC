@@ -21,6 +21,7 @@
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
+import sys
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -47,7 +48,20 @@ if hresult != SCARD_S_SUCCESS:
 print SCardGetErrorMessage(hresult)
 
 print "reader:", reader
-print "state:", state
+print "state:", hex(state)
+print "protocol:", protocol
+print "atr:", atr
+
+print "Press enter"
+sys.stdin.read(1)
+
+hresult, reader, state, protocol, atr = SCardStatus(hcard)
+if hresult != SCARD_S_SUCCESS:
+    raise BaseSCardException(hresult)
+print SCardGetErrorMessage(hresult)
+
+print "reader:", reader
+print "state:", hex(state)
 print "protocol:", protocol
 print "atr:", atr
 
