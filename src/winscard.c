@@ -583,6 +583,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
+			dwAtrLen = rContext->readerState->cardAtrLength;
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
@@ -854,6 +855,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
+			dwAtrLen = rContext->readerState->cardAtrLength;
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
@@ -1052,6 +1054,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
+			dwAtrLen = rContext->readerState->cardAtrLength;
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
