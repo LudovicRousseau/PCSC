@@ -237,6 +237,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	LONG rv;
 	const char *readerName;
 	DWORD dwStatus;
+	uint32_t readerState;
 	int32_t readerSharing;
 	DWORD dwCurrentState;
 	DWORD dwAtrLen;
@@ -267,7 +268,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 		if (rv == IFD_SUCCESS)
 		{
-			dwStatus = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+			readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 			if (rContext->readerState->cardAtrLength > 0)
 			{
@@ -280,7 +281,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		}
 		else
 		{
-			dwStatus = SCARD_PRESENT | SCARD_SWALLOWED;
+			readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
 		}
 
@@ -288,7 +289,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	}
 	else
 	{
-		dwStatus = SCARD_ABSENT;
+		readerState = SCARD_ABSENT;
 		rContext->readerState->cardAtrLength = 0;
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
@@ -298,7 +299,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	/*
 	 * Set all the public attributes to this reader
 	 */
-	rContext->readerState->readerState = dwStatus;
+	rContext->readerState->readerState = readerState;
 	rContext->readerState->readerSharing = readerSharing = rContext->contexts;
 
 	(void)EHSignalEventToClients();

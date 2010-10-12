@@ -1871,7 +1871,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	SCARD_READERSTATE *currReader;
 	READER_STATE *rContext;
 	long dwTime;
-	DWORD dwState;
 	DWORD dwBreakFlag = 0;
 	unsigned int j;
 	SCONTEXTMAP * currentContextMap;
@@ -2007,6 +2006,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			}
 			else
 			{
+				uint32_t readerState;
+
 				/* The reader has come back after being away */
 				if (currReader->dwCurrentState & SCARD_STATE_UNKNOWN)
 				{
@@ -2022,7 +2023,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				rContext = &readerStates[i];
 
 				/* Now we check all the Reader States */
-				dwState = rContext->readerState;
+				readerState = rContext->readerState;
 
 				/* only if current state has an non null event counter */
 				if (currReader->dwCurrentState & 0xFFFF0000)
@@ -2045,7 +2046,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					| (rContext->eventCounter << 16));
 
 	/*********** Check if the reader is in the correct state ********/
-				if (dwState & SCARD_UNKNOWN)
+				if (readerState & SCARD_UNKNOWN)
 				{
 					/* reader is in bad state */
 					currReader->dwEventState = SCARD_STATE_UNAVAILABLE;
@@ -2071,7 +2072,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	/********** Check for card presence in the reader **************/
 
-				if (dwState & SCARD_PRESENT)
+				if (readerState & SCARD_PRESENT)
 				{
 					/* card present but not yet powered up */
 					if (0 == rContext->cardAtrLength)
@@ -2086,7 +2087,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					currReader->cbAtr = 0;
 
 				/* Card is now absent */
-				if (dwState & SCARD_ABSENT)
+				if (readerState & SCARD_ABSENT)
 				{
 					currReader->dwEventState |= SCARD_STATE_EMPTY;
 					currReader->dwEventState &= ~SCARD_STATE_PRESENT;
@@ -2107,7 +2108,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 				}
 				/* Card is now present */
-				else if (dwState & SCARD_PRESENT)
+				else if (readerState & SCARD_PRESENT)
 				{
 					currReader->dwEventState |= SCARD_STATE_PRESENT;
 					currReader->dwEventState &= ~SCARD_STATE_EMPTY;
@@ -2124,7 +2125,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 						dwBreakFlag = 1;
 					}
 
-					if (dwState & SCARD_SWALLOWED)
+					if (readerState & SCARD_SWALLOWED)
 					{
 						currReader->dwEventState |= SCARD_STATE_MUTE;
 						if (!(currReader->dwCurrentState & SCARD_STATE_MUTE))
@@ -2161,7 +2162,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				else if (rContext->readerSharing >= SCARD_LAST_CONTEXT)
 				{
 					/* A card must be inserted for it to be INUSE */
-					if (dwState & SCARD_PRESENT)
+					if (readerState & SCARD_PRESENT)
 					{
 						currReader->dwEventState |= SCARD_STATE_INUSE;
 						currReader->dwEventState &= ~SCARD_STATE_EXCLUSIVE;

@@ -250,7 +250,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
-	DWORD dwStatus;
+	uint32_t readerState;
 
 	(void)hContext;
 	PROFILE_START
@@ -325,17 +325,17 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 * presence of a card or not
 	 *
 	 *******************************************/
-	dwStatus = rContext->readerState->readerState;
+	readerState = rContext->readerState->readerState;
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
-		if (!(dwStatus & SCARD_PRESENT))
+		if (!(readerState & SCARD_PRESENT))
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Inserted");
 			return SCARD_E_NO_SMARTCARD;
 		}
 
-		if (dwStatus & SCARD_SWALLOWED)
+		if (readerState & SCARD_SWALLOWED)
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			return SCARD_W_UNPOWERED_CARD;
@@ -593,7 +593,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
-		 * Set up the status bit masks on dwStatus
+		 * Set up the status bit masks on readerState
 		 */
 		if (rv == SCARD_S_SUCCESS)
 		{
@@ -640,13 +640,13 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	else
 		if (dwInitialization == SCARD_LEAVE_CARD)
 		{
-			DWORD dwStatus = rContext->readerState->readerState;
+			uint32_t readerState = rContext->readerState->readerState;
 
-			if (dwStatus & SCARD_ABSENT)
+			if (readerState & SCARD_ABSENT)
 				return SCARD_E_NO_SMARTCARD;
 
-			if ((dwStatus & SCARD_PRESENT)
-				&& (dwStatus & SCARD_SWALLOWED))
+			if ((readerState & SCARD_PRESENT)
+				&& (readerState & SCARD_SWALLOWED))
 				return SCARD_W_UNRESPONSIVE_CARD;
 		}
 
@@ -877,7 +877,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
-		 * Set up the status bit masks on dwStatus
+		 * Set up the status bit masks on readerState
 		 */
 		if (rv == SCARD_S_SUCCESS)
 		{
@@ -1088,7 +1088,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		(void)RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
-		 * Set up the status bit masks on dwStatus
+		 * Set up the status bit masks on readerState
 		 */
 		if (rv == SCARD_S_SUCCESS)
 		{
