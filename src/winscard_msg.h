@@ -68,7 +68,7 @@ extern "C"
 		SCARD_TRANSMIT = 0x09,			/**< used by SCardTransmit() */
 		SCARD_CONTROL = 0x0A,			/**< used by SCardControl() */
 		SCARD_STATUS = 0x0B,			/**< used by SCardStatus() */
-		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< used by SCardGetStatusChange() */
+		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< not use */
 		SCARD_CANCEL = 0x0D,			/**< used by SCardCancel() */
 		SCARD_CANCEL_TRANSACTION = 0x0E,	/**< used by SCardCancelTransaction() */
 		SCARD_GET_ATTRIB = 0x0F,		/**< used by SCardGetAttrib() */
