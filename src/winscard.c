@@ -1191,8 +1191,15 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
-	char *readerName;
-	unsigned int readerLen;
+
+	/* These parameters are not used by the client
+	 * Client side code uses readerStates[] instead */
+	(void)mszReaderNames;
+	(void)pcchReaderLen;
+	(void)pdwState;
+	(void)pdwProtocol;
+	(void)pbAtr;
+	(void)pcbAtrLen;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -1237,79 +1244,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
-
-	readerName = rContext->readerState->readerName;
-	readerLen = strlen(readerName);
-
-	if (mszReaderNames)
-	{  /* want reader name */
-		if (pcchReaderLen)
-		{ /* & present reader name length */
-			*pcchReaderLen = readerLen;
-			if (*pcchReaderLen >= readerLen)
-			{ /* & enough room */
-				strncpy(mszReaderNames, readerName, MAX_READERNAME);
-			}
-			else
-			{        /* may report only reader name len */
-				rv = SCARD_E_INSUFFICIENT_BUFFER;
-			}
-		}
-		else
-		{            /* present buf & no buflen */
-			return SCARD_E_INVALID_PARAMETER;
-		}
-	}
-	else
-	{
-		if (pcchReaderLen)
-		{ /* want reader len only */
-			*pcchReaderLen = readerLen;
-		}
-		else
-		{
-		/* nothing todo */
-		}
-	}
-
-	if (pdwState)
-		*pdwState = rContext->readerState->readerState;
-
-	if (pdwProtocol)
-		*pdwProtocol = rContext->readerState->cardProtocol;
-
-	if (pbAtr)
-	{  /* want ATR */
-		if (pcbAtrLen)
-		{ /* & present ATR length */
-			if (*pcbAtrLen >= rContext->readerState->cardAtrLength)
-			{ /* & enough room */
-				*pcbAtrLen = rContext->readerState->cardAtrLength;
-				memcpy(pbAtr, rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
-			}
-			else
-			{ /* may report only ATR len */
-				*pcbAtrLen = rContext->readerState->cardAtrLength;
-				rv = SCARD_E_INSUFFICIENT_BUFFER;
-			}
-		}
-		else
-		{ /* present buf & no buflen */
-			return SCARD_E_INVALID_PARAMETER;
-		}
-	}
-	else
-	{
-		if (pcbAtrLen)
-		{ /* want ATR len only */
-			*pcbAtrLen = rContext->readerState->cardAtrLength;
-		}
-		else
-		{
-			/* nothing todo */
-		}
-	}
 
 	return rv;
 }

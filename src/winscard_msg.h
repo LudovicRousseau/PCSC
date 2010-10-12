@@ -213,12 +213,6 @@ extern "C"
 	struct status_struct
 	{
 		int32_t hCard;
-		char mszReaderNames[MAX_READERNAME];
-		uint32_t pcchReaderLen;
-		uint32_t dwState;
-		uint32_t dwProtocol;
-		uint8_t pbAtr[MAX_ATR_SIZE];
-		uint32_t pcbAtrLen;
 		uint32_t rv;
 	};
 

@@ -1649,10 +1649,6 @@ retry:
 	memset(&scStatusStruct, 0, sizeof(scStatusStruct));
 	scStatusStruct.hCard = hCard;
 
-	/* those sizes need to be initialised */
-	scStatusStruct.pcchReaderLen = sizeof(scStatusStruct.mszReaderNames);
-	scStatusStruct.pcbAtrLen = sizeof(scStatusStruct.pbAtr);
-
 	rv = MessageSendWithHeader(SCARD_STATUS, currentContextMap->dwClientID,
 		sizeof(scStatusStruct),
 		(void *) &scStatusStruct);

@@ -548,38 +548,15 @@ static void ContextThread(LPVOID newContext)
 			case SCARD_STATUS:
 			{
 				struct status_struct stStr;
-				DWORD cchReaderLen;
-				DWORD dwState;
-				DWORD dwProtocol;
-				DWORD cbAtrLen;
 
 				READ_BODY(stStr)
 
 				if (MSGCheckHandleAssociation(stStr.hCard, threadContext))
 					goto exit;
 
-				cchReaderLen = stStr.pcchReaderLen;
-				dwState = stStr.dwState;
-				dwProtocol = stStr.dwProtocol;
-				cbAtrLen = stStr.pcbAtrLen;
-
-				/* avoids buffer overflow */
-				if ((cchReaderLen > sizeof(stStr.mszReaderNames))
-					|| (cbAtrLen > sizeof(stStr.pbAtr)))
-				{
-					stStr.rv = SCARD_E_INSUFFICIENT_BUFFER ;
-				}
-				else
-				{
-					stStr.rv = SCardStatus(stStr.hCard,
-						stStr.mszReaderNames, &cchReaderLen, &dwState,
-						&dwProtocol, stStr.pbAtr, &cbAtrLen);
-
-					stStr.pcchReaderLen = cchReaderLen;
-					stStr.dwState = dwState;
-					stStr.dwProtocol = dwProtocol;
-					stStr.pcbAtrLen = cbAtrLen;
-				}
+				/* only hCard and return value are used by the client */
+				stStr.rv = SCardStatus(stStr.hCard, NULL, NULL, NULL,
+					NULL, 0, NULL);
 
 				WRITE_BODY(stStr)
 			}

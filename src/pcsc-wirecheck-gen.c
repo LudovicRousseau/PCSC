@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2007
  *  Jacob Berkman
- * Copyright (C) 2007-2009
+ * Copyright (C) 2007-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  */
 
@@ -186,12 +186,6 @@ check_types (void)
     BLANK_LINE ();
     CHECK_STRUCT (status_struct);
     CHECK_MEMBER (status_struct, hCard);
-    CHECK_MEMBER (status_struct, mszReaderNames);
-    CHECK_MEMBER (status_struct, pcchReaderLen);
-    CHECK_MEMBER (status_struct, dwState);
-    CHECK_MEMBER (status_struct, dwProtocol);
-    CHECK_MEMBER (status_struct, pbAtr);
-    CHECK_MEMBER (status_struct, pcbAtrLen);
     CHECK_MEMBER (status_struct, rv);
 
     BLANK_LINE ();
