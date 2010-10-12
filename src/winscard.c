@@ -640,9 +640,14 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	else
 		if (dwInitialization == SCARD_LEAVE_CARD)
 		{
-			/*
-			 * Do nothing
-			 */
+			DWORD dwStatus = rContext->readerState->readerState;
+
+			if (dwStatus & SCARD_ABSENT)
+				return SCARD_E_NO_SMARTCARD;
+
+			if ((dwStatus & SCARD_PRESENT)
+				&& (dwStatus & SCARD_SWALLOWED))
+				return SCARD_W_UNRESPONSIVE_CARD;
 		}
 
 	/*******************************************
