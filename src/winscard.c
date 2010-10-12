@@ -1242,21 +1242,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	return rv;
 }
 
-LONG SCardGetStatusChange(/*@unused@*/ SCARDCONTEXT hContext,
-	/*@unused@*/ DWORD dwTimeout,
-	/*@unused@*/ SCARD_READERSTATE *rgReaderStates,
-	/*@unused@*/ DWORD cReaders)
-{
-	/*
-	 * Client side function
-	 */
-	(void)hContext;
-	(void)dwTimeout;
-	(void)rgReaderStates;
-	(void)cReaders;
-	return SCARD_S_SUCCESS;
-}
-
 LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	LPCVOID pbSendBuffer, DWORD cbSendLength,
 	LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned)
