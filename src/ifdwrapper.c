@@ -333,6 +333,8 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 #endif
 	DWORD dwStatus;
 	UCHAR ucValue[1];
+	UCHAR dummyAtr[MAX_ATR_SIZE];
+	DWORD dummyAtrLen = sizeof(dummyAtr);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFD_power_icc) (DWORD) = NULL;
@@ -345,6 +347,11 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	rv = IFD_SUCCESS;
 	dwStatus = 0;
 	ucValue[0] = 0;
+
+	if (NULL == pucAtr)
+		pucAtr = dummyAtr;
+	if (NULL == pdwAtrLen)
+		pdwAtrLen = &dummyAtrLen;
 
 	/*
 	 * Check that the card is inserted first
