@@ -1019,7 +1019,7 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 	 * If the reader is getting uninitialized then it is being unplugged
 	 * so I can't send a IFDPowerICC call to it
 	 *
-	 * IFDPowerICC( rContext, IFD_POWER_DOWN, Atr, &AtrLen );
+	 * IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 	 */
 	(void)IFDCloseIFD(rContext);
 	(void)RFUnBindFunctions(rContext);
