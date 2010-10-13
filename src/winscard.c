@@ -576,14 +576,12 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwInitialization)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		}
 		rContext->readerState->cardAtrLength = dwAtrLen;
 
@@ -845,14 +843,12 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		}
 
 		/* the protocol is unset after a power on */
@@ -1041,14 +1037,12 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr,
-				&dwAtrLen);
+				rContext->readerState->cardAtr, &dwAtrLen);
 		}
 
 		/* the protocol is unset after a power on */
