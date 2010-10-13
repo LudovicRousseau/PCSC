@@ -573,7 +573,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
-		dwAtrLen = rContext->readerState->cardAtrLength;
+		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwInitialization)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
@@ -583,7 +583,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
-			dwAtrLen = rContext->readerState->cardAtrLength;
+			dwAtrLen = sizeof(rContext->readerState->cardAtr);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
@@ -845,7 +845,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
 		 */
-		dwAtrLen = rContext->readerState->cardAtrLength;
+		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
@@ -855,7 +855,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
-			dwAtrLen = rContext->readerState->cardAtrLength;
+			dwAtrLen = sizeof(rContext->readerState->cardAtr);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
@@ -1044,7 +1044,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Currently pcsc-lite keeps the card always powered
 		 */
-		dwAtrLen = rContext->readerState->cardAtrLength;
+		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
 				rContext->readerState->cardAtr,
@@ -1054,7 +1054,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
-			dwAtrLen = rContext->readerState->cardAtrLength;
+			dwAtrLen = sizeof(rContext->readerState->cardAtr);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr,
 				&dwAtrLen);
