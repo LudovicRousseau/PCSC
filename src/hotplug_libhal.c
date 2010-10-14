@@ -62,7 +62,6 @@ static struct _driverTracker
 	char *bundleName;
 	char *libraryPath;
 	char *readerName;
-	int ifdCapabilities;
 	char *CFBundleName;
 } *driverTracker = NULL;
 #define DRIVER_TRACKER_SIZE_STEP 8
@@ -139,7 +138,6 @@ static LONG HPReadBundleValues(void)
 			list_t *manuIDs, *productIDs, *readerNames;
 			char *CFBundleName;
 			char *libraryPath;
-			int ifdCapabilities;
 
 			/*
 			 * The bundle exists - let's form a full path name and get the
@@ -161,10 +159,6 @@ static LONG HPReadBundleValues(void)
 				PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
 				libraryPath);
 			fullLibPath[sizeof(fullLibPath) - 1] = '\0';
-
-			/* Get ifdCapabilities */
-			GET_KEY(PCSCLITE_HP_CPCTKEY_NAME, &values)
-			ifdCapabilities = strtol(list_get_at(values, 0), NULL, 16);
 
 			GET_KEY(PCSCLITE_HP_MANUKEY_NAME, &manuIDs)
 			GET_KEY(PCSCLITE_HP_PRODKEY_NAME, &productIDs)
@@ -195,7 +189,6 @@ static LONG HPReadBundleValues(void)
 				/* constant entries for a same driver */
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 				driverTracker[listCount].libraryPath = strdup(fullLibPath);
-				driverTracker[listCount].ifdCapabilities = ifdCapabilities;
 				driverTracker[listCount].CFBundleName = CFBundleName;
 
 #ifdef DEBUG_HOTPLUG
@@ -230,7 +223,6 @@ static LONG HPReadBundleValues(void)
 						driverTracker[i].bundleName = NULL;
 						driverTracker[i].libraryPath = NULL;
 						driverTracker[i].readerName = NULL;
-						driverTracker[i].ifdCapabilities = 0;
 						driverTracker[i].CFBundleName = NULL;
 					}
 				}
