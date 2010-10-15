@@ -31,14 +31,14 @@ extern "C"
 	 */
 	typedef struct pubReaderStatesList
 	{
-		char readerName[MAX_READERNAME];
-		uint32_t eventCounter;
-		uint32_t readerState;
-		int32_t readerSharing;
+		char readerName[MAX_READERNAME]; /**< reader name */
+		uint32_t eventCounter; /**< number of card events */
+		uint32_t readerState; /**< SCARD_* bit field */
+		int32_t readerSharing; /**< PCSCLITE_SHARING_* sharing status */
 
-		UCHAR cardAtr[MAX_ATR_SIZE];
-		uint32_t cardAtrLength;
-		uint32_t cardProtocol;
+		UCHAR cardAtr[MAX_ATR_SIZE]; /**< ATR */
+		uint32_t cardAtrLength; /**< ATR length */
+		uint32_t cardProtocol; /**< SCARD_PROTOCOL_* value */
 	}
 	READER_STATE;
 
@@ -51,12 +51,12 @@ extern "C"
 		/*@null@*/ RESPONSECODE (*)(DWORD));
 	LONG EHDestroyEventHandler(READER_CONTEXT *);
 
-/** Some defines for context stack. */
-#define SCARD_LAST_CONTEXT       1
-/** Some defines for context stack. */
-#define SCARD_NO_CONTEXT         0
-/** Some defines for context stack. */
-#define SCARD_EXCLUSIVE_CONTEXT -1
+/** One application is using the reader */
+#define PCSCLITE_SHARING_LAST_CONTEXT       1
+/** No application is using the reader */
+#define PCSCLITE_SHARING_NO_CONTEXT         0
+/** Reader used in exclusive mode */
+#define PCSCLITE_SHARING_EXCLUSIVE_CONTEXT -1
 
 /** Special value to indicate that power up has not yet happen
  * This is used to auto start mode to wait until the reader is
