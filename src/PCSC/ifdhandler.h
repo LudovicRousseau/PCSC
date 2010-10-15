@@ -626,10 +626,6 @@ don't mind loading a new driver for each reader then ignore @p Lun.
 @ingroup IFDHandler
 @param[in] Lun Logical Unit Number
 @param[in] Tag Tag of the desired data value
-- \ref TAG_IFD_SLOTNUM
-  This is used in IFDHandler v1.0 to select the slot to use for the next
-  IFD_* command. This tag is no more used with versions 2.0 and 3.0 of
-  the IFD Handler.
 @param[in,out] Length Length of the desired data value
 @param[out] Value Value of the desired data
 

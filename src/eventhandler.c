@@ -209,10 +209,8 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 {
 	LONG rv;
 	DWORD dwStatus = 0;
-	UCHAR ucAtr[MAX_ATR_SIZE];
-	DWORD dwAtrLen = 0;
 
-	rv = IFDStatusICC(rContext, &dwStatus, ucAtr, &dwAtrLen);
+	rv = IFDStatusICC(rContext, &dwStatus);
 	if (rv != SCARD_S_SUCCESS)
 	{
 		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s",
@@ -251,14 +249,11 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 	readerName = rContext->readerState->readerName;
 
-	dwAtrLen = rContext->readerState->cardAtrLength;
-	rv = IFDStatusICC(rContext, &dwStatus, rContext->readerState->cardAtr,
-		&dwAtrLen);
-	rContext->readerState->cardAtrLength = dwAtrLen;
+	rv = IFDStatusICC(rContext, &dwStatus);
 
 	if (dwStatus & SCARD_PRESENT)
 	{
-		dwAtrLen = MAX_ATR_SIZE;
+		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->readerState->cardAtr, &dwAtrLen);
 		rContext->readerState->cardAtrLength = dwAtrLen;
@@ -308,10 +303,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	{
 		dwStatus = 0;
 
-		dwAtrLen = rContext->readerState->cardAtrLength;
-		rv = IFDStatusICC(rContext, &dwStatus,
-			rContext->readerState->cardAtr, &dwAtrLen);
-		rContext->readerState->cardAtrLength = dwAtrLen;
+		rv = IFDStatusICC(rContext, &dwStatus);
 
 		if (rv != SCARD_S_SUCCESS)
 		{
@@ -362,7 +354,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				/*
 				 * Power and reset the card
 				 */
-				dwAtrLen = MAX_ATR_SIZE;
+				dwAtrLen = sizeof(rContext->readerState->cardAtr);
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
 					rContext->readerState->cardAtr, &dwAtrLen);
 				rContext->readerState->cardAtrLength = dwAtrLen;

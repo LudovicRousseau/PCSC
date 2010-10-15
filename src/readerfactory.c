@@ -749,62 +749,13 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 		}
 		else
 		{
-			rv = DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
-			if (SCARD_S_SUCCESS == rv)
-			{
-				/* Ifd Handler 1.0 found */
-				rContext->version = IFD_HVERSION_1_0;
-			}
-			else
-			{
-				/* Neither version of the IFD Handler was found - exit */
-				Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
-				return SCARD_F_UNKNOWN_ERROR;
-			}
-		}
-	}
-
-	/* The following binds version 1.0 of the IFD Handler specs */
-	if (rContext->version == IFD_HVERSION_1_0)
-	{
-		Log1(PCSC_LOG_INFO, "Loading IFD Handler 1.0");
-
-#define GET_ADDRESS_OPTIONALv1(field, function, code) \
-{ \
-	void *f1 = NULL; \
-	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFD_" #function); \
-	if (SCARD_S_SUCCESS != rvl) \
-	{ \
-		code \
-	} \
-	rContext->psFunctions.psFunctions_v1.pvf ## field = f1; \
-}
-
-#define GET_ADDRESSv1(field, function) \
-	GET_ADDRESS_OPTIONALv1(field, function, \
-		Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing: " #function ); \
-		return(rv); )
-
-		(void)DYN_GetAddress(rContext->vHandle, &f, "IO_Create_Channel");
-		rContext->psFunctions.psFunctions_v1.pvfCreateChannel = f;
-
-		if (SCARD_S_SUCCESS != DYN_GetAddress(rContext->vHandle, &f,
-			"IO_Close_Channel"))
-		{
+			/* Neither version of the IFD Handler was found - exit */
 			Log1(PCSC_LOG_CRITICAL, "IFDHandler functions missing");
 			return SCARD_F_UNKNOWN_ERROR;
 		}
-		rContext->psFunctions.psFunctions_v1.pvfCloseChannel = f;
-
-		GET_ADDRESSv1(GetCapabilities, Get_Capabilities)
-		GET_ADDRESSv1(SetCapabilities, Set_Capabilities)
-		GET_ADDRESSv1(PowerICC, Power_ICC)
-		GET_ADDRESSv1(TransmitToICC, Transmit_to_ICC)
-		GET_ADDRESSv1(ICCPresence, Is_ICC_Present)
-
-		GET_ADDRESS_OPTIONALv1(SetProtocolParameters, Set_Protocol_Parameters, )
 	}
-	else if (rContext->version == IFD_HVERSION_2_0)
+
+	if (rContext->version == IFD_HVERSION_2_0)
 	{
 		/* The following binds version 2.0 of the IFD Handler specs */
 #define GET_ADDRESS_OPTIONALv2(s, code) \
@@ -1432,15 +1383,14 @@ void RFReCheckReaderConf(void)
 				if ((strcmp(reader_list[i].pcFriendlyname, lpcStripReader) == 0)
 					&& (reader_list[r].channelId == sReadersContexts[i]->port))
 				{
-					DWORD dwStatus = 0, dwAtrLen = 0;
-					UCHAR ucAtr[MAX_ATR_SIZE];
+					DWORD dwStatus = 0;
 
 					/* the reader was already started */
 					present = TRUE;
 
 					/* verify the reader is still connected */
-					if (IFDStatusICC(sReadersContexts[r], &dwStatus, ucAtr,
-						&dwAtrLen) != SCARD_S_SUCCESS)
+					if (IFDStatusICC(sReadersContexts[r], &dwStatus)
+						!= SCARD_S_SUCCESS)
 					{
 						Log2(PCSC_LOG_INFO, "Reader %s disappeared",
 							reader_list[i].pcFriendlyname);
