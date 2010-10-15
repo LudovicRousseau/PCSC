@@ -65,5 +65,9 @@ print "state:", hex(state)
 print "protocol:", protocol
 print "atr:", atr
 
+hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+if hresult != SCARD_S_SUCCESS:
+    raise BaseSCardException(hresult)
+
 hresult = SCardReleaseContext(hcontext)
 print SCardGetErrorMessage(hresult)
