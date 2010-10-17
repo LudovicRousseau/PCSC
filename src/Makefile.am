@@ -133,11 +133,12 @@ regen: pcsc-wirecheck-gen
 nobase_include_HEADERS = \
 	PCSC/debuglog.h \
 	PCSC/ifdhandler.h \
+	PCSC/reader.h \
 	PCSC/winscard.h \
 	PCSC/wintypes.h
 
 nodistheaderdir = $(includedir)/PCSC
-nodistheader_DATA = PCSC/reader.h PCSC/pcsclite.h
+nodistheader_DATA = PCSC/pcsclite.h
 
 pcdir= $(libdir)/pkgconfig
 pc_DATA = libpcsclite.pc
