@@ -1,10 +1,5 @@
 - include Apple patches and improvements (if possible/needed)
 
-- power on the card _only_ if an application requests a connection
-  see Alioth bug #301965
-  That could be implemented by polling the reader only if an application
-  requests it.
-
 - allow to have pcscd and libpcsclite on two different machines.
   That would be needed to support remote PAM login.
   Maybe use unix2tcp (http://dizzy.roedu.net/unix2tcp/)
@@ -30,4 +25,4 @@ For embedded/constrained systems
 
 - use static driver instead of reader polling and dynamic driver loading
 
-March 2010
+October 2010

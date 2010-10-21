@@ -185,6 +185,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	(sReadersContexts[dwContext])->vHandle = NULL;
 	(sReadersContexts[dwContext])->pFeeds = NULL;
 	(sReadersContexts[dwContext])->pMutex = NULL;
+	sReadersContexts[dwContext]->pthCardEvent = NULL;
 	(sReadersContexts[dwContext])->dwIdentity =
 		(dwContext + 1) << IDENTITY_SHIFT;
 
@@ -272,21 +273,23 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 
 	/* asynchronous card movement?  */
 	{
-		RESPONSECODE (*fct)(DWORD) = NULL;
+		RESPONSECODE (*fct)(DWORD, int) = NULL;
 
 		dwGetSize = sizeof(fct);
 
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
-			TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
+			TAG_IFD_POLLING_THREAD_WITH_TIMEOUT, &dwGetSize, (PUCHAR)&fct);
 		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
 		{
-			fct = NULL;
 			Log1(PCSC_LOG_INFO, "Using the pcscd polling thread");
 		}
 		else
+		{
+			sReadersContexts[dwContext]->pthCardEvent = fct;
 			Log1(PCSC_LOG_INFO, "Using the reader polling thread");
+		}
 
-		rv = EHSpawnEventHandler(sReadersContexts[dwContext], fct);
+		rv = EHSpawnEventHandler(sReadersContexts[dwContext]);
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
@@ -319,7 +322,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	{
 		char *tmpReader = NULL;
 		DWORD dwContextB = 0;
-		RESPONSECODE (*fct)(DWORD) = NULL;
+		RESPONSECODE (*fct)(DWORD, int) = NULL;
 
 		/* We must find an empty spot to put the reader structure */
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -428,16 +431,18 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		dwGetSize = sizeof(fct);
 
 		rv = IFDGetCapabilities((sReadersContexts[dwContextB]),
-				TAG_IFD_POLLING_THREAD, &dwGetSize, (PUCHAR)&fct);
+			TAG_IFD_POLLING_THREAD_WITH_TIMEOUT, &dwGetSize, (PUCHAR)&fct);
 		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
 		{
-			fct = NULL;
 			Log1(PCSC_LOG_INFO, "Using the pcscd polling thread");
 		}
 		else
+		{
+			sReadersContexts[dwContextB]->pthCardEvent = fct;
 			Log1(PCSC_LOG_INFO, "Using the reader polling thread");
+		}
 
-		rv = EHSpawnEventHandler(sReadersContexts[dwContextB], fct);
+		rv = EHSpawnEventHandler(sReadersContexts[dwContextB]);
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);

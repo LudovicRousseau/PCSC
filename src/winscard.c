@@ -342,6 +342,20 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		}
 	}
 
+	/* Power on (again) the card if needed */
+	if (POWER_STATE_UNPOWERED == rContext->powerState)
+	{
+		DWORD dwAtrLen;
+
+		dwAtrLen = sizeof(rContext->readerState->cardAtr);
+		Log0(PCSC_LOG_CRITICAL);
+		rv = IFDPowerICC(rContext, IFD_POWER_UP,
+			rContext->readerState->cardAtr, &dwAtrLen);
+		rContext->readerState->cardAtrLength = dwAtrLen;
+	}
+
+	/* the card is now in use */
+	rContext->powerState = POWER_STATE_INUSE;
 
 	/*******************************************
 	 *
@@ -941,6 +955,26 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 		if (rContext->contexts < 0)
 			rContext->contexts = 0;
+	}
+
+	if (PCSCLITE_SHARING_NO_CONTEXT == rContext->contexts)
+	{
+		RESPONSECODE (*fct)(DWORD) = NULL;
+		DWORD dwGetSize;
+
+		rContext->powerState = POWER_STATE_GRACE_PERIOD;
+
+		/* ask to stop the "polling" thread so it can be restarted using
+		 * the correct timeout */
+		dwGetSize = sizeof(fct);
+		rv = IFDGetCapabilities(rContext, TAG_IFD_STOP_POLLING_THREAD,
+			&dwGetSize, (PUCHAR)&fct);
+
+		if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
+		{
+			Log1(PCSC_LOG_INFO, "Stoping polling thread");
+			fct(rContext->slot);
+		}
 	}
 
 	/*

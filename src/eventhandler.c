@@ -39,6 +39,9 @@
 #include "winscard_svc.h"
 #include "simclist.h"
 
+/* Uncomment the next line if you do NOT want to use auto power off */
+/* #define DISABLE_ON_DEMAND_POWER_ON */
+
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
@@ -204,8 +207,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
-	RESPONSECODE (*card_event)(DWORD))
+LONG EHSpawnEventHandler(READER_CONTEXT * rContext)
 {
 	LONG rv;
 	DWORD dwStatus = 0;
@@ -218,7 +220,6 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext,
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
-	rContext->pthCardEvent = card_event;
 	rv = ThreadCreate(&rContext->pthThread, 0,
 		(PCSCLITE_THREAD_FUNCTION( ))EHStatusHandlerThread, (LPVOID) rContext);
 	if (rv)
@@ -264,6 +265,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		if (rv == IFD_SUCCESS)
 		{
 			readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+			rContext->powerState = POWER_STATE_POWERED;
 
 			if (rContext->readerState->cardAtrLength > 0)
 			{
@@ -277,6 +279,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		else
 		{
 			readerState = SCARD_PRESENT | SCARD_SWALLOWED;
+			rContext->powerState = POWER_STATE_UNPOWERED;
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
 		}
 
@@ -365,10 +368,12 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				if (rv == IFD_SUCCESS)
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+					rContext->powerState = POWER_STATE_POWERED;
 				}
 				else
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_SWALLOWED;
+					rContext->powerState = POWER_STATE_UNPOWERED;
 					rContext->readerState->cardAtrLength = 0;
 				}
 
@@ -409,13 +414,42 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		if (rContext->pthCardEvent)
 		{
 			int ret;
+			int timeout;
 
-			ret = rContext->pthCardEvent(rContext->slot);
+#ifndef DISABLE_ON_DEMAND_POWER_ON
+			if (POWER_STATE_POWERED == rContext->powerState)
+				/* The card is powered but not yet used */
+				timeout = PCSCLITE_POWER_OFF_GRACE_PERIOD;
+			else
+				/* The card is already in use or not used at all */
+#endif
+				timeout = PCSCLITE_STATUS_EVENT_TIMEOUT;
+
+			ret = rContext->pthCardEvent(rContext->slot, timeout);
 			if (IFD_NO_SUCH_DEVICE == ret)
 				(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 		}
 		else
 			(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
+
+#ifndef DISABLE_ON_DEMAND_POWER_ON
+		/* the card is powered but not used */
+		if (POWER_STATE_POWERED == rContext->powerState)
+		{
+			/* power down */
+			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
+			rContext->powerState = POWER_STATE_UNPOWERED;
+
+			/* the protocol is unset after a power down */
+			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		}
+
+		/* the card was in use */
+		if (POWER_STATE_GRACE_PERIOD == rContext->powerState)
+			/* the next state should be UNPOWERED unless the
+			 * card is used again */
+			rContext->powerState = POWER_STATE_POWERED;
+#endif
 
 		if (rContext->hLockId == 0xFFFF)
 		{

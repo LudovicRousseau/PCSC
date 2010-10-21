@@ -46,4 +46,20 @@
 #define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for get/set attributes */
 #define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/**< max APDU (64K + APDU + Lc + Le) Tx/Rx Buffer */
 
+/** Different values for struct ReaderContext powerState field */
+enum
+{
+	POWER_STATE_UNPOWERED,	/**< auto power off */
+	POWER_STATE_POWERED,	/**< powered */
+	POWER_STATE_GRACE_PERIOD,	/**< card was in use */
+	POWER_STATE_INUSE		/**< card is used */
+};
+
+/** time to wait before powering down an unused card */
+#define PCSCLITE_POWER_OFF_GRACE_PERIOD 5*1000 /* 5 second */
+
+/** normal timeout for pthCardEvent driver function when
+ * no card or card in use */
+#define PCSCLITE_STATUS_EVENT_TIMEOUT 10*60*1000 /* 10 minutes */
+
 #endif

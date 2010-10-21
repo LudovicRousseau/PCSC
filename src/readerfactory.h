@@ -108,7 +108,7 @@ extern "C"
 		char *library;	/**< Library Path */
 		char *device;	/**< Device Name */
 		pthread_t pthThread;	/**< Event polling thread */
-		RESPONSECODE (*pthCardEvent)(DWORD);	/**< Card Event sync */
+		RESPONSECODE (*pthCardEvent)(DWORD, int);	/**< Card Event sync */
 		pthread_mutex_t *mMutex;	/**< Mutex for this connection */
 		list_t handlesList;
 		pthread_mutex_t handlesList_lock;	/**< lock for the above list */
@@ -129,6 +129,7 @@ extern "C"
 		int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */
 		int * pMutex;			/**< Number of client to mutex */
+		int powerState;			/**< auto power off state */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use READER_CONTEXT * here since eventhandler.h can't be

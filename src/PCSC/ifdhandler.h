@@ -307,9 +307,10 @@ extern "C"
 #define TAG_IFD_THREAD_SAFE             0x0FAD	/**< driver is thread safe */
 #define TAG_IFD_SLOTS_NUMBER            0x0FAE	/**< number of slots of the reader */
 #define TAG_IFD_SIMULTANEOUS_ACCESS     0x0FAF	/**< number of reader the driver can manage */
-#define TAG_IFD_POLLING_THREAD          0x0FB0	/**< driver uses a polling thread */
+#define TAG_IFD_POLLING_THREAD          0x0FB0	/**< not used. See TAG_IFD_POLLING_THREAD_WITH_TIMEOUT */
 #define TAG_IFD_POLLING_THREAD_KILLABLE 0x0FB1	/**< the polling thread can be killed */
 #define TAG_IFD_STOP_POLLING_THREAD     0x0FB2	/**< method used to stop the polling thread (instead of just pthread_kill()) */
+#define TAG_IFD_POLLING_THREAD_WITH_TIMEOUT 0x0FB3	/**< driver uses a polling thread with a timeout parameter */
 
 	/*
 	 * IFD Handler version number enummerations

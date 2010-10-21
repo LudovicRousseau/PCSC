@@ -47,8 +47,7 @@ extern "C"
 	LONG EHUnregisterClientForEvent(int32_t filedes); 
 	LONG EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
-	LONG EHSpawnEventHandler(READER_CONTEXT *,
-		/*@null@*/ RESPONSECODE (*)(DWORD));
+	LONG EHSpawnEventHandler(READER_CONTEXT *);
 	LONG EHDestroyEventHandler(READER_CONTEXT *);
 
 /** One application is using the reader */
