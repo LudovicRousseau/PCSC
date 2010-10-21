@@ -87,7 +87,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
-		(sReadersContexts[i])->vHandle = NULL;
+		sReadersContexts[i]->vHandle = NULL;
 
 		/* Zero out each value in the struct */
 		memset(readerStates[i].readerName, 0, MAX_READERNAME);
@@ -129,7 +129,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	{
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			if ((sReadersContexts[i])->vHandle != 0)
+			if (sReadersContexts[i]->vHandle != 0)
 			{
 				char lpcStripReader[MAX_READERNAME];
 				int tmplen;
@@ -142,7 +142,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 				lpcStripReader[tmplen - 6] = 0;
 
 				if ((strcmp(readerName, lpcStripReader) == 0) &&
-					(port == (sReadersContexts[i])->port))
+					(port == sReadersContexts[i]->port))
 				{
 					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
 					return SCARD_E_DUPLICATE_READER;
@@ -154,7 +154,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	/* We must find an empty slot to put the reader structure */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((sReadersContexts[i])->vHandle == 0)
+		if (sReadersContexts[i]->vHandle == 0)
 		{
 			dwContext = i;
 			break;
@@ -175,28 +175,28 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 
 	sReadersContexts[dwContext]->library = strdup(library);
 	sReadersContexts[dwContext]->device = strdup(device);
-	(sReadersContexts[dwContext])->version = 0;
-	(sReadersContexts[dwContext])->port = port;
-	(sReadersContexts[dwContext])->mMutex = NULL;
-	(sReadersContexts[dwContext])->contexts = 0;
-	(sReadersContexts[dwContext])->pthThread = 0;
-	(sReadersContexts[dwContext])->hLockId = 0;
-	(sReadersContexts[dwContext])->LockCount = 0;
-	(sReadersContexts[dwContext])->vHandle = NULL;
-	(sReadersContexts[dwContext])->pFeeds = NULL;
-	(sReadersContexts[dwContext])->pMutex = NULL;
+	sReadersContexts[dwContext]->version = 0;
+	sReadersContexts[dwContext]->port = port;
+	sReadersContexts[dwContext]->mMutex = NULL;
+	sReadersContexts[dwContext]->contexts = 0;
+	sReadersContexts[dwContext]->pthThread = 0;
+	sReadersContexts[dwContext]->hLockId = 0;
+	sReadersContexts[dwContext]->LockCount = 0;
+	sReadersContexts[dwContext]->vHandle = NULL;
+	sReadersContexts[dwContext]->pFeeds = NULL;
+	sReadersContexts[dwContext]->pMutex = NULL;
 	sReadersContexts[dwContext]->pthCardEvent = NULL;
-	(sReadersContexts[dwContext])->dwIdentity =
+	sReadersContexts[dwContext]->dwIdentity =
 		(dwContext + 1) << IDENTITY_SHIFT;
 
-	lrv = list_init(&((sReadersContexts[dwContext])->handlesList));
+	lrv = list_init(&sReadersContexts[dwContext]->handlesList);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		return SCARD_E_NO_MEMORY;
 	}
 
-	lrv = list_attributes_seeker(&((sReadersContexts[dwContext])->handlesList),
+	lrv = list_attributes_seeker(&sReadersContexts[dwContext]->handlesList,
 		RDR_CLIHANDLES_seeker);
 	if (lrv < 0)
 	{
@@ -205,40 +205,40 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		return SCARD_E_NO_MEMORY;
 	}
 
-	(void)pthread_mutex_init(&(sReadersContexts[dwContext])->handlesList_lock,
+	(void)pthread_mutex_init(&sReadersContexts[dwContext]->handlesList_lock,
 		NULL);
 
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
-		(sReadersContexts[dwContext])->pFeeds =
-		  (sReadersContexts[parentNode])->pFeeds;
+		sReadersContexts[dwContext]->pFeeds =
+		  sReadersContexts[parentNode]->pFeeds;
 		*(sReadersContexts[dwContext])->pFeeds += 1;
-		(sReadersContexts[dwContext])->vHandle =
-		  (sReadersContexts[parentNode])->vHandle;
-		(sReadersContexts[dwContext])->mMutex =
-		  (sReadersContexts[parentNode])->mMutex;
-		(sReadersContexts[dwContext])->pMutex =
-		  (sReadersContexts[parentNode])->pMutex;
+		sReadersContexts[dwContext]->vHandle =
+		  sReadersContexts[parentNode]->vHandle;
+		sReadersContexts[dwContext]->mMutex =
+		  sReadersContexts[parentNode]->mMutex;
+		sReadersContexts[dwContext]->pMutex =
+		  sReadersContexts[parentNode]->pMutex;
 
 		/* Call on the parent driver to see if it is thread safe */
 		dwGetSize = sizeof(ucThread);
-		rv = IFDGetCapabilities((sReadersContexts[parentNode]),
+		rv = IFDGetCapabilities(sReadersContexts[parentNode],
 			TAG_IFD_THREAD_SAFE, &dwGetSize, ucThread);
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
 			Log1(PCSC_LOG_INFO, "Driver is thread safe");
-			(sReadersContexts[dwContext])->mMutex = NULL;
-			(sReadersContexts[dwContext])->pMutex = NULL;
+			sReadersContexts[dwContext]->mMutex = NULL;
+			sReadersContexts[dwContext]->pMutex = NULL;
 		}
 		else
 			*(sReadersContexts[dwContext])->pMutex += 1;
 	}
 
-	if ((sReadersContexts[dwContext])->pFeeds == NULL)
+	if (sReadersContexts[dwContext]->pFeeds == NULL)
 	{
-		(sReadersContexts[dwContext])->pFeeds = malloc(sizeof(int));
+		sReadersContexts[dwContext]->pFeeds = malloc(sizeof(int));
 
 		/* Initialize pFeeds to 1, otherwise multiple
 		   cloned readers will cause pcscd to crash when
@@ -247,16 +247,16 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		*(sReadersContexts[dwContext])->pFeeds = 1;
 	}
 
-	if ((sReadersContexts[dwContext])->mMutex == 0)
+	if (sReadersContexts[dwContext]->mMutex == 0)
 	{
-		(sReadersContexts[dwContext])->mMutex =
+		sReadersContexts[dwContext]->mMutex =
 			malloc(sizeof(pthread_mutex_t));
-		(void)pthread_mutex_init((sReadersContexts[dwContext])->mMutex, NULL);
+		(void)pthread_mutex_init(sReadersContexts[dwContext]->mMutex, NULL);
 	}
 
-	if ((sReadersContexts[dwContext])->pMutex == NULL)
+	if (sReadersContexts[dwContext]->pMutex == NULL)
 	{
-		(sReadersContexts[dwContext])->pMutex = malloc(sizeof(int));
+		sReadersContexts[dwContext]->pMutex = malloc(sizeof(int));
 		*(sReadersContexts[dwContext])->pMutex = 1;
 	}
 
@@ -277,7 +277,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 
 		dwGetSize = sizeof(fct);
 
-		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
+		rv = IFDGetCapabilities(sReadersContexts[dwContext],
 			TAG_IFD_POLLING_THREAD_WITH_TIMEOUT, &dwGetSize, (PUCHAR)&fct);
 		if ((rv != SCARD_S_SUCCESS) || (dwGetSize != sizeof(fct)))
 		{
@@ -327,7 +327,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		/* We must find an empty spot to put the reader structure */
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			if ((sReadersContexts[i])->vHandle == 0)
+			if (sReadersContexts[i]->vHandle == 0)
 			{
 				dwContextB = i;
 				break;
@@ -352,16 +352,16 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 			sReadersContexts[dwContext]->library;
 		sReadersContexts[dwContextB]->device =
 			sReadersContexts[dwContext]->device;
-		(sReadersContexts[dwContextB])->version =
-		  (sReadersContexts[dwContext])->version;
-		(sReadersContexts[dwContextB])->port =
-		  (sReadersContexts[dwContext])->port;
-		(sReadersContexts[dwContextB])->vHandle =
-		  (sReadersContexts[dwContext])->vHandle;
-		(sReadersContexts[dwContextB])->mMutex =
-		  (sReadersContexts[dwContext])->mMutex;
-		(sReadersContexts[dwContextB])->pMutex =
-		  (sReadersContexts[dwContext])->pMutex;
+		sReadersContexts[dwContextB]->version =
+		  sReadersContexts[dwContext]->version;
+		sReadersContexts[dwContextB]->port =
+		  sReadersContexts[dwContext]->port;
+		sReadersContexts[dwContextB]->vHandle =
+		  sReadersContexts[dwContext]->vHandle;
+		sReadersContexts[dwContextB]->mMutex =
+		  sReadersContexts[dwContext]->mMutex;
+		sReadersContexts[dwContextB]->pMutex =
+		  sReadersContexts[dwContext]->pMutex;
 		sReadersContexts[dwContextB]->slot =
 			sReadersContexts[dwContext]->slot + j;
 
@@ -369,26 +369,26 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		 * Added by Dave - slots did not have a pFeeds
 		 * parameter so it was by luck they were working
 		 */
-		(sReadersContexts[dwContextB])->pFeeds =
-		  (sReadersContexts[dwContext])->pFeeds;
+		sReadersContexts[dwContextB]->pFeeds =
+		  sReadersContexts[dwContext]->pFeeds;
 
 		/* Added by Dave for multiple slots */
 		*(sReadersContexts[dwContextB])->pFeeds += 1;
 
-		(sReadersContexts[dwContextB])->contexts = 0;
-		(sReadersContexts[dwContextB])->hLockId = 0;
-		(sReadersContexts[dwContextB])->LockCount = 0;
-		(sReadersContexts[dwContextB])->dwIdentity =
+		sReadersContexts[dwContextB]->contexts = 0;
+		sReadersContexts[dwContextB]->hLockId = 0;
+		sReadersContexts[dwContextB]->LockCount = 0;
+		sReadersContexts[dwContextB]->dwIdentity =
 			(dwContextB + 1) << IDENTITY_SHIFT;
 
-		lrv = list_init(&((sReadersContexts[dwContextB])->handlesList));
+		lrv = list_init(&sReadersContexts[dwContextB]->handlesList);
 		if (lrv < 0)
 		{
 			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 			return SCARD_E_NO_MEMORY;
 		}
 
-		lrv = list_attributes_seeker(&((sReadersContexts[dwContextB])->handlesList),
+		lrv = list_attributes_seeker(&sReadersContexts[dwContextB]->handlesList,
 			RDR_CLIHANDLES_seeker);
 		if (lrv < 0)
 		{
@@ -397,7 +397,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 			return SCARD_E_NO_MEMORY;
 		}
 
-		(void)pthread_mutex_init(&(sReadersContexts[dwContextB])->handlesList_lock, NULL);
+		(void)pthread_mutex_init(&sReadersContexts[dwContextB]->handlesList_lock, NULL);
 
 		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);
@@ -406,12 +406,12 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
-			(sReadersContexts[dwContextB])->mMutex =
+			sReadersContexts[dwContextB]->mMutex =
 				malloc(sizeof(pthread_mutex_t));
-			(void)pthread_mutex_init((sReadersContexts[dwContextB])->mMutex,
+			(void)pthread_mutex_init(sReadersContexts[dwContextB]->mMutex,
 				NULL);
 
-			(sReadersContexts[dwContextB])->pMutex = malloc(sizeof(int));
+			sReadersContexts[dwContextB]->pMutex = malloc(sizeof(int));
 			*(sReadersContexts[dwContextB])->pMutex = 1;
 		}
 		else
@@ -556,16 +556,16 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	{
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
-			if ((sReadersContexts[i])->vHandle != 0)
+			if (sReadersContexts[i]->vHandle != 0)
 			{
-				if (strcmp((sReadersContexts[i])->library, libraryName) == 0)
+				if (strcmp(sReadersContexts[i]->library, libraryName) == 0)
 				{
 					UCHAR tagValue[1];
 					LONG ret;
 
 					/* Ask the driver if it supports multiple channels */
 					valueLength = sizeof(tagValue);
-					ret = IFDGetCapabilities((sReadersContexts[i]),
+					ret = IFDGetCapabilities(sReadersContexts[i],
 						TAG_IFD_SIMULTANEOUS_ACCESS,
 						&valueLength, tagValue);
 
@@ -580,9 +580,9 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 						supportedChannels = 1;
 
 					/* Check to see if it is a hotplug reader and different */
-					if (((((sReadersContexts[i])->port & 0xFFFF0000) ==
+					if ((((sReadersContexts[i]->port & 0xFFFF0000) ==
 							PCSCLITE_HP_BASE_PORT)
-						&& ((sReadersContexts[i])->port != port))
+						&& (sReadersContexts[i]->port != port))
 						|| (supportedChannels > 1))
 					{
 						const char *reader = sReadersContexts[i]->readerState->readerName;
@@ -656,7 +656,7 @@ LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((sReadersContexts[i])->vHandle != 0)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
 			if (strcmp(readerName,
 				sReadersContexts[i]->readerState->readerName) == 0)
@@ -678,7 +678,7 @@ LONG RFReaderInfoNamePort(int port, const char *readerName,
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((sReadersContexts[i])->vHandle != 0)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
 			int tmplen;
 
@@ -689,7 +689,7 @@ LONG RFReaderInfoNamePort(int port, const char *readerName,
 			lpcStripReader[tmplen - 6] = 0;
 
 			if ((strcmp(readerName, lpcStripReader) == 0) &&
-				(port == (sReadersContexts[i])->port))
+				(port == sReadersContexts[i]->port))
 			{
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
@@ -710,7 +710,7 @@ LONG RFReaderInfoById(DWORD dwIdentity, READER_CONTEXT * * sReader)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (dwIdentity == (sReadersContexts[i])->dwIdentity)
+		if (dwIdentity == sReadersContexts[i]->dwIdentity)
 		{
 			*sReader = sReadersContexts[i];
 			return SCARD_S_SUCCESS;
@@ -999,12 +999,12 @@ SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 again:
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((sReadersContexts[i])->vHandle != 0)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
 			RDR_CLIHANDLES *currentHandle;
-			list_t * l = &((sReadersContexts[i])->handlesList);
+			list_t * l = &sReadersContexts[i]->handlesList;
 
-			(void)pthread_mutex_lock(&(sReadersContexts[i])->handlesList_lock);
+			(void)pthread_mutex_lock(&sReadersContexts[i]->handlesList_lock);
 			list_iterator_start(l);
 			while (list_iterator_hasnext(l))
 			{
@@ -1015,12 +1015,12 @@ again:
 					/* Get a new handle and loop again */
 					randHandle = SYS_RandomInt(10, 65000);
 					list_iterator_stop(l);
-					(void)pthread_mutex_unlock(&(sReadersContexts[i])->handlesList_lock);
+					(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
 					goto again;
 				}
 			}
 			list_iterator_stop(l);
-			(void)pthread_mutex_unlock(&(sReadersContexts[i])->handlesList_lock);
+			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
 		}
 	}
 
@@ -1035,13 +1035,13 @@ LONG RFFindReaderHandle(SCARDHANDLE hCard)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if ((sReadersContexts[i])->vHandle != 0)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
 			RDR_CLIHANDLES * currentHandle;
-			(void)pthread_mutex_lock(&(sReadersContexts[i])->handlesList_lock);
-			currentHandle = list_seek(&((sReadersContexts[i])->handlesList),
+			(void)pthread_mutex_lock(&sReadersContexts[i]->handlesList_lock);
+			currentHandle = list_seek(&sReadersContexts[i]->handlesList,
 				&hCard);
-			(void)pthread_mutex_unlock(&(sReadersContexts[i])->handlesList_lock);
+			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
 			if (currentHandle != NULL)
 				return SCARD_S_SUCCESS;
 		}
