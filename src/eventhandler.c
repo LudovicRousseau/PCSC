@@ -42,6 +42,10 @@
 /* Uncomment the next line if you do NOT want to use auto power off */
 /* #define DISABLE_ON_DEMAND_POWER_ON */
 
+/* Uncomment the next line if you do not want the card to be powered on
+ * when inserted */
+/* #define DISABLE_AUTO_POWER_ON */
+
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
@@ -254,6 +258,12 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 	if (dwStatus & SCARD_PRESENT)
 	{
+#ifdef DISABLE_AUTO_POWER_ON
+		rContext->readerState->cardAtrLength = 0; 
+		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		readerState = SCARD_PRESENT;
+		Log1(PCSC_LOG_INFO, "Skip card power on");
+#else
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->readerState->cardAtr, &dwAtrLen);
@@ -282,6 +292,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			rContext->powerState = POWER_STATE_UNPOWERED;
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
 		}
+#endif
 
 		dwCurrentState = SCARD_PRESENT;
 	}
@@ -354,6 +365,15 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			if (dwCurrentState == SCARD_ABSENT ||
 				dwCurrentState == SCARD_UNKNOWN)
 			{
+#ifdef DISABLE_AUTO_POWER_ON
+				rContext->readerState->cardAtrLength = 0; 
+				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+				rContext->readerState->readerState = SCARD_PRESENT;
+				rContext->powerState = POWER_STATE_UNPOWERED;
+				readerState = SCARD_PRESENT;
+				rv = IFD_SUCCESS;
+				Log1(PCSC_LOG_INFO, "Skip card power on");
+#else
 				/*
 				 * Power and reset the card
 				 */
@@ -376,6 +396,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 					rContext->powerState = POWER_STATE_UNPOWERED;
 					rContext->readerState->cardAtrLength = 0;
 				}
+#endif
 
 				dwCurrentState = SCARD_PRESENT;
 
