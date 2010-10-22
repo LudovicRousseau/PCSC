@@ -18,7 +18,7 @@
 /**
  * @file
  * @defgroup API
- * @brief This handles smartcard reader communications and
+ * @brief Handles smartcard reader communications and
  * forwarding requests over message queues.
  *
  * Here is exposed the API for client applications.
@@ -331,7 +331,7 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
  * Thread safety functions
  */
 /**
- * @brief This function locks a mutex so another thread must wait to use this
+ * @brief Locks a mutex so another thread must wait to use this
  * function.
  *
  * Wrapper to the function pthread_mutex_lock().
@@ -342,7 +342,7 @@ inline static LONG SCardLockThread(void)
 }
 
 /**
- * @brief This function unlocks a mutex so another thread may use the client.
+ * @brief Unlocks a mutex so another thread may use the client.
  *
  * Wrapper to the function pthread_mutex_unlock().
  */
@@ -643,7 +643,7 @@ again:
 }
 
 /**
- * @brief This function destroys a communication context to the PC/SC Resource
+ * @brief Destroys a communication context to the PC/SC Resource
  * Manager. This must be the last function called in a PC/SC application.
  *
  * @ingroup API
@@ -736,8 +736,7 @@ end:
 }
 
 /**
- * @brief This function establishes a connection to the reader specified in \p
- * szReader.
+ * @brief Establishes a connection to the reader specified in \p * szReader.
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -890,7 +889,7 @@ end:
 }
 
 /**
- * @brief This function reestablishes a connection to a reader that was
+ * @brief Reestablishes a connection to a reader that was
  * previously connected to using SCardConnect().
  *
  * In a multi application environment it is possible for an application to
@@ -1047,7 +1046,7 @@ end:
 }
 
 /**
- * @brief This function terminates a connection made through SCardConnect().
+ * @brief Terminates a connection made through SCardConnect().
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
@@ -1144,7 +1143,7 @@ end:
 }
 
 /**
- * @brief This function establishes a temporary exclusive access mode for
+ * @brief Establishes a temporary exclusive access mode for
  * doing a serie of commands in a transaction.
  *
  * You might want to use this when you are selecting a few files and then
@@ -1254,7 +1253,7 @@ end:
 }
 
 /**
- * @brief This function ends a previously begun transaction.
+ * @brief Ends a previously begun transaction.
  *
  * The calling application must be the owner of the previously begun
  * transaction or an error will occur.
@@ -1371,7 +1370,7 @@ end:
 }
 
 /**
- * @brief This function returns the current status of the reader connected to
+ * @brief Returns the current status of the reader connected to
  * by \p hCard.
  *
  * It's friendly name will be stored in \p szReaderName. \p pcchReaderLen will
@@ -1664,7 +1663,7 @@ end:
 }
 
 /**
- * @brief This function blocks execution until the current availability
+ * @brief Blocks execution until the current availability
  * of the cards in a specific set of readers changes.
  *
  * This function receives a structure or list of structures containing
@@ -2223,7 +2222,7 @@ end:
 }
 
 /**
- * @brief This function sends a command directly to the IFD Handler (reader
+ * @brief Sends a command directly to the IFD Handler (reader
  * driver) to be processed by the reader.
  *
  * This is useful for creating client side reader drivers for functions like
@@ -2385,7 +2384,7 @@ end:
 }
 
 /**
- * @brief This function get an attribute from the IFD Handler (reader driver).
+ * @brief Get an attribute from the IFD Handler (reader driver).
  *
  * The list of possible attributes is available in the file \c reader.h.
  *
@@ -2530,7 +2529,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr,
 }
 
 /**
- * @brief This function set an attribute of the IFD Handler.
+ * @brief Set an attribute of the IFD Handler.
  *
  * The list of attributes you can set is dependent on the IFD Handler you are
  * using.
@@ -2671,7 +2670,7 @@ end:
 }
 
 /**
- * @brief This function sends an APDU to the smart card contained in the reader
+ * @brief Sends an APDU to the smart card contained in the reader
  * connected to by SCardConnect().
  *
  * The card responds from the APDU and stores this response in \p pbRecvBuffer
@@ -3065,7 +3064,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 }
 
 /**
- * @brief This function returns a list of currently available reader groups on
+ * @brief Returns a list of currently available reader groups on
  * the system. \p mszGroups is a pointer to a character string that is
  * allocated by the application.  If the application sends \p mszGroups as NULL
  * then this function will return the size of the buffer needed to allocate in
