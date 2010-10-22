@@ -240,6 +240,7 @@ struct _psContextMap
 	SCARDCONTEXT hContext;			/**< Application Context ID */
 	pthread_mutex_t * mMutex;		/**< Mutex for this context */
 	list_t channelMapList;
+	char cancellable;				/**< We are in a cancellable call */
 };
 typedef struct _psContextMap SCONTEXTMAP;
 
@@ -2119,6 +2120,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				waitStatusStruct.timeOut = dwTime;
 				waitStatusStruct.rv = SCARD_S_SUCCESS;
 
+				/* another thread can do SCardCancel() */
+				currentContextMap->cancellable = TRUE;
+
 				rv = MessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
 					currentContextMap->dwClientID,
 					sizeof(waitStatusStruct), &waitStatusStruct);
@@ -2135,6 +2139,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				rv = MessageReceiveTimeout(CMD_WAIT_READER_STATE_CHANGE,
 					&waitStatusStruct, sizeof(waitStatusStruct),
 					currentContextMap->dwClientID, dwTime);
+
+				/* another thread can do SCardCancel() */
+				currentContextMap->cancellable = FALSE;
 
 				/* timeout */
 				if (-2 == rv)
@@ -3224,6 +3231,9 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
+	if (! currentContextMap->cancellable)
+		return SCARD_S_SUCCESS;
+
 	/* create a new connection to the server */
 	if (ClientSetupSession(&dwClientID) != 0)
 	{
@@ -3339,6 +3349,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	Log2(PCSC_LOG_DEBUG, "Allocating new SCONTEXTMAP @%X", newContextMap);
 	newContextMap->hContext = hContext;
 	newContextMap->dwClientID = dwClientID;
+	newContextMap->cancellable = FALSE;
 
 	newContextMap->mMutex = malloc(sizeof(pthread_mutex_t));
 	if (NULL == newContextMap->mMutex)
