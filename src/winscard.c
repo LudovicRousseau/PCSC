@@ -348,7 +348,6 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		DWORD dwAtrLen;
 
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
-		Log0(PCSC_LOG_CRITICAL);
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
 			rContext->readerState->cardAtr, &dwAtrLen);
 		rContext->readerState->cardAtrLength = dwAtrLen;
