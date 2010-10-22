@@ -39,13 +39,6 @@
 #include "winscard_svc.h"
 #include "simclist.h"
 
-/* Uncomment the next line if you do NOT want to use auto power off */
-/* #define DISABLE_ON_DEMAND_POWER_ON */
-
-/* Uncomment the next line if you do not want the card to be powered on
- * when inserted */
-/* #define DISABLE_AUTO_POWER_ON */
-
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 

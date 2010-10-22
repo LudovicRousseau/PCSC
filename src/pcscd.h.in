@@ -62,4 +62,11 @@ enum
  * no card or card in use */
 #define PCSCLITE_STATUS_EVENT_TIMEOUT 10*60*1000 /* 10 minutes */
 
+/* Uncomment the next line if you do NOT want to use auto power off */
+/* #define DISABLE_ON_DEMAND_POWER_ON */
+
+/* Uncomment the next line if you do not want the card to be powered on
+ * when inserted */
+/* #define DISABLE_AUTO_POWER_ON */
+
 #endif
