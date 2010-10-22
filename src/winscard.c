@@ -1622,27 +1622,3 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardListReaders(/*@unused@*/ SCARDCONTEXT hContext,
-	/*@unused@*/ LPCSTR mszGroups,
-	/*@unused@*/ LPSTR mszReaders,
-	/*@unused@*/ LPDWORD pcchReaders)
-{
-	/*
-	 * Client side function
-	 */
-	(void)hContext;
-	(void)mszGroups;
-	(void)mszReaders;
-	(void)pcchReaders;
-	return SCARD_S_SUCCESS;
-}
-
-LONG SCardCancel(/*@unused@*/ SCARDCONTEXT hContext)
-{
-	/*
-	 * Client side function
-	 */
-	(void)hContext;
-	return SCARD_S_SUCCESS;
-}
-
