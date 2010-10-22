@@ -61,8 +61,8 @@ struct _psContext
 	int32_t hContext;
 	list_t cardsList;
 	pthread_mutex_t cardsList_lock;	/**< lock for the above list */
-	uint32_t dwClientID;			/**< Connection ID used to reference the Client. */
-	pthread_t pthThread;		/**< Event polling thread's ID */
+	uint32_t dwClientID;	/**< Connection ID used to reference the Client. */
+	pthread_t pthThread;	/**< Event polling thread's ID */
 };
 typedef struct _psContext SCONTEXT;
 
@@ -83,7 +83,8 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 
 	if ((el == NULL) || (key == NULL))
 	{
-		Log3(PCSC_LOG_CRITICAL, "contextsListhContext_seeker called with NULL pointer: el=%X, key=%X", el, key);
+		Log3(PCSC_LOG_CRITICAL, "called with NULL pointer: el=%X, key=%X",
+			el, key);
 	}
 
 	if (currentContext->hContext == *(int32_t *)key)
@@ -91,7 +92,8 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 	return 0;
 }
 
-LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandles)
+LONG ContextsInitialize(int customMaxThreadCounter,
+	int customMaxThreadCardHandles)
 {
 	int lrv = 0;
 
@@ -110,7 +112,8 @@ LONG ContextsInitialize(int customMaxThreadCounter, int customMaxThreadCardHandl
 	lrv = list_attributes_seeker(& contextsList, contextsListhContext_seeker);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_attributes_seeker failed with return value: %d", lrv);
+		Log2(PCSC_LOG_CRITICAL,
+			"list_attributes_seeker failed with return value: %d", lrv);
 		return -1;
 	}
 
@@ -181,10 +184,12 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	 * usefull even on a 64-bit CPU since the API between pcscd and
 	 * libpcscliter uses "int32_t hCard;"
 	 */
-	lrv = list_attributes_comparator(&(newContext->cardsList), list_comparator_int32_t);
+	lrv = list_attributes_comparator(&(newContext->cardsList),
+		list_comparator_int32_t);
 	if (lrv != 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_attributes_comparator failed with return value: %d", lrv);
+		Log2(PCSC_LOG_CRITICAL,
+			"list_attributes_comparator failed with return value: %d", lrv);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -196,7 +201,8 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	(void)pthread_mutex_unlock(&contextsList_lock);
 	if (lrv < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
+			lrv);
 		list_destroy(&(newContext->cardsList));
 		goto error;
 	}
@@ -386,12 +392,12 @@ static void ContextThread(LPVOID newContext)
 				READ_BODY(esStr)
 
 				hContext = esStr.hContext;
-				esStr.rv = SCardEstablishContext(esStr.dwScope, 0, 0, &hContext);
+				esStr.rv = SCardEstablishContext(esStr.dwScope, 0, 0,
+					&hContext);
 				esStr.hContext = hContext;
 
 				if (esStr.rv == SCARD_S_SUCCESS)
-					esStr.rv =
-						MSGAddContext(esStr.hContext, threadContext);
+					esStr.rv = MSGAddContext(esStr.hContext, threadContext);
 
 				WRITE_BODY(esStr)
 			}
@@ -406,8 +412,7 @@ static void ContextThread(LPVOID newContext)
 				reStr.rv = SCardReleaseContext(reStr.hContext);
 
 				if (reStr.rv == SCARD_S_SUCCESS)
-					reStr.rv =
-						MSGRemoveContext(reStr.hContext, threadContext);
+					reStr.rv = MSGRemoveContext(reStr.hContext, threadContext);
 
 				WRITE_BODY(reStr)
 			}
@@ -425,15 +430,15 @@ static void ContextThread(LPVOID newContext)
 				dwActiveProtocol = coStr.dwActiveProtocol;
 
 				coStr.rv = SCardConnect(coStr.hContext, coStr.szReader,
-						coStr.dwShareMode, coStr.dwPreferredProtocols,
-						&hCard, &dwActiveProtocol);
+					coStr.dwShareMode, coStr.dwPreferredProtocols,
+					&hCard, &dwActiveProtocol);
 
 				coStr.hCard = hCard;
 				coStr.dwActiveProtocol = dwActiveProtocol;
 
 				if (coStr.rv == SCARD_S_SUCCESS)
-					coStr.rv =
-						MSGAddHandle(coStr.hContext, coStr.hCard, threadContext);
+					coStr.rv = MSGAddHandle(coStr.hContext, coStr.hCard,
+						threadContext);
 
 				WRITE_BODY(coStr)
 			}
@@ -450,8 +455,8 @@ static void ContextThread(LPVOID newContext)
 					goto exit;
 
 				rcStr.rv = SCardReconnect(rcStr.hCard, rcStr.dwShareMode,
-						rcStr.dwPreferredProtocols,
-						rcStr.dwInitialization, &dwActiveProtocol);
+					rcStr.dwPreferredProtocols, rcStr.dwInitialization,
+					&dwActiveProtocol);
 				rcStr.dwActiveProtocol = dwActiveProtocol;
 
 				WRITE_BODY(rcStr)
@@ -470,8 +475,7 @@ static void ContextThread(LPVOID newContext)
 				diStr.rv = SCardDisconnect(diStr.hCard, diStr.dwDisposition);
 
 				if (SCARD_S_SUCCESS == diStr.rv)
-					diStr.rv =
-						MSGRemoveHandle(diStr.hCard, threadContext);
+					diStr.rv = MSGRemoveHandle(diStr.hCard, threadContext);
 
 				WRITE_BODY(diStr)
 			}
@@ -501,7 +505,8 @@ static void ContextThread(LPVOID newContext)
 				if (MSGCheckHandleAssociation(enStr.hCard, threadContext))
 					goto exit;
 
-				enStr.rv = SCardEndTransaction(enStr.hCard, enStr.dwDisposition);
+				enStr.rv = SCardEndTransaction(enStr.hCard,
+					enStr.dwDisposition);
 
 				WRITE_BODY(enStr)
 			}
@@ -659,7 +664,7 @@ static void ContextThread(LPVOID newContext)
 				cbAttrLen = gsStr.cbAttrLen;
 
 				gsStr.rv = SCardGetAttrib(gsStr.hCard, gsStr.dwAttrId,
-						gsStr.pbAttr, &cbAttrLen);
+					gsStr.pbAttr, &cbAttrLen);
 
 				gsStr.cbAttrLen = cbAttrLen;
 
@@ -822,7 +827,8 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		listLength = list_size(&(threadContext->cardsList));
 		if (listLength >= contextMaxCardHandles)
 		{
-			Log4(PCSC_LOG_DEBUG, "Too many card handles for thread context @%X: %d (max is %d)"
+			Log4(PCSC_LOG_DEBUG,
+				"Too many card handles for thread context @%X: %d (max is %d)"
 				"Restart pcscd with --max-card-handle-per-thread value",
 				threadContext, listLength, contextMaxCardHandles);
 			return SCARD_E_NO_MEMORY;
@@ -860,7 +866,8 @@ static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 }
 
 
-static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard, SCONTEXT * threadContext)
+static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard,
+	SCONTEXT * threadContext)
 {
 	int list_index = 0;
 
