@@ -8,7 +8,7 @@
  * Copyright (C) 2002
  *  David Corcoran <corcoran@linuxnet.com>
  * Copyright (C) 2003
- *  Antti Tapaninen 
+ *  Antti Tapaninen
  *
  * $Id$
  */

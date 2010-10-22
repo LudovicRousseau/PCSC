@@ -562,7 +562,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			Log1(PCSC_LOG_INFO, "Disable shared blocking");
 			sharing_shall_block = FALSE;
 		}
-		
+
 		isExecuted = 1;
 	}
 
@@ -998,7 +998,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 
 	/* Retry loop for blocking behaviour */
 retry:
-	
+
 	scReconnectStruct.hCard = hCard;
 	scReconnectStruct.dwShareMode = dwShareMode;
 	scReconnectStruct.dwPreferredProtocols = dwPreferredProtocols;
@@ -1034,7 +1034,7 @@ retry:
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
-	
+
 	*pdwActiveProtocol = scReconnectStruct.dwActiveProtocol;
 
 end:
@@ -1577,7 +1577,7 @@ retry:
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
-	
+
 	if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INSUFFICIENT_BUFFER)
 	{
 		/*
@@ -1851,7 +1851,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			const char *readerName;
 			int i;
 
-			/* Looks for correct readernames */ 
+			/* Looks for correct readernames */
 			readerName = currReader->szReader;
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
@@ -2771,7 +2771,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 
 	/* Retry loop for blocking behaviour */
 retry:
-	
+
 	scTransmitStruct.hCard = hCard;
 	scTransmitStruct.cbSendLength = cbSendLength;
 	scTransmitStruct.pcbRecvLength = *pcbRecvLength;

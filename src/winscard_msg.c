@@ -181,7 +181,7 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 			} else
 			{
 				/* we ignore the signals and socket full situations, all
-				 * other errors are fatal */ 
+				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
 					retval = -1;

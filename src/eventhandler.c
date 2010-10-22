@@ -49,7 +49,7 @@ LONG EHRegisterClientForEvent(int32_t filedes)
 	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
 	(void)list_append(&ClientsWaitingForEvent, &filedes);
-	
+
 	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;
@@ -67,9 +67,9 @@ LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
 	ret = list_delete(&ClientsWaitingForEvent, &filedes);
-	
+
 	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
-	
+
 	if (ret < 0)
 		rv = SCARD_F_INTERNAL_ERROR;
 
@@ -82,7 +82,7 @@ LONG EHTryToUnregisterClientForEvent(int32_t filedes)
 LONG EHUnregisterClientForEvent(int32_t filedes)
 {
 	LONG rv = EHTryToUnregisterClientForEvent(filedes);
-	
+
 	if (rv < 0)
 		Log2(PCSC_LOG_ERROR, "Can't remove client: %d", filedes);
 
@@ -252,7 +252,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	if (dwStatus & SCARD_PRESENT)
 	{
 #ifdef DISABLE_AUTO_POWER_ON
-		rContext->readerState->cardAtrLength = 0; 
+		rContext->readerState->cardAtrLength = 0;
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 		readerState = SCARD_PRESENT;
 		Log1(PCSC_LOG_INFO, "Skip card power on");
@@ -359,7 +359,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				dwCurrentState == SCARD_UNKNOWN)
 			{
 #ifdef DISABLE_AUTO_POWER_ON
-				rContext->readerState->cardAtrLength = 0; 
+				rContext->readerState->cardAtrLength = 0;
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 				rContext->readerState->readerState = SCARD_PRESENT;
 				rContext->powerState = POWER_STATE_UNPOWERED;

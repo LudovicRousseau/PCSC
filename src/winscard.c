@@ -863,7 +863,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 #ifdef DISABLE_AUTO_POWER_ON
 		if (SCARD_UNPOWER_CARD == dwDisposition)
 		{
-			rContext->readerState->cardAtrLength = 0; 
+			rContext->readerState->cardAtrLength = 0;
 			rContext->readerState->readerState = SCARD_PRESENT;
 			Log1(PCSC_LOG_INFO, "Skip card power on");
 		}
@@ -1354,7 +1354,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 				}
 
 			}
-			else 
+			else
 				rv = SCARD_E_UNSUPPORTED_FEATURE;
 			break;
 		case IFD_ERROR_INSUFFICIENT_BUFFER:

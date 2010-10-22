@@ -44,7 +44,7 @@ extern "C"
 
 	LONG EHTryToUnregisterClientForEvent(int32_t filedes);
 	LONG EHRegisterClientForEvent(int32_t filedes);
-	LONG EHUnregisterClientForEvent(int32_t filedes); 
+	LONG EHUnregisterClientForEvent(int32_t filedes);
 	LONG EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
 	LONG EHSpawnEventHandler(READER_CONTEXT *);

@@ -403,7 +403,7 @@ static void HPAddDevice(LibHalContext *ctx, const char *udi)
 		sSerialNumber = libhal_device_get_property_string(ctx, udi,
 			"usb.serial", NULL);
 #endif
-	
+
 	/* name from the Info.plist file */
 	strlcpy(fullname, driver->readerName, sizeof(fullname));
 

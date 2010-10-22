@@ -76,7 +76,7 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 		dwProtocol, ucFlags, ucPTS1, ucPTS2, ucPTS3);
 #else
 	rv = IFDHSetProtocolParameters(rContext->slot, dwProtocol, ucFlags,
-		ucPTS1, ucPTS2, ucPTS3); 
+		ucPTS1, ucPTS2, ucPTS3);
 #endif
 
 	return rv;

@@ -269,7 +269,7 @@ int main(int argc, char **argv)
 				break;
 
 			case 't':
-				customMaxThreadCounter = optarg ? atoi(optarg) : 0; 
+				customMaxThreadCounter = optarg ? atoi(optarg) : 0;
 				if (limited_rights && (customMaxThreadCounter < PCSC_MAX_CONTEXT_THREADS))
 					customMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 				Log2(PCSC_LOG_INFO, "setting customMaxThreadCounter to: %d",
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 				break;
 
 			case 'r':
-				customMaxReaderHandles = optarg ? atoi(optarg) : 0; 
+				customMaxReaderHandles = optarg ? atoi(optarg) : 0;
 				if (limited_rights && (customMaxReaderHandles < PCSC_MAX_READER_HANDLES))
 					customMaxReaderHandles = PCSC_MAX_READER_HANDLES;
 				Log2(PCSC_LOG_INFO, "setting customMaxReaderHandles to: %d",
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
 				break;
 
 			case 's':
-				customMaxThreadCardHandles = optarg ? atoi(optarg) : 0; 
+				customMaxThreadCardHandles = optarg ? atoi(optarg) : 0;
 				if (limited_rights && (customMaxThreadCardHandles < PCSC_MAX_CONTEXT_CARD_HANDLES))
 					customMaxThreadCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 				Log2(PCSC_LOG_INFO, "setting customMaxThreadCardHandles to: %d",
