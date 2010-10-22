@@ -175,7 +175,7 @@ static void profile_end(const char *f, LONG rv)
 		{
 			if (strncmp(fct_name, f, sizeof(fct_name)))
 				printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
-						f, fct_name);
+					f, fct_name);
 		}
 		else
 			printf("\33[01;34m WARNING: %s ends but we lost its start\33[0m\n",
@@ -305,8 +305,10 @@ static LONG SCardRemoveContext(SCARDCONTEXT);
 static LONG SCardCleanContext(SCONTEXTMAP *);
 
 static LONG SCardAddHandle(SCARDHANDLE, SCONTEXTMAP *, LPCSTR);
-static LONG SCardGetContextAndChannelFromHandle(SCARDHANDLE, /*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
-static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE, /*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
+static LONG SCardGetContextAndChannelFromHandle(SCARDHANDLE,
+	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
+static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE,
+	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
 static LONG SCardRemoveHandle(SCARDHANDLE);
 
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
@@ -540,7 +542,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		lrv = list_init(&contextMapList);
 		if (lrv < 0)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
+			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d",
+				lrv);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -584,7 +587,8 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		/* Read a message from the server */
 		if (MessageReceive(&veStr, sizeof(veStr), dwClientID) < 0)
 		{
-			Log1(PCSC_LOG_CRITICAL, "Your pcscd is too old and does not support CMD_VERSION");
+			Log1(PCSC_LOG_CRITICAL,
+				"Your pcscd is too old and does not support CMD_VERSION");
 			return SCARD_F_COMM_ERROR;
 		}
 
@@ -612,7 +616,8 @@ again:
 	/*
 	 * Read the response from the server
 	 */
-	rv = MessageReceive(&scEstablishStruct, sizeof(scEstablishStruct), dwClientID);
+	rv = MessageReceive(&scEstablishStruct, sizeof(scEstablishStruct),
+		dwClientID);
 
 	if (rv < 0)
 		return SCARD_F_COMM_ERROR;
@@ -693,8 +698,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 
 	rv = MessageSendWithHeader(SCARD_RELEASE_CONTEXT,
 		currentContextMap->dwClientID,
-		sizeof(scReleaseStruct),
-		(void *) &scReleaseStruct);
+		sizeof(scReleaseStruct), (void *) &scReleaseStruct);
 
 	if (rv == -1)
 	{
@@ -843,8 +847,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	scConnectStruct.rv = SCARD_S_SUCCESS;
 
 	rv = MessageSendWithHeader(SCARD_CONNECT, currentContextMap->dwClientID,
-		sizeof(scConnectStruct),
-		(void *) &scConnectStruct);
+		sizeof(scConnectStruct), (void *) &scConnectStruct);
 
 	if (rv == -1)
 	{
@@ -1003,10 +1006,8 @@ retry:
 	scReconnectStruct.dwActiveProtocol = *pdwActiveProtocol;
 	scReconnectStruct.rv = SCARD_S_SUCCESS;
 
-	rv = MessageSendWithHeader(SCARD_RECONNECT,
-		currentContextMap->dwClientID,
-		sizeof(scReconnectStruct),
-		(void *) &scReconnectStruct);
+	rv = MessageSendWithHeader(SCARD_RECONNECT, currentContextMap->dwClientID,
+		sizeof(scReconnectStruct), (void *) &scReconnectStruct);
 
 	if (rv == -1)
 	{
@@ -1017,8 +1018,7 @@ retry:
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(&scReconnectStruct,
-		sizeof(scReconnectStruct),
+	rv = MessageReceive(&scReconnectStruct, sizeof(scReconnectStruct),
 		currentContextMap->dwClientID);
 
 	if (rv < 0)
@@ -1110,10 +1110,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	scDisconnectStruct.dwDisposition = dwDisposition;
 	scDisconnectStruct.rv = SCARD_S_SUCCESS;
 
-	rv = MessageSendWithHeader(SCARD_DISCONNECT,
-		currentContextMap->dwClientID,
-		sizeof(scDisconnectStruct),
-		(void *) &scDisconnectStruct);
+	rv = MessageSendWithHeader(SCARD_DISCONNECT, currentContextMap->dwClientID,
+		sizeof(scDisconnectStruct), (void *) &scDisconnectStruct);
 
 	if (rv == -1)
 	{
@@ -1124,8 +1122,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(&scDisconnectStruct,
-		sizeof(scDisconnectStruct),
+	rv = MessageReceive(&scDisconnectStruct, sizeof(scDisconnectStruct),
 		currentContextMap->dwClientID);
 
 	if (rv < 0)
@@ -1223,8 +1220,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	{
 		rv = MessageSendWithHeader(SCARD_BEGIN_TRANSACTION,
 			currentContextMap->dwClientID,
-			sizeof(scBeginStruct),
-			(void *) &scBeginStruct);
+			sizeof(scBeginStruct), (void *) &scBeginStruct);
 
 		if (rv == -1)
 		{
@@ -1338,8 +1334,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	rv = MessageSendWithHeader(SCARD_END_TRANSACTION,
 		currentContextMap->dwClientID,
-		sizeof(scEndStruct),
-		(void *) &scEndStruct);
+		sizeof(scEndStruct), (void *) &scEndStruct);
 
 	if (rv == -1)
 	{
@@ -1624,8 +1619,7 @@ retry:
 	scStatusStruct.hCard = hCard;
 
 	rv = MessageSendWithHeader(SCARD_STATUS, currentContextMap->dwClientID,
-		sizeof(scStatusStruct),
-		(void *) &scStatusStruct);
+		sizeof(scStatusStruct), (void *) &scStatusStruct);
 
 	if (rv == -1)
 	{
@@ -1699,9 +1693,7 @@ retry:
 		if (*pcchReaderLen > dwReaderLen)
 			rv = SCARD_E_INSUFFICIENT_BUFFER;
 
-		strncpy(bufReader,
-			pChannelMap->readerName,
-			dwReaderLen);
+		strncpy(bufReader, pChannelMap->readerName, dwReaderLen);
 	}
 
 	if (SCARD_AUTOALLOCATE == dwAtrLen)
@@ -1928,10 +1920,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			const char *readerName;
 			int i;
 
-	  /************ Looks for correct readernames *********************/
-
+			/* Looks for correct readernames */ 
 			readerName = currReader->szReader;
-
 			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 			{
 				if (strcmp(readerName, readerStates[i].readerName) == 0)
@@ -1961,7 +1951,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 				else
 				{
-					currReader->dwEventState = SCARD_STATE_UNKNOWN | SCARD_STATE_UNAVAILABLE;
+					currReader->dwEventState =
+						SCARD_STATE_UNKNOWN | SCARD_STATE_UNAVAILABLE;
 					if (!(currReader->dwCurrentState & SCARD_STATE_UNKNOWN))
 					{
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
@@ -1986,8 +1977,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					Log0(PCSC_LOG_DEBUG);
 					dwBreakFlag = 1;
 				}
-
-	/*****************************************************************/
 
 				/* Set the reader status structure */
 				rContext = &readerStates[i];
@@ -2015,7 +2004,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				currReader->dwEventState = ((currReader->dwEventState & 0xffff )
 					| (rContext->eventCounter << 16));
 
-	/*********** Check if the reader is in the correct state ********/
+				/* Check if the reader is in the correct state */
 				if (readerState & SCARD_UNKNOWN)
 				{
 					/* reader is in bad state */
@@ -2040,8 +2029,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					}
 				}
 
-	/********** Check for card presence in the reader **************/
-
+				/* Check for card presence in the reader */
 				if (readerState & SCARD_PRESENT)
 				{
 					/* card present but not yet powered up */
@@ -2202,8 +2190,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				rv = MessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
 					currentContextMap->dwClientID,
-					sizeof(waitStatusStruct),
-					&waitStatusStruct);
+					sizeof(waitStatusStruct), &waitStatusStruct);
 
 				if (rv == -1)
 				{
@@ -2224,8 +2211,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					/* ask server to remove us from the event list */
 					rv = MessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
 						currentContextMap->dwClientID,
-						sizeof(waitStatusStruct),
-						&waitStatusStruct);
+						sizeof(waitStatusStruct), &waitStatusStruct);
 
 					if (rv == -1)
 					{
@@ -2402,8 +2388,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	scControlStruct.cbSendLength = cbSendLength;
 	scControlStruct.cbRecvLength = cbRecvLength;
 
-	rv = MessageSendWithHeader(SCARD_CONTROL,
-		currentContextMap->dwClientID,
+	rv = MessageSendWithHeader(SCARD_CONTROL, currentContextMap->dwClientID,
 		sizeof(scControlStruct), &scControlStruct);
 
 	if (rv == -1)
@@ -2698,9 +2683,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	if (SCARD_SET_ATTRIB == command)
 		memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
 
-	rv = MessageSendWithHeader(command,
-		currentContextMap->dwClientID, sizeof(scGetSetStruct),
-		&scGetSetStruct);
+	rv = MessageSendWithHeader(command, currentContextMap->dwClientID,
+		sizeof(scGetSetStruct), &scGetSetStruct);
 
 	if (rv == -1)
 	{
@@ -2875,9 +2859,8 @@ retry:
 		scTransmitStruct.ioRecvPciLength = sizeof(SCARD_IO_REQUEST);
 	}
 
-	rv = MessageSendWithHeader(SCARD_TRANSMIT,
-		currentContextMap->dwClientID, sizeof(scTransmitStruct),
-		(void *) &scTransmitStruct);
+	rv = MessageSendWithHeader(SCARD_TRANSMIT, currentContextMap->dwClientID,
+		sizeof(scTransmitStruct), (void *) &scTransmitStruct);
 
 	if (rv == -1)
 	{
@@ -3320,8 +3303,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	scCancelStruct.hContext = hContext;
 	scCancelStruct.rv = SCARD_S_SUCCESS;
 
-	rv = MessageSendWithHeader(SCARD_CANCEL,
-		dwClientID,
+	rv = MessageSendWithHeader(SCARD_CANCEL, dwClientID,
 		sizeof(scCancelStruct), (void *) &scCancelStruct);
 
 	if (rv == -1)
@@ -3333,8 +3315,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Read a message from the server
 	 */
-	rv = MessageReceive(&scCancelStruct, sizeof(scCancelStruct),
-		dwClientID);
+	rv = MessageReceive(&scCancelStruct, sizeof(scCancelStruct), dwClientID);
 
 	if (rv < 0)
 	{
@@ -3601,7 +3582,8 @@ static LONG SCardAddHandle(SCARDHANDLE hCard, SCONTEXTMAP * currentContextMap,
 	{
 		free(newChannelMap->readerName);
 		free(newChannelMap);
-		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d", lrv);
+		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
+			lrv);
 		return SCARD_E_NO_MEMORY;
 	}
 
@@ -3643,7 +3625,8 @@ static LONG SCardGetContextAndChannelFromHandle(SCARDHANDLE hCard,
 		return -1;
 
 	(void)SCardLockThread();
-	rv = SCardGetContextAndChannelFromHandleTH(hCard, targetContextMap, targetChannelMap);
+	rv = SCardGetContextAndChannelFromHandleTH(hCard, targetContextMap,
+		targetChannelMap);
 	(void)SCardUnlockThread();
 
 	return rv;
@@ -3668,7 +3651,8 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 		currentContextMap = list_get_at(&contextMapList, list_index);
 		if (currentContextMap == NULL)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_get_at failed for index %d", list_index);
+			Log2(PCSC_LOG_CRITICAL, "list_get_at failed for index %d",
+				list_index);
 			continue;
 		}
 		currentChannelMap = list_seek(&(currentContextMap->channelMapList),
