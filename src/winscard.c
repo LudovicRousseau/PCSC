@@ -231,19 +231,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
-	/*@unused@*/ DWORD dwTimeout)
-{
-	/*
-	 * This is only used at the client side of an RPC call but just in
-	 * case someone calls it here
-	 */
-
-	(void)hContext;
-	(void)dwTimeout;
-	return SCARD_E_UNSUPPORTED_FEATURE;
-}
-
 LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
 	LPDWORD pdwActiveProtocol)
