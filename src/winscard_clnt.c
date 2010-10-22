@@ -731,32 +731,6 @@ end:
 }
 
 /**
- * @brief The function does not do anything except returning \ref
- * SCARD_S_SUCCESS.
- *
- * @deprecated
- * This function is not in Microsoft(R) WinSCard API and is deprecated
- * in pcsc-lite API.
- *
- * @ingroup API
- * @param[in] hContext Connection context to the PC/SC Resource Manager.
- * @param[in] dwTimeout New timeout value.
- *
- * @return Error code.
- * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
- */
-LONG SCardSetTimeout(/*@unused@*/ SCARDCONTEXT hContext,
-	/*@unused@*/ DWORD dwTimeout)
-{
-	/*
-	 * Deprecated
-	 */
-	(void)hContext;
-	(void)dwTimeout;
-	return SCARD_S_SUCCESS;
-}
-
-/**
  * @brief This function establishes a connection to the reader specified in \p
  * szReader.
  *
