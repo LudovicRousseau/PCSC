@@ -852,6 +852,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
+		 * unless DISABLE_AUTO_POWER_ON is defined
 		 */
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
@@ -860,13 +861,28 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 		{
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
+
+#ifdef DISABLE_AUTO_POWER_ON
+			rContext->powerState = POWER_STATE_UNPOWERED;
+#else
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
+#endif
 		}
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
+#ifdef DISABLE_AUTO_POWER_ON
+		if (SCARD_UNPOWER_CARD == dwDisposition)
+		{
+			rContext->readerState->cardAtrLength = 0; 
+			rContext->readerState->readerState = SCARD_PRESENT;
+			Log1(PCSC_LOG_INFO, "Skip card power on");
+		}
+		else
+#endif
+		{
 		/*
 		 * Set up the status bit masks on readerState
 		 */
@@ -891,6 +907,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			else
 				rContext->readerState->readerState =
 					SCARD_PRESENT | SCARD_SWALLOWED;
+		}
 		}
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
@@ -961,7 +978,12 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		RESPONSECODE (*fct)(DWORD) = NULL;
 		DWORD dwGetSize;
 
+#ifdef DISABLE_AUTO_POWER_ON
+		if (SCARD_RESET_CARD == dwDisposition)
+			rContext->powerState = POWER_STATE_GRACE_PERIOD;
+#else
 		rContext->powerState = POWER_STATE_GRACE_PERIOD;
+#endif
 
 		/* ask to stop the "polling" thread so it can be restarted using
 		 * the correct timeout */
