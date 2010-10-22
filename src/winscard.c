@@ -870,31 +870,31 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 #endif
 		{
-		/*
-		 * Set up the status bit masks on readerState
-		 */
-		if (rv == SCARD_S_SUCCESS)
-		{
-			rContext->readerState->cardAtrLength = dwAtrLen;
-			rContext->readerState->readerState =
-				SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
-
-			Log1(PCSC_LOG_DEBUG, "Reset complete.");
-			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-				rContext->readerState->cardAtr,
-				rContext->readerState->cardAtrLength);
-		}
-		else
-		{
-			rContext->readerState->cardAtrLength = 0;
-			Log1(PCSC_LOG_ERROR, "Error resetting card.");
-
-			if (rv == SCARD_W_REMOVED_CARD)
-				rContext->readerState->readerState = SCARD_ABSENT;
-			else
+			/*
+			 * Set up the status bit masks on readerState
+			 */
+			if (rv == SCARD_S_SUCCESS)
+			{
+				rContext->readerState->cardAtrLength = dwAtrLen;
 				rContext->readerState->readerState =
-					SCARD_PRESENT | SCARD_SWALLOWED;
-		}
+					SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+
+				Log1(PCSC_LOG_DEBUG, "Reset complete.");
+				LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
+					rContext->readerState->cardAtr,
+					rContext->readerState->cardAtrLength);
+			}
+			else
+			{
+				rContext->readerState->cardAtrLength = 0;
+				Log1(PCSC_LOG_ERROR, "Error resetting card.");
+
+				if (rv == SCARD_W_REMOVED_CARD)
+					rContext->readerState->readerState = SCARD_ABSENT;
+				else
+					rContext->readerState->readerState =
+						SCARD_PRESENT | SCARD_SWALLOWED;
+			}
 		}
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
