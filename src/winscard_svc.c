@@ -507,21 +507,6 @@ static void ContextThread(LPVOID newContext)
 			}
 			break;
 
-			case SCARD_CANCEL_TRANSACTION:
-			{
-				struct cancel_transaction_struct caStr;
-
-				READ_BODY(caStr)
-
-				if (MSGCheckHandleAssociation(caStr.hCard, threadContext))
-					goto exit;
-
-				caStr.rv = SCardCancelTransaction(caStr.hCard);
-
-				WRITE_BODY(caStr)
-			}
-			break;
-
 			case SCARD_CANCEL:
 			{
 				struct cancel_struct caStr;

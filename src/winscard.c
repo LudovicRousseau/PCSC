@@ -1172,40 +1172,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	return rv;
 }
 
-LONG SCardCancelTransaction(SCARDHANDLE hCard)
-{
-	LONG rv;
-	READER_CONTEXT * rContext = NULL;
-
-	/*
-	 * Ignoring dwDisposition for now
-	 */
-	if (hCard == 0)
-		return SCARD_E_INVALID_HANDLE;
-
-	/* get rContext corresponding to hCard */
-	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFFindReaderHandle(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	/*
-	 * Make sure some event has not occurred
-	 */
-	rv = RFCheckReaderEventState(rContext, hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFUnlockSharing(hCard, rContext);
-
-	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
-
-	return rv;
-}
-
 LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)

@@ -68,9 +68,9 @@ extern "C"
 		SCARD_TRANSMIT = 0x09,			/**< used by SCardTransmit() */
 		SCARD_CONTROL = 0x0A,			/**< used by SCardControl() */
 		SCARD_STATUS = 0x0B,			/**< used by SCardStatus() */
-		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< not use */
+		SCARD_GET_STATUS_CHANGE = 0x0C,	/**< not used */
 		SCARD_CANCEL = 0x0D,			/**< used by SCardCancel() */
-		SCARD_CANCEL_TRANSACTION = 0x0E,	/**< used by SCardCancelTransaction() */
+		SCARD_CANCEL_TRANSACTION = 0x0E,/**< not used */
 		SCARD_GET_ATTRIB = 0x0F,		/**< used by SCardGetAttrib() */
 		SCARD_SET_ATTRIB = 0x10,		/**< used by SCardSetAttrib() */
 		CMD_VERSION = 0x11,				/**< get the client/server protocol version */
@@ -191,17 +191,6 @@ extern "C"
 	struct cancel_struct
 	{
 		int32_t hContext;
-		uint32_t rv;
-	};
-
-	/**
-	 * @brief contained in \ref SCARD_CANCEL_TRANSACTION Messages.
-	 *
-	 * These data are passed throw the field \c sharedSegmentMsg.data.
-	 */
-	struct cancel_transaction_struct
-	{
-		int32_t hCard;
 		uint32_t rv;
 	};
 

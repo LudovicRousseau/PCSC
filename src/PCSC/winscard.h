@@ -53,8 +53,6 @@ extern "C"
 
 	PCSC_API LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition);
 
-	PCSC_API LONG SCardCancelTransaction(SCARDHANDLE hCard);
-
 	PCSC_API LONG SCardStatus(SCARDHANDLE hCard,
 		/*@null@*/ /*@out@*/ LPSTR mszReaderName,
 		/*@null@*/ /*@out@*/ LPDWORD pcchReaderLen,
