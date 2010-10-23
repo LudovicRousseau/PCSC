@@ -331,6 +331,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
 			rContext->readerState->cardAtrLength = dwAtrLen;
+
+			if (rv == IFD_SUCCESS)
+				readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 		}
 
 		if (readerState & SCARD_SWALLOWED)
