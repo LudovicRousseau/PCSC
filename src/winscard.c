@@ -322,22 +322,22 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			return SCARD_E_NO_SMARTCARD;
 		}
 
+		/* Power on (again) the card if needed */
+		if (POWER_STATE_UNPOWERED == rContext->powerState)
+		{
+			DWORD dwAtrLen;
+
+			dwAtrLen = sizeof(rContext->readerState->cardAtr);
+			rv = IFDPowerICC(rContext, IFD_POWER_UP,
+				rContext->readerState->cardAtr, &dwAtrLen);
+			rContext->readerState->cardAtrLength = dwAtrLen;
+		}
+
 		if (readerState & SCARD_SWALLOWED)
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			return SCARD_W_UNPOWERED_CARD;
 		}
-	}
-
-	/* Power on (again) the card if needed */
-	if (POWER_STATE_UNPOWERED == rContext->powerState)
-	{
-		DWORD dwAtrLen;
-
-		dwAtrLen = sizeof(rContext->readerState->cardAtr);
-		rv = IFDPowerICC(rContext, IFD_POWER_UP,
-			rContext->readerState->cardAtr, &dwAtrLen);
-		rContext->readerState->cardAtrLength = dwAtrLen;
 	}
 
 	/* the card is now in use */
