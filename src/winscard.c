@@ -334,6 +334,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 			if (rv == IFD_SUCCESS)
 				readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+			else
+				Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X",
+					rv, rv);
 		}
 
 		if (readerState & SCARD_SWALLOWED)
