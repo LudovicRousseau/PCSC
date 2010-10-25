@@ -339,7 +339,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					rv, rv);
 		}
 
-		if (readerState & SCARD_SWALLOWED)
+		if (! (readerState & SCARD_POWERED))
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			return SCARD_W_UNPOWERED_CARD;
