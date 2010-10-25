@@ -1,5 +1,8 @@
 SUBDIRS = m4 src doc
 
+fix-rights:
+	$(MAKE) -C src $@
+
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.svn
