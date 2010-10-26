@@ -1418,17 +1418,11 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	SCARD_IO_HEADER sSendPci, sRecvPci;
 	DWORD dwRxLength, tempRxLength;
 
-	if (pcbRecvLength == 0)
-		return SCARD_E_INVALID_PARAMETER;
-
 	dwRxLength = *pcbRecvLength;
 	*pcbRecvLength = 0;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
-
-	if (pbSendBuffer == NULL || pbRecvBuffer == NULL || pioSendPci == NULL)
-		return SCARD_E_INVALID_PARAMETER;
 
 	/*
 	 * Must at least have 2 status words even for SCardControl
