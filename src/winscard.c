@@ -529,9 +529,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			!(dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD))
 		return SCARD_E_PROTO_MISMATCH;
 
-	if (pdwActiveProtocol == NULL)
-		return SCARD_E_INVALID_PARAMETER;
-
 	/* get rContext corresponding to hCard */
 	rv = RFReaderInfoById(hCard, &rContext);
 	if (rv != SCARD_S_SUCCESS)
