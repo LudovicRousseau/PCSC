@@ -836,7 +836,18 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		if (SCARD_UNPOWER_CARD == dwDisposition)
 		{
 			rContext->readerState->cardAtrLength = 0;
-			rContext->readerState->readerState = SCARD_PRESENT;
+			if (rv == SCARD_S_SUCCESS)
+				rContext->readerState->readerState = SCARD_PRESENT;
+			else
+			{
+				Log3(PCSC_LOG_ERROR, "Error powering down card: %d 0x%04X",
+					rv, rv);
+				if (rv == SCARD_W_REMOVED_CARD)
+					rContext->readerState->readerState = SCARD_ABSENT;
+				else
+					rContext->readerState->readerState =
+						SCARD_PRESENT | SCARD_SWALLOWED;
+			}
 			Log1(PCSC_LOG_INFO, "Skip card power on");
 		}
 		else
