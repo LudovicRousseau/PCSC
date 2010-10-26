@@ -195,11 +195,6 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 {
 	(void)pvReserved1;
 	(void)pvReserved2;
-	/*
-	 * Check for NULL pointer
-	 */
-	if (phContext == 0)
-		return SCARD_E_INVALID_PARAMETER;
 
 	if (dwScope != SCARD_SCOPE_USER && dwScope != SCARD_SCOPE_TERMINAL &&
 		dwScope != SCARD_SCOPE_SYSTEM && dwScope != SCARD_SCOPE_GLOBAL)
