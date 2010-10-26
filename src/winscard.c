@@ -237,13 +237,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	(void)hContext;
 	PROFILE_START
 
-	/*
-	 * Check for NULL parameters
-	 */
-	if (szReader == NULL || phCard == NULL || pdwActiveProtocol == NULL)
-		return SCARD_E_INVALID_PARAMETER;
-	else
-		*phCard = 0;
+	*phCard = 0;
 
 	if ((dwShareMode != SCARD_SHARE_DIRECT) &&
 			!(dwPreferredProtocols & SCARD_PROTOCOL_T0) &&
