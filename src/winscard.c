@@ -170,26 +170,6 @@ static void profile_end(const char *f, int line)
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	 0x1000
 
-/**
- * @brief Creates an Application Context for a client.
- *
- * This must be the first function called in a PC/SC application.
- *
- * @param[in] dwScope Scope of the establishment.
- * This can either be a local or remote connection.
- * - SCARD_SCOPE_USER - Not used.
- * - SCARD_SCOPE_TERMINAL - Not used.
- * - SCARD_SCOPE_GLOBAL - Not used.
- * - SCARD_SCOPE_SYSTEM - Services on the local machine.
- * @param[in] pvReserved1 Reserved for future use. Can be used for remote connection.
- * @param[in] pvReserved2 Reserved for future use.
- * @param[out] phContext Returned Application Context.
- *
- * @return Connection status.
- * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
- * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_INVALID_PARAMETER phContext is null (\ref SCARD_E_INVALID_PARAMETER)
- */
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
