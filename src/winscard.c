@@ -767,7 +767,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
-	DWORD dwAtrLen;
 
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
@@ -811,6 +810,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
+		DWORD dwAtrLen;
+
 		/*
 		 * Notify the card has been reset
 		 */
@@ -1030,7 +1031,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
-	DWORD dwAtrLen;
 
 	/*
 	 * Ignoring dwDisposition for now
@@ -1063,6 +1063,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
+		DWORD dwAtrLen;
+
 		/*
 		 * Currently pcsc-lite keeps the card always powered
 		 */
