@@ -302,7 +302,14 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			rContext->readerState->cardAtrLength = dwAtrLen;
 
 			if (rv == IFD_SUCCESS)
+			{
 				readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+
+				Log1(PCSC_LOG_DEBUG, "power up complete.");
+				LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
+					rContext->readerState->cardAtr,
+					rContext->readerState->cardAtrLength);
+			}
 			else
 				Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X",
 					rv, rv);
