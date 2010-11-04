@@ -45,6 +45,29 @@
 #include "sys_generic.h"
 #include "utils.h"
 
+#ifdef PCSCD
+
+/* functions used by pcscd only */
+
+/**
+ * @brief Closes the communications channel used by the server to talk to the
+ * clients.
+ *
+ * The socket used is closed and the file it is bound to is removed.
+ *
+ * @param[in] sockValue Socket to be closed.
+ * @param[in] pcFilePath File used by the socket.
+ */
+INTERNAL void CleanupSharedSegment(int sockValue, const char *pcFilePath)
+{
+	(void)close(sockValue);
+	(void)remove(pcFilePath);
+}
+
+#else
+
+/* functions used by libpcsclite only */
+
 /**
  * @brief Prepares a communication channel for the client to talk to the server.
  *
@@ -109,6 +132,173 @@ INTERNAL int ClientCloseSession(uint32_t dwClientID)
 {
 	return close(dwClientID);
 }
+
+/**
+ * @brief Called by the Client to get the reponse from the server or vice-versa.
+ *
+ * Reads the message from the file \c filedes.
+ *
+ * @param[in] command one of the \ref pcsc_msg_commands commands
+ * @param[out] buffer_void Message read.
+ * @param[in] buffer_size Size to read
+ * @param[in] filedes Socket handle.
+ * @param[in] timeOut Timeout in milliseconds.
+ *
+ * @retval 0 Success.
+ * @retval -1 Timeout.
+ * @retval -1 Socket is closed.
+ * @retval -1 A signal was received.
+ */
+INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
+	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
+{
+	char *buffer = buffer_void;
+
+	/* default is success */
+	int retval = 0;
+
+	/* record the time when we started */
+	struct timeval start;
+
+	/* how many bytes we must read */
+	size_t remaining = buffer_size;
+
+	gettimeofday(&start, NULL);
+
+	/* repeat until we get the whole message */
+	while (remaining > 0)
+	{
+		fd_set read_fd;
+		struct timeval timeout, now;
+		int selret;
+		long delta;
+
+		gettimeofday(&now, NULL);
+		delta = time_sub(&now, &start);
+
+		if (delta > timeOut*1000)
+		{
+			/* we already timed out */
+			retval = -2;
+			break;
+		}
+
+		/* remaining time to wait */
+		delta = timeOut*1000 - delta;
+
+		FD_ZERO(&read_fd);
+		FD_SET(filedes, &read_fd);
+
+		timeout.tv_sec = delta/1000000;
+		timeout.tv_usec = delta - timeout.tv_sec*1000000;
+
+		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
+
+		/* try to read only when socket is readable */
+		if (selret > 0)
+		{
+			int readed;
+
+			if (!FD_ISSET(filedes, &read_fd))
+			{
+				/* very strange situation. it should be an assert really */
+				retval = -1;
+				break;
+			}
+			readed = read(filedes, buffer, remaining);
+
+			if (readed > 0)
+			{
+				/* we got something */
+				buffer += readed;
+				remaining -= readed;
+			} else if (readed == 0)
+			{
+				/* peer closed the socket */
+				retval = -1;
+				break;
+			} else
+			{
+				/* we ignore the signals and empty socket situations, all
+				 * other errors are fatal */
+				if (errno != EINTR && errno != EAGAIN)
+				{
+					retval = -1;
+					break;
+				}
+			}
+		} else if (selret == 0)
+		{
+#ifdef PCSCD
+			(void)command;
+
+			/* timeout */
+			retval = -1;
+			break;
+#else
+			/* is the daemon still there? */
+			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+			{
+				/* timeout */
+				retval = -1;
+				break;
+			}
+
+			/* you need to set the env variable PCSCLITE_DEBUG=0 since
+			 * this is logged on the client side and not on the pcscd
+			 * side*/
+			Log2(PCSC_LOG_INFO, "Command 0x%X not yet finished", command);
+#endif
+		} else
+		{
+			/* we ignore signals, all other errors are fatal */
+			if (errno != EINTR)
+			{
+				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
+					strerror(errno));
+				retval = -1;
+				break;
+			}
+		}
+	}
+
+	return retval;
+}
+
+/**
+ * @brief Wrapper for the MessageSend() function.
+ *
+ * Called by clients to send messages to the server.
+ * The parameters \p command and \p data are set in the \c sharedSegmentMsg
+ * struct in order to be sent.
+ *
+ * @param[in] command Command to be sent.
+ * @param[in] dwClientID Client socket handle.
+ * @param[in] size Size of the message (\p data).
+ * @param[in] data_void Data to be sent.
+ *
+ * @return Same error codes as MessageSend().
+ */
+INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
+	uint64_t size, void *data_void)
+{
+	struct rxHeader header;
+	int ret;
+
+	/* header */
+	header.command = command;
+	header.size = size;
+	ret = MessageSend(&header, sizeof(header), dwClientID);
+
+	/* command */
+	ret = MessageSend(data_void, size, dwClientID);
+
+	return ret;
+}
+
+#endif
+
+/* functions used by pcscd and libpcsclite */
 
 /**
  * @brief Sends a menssage from client to server or vice-versa.
@@ -292,183 +482,5 @@ INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
 	}
 
 	return retval;
-}
-
-/**
- * @brief Called by the Client to get the reponse from the server or vice-versa.
- *
- * Reads the message from the file \c filedes.
- *
- * @param[in] command one of the \ref pcsc_msg_commands commands
- * @param[out] buffer_void Message read.
- * @param[in] buffer_size Size to read
- * @param[in] filedes Socket handle.
- * @param[in] timeOut Timeout in milliseconds.
- *
- * @retval 0 Success.
- * @retval -1 Timeout.
- * @retval -1 Socket is closed.
- * @retval -1 A signal was received.
- */
-INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
-	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
-{
-	char *buffer = buffer_void;
-
-	/* default is success */
-	int retval = 0;
-
-	/* record the time when we started */
-	struct timeval start;
-
-	/* how many bytes we must read */
-	size_t remaining = buffer_size;
-
-	gettimeofday(&start, NULL);
-
-	/* repeat until we get the whole message */
-	while (remaining > 0)
-	{
-		fd_set read_fd;
-		struct timeval timeout, now;
-		int selret;
-		long delta;
-
-		gettimeofday(&now, NULL);
-		delta = time_sub(&now, &start);
-
-		if (delta > timeOut*1000)
-		{
-			/* we already timed out */
-			retval = -2;
-			break;
-		}
-
-		/* remaining time to wait */
-		delta = timeOut*1000 - delta;
-
-		FD_ZERO(&read_fd);
-		FD_SET(filedes, &read_fd);
-
-		timeout.tv_sec = delta/1000000;
-		timeout.tv_usec = delta - timeout.tv_sec*1000000;
-
-		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
-
-		/* try to read only when socket is readable */
-		if (selret > 0)
-		{
-			int readed;
-
-			if (!FD_ISSET(filedes, &read_fd))
-			{
-				/* very strange situation. it should be an assert really */
-				retval = -1;
-				break;
-			}
-			readed = read(filedes, buffer, remaining);
-
-			if (readed > 0)
-			{
-				/* we got something */
-				buffer += readed;
-				remaining -= readed;
-			} else if (readed == 0)
-			{
-				/* peer closed the socket */
-				retval = -1;
-				break;
-			} else
-			{
-				/* we ignore the signals and empty socket situations, all
-				 * other errors are fatal */
-				if (errno != EINTR && errno != EAGAIN)
-				{
-					retval = -1;
-					break;
-				}
-			}
-		} else if (selret == 0)
-		{
-#ifdef PCSCD
-			(void)command;
-
-			/* timeout */
-			retval = -1;
-			break;
-#else
-			/* is the daemon still there? */
-			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
-			{
-				/* timeout */
-				retval = -1;
-				break;
-			}
-
-			/* you need to set the env variable PCSCLITE_DEBUG=0 since
-			 * this is logged on the client side and not on the pcscd
-			 * side*/
-			Log2(PCSC_LOG_INFO, "Command 0x%X not yet finished", command);
-#endif
-		} else
-		{
-			/* we ignore signals, all other errors are fatal */
-			if (errno != EINTR)
-			{
-				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
-					strerror(errno));
-				retval = -1;
-				break;
-			}
-		}
-	}
-
-	return retval;
-}
-
-/**
- * @brief Wrapper for the MessageSend() function.
- *
- * Called by clients to send messages to the server.
- * The parameters \p command and \p data are set in the \c sharedSegmentMsg
- * struct in order to be sent.
- *
- * @param[in] command Command to be sent.
- * @param[in] dwClientID Client socket handle.
- * @param[in] size Size of the message (\p data).
- * @param[in] data_void Data to be sent.
- *
- * @return Same error codes as MessageSend().
- */
-INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
-	uint64_t size, void *data_void)
-{
-	struct rxHeader header;
-	int ret;
-
-	/* header */
-	header.command = command;
-	header.size = size;
-	ret = MessageSend(&header, sizeof(header), dwClientID);
-
-	/* command */
-	ret = MessageSend(data_void, size, dwClientID);
-
-	return ret;
-}
-
-/**
- * @brief Closes the communications channel used by the server to talk to the
- * clients.
- *
- * The socket used is closed and the file it is bound to is removed.
- *
- * @param[in] sockValue Socket to be closed.
- * @param[in] pcFilePath File used by the socket.
- */
-INTERNAL void CleanupSharedSegment(int sockValue, const char *pcFilePath)
-{
-	(void)close(sockValue);
-	(void)remove(pcFilePath);
 }
 
