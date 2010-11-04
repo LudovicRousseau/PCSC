@@ -229,13 +229,6 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			}
 		} else if (selret == 0)
 		{
-#ifdef PCSCD
-			(void)command;
-
-			/* timeout */
-			retval = -1;
-			break;
-#else
 			/* is the daemon still there? */
 			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
 			{
@@ -248,7 +241,6 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			 * this is logged on the client side and not on the pcscd
 			 * side*/
 			Log2(PCSC_LOG_INFO, "Command 0x%X not yet finished", command);
-#endif
 		} else
 		{
 			/* we ignore signals, all other errors are fatal */
