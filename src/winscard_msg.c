@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
@@ -44,6 +45,7 @@
 #include "winscard_msg.h"
 #include "sys_generic.h"
 #include "utils.h"
+#include "strlcpycat.h"
 
 #ifdef PCSCD
 
@@ -68,6 +70,25 @@ INTERNAL void CleanupSharedSegment(int sockValue, const char *pcFilePath)
 
 /* functions used by libpcsclite only */
 
+char *getSocketName(void)
+{
+	static char socketName[sizeof(struct sockaddr_un)];
+
+	if ('\0' == socketName[0])
+	{
+		/* socket name not yet initialized */
+		char *socketNameEnv;
+
+		socketNameEnv = getenv("PCSCLITE_CSOCK_NAME");
+		if (socketNameEnv)
+			strlcpy(socketName, socketNameEnv, sizeof(socketName));
+		else
+			strlcpy(socketName, PCSCLITE_CSOCK_NAME, sizeof(socketName));
+	}
+
+	return socketName;
+}
+
 /**
  * @brief Prepares a communication channel for the client to talk to the server.
  *
@@ -86,6 +107,7 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 	struct sockaddr_un svc_addr;
 	int one;
 	int ret;
+	char *socketName;
 
 	ret = socket(PF_UNIX, SOCK_STREAM, 0);
 	if (ret < 0)
@@ -96,15 +118,15 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 	}
 	*pdwClientID = ret;
 
+	socketName = getSocketName();
 	svc_addr.sun_family = AF_UNIX;
-	strncpy(svc_addr.sun_path, PCSCLITE_CSOCK_NAME,
-		sizeof(svc_addr.sun_path));
+	strncpy(svc_addr.sun_path, socketName, sizeof(svc_addr.sun_path));
 
 	if (connect(*pdwClientID, (struct sockaddr *) &svc_addr,
 			sizeof(svc_addr.sun_family) + strlen(svc_addr.sun_path) + 1) < 0)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Error: connect to client socket %s: %s",
-			PCSCLITE_CSOCK_NAME, strerror(errno));
+			socketName, strerror(errno));
 		(void)close(*pdwClientID);
 		return -1;
 	}
@@ -113,7 +135,7 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 	if (ioctl(*pdwClientID, FIONBIO, &one) < 0)
 	{
 		Log3(PCSC_LOG_CRITICAL, "Error: cannot set socket %s nonblocking: %s",
-			PCSCLITE_CSOCK_NAME, strerror(errno));
+			socketName, strerror(errno));
 		(void)close(*pdwClientID);
 		return -1;
 	}

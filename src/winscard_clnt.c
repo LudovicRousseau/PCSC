@@ -3650,13 +3650,15 @@ LONG SCardCheckDaemonAvailability(void)
 	LONG rv;
 	struct stat statBuffer;
 	int need_restart = 0;
+	char *socketName;
 
-	rv = stat(PCSCLITE_CSOCK_NAME, &statBuffer);
+	socketName = getSocketName();
+	rv = stat(socketName, &statBuffer);
 
 	if (rv != 0)
 	{
-		Log2(PCSC_LOG_INFO, "PCSC Not Running: " PCSCLITE_CSOCK_NAME ": %s",
-			strerror(errno));
+		Log3(PCSC_LOG_INFO, "PCSC Not Running: %s: %s",
+			socketName, strerror(errno));
 		return SCARD_E_NO_SERVICE;
 	}
 
