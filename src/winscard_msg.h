@@ -258,6 +258,7 @@ extern "C"
 #ifdef PCSCD
 	void CleanupSharedSegment(int32_t, const char *);
 #else
+	char *getSocketName(void);
 	int32_t ClientSetupSession(uint32_t *);
 	int32_t ClientCloseSession(uint32_t);
 	int32_t InitializeSocket(void);
