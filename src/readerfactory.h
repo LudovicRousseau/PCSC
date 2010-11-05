@@ -37,22 +37,6 @@ extern "C"
 		int channelId;		/**< CHANNELID */
 	} SerialReader;
 
-	struct FctMap_V1
-	{
-		RESPONSECODE (*pvfCreateChannel)(DWORD);
-		RESPONSECODE (*pvfCloseChannel)(void);
-		RESPONSECODE (*pvfGetCapabilities)(DWORD, PUCHAR);
-		RESPONSECODE (*pvfSetCapabilities)(DWORD, PUCHAR);
-		RESPONSECODE (*pvfSetProtocolParameters)(DWORD, UCHAR, UCHAR, UCHAR,
-			UCHAR);
-		RESPONSECODE (*pvfPowerICC)(DWORD);
-		RESPONSECODE (*pvfTransmitToICC)(SCARD_IO_HEADER, PUCHAR, DWORD,
-			PUCHAR, PDWORD, PSCARD_IO_HEADER);
-		RESPONSECODE (*pvfICCPresence)(void);
-	};
-
-	typedef struct FctMap_V1 FCT_MAP_V1;
-
 	struct FctMap_V2
 	{
 		/* shared with API 3.0 */
