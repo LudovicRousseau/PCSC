@@ -41,7 +41,7 @@
  * @param[in] dwLength ATR length
  * @return
  */
-short ATRDecodeAtr(PSMARTCARD_EXTENSION psExtension,
+short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
 {
 	USHORT p;

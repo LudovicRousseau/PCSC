@@ -26,10 +26,10 @@ extern "C"
 #define SCARD_CONVENTION_DIRECT  0x0001
 #define SCARD_CONVENTION_INVERSE 0x0002
 
-	typedef struct _SMARTCARD_EXTENSION
+	typedef struct
 	{
 
-		struct _ATR
+		struct
 		{
 			int Length;
 			int HistoryLength;
@@ -38,7 +38,7 @@ extern "C"
 		}
 		ATR;
 
-		struct _CardCapabilities
+		struct
 		{
 			UCHAR AvailableProtocols;
 			UCHAR CurrentProtocol;
@@ -46,13 +46,13 @@ extern "C"
 		}
 		CardCapabilities;
 	}
-	SMARTCARD_EXTENSION, *PSMARTCARD_EXTENSION;
+	SMARTCARD_EXTENSION;
 
 	/*
 	 * Decodes the ATR and fills the structure
 	 */
 
-	short ATRDecodeAtr(/*@out@*/ PSMARTCARD_EXTENSION psExtension,
+	short ATRDecodeAtr(/*@out@*/ SMARTCARD_EXTENSION *psExtension,
 		PUCHAR pucAtr, DWORD dwLength);
 
 #ifdef __cplusplus
