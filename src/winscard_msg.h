@@ -255,17 +255,22 @@ extern "C"
 	 * Now some function definitions
 	 */
 
+#ifdef PCSCD
+	void CleanupSharedSegment(int32_t, const char *);
+#else
 	int32_t ClientSetupSession(uint32_t *);
 	int32_t ClientCloseSession(uint32_t);
 	int32_t InitializeSocket(void);
-	int32_t ProcessEventsServer(/*@out@*/ uint32_t *);
+	int32_t MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
+		uint64_t buffer_size, int32_t filedes, int32_t timeOut);
+	int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
+		uint64_t size, void *data);
+#endif
 	int32_t MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes);
 	int32_t MessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
 		int32_t filedes);
-	int32_t MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
-		uint64_t buffer_size, int32_t filedes, int32_t timeOut);
-	int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID, uint64_t size, void *data);
-	void CleanupSharedSegment(int32_t, const char *);
+
+	int32_t ProcessEventsServer(/*@out@*/ uint32_t *);
 
 #ifdef __cplusplus
 }
