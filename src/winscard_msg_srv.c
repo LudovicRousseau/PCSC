@@ -119,7 +119,6 @@ INTERNAL int32_t InitializeSocket(void)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to bind common socket: %s",
 			strerror(errno));
-		CleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
 
@@ -127,7 +126,6 @@ INTERNAL int32_t InitializeSocket(void)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to listen common socket: %s",
 			strerror(errno));
-		CleanupSharedSegment(commonSocket, PCSCLITE_CSOCK_NAME);
 		return -1;
 	}
 

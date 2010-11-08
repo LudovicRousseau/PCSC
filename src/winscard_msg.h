@@ -256,7 +256,6 @@ extern "C"
 	 */
 
 #ifdef PCSCD
-	void CleanupSharedSegment(int32_t, const char *);
 	int32_t InitializeSocket(void);
 	int32_t ProcessEventsServer(/*@out@*/ uint32_t *);
 #else

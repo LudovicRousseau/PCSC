@@ -51,21 +51,6 @@
 
 /* functions used by pcscd only */
 
-/**
- * @brief Closes the communications channel used by the server to talk to the
- * clients.
- *
- * The socket used is closed and the file it is bound to is removed.
- *
- * @param[in] sockValue Socket to be closed.
- * @param[in] pcFilePath File used by the socket.
- */
-INTERNAL void CleanupSharedSegment(int sockValue, const char *pcFilePath)
-{
-	(void)close(sockValue);
-	(void)remove(pcFilePath);
-}
-
 #else
 
 /* functions used by libpcsclite only */
