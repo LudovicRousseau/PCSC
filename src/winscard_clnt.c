@@ -270,17 +270,6 @@ static short isExecuted = 0;
 
 
 /**
- * creation time of pcscd PCSCLITE_CSOCK_NAME file
- */
-static time_t daemon_ctime = 0;
-static pid_t daemon_pid = 0;
-/**
- * PID of the client application.
- * Used to detect fork() and disable handles in the child process
- */
-static pid_t client_pid = 0;
-
-/**
  * Ensure that some functions be accessed in thread-safe mode.
  * These function's names finishes with "TH".
  */
@@ -3627,10 +3616,6 @@ static LONG SCardInvalidateHandles(void)
 
 	(void)SCardUnlockThread();
 
-	/* reset pcscd status */
-	daemon_ctime = 0;
-	client_pid = 0;
-
 	return SCARD_E_INVALID_HANDLE;
 }
 
@@ -3649,7 +3634,6 @@ LONG SCardCheckDaemonAvailability(void)
 {
 	LONG rv;
 	struct stat statBuffer;
-	int need_restart = 0;
 	char *socketName;
 
 	socketName = getSocketName();
@@ -3661,32 +3645,6 @@ LONG SCardCheckDaemonAvailability(void)
 			socketName, strerror(errno));
 		return SCARD_E_NO_SERVICE;
 	}
-
-	/* when the _first_ reader is connected the ctime changes
-	 * I don't know why yet */
-	if (daemon_ctime && statBuffer.st_ctime > daemon_ctime)
-	{
-		/* so we also check the daemon pid to be sure it is a new pcscd */
-		if (GetDaemonPid() != daemon_pid)
-		{
-			Log1(PCSC_LOG_INFO, "PCSC restarted");
-			need_restart = 1;
-		}
-	}
-
-	/* after fork() need to restart */
-	if (client_pid && client_pid != getpid())
-	{
-		Log1(PCSC_LOG_INFO, "Client forked");
-		need_restart = 1;
-	}
-
-	if (need_restart)
-		return SCardInvalidateHandles();
-
-	daemon_ctime = statBuffer.st_ctime;
-	daemon_pid = GetDaemonPid();
-	client_pid = getpid();
 
 	return SCARD_S_SUCCESS;
 }
