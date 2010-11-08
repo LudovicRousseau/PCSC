@@ -97,7 +97,7 @@ static int ProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
  */
 INTERNAL int32_t InitializeSocket(void)
 {
-	static struct sockaddr_un serv_adr;
+	struct sockaddr_un serv_adr;
 
 	/*
 	 * Create the common shared connection socket
