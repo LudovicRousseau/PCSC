@@ -3598,27 +3598,6 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 	return -1;
 }
 
-static LONG SCardInvalidateHandles(void)
-{
-	/* invalid all handles */
-	(void)SCardLockThread();
-
-	while (list_size(&contextMapList) != 0)
-	{
-		SCONTEXTMAP * currentContextMap;
-
-		currentContextMap = list_get_at(&contextMapList, 0);
-		if (currentContextMap != NULL)
-			(void)SCardCleanContext(currentContextMap);
-		else
-			Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
-	}
-
-	(void)SCardUnlockThread();
-
-	return SCARD_E_INVALID_HANDLE;
-}
-
 /**
  * @brief Checks if the server is running.
  *
@@ -3650,6 +3629,27 @@ LONG SCardCheckDaemonAvailability(void)
 }
 
 #ifdef DO_CHECK_SAME_PROCESS
+static LONG SCardInvalidateHandles(void)
+{
+	/* invalid all handles */
+	(void)SCardLockThread();
+
+	while (list_size(&contextMapList) != 0)
+	{
+		SCONTEXTMAP * currentContextMap;
+
+		currentContextMap = list_get_at(&contextMapList, 0);
+		if (currentContextMap != NULL)
+			(void)SCardCleanContext(currentContextMap);
+		else
+			Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
+	}
+
+	(void)SCardUnlockThread();
+
+	return SCARD_E_INVALID_HANDLE;
+}
+
 static LONG SCardCheckSameProcess(void)
 {
 	/* after fork() need to restart */
