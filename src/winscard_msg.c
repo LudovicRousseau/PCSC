@@ -389,7 +389,7 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					retval = SCARD_F_COMM_ERROR;
+					retval = SCARD_E_NO_SERVICE;
 					break;
 				}
 			}
