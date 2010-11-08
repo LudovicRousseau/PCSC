@@ -305,7 +305,8 @@ INTERNAL LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	ret = MessageSend(&header, sizeof(header), dwClientID);
 
 	/* command */
-	ret = MessageSend(data_void, size, dwClientID);
+	if (size > 0)
+		ret = MessageSend(data_void, size, dwClientID);
 
 	return ret;
 }
