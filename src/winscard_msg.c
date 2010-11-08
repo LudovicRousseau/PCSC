@@ -166,18 +166,18 @@ INTERNAL int ClientCloseSession(uint32_t dwClientID)
  * @param[in] filedes Socket handle.
  * @param[in] timeOut Timeout in milliseconds.
  *
- * @retval 0 Success.
- * @retval -1 Timeout.
- * @retval -1 Socket is closed.
- * @retval -1 A signal was received.
+ * @retval SCARD_S_SUCCESS Success.
+ * @retval SCARD_E_TIMEOUT Timeout.
+ * @retval SCARD_F_COMM_ERROR Socket is closed.
+ * @retval SCARD_F_COMM_ERROR A signal was received.
  */
-INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
+INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 	uint64_t buffer_size, int32_t filedes, int32_t timeOut)
 {
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = 0;
+	int retval = SCARD_S_SUCCESS;
 
 	/* record the time when we started */
 	struct timeval start;
@@ -201,7 +201,7 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 		if (delta > timeOut*1000)
 		{
 			/* we already timed out */
-			retval = -2;
+			retval = SCARD_E_TIMEOUT;
 			break;
 		}
 
@@ -224,7 +224,7 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			if (!FD_ISSET(filedes, &read_fd))
 			{
 				/* very strange situation. it should be an assert really */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 			readed = read(filedes, buffer, remaining);
@@ -237,7 +237,7 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			} else if (readed == 0)
 			{
 				/* peer closed the socket */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			} else
 			{
@@ -245,17 +245,17 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					retval = -1;
+					retval = SCARD_F_COMM_ERROR;
 					break;
 				}
 			}
 		} else if (selret == 0)
 		{
 			/* is the daemon still there? */
-			if (SCardCheckDaemonAvailability() != SCARD_S_SUCCESS)
+			retval  =  SCardCheckDaemonAvailability();
+			if (retval != SCARD_S_SUCCESS)
 			{
 				/* timeout */
-				retval = -1;
 				break;
 			}
 
@@ -270,7 +270,7 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			{
 				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
 					strerror(errno));
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 		}
@@ -293,7 +293,7 @@ INTERNAL int32_t MessageReceiveTimeout(uint32_t command, void *buffer_void,
  *
  * @return Same error codes as MessageSend().
  */
-INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
+INTERNAL LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	uint64_t size, void *data_void)
 {
 	struct rxHeader header;
@@ -323,18 +323,18 @@ INTERNAL int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
  * @param[in] buffer_size Size of the message to send
  * @param[in] filedes Socket handle.
  *
- * @retval 0 Success
- * @retval -1 Timeout.
- * @retval -1 Socket is closed.
- * @retval -1 A signal was received.
+ * @retval SCARD_S_SUCCESS Success
+ * @retval SCARD_E_TIMEOUT Timeout.
+ * @retval SCARD_F_COMM_ERROR Socket is closed.
+ * @retval SCARD_F_COMM_ERROR A signal was received.
  */
-INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
+INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes)
 {
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = 0;
+	int retval = SCARD_S_SUCCESS;
 
 	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
@@ -358,7 +358,7 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 			if (!FD_ISSET(filedes, &write_fd))
 			{
 				/* very strange situation. it should be an assert really */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 			/* since we are a user library we can't play with signals
@@ -380,7 +380,7 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 			} else if (written == 0)
 			{
 				/* peer closed the socket */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			} else
 			{
@@ -388,14 +388,14 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					retval = -1;
+					retval = SCARD_F_COMM_ERROR;
 					break;
 				}
 			}
 		} else if (selret == 0)
 		{
 			/* timeout */
-			retval = -1;
+			retval = SCARD_E_TIMEOUT;
 			break;
 		} else
 		{
@@ -404,7 +404,7 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
 			{
 				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
 					strerror(errno));
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 		}
@@ -422,17 +422,17 @@ INTERNAL int32_t MessageSend(void *buffer_void, uint64_t buffer_size,
  * @param[in] buffer_size Size to read
  * @param[in] filedes Socket handle.
  *
- * @retval 0 Success.
- * @retval -1 Socket is closed.
- * @retval -1 A signal was received.
+ * @retval SCARD_S_SUCCESS Success.
+ * @retval SCARD_F_COMM_ERROR Socket is closed.
+ * @retval SCARD_F_COMM_ERROR A signal was received.
  */
-INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
+INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes)
 {
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = 0;
+	int retval = SCARD_S_SUCCESS;
 
 	/* how many bytes we must read */
 	size_t remaining = buffer_size;
@@ -456,7 +456,7 @@ INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
 			if (!FD_ISSET(filedes, &read_fd))
 			{
 				/* very strange situation. it should be an assert really */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 			readed = read(filedes, buffer, remaining);
@@ -469,7 +469,7 @@ INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
 			} else if (readed == 0)
 			{
 				/* peer closed the socket */
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			} else
 			{
@@ -477,7 +477,7 @@ INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					retval = -1;
+					retval = SCARD_F_COMM_ERROR;
 					break;
 				}
 			}
@@ -489,7 +489,7 @@ INTERNAL int32_t MessageReceive(void *buffer_void, uint64_t buffer_size,
 			{
 				Log2(PCSC_LOG_ERROR, "select returns with failure: %s",
 					strerror(errno));
-				retval = -1;
+				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
 		}

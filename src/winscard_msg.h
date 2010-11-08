@@ -263,13 +263,13 @@ extern "C"
 	char *getSocketName(void);
 	int32_t ClientSetupSession(uint32_t *);
 	int32_t ClientCloseSession(uint32_t);
-	int32_t MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
+	LONG MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
 		uint64_t buffer_size, int32_t filedes, int32_t timeOut);
-	int32_t MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
+	LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 		uint64_t size, void *data);
 #endif
-	int32_t MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes);
-	int32_t MessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
+	LONG MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes);
+	LONG MessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
 		int32_t filedes);
 
 #ifdef __cplusplus

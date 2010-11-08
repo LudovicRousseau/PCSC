@@ -279,7 +279,7 @@ static const char *CommandsText[] = {
 #define READ_BODY(v) \
 	if (header.size != sizeof(v)) { goto wrong_length; } \
 	ret = MessageReceive(&v, sizeof(v), filedes); \
-	if (ret < 0) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
+	if (ret != SCARD_S_SUCCESS) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
 
 #define WRITE_BODY(v) \
 	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
@@ -300,7 +300,7 @@ static void ContextThread(LPVOID newContext)
 		struct rxHeader header;
 		int32_t ret = MessageReceive(&header, sizeof(header), filedes);
 
-		if (ret < 0)
+		if (ret != SCARD_S_SUCCESS)
 		{
 			/* Clean up the dead client */
 			Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
@@ -573,7 +573,7 @@ static void ContextThread(LPVOID newContext)
 
 				/* read sent buffer */
 				ret = MessageReceive(pbSendBuffer, trStr.cbSendLength, filedes);
-				if (ret < 0)
+				if (ret != SCARD_S_SUCCESS)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
 					goto exit;
@@ -624,7 +624,7 @@ static void ContextThread(LPVOID newContext)
 
 				/* read sent buffer */
 				ret = MessageReceive(pbSendBuffer, ctStr.cbSendLength, filedes);
-				if (ret < 0)
+				if (ret != SCARD_S_SUCCESS)
 				{
 					Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
 					goto exit;
@@ -698,7 +698,7 @@ static void ContextThread(LPVOID newContext)
 		}
 
 		/* MessageSend() failed */
-		if (-1 == ret)
+		if (ret != SCARD_S_SUCCESS)
 		{
 			/* Clean up the dead client */
 			Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes);
