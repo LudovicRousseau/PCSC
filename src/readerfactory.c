@@ -465,9 +465,9 @@ LONG RFRemoveReader(const char *readerName, int port)
 	while (SCARD_S_SUCCESS ==
 		RFReaderInfoNamePort(port, readerName, &sContext))
 	{
-
 		/* Try to destroy the thread */
-		rv = EHDestroyEventHandler(sContext);
+		if (sContext -> pthThread)
+			(void)EHDestroyEventHandler(sContext);
 
 		rv = RFUnInitializeReader(sContext);
 		if (rv != SCARD_S_SUCCESS)
