@@ -955,6 +955,10 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 			rContext->port, rContext->device);
 		(void)RFUnBindFunctions(rContext);
 		(void)RFUnloadReader(rContext);
+
+		/* IFDOpenIFD() failed */
+		rContext->slot = -1;
+
 		if (IFD_NO_SUCH_DEVICE == rv)
 			return SCARD_E_UNKNOWN_READER;
 		else
@@ -977,7 +981,10 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 	 *
 	 * IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 	 */
-	(void)IFDCloseIFD(rContext);
+	/* Do not close a reader if IFDOpenIFD() failed in RFInitializeReader() */
+	if (rContext->slot != -1)
+		(void)IFDCloseIFD(rContext);
+
 	(void)RFUnBindFunctions(rContext);
 	(void)RFUnloadReader(rContext);
 
