@@ -320,10 +320,10 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			return SCARD_W_UNPOWERED_CARD;
 		}
-	}
 
-	/* the card is now in use */
-	rContext->powerState = POWER_STATE_INUSE;
+		/* the card is now in use */
+		rContext->powerState = POWER_STATE_INUSE;
+	}
 
 	/*******************************************
 	 *
