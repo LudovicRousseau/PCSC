@@ -956,12 +956,15 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		RESPONSECODE (*fct)(DWORD) = NULL;
 		DWORD dwGetSize;
 
+		if (POWER_STATE_INUSE == rContext->powerState)
+		{
 #ifdef DISABLE_AUTO_POWER_ON
-		if (SCARD_RESET_CARD == dwDisposition)
-			rContext->powerState = POWER_STATE_GRACE_PERIOD;
+			if (SCARD_RESET_CARD == dwDisposition)
+				rContext->powerState = POWER_STATE_GRACE_PERIOD;
 #else
-		rContext->powerState = POWER_STATE_GRACE_PERIOD;
+			rContext->powerState = POWER_STATE_GRACE_PERIOD;
 #endif
+		}
 
 		/* ask to stop the "polling" thread so it can be restarted using
 		 * the correct timeout */
