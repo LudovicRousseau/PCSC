@@ -989,6 +989,19 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 	(void)RFUnBindFunctions(rContext);
 	(void)RFUnloadReader(rContext);
 
+	/*
+	 * Zero out the public status struct to allow it to be recycled and
+	 * used again
+	 */
+	memset(rContext->readerState->readerName, 0,
+		sizeof(rContext->readerState->readerName));
+	memset(rContext->readerState->cardAtr, 0,
+		sizeof(rContext->readerState->cardAtr));
+	rContext->readerState->readerState = 0;
+	rContext->readerState->readerSharing = 0;
+	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
+	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+
 	return SCARD_S_SUCCESS;
 }
 

@@ -183,19 +183,6 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	if (rv)
 		Log2(PCSC_LOG_ERROR, "pthread_join failed: %s", strerror(rv));
 
-	/*
-	 * Zero out the public status struct to allow it to be recycled and
-	 * used again
-	 */
-	memset(rContext->readerState->readerName, 0,
-		sizeof(rContext->readerState->readerName));
-	memset(rContext->readerState->cardAtr, 0,
-		sizeof(rContext->readerState->cardAtr));
-	rContext->readerState->readerState = 0;
-	rContext->readerState->readerSharing = 0;
-	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
-	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-
 	/* Zero the thread */
 	rContext->pthThread = 0;
 
