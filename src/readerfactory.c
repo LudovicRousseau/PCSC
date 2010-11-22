@@ -974,14 +974,6 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
 		rContext->readerState->readerName);
 
-	/* Close the port, unbind the functions, and unload the library */
-
-	/*
-	 * If the reader is getting uninitialized then it is being unplugged
-	 * so I can't send a IFDPowerICC call to it
-	 *
-	 * IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
-	 */
 	/* Do not close a reader if IFDOpenIFD() failed in RFInitializeReader() */
 	if (rContext->slot != -1)
 		(void)IFDCloseIFD(rContext);
