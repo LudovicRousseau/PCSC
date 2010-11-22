@@ -323,6 +323,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 		/* the card is now in use */
 		rContext->powerState = POWER_STATE_INUSE;
+		Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_INUSE");
 	}
 
 	/*******************************************
@@ -806,6 +807,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		return rv;
 
 	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->contexts);
+	Log2(PCSC_LOG_DEBUG, "dwDisposition: %d", dwDisposition);
 
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
@@ -831,6 +833,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 #ifdef DISABLE_AUTO_POWER_ON
 			rContext->powerState = POWER_STATE_UNPOWERED;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 #else
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
@@ -960,9 +963,13 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		{
 #ifdef DISABLE_AUTO_POWER_ON
 			if (SCARD_RESET_CARD == dwDisposition)
+			{
 				rContext->powerState = POWER_STATE_GRACE_PERIOD;
+				Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_GRACE_PERIOD");
+			}
 #else
 			rContext->powerState = POWER_STATE_GRACE_PERIOD;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_GRACE_PERIOD");
 #endif
 		}
 

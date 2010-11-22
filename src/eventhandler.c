@@ -256,6 +256,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		{
 			readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 			rContext->powerState = POWER_STATE_POWERED;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 
 			if (rContext->readerState->cardAtrLength > 0)
 			{
@@ -270,6 +271,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		{
 			readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 			rContext->powerState = POWER_STATE_UNPOWERED;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
 		}
 #endif
@@ -350,6 +352,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 				rContext->readerState->readerState = SCARD_PRESENT;
 				rContext->powerState = POWER_STATE_UNPOWERED;
+				Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 				readerState = SCARD_PRESENT;
 				rv = IFD_SUCCESS;
 				Log1(PCSC_LOG_INFO, "Skip card power on");
@@ -369,11 +372,13 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 					rContext->powerState = POWER_STATE_POWERED;
+					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 				}
 				else
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 					rContext->powerState = POWER_STATE_UNPOWERED;
+					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 					rContext->readerState->cardAtrLength = 0;
 				}
 #endif
@@ -440,6 +445,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			/* power down */
 			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rContext->powerState = POWER_STATE_UNPOWERED;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 
 			/* the protocol is unset after a power down */
 			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
@@ -447,9 +453,12 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 		/* the card was in use */
 		if (POWER_STATE_GRACE_PERIOD == rContext->powerState)
+		{
 			/* the next state should be UNPOWERED unless the
 			 * card is used again */
 			rContext->powerState = POWER_STATE_POWERED;
+			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
+		}
 #endif
 
 		if (rContext->hLockId == 0xFFFF)
