@@ -208,6 +208,10 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	(void)pthread_mutex_init(&sReadersContexts[dwContext]->handlesList_lock,
 		NULL);
 
+	(void)pthread_mutex_init(&sReadersContexts[dwContext]->powerState_lock,
+		NULL);
+	sReadersContexts[dwContext]->powerState = POWER_STATE_UNPOWERED;
+
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
 	{
@@ -398,6 +402,9 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		}
 
 		(void)pthread_mutex_init(&sReadersContexts[dwContextB]->handlesList_lock, NULL);
+		(void)pthread_mutex_init(&sReadersContexts[dwContextB]->powerState_lock,
+			NULL);
+		sReadersContexts[dwContextB]->powerState = POWER_STATE_UNPOWERED;
 
 		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);

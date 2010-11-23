@@ -292,6 +292,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		}
 
 		/* Power on (again) the card if needed */
+		(void)pthread_mutex_lock(&rContext->powerState_lock);
 		if (POWER_STATE_UNPOWERED == rContext->powerState)
 		{
 			DWORD dwAtrLen;
@@ -318,12 +319,14 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		if (! (readerState & SCARD_POWERED))
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
+			(void)pthread_mutex_unlock(&rContext->powerState_lock);
 			return SCARD_W_UNPOWERED_CARD;
 		}
 
 		/* the card is now in use */
 		rContext->powerState = POWER_STATE_INUSE;
 		Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_INUSE");
+		(void)pthread_mutex_unlock(&rContext->powerState_lock);
 	}
 
 	/*******************************************
@@ -959,6 +962,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		RESPONSECODE (*fct)(DWORD) = NULL;
 		DWORD dwGetSize;
 
+		(void)pthread_mutex_lock(&rContext->powerState_lock);
 		if (POWER_STATE_INUSE == rContext->powerState)
 		{
 #ifdef DISABLE_AUTO_POWER_ON
@@ -972,6 +976,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_GRACE_PERIOD");
 #endif
 		}
+		(void)pthread_mutex_unlock(&rContext->powerState_lock);
 
 		/* ask to stop the "polling" thread so it can be restarted using
 		 * the correct timeout */

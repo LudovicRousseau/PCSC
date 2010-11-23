@@ -440,6 +440,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 #ifndef DISABLE_ON_DEMAND_POWER_ON
 		/* the card is powered but not used */
+		(void)pthread_mutex_lock(&rContext->powerState_lock);
 		if (POWER_STATE_POWERED == rContext->powerState)
 		{
 			/* power down */
@@ -459,6 +460,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			rContext->powerState = POWER_STATE_POWERED;
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 		}
+		(void)pthread_mutex_unlock(&rContext->powerState_lock);
 #endif
 
 		if (rContext->hLockId == 0xFFFF)

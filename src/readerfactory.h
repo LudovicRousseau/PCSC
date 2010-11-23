@@ -114,6 +114,7 @@ extern "C"
 		int * pFeeds;			/**< Number of shared client to lib */
 		int * pMutex;			/**< Number of client to mutex */
 		int powerState;			/**< auto power off state */
+		pthread_mutex_t powerState_lock;	/**< powerState mutex */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use READER_CONTEXT * here since eventhandler.h can't be
