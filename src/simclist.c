@@ -19,12 +19,11 @@
  * SimCList library. See http://mij.oltrelinux.com/devel/simclist
  */
 
-/* SimCList implementation, version 1.4.4rc4 */
+/* SimCList implementation, version 1.5 */
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>      /* for setting errno */
-#include <inttypes.h>   /* (u)int*_t */
 #include <sys/types.h>
 #include <sys/uio.h>    /* for READ_ERRCHECK() and write() */
 #include <fcntl.h>      /* for open() etc */
@@ -37,11 +36,21 @@
 #include <stdint.h>
 
 
-/* use rand() in place of srand()? */
-#ifndef _BSD_SOURCE
-#   define random       rand
-#   define srandom      srand
+/* work around lack of inttypes.h support in broken Microsoft Visual Studio compilers */
+#if !defined(WIN32) || !defined(_MSC_VER)
+#   include <inttypes.h>   /* (u)int*_t */
+#else
+#   include <basetsd.h>
+typedef UINT8   uint8_t;
+typedef UINT16  uint16_t;
+typedef ULONG32 uint32_t;
+typedef UINT64  uint64_t;
+typedef INT8    int8_t;
+typedef INT16   int16_t;
+typedef LONG32  int32_t;
+typedef INT64   int64_t;
 #endif
+ 
 
 
 #ifndef SIMCLIST_NO_DUMPRESTORE
@@ -181,12 +190,54 @@ static inline struct list_entry_s *list_findpos(const list_t *restrict l, int po
                                                     }                                                   \
                                                 } while (0);
 
+/*
+ * Random Number Generator
+ * 
+ * The user is expected to seed the RNG (ie call srand()) if 
+ * SIMCLIST_SYSTEM_RNG is defined.
+ *
+ * Otherwise, a self-contained RNG based on LCG is used; see
+ * http://en.wikipedia.org/wiki/Linear_congruential_generator .
+ *
+ * Facts pro local RNG:
+ * 1. no need for the user to call srand() on his own
+ * 2. very fast, possibly faster than OS
+ * 3. avoid interference with user's RNG
+ *
+ * Facts pro system RNG:
+ * 1. may be more accurate (irrelevant for SimCList randno purposes)
+ * 2. why reinvent the wheel
+ *
+ * Default to local RNG for user's ease of use.
+ */
+
+#ifdef SIMCLIST_SYSTEM_RNG
+/* keep track whether we initialized already (non-0) or not (0) */
+static unsigned random_seed = 0;
+
+/* use local RNG */
+static inline void seed_random() {
+    if (random_seed == 0)
+        random_seed = (unsigned)getpid() ^ (unsigned)time(NULL);
+}
+
+static inline long get_random() {
+    random_seed = (1664525 * random_seed + 1013904223);
+    return random_seed;
+}
+
+#else
+/* use OS's random generator */
+#   define  seed_random()
+#   define  get_random()        (rand())
+#endif
+
 
 /* list initialization */
 int list_init(list_t *restrict l) {
     if (l == NULL) return -1;
 
-    srandom((unsigned long)time(NULL));
+    seed_random();
 
     l->numels = 0;
 
@@ -360,10 +411,7 @@ static inline struct list_entry_s *list_findpos(const list_t *restrict l, int po
     /* accept 1 slot overflow for fetching head and tail sentinels */
     if (posstart < -1 || posstart > (int)l->numels) return NULL;
 
-    if (0 == l->numels)
-        x = 0;
-    else
-        x = (float)(posstart+1) / l->numels;
+    x = (float)(posstart+1) / l->numels;
     if (x <= 0.25) {
         /* first quarter: get to posstart from head */
         for (i = -1, ptr = l->head_sentinel; i < posstart; ptr = ptr->next, i++);
@@ -393,10 +441,7 @@ void *list_extract_at(list_t *restrict l, unsigned int pos) {
     tmp->data = NULL;   /* save data from list_drop_elem() free() */
     list_drop_elem(l, tmp, pos);
     l->numels--;
-
-    if (0 == l->numels)
-        l->mid = NULL;
-
+    
     assert(list_repOk(l));
 
     return data;
@@ -479,8 +524,6 @@ int list_delete_at(list_t *restrict l, unsigned int pos) {
 
     l->numels--;
 
-    if (0 == l->numels)
-        l->mid = NULL;
 
     assert(list_repOk(l));
 
@@ -762,7 +805,7 @@ static void list_sort_quicksort(list_t *restrict l, int versus,
     /* base of iteration: one element list */
     if (! (last > first)) return;
 
-    pivotid = (random() % (last - first + 1));
+    pivotid = (get_random() % (last - first + 1));
     /* pivotid = (last - first + 1) / 2; */
 
     /* find pivot */
@@ -1038,7 +1081,7 @@ int list_dump_filedescriptor(const list_t *restrict l, int fd, size_t *restrict 
     header.timestamp = (int64_t)timeofday.tv_sec * 1000000 + (int64_t)timeofday.tv_usec;
     header.timestamp = hton64(header.timestamp);
 
-    header.rndterm = htonl((int32_t)random());
+    header.rndterm = htonl((int32_t)get_random());
 
     /* total list size is postprocessed afterwards */
 
@@ -1302,9 +1345,11 @@ int list_restore_file(list_t *restrict l, const char *restrict filename, size_t 
 static int list_drop_elem(list_t *restrict l, struct list_entry_s *tmp, unsigned int pos) {
     if (tmp == NULL) return -1;
 
-    /* fix mid pointer */
+    /* fix mid pointer. This is wrt the PRE situation */
     if (l->numels % 2) {    /* now odd */
-        if (pos >= l->numels/2) l->mid = l->mid->prev;
+        /* sort out the base case by hand */
+        if (l->numels == 1) l->mid = NULL;
+        else if (pos >= l->numels/2) l->mid = l->mid->prev;
     } else {                /* now even */
         if (pos < l->numels/2) l->mid = l->mid->next;
     }
