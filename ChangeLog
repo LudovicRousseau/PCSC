@@ -1,3 +1,46 @@
+pcsc-lite-1.6.5: Ludovic Rousseau
+3 December 2010
+- Power on the card _only_ if an application requests a connection.
+  You can disable the feature using DISABLE_ON_DEMAND_POWER_ON in
+  src/pcscd.h.in
+  If DISABLE_AUTO_POWER_ON is defined then do not automatically power on
+  the card. The card will be powered on on the first SCardConnect()
+  See http://ludovicrousseau.blogspot.com/2010/10/card-auto-power-on-and-off.html
+- SCardReconnect(): return SCARD_E_NO_SMARTCARD when card is removed and
+  SCARD_W_UNRESPONSIVE_CARD when card is unresponsive instead of
+  SCARD_E_PROTO_MISMATCH
+- Install pcscd as sgid pcscd instead of suid root
+  See http://ludovicrousseau.blogspot.com/2010/09/pcscd-auto-start.html
+- SCardSetTimeout() is no more provided. This function is not provided
+  by Microsoft and is deprecated since 2004 in pcsc-lite. 
+- SCardCancelTransaction() is no more provided. This function is not
+  provided by Microsoft and is deprecated since 2005 in pcsc-lite.
+- Parsing the CCID Info.plist (159 readers supported) was, on a i386
+  machine, done in 264306 µs and is now done 5547 µs => gain x47 or 4600%
+  See http://ludovicrousseau.blogspot.com/2010/08/ram-and-cpu-improvements-in-pcsc-lite.html
+- It is now possible to configure the local socket name to use using the
+  environment variable PCSCLITE_CSOCK_NAME
+  See http://ludovicrousseau.blogspot.com/2010/11/pcsc-client-and-server-on-two-different.html	  
+- Wait until all connected readers have a chance to power up a possibly
+  inserted card before accepting clients.
+- restrict pcscd features when not run by root (so using suid): APDU
+  logging or setting parameters are disabled for example
+- fix compilation problem on kfreebsd-* systems
+- PCSC/reader.h: HOST_TO_CCID_16() and HOST_TO_CCID_32() are now
+  identity functions
+  Since libccid 1.4.1 (revision 5252) the byte order is no more important
+- If you want to use IFDHCreateChannel() instead of
+  IFDHCreateChannelByName() then do not use any DEVICENAME line in the
+  configuration file. IFDHCreateChannel() will then be called with the
+  CHANNELID parameter.
+- the CHANNELID parameter can also be a decimal number.
+- Remove the support of IFDHandler v1 API. I don't know any driver using
+  this API.
+  See http://ludovicrousseau.blogspot.com/2010/10/ifdhandler-version-1-support-removed.html
+- avoids a buffer overflow with badly formed ATR
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.6.4: Ludovic Rousseau
 15 August 2010
 - Do not use sysconfdir as configuration directory but
