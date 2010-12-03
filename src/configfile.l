@@ -28,7 +28,7 @@ static int iOldLinenumber;
 static char *pcPrevious;
 static char *pcCurrent;
 static char *pcFriendlyname;
-static char *pcDevicename;
+static const char *pcDevicename;
 static char *pcLibpath;
 static char *pcChannelid;
 static int badError;
