@@ -18,11 +18,6 @@
 #ifndef __atrhandler_h__
 #define __atrhandler_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #define SCARD_CONVENTION_DIRECT  0x0001
 #define SCARD_CONVENTION_INVERSE 0x0002
 
@@ -54,9 +49,5 @@ extern "C"
 
 	short ATRDecodeAtr(/*@out@*/ SMARTCARD_EXTENSION *psExtension,
 		PUCHAR pucAtr, DWORD dwLength);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __atrhandler_h__ */

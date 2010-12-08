@@ -20,16 +20,9 @@
 #ifndef __winscard_svc_h__
 #define __winscard_svc_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 	LONG ContextsInitialize(int, int);
 	void ContextsDeinitialize(void);
 	LONG CreateContextThread(uint32_t *);
 	LONG MSGSignalClient(uint32_t filedes, LONG rv);
-#ifdef __cplusplus
-}
-#endif
 
 #endif

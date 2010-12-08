@@ -17,20 +17,11 @@
 #ifndef __prothandler_h__
 #define __prothandler_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	UCHAR PHGetDefaultProtocol(PUCHAR, DWORD);
 	UCHAR PHGetAvailableProtocols(PUCHAR, DWORD);
 	DWORD PHSetProtocol(struct ReaderContext *, DWORD, UCHAR, UCHAR);
 
 #define SET_PROTOCOL_WRONG_ARGUMENT -1
 #define SET_PROTOCOL_PPS_FAILED -2
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __prothandler_h__ */

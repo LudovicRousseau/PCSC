@@ -33,11 +33,6 @@
 #ifndef __debuglog_h__
 #define __debuglog_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #ifndef PCSC_API
 #define PCSC_API
 #endif
@@ -108,10 +103,6 @@ void DebugLogSetLogType(const int);
 int DebugLogSetCategory(const int);
 void DebugLogCategory(const int, const unsigned char *, const int);
 PCSC_API void DebugLogSetLevel(const int level);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __debuglog_h__ */
 

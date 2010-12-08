@@ -20,11 +20,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	/**
 	 * Define an exported public reader state structure so each
 	 * application gets instant notification of changes in state.
@@ -61,9 +56,5 @@ extern "C"
  * This is used to auto start mode to wait until the reader is
  * ready and the (possible) card has been powered up */
 #define READER_NOT_INITIALIZED (MAX_ATR_SIZE+1)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __eventhandler_h__ */

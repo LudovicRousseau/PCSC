@@ -231,11 +231,6 @@ whichever location your reader resides.
 
 #include <pcsclite.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	/*
 	 * List of data structures available to ifdhandler
 	 */
@@ -780,9 +775,5 @@ command each time this function is called.
 @retval IFD_NO_SUCH_DEVICE The reader is no more present (\ref IFD_NO_SUCH_DEVICE)
  */
 RESPONSECODE IFDHICCPresence(DWORD Lun);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

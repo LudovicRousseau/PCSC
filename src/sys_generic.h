@@ -17,11 +17,6 @@
 #ifndef __sys_generic_h__
 #define __sys_generic_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <sys/stat.h>
 #include <sys/mman.h>
 
@@ -34,9 +29,5 @@ extern "C"
 	int SYS_RandomInt(int, int);
 
 	int SYS_GetSeed(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __sys_generic_h__ */

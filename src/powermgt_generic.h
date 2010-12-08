@@ -15,20 +15,9 @@
 #ifndef __powermgt_generic_h__
 #define __powermgt_generic_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-
 /**
  * Registers for Power Management callbacks
  */
 ULONG PMRegisterForPowerEvents(void);
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

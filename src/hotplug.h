@@ -17,11 +17,6 @@
 #ifndef __hotplug_h__
 #define __hotplug_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #ifndef PCSCLITE_HP_DROPDIR
 #define PCSCLITE_HP_DROPDIR		"/usr/local/pcsc/drivers/"
 #endif
@@ -39,9 +34,5 @@ extern "C"
 	ULONG HPRegisterForHotplugEvents(void);
 	LONG HPStopHotPluggables(void);
 	void HPReCheckSerialReaders(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

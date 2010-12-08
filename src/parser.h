@@ -17,11 +17,6 @@
 #ifndef __parser_h__
 #define __parser_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "simclist.h"
 
 struct bundleElt
@@ -33,9 +28,5 @@ struct bundleElt
 int LTPBundleFindValueWithKey(list_t *l, const char *key, list_t **values);
 int bundleParse(const char *fileName, list_t *l);
 void bundleRelease(list_t *l);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

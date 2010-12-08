@@ -27,11 +27,6 @@
 /** Minor version of the current message protocol */
 #define PROTOCOL_VERSION_MINOR 2
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	/**
 	 * @brief Information transmitted in \ref CMD_VERSION Messages.
 	 */
@@ -270,9 +265,5 @@ extern "C"
 	LONG MessageSend(void *buffer, uint64_t buffer_size, int32_t filedes);
 	LONG MessageReceive(/*@out@*/ void *buffer, uint64_t buffer_size,
 		int32_t filedes);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

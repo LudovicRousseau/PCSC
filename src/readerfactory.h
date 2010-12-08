@@ -24,11 +24,6 @@
 #include "pcscd.h"
 #include "simclist.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	typedef struct
 	{
 		char *pcFriendlyname;	/**< FRIENDLYNAME */
@@ -153,9 +148,5 @@ extern "C"
 	void RFWaitForReaderInit(void);
 	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -12,11 +12,6 @@
 #ifndef __misc_h__
 #define __misc_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /*
  * Declare the function as internal to the library: the function name is
  * not exported and can't be used by a program linked to the library
@@ -58,10 +53,6 @@ extern "C"
 
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* __misc_h__ */

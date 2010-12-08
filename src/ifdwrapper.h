@@ -18,11 +18,6 @@
 #ifndef __ifdwrapper_h__
 #define __ifdwrapper_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 	LONG IFDOpenIFD(READER_CONTEXT *);
 	LONG IFDCloseIFD(READER_CONTEXT *);
 	LONG IFDPowerICC(READER_CONTEXT *, DWORD, PUCHAR, /*@out@*/ PDWORD);
@@ -36,9 +31,5 @@ extern "C"
 	LONG IFDSetPTS(READER_CONTEXT *, DWORD, UCHAR, UCHAR, UCHAR, UCHAR);
 	LONG IFDSetCapabilities(READER_CONTEXT *, DWORD, DWORD, PUCHAR);
 	LONG IFDGetCapabilities(READER_CONTEXT *, DWORD, PDWORD, /*@out@*/ PUCHAR);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif							/* __ifdwrapper_h__ */
