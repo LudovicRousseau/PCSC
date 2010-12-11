@@ -162,7 +162,7 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = SCARD_S_SUCCESS;
+	LONG retval = SCARD_S_SUCCESS;
 
 	/* record the time when we started */
 	struct timeval start;
@@ -282,7 +282,7 @@ INTERNAL LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 	uint64_t size, void *data_void)
 {
 	struct rxHeader header;
-	int ret;
+	LONG ret;
 
 	/* header */
 	header.command = command;
@@ -320,7 +320,7 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = SCARD_S_SUCCESS;
+	LONG retval = SCARD_S_SUCCESS;
 
 	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
@@ -418,7 +418,7 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 	char *buffer = buffer_void;
 
 	/* default is success */
-	int retval = SCARD_S_SUCCESS;
+	LONG retval = SCARD_S_SUCCESS;
 
 	/* how many bytes we must read */
 	size_t remaining = buffer_size;
