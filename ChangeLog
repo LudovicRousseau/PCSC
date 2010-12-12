@@ -1,3 +1,9 @@
+pcsc-lite-1.6.6: Ludovic Rousseau
+12 December 2010
+- SCardGetStatusChange(): fix a bug on 64-bits systems
+- Fix another bug because of a regression in internal list manager
+
+
 pcsc-lite-1.6.5: Ludovic Rousseau
 3 December 2010
 - Power on the card _only_ if an application requests a connection.
