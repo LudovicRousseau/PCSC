@@ -351,6 +351,9 @@ static void ContextThread(LPVOID newContext)
 			{
 				/* nothing to read */
 
+				/* wait until all readers are ready */
+				RFWaitForReaderInit();
+
 				/* dump the readers state */
 				ret = MessageSend(readerStates, sizeof(readerStates), filedes);
 			}
