@@ -963,7 +963,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		DWORD dwGetSize;
 
 		(void)pthread_mutex_lock(&rContext->powerState_lock);
-		if (POWER_STATE_INUSE == rContext->powerState)
+		/* Switch to POWER_STATE_GRACE_PERIOD unless the card was not
+		 * powered */
+		if (POWER_STATE_POWERED <= rContext->powerState)
 		{
 #ifdef DISABLE_AUTO_POWER_ON
 			if (SCARD_RESET_CARD == dwDisposition)
@@ -976,6 +978,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_GRACE_PERIOD");
 #endif
 		}
+
 		(void)pthread_mutex_unlock(&rContext->powerState_lock);
 
 		/* ask to stop the "polling" thread so it can be restarted using
