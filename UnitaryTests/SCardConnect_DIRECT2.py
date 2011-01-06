@@ -25,6 +25,9 @@
 # Connect in SCARD_SHARE_DIRECT
 # driver should NOT negociate PPS (the card has not been reset)
 # Disconnect
+# Connect in SCARD_SHARE_SHARED
+# driver should NOT negociate PPS (the card has not been reset)
+# Disconnect
 
 # same issue with Reconnect instead of connect
 # bug fixed in revision 4940
@@ -53,11 +56,13 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
+# Transmit
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print response
 
+# Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -68,6 +73,7 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
+# Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -77,6 +83,8 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
+
+# Transmit
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -88,6 +96,7 @@ hresult, dwActiveProtocol = SCardReconnect(hcard,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
+# Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
@@ -97,11 +106,14 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
+
+# Transmit
 hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print response
 
+# Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
