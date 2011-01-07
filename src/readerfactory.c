@@ -368,6 +368,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		  sReadersContexts[dwContext]->pMutex;
 		sReadersContexts[dwContextB]->slot =
 			sReadersContexts[dwContext]->slot + j;
+		sReadersContexts[dwContextB]->pthCardEvent = NULL;
 
 		/*
 		 * Added by Dave - slots did not have a pFeeds
