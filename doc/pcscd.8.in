@@ -14,7 +14,7 @@ log APDUs and SW using the debug method (see
 .TP
 .BR \-c ", " \-\-config " \fIfile\fP"
 Specifies the file \fIfile\fP as an alternate location for
-.IR @sysconfdir_exp@/reader.conf .
+.IR @confdir_exp@/reader.conf .
 .TP
 .BR \-f ", " \-\-foreground
 Runs pcscd in the foreground and sends log messages to stderr instead of
@@ -46,7 +46,7 @@ Displays the program version number
 .BR \-H ", " \-\-hotplug
 Ask pcscd to rescan the USB buses for added or removed readers and re-read
 the
-.I @sysconfdir_exp@/reader.conf
+.I @confdir_exp@/reader.conf
 file to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .SH DESCRIPTION
@@ -55,7 +55,7 @@ a resource manager that coordinates communications with smart card readers
 and smart cards and cryptographic tokens that are connected to the system.
 .PP
 pcscd is normally started at boot time from
-.IR @sysconfdir_exp@/init.d/pcscd .
+.IR @confdir_exp@/init.d/pcscd .
 It allows applications to access smart cards and readers without knowing
 details of the card or reader.
 .PP
@@ -65,7 +65,7 @@ The purpose of pcsc-lite is to provide a cross compatible API (called
 winscard) for migrating Windows based PC/SC applications to Unix.
 .PP
 At startup, pcscd loads the smart card reader drivers specified in the
-.I @sysconfdir_exp@/reader.conf
+.I @confdir_exp@/reader.conf
 file (or specified using
 .B \-\-config
 .IR file ).
@@ -76,7 +76,7 @@ Smart card reader drivers are placed in the
 directory. Each driver is simply an
 .I .so
 file.  pcscd locates the driver using the
-.I @sysconfdir_exp@/reader.conf
+.I @confdir_exp@/reader.conf
 file.  See the
 .BR reader.conf (5)
 manual page for more information.
@@ -86,14 +86,14 @@ Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fP.
 USB smart card reader drivers are located in
 .I @usbdropdir@
 directory as a bundle. You shall not add a USB driver in
-.I @sysconfdir_exp@/reader.conf
+.I @confdir_exp@/reader.conf
 file.
 .
 .SH FILES
-.I @sysconfdir_exp@/reader.conf
+.I @confdir_exp@/reader.conf
 : Reader configuration file
 .PP
-.I @sysconfdir_exp@/init.d/pcscd
+.I @confdir_exp@/init.d/pcscd
 : pcscd startup script
 .PP
 .I @ipcdir@/pcscd.pid
