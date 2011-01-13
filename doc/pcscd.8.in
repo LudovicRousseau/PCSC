@@ -50,25 +50,14 @@ the
 file to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .SH DESCRIPTION
-pcscd is the daemon program for pcsc-lite and the MuscleCard framework. It is
-a resource manager that coordinates communications with smart card readers
-and smart cards and cryptographic tokens that are connected to the system.
+pcscd is the daemon program for pcsc-lite. It is a resource manager that
+coordinates communications with smart card readers and smart cards and
+cryptographic tokens that are connected to the system.
 .PP
-pcscd is normally started at boot time from
-.IR @confdir_exp@/init.d/pcscd .
-It allows applications to access smart cards and readers without knowing
-details of the card or reader.
+It allows applications to access smart cards and readers using the
+winscard API but without knowing details of the card or reader.
 .PP
 pcscd coordinates the loading of drivers for card readers.
-.PP
-The purpose of pcsc-lite is to provide a cross compatible API (called
-winscard) for migrating Windows based PC/SC applications to Unix.
-.PP
-At startup, pcscd loads the smart card reader drivers specified in the
-.I @confdir_exp@/reader.conf
-file (or specified using
-.B \-\-config
-.IR file ).
 .
 .SH "SERIAL SMART CARD READER DRIVERS"
 Smart card reader drivers are placed in the
@@ -92,9 +81,6 @@ file.
 .SH FILES
 .I @confdir_exp@/reader.conf
 : Reader configuration file
-.PP
-.I @confdir_exp@/init.d/pcscd
-: pcscd startup script
 .PP
 .I @ipcdir@/pcscd.pid
 : process id of the running pcscd
