@@ -22,6 +22,37 @@ extern "C"
 {
 #endif
 
+#ifdef __APPLE__
+
+#include <stdint.h>
+
+#ifndef BYTE
+    typedef uint8_t BYTE;
+#endif
+    typedef uint8_t UCHAR;
+    typedef uint8_t *PUCHAR;
+    typedef uint16_t USHORT;
+
+#ifndef __COREFOUNDATION_CFPLUGINCOM__
+    typedef uint32_t ULONG;
+    typedef void *LPVOID;
+    typedef int16_t BOOL;
+#endif
+
+    typedef uint32_t *PULONG;
+    typedef const void *LPCVOID;
+    typedef uint32_t DWORD;
+    typedef uint32_t *PDWORD;
+    typedef uint16_t WORD;
+    typedef int32_t LONG;
+    typedef const char *LPCSTR;
+    typedef const BYTE *LPCBYTE;
+    typedef BYTE *LPBYTE;
+    typedef DWORD *LPDWORD;
+    typedef char *LPSTR;
+
+#else
+
 #ifndef BYTE
 	typedef unsigned char BYTE;
 #endif
@@ -53,6 +84,8 @@ extern "C"
 	typedef short BOOL;
 	typedef unsigned short WORD;
 	typedef unsigned long *PULONG;
+
+#endif
 
 #ifdef __cplusplus
 }

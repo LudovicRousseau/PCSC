@@ -37,6 +37,12 @@ typedef SCARDHANDLE *LPSCARDHANDLE;
 
 #define MAX_ATR_SIZE			33	/**< Maximum ATR size */
 
+/* Set structure elements aligment on bytes
+ * http://gcc.gnu.org/onlinedocs/gcc/Structure_002dPacking-Pragmas.html */
+#ifdef __APPLE__
+#pragma pack(1)
+#endif
+
 typedef struct
 {
 	const char *szReader;
@@ -59,6 +65,11 @@ SCARD_IO_REQUEST, *PSCARD_IO_REQUEST, *LPSCARD_IO_REQUEST;
 typedef const SCARD_IO_REQUEST *LPCSCARD_IO_REQUEST;
 
 extern SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
+
+/* restore default structure elements alignment */
+#ifdef __APPLE__
+#pragma pack()
+#endif
 
 #define SCARD_PCI_T0	(&g_rgSCardT0Pci) /**< protocol control information (PCI) for T=0 */
 #define SCARD_PCI_T1	(&g_rgSCardT1Pci) /**< protocol control information (PCI) for T=1 */
