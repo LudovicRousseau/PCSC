@@ -53,7 +53,12 @@ hresult, readers = SCardListReaders(hcontext, [])
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-print "values", readerstates.values()
+
+# Add the PnP special reader
+reader = "\\\\?PnP?\\Notification"
+readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
+
+print "values:", readerstates.values()
 (hresult, states) = SCardGetStatusChange(hcontext, 0, readerstates.values())
 print SCardGetErrorMessage(hresult)
 print states
@@ -65,14 +70,13 @@ for state in states:
     print "atr:", toHexString(atr)
     readerstates[readername] = (readername, eventstate)
 print "values", readerstates.values()
+print
 
 # wait for a change with a 10s timeout
-reader = "\\\\?PnP?\\Notification"
-readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-
 (hresult, states) = SCardGetStatusChange(hcontext, 10000, readerstates.values())
 print SCardGetErrorMessage(hresult)
 print states
+print
 
 for state in states:
     readername, eventstate, atr = state
@@ -80,7 +84,7 @@ for state in states:
     print "eventstate:", scardstate2text(eventstate)
     print "atr:", toHexString(atr)
     readerstates[readername] = (readername, eventstate)
-print "values", readerstates.values()
+print "values:", readerstates.values()
 
 hresult = SCardReleaseContext(hcontext)
 print SCardGetErrorMessage(hresult)
