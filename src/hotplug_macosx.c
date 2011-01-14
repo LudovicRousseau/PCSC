@@ -112,7 +112,6 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
  */
 static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 {
-	int i;
 #ifdef DEBUG_HOTPLUG
 	Log2(PCSC_LOG_DEBUG, "Entering HPDriversGetFromDirectory: %s",
 		driverBundlePath);
@@ -145,6 +144,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	CFRelease(pluginUrl);
 
 	size_t bundleArraySize = CFArrayGetCount(bundleArray);
+	size_t i;
 
 	/* get the number of readers (including aliases) */
 	for (i = 0; i < bundleArraySize; i++)
