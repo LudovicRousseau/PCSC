@@ -28,10 +28,10 @@ extern "C"
 {
 #endif
 
-typedef long SCARDCONTEXT; /**< \p hContext returned by SCardEstablishContext() */
+typedef LONG SCARDCONTEXT; /**< \p hContext returned by SCardEstablishContext() */
 typedef SCARDCONTEXT *PSCARDCONTEXT;
 typedef SCARDCONTEXT *LPSCARDCONTEXT;
-typedef long SCARDHANDLE; /**< \p hCard returned by SCardConnect() */
+typedef LONG SCARDHANDLE; /**< \p hCard returned by SCardConnect() */
 typedef SCARDHANDLE *PSCARDHANDLE;
 typedef SCARDHANDLE *LPSCARDHANDLE;
 
