@@ -759,12 +759,10 @@ LONG HPSearchHotPluggables(void)
 		{
 			char deviceName[MAX_DEVICENAME];
 
-			/* the format should be "usb:%04x/%04x:libusb:%s" but we do not
-			 * know the libusb string. So it is not possible to differentiate
-			 * two identical readers :-( */
-			snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x",
-				(unsigned int)a->m_driver->m_vendorId,
-				(unsigned int)a->m_driver->m_productId);
+			/* the format should be "usb:%04x/%04x" but Apple uses the
+			 * friendly name instead */
+			snprintf(deviceName, sizeof(deviceName),
+				"%s", a->m_driver->m_friendlyName);
 			deviceName[sizeof(deviceName)-1] = '\0';
 
 			RFAddReader(a->m_driver->m_friendlyName,
