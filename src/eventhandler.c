@@ -234,7 +234,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 	rv = IFDStatusICC(rContext, &dwStatus);
 
-	if (dwStatus & SCARD_PRESENT)
+	if ((SCARD_S_SUCCESS == rv) && (dwStatus & SCARD_PRESENT))
 	{
 #ifdef DISABLE_AUTO_POWER_ON
 		rContext->readerState->cardAtrLength = 0;
