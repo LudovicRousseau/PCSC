@@ -1030,7 +1030,7 @@ again:
 			while (list_iterator_hasnext(l))
 			{
 				currentHandle = list_iterator_next(l);
-				if ((rContext->dwIdentity + randHandle) ==
+				if (((LONG)rContext->dwIdentity + randHandle) ==
 					(currentHandle->hCard))
 				{
 					/* Get a new handle and loop again */
