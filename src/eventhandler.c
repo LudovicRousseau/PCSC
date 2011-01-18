@@ -229,8 +229,6 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	 * Zero out everything
 	 */
 	dwStatus = 0;
-	readerSharing = 0;
-	dwCurrentState = 0;
 
 	readerName = rContext->readerState->readerName;
 
