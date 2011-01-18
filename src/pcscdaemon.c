@@ -82,8 +82,6 @@ static void SVCServiceRunLoop(void)
 	LONG rv;
 	uint32_t dwClientID;	/* Connection ID used to reference the Client */
 
-	rv = 0;
-
 	while (TRUE)
 	{
 		switch (rsp = ProcessEventsServer(&dwClientID))
@@ -172,7 +170,6 @@ int main(int argc, char **argv)
 #endif
 #define OPT_STRING "c:fdhvaeCHt:r:s:x"
 
-	rv = 0;
 	newReaderConfig = NULL;
 	setToForeground = FALSE;
 	HotPlug = FALSE;
