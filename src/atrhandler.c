@@ -49,11 +49,6 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	UCHAR Y1i, T;				/* MSN/LSN of TDi */
 	int i = 1;					/* value of the index in TAi, TBi, etc. */
 
-	/*
-	 * Zero out everything
-	 */
-	p = K = TCK = Y1i = T = 0;
-
 #ifdef ATR_DEBUG
 	if (dwLength > 0)
 		LogXxd(PCSC_LOG_DEBUG, "ATR: ", pucAtr, dwLength);
