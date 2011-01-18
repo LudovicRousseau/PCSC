@@ -1867,7 +1867,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/* only if current state has an non null event counter */
 				if (currReader->dwCurrentState & 0xFFFF0000)
 				{
-					int currentCounter;
+					unsigned int currentCounter;
 
 					currentCounter = (currReader->dwCurrentState >> 16) & 0xFFFF;
 
