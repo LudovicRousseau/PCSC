@@ -249,10 +249,6 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv;
-#ifndef PCSCLITE_STATIC_DRIVER
-	short ret;
-	SMARTCARD_EXTENSION sSmartCard;
-#endif
 	DWORD dwStatus;
 	UCHAR ucValue[1];
 	UCHAR dummyAtr[MAX_ATR_SIZE];
@@ -265,7 +261,6 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	/*
 	 * Zero out everything
 	 */
-	rv = IFD_SUCCESS;
 	dwStatus = 0;
 	ucValue[0] = 0;
 
@@ -290,8 +285,6 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_power_icc) (rContext->slot, dwAction, pucAtr, pdwAtrLen);
-
-	ret = ATRDecodeAtr(&sSmartCard, pucAtr, *pdwAtrLen);
 #else
 	rv = IFDHPowerICC(rContext->slot, dwAction, pucAtr, pdwAtrLen);
 #endif
