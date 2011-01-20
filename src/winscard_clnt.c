@@ -221,6 +221,7 @@ static int CHANNEL_MAP_seeker(const void *el, const void *key)
 		Log3(PCSC_LOG_CRITICAL,
 			"CHANNEL_MAP_seeker called with NULL pointer: el=%X, key=%X",
 			el, key);
+		return 0;
 	}
 
 	if (channelMap->hCard == *(SCARDHANDLE *)key)
@@ -255,6 +256,7 @@ static int SCONTEXTMAP_seeker(const void *el, const void *key)
 		Log3(PCSC_LOG_CRITICAL,
 			"SCONTEXTMAP_seeker called with NULL pointer: el=%X, key=%X",
 			el, key);
+		return 0;
 	}
 
 	if (contextMap->hContext == *(SCARDCONTEXT *) key)
