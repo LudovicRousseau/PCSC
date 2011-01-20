@@ -1263,11 +1263,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	PROFILE_START
 
-	/*
-	 * Zero out everything
-	 */
-	randnum = 0;
-
 	CHECK_SAME_PROCESS
 
 	/*
