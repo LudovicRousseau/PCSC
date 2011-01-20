@@ -341,7 +341,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/* No more slot left return */
-			rv = RFRemoveReader(readerName, port);
+			RFRemoveReader(readerName, port);
 			return SCARD_E_NO_MEMORY;
 		}
 
