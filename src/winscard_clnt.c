@@ -1429,7 +1429,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	char *r;
 	char *bufReader = NULL;
 	LPBYTE bufAtr = NULL;
-	DWORD dummy;
+	DWORD dummy = 0;
 
 	PROFILE_START
 
