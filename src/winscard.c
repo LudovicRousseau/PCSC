@@ -562,7 +562,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
-			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
+			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
 		}
@@ -832,7 +832,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
-			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
+			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 
 #ifdef DISABLE_AUTO_POWER_ON
 			rContext->powerState = POWER_STATE_UNPOWERED;
@@ -1092,7 +1092,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 				rContext->readerState->cardAtr, &dwAtrLen);
 		else
 		{
-			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
+			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
 		}
