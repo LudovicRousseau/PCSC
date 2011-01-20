@@ -423,7 +423,7 @@ launch:
 
 			if (0 == pid)
 			{
-				int ret, i, max;
+				int i, max;
 				char *param = getenv("PCSCLITE_PCSCD_ARGS");
 
 				/* close all file handles except stdin, stdout and
@@ -436,7 +436,7 @@ launch:
 					(void)close(i);
 
 				/* son process */
-				ret = execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
+				execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
 					(char *)NULL);
 				Log2(PCSC_LOG_CRITICAL, "exec " PCSCD_BINARY " failed: %s",
 					strerror(errno));
