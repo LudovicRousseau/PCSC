@@ -1117,7 +1117,7 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	}
 end:
 	(void)pthread_mutex_unlock(&rContext->handlesList_lock);
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
