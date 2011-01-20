@@ -85,6 +85,7 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 	{
 		Log3(PCSC_LOG_CRITICAL, "called with NULL pointer: el=%X, key=%X",
 			el, key);
+		return 0;
 	}
 
 	if (currentContext->hContext == *(int32_t *)key)
