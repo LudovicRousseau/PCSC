@@ -65,9 +65,12 @@ static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
 	const RDR_CLIHANDLES *rdrCliHandles = el;
 
 	if ((el == NULL) || (key == NULL))
+	{
 		Log3(PCSC_LOG_CRITICAL,
 			"RDR_CLIHANDLES_seeker called with NULL pointer: el=%X, key=%X",
 			el, key);
+		return 0;
+	}
 
 	if (rdrCliHandles->hCard == *(SCARDHANDLE *)key)
 		return 1;
