@@ -152,17 +152,21 @@ static void trace(const char *func, const char direction, const char *fmt, ...)
 #include <stdio.h>
 #include <sys/time.h>
 
-struct timeval profile_time_start;
+/* we can profile a maximum of 5 simultaneous calls */
+#define MAX_THREADS 5
+pthread_t threads[MAX_THREADS];
+struct timeval profile_time_start[MAX_THREADS];
 FILE *profile_fd;
 char profile_tty;
-char fct_name[100];
 
-#define PROFILE_START profile_start(__FUNCTION__);
+#define PROFILE_START profile_start();
 #define PROFILE_END(rv) profile_end(__FUNCTION__, rv);
 
-static void profile_start(const char *f)
+static void profile_start(void)
 {
 	static char initialized = FALSE;
+	pthread_t t;
+	int i;
 
 	if (!initialized)
 	{
@@ -185,39 +189,44 @@ static void profile_start(const char *f)
 			profile_tty = FALSE;
 	}
 
-	/* PROFILE_END was not called before? */
-	if (profile_tty && fct_name[0])
-		printf(COLOR_BLUE " WARNING: %s starts before %s finishes"
-			COLOR_NORMAL "\n", f, fct_name);
+	t = pthread_self();
+	for (i=0; i<MAX_THREADS; i++)
+		if (0 == threads[i])
+		{
+			threads[i] = t;
+			break;
+		}
 
-	strlcpy(fct_name, f, sizeof(fct_name));
-
-	gettimeofday(&profile_time_start, NULL);
+	gettimeofday(&profile_time_start[i], NULL);
 } /* profile_start */
 
 static void profile_end(const char *f, LONG rv)
 {
 	struct timeval profile_time_end;
 	long d;
+	pthread_t t;
+	int i;
 
 	gettimeofday(&profile_time_end, NULL);
-	d = time_sub(&profile_time_end, &profile_time_start);
+
+	t = pthread_self();
+	for (i=0; i<MAX_THREADS; i++)
+		if (t == threads[i])
+			break;
+
+	if (i>=MAX_THREADS)
+	{
+		fprintf(stderr, COLOR_BLUE " WARNING: no start info for %s", f);
+		return;
+	}
+
+	d = time_sub(&profile_time_end, &profile_time_start[i]);
+
+	/* free this entry */
+	threads[i] = 0;
 
 	if (profile_tty)
 	{
-		if (fct_name[0])
-		{
-			if (strncmp(fct_name, f, sizeof(fct_name)))
-				printf(COLOR_BLUE " WARNING: %s ends before %s"
-					COLOR_NORMAL "\n", f, fct_name);
-		}
-		else
-			printf(COLOR_BLUE " WARNING: %s ends but we lost its start"
-				COLOR_NORMAL "\n", f);
-
-		/* allow to detect missing PROFILE_END calls */
-		fct_name[0] = '\0';
-
 		if (rv != SCARD_S_SUCCESS)
 			fprintf(stderr,
 				COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld "
