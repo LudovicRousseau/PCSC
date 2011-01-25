@@ -1068,7 +1068,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
 		&pChannelMap);
 	if (rv == -1)
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
@@ -1079,7 +1082,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/* the handle is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	scDisconnectStruct.hCard = hCard;
 	scDisconnectStruct.dwDisposition = dwDisposition;
@@ -1106,6 +1112,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
+error:
     PROFILE_END(rv)
 
 	return rv;
