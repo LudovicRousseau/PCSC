@@ -111,6 +111,40 @@
 
 static char sharing_shall_block = TRUE;
 
+#define COLOR_RED "\33[01;31m"
+#define COLOR_GREEN "\33[32m"
+#define COLOR_BLUE "\33[34m"
+#define COLOR_MAGENTA "\33[35m"
+#define COLOR_NORMAL "\33[0m"
+
+#undef DO_TRACE
+#ifdef DO_TRACE
+
+#include <stdio.h>
+#include <stdarg.h>
+
+static void trace(const char *func, const char direction, const char *fmt, ...)
+{
+	va_list args;
+
+	printf(COLOR_GREEN "%c " COLOR_BLUE "[%lX] " COLOR_GREEN "%s ",
+		direction, pthread_self(), func);
+
+	printf(COLOR_MAGENTA);
+	va_start(args, fmt);
+	vprintf(fmt, args);
+	va_end(args);
+
+	printf(COLOR_NORMAL "\n");
+}
+
+#define API_TRACE_IN(...) trace(__FUNCTION__, '<', __VA_ARGS__);
+#define API_TRACE_OUT(...) trace(__FUNCTION__, '>', __VA_ARGS__);
+#else
+#define API_TRACE_IN(...)
+#define API_TRACE_OUT(...)
+#endif
+
 #undef DO_PROFILE
 #ifdef DO_PROFILE
 
@@ -385,6 +419,7 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	int daemon_launched = FALSE;
 	int retries = 0;
 
+	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
 	PROFILE_START
 
 again:
@@ -474,6 +509,7 @@ launch:
 
 end:
 	PROFILE_END(rv)
+	API_TRACE_OUT("%ld", *phContext)
 
 	return rv;
 }
@@ -662,6 +698,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	struct release_struct scReleaseStruct;
 	SCONTEXTMAP * currentContextMap;
 
+	API_TRACE_IN("%ld", hContext)
 	PROFILE_START
 
 	CHECK_SAME_PROCESS
@@ -718,6 +755,7 @@ end:
 	(void)SCardUnlockThread();
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
@@ -787,6 +825,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
+	API_TRACE_IN("%d %s %d %d", hContext, szReader, dwShareMode, dwPreferredProtocols)
 
 	/*
 	 * Check for NULL parameters
@@ -865,6 +904,7 @@ end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
     PROFILE_END(rv)
+	API_TRACE_OUT("%d", *pdwActiveProtocol)
 
 	return rv;
 }
@@ -1059,6 +1099,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
+	API_TRACE_IN("%d %d", hCard, dwDisposition)
 
 	CHECK_SAME_PROCESS
 
@@ -1114,6 +1155,7 @@ end:
 
 error:
     PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
@@ -1724,6 +1766,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LONG rv = SCARD_S_SUCCESS;
 
 	PROFILE_START
+	API_TRACE_IN("%d %d %d", hContext, dwTimeout, cReaders)
+#ifdef DO_TRACE
+	for (j=0; j<cReaders; j++)
+	{
+		API_TRACE_IN("[%d] %s %X %X", j, rgReaderStates[j].szReader,
+			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState)
+	}
+#endif
 
 	if ((rgReaderStates == NULL && cReaders > 0)
 		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
@@ -2174,6 +2224,13 @@ end:
 
 error:
 	PROFILE_END(rv)
+#ifdef DO_TRACE
+	for (j=0; j<cReaders; j++)
+	{
+		API_TRACE_OUT("[%d] %s %X %X", j, rgReaderStates[j].szReader,
+			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState)
+	}
+#endif
 
 	return rv;
 }
@@ -2852,6 +2909,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 
 	(void)mszGroups;
 	PROFILE_START
+	API_TRACE_IN("%ld", hContext)
 
 	/*
 	 * Check for NULL parameters
@@ -2950,6 +3008,7 @@ end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("%d", *pcchReaders)
 
 	return rv;
 }
@@ -3149,6 +3208,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	struct cancel_struct scCancelStruct;
 
 	PROFILE_START
+	API_TRACE_IN("%d", hContext)
 
 	/*
 	 * Make sure this context has been opened
@@ -3190,6 +3250,7 @@ end:
 
 error:
 	PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
@@ -3223,6 +3284,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
+	API_TRACE_IN("%ld", hContext)
 
 	rv = SCARD_S_SUCCESS;
 
@@ -3237,6 +3299,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 		rv = SCARD_E_INVALID_HANDLE;
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
