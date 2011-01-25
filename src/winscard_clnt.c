@@ -3226,10 +3226,16 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	 */
 	currentContextMap = SCardGetContext(hContext);
 	if (NULL == currentContextMap)
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	if (! currentContextMap->cancellable)
-		return SCARD_S_SUCCESS;
+	{
+		rv = SCARD_S_SUCCESS;
+		goto error;
+	}
 
 	/* create a new connection to the server */
 	if (ClientSetupSession(&dwClientID) != 0)
