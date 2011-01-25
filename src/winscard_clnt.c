@@ -173,7 +173,7 @@ static void profile_start(const char *f)
 		profile_fd = fopen(filename, "a+");
 		if (NULL == profile_fd)
 		{
-			fprintf(stderr, "\33[01;31mCan't open %s: %s\33[0m\n",
+			fprintf(stderr, COLOR_RED "Can't open %s: %s" COLOR_NORMAL "\n",
 				PROFILE_FILE, strerror(errno));
 			exit(-1);
 		}
@@ -187,8 +187,8 @@ static void profile_start(const char *f)
 
 	/* PROFILE_END was not called before? */
 	if (profile_tty && fct_name[0])
-		printf("\33[01;34m WARNING: %s starts before %s finishes\33[0m\n",
-			f, fct_name);
+		printf(COLOR_BLUE " WARNING: %s starts before %s finishes"
+			COLOR_NORMAL "\n", f, fct_name);
 
 	strlcpy(fct_name, f, sizeof(fct_name));
 
@@ -208,22 +208,24 @@ static void profile_end(const char *f, LONG rv)
 		if (fct_name[0])
 		{
 			if (strncmp(fct_name, f, sizeof(fct_name)))
-				printf("\33[01;34m WARNING: %s ends before %s\33[0m\n",
-					f, fct_name);
+				printf(COLOR_BLUE " WARNING: %s ends before %s"
+					COLOR_NORMAL "\n", f, fct_name);
 		}
 		else
-			printf("\33[01;34m WARNING: %s ends but we lost its start\33[0m\n",
-				f);
+			printf(COLOR_BLUE " WARNING: %s ends but we lost its start"
+				COLOR_NORMAL "\n", f);
 
 		/* allow to detect missing PROFILE_END calls */
 		fct_name[0] = '\0';
 
 		if (rv != SCARD_S_SUCCESS)
 			fprintf(stderr,
-				"\33[01;31mRESULT %s \33[35m%ld \33[34m0x%08lX %s\33[0m\n",
+				COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld "
+				COLOR_BLUE "0x%08lX %s" COLOR_NORMAL "\n",
 				f, d, rv, pcsc_stringify_error(rv));
 		else
-			fprintf(stderr, "\33[01;31mRESULT %s \33[35m%ld\33[0m\n", f, d);
+			fprintf(stderr, COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld"
+				COLOR_NORMAL "\n", f, d);
 	}
 	fprintf(profile_fd, "%s %ld\n", f, d);
 	fflush(profile_fd);
