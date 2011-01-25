@@ -721,8 +721,8 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	currentContextMap = SCardGetContext(hContext);
 	if (NULL == currentContextMap)
 	{
-		PROFILE_END(SCARD_E_INVALID_HANDLE)
-		return SCARD_E_INVALID_HANDLE;
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
 	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
@@ -733,7 +733,10 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	scReleaseStruct.hContext = hContext;
 	scReleaseStruct.rv = SCARD_S_SUCCESS;
@@ -765,6 +768,7 @@ end:
 	(void)SCardRemoveContext(hContext);
 	(void)SCardUnlockThread();
 
+error:
 	PROFILE_END(rv)
 	API_TRACE_OUT("")
 
