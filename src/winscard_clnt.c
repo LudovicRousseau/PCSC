@@ -1727,7 +1727,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	if ((rgReaderStates == NULL && cReaders > 0)
 		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
-		return SCARD_E_INVALID_PARAMETER;
+	{
+		rv = SCARD_E_INVALID_PARAMETER;
+		goto error;
+	}
 
 	/* Check the integrity of the reader states structures */
 	for (j = 0; j < cReaders; j++)
@@ -1746,11 +1749,17 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				nbNonIgnoredReaders--;
 
 		if (0 == nbNonIgnoredReaders)
-			return SCARD_S_SUCCESS;
+		{
+			rv = SCARD_S_SUCCESS;
+			goto error;
+		}
 	}
 	else
+	{
 		/* reader list is empty */
-		return SCARD_S_SUCCESS;
+		rv = SCARD_S_SUCCESS;
+		goto error;
+	}
 
 	CHECK_SAME_PROCESS
 
@@ -1759,7 +1768,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	 */
 	currentContextMap = SCardGetContext(hContext);
 	if (NULL == currentContextMap)
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
@@ -1769,7 +1781,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		/* the context is now invalid
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
-		return SCARD_E_INVALID_HANDLE;
+	{
+		rv = SCARD_E_INVALID_HANDLE;
+		goto error;
+	}
 
 	/* synchronize reader states with daemon */
 	rv = getReaderStates(currentContextMap);
@@ -2157,6 +2172,7 @@ end:
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
+error:
 	PROFILE_END(rv)
 
 	return rv;
