@@ -216,7 +216,7 @@ static void profile_end(const char *f, LONG rv)
 
 	if (i>=MAX_THREADS)
 	{
-		fprintf(stderr, COLOR_BLUE " WARNING: no start info for %s", f);
+		fprintf(stderr, COLOR_BLUE " WARNING: no start info for %s\n", f);
 		return;
 	}
 
