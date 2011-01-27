@@ -2682,8 +2682,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
-
 	return rv;
 }
 
