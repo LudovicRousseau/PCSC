@@ -191,7 +191,7 @@ static void profile_start(void)
 
 	t = pthread_self();
 	for (i=0; i<MAX_THREADS; i++)
-		if (0 == threads[i])
+		if (pthread_equal(0, threads[i]))
 		{
 			threads[i] = t;
 			break;
@@ -211,7 +211,7 @@ static void profile_end(const char *f, LONG rv)
 
 	t = pthread_self();
 	for (i=0; i<MAX_THREADS; i++)
-		if (t == threads[i])
+		if (pthread_equal(t, threads[i]))
 			break;
 
 	if (i>=MAX_THREADS)
