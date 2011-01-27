@@ -2592,11 +2592,15 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr,
 {
 	LONG ret;
 
+	PROFILE_START
+
 	if (NULL == pbAttr || 0 == cbAttrLen)
 		return SCARD_E_INVALID_PARAMETER;
 
 	ret = SCardGetSetAttrib(hCard, SCARD_SET_ATTRIB, dwAttrId, (LPBYTE)pbAttr,
 		&cbAttrLen);
+
+	PROFILE_END(ret)
 
 	return ret;
 }
