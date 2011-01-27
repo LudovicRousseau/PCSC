@@ -127,15 +127,15 @@ static void trace(const char *func, const char direction, const char *fmt, ...)
 {
 	va_list args;
 
-	printf(COLOR_GREEN "%c " COLOR_BLUE "[%lX] " COLOR_GREEN "%s ",
+	fprintf(stderr, COLOR_GREEN "%c " COLOR_BLUE "[%lX] " COLOR_GREEN "%s ",
 		direction, pthread_self(), func);
 
-	printf(COLOR_MAGENTA);
+	fprintf(stderr, COLOR_MAGENTA);
 	va_start(args, fmt);
-	vprintf(fmt, args);
+	vfprintf(stderr, fmt, args);
 	va_end(args);
 
-	printf(COLOR_NORMAL "\n");
+	fprintf(stderr, COLOR_NORMAL "\n");
 }
 
 #define API_TRACE_IN(...) trace(__FUNCTION__, '<', __VA_ARGS__);
