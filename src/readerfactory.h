@@ -20,6 +20,7 @@
 #include <inttypes.h>
 #include <pthread.h>
 
+#include "pcsclite.h"
 #include "ifdhandler.h"
 #include "pcscd.h"
 #include "simclist.h"

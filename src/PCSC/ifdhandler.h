@@ -229,8 +229,6 @@ whichever location your reader resides.
 #ifndef _ifd_handler_h_
 #define _ifd_handler_h_
 
-#include <pcsclite.h>
-
 	/*
 	 * List of data structures available to ifdhandler
 	 */
