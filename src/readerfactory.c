@@ -31,7 +31,6 @@
 
 #include "misc.h"
 #include "pcscd.h"
-#include "ifdhandler.h"
 #include "debuglog.h"
 #include "readerfactory.h"
 #include "dyn_generic.h"

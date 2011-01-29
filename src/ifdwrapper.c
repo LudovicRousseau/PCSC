@@ -23,7 +23,6 @@
 #include "config.h"
 #include "misc.h"
 #include "pcscd.h"
-#include "ifdhandler.h"
 #include "debuglog.h"
 #include "readerfactory.h"
 #include "ifdwrapper.h"
