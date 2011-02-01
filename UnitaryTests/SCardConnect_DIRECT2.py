@@ -57,7 +57,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Transmit
-hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
+hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print response
@@ -85,7 +85,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Transmit
-hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
+hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print response
@@ -108,7 +108,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Transmit
-hresult, response = SCardTransmit(hcard, SCARD_PCI_T1, SELECT)
+hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print response
