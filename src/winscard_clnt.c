@@ -1162,7 +1162,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
-	(void)SCardRemoveHandle(hCard);
+	if (SCARD_S_SUCCESS == scDisconnectStruct.rv)
+		(void)SCardRemoveHandle(hCard);
 	rv = scDisconnectStruct.rv;
 
 end:
