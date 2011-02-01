@@ -803,11 +803,25 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 
 	/*
-	 * Unlock any blocks on this context
+	 * Try to unlock any blocks on this context
+	 *
+	 * This may fail with SCARD_E_SHARING_VIOLATION if a transaction is
+	 * on going on another card context and dwDisposition == SCARD_LEAVE_CARD.
+	 * We should not stop.
 	 */
 	rv = RFUnlockAllSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+	{
+		if (rv != SCARD_E_SHARING_VIOLATION)
+		{
+			return rv;
+		}
+		else
+		{
+			if (SCARD_LEAVE_CARD != dwDisposition)
+				return rv;
+		}
+	}
 
 	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->contexts);
 	Log2(PCSC_LOG_DEBUG, "dwDisposition: %d", dwDisposition);
