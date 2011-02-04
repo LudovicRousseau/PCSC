@@ -45,6 +45,7 @@ def stress(*args):
         if hresult != SCARD_S_SUCCESS:
             raise ReleaseContextException(hresult)
 
+
 def main():
     """
     main

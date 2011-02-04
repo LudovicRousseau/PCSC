@@ -43,7 +43,7 @@ def stress(reader):
         after = time()
         print data
         delta = after - before
-        print "%d Command: %02X %02X, delta: %f" % (i, sw1, sw2,  delta)
+        print "%d Command: %02X %02X, delta: %f" % (i, sw1, sw2, delta)
         if delta > 1:
             sys.stderr.write(ctime() + " %f\n" % delta)
         i += 1
