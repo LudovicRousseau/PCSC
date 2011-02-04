@@ -74,6 +74,11 @@
  *    SCardCancel() is the only exception to the rule.  On Windows the
  *    same SCARDCONTEXT can be shared by different threads of same
  *    application.
+ * -# CardConnect() & SCardReconnect()
+ *    @par
+ *    pdwActiveProtocol is not set to SCARD_PROTOCOL_UNDEFINED if
+ *    SCARD_SHARE_DIRECT is used but the card has already negociated its
+ *    protocol
  */
 
 #include "config.h"
