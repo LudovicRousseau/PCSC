@@ -29,11 +29,13 @@ MAX_THREADS = 100
 MAX_ITER = 10
 
 
-def stress():
+def stress(*args):
     """
     stress method
     """
+    thread = args[0]
     for j in range(1, MAX_ITER):
+        print thread,
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
         if hresult != SCARD_S_SUCCESS:
             raise EstablishContextException(hresult)
@@ -51,8 +53,9 @@ def main():
     threads = list()
 
     for i in range(1, MAX_THREADS):
-        thread = threading.Thread(target=stress)
+        thread = threading.Thread(target=stress, args=(i,))
         threads.append(thread)
+        print "start thread", i
         thread.start()
 
     for thread in threads:
