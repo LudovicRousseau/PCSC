@@ -357,6 +357,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
 #ifdef DO_CHECK_SAME_PROCESS
+pid_t client_pid = 0;
 static LONG SCardCheckSameProcess(void);
 #define CHECK_SAME_PROCESS \
 	rv = SCardCheckSameProcess(); \
