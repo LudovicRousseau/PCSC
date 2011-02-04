@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-#   SCardCancel.py : Unitary test for SCardCancel()
+#   SCard_fork.py : Unitary test for handle invalid after fork()
 #   Copyright (C) 2008-2009  Ludovic Rousseau
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,9 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+# you must compile pcsc-lite (src/winscard_clnt.c) with
+# #define DO_CHECK_SAME_PROCESS
+# or this unitary test will fail
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
@@ -54,16 +57,17 @@ if pid == 0:
     elif hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
     else:
-        print "test failed"
+        print "test FAILED. SCARD_E_INVALID_HANDLE was expected"
+        print
 
-    hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
-    if hresult != SCARD_S_SUCCESS:
-        raise BaseSCardException(hresult)
+        hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+        if hresult != SCARD_S_SUCCESS:
+            raise BaseSCardException(hresult)
 
-    hresult = SCardReleaseContext(hcontext)
-    print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
-    if hresult != SCARD_S_SUCCESS:
-        raise ReleaseContextException(hresult)
+        hresult = SCardReleaseContext(hcontext)
+        print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+        if hresult != SCARD_S_SUCCESS:
+            raise ReleaseContextException(hresult)
 
 else:
     # father
