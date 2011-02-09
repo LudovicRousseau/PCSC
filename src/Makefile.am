@@ -150,8 +150,3 @@ tokenparser.c: tokenparser.l
 	$(SHELL) $(YLWRAP) $< lex.tp.c $@ -- "$(LEX)" -Ptp $(AM_LFLAGS) $(LFLAGS)
 
 EXTRA_DIST = README_INTERNALS.txt
-
-# Create empty directories used by drivers
-install-data-hook:
-	$(mkinstalldirs) $(DESTDIR)$(usbdropdir)
-	$(mkinstalldirs) $(DESTDIR)$(PCSCLITE_CONFIG_DIR)
