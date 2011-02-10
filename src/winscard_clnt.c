@@ -106,6 +106,19 @@
 #include "winscard_msg.h"
 #include "utils.h"
 
+/* Display, on stderr, a trace of the WinSCard calls with arguments and
+ * results */
+#undef DO_TRACE
+
+/* Profile the execution time of WinSCard calls */
+#undef DO_PROFILE
+
+/* Check that handles are not shared between (forked) processes
+ * This check is disabled since some systems uses the same PID for
+ * different threads of a same process */
+#undef DO_CHECK_SAME_PROCESS
+
+
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	0x1000
 
@@ -122,7 +135,6 @@ static char sharing_shall_block = TRUE;
 #define COLOR_MAGENTA "\33[35m"
 #define COLOR_NORMAL "\33[0m"
 
-#undef DO_TRACE
 #ifdef DO_TRACE
 
 #include <stdio.h>
@@ -150,7 +162,6 @@ static void trace(const char *func, const char direction, const char *fmt, ...)
 #define API_TRACE_OUT(...)
 #endif
 
-#undef DO_PROFILE
 #ifdef DO_PROFILE
 
 #define PROFILE_FILE "/tmp/pcsc_profile"
