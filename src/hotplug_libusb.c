@@ -47,8 +47,8 @@
 #undef DEBUG_HOTPLUG
 #define ADD_SERIAL_NUMBER
 
-/* format is "%d:%d", bus_number, device_address */
-#define BUS_DEVICE_STRSIZE	10+1+10+1
+/* format is "%d:%d:%d", bus_number, device_address, interface */
+#define BUS_DEVICE_STRSIZE	10+1+10+1+10+1
 
 #define READER_ABSENT		0
 #define READER_PRESENT		1
@@ -98,7 +98,8 @@ static struct _readerTracker
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct _driverTracker *driver);
+	const char bus_device[], int interface,
+	struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 
 static LONG HPReadBundleValues(void)
@@ -276,6 +277,7 @@ static void HPRescanUsbBus(void)
 	while ((dev = devs[cnt++]) != NULL)
 	{
 		struct libusb_device_descriptor desc;
+		struct libusb_config_descriptor *config_desc;
 		uint8_t bus_number = libusb_get_bus_number(dev);
 		uint8_t device_address = libusb_get_device_address(dev);
 
@@ -287,6 +289,14 @@ static void HPRescanUsbBus(void)
 			continue;
 		}
 
+		r = libusb_get_active_config_descriptor(dev, &config_desc);
+		if (r < 0)
+		{
+			Log3(PCSC_LOG_ERROR, "failed to get device config for %d/%d",
+				bus_number, device_address);
+			continue;
+		}
+
 		/* check if the device is supported by one driver */
 		for (i=0; i<driverSize; i++)
 		{
@@ -294,38 +304,53 @@ static void HPRescanUsbBus(void)
 				desc.idVendor == driverTracker[i].manuID &&
 				desc.idProduct == driverTracker[i].productID)
 			{
-				int newreader;
+				int interface;
 
-				/* A known device has been found */
-				snprintf(bus_device, BUS_DEVICE_STRSIZE, "%d:%d",
+#ifdef DEBUG_HOTPLUG
+				Log3(PCSC_LOG_DEBUG, "Found matching USB device: %d:%d",
 					bus_number, device_address);
-				bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-#ifdef DEBUG_HOTPLUG
-				Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s",
-					bus_device);
 #endif
-				newreader = TRUE;
 
-				/* Check if the reader is a new one */
-				for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
+				for (interface = 0; interface < config_desc->bNumInterfaces;
+					interface++)
 				{
-					if (strncmp(readerTracker[j].bus_device,
-						bus_device, BUS_DEVICE_STRSIZE) == 0)
+					int newreader;
+
+					/* A known device has been found */
+					snprintf(bus_device, BUS_DEVICE_STRSIZE, "%d:%d:%d",
+						 bus_number, device_address, interface);
+					bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+					newreader = TRUE;
+
+					/* Check if the reader is a new one */
+					for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
 					{
-						/* The reader is already known */
-						readerTracker[j].status = READER_PRESENT;
-						newreader = FALSE;
+						if (strncmp(readerTracker[j].bus_device,
+							bus_device, BUS_DEVICE_STRSIZE) == 0)
+						{
+							/* The reader is already known */
+							readerTracker[j].status = READER_PRESENT;
+							newreader = FALSE;
 #ifdef DEBUG_HOTPLUG
-						Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
-							bus_device);
+							Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
+								bus_device);
 #endif
-						break;
+							break;
+						}
+					}
+
+					/* New reader found */
+					if (newreader)
+					{
+						printf("POUET %d\n", config_desc->bNumInterfaces);
+						if (config_desc->bNumInterfaces > 1)
+							HPAddHotPluggable(dev, desc, bus_device,
+								interface, &driverTracker[i]);
+							else
+							HPAddHotPluggable(dev, desc, bus_device,
+								-1, &driverTracker[i]);
 					}
 				}
-
-				/* New reader found */
-				if (newreader)
-					HPAddHotPluggable(dev, desc, bus_device, &driverTracker[i]);
 			}
 		}
 	}
@@ -470,15 +495,22 @@ LONG HPStopHotPluggables(void)
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct _driverTracker *driver)
+	const char bus_device[], int interface,
+	struct _driverTracker *driver)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
-	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
-		desc.idVendor, desc.idProduct, bus_device);
+	if (interface >= 0)
+		snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libhal:/org/freedesktop/Hal/devices/usb_device_%04x_%04x_serialnotneeded_if%d",
+			 desc.idVendor, desc.idProduct, desc.idVendor, desc.idProduct,
+			 interface);
+	else
+		snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
+			desc.idVendor, desc.idProduct, bus_device);
+
 	deviceName[sizeof(deviceName) -1] = '\0';
 
 	pthread_mutex_lock(&usbNotifierMutex);
