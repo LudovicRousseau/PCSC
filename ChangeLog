@@ -1,3 +1,16 @@
+pcsc-lite-1.6.7: Ludovic Rousseau
+22 February 2011
+- better Mac OS X support
+- Fix Alioth bug [#312960] SCardDisconnect when other context has transaction
+- add support of multi-interfaces readers with libusb and not just libhal
+- add a API tracing feature in the client side (#define DO_TRACE)
+- allow the use of tracing and profiling features from different
+  application threads
+- fix a problem with a multi-slots reader
+- fix minor problems detected by the clang tool
+- some other minor improvements and bug corrections
+
+
 pcsc-lite-1.6.6: Ludovic Rousseau
 12 December 2010
 - SCardGetStatusChange(): fix a bug on 64-bits systems
