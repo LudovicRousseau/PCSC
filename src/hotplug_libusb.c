@@ -342,7 +342,6 @@ static void HPRescanUsbBus(void)
 					/* New reader found */
 					if (newreader)
 					{
-						printf("POUET %d\n", config_desc->bNumInterfaces);
 						if (config_desc->bNumInterfaces > 1)
 							HPAddHotPluggable(dev, desc, bus_device,
 								interface, &driverTracker[i]);
