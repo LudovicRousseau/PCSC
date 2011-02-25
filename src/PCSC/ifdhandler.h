@@ -426,25 +426,29 @@ port used by each reader.
   So it is something like: <tt>usb:08e6/3437:libusb:001:042</tt> under
   GNU/Linux.
 
-- libhal
+- libudev
 
-  If pcscd is compiled with libhal support instead of libusb (default
-  since pcsc-lite 1.4.100) the string will look like:
+  If pcscd is compiled with libudev support instead of libusb (default
+  since pcsc-lite 1.6.8) the string will look like:
 
   @code
-  printf("usb:%04x/%04x:libhal:%s", idVendor, idProduct, udi)
+  printf("usb:%04x/%04x:libudev:%d:%s", idVendor, idProduct,
+		bInterfaceNumber, devpath);
   @endcode
 
-  udi is the Universal Device Id at the HAL level.
+  bInterfaceNumber is the number of the interface on the device. It is
+  only usefull for devices with more than one CCID interface.
+
+  devpath is the filename of the device on the file system.
 
   So it is something like:
-  <tt>usb:08e6/3437:libhal:/org/freedesktop/Hal/devices/usb_device_8e6_3437_noserial_if0</tt>
+  <tt>usb:08e6/3437:libudev:0:/dev/bus/usb/008/047</tt>
   under GNU/Linux.
 
 - other
 
   If the driver does not understand the <tt>:libusb:</tt> or
-  <tt>:libhal:</tt> scheme or if a new scheme is used, the driver should
+  <tt>:libudev:</tt> scheme or if a new scheme is used, the driver should
   ignore the part it does not understand instead of failing.
 
   The driver shall recognize the <tt>usb:VID/PID</tt> part and, only if

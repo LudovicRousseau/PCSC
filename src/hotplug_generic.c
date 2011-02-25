@@ -27,7 +27,7 @@
 #define FALSE 0
 #endif
 
-#if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__) && !defined(HAVE_LIBHAL)
+#if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(__linux__) && !defined(HAVE_LIBUDEV)
 
 LONG HPSearchHotPluggables(void)
 {

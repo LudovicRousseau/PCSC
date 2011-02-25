@@ -14,7 +14,7 @@ endif
 
 if ENABLE_USB
 USB_CONFIG = tokenparser.l \
-	hotplug_libhal.c \
+	hotplug_libudev.c \
 	hotplug_libusb.c \
 	hotplug_linux.c \
 	hotplug_macosx.c
@@ -83,12 +83,12 @@ pcscd_SOURCES = \
 	winscard_msg_srv.c \
 	winscard_svc.c \
 	winscard_svc.h
-pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBHAL_CFLAGS) \
+pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
 	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
-	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) $(LIBHAL_LIBS) \
+	$(LIBUSB_LIBS) $(LIBDL) $(IOKIT) $(LIBUDEV_LIBS) \
 	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS)
 
 fix-rights: install-sbinPROGRAMS

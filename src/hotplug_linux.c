@@ -20,7 +20,7 @@
 #include "config.h"
 #include <string.h>
 
-#if defined(__linux__) && !defined(HAVE_LIBUSB) && !defined(HAVE_LIBHAL)
+#if defined(__linux__) && !defined(HAVE_LIBUSB) && !defined(HAVE_LIBUDEV)
 #include <sys/types.h>
 #include <stdio.h>
 #include <dirent.h>
