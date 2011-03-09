@@ -1,4 +1,4 @@
-pcsc-look-1.7.0: Ludovic Rousseau
+pcsc-lite-1.7.0: Ludovic Rousseau
 9 March 2011
 - use libudev instead of (the deprecated) libhal
 
