@@ -1,3 +1,8 @@
+pcsc-look-1.7.0: Ludovic Rousseau
+9 March 2011
+- use libudev instead of (the deprecated) libhal
+
+
 pcsc-lite-1.6.7: Ludovic Rousseau
 22 February 2011
 - better Mac OS X support
