@@ -168,7 +168,12 @@ fi
 # --enable-libudev
 AC_ARG_ENABLE(libudev,
 	AC_HELP_STRING([--disable-libudev],[do not use libudev]),
-	[ use_libudev="${enableval}" ], [ use_libudev="${use_libudev-yes}" ] )
+	[ use_libudev="${enableval}" ],
+	[	if test "$PCSC_ARCH" != "Linux" ; then
+			use_libudev="no"
+		else
+			 use_libudev="${use_libudev-yes}"
+		fi ])
 
 # check if libudev is used
 if test "x$use_libudev" != xno ; then
