@@ -130,7 +130,7 @@ AC_SUBST(LIBDL)
 AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
 
 # Use 'uname' output as an architecture define
-PCSC_ARCH=`uname`
+PCSC_ARCH=`uname | sed -e s,/,_,`
 case "$PCSC_ARCH" in
 Darwin)
 	PCSC_ARCH=MacOS
