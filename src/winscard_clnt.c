@@ -2371,6 +2371,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	scControlStruct.dwControlCode = dwControlCode;
 	scControlStruct.cbSendLength = cbSendLength;
 	scControlStruct.cbRecvLength = cbRecvLength;
+	scControlStruct.dwBytesReturned = 0;
+	scControlStruct.rv = 0;
 
 	rv = MessageSendWithHeader(SCARD_CONTROL, currentContextMap->dwClientID,
 		sizeof(scControlStruct), &scControlStruct);
