@@ -230,11 +230,11 @@ static LONG HPReadBundleValues(void)
 
 
 /*@null@*/ static struct _driverTracker *get_driver(struct udev_device *dev,
-	const char *devpath)
+	const char *devpath, struct _driverTracker **classdriver)
 {
 	int i;
 	unsigned int idVendor, idProduct;
-	static struct _driverTracker *classdriver, *driver;
+	static struct _driverTracker *driver;
 	const char *str;
 
 	str = udev_device_get_sysattr_value(dev, "idVendor");
@@ -257,7 +257,7 @@ static LONG HPReadBundleValues(void)
 		"Looking for a driver for VID: 0x%04X, PID: 0x%04X, path: %s",
 		idVendor, idProduct, devpath);
 
-	classdriver = NULL;
+	*classdriver = NULL;
 	driver = NULL;
 	/* check if the device is supported by one driver */
 	for (i=0; i<driverSize; i++)
@@ -268,7 +268,7 @@ static LONG HPReadBundleValues(void)
 		{
 			if ((driverTracker[i].CFBundleName != NULL)
 				&& (0 == strcmp(driverTracker[i].CFBundleName, "CCIDCLASSDRIVER")))
-				classdriver = &driverTracker[i];
+				*classdriver = &driverTracker[i];
 			else
 				/* it is not a CCID Class driver */
 				driver = &driverTracker[i];
@@ -280,7 +280,7 @@ static LONG HPReadBundleValues(void)
 		return driver;
 
 	/* else return the Class driver (if any) */
-	return classdriver;
+	return *classdriver;
 }
 
 
@@ -290,12 +290,12 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 	int i;
 	char deviceName[MAX_DEVICENAME];
 	char fullname[MAX_READERNAME];
-	struct _driverTracker *driver;
+	struct _driverTracker *driver, *classdriver;
 	const char *sSerialNumber = NULL, *sInterfaceName = NULL;
 	LONG ret;
 	int bInterfaceNumber;
 
-	driver = get_driver(parent, devpath);
+	driver = get_driver(parent, devpath, &classdriver);
 	if (NULL == driver)
 	{
 		/* not a smart card reader */
@@ -375,9 +375,28 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 	{
 		Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s",
 			driver->readerName);
-		readerTracker[i].status = READER_FAILED;
 
-		(void)CheckForOpenCT();
+		if (driver != classdriver)
+		{
+			/* the reader can also be used by the a class driver */
+			ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + i,
+				classdriver->libraryPath, deviceName);
+			if ((SCARD_S_SUCCESS != ret) && (SCARD_E_UNKNOWN_READER != ret))
+			{
+				Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s",
+						driver->readerName);
+
+				readerTracker[i].status = READER_FAILED;
+
+				(void)CheckForOpenCT();
+			}
+		}
+		else
+		{
+			readerTracker[i].status = READER_FAILED;
+
+			(void)CheckForOpenCT();
+		}
 	}
 
 	(void)pthread_mutex_unlock(&usbNotifierMutex);
@@ -405,7 +424,7 @@ static void HPRescanUsbBus(struct udev *udev)
 	{
 		const char *devpath;
 		struct udev_device *dev, *parent;
-		struct _driverTracker *driver;
+		struct _driverTracker *driver, *classdriver;
 		int newreader;
 		int bInterfaceNumber;
 		const char *interface;
@@ -430,7 +449,7 @@ static void HPRescanUsbBus(struct udev *udev)
 			/* the device disapeared? */
 			continue;
 
-		driver = get_driver(parent, devpath);
+		driver = get_driver(parent, devpath, &classdriver);
 		if (NULL == driver)
 			/* no driver known for this device */
 			continue;
