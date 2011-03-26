@@ -92,7 +92,7 @@ int CheckForOpenCT(void)
 
 	if (0 == stat(OPENCT_FILE, &buf))
 	{
-		Log1(PCSC_LOG_CRITICAL, "Remove OpenCT and try again");
+		Log1(PCSC_LOG_CRITICAL, "File " OPENCT_FILE " found. Remove OpenCT and try again");
 		return 1;
 	}
 
