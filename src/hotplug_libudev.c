@@ -446,8 +446,11 @@ static void HPRescanUsbBus(struct udev *udev)
 
 		devpath = udev_device_get_devnode(parent);
 		if (!devpath)
+		{
 			/* the device disapeared? */
+			Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
 			continue;
+		}
 
 		driver = get_driver(parent, devpath, &classdriver);
 		if (NULL == driver)
@@ -571,8 +574,11 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 			"usb_device");
 		devpath = udev_device_get_devnode(parent);
 		if (!devpath)
+		{
 			/* the device disapeared? */
+			Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
 			continue;
+		}
 
 		HPAddDevice(dev, parent, devpath);
 
