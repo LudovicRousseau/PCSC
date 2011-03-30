@@ -1,3 +1,12 @@
+pcsc-lite-1.7.1: Ludovic Rousseau
+30 March 2011
+- use libudev only on Linux and libusb elsewhere. The configuration now
+  works by default on GNU/kFreeBSD systems
+- Try to use a (CCID) class driver if a specific driver fails to use the
+  reader.
+- fix a potential crash
+
+
 pcsc-lite-1.7.0: Ludovic Rousseau
 9 March 2011
 - use libudev instead of (the deprecated) libhal
