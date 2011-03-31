@@ -376,7 +376,7 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 		Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s",
 			driver->readerName);
 
-		if (driver != classdriver)
+		if (classdriver && driver != classdriver)
 		{
 			/* the reader can also be used by the a class driver */
 			ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + i,
