@@ -1,3 +1,8 @@
+pcsc-lite-1.7.2: Ludovic Rousseau
+31 March 2011
+- fix a crash if a specific driver fails to work and no class driver is
+  available
+
 pcsc-lite-1.7.1: Ludovic Rousseau
 30 March 2011
 - use libudev only on Linux and libusb elsewhere. The configuration now
