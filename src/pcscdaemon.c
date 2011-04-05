@@ -459,8 +459,8 @@ int main(int argc, char **argv)
 	 * signal_trap() does just set a global variable used by the main loop
 	 */
 	(void)signal(SIGQUIT, signal_trap);
-	(void)signal(SIGTERM, signal_trap);
-	(void)signal(SIGINT, signal_trap);
+	(void)signal(SIGTERM, signal_trap); /* default kill signal & init round 1 */
+	(void)signal(SIGINT, signal_trap);	/* sent by Ctrl-C */
 
 	/* exits on SIGALARM to allow pcscd to suicide if not used */
 	(void)signal(SIGALRM, signal_trap);
@@ -674,6 +674,14 @@ static void signal_reload(/*@unused@*/ int sig)
 static void signal_trap(int sig)
 {
 	Log2(PCSC_LOG_INFO, "Received signal: %d", sig);
+
+	/* do not wait if asked to terminate
+	 * avoids waiting after the reader(s) in shutdown for example */
+	if (SIGTERM == sig)
+	{
+		Log1(PCSC_LOG_INFO, "Direct suicide");
+		at_exit();
+	}
 
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
