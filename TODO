@@ -21,8 +21,4 @@
   http://www.opensc-project.org/pipermail/opensc-devel/2009-February/011801.html
 
 
-For embedded/constrained systems
-
-- use static driver instead of reader polling and dynamic driver loading
-
 October 2010
