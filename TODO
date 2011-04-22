@@ -11,14 +11,10 @@
   reader insertion? use an external launcher like launch on Mac OS X?
   See https://bugzilla.redhat.com/show_bug.cgi?id=233762
 
-- start pcscd as an normal user daemon (as id smartcard?) instead as
-  root.  Of course the smart card readers should be accessible by this
-  user (use UDEV rule files to set the correct access rights).
-
 - do not open the reader USB device if no client is using the reader.
   This will allow the Linux kernel to put the USB device in suspend
   mode.
   http://www.opensc-project.org/pipermail/opensc-devel/2009-February/011801.html
 
 
-October 2010
+April 2011
