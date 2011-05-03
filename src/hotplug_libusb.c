@@ -352,6 +352,7 @@ static void HPRescanUsbBus(void)
 				}
 			}
 		}
+		libusb_free_config_descriptor(config_desc);
 	}
 
 	/*
