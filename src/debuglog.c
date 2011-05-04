@@ -51,11 +51,6 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	(void)len;
 }
 
-void DebugLogSuppress(const int lSType)
-{
-	(void)lSType;
-}
-
 void DebugLogSetLogType(const int dbgtype)
 {
 	(void)dbgtype;
@@ -89,7 +84,6 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
  */
 #define DEBUG_BUF_SIZE 2048
 
-static char LogSuppress = DEBUGLOG_LOG_ENTRIES;
 static char LogMsgType = DEBUGLOG_NO_DEBUG;
 static char LogCategory = DEBUG_CATEGORY_NOTHING;
 
@@ -105,8 +99,7 @@ void log_msg(const int priority, const char *fmt, ...)
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (priority < LogLevel) /* log priority lower than threshold? */
+	if ((priority < LogLevel) /* log priority lower than threshold? */
 		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
@@ -206,18 +199,12 @@ static void log_xxd_always(const int priority, const char *msg,
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 	const int len)
 {
-	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (priority < LogLevel) /* log priority lower than threshold? */
+	if ((priority < LogLevel) /* log priority lower than threshold? */
 		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
 	log_xxd_always(priority, msg, buffer, len);
 } /* log_xxd */
-
-void DebugLogSuppress(const int lSType)
-{
-	LogSuppress = lSType;
-}
 
 void DebugLogSetLogType(const int dbgtype)
 {
@@ -331,8 +318,7 @@ void debug_msg(const char *fmt, ...)
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
 
-	if ((LogSuppress != DEBUGLOG_LOG_ENTRIES)
-		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
+	if (DEBUGLOG_NO_DEBUG == LogMsgType)
 		return;
 
 	va_start(argptr, fmt);
