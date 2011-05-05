@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 1999-2005
+ * Copyright (C) 1999-2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
