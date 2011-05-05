@@ -116,14 +116,31 @@ static void log_line(const int priority, const char *DebugBuffer)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
 	{
+		static struct timeval last_time = { 0, 0 };
+		struct timeval new_time = { 0, 0 };
+		struct timeval tmp;
+		int delta;
+
+		gettimeofday(&new_time, NULL);
+		if (0 == last_time.tv_sec)
+			last_time = new_time;
+
+		tmp.tv_sec = new_time.tv_sec - last_time.tv_sec;
+		tmp.tv_usec = new_time.tv_usec - last_time.tv_usec;
+		if (tmp.tv_usec < 0)
+		{
+			tmp.tv_sec--;
+			tmp.tv_usec += 1000000;
+		}
+		if (tmp.tv_sec < 100)
+			delta = tmp.tv_sec * 1000000 + tmp.tv_usec;
+		else
+			delta = 99999999;
+
 		if (LogDoColor)
 		{
 			const char *color_pfx = "", *color_sfx = "\33[0m";
 			const char *time_pfx = "\33[36m", *time_sfx = color_sfx;
-			static struct timeval last_time = { 0, 0 };
-			struct timeval new_time = { 0, 0 };
-			struct timeval tmp;
-			int delta;
 
 			switch (priority)
 			{
@@ -145,28 +162,14 @@ static void log_line(const int priority, const char *DebugBuffer)
 					break;
 			}
 
-			gettimeofday(&new_time, NULL);
-			if (0 == last_time.tv_sec)
-				last_time = new_time;
-
-			tmp.tv_sec = new_time.tv_sec - last_time.tv_sec;
-			tmp.tv_usec = new_time.tv_usec - last_time.tv_usec;
-			if (tmp.tv_usec < 0)
-			{
-				tmp.tv_sec--;
-				tmp.tv_usec += 1000000;
-			}
-			if (tmp.tv_sec < 100)
-				delta = tmp.tv_sec * 1000000 + tmp.tv_usec;
-			else
-				delta = 99999999;
-
 			printf("%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
 				color_pfx, DebugBuffer, color_sfx);
 			last_time = new_time;
 		}
 		else
-			puts(DebugBuffer);
+		{
+			printf("%.8d %s\n", delta, DebugBuffer);
+		}
 	}
 } /* log_msg */
 
