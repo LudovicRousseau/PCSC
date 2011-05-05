@@ -639,7 +639,7 @@ static void at_exit(void)
 		close(pipefd[1]);
 	}
 
-	_exit(ExitValue);
+	exit(ExitValue);
 }
 
 static void clean_temp_files(void)
