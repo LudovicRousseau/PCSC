@@ -161,12 +161,12 @@ static void log_line(const int priority, const char *DebugBuffer)
 			else
 				delta = 99999999;
 
-			fprintf(stderr, "%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
+			printf("%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
 				color_pfx, DebugBuffer, color_sfx);
 			last_time = new_time;
 		}
 		else
-			fprintf(stderr, "%s\n", DebugBuffer);
+			puts(DebugBuffer);
 	}
 } /* log_msg */
 
@@ -212,17 +212,17 @@ void DebugLogSetLogType(const int dbgtype)
 	{
 		case DEBUGLOG_NO_DEBUG:
 		case DEBUGLOG_SYSLOG_DEBUG:
-		case DEBUGLOG_STDERR_DEBUG:
+		case DEBUGLOG_STDOUT_DEBUG:
 			LogMsgType = dbgtype;
 			break;
 		default:
-			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stderr",
+			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stdout",
 				dbgtype);
-			LogMsgType = DEBUGLOG_STDERR_DEBUG;
+			LogMsgType = DEBUGLOG_STDOUT_DEBUG;
 	}
 
-	/* log to stderr and stderr is a tty? */
-	if (DEBUGLOG_STDERR_DEBUG == LogMsgType && isatty(fileno(stderr)))
+	/* log to stdout and stdout is a tty? */
+	if (DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
 	{
 		const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };
 		char *term;
@@ -328,7 +328,7 @@ void debug_msg(const char *fmt, ...)
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
 	else
-		fprintf(stderr, "%s\n", DebugBuffer);
+		puts(DebugBuffer);
 } /* debug_msg */
 
 void debug_xxd(const char *msg, const unsigned char *buffer, const int len);

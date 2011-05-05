@@ -224,10 +224,10 @@ int main(int argc, char **argv)
 
 			case 'f':
 				setToForeground = TRUE;
-				/* debug to stderr instead of default syslog */
-				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+				/* debug to stdout instead of default syslog */
+				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
 				Log1(PCSC_LOG_INFO,
-					"pcscd set to foreground with debug send to stderr");
+					"pcscd set to foreground with debug send to stdout");
 				break;
 
 			case 'd':
@@ -260,8 +260,8 @@ int main(int argc, char **argv)
 				break;
 
 			case 'H':
-				/* debug to stderr instead of default syslog */
-				DebugLogSetLogType(DEBUGLOG_STDERR_DEBUG);
+				/* debug to stdout instead of default syslog */
+				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
 				HotPlug = TRUE;
 				break;
 
@@ -732,7 +732,7 @@ static void print_usage (char const * const progname)
 	printf("  -a, --apdu		log APDU commands and results\n");
 	printf("  -c, --config		path to reader.conf\n");
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
-	printf("			send logs to stderr instead of syslog\n");
+	printf("			send logs to stdout instead of syslog\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
@@ -747,7 +747,7 @@ static void print_usage (char const * const progname)
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
-	printf("  -f	run in foreground (no daemon), send logs to stderr instead of syslog\n");
+	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -d 	display debug messages. Output may be:\n");
 	printf("  -h 	display usage information\n");
 	printf("  -H	ask the daemon to rescan the available readers\n");
