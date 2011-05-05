@@ -1,7 +1,7 @@
 /*
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2006-2009
+ * Copyright (C) 2006-2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
