@@ -216,6 +216,7 @@ void DebugLogSetLogType(const int dbgtype)
 		case DEBUGLOG_NO_DEBUG:
 		case DEBUGLOG_SYSLOG_DEBUG:
 		case DEBUGLOG_STDOUT_DEBUG:
+		case DEBUGLOG_STDOUT_COLOR_DEBUG:
 			LogMsgType = dbgtype;
 			break;
 		default:
@@ -225,7 +226,8 @@ void DebugLogSetLogType(const int dbgtype)
 	}
 
 	/* log to stdout and stdout is a tty? */
-	if (DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
+	if ((DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
+		|| (DEBUGLOG_STDOUT_COLOR_DEBUG == LogMsgType))
 	{
 		const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };
 		char *term;

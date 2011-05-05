@@ -152,6 +152,7 @@ int main(int argc, char **argv)
 	static struct option long_options[] = {
 		{"config", 1, NULL, 'c'},
 		{"foreground", 0, NULL, 'f'},
+		{"color", 0, NULL, 'T'},
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
 		{"apdu", 0, NULL, 'a'},
@@ -168,7 +169,7 @@ int main(int argc, char **argv)
 		{NULL, 0, NULL, 0}
 	};
 #endif
-#define OPT_STRING "c:fdhvaeCHt:r:s:x"
+#define OPT_STRING "c:fTdhvaeCHt:r:s:x"
 
 	newReaderConfig = NULL;
 	setToForeground = FALSE;
@@ -228,6 +229,11 @@ int main(int argc, char **argv)
 				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
 				Log1(PCSC_LOG_INFO,
 					"pcscd set to foreground with debug send to stdout");
+				break;
+
+			case 'T':
+				DebugLogSetLogType(DEBUGLOG_STDOUT_COLOR_DEBUG);
+				Log1(PCSC_LOG_INFO, "Force colored logs");
 				break;
 
 			case 'd':
@@ -733,6 +739,7 @@ static void print_usage (char const * const progname)
 	printf("  -c, --config		path to reader.conf\n");
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stdout instead of syslog\n");
+	printf("  -T, --color       force use of colored logs\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
@@ -748,6 +755,7 @@ static void print_usage (char const * const progname)
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c 	path to reader.conf\n");
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
+	printf("  -T    force use of colored logs\n");
 	printf("  -d 	display debug messages. Output may be:\n");
 	printf("  -h 	display usage information\n");
 	printf("  -H	ask the daemon to rescan the available readers\n");
