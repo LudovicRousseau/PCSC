@@ -352,8 +352,10 @@ static void ContextThread(LPVOID newContext)
 			{
 				/* nothing to read */
 
+#ifdef USE_USB
 				/* wait until all readers are ready */
 				RFWaitForReaderInit();
+#endif
 
 				/* dump the readers state */
 				ret = MessageSend(readerStates, sizeof(readerStates), filedes);
