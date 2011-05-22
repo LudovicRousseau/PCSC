@@ -285,7 +285,7 @@ static const char *CommandsText[] = {
 #define WRITE_BODY(v) \
 	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
 #define WRITE_BODY_WITH_COMMAND(command, v) \
-	Log4(SCARD_S_SUCCESS == v.rv ? PCSC_LOG_DEBUG : PCSC_LOG_ERROR, "%s rv=0x%X for client %d", command, v.rv, filedes); \
+	Log4(PCSC_LOG_DEBUG, "%s rv=0x%X for client %d", command, v.rv, filedes); \
 	ret = MessageSend(&v, sizeof(v), filedes);
 
 static void ContextThread(LPVOID newContext)
