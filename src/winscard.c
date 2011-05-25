@@ -287,7 +287,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	{
 		if (!(readerState & SCARD_PRESENT))
 		{
-			Log1(PCSC_LOG_ERROR, "Card Not Inserted");
+			Log1(PCSC_LOG_DEBUG, "Card Not Inserted");
 			return SCARD_E_NO_SMARTCARD;
 		}
 
