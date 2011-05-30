@@ -429,7 +429,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				timeout = PCSCLITE_STATUS_EVENT_TIMEOUT;
 
 			ret = rContext->pthCardEvent(rContext->slot, timeout);
-			if (IFD_NO_SUCH_DEVICE == ret)
+			if (IFD_SUCCESS != ret)
 				(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE);
 		}
 		else
