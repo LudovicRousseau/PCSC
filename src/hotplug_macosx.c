@@ -181,7 +181,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	 *  and HPDriverVectorRelease:376 */
 	readersNumber++;
 
-	bundleVector = (HPDriver *) calloc(readersNumber, sizeof(HPDriver));
+	bundleVector = calloc(readersNumber, sizeof(HPDriver));
 	if (!bundleVector)
 	{
 		Log1(PCSC_LOG_ERROR, "memory allocation failure");
@@ -349,7 +349,7 @@ static HPDriver *HPDriverCopy(HPDriver * rhs)
 	if (!rhs)
 		return NULL;
 
-	HPDriver *newDriverBundle = (HPDriver *) calloc(1, sizeof(HPDriver));
+	HPDriver *newDriverBundle = calloc(1, sizeof(HPDriver));
 
 	if (!newDriverBundle)
 		return NULL;
@@ -396,7 +396,7 @@ static void HPDriverVectorRelease(HPDriverVector driverBundleVector)
 static HPDeviceList
 HPDeviceListInsert(HPDeviceList list, HPDriver * bundle, UInt32 address)
 {
-	HPDevice *newReader = (HPDevice *) calloc(1, sizeof(HPDevice));
+	HPDevice *newReader = calloc(1, sizeof(HPDevice));
 
 	if (!newReader)
 	{
