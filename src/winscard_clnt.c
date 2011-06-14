@@ -857,7 +857,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
-	API_TRACE_IN("%d %s %d %d", hContext, szReader, dwShareMode, dwPreferredProtocols)
+	API_TRACE_IN("%ld %s %ld %ld", hContext, szReader, dwShareMode, dwPreferredProtocols)
 
 	/*
 	 * Check for NULL parameters
@@ -1131,7 +1131,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
-	API_TRACE_IN("%d %d", hCard, dwDisposition)
+	API_TRACE_IN("%ld %ld", hCard, dwDisposition)
 
 	CHECK_SAME_PROCESS
 
@@ -1799,11 +1799,11 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	LONG rv = SCARD_S_SUCCESS;
 
 	PROFILE_START
-	API_TRACE_IN("%d %d %d", hContext, dwTimeout, cReaders)
+	API_TRACE_IN("%ld %ld %d", hContext, dwTimeout, cReaders)
 #ifdef DO_TRACE
 	for (j=0; j<cReaders; j++)
 	{
-		API_TRACE_IN("[%d] %s %X %X", j, rgReaderStates[j].szReader,
+		API_TRACE_IN("[%d] %s %lX %lX", j, rgReaderStates[j].szReader,
 			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState)
 	}
 #endif
@@ -3252,7 +3252,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	struct cancel_struct scCancelStruct;
 
 	PROFILE_START
-	API_TRACE_IN("%d", hContext)
+	API_TRACE_IN("%ld", hContext)
 
 	/*
 	 * Make sure this context has been opened
