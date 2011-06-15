@@ -524,6 +524,8 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 {
 	struct udev_monitor *udev_monitor;
 	int r, i;
+	int fd;
+	fd_set fds;
 
 	udev_monitor = udev_monitor_new_from_netlink(udev, "udev");
 
@@ -543,6 +545,9 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 		return;
 	}
 
+	/* udev monitor file descriptor */
+	fd = udev_monitor_get_fd(udev_monitor);
+
 	while (!AraKiriHotPlug)
 	{
 		struct udev_device *dev, *parent;
@@ -551,6 +556,17 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 #ifdef DEBUG_HOTPLUG
 		Log0(PCSC_LOG_INFO);
 #endif
+
+		FD_ZERO(&fds);
+		FD_SET(fd, &fds);
+
+		/* wait for a udev event */
+		r = select(fd+1, &fds, NULL, NULL, NULL);
+		if (r < 0)
+		{
+			Log2(PCSC_LOG_ERROR, "select(): %s", strerror(errno));
+			return;
+		}
 
 		dev = udev_monitor_receive_device(udev_monitor);
 		if (!dev)
