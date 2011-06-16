@@ -1887,7 +1887,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			currentReaderCount++;
 
 	/* catch possible sign extension problems from 32 to 64-bits integers */
-	if (-1 == dwTimeout)
+	if ((DWORD)-1 == dwTimeout)
 		dwTimeout = INFINITE;
 	if (INFINITE == dwTimeout)
 		dwTime = 60*1000;	/* "infinite" timeout */
