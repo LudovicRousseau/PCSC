@@ -45,7 +45,7 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	PUCHAR pucAtr, DWORD dwLength)
 {
 	USHORT p;
-	UCHAR K, TCK;				/* MSN of T0/Check Sum */
+	UCHAR K;					/* MSN of T0/Check Sum */
 	UCHAR Y1i, T;				/* MSN/LSN of TDi */
 	int i = 1;					/* value of the index in TAi, TBi, etc. */
 
@@ -234,7 +234,8 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	 * more than T=0 is supported
 	 */
 	if (psExtension->CardCapabilities.AvailableProtocols & SCARD_PROTOCOL_T1)
-		TCK = pucAtr[p++];
+		/* TCK = pucAtr[p++]; */
+		p++;
 
 	if (p > MAX_ATR_SIZE)
 		return 0;	/** @retval 0 Maximum attribute size */
