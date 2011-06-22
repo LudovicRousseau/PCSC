@@ -47,7 +47,6 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
 	RESPONSECODE rv = IFD_SUCCESS;
-	UCHAR ucValue[1];
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFDH_set_protocol_parameters) (DWORD, DWORD, UCHAR,
@@ -67,8 +66,6 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 	 * This avoids to renegotiate the protocol and confuse the card
 	 * Error returned by CCID driver is: CCID_Receive Procedure byte conflict
 	 */
-
-	ucValue[0] = rContext->slot;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	rv = (*IFDH_set_protocol_parameters) (rContext->slot,
@@ -249,7 +246,6 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 {
 	RESPONSECODE rv;
 	DWORD dwStatus;
-	UCHAR ucValue[1];
 	UCHAR dummyAtr[MAX_ATR_SIZE];
 	DWORD dummyAtrLen = sizeof(dummyAtr);
 
@@ -261,7 +257,6 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	 * Zero out everything
 	 */
 	dwStatus = 0;
-	ucValue[0] = 0;
 
 	if (NULL == pucAtr)
 		pucAtr = dummyAtr;
