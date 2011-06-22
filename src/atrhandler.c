@@ -103,11 +103,19 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	 */
 	do
 	{
-		short TAi, TBi, TCi, TDi;	/* Interface characters */
+		short TAi, TDi;	/* Interface characters */
+#ifdef ATR_DEBUG
+		short TBi, TCi;	/* Interface characters */
+#endif
 
 		TAi = (Y1i & 0x01) ? pucAtr[p++] : -1;
+#ifdef ATR_DEBUG
 		TBi = (Y1i & 0x02) ? pucAtr[p++] : -1;
 		TCi = (Y1i & 0x04) ? pucAtr[p++] : -1;
+#else
+		p++;	/* TBi */
+		p++;	/* TCi */
+#endif
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
 #ifdef ATR_DEBUG
