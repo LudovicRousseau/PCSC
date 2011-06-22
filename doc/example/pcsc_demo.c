@@ -3,7 +3,7 @@
  *
  * MUSCLE SmartCard Development ( http://www.linuxnet.com )
  *
- * Copyright (C) 2003-2009
+ * Copyright (C) 2003-2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	char pbReader[MAX_READERNAME] = "";
 	int reader_nb;
 	unsigned int i;
-    SCARD_IO_REQUEST *pioSendPci;
+	const SCARD_IO_REQUEST *pioSendPci;
 	SCARD_IO_REQUEST pioRecvPci;
 	BYTE pbRecvBuffer[10];
 	BYTE pbSendBuffer[] = { 0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
