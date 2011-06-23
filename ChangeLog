@@ -1,3 +1,9 @@
+pcsc-lite-1.7.4: Ludovic Rousseau
+23 June 2011
+- Fix a stupid bug from the previous version. T=1 cards were not
+  working.
+
+
 pcsc-lite-1.7.3: Ludovic Rousseau
 22 June 2011
 - COPYING: Add my name as copyright holder
