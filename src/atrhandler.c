@@ -27,7 +27,7 @@
 #include "debuglog.h"
 #include "atrhandler.h"
 
-/**
+/*
  * Uncomment the following for ATR debugging
  * or use ./configure --enable-debugatr
  */
@@ -36,16 +36,16 @@
 /**
  * @brief parse an ATR
  *
- * @param[out] psExtension
+ * @param[out] availableProtocols available protocols
+ * @param[out] currentProtocol current protocol
  * @param[in] pucAtr ATR
  * @param[in] dwLength ATR length
  * @return
  */
-short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
+short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 	PUCHAR pucAtr, DWORD dwLength)
 {
 	USHORT p;
-	UCHAR K;					/* MSN of T0/Check Sum */
 	UCHAR Y1i, T;				/* MSN/LSN of TDi */
 	int i = 1;					/* value of the index in TAi, TBi, etc. */
 
@@ -60,26 +60,14 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	/*
 	 * Zero out the bitmasks
 	 */
-	psExtension->CardCapabilities.AvailableProtocols = SCARD_PROTOCOL_UNDEFINED;
-	psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_UNDEFINED;
+	*availableProtocols = SCARD_PROTOCOL_UNDEFINED;
+	*currentProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	/*
 	 * Decode the TS byte
 	 */
-	if (pucAtr[0] == 0x3F)
-	{	/* Inverse convention used */
-		psExtension->CardCapabilities.Convention = SCARD_CONVENTION_INVERSE;
-	}
-	else
-		if (pucAtr[0] == 0x3B)
-		{	/* Direct convention used */
-			psExtension->CardCapabilities.Convention = SCARD_CONVENTION_DIRECT;
-		}
-		else
-		{
-			memset(psExtension, 0x00, sizeof(SMARTCARD_EXTENSION));
-			return 0;	/** @retval 0 Unable to decode TS byte */
-		}
+	if ((pucAtr[0] != 0x3F) && (pucAtr[0] != 0x3B))
+		return 0;	/** @retval 0 Unable to decode TS byte */
 
 	/*
 	 * Here comes the platform dependant stuff
@@ -89,14 +77,8 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	 * Decode the T0 byte
 	 */
 	Y1i = pucAtr[1] >> 4;	/* Get the MSN in Y1 */
-	K = pucAtr[1] & 0x0F;	/* Get the LSN in K */
 
 	p = 2;
-
-#ifdef ATR_DEBUG
-	Log4(PCSC_LOG_DEBUG, "Conv: %02X, Y1: %02X, K: %02X",
-		psExtension->CardCapabilities.Convention, Y1i, K);
-#endif
 
 	/*
 	 * Examine Y1
@@ -127,17 +109,15 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 			/*
 			 * Set the current protocol TD1 (first TD only)
 			 */
-			if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNDEFINED)
+			if (*currentProtocol == SCARD_PROTOCOL_UNDEFINED)
 			{
 				switch (T)
 				{
 					case 0:
-						psExtension->CardCapabilities.CurrentProtocol =
-							SCARD_PROTOCOL_T0;
+						*currentProtocol = SCARD_PROTOCOL_T0;
 						break;
 					case 1:
-						psExtension->CardCapabilities.CurrentProtocol =
-							SCARD_PROTOCOL_T1;
+						*currentProtocol = SCARD_PROTOCOL_T1;
 						break;
 					default:
 						return 0; /** @retval 0 Unable to decode LNS */
@@ -149,20 +129,17 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 #endif
 			if (0 == T)
 			{
-				psExtension->CardCapabilities.AvailableProtocols |=
-					SCARD_PROTOCOL_T0;
+				*availableProtocols |= SCARD_PROTOCOL_T0;
 			}
 			else
 				if (1 == T)
 				{
-					psExtension->CardCapabilities.AvailableProtocols |=
-						SCARD_PROTOCOL_T1;
+					*availableProtocols |= SCARD_PROTOCOL_T1;
 				}
 				else
 					if (15 == T)
 					{
-						psExtension->CardCapabilities.AvailableProtocols |=
-							SCARD_PROTOCOL_T15;
+						*availableProtocols |= SCARD_PROTOCOL_T15;
 					}
 					else
 					{
@@ -185,15 +162,11 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 			switch (T)
 			{
 				case 0:
-					psExtension->CardCapabilities.CurrentProtocol =
-						psExtension->CardCapabilities.AvailableProtocols =
-						SCARD_PROTOCOL_T0;
+					*currentProtocol = *availableProtocols = SCARD_PROTOCOL_T0;
 					break;
 
 				case 1:
-					psExtension->CardCapabilities.CurrentProtocol =
-						psExtension->CardCapabilities.AvailableProtocols =
-						SCARD_PROTOCOL_T1;
+					*currentProtocol = *availableProtocols = SCARD_PROTOCOL_T1;
 					break;
 
 				default:
@@ -202,10 +175,7 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 		}
 
 		if (p > MAX_ATR_SIZE)
-		{
-			memset(psExtension, 0x00, sizeof(SMARTCARD_EXTENSION));
 			return 0;	/** @retval 0 Maximum attribute size */
-		}
 
 		/* next interface characters index */
 		i++;
@@ -215,38 +185,15 @@ short ATRDecodeAtr(SMARTCARD_EXTENSION *psExtension,
 	/*
 	 * If TDx is not set then the current must be T0
 	 */
-	if (psExtension->CardCapabilities.CurrentProtocol == SCARD_PROTOCOL_UNDEFINED)
+	if (*currentProtocol == SCARD_PROTOCOL_UNDEFINED)
 	{
-		psExtension->CardCapabilities.CurrentProtocol = SCARD_PROTOCOL_T0;
-		psExtension->CardCapabilities.AvailableProtocols |= SCARD_PROTOCOL_T0;
+		*currentProtocol = SCARD_PROTOCOL_T0;
+		*availableProtocols |= SCARD_PROTOCOL_T0;
 	}
-
-	/*
-	 * Take care of the historical characters
-	 */
-	psExtension->ATR.HistoryLength = K;
-	memcpy(psExtension->ATR.HistoryValue, &pucAtr[p], K);
-
-	p += K;
-
-	/*
-	 * Check to see if TCK character is included It will be included if
-	 * more than T=0 is supported
-	 */
-	if (psExtension->CardCapabilities.AvailableProtocols & SCARD_PROTOCOL_T1)
-		/* TCK = pucAtr[p++]; */
-		p++;
-
-	if (p > MAX_ATR_SIZE)
-		return 0;	/** @retval 0 Maximum attribute size */
-
-	memcpy(psExtension->ATR.Value, pucAtr, p);
-	psExtension->ATR.Length = p;	/* modified from p-1 */
 
 #ifdef ATR_DEBUG
 	Log3(PCSC_LOG_DEBUG, "CurrentProtocol: %d, AvailableProtocols: %d",
-		psExtension->CardCapabilities.CurrentProtocol,
-		psExtension->CardCapabilities.AvailableProtocols);
+		*currentProtocol, *availableProtocols);
 #endif
 
 	return 1; /** @retval 1 Success */

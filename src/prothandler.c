@@ -33,15 +33,10 @@
  */
 UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
 {
-	SMARTCARD_EXTENSION sSmartCard;
+	int availableProtocols, currentProtocol;
 
-	/*
-	 * Zero out everything
-	 */
-	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
-
-	if (ATRDecodeAtr(&sSmartCard, pucAtr, dwLength))
-		return sSmartCard.CardCapabilities.CurrentProtocol;
+	if (ATRDecodeAtr(&availableProtocols, &currentProtocol, pucAtr, dwLength))
+		return currentProtocol;
 	else
 		return 0x00;
 }
@@ -53,15 +48,10 @@ UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
  */
 UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
 {
-	SMARTCARD_EXTENSION sSmartCard;
+	int availableProtocols, currentProtocol;
 
-	/*
-	 * Zero out everything
-	 */
-	memset(&sSmartCard, 0x00, sizeof(SMARTCARD_EXTENSION));
-
-	if (ATRDecodeAtr(&sSmartCard, pucAtr, dwLength))
-		return sSmartCard.CardCapabilities.AvailableProtocols;
+	if (ATRDecodeAtr(&availableProtocols, &currentProtocol, pucAtr, dwLength))
+		return availableProtocols;
 	else
 		return 0x00;
 }

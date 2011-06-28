@@ -18,36 +18,10 @@
 #ifndef __atrhandler_h__
 #define __atrhandler_h__
 
-#define SCARD_CONVENTION_DIRECT  0x0001
-#define SCARD_CONVENTION_INVERSE 0x0002
-
-	typedef struct
-	{
-
-		struct
-		{
-			int Length;
-			int HistoryLength;
-			UCHAR Value[MAX_ATR_SIZE];
-			UCHAR HistoryValue[MAX_ATR_SIZE];
-		}
-		ATR;
-
-		struct
-		{
-			UCHAR AvailableProtocols;
-			UCHAR CurrentProtocol;
-			UCHAR Convention;
-		}
-		CardCapabilities;
-	}
-	SMARTCARD_EXTENSION;
-
 	/*
-	 * Decodes the ATR and fills the structure
+	 * Decodes the ATR
 	 */
-
-	short ATRDecodeAtr(/*@out@*/ SMARTCARD_EXTENSION *psExtension,
+	short ATRDecodeAtr(/*@out@*/ int *availableProtocols, int *currentProtocol,
 		PUCHAR pucAtr, DWORD dwLength);
 
 #endif							/* __atrhandler_h__ */
