@@ -27,36 +27,6 @@
 #include "eventhandler.h"
 
 /**
- * Get the default protocol used immediately after reset.
- *
- * This protocol is returned from the function.
- */
-UCHAR PHGetDefaultProtocol(PUCHAR pucAtr, DWORD dwLength)
-{
-	int availableProtocols, currentProtocol;
-
-	if (ATRDecodeAtr(&availableProtocols, &currentProtocol, pucAtr, dwLength))
-		return currentProtocol;
-	else
-		return 0x00;
-}
-
-/**
- * Get the protocols supported by the card.
- *
- * These protocols are returned from the function as bit masks.
- */
-UCHAR PHGetAvailableProtocols(PUCHAR pucAtr, DWORD dwLength)
-{
-	int availableProtocols, currentProtocol;
-
-	if (ATRDecodeAtr(&availableProtocols, &currentProtocol, pucAtr, dwLength))
-		return availableProtocols;
-	else
-		return 0x00;
-}
-
-/**
  * Determine which protocol to use.
  *
  * SCardConnect has a DWORD dwPreferredProtocols that is a bitmask of what

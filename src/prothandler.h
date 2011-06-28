@@ -17,8 +17,6 @@
 #ifndef __prothandler_h__
 #define __prothandler_h__
 
-	UCHAR PHGetDefaultProtocol(PUCHAR, DWORD);
-	UCHAR PHGetAvailableProtocols(PUCHAR, DWORD);
 	DWORD PHSetProtocol(struct ReaderContext *, DWORD, UCHAR, UCHAR);
 
 #define SET_PROTOCOL_WRONG_ARGUMENT -1
