@@ -348,23 +348,19 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
-				UCHAR ucAvailable, ucDefault;
+				int availableProtocols, defaultProtocol;
 				int ret;
 
-				ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
+				ATRDecodeAtr(&availableProtocols, &defaultProtocol,
+					rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
-				ucAvailable =
-					PHGetAvailableProtocols(rContext->readerState->cardAtr,
-							rContext->readerState->cardAtrLength);
 
-				/*
-				 * If it is set to ANY let it do any of the protocols
-				 */
+				/* If it is set to ANY let it do any of the protocols */
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
-					ucAvailable, ucDefault);
+					availableProtocols, defaultProtocol);
 
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
@@ -635,21 +631,19 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/* the protocol is not yet set (no PPS yet) */
 			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
 			{
-				UCHAR ucAvailable, ucDefault;
+				int availableProtocols, defaultProtocol;
 				int ret;
 
-				ucDefault = PHGetDefaultProtocol(rContext->readerState->cardAtr,
+				ATRDecodeAtr(&availableProtocols, &defaultProtocol,
+					rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
-				ucAvailable =
-					PHGetAvailableProtocols(rContext->readerState->cardAtr,
-							rContext->readerState->cardAtrLength);
 
 				/* If it is set to ANY let it do any of the protocols */
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
-					ucAvailable, ucDefault);
+					availableProtocols, defaultProtocol);
 
 				/* keep cardProtocol = SCARD_PROTOCOL_UNDEFINED in case of error  */
 				if (SET_PROTOCOL_PPS_FAILED == ret)
