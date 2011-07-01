@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 #   SCardReconnect.py : Unitary test for SCardReconnect
-#   Copyright (C) 2009  Ludovic Rousseau
+#   Copyright (C) 2009-2011  Ludovic Rousseau
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # SCardReconnect() should block instead of returning SCARD_E_SHARING_VIOLATION
+# when the reconnection requets exclusive access and the reader is
+# already shared.
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
@@ -41,10 +43,13 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
+# start here another application using the reader in SCARD_SHARE_SHARED
+# mode
+
 print "Press enter"
 sys.stdin.read(1)
 
-# Reconnect in SCARD_SHARE_DIRECT mode
+# Reconnect in SCARD_SHARE_EXCLUSIVE mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
     SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
