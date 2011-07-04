@@ -740,8 +740,8 @@ static void print_usage (char const * const progname)
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
 	printf("  -d, --debug	 	display lower level debug messages\n");
-	printf("      --info	 	display info level debug messages (default level)\n");
-	printf("  -e  --error	 	display error level debug messages\n");
+	printf("      --info	 	display info level debug messages\n");
+	printf("  -e  --error	 	display error level debug messages (default level)\n");
 	printf("  -C  --critical 	display critical only level debug messages\n");
 	printf("  --force-reader-polling ignore the IFD_GENERATE_HOTPLUG reader capability\n");
 	printf("  -t, --max-thread	maximum number of threads (default %d)\n", PCSC_MAX_CONTEXT_THREADS);
@@ -753,7 +753,9 @@ static void print_usage (char const * const progname)
 	printf("  -c 	path to reader.conf\n");
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -T    force use of colored logs\n");
-	printf("  -d 	display debug messages. Output may be:\n");
+	printf("  -d 	display debug messages.\n");
+	printf("  -e 	display error messages (default level).\n");
+	printf("  -C 	display critical messages.\n");
 	printf("  -h 	display usage information\n");
 	printf("  -H	ask the daemon to rescan the available readers\n");
 	printf("  -v 	display the program version number\n");
