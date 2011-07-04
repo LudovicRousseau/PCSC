@@ -520,10 +520,6 @@ int main(int argc, char **argv)
 				strerror(errno));
 	}
 
-	/* cleanly remove /var/run/pcscd/pcsc.* files when exiting */
-	if (atexit(at_exit))
-		Log2(PCSC_LOG_CRITICAL, "atexit() failed: %s", strerror(errno));
-
 	/*
 	 * Allocate memory for reader structures
 	 */
