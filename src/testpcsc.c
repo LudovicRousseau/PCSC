@@ -79,7 +79,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	DWORD i;
 	int p, iReader;
 	int iList[16];
-	SCARD_IO_REQUEST *pioRecvPci;
+	SCARD_IO_REQUEST ioRecvPci = *SCARD_PCI_T0;	/* use a default value */
 	SCARD_IO_REQUEST *pioSendPci;
 	unsigned char bSendBuffer[MAX_BUFFER_SIZE];
 	unsigned char bRecvBuffer[MAX_BUFFER_SIZE];
@@ -219,13 +219,13 @@ wait_for_card_again:
 	switch(dwPref)
 	{
 		case SCARD_PROTOCOL_T0:
-			pioSendPci = pioRecvPci = SCARD_PCI_T0;
+			pioSendPci = SCARD_PCI_T0;
 			break;
 		case SCARD_PROTOCOL_T1:
-			pioSendPci = pioRecvPci =SCARD_PCI_T1;
+			pioSendPci = SCARD_PCI_T1;
 			break;
 		case SCARD_PROTOCOL_RAW:
-			pioSendPci = pioRecvPci =SCARD_PCI_RAW;
+			pioSendPci = SCARD_PCI_RAW;
 			break;
 		default:
 			printf("Unknown protocol\n");
@@ -243,7 +243,7 @@ wait_for_card_again:
 
 	printf("Testing SCardTransmit\t\t: ");
 	rv = SCardTransmit(hCard, pioSendPci, bSendBuffer, send_length,
-		pioRecvPci, bRecvBuffer, &length);
+		&ioRecvPci, bRecvBuffer, &length);
 	test_rv(rv, hContext, PANIC);
 	printf(" card response:" GREEN);
 	for (i=0; i<length; i++)
