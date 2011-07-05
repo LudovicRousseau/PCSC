@@ -479,17 +479,16 @@ LONG RFRemoveReader(const char *readerName, int port)
 		if (sContext -> pthThread)
 			(void)EHDestroyEventHandler(sContext);
 
-		rv = RFUnInitializeReader(sContext);
-		if (rv != SCARD_S_SUCCESS)
-			return rv;
-
-		/* Destroy and free the mutex */
 		if ((NULL == sContext->pMutex) || (NULL == sContext->pFeeds))
 		{
 			Log1(PCSC_LOG_ERROR,
 				"Trying to remove an already removed driver");
 			return SCARD_E_INVALID_VALUE;
 		}
+
+		rv = RFUnInitializeReader(sContext);
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
 
 		*sContext->pMutex -= 1;
 
