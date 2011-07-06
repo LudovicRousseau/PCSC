@@ -1221,12 +1221,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	/*
-	 * Cannot find the hCard in this context
-	 */
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	if (rContext->readerState->cardAtrLength > MAX_ATR_SIZE)
 		return SCARD_F_INTERNAL_ERROR;
 
