@@ -935,7 +935,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 	API_TRACE_OUT("%d", *pdwActiveProtocol)
 
 	return rv;
@@ -1087,7 +1087,7 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -1187,7 +1187,7 @@ end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
 error:
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 	API_TRACE_OUT("")
 
 	return rv;
@@ -1292,7 +1292,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -1685,7 +1685,7 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -2418,7 +2418,7 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -2890,7 +2890,7 @@ retry:
 end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
@@ -3213,7 +3213,7 @@ end:
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
-    PROFILE_END(rv)
+	PROFILE_END(rv)
 
 	return rv;
 }
