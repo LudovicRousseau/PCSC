@@ -216,6 +216,7 @@ static LONG HPReadBundleValues(void)
 				}
 			}
 			bundleRelease(&plist);
+			free(CFBundleName);
 		}
 	}
 
