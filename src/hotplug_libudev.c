@@ -497,13 +497,13 @@ static void HPRescanUsbBus(struct udev *udev)
 	/* Free the enumerator object */
 	udev_enumerate_unref(enumerate);
 
+	pthread_mutex_lock(&usbNotifierMutex);
 	/* check if all the previously found readers are still present */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		if ((READER_ABSENT == readerTracker[i].status)
 			&& (readerTracker[i].fullName != NULL))
 		{
-			pthread_mutex_lock(&usbNotifierMutex);
 
 			Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", i,
 				readerTracker[i].devpath);
@@ -517,9 +517,9 @@ static void HPRescanUsbBus(struct udev *udev)
 			free(readerTracker[i].fullName);
 			readerTracker[i].fullName = NULL;
 
-			pthread_mutex_unlock(&usbNotifierMutex);
 		}
 	}
+	pthread_mutex_unlock(&usbNotifierMutex);
 }
 
 static void HPEstablishUSBNotifications(struct udev *udev)
