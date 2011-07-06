@@ -352,7 +352,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		(void)strlcpy(tmpReader,
 			sReadersContexts[dwContext]->readerState->readerName,
 			sizeof(sReadersContexts[dwContextB]->readerState->readerName));
-		sprintf(tmpReader + strlen(tmpReader) - 2, "%02X", j);
+		snprintf(tmpReader + strlen(tmpReader) - 2, 3, "%02X", j);
 
 		sReadersContexts[dwContextB]->library =
 			sReadersContexts[dwContext]->library;
