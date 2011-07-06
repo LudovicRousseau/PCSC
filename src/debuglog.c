@@ -188,7 +188,8 @@ static void log_xxd_always(const int priority, const char *msg,
 
 	for (i = 0; (i < len) && (c < debug_buf_end); ++i)
 	{
-		sprintf(c, "%02X ", buffer[i]);
+		/* 2 hex characters, 1 space, 1 NUL : total 4 characters */
+		snprintf(c, 4, "%02X ", buffer[i]);
 		c += 3;
 	}
 
