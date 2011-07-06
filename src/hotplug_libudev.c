@@ -199,6 +199,7 @@ static LONG HPReadBundleValues(void)
 					{
 						Log1(PCSC_LOG_CRITICAL, "Not enough memory");
 						driverSize = -1;
+						(void)closedir(hpDir);
 						return -1;
 					}
 
