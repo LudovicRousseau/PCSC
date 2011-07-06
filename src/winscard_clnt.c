@@ -895,7 +895,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
-	strncpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
+	strlcpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
 
 	scConnectStruct.hContext = hContext;
 	scConnectStruct.dwShareMode = dwShareMode;
