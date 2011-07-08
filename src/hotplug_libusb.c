@@ -626,6 +626,7 @@ ULONG HPRegisterForHotplugEvents(void)
 
 void HPReCheckSerialReaders(void)
 {
+	Log0(PCSC_LOG_INFO);
   	if (rescan_pipe[1] >= 0)
 	{
 		char dummy = 0;
