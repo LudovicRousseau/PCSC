@@ -32,6 +32,7 @@
 #include <errno.h>
 #include <libusb.h>
 #include <pthread.h>
+#include <signal.h>
 
 #include "misc.h"
 #include "wintypes.h"
@@ -390,9 +391,17 @@ static void HPRescanUsbBus(void)
 static void HPEstablishUSBNotifications(int pipefd[2])
 {
 	int i, do_polling;
+	int r;
 	char c = 42;	/* magic value */
 
-	libusb_init(ctx);
+	r = libusb_init(ctx);
+	if (r < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "libusb_init failed: %d", r);
+		/* emergency exit */
+		kill(getpid(), SIGTERM);
+		return;
+	}
 
 	/* scan the USB bus for devices at startup */
 	HPRescanUsbBus();
