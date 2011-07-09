@@ -83,7 +83,7 @@ static int contextsListhContext_seeker(const void *el, const void *key)
 
 	if ((el == NULL) || (key == NULL))
 	{
-		Log3(PCSC_LOG_CRITICAL, "called with NULL pointer: el=%X, key=%X",
+		Log3(PCSC_LOG_CRITICAL, "called with NULL pointer: el=%p, key=%p",
 			el, key);
 		return 0;
 	}
@@ -293,7 +293,7 @@ static void ContextThread(LPVOID newContext)
 	SCONTEXT * threadContext = (SCONTEXT *) newContext;
 	int32_t filedes = threadContext->dwClientID;
 
-	Log3(PCSC_LOG_DEBUG, "Thread is started: dwClientID=%d, threadContext @%X",
+	Log3(PCSC_LOG_DEBUG, "Thread is started: dwClientID=%d, threadContext @%p",
 		threadContext->dwClientID, threadContext);
 
 	while (1)
@@ -834,7 +834,7 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		if (listLength >= contextMaxCardHandles)
 		{
 			Log4(PCSC_LOG_DEBUG,
-				"Too many card handles for thread context @%X: %d (max is %d)"
+				"Too many card handles for thread context @%p: %d (max is %d)"
 				"Restart pcscd with --max-card-handle-per-thread value",
 				threadContext, listLength, contextMaxCardHandles);
 			return SCARD_E_NO_MEMORY;
@@ -914,14 +914,14 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 	}
 
 	Log3(PCSC_LOG_DEBUG,
-		"Thread is stopping: dwClientID=%d, threadContext @%X",
+		"Thread is stopping: dwClientID=%d, threadContext @%p",
 		threadContext->dwClientID, threadContext);
 
 	/* Clear the struct to ensure that we detect
 	 * access to de-allocated memory
 	 * Hopefully the compiler won't optimise it out */
 	memset((void*) threadContext, 0, sizeof(SCONTEXT));
-	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%X", threadContext);
+	Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXT @%p", threadContext);
 
 	(void)pthread_mutex_lock(&contextsList_lock);
 	lrv = list_delete(&contextsList, threadContext);
