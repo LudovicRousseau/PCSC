@@ -30,7 +30,7 @@ extern "C"
     typedef uint8_t BYTE;
 #endif
     typedef uint8_t UCHAR;
-    typedef uint8_t *PUCHAR;
+    typedef UCHAR *PUCHAR;
     typedef uint16_t USHORT;
 
 #ifndef __COREFOUNDATION_CFPLUGINCOM__
@@ -39,10 +39,10 @@ extern "C"
     typedef int16_t BOOL;
 #endif
 
-    typedef uint32_t *PULONG;
+    typedef ULONG *PULONG;
     typedef const void *LPCVOID;
     typedef uint32_t DWORD;
-    typedef uint32_t *PDWORD;
+    typedef DWORD *PDWORD;
     typedef uint16_t WORD;
     typedef int32_t LONG;
     typedef const char *LPCSTR;
@@ -57,7 +57,7 @@ extern "C"
 	typedef unsigned char BYTE;
 #endif
 	typedef unsigned char UCHAR;
-	typedef unsigned char *PUCHAR;
+	typedef UCHAR *PUCHAR;
 	typedef unsigned short USHORT;
 
 #ifndef __COREFOUNDATION_CFPLUGINCOM__
@@ -67,7 +67,7 @@ extern "C"
 
 	typedef const void *LPCVOID;
 	typedef unsigned long DWORD;
-	typedef unsigned long *PDWORD;
+	typedef DWORD *PDWORD;
 	typedef long LONG;
 	typedef const char *LPCSTR;
 	typedef const BYTE *LPCBYTE;
@@ -83,7 +83,7 @@ extern "C"
 	/* types unused by pcsc-lite */
 	typedef short BOOL;
 	typedef unsigned short WORD;
-	typedef unsigned long *PULONG;
+	typedef ULONG *PULONG;
 
 #endif
 
