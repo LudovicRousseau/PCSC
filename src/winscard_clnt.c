@@ -280,7 +280,7 @@ static int CHANNEL_MAP_seeker(const void *el, const void *key)
 	if ((el == NULL) || (key == NULL))
 	{
 		Log3(PCSC_LOG_CRITICAL,
-			"CHANNEL_MAP_seeker called with NULL pointer: el=%X, key=%X",
+			"CHANNEL_MAP_seeker called with NULL pointer: el=%p, key=%p",
 			el, key);
 		return 0;
 	}
@@ -315,7 +315,7 @@ static int SCONTEXTMAP_seeker(const void *el, const void *key)
 	if ((el == NULL) || (key == NULL))
 	{
 		Log3(PCSC_LOG_CRITICAL,
-			"SCONTEXTMAP_seeker called with NULL pointer: el=%X, key=%X",
+			"SCONTEXTMAP_seeker called with NULL pointer: el=%p, key=%p",
 			el, key);
 		return 0;
 	}
@@ -3382,7 +3382,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	if (NULL == newContextMap)
 		return SCARD_E_NO_MEMORY;
 
-	Log2(PCSC_LOG_DEBUG, "Allocating new SCONTEXTMAP @%X", newContextMap);
+	Log2(PCSC_LOG_DEBUG, "Allocating new SCONTEXTMAP @%p", newContextMap);
 	newContextMap->hContext = hContext;
 	newContextMap->dwClientID = dwClientID;
 	newContextMap->cancellable = FALSE;
@@ -3390,7 +3390,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	newContextMap->mMutex = malloc(sizeof(pthread_mutex_t));
 	if (NULL == newContextMap->mMutex)
 	{
-		Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXTMAP @%X", newContextMap);
+		Log2(PCSC_LOG_DEBUG, "Freeing SCONTEXTMAP @%p", newContextMap);
 		free(newContextMap);
 		return SCARD_E_NO_MEMORY;
 	}
