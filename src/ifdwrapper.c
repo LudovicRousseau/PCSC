@@ -452,7 +452,7 @@ LONG IFDControl(READER_CONTEXT * rContext, DWORD ControlCode,
 	else
 	{
 		Log2(PCSC_LOG_ERROR, "Card not transacted: %ld", rv);
-		Log3(PCSC_LOG_DEBUG, "ControlCode: 0x%.8LX BytesReturned: %ld",
+		Log3(PCSC_LOG_DEBUG, "ControlCode: 0x%.8lX BytesReturned: %ld",
 			ControlCode, *BytesReturned);
 		LogXxd(PCSC_LOG_DEBUG, "TxBuffer ", TxBuffer, TxLength);
 		LogXxd(PCSC_LOG_DEBUG, "RxBuffer ", RxBuffer, *BytesReturned);
