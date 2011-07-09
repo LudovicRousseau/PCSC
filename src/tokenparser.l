@@ -159,6 +159,9 @@ int bundleParse(const char *fileName, list_t *l)
 {
 	FILE *file = NULL;
 	int r;
+#ifndef NDEBUG
+	int i;
+#endif
 
 	file = fopen(fileName, "r");
 	if (!file)
