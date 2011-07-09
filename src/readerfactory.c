@@ -1164,7 +1164,7 @@ LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 		currentHandle = list_get_at(&(rContext->handlesList), list_index);
 		if (NULL == currentHandle)
 		{
-			Log2(PCSC_LOG_CRITICAL, "list_get_at failed at index %s",
+			Log2(PCSC_LOG_CRITICAL, "list_get_at failed at index %d",
 				list_index);
 			continue;
 		}
