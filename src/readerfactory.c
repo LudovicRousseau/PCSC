@@ -938,7 +938,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 	rv = RFLoadReader(rContext);
 	if (rv != SCARD_S_SUCCESS)
 	{
-		Log2(PCSC_LOG_ERROR, "RFLoadReader failed: 0x%X", rv);
+		Log2(PCSC_LOG_ERROR, "RFLoadReader failed: 0x%lX", rv);
 		return rv;
 	}
 
@@ -947,7 +947,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 
 	if (rv != SCARD_S_SUCCESS)
 	{
-		Log2(PCSC_LOG_ERROR, "RFBindFunctions failed: 0x%X", rv);
+		Log2(PCSC_LOG_ERROR, "RFBindFunctions failed: 0x%lX", rv);
 		(void)RFUnloadReader(rContext);
 		return rv;
 	}
@@ -1132,7 +1132,7 @@ LONG RFRemoveReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	currentHandle = list_seek(&(rContext->handlesList), &hCard);
 	if (NULL == currentHandle)
 	{
-		Log2(PCSC_LOG_CRITICAL, "list_seek failed to locate hCard=%X", hCard);
+		Log2(PCSC_LOG_CRITICAL, "list_seek failed to locate hCard=%lX", hCard);
 		rv = SCARD_E_INVALID_HANDLE;
 		goto end;
 	}
@@ -1195,7 +1195,7 @@ LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	if (NULL == currentHandle)
 	{
 		/* Not Found */
-		Log2(PCSC_LOG_CRITICAL, "list_seek failed for hCard 0x%X", hCard);
+		Log2(PCSC_LOG_CRITICAL, "list_seek failed for hCard 0x%lX", hCard);
 		return SCARD_E_INVALID_HANDLE;
 	}
 
@@ -1271,7 +1271,7 @@ void RFCleanupReaders(void)
 			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->port);
 
 			if (rv != SCARD_S_SUCCESS)
-				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08X", rv);
+				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08lX", rv);
 		}
 	}
 }
