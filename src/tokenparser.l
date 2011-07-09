@@ -78,6 +78,7 @@ static void eval_key(char *pcToken, list_t *list_key)
 
 	r = list_init(&elt->values);
 	assert(r >= 0);
+	(void)r;
 
 	/* add the key/values */
 	list_append(list_key, elt);
@@ -107,6 +108,7 @@ static void eval_value(char *pcToken, list_t *list_values)
 
 	r = list_append(list_values, value);
 	assert(r >= 0);
+	(void)r;
 }
 
 void tperrorCheck (char *token_error)
@@ -173,6 +175,7 @@ int bundleParse(const char *fileName, list_t *l)
 
 	r = list_init(l);
 	assert(r >= 0);
+	(void)r;
 
 	ListKeys = l;
 	yyin = file;
