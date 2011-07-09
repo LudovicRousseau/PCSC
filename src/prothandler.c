@@ -99,7 +99,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 					(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 			else
 			{
-				Log3(PCSC_LOG_INFO, "PTS failed (%d), using T=%d", rv,
+				Log3(PCSC_LOG_INFO, "PTS failed (%ld), using T=%d", rv,
 					(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 
 				/* ISO 7816-3:1997 ch. 7.2 PPS protocol page 14
