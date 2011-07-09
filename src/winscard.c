@@ -190,7 +190,7 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 
 	*phContext = (PCSCLITE_SVC_IDENTITY + SYS_RandomInt(1, 65535));
 
-	Log2(PCSC_LOG_DEBUG, "Establishing Context: 0x%X", *phContext);
+	Log2(PCSC_LOG_DEBUG, "Establishing Context: 0x%lX", *phContext);
 
 	return SCARD_S_SUCCESS;
 }
@@ -201,7 +201,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 * Nothing to do here RPC layer will handle this
 	 */
 
-	Log2(PCSC_LOG_DEBUG, "Releasing Context: 0x%X", hContext);
+	Log2(PCSC_LOG_DEBUG, "Releasing Context: 0x%lX", hContext);
 
 	return SCARD_S_SUCCESS;
 }
@@ -231,7 +231,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			dwShareMode != SCARD_SHARE_DIRECT)
 		return SCARD_E_INVALID_VALUE;
 
-	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s using protocol: %d",
+	Log3(PCSC_LOG_DEBUG, "Attempting Connect to %s using protocol: %ld",
 		szReader, dwPreferredProtocols);
 
 	rv = RFReaderInfo((LPSTR) szReader, &rContext);
@@ -312,7 +312,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					rContext->readerState->cardAtrLength);
 			}
 			else
-				Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X",
+				Log3(PCSC_LOG_ERROR, "Error powering up card: %ld 0x%04lX",
 					rv, rv);
 		}
 
@@ -407,7 +407,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				break;
 
 			default:
-				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %ld",
 					*pdwActiveProtocol);
 		}
 	}
@@ -419,7 +419,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 */
 	*phCard = RFCreateReaderHandle(rContext);
 
-	Log2(PCSC_LOG_DEBUG, "hCard Identity: %x", *phCard);
+	Log2(PCSC_LOG_DEBUG, "hCard Identity: %lx", *phCard);
 
 	/*******************************************
 	 *
@@ -690,7 +690,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				break;
 
 			default:
-				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %d",
+				Log2(PCSC_LOG_ERROR, "Active Protocol: unknown %ld",
 					*pdwActiveProtocol);
 		}
 	}
@@ -818,7 +818,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	}
 
 	Log2(PCSC_LOG_DEBUG, "Active Contexts: %d", rContext->contexts);
-	Log2(PCSC_LOG_DEBUG, "dwDisposition: %d", dwDisposition);
+	Log2(PCSC_LOG_DEBUG, "dwDisposition: %ld", dwDisposition);
 
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
@@ -1048,7 +1048,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (SCARD_E_SHARING_VIOLATION == rv)
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 
-	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 
 	return rv;
 }
@@ -1185,7 +1185,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	(void)RFUnlockSharing(hCard, rContext);
 
-	Log2(PCSC_LOG_DEBUG, "Status: 0x%08X", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 
 	return rv;
 }
@@ -1536,7 +1536,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	sRecvPci.Length = pioRecvPci->cbPciLength;
 
 	/* the protocol number is decoded a few lines above */
-	Log2(PCSC_LOG_DEBUG, "Send Protocol: T=%d", sSendPci.Protocol);
+	Log2(PCSC_LOG_DEBUG, "Send Protocol: T=%ld", sSendPci.Protocol);
 
 	tempRxLength = dwRxLength;
 
