@@ -66,7 +66,7 @@ static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
 	if ((el == NULL) || (key == NULL))
 	{
 		Log3(PCSC_LOG_CRITICAL,
-			"RDR_CLIHANDLES_seeker called with NULL pointer: el=%X, key=%X",
+			"RDR_CLIHANDLES_seeker called with NULL pointer: el=%p, key=%p",
 			el, key);
 		return 0;
 	}
