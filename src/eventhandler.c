@@ -269,7 +269,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 			rContext->powerState = POWER_STATE_UNPOWERED;
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
-			Log3(PCSC_LOG_ERROR, "Error powering up card: %d 0x%04X", rv, rv);
+			Log3(PCSC_LOG_ERROR, "Error powering up card: %ld 0x%04lX", rv, rv);
 		}
 #endif
 
