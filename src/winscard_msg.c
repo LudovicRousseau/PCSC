@@ -157,7 +157,7 @@ INTERNAL int ClientCloseSession(uint32_t dwClientID)
  * @retval SCARD_F_COMM_ERROR A signal was received.
  */
 INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
-	uint64_t buffer_size, int32_t filedes, unsigned long timeOut)
+	uint64_t buffer_size, int32_t filedes, long timeOut)
 {
 	char *buffer = buffer_void;
 
