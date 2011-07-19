@@ -185,7 +185,7 @@ static LONG HPReadBundleValues(void)
 
 				if (listCount >= sizeof(bundleTracker)/sizeof(bundleTracker[0]))
 				{
-					Log2(PCSC_LOG_CRITICAL, "Too many readers declared. Maximum is %d", sizeof(bundleTracker)/sizeof(bundleTracker[0]));
+					Log2(PCSC_LOG_CRITICAL, "Too many readers declared. Maximum is %ld", sizeof(bundleTracker)/sizeof(bundleTracker[0]));
 					goto end;
 				}
 			}
