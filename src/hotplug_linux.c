@@ -258,7 +258,8 @@ static void HPEstablishUSBNotifications(void)
 					continue;
 				}
 
-				sprintf(dirpath, "%s/%s", PCSCLITE_USB_PATH, entry->d_name);
+				snprintf(dirpath, sizeof dirpath, "%s/%s",
+					PCSCLITE_USB_PATH, entry->d_name);
 
 				dirB = opendir(dirpath);
 
@@ -280,7 +281,8 @@ static void HPEstablishUSBNotifications(void)
 
 					/* Get the device number so we can distinguish
 					   multiple readers */
-					sprintf(filename, "%s/%s", dirpath, entryB->d_name);
+					snprintf(filename, sizeof filename, "%s/%s",
+						dirpath, entryB->d_name);
 					sscanf(entryB->d_name, "%d", &deviceNumber);
 
 					fd = open(filename, O_RDONLY);
