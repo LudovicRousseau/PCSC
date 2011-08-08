@@ -1874,6 +1874,31 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
+	/* check all the readers are already known */
+	for (j=0; j<cReaders; j++)
+	{
+		const char *readerName;
+		int i;
+
+		readerName = rgReaderStates[j].szReader;
+		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		{
+			if (strcmp(readerName, readerStates[i].readerName) == 0)
+				break;
+		}
+
+		/* The requested reader name is not recognized */
+		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		{
+			/* PnP special reader? */
+			if (strcasecmp(readerName, "\\\\?PnP?\\Notification") != 0)
+			{
+				rv = SCARD_E_UNKNOWN_READER;
+				goto end;
+			}
+		}
+	}
+
 	/* Clear the event state for all readers */
 	for (j = 0; j < cReaders; j++)
 		rgReaderStates[j].dwEventState = 0;
