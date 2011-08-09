@@ -283,7 +283,7 @@ static void HPEstablishUSBNotifications(void)
 					   multiple readers */
 					snprintf(filename, sizeof filename, "%s/%s",
 						dirpath, entryB->d_name);
-					sscanf(entryB->d_name, "%d", &deviceNumber);
+					deviceNumber = atoi(entryB->d_name);
 
 					fd = open(filename, O_RDONLY);
 					if (fd < 0)
