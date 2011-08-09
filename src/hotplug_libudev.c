@@ -246,7 +246,7 @@ static LONG HPReadBundleValues(void)
 		Log1(PCSC_LOG_ERROR, "udev_device_get_sysattr_value() failed");
 		return NULL;
 	}
-	sscanf(str, "%X", &idVendor);
+	idVendor = strtol(str, NULL, 16);
 
 	str = udev_device_get_sysattr_value(dev, "idProduct");
 	if (!str)
@@ -254,7 +254,7 @@ static LONG HPReadBundleValues(void)
 		Log1(PCSC_LOG_ERROR, "udev_device_get_sysattr_value() failed");
 		return NULL;
 	}
-	sscanf(str, "%X", &idProduct);
+	idProduct = strtol(str, NULL, 16);
 
 	Log4(PCSC_LOG_DEBUG,
 		"Looking for a driver for VID: 0x%04X, PID: 0x%04X, path: %s",
