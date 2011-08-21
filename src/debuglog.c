@@ -79,10 +79,9 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
 #else
 
 /**
- * Max string size when dumping a 256 bytes longs APDU
- * Should be bigger than 256*3+30
+ * Max string size dumping a maxmium of 2 lines of 80 characters
  */
-#define DEBUG_BUF_SIZE 2048
+#define DEBUG_BUF_SIZE 160
 
 static char LogMsgType = DEBUGLOG_NO_DEBUG;
 static char LogCategory = DEBUG_CATEGORY_NOTHING;
@@ -177,26 +176,20 @@ static void log_line(const int priority, const char *DebugBuffer)
 static void log_xxd_always(const int priority, const char *msg,
 	const unsigned char *buffer, const int len)
 {
-	char DebugBuffer[DEBUG_BUF_SIZE];
+	char DebugBuffer[len*3 + strlen(msg) +1];
 	int i;
 	char *c;
-	char *debug_buf_end;
+	size_t l;
 
-	debug_buf_end = DebugBuffer + sizeof DebugBuffer - 5;
+	l = strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
+	c = DebugBuffer + l;
 
-	strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
-	c = DebugBuffer + strlen(DebugBuffer);
-
-	for (i = 0; (i < len) && (c < debug_buf_end); ++i)
+	for (i = 0; (i < len); ++i)
 	{
 		/* 2 hex characters, 1 space, 1 NUL : total 4 characters */
 		snprintf(c, 4, "%02X ", buffer[i]);
 		c += 3;
 	}
-
-	/* the buffer is too small so end it with "..." */
-	if ((c >= debug_buf_end) && (i < len))
-		c[-3] = c[-2] = c[-1] = '.';
 
 	log_line(priority, DebugBuffer);
 } /* log_xxd_always */
