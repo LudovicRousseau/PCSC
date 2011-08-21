@@ -172,7 +172,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 
 	/* Check and set the readername to see if it must be enumerated */
 	parentNode = RFSetReaderName(sReadersContexts[dwContext], readerName,
-		library, port, 0);
+		library, port);
 	if (parentNode < -1)
 		return SCARD_E_NO_MEMORY;
 
@@ -549,7 +549,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 }
 
 LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
-	const char *libraryName, int port, DWORD slot)
+	const char *libraryName, int port)
 {
 	LONG parent = -1;	/* reader number of the parent of the clone */
 	DWORD valueLength;
@@ -562,7 +562,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		usedDigits[i] = FALSE;
 
-	if ((0 == slot) && (dwNumReadersContexts != 0))
+	if (dwNumReadersContexts != 0)
 	{
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
@@ -648,11 +648,11 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	}
 
 	snprintf(rContext->readerState->readerName,
-		sizeof(rContext->readerState->readerName), "%s %02X %02lX",
-		readerName, i, slot);
+		sizeof(rContext->readerState->readerName), "%s %02X 00",
+		readerName, i);
 
 	/* Set the slot in 0xDDDDCCCC */
-	rContext->slot = (i << 16) + slot;
+	rContext->slot = i << 16;
 
 	return parent;
 }
