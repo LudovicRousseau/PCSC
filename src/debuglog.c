@@ -104,7 +104,7 @@ void log_msg(const int priority, const char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+	vsnprintf(DebugBuffer, sizeof DebugBuffer, fmt, argptr);
 	va_end(argptr);
 
 	log_line(priority, DebugBuffer);
@@ -182,7 +182,7 @@ static void log_xxd_always(const int priority, const char *msg,
 	char *c;
 	char *debug_buf_end;
 
-	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
+	debug_buf_end = DebugBuffer + sizeof DebugBuffer - 5;
 
 	strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
 	c = DebugBuffer + strlen(DebugBuffer);
@@ -329,7 +329,7 @@ void debug_msg(const char *fmt, ...)
 		return;
 
 	va_start(argptr, fmt);
-	vsnprintf(DebugBuffer, DEBUG_BUF_SIZE, fmt, argptr);
+	vsnprintf(DebugBuffer, sizeof DebugBuffer, fmt, argptr);
 	va_end(argptr);
 
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
