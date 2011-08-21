@@ -137,6 +137,8 @@ static void log_line(const int priority, const char *DebugBuffer)
 		else
 			delta = 99999999;
 
+		last_time = new_time;
+
 		if (LogDoColor)
 		{
 			const char *color_pfx = "", *color_sfx = "\33[0m";
@@ -164,7 +166,6 @@ static void log_line(const int priority, const char *DebugBuffer)
 
 			printf("%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
 				color_pfx, DebugBuffer, color_sfx);
-			last_time = new_time;
 		}
 		else
 		{
