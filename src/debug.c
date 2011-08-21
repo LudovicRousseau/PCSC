@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999-2002
  *  David Corcoran <corcoran@linuxnet.com>
- * Copyright (C) 2002-2009
+ * Copyright (C) 2002-2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
  * $Id$
@@ -32,15 +32,6 @@ void log_msg(const int priority, const char *fmt, ...)
 {
 	(void)priority;
 	(void)fmt;
-}
-
-void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
-	const int len)
-{
-	(void)priority;
-	(void)msg;
-	(void)buffer;
-	(void)len;
 }
 
 #else
@@ -136,32 +127,6 @@ void log_msg(const int priority, const char *fmt, ...)
 			fprintf(stderr, "%s\n", DebugBuffer);
 	}
 } /* log_msg */
-
-void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
-	const int len)
-{
-	char DebugBuffer[DEBUG_BUF_SIZE];
-	int i;
-	char *c;
-	char *debug_buf_end;
-
-	if (priority < LogLevel) /* log priority lower than threshold? */
-		return;
-
-	debug_buf_end = DebugBuffer + DEBUG_BUF_SIZE - 5;
-
-	(void)strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
-	c = DebugBuffer + strlen(DebugBuffer);
-
-	for (i = 0; (i < len) && (c < debug_buf_end); ++i)
-	{
-		/* 2 hex characters, 1 space, 1 NUL : total 4 characters */
-		snprintf(c, 4, "%02X ", buffer[i]);
-		c += strlen(c);
-	}
-
-	fprintf(stderr, "%s\n", DebugBuffer);
-} /* log_xxd */
 
 #endif
 
