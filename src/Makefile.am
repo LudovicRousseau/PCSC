@@ -102,8 +102,8 @@ fix-rights: install-sbinPROGRAMS
 	chmod g+s $(DESTDIR)$(sbindir)/pcscd
 
 update-systemd:
-	curl http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c > sd-daemon.c
-	curl http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.h > sd-daemon.h
+	curl -O http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c
+	curl -O http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.h
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
