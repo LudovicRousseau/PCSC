@@ -1,0 +1,13 @@
+[Unit]
+Description=PC/SC Smart Card Daemon
+Requires=pcscd.socket
+After=syslog.target
+
+[Service]
+ExecStart=@sbindir_exp@/pcscd -f
+ExecReload=@sbindir_exp@/pcscd -H
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
+Also=pcscd.socket

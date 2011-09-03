@@ -1,0 +1,8 @@
+[Unit]
+Description=PC/SC Smart Card Daemon Activation Socket
+
+[Socket]
+ListenStream=@ipcdir@/pcscd.comm
+
+[Install]
+WantedBy=sockets.target
