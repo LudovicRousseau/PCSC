@@ -4,8 +4,8 @@ Requires=pcscd.socket
 After=syslog.target
 
 [Service]
-ExecStart=@sbindir_exp@/pcscd -f
-ExecReload=@sbindir_exp@/pcscd -H
+ExecStart=@sbindir_exp@/pcscd --foreground
+ExecReload=@sbindir_exp@/pcscd --hotplug
 StandardOutput=syslog
 
 [Install]
