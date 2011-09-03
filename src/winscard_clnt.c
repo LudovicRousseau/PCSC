@@ -444,8 +444,10 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
+#ifdef ENABLE_AUTOSTART
 	int daemon_launched = FALSE;
 	int retries = 0;
+#endif
 
 	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
 	PROFILE_START
@@ -457,6 +459,7 @@ again:
 		/* we reconnected to a daemon or we got called from a forked child */
 		rv = SCardCheckDaemonAvailability();
 
+#ifdef ENABLE_AUTOSTART
 	if (SCARD_E_NO_SERVICE == rv)
 	{
 launch:
@@ -517,6 +520,7 @@ launch:
 			goto again;
 		}
 	}
+#endif
 
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
@@ -526,6 +530,7 @@ launch:
 		pvReserved2, phContext);
 	(void)SCardUnlockThread();
 
+#ifdef ENABLE_AUTOSTART
 	/* SCardEstablishContextTH may fail if the previous pcscd crashed
 	 * without cleaning /var/run/pcscd/pcscd.comm */
 	if (SCARD_E_NO_SERVICE == rv)
@@ -534,6 +539,7 @@ launch:
 		if (retries <= 1)
 			goto launch;
 	}
+#endif
 
 end:
 	PROFILE_END(rv)

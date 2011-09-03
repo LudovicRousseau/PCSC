@@ -276,6 +276,16 @@ if test x$use_libusb = xyes; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} libusb"
 fi
 
+# --disable-autostart
+AC_ARG_ENABLE(autostart,
+  AC_HELP_STRING([--disable-autostart], [disable pcscd automatic startup]),
+  [ use_autostart="${enableval}" ], [ use_autostart="yes" ] )
+
+if test x$use_autostart != xno; then
+  AC_DEFINE(ENABLE_AUTOSTART, 1, [Enable pcscd automatic startup])
+  PCSCLITE_FEATURES="${PCSCLITE_FEATURES} autostart"
+fi
+
 # --enable-embedded
 AC_ARG_ENABLE(embedded,
   AC_HELP_STRING([--enable-embedded], [limit RAM and CPU ressources by disabling features (log)]),
@@ -383,6 +393,7 @@ ATR parsing messages: ${debugatr}
 ipcdir:               ${ipcdir}
 use serial:           ${use_serial}
 use usb:              ${use_usb}
+use autostart:        ${use_autostart}
 
 PCSCLITE_FEATURES:    ${PCSCLITE_FEATURES}
 
