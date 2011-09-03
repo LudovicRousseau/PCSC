@@ -93,7 +93,7 @@ static void SVCServiceRunLoop(void)
 			Log2(PCSC_LOG_DEBUG, "A new context thread creation is requested: %d", dwClientID);
 			rv = CreateContextThread(&dwClientID);
 
- 			if (rv != SCARD_S_SUCCESS)
+			if (rv != SCARD_S_SUCCESS)
 				Log1(PCSC_LOG_ERROR, "Problem during the context thread creation");
 			break;
 
@@ -765,10 +765,10 @@ static void print_usage (char const * const progname)
 	printf("  -h, --help		display usage information\n");
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
-	printf("  -d, --debug	 	display lower level debug messages\n");
-	printf("      --info	 	display info level debug messages\n");
-	printf("  -e  --error	 	display error level debug messages (default level)\n");
-	printf("  -C  --critical 	display critical only level debug messages\n");
+	printf("  -d, --debug		display lower level debug messages\n");
+	printf("      --info		display info level debug messages\n");
+	printf("  -e  --error		display error level debug messages (default level)\n");
+	printf("  -C  --critical	display critical only level debug messages\n");
 	printf("  --force-reader-polling ignore the IFD_GENERATE_HOTPLUG reader capability\n");
 	printf("  -t, --max-thread	maximum number of threads (default %d)\n", PCSC_MAX_CONTEXT_THREADS);
 	printf("  -s, --max-card-handle-per-thread	maximum number of card handle per thread (default: %d)\n", PCSC_MAX_CONTEXT_CARD_HANDLES);
@@ -776,15 +776,15 @@ static void print_usage (char const * const progname)
 	printf("  -x, --auto-exit	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE);
 #else
 	printf("  -a    log APDU commands and results\n");
-	printf("  -c 	path to reader.conf\n");
+	printf("  -c	path to reader.conf\n");
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -T    force use of colored logs\n");
-	printf("  -d 	display debug messages.\n");
-	printf("  -e 	display error messages (default level).\n");
-	printf("  -C 	display critical messages.\n");
-	printf("  -h 	display usage information\n");
+	printf("  -d	display debug messages.\n");
+	printf("  -e	display error messages (default level).\n");
+	printf("  -C	display critical messages.\n");
+	printf("  -h	display usage information\n");
 	printf("  -H	ask the daemon to rescan the available readers\n");
-	printf("  -v 	display the program version number\n");
+	printf("  -v	display the program version number\n");
 	printf("  -t    maximum number of threads\n");
 	printf("  -s    maximum number of card handle per thread\n");
 	printf("  -r    maximum number of card handle per reader\n");

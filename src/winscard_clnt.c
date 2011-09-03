@@ -1455,8 +1455,8 @@ end:
  * - \ref SCARD_SPECIFIC - The card has been reset and specific
  *   communication protocols have been established.
  * @param[out] pdwProtocol Current protocol of this reader.
- * - \ref SCARD_PROTOCOL_T0 	Use the T=0 protocol.
- * - \ref SCARD_PROTOCOL_T1 	Use the T=1 protocol.
+ * - \ref SCARD_PROTOCOL_T0	Use the T=0 protocol.
+ * - \ref SCARD_PROTOCOL_T1	Use the T=1 protocol.
  * @param[out] pbAtr Current ATR of a card in this reader.
  * @param[out] pcbAtrLen Length of ATR.
  *
