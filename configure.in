@@ -276,6 +276,7 @@ if test x$use_libusb = xyes; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} libusb"
 fi
 
+# --with-systemdsystemunitdir=DIR
 AC_ARG_WITH([systemdsystemunitdir],
   AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
   [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
