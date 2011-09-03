@@ -452,7 +452,9 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
 	PROFILE_START
 
+#ifdef ENABLE_AUTOSTART
 again:
+#endif
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
 	if (SCARD_E_INVALID_HANDLE == rv)
