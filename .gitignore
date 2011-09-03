@@ -23,6 +23,8 @@ doc/example/pcsc_demo
 doc/example/pcsc_demo-pcsc_demo.o
 doc/pcscd.8
 doc/reader.conf.5
+etc/pcscd.service
+etc/pcscd.socket
 install-sh
 libtool
 ltmain.sh
@@ -52,6 +54,8 @@ src/libpcsclite_la-sys_unix.lo
 src/libpcsclite_la-utils.lo
 src/libpcsclite_la-winscard_clnt.lo
 src/libpcsclite_la-winscard_msg.lo
+src/libpcscspy.la
+src/pcsc-spy.lo
 src/pcsc-wirecheck
 src/pcsc-wirecheck-dist.c
 src/pcsc-wirecheck-dist.o
@@ -76,6 +80,7 @@ src/pcscd-pcscdaemon.o
 src/pcscd-powermgt_generic.o
 src/pcscd-prothandler.o
 src/pcscd-readerfactory.o
+src/pcscd-sd-daemon.o
 src/pcscd-simclist.o
 src/pcscd-strlcat.o
 src/pcscd-strlcpy.o
