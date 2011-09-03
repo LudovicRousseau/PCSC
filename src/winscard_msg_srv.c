@@ -39,6 +39,7 @@
 
 #include "misc.h"
 #include "pcscd.h"
+#include "sd-daemon.h"
 #include "winscard.h"
 #include "debuglog.h"
 #include "winscard_msg.h"
@@ -134,6 +135,30 @@ INTERNAL int32_t InitializeSocket(void)
 	 */
 	(void)chmod(PCSCLITE_CSOCK_NAME, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
+	return 0;
+}
+
+/**
+ * @brief Acquires a socket passed in from systemd.
+ *
+ * This is called by the server to start listening on an existing socket for
+ * local IPC with the clients.
+ *
+ * @param fd The file descriptor to start listening on.
+ *
+ * @return Error code.
+ * @retval 0 Success
+ * @retval -1 Passed FD is not an UNIX socket.
+ */
+INTERNAL int32_t ListenExistingSocket(int fd)
+{
+	if (!sd_is_socket(fd, AF_UNIX, SOCK_STREAM, -1))
+	{
+		Log1(PCSC_LOG_CRITICAL, "Passed FD is not an UNIX socket");
+		return -1;
+	}
+
+	commonSocket = fd;
 	return 0;
 }
 

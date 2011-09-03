@@ -252,6 +252,7 @@
 
 #ifdef PCSCD
 	int32_t InitializeSocket(void);
+	int32_t ListenExistingSocket(int fd);
 	int32_t ProcessEventsServer(/*@out@*/ uint32_t *);
 #else
 	char *getSocketName(void);

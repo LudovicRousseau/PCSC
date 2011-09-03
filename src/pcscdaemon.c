@@ -37,6 +37,7 @@
 #include "pcsclite.h"
 #include "pcscd.h"
 #include "debuglog.h"
+#include "sd-daemon.h"
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"
@@ -54,6 +55,7 @@
 char AraKiri = FALSE;
 static char Init = TRUE;
 char AutoExit = FALSE;
+char SocketActivated = FALSE;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
 static int pipefd[] = {-1, -1};
@@ -316,6 +318,20 @@ int main(int argc, char **argv)
 	}
 
 	/*
+	 * Check if systemd passed us any file descriptors
+	 */
+	rv = sd_listen_fds(0);
+	if (rv > 1)
+	{
+		Log1(PCSC_LOG_CRITICAL, "Too many file descriptors received");
+		return EXIT_FAILURE;
+	}
+	else if (rv == 1)
+		SocketActivated = TRUE;
+	else
+		SocketActivated = FALSE;
+
+	/*
 	 * test the presence of /var/run/pcscd/pcscd.comm
 	 */
 
@@ -366,16 +382,19 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 			}
 
-			Log1(PCSC_LOG_CRITICAL,
-				"file " PCSCLITE_CSOCK_NAME " already exists.");
-			Log1(PCSC_LOG_CRITICAL,
-				"Maybe another pcscd is running?");
-			Log1(PCSC_LOG_CRITICAL,
-				"I can't read process pid from " PCSCLITE_RUN_PID);
-			Log1(PCSC_LOG_CRITICAL, "Remove " PCSCLITE_CSOCK_NAME);
-			Log1(PCSC_LOG_CRITICAL,
-				"if pcscd is not running to clear this message.");
-			return EXIT_FAILURE;
+			if (!SocketActivated)
+			{
+				Log1(PCSC_LOG_CRITICAL,
+					"file " PCSCLITE_CSOCK_NAME " already exists.");
+				Log1(PCSC_LOG_CRITICAL,
+					"Maybe another pcscd is running?");
+				Log1(PCSC_LOG_CRITICAL,
+					"I can't read process pid from " PCSCLITE_RUN_PID);
+				Log1(PCSC_LOG_CRITICAL, "Remove " PCSCLITE_CSOCK_NAME);
+				Log1(PCSC_LOG_CRITICAL,
+					"if pcscd is not running to clear this message.");
+				return EXIT_FAILURE;
+			}
 		}
 	}
 	else
@@ -564,7 +583,11 @@ int main(int argc, char **argv)
 	/*
 	 * Initialize the comm structure
 	 */
-	rv = InitializeSocket();
+	if (SocketActivated)
+		rv = ListenExistingSocket(SD_LISTEN_FDS_START + 0);
+	else
+		rv = InitializeSocket();
+
 	if (rv)
 	{
 		Log1(PCSC_LOG_CRITICAL, "Error initializing pcscd.");
@@ -648,10 +671,13 @@ static void clean_temp_files(void)
 {
 	int rv;
 
-	rv = remove(PCSCLITE_CSOCK_NAME);
-	if (rv != 0)
-		Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_CSOCK_NAME ": %s",
-			strerror(errno));
+	if (!SocketActivated)
+	{
+		rv = remove(PCSCLITE_CSOCK_NAME);
+		if (rv != 0)
+			Log2(PCSC_LOG_ERROR, "Cannot remove " PCSCLITE_CSOCK_NAME ": %s",
+				strerror(errno));
+	}
 
 	rv = remove(PCSCLITE_RUN_PID);
 	if (rv != 0)

@@ -71,6 +71,8 @@ pcscd_SOURCES = \
 	prothandler.h \
 	readerfactory.c \
 	readerfactory.h \
+	sd-daemon.c \
+	sd-daemon.h \
 	simclist.c \
 	simclist.h \
 	strlcat.c \
@@ -98,6 +100,10 @@ pcscd_LDADD = \
 fix-rights: install-sbinPROGRAMS
 	chgrp pcscd $(DESTDIR)$(sbindir)/pcscd
 	chmod g+s $(DESTDIR)$(sbindir)/pcscd
+
+update-systemd:
+	curl http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c > sd-daemon.c
+	curl http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.h > sd-daemon.h
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
