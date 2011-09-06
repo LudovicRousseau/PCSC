@@ -226,17 +226,18 @@ static void spy_n_str(const char *str, unsigned long *len, int autoallocate)
         }
         else
         {
-            if (autoallocate)
-            {
-                const char *s;
+            const char *s = str;
+            int length = 0;
 
+            if (autoallocate)
                 s = *(char **)str;
-                spy_line("%s", s);
-            }
-            else
+
+            do
             {
-                spy_line("%s", str);
-            }
+                spy_line("%s", s);
+                length += strlen(s)+1;
+                s += strlen(s)+1;
+            } while(length < *len);
         }
     }
 }
@@ -498,7 +499,7 @@ PCSC_API p_SCardListReaderGroups(SCardListReaderGroups)
 {
 	LONG rv;
     int autoallocate = 0;
-    
+
     if (pcchGroups)
         autoallocate = *pcchGroups == SCARD_AUTOALLOCATE;
 
@@ -515,7 +516,7 @@ PCSC_API p_SCardListReaders(SCardListReaders)
 {
 	LONG rv;
     int autoallocate = 0;
-    
+
     if (pcchReaders)
         autoallocate = *pcchReaders == SCARD_AUTOALLOCATE;
 

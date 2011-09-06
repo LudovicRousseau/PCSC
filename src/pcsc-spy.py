@@ -74,6 +74,18 @@ def log_out2(header, f):
     data = f.readline().strip()
     log_out("%s %s" % (header, data))
 
+def log_out_n_str(size_name, field_name, f):
+    data = f.readline().strip()
+    log_out("%s %s" % (size_name, data))
+    size = int(data, 16)
+    data_read = 0
+    while data_read < size:
+        data = f.readline().strip()
+        log_out("%s %s" % (field_name, data))
+        if data == 'NULL':
+            break
+        data_read += len(data)+1
+
 def log_name(name):
     print color_blue + name + color_normal
 
@@ -101,16 +113,14 @@ def SCardListReaders(f):
     log_name("SCardListReaders")
     log_in_hContext(f)
     log_in2("mszGroups:", f)
-    log_out2("pcchReaders:", f)
-    log_out2("mszReaders:", f)
+    log_out_n_str("pcchReaders:", "mszReaders:", f)
     log_rv(f)
 
 def SCardListReaderGroups(f):
     log_name("SCardListReaderGroups")
     log_in_hContext(f)
     log_in2("pcchGroups:", f)
-    log_out2("pcchGroups:", f)
-    log_out2("mszGroups:", f)
+    log_out_n_str("pcchGroups:", "mszGroups:", f)
     log_rv(f)
 
 def SCardGetStatusChange(f):
