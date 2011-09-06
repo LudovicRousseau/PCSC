@@ -245,7 +245,7 @@ static LONG load_lib(void)
 {
 	void *handle;
 
-#define LIBPCSC "/usr/lib/libpcsclite.so.1"
+#define LIBPCSC "libpcsclite.so.1"
 	handle = dlopen(LIBPCSC, RTLD_LAZY);
 	if (NULL == handle)
 	{
