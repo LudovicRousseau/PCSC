@@ -230,7 +230,7 @@ static void spy_n_str(const char *str, unsigned long *len, int autoallocate)
         else
         {
             const char *s = str;
-            int length = 0;
+            unsigned int length = 0;
 
             if (autoallocate)
                 s = *(char **)str;
