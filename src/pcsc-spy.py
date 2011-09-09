@@ -30,8 +30,10 @@ color_blue = "\x1b[34m"
 color_magenta = "\x1b[35m"
 color_normal = "\x1b[0m"
 
+
 def cleanup():
     os.unlink(fifo)
+
 
 def parse_rv(line):
     (function, rv) = line.split(':')
@@ -39,6 +41,7 @@ def parse_rv(line):
         raise Exception("Wrong line:", line)
 
     return rv
+
 
 def log_rv(f):
     line = f.readline().strip()
@@ -48,31 +51,39 @@ def log_rv(f):
     else:
         print " =>", rv
 
+
 def log_in(line):
     print color_green + " i " + line + color_normal
 
+
 def log_out(line):
     print color_magenta + " o " + line + color_normal
+
 
 def log_in_hCard(f):
     hContext = f.readline().strip()
     log_in("hCard: %s" % hContext)
 
+
 def log_in_hContext(f):
     hContext = f.readline().strip()
     log_in("hContext: %s" % hContext)
+
 
 def log_out_hContext(f):
     hContext = f.readline().strip()
     log_out("hContext: %s" % hContext)
 
+
 def log_in2(header, f):
     data = f.readline().strip()
     log_in("%s %s" % (header, data))
 
+
 def log_out2(header, f):
     data = f.readline().strip()
     log_out("%s %s" % (header, data))
+
 
 def log_out_n_str(size_name, field_name, f):
     data = f.readline().strip()
@@ -84,10 +95,12 @@ def log_out_n_str(size_name, field_name, f):
         log_out("%s %s" % (field_name, data))
         if data == 'NULL':
             break
-        data_read += len(data)+1
+        data_read += len(data) + 1
+
 
 def log_name(name):
     print color_blue + name + color_normal
+
 
 def SCardEstablishContext(f):
     log_name("SCardEstablishContext")
@@ -99,15 +112,18 @@ def SCardEstablishContext(f):
     log_out_hContext(f)
     log_rv(f)
 
+
 def SCardIsValidContext(f):
     log_name("SCardIsValidContext")
     log_in_hContext(f)
     log_rv(f)
 
+
 def SCardReleaseContext(f):
     log_name("SCardReleaseContext")
     log_in_hContext(f)
     log_rv(f)
+
 
 def SCardListReaders(f):
     log_name("SCardListReaders")
@@ -116,12 +132,14 @@ def SCardListReaders(f):
     log_out_n_str("pcchReaders:", "mszReaders:", f)
     log_rv(f)
 
+
 def SCardListReaderGroups(f):
     log_name("SCardListReaderGroups")
     log_in_hContext(f)
     log_in2("pcchGroups:", f)
     log_out_n_str("pcchGroups:", "mszGroups:", f)
     log_rv(f)
+
 
 def SCardGetStatusChange(f):
     log_name("SCardGetStatusChange")
@@ -130,11 +148,13 @@ def SCardGetStatusChange(f):
     log_in2("cReaders:", f)
     log_rv(f)
 
+
 def SCardFreeMemory(f):
     log_name("SCardFreeMemory")
     log_in_hContext(f)
     log_in2("pvMem:", f)
     log_rv(f)
+
 
 def SCardConnect(f):
     log_name("SCardConnect")
@@ -148,12 +168,14 @@ def SCardConnect(f):
     log_out2("pdwActiveProtocol", f)
     log_rv(f)
 
+
 def SCardTransmit(f):
     log_name("SCardTransmit")
     log_in_hCard(f)
     log_in2("bSendBuffer", f)
     log_out2("bRecvBuffer", f)
     log_rv(f)
+
 
 def SCardControl(f):
     log_name("SCarControl")
@@ -163,6 +185,7 @@ def SCardControl(f):
     log_out2("bRecvBuffer", f)
     log_rv(f)
 
+
 def SCardGetAttrib(f):
     log_name("SCardGetAttrib")
     log_in_hCard(f)
@@ -170,12 +193,14 @@ def SCardGetAttrib(f):
     log_out2("bAttr", f)
     log_rv(f)
 
+
 def SCardSetAttrib(f):
     log_name("SCardSetAttrib")
     log_in_hCard(f)
     log_in2("dwAttrId", f)
     log_in2("bAttr", f)
     log_rv(f)
+
 
 def SCardStatus(f):
     log_name("SCardStatus")
@@ -189,6 +214,7 @@ def SCardStatus(f):
     log_out2("bAtr", f)
     log_rv(f)
 
+
 def SCardReconnect(f):
     log_name("SCardReconnect")
     log_in_hCard(f)
@@ -198,11 +224,13 @@ def SCardReconnect(f):
     log_out2("dwActiveProtocol", f)
     log_rv(f)
 
+
 def SCardDisconnect(f):
     log_name("SCardDisconnect")
     log_in_hCard(f)
     log_in2("dwDisposition", f)
     log_rv(f)
+
 
 def main():
     # register clean up function
@@ -225,7 +253,7 @@ def main():
 
     functions = {'SCardEstablishContext': SCardEstablishContext,
             'SCardIsValidContext': SCardIsValidContext,
-            'SCardReleaseContext': SCardReleaseContext }
+            'SCardReleaseContext': SCardReleaseContext}
 
     line = f.readline()
     while line != '':
