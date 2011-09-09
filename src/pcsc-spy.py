@@ -34,6 +34,9 @@ class PCSCspy(object):
 
     def _parse_rv(self, line):
         """ parse the return value line """
+        if line == "":
+            raise Exception("Empty line (application exited?)")
+
         (function, rv) = line.split(':')
         if function[0] != '<':
             raise Exception("Wrong line:", line)
@@ -99,6 +102,17 @@ class PCSCspy(object):
         """ log function name """
         print PCSCspy.color_blue + name + PCSCspy.color_normal
 
+    def _log_readers(self, readers, direction):
+        log = self.log_in2
+        if (direction == 1):
+            log = self.log_out2
+        for index in range(readers):
+            log("szReader:")
+            log(" dwCurrentState:")
+            log(" dwEventState:")
+            log(" Atr length:")
+            log(" Atr:")
+
     def _SCardEstablishContext(self):
         """ SCardEstablishContext """
         self.log_name("SCardEstablishContext")
@@ -143,7 +157,10 @@ class PCSCspy(object):
         self.log_name("SCardGetStatusChange")
         self.log_in_hContext()
         self.log_in2("dwTimeout:")
-        self.log_in2("cReaders:")
+        readers = int(self.filedesc.readline().strip(), 16)
+        self.log_in("cReaders: %d" % readers)
+        self._log_readers(readers, direction = 0)
+        self._log_readers(readers, direction = 1)
         self._log_rv()
 
     def _SCardFreeMemory(self):

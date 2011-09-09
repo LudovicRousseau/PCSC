@@ -189,14 +189,17 @@ static void spy_pvoid(const void *ptr)
 
 static void spy_buffer(const unsigned char *buffer, size_t length)
 {
-    char log_buffer[length * 3 +1], *p;
+    spy_long(length);
 
     if (NULL == buffer)
         spy_line("NULL");
     else
     {
+        char log_buffer[length * 3 +1], *p;
         size_t i;
+
         p = log_buffer;
+        log_buffer[0] = '\0';
         for (i=0; i<length; i++)
         {
             snprintf(p, 4, "%02X ", buffer[i]);
@@ -239,6 +242,23 @@ static void spy_n_str(const char *str, unsigned long *len, int autoallocate)
                 s += strlen(s)+1;
             } while(length < *len);
         }
+    }
+}
+
+
+static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
+{
+    int i;
+
+    for (i=0; i<cReaders; i++)
+    {
+        spy_str(rgReaderStates[i].szReader);
+        spy_long(rgReaderStates[i].dwCurrentState);
+        spy_long(rgReaderStates[i].dwEventState);
+        if (rgReaderStates[i].cbAtr <= MAX_ATR_SIZE)
+            spy_buffer(rgReaderStates[i].rgbAtr, rgReaderStates[i].cbAtr);
+        else
+            spy_buffer(NULL, rgReaderStates[i].cbAtr);
     }
 }
 
@@ -454,8 +474,10 @@ PCSC_API p_SCardGetStatusChange(SCardGetStatusChange)
 	spy_long(hContext);
     spy_long(dwTimeout);
     spy_long(cReaders);
+    spy_readerstate(rgReaderStates, cReaders);
 	rv = spy.SCardGetStatusChange(hContext, dwTimeout, rgReaderStates,
 		cReaders);
+    spy_readerstate(rgReaderStates, cReaders);
 	Quit();
 	return rv;
 }
