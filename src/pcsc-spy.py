@@ -187,7 +187,9 @@ class PCSCspy(object):
         """ SCardTransmit """
         self.log_name("SCardTransmit")
         self.log_in_hCard()
+        self.log_in2("bSendLength")
         self.log_in2("bSendBuffer")
+        self.log_out2("bRecvLength")
         self.log_out2("bRecvBuffer")
         self._log_rv()
 
@@ -196,7 +198,9 @@ class PCSCspy(object):
         self.log_name("SCarControl")
         self.log_in_hCard()
         self.log_in2("dwControlCode")
+        self.log_in2("bSendLength")
         self.log_in2("bSendBuffer")
+        self.log_out2("bRecvLength")
         self.log_out2("bRecvBuffer")
         self._log_rv()
 
@@ -205,6 +209,7 @@ class PCSCspy(object):
         self.log_name("SCardGetAttrib")
         self.log_in_hCard()
         self.log_in2("dwAttrId")
+        self.log_out2("bAttrLen")
         self.log_out2("bAttr")
         self._log_rv()
 
@@ -213,6 +218,7 @@ class PCSCspy(object):
         self.log_name("SCardSetAttrib")
         self.log_in_hCard()
         self.log_in2("dwAttrId")
+        self.log_in2("bAttrLen")
         self.log_in2("bAttr")
         self._log_rv()
 
@@ -226,6 +232,7 @@ class PCSCspy(object):
         self.log_out2("mszReaderName")
         self.log_out2("dwState")
         self.log_out2("dwProtocol")
+        self.log_out2("bAtrLen")
         self.log_out2("bAtr")
         self._log_rv()
 

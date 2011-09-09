@@ -495,7 +495,7 @@ PCSC_API p_SCardControl(SCardControl)
     if (lpBytesReturned)
         spy_buffer(pbRecvBuffer, *lpBytesReturned);
     else
-        spy_line("NULL");
+        spy_buffer(NULL, 0);
 	Quit();
 	return rv;
 }
@@ -512,7 +512,7 @@ PCSC_API p_SCardTransmit(SCardTransmit)
     if (pcbRecvLength)
         spy_buffer(pbRecvBuffer, *pcbRecvLength);
     else
-        spy_line("NULL");
+        spy_buffer(NULL, 0);
 	Quit();
 	return rv;
 }
@@ -582,7 +582,7 @@ PCSC_API p_SCardGetAttrib(SCardGetAttrib)
     spy_long(dwAttrId);
 	rv = spy.SCardGetAttrib(hCard, dwAttrId, pbAttr, pcbAttrLen);
     if (NULL == pcbAttrLen)
-        spy_line("NULL");
+        spy_buffer(NULL, 0);
     else
         spy_buffer(pbAttr, *pcbAttrLen);
 	Quit();
