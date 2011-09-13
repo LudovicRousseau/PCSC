@@ -428,6 +428,7 @@ src/Makefile
 src/libpcsclite.pc
 src/pcscd.h
 src/PCSC/pcsclite.h
+src/spy/Makefile
 ])
 AC_OUTPUT
 
