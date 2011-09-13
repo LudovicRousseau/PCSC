@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "misc.h"
 #include <winscard.h>
@@ -123,9 +124,6 @@ static struct
 
 #define LOG log_line("%s:%d", __FILE__, __LINE__)
 
-#define Enter() spy_line("> %s", __FUNCTION__);
-#define Quit() spy_line("< %s: %s (0x%08X)", __FUNCTION__, pcsc_stringify_error(rv), rv)
-
 static int Log_fd = -1;
 
 #ifdef DEBUG
@@ -160,6 +158,26 @@ static void spy_line(const char *fmt, ...)
 	write(Log_fd, "\n", 1);
 	va_end(args);
 }
+
+static void spy_enter(const char *fname)
+{
+    struct timeval profile_time;
+
+    gettimeofday(&profile_time, NULL);
+    spy_line(">|%d|%d|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
+}
+
+static void spy_quit(const char *fname, int rv)
+{
+    struct timeval profile_time;
+
+    gettimeofday(&profile_time, NULL);
+    spy_line("<|%d|%d|%s|%s (0x%08X)", profile_time.tv_sec,
+        profile_time.tv_usec, fname, pcsc_stringify_error(rv), rv);
+}
+
+#define Enter() spy_enter(__FUNCTION__)
+#define Quit() spy_quit(__FUNCTION__, rv)
 
 static void spy_long(long arg)
 {

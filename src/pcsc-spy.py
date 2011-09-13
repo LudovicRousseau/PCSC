@@ -37,20 +37,29 @@ class PCSCspy(object):
         if line == "":
             raise Exception("Empty line (application exited?)")
 
-        (function, rv) = line.split(':')
-        if function[0] != '<':
+        (direction, sec, usec, function, rv) = line.split('|')
+        if direction != '<':
             raise Exception("Wrong line:", line)
 
-        return rv
+        sec = int(sec)
+        usec = int(usec)
+        return (rv, sec, usec)
 
     def _log_rv(self):
         """ log the return value """
         line = self.filedesc.readline().strip()
-        rv = self._parse_rv(line)
+        (rv, sec, usec) = self._parse_rv(line)
+        delta_sec = sec - self.sec
+        delta_usec = usec - self.usec
+        if delta_usec < 0:
+            delta_sec -= 1
+            delta_usec += 1000000
+        a = b
+        time = " [%d.%09d]" % (delta_sec, delta_usec)
         if not "0x00000000" in rv:
-            print PCSCspy.color_red + " =>" + rv + PCSCspy.color_normal
+            print PCSCspy.color_red + " =>" + rv + PCSCspy.color_normal + time
         else:
-            print " =>", rv
+            print " =>", rv + time
 
     def log_in(self, line):
         """ generic log for IN line """
@@ -286,7 +295,9 @@ class PCSCspy(object):
                 print "Garbage: ", line
             else:
                 # dispatch
-                fct = line[2:-1]
+                (direction, sec, usec, fct) = line.strip().split('|')
+                self.sec = int(sec)
+                self.usec = int(usec)
                 if fct == 'SCardEstablishContext':
                     self._SCardEstablishContext()
                 elif fct == 'SCardReleaseContext':
