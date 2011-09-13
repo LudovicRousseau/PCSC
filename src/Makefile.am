@@ -1,9 +1,9 @@
-# Process this file with automake to create Makefile.in.
+SUBDIRS = spy
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	$(SYMBOL_VISIBILITY)
 
-lib_LTLIBRARIES = libpcsclite.la libpcscspy.la
+lib_LTLIBRARIES = libpcsclite.la
 
 sbin_PROGRAMS = pcscd
 noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
@@ -19,10 +19,6 @@ USB_CONFIG = tokenparser.l \
 	hotplug_linux.c \
 	hotplug_macosx.c
 endif
-
-libpcscspy_la_SOURCES = \
-	pcsc-spy.c
-libpcscspy_la_LIBADD = -ldl
 
 libpcsclite_la_SOURCES = \
 	debug.c \
