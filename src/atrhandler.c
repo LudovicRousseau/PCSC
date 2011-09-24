@@ -12,7 +12,7 @@
 /**
  * @file
  *
- * @brief This keeps track of smartcard protocols, timing issues
+ * @brief This keeps track of smart card protocols, timing issues
  * and ATR (Answer-to-Reset) handling.
  *
  * @note use ./configure --enable-debugatr to enable debug messages

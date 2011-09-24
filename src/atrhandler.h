@@ -11,7 +11,7 @@
 
 /**
  * @file
- * @brief This keeps track of smartcard protocols, timing issues
+ * @brief This keeps track of smart card protocols, timing issues
  * and Answer to Reset ATR handling.
  */
 

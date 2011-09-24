@@ -11,7 +11,7 @@
 
 /**
  * @file
- * @brief This handles smartcard reader communications.
+ * @brief This handles smart card reader communications.
  */
 
 #ifndef __winscard_h__

@@ -72,8 +72,8 @@
 
 /**
  * @file
- * @brief This handles smartcard reader communications.
- * This is the heart of the M$ smartcard API.
+ * @brief This handles smart card reader communications.
+ * This is the heart of the smart card API.
  *
  * Here are the main server-side functions which execute the requests from the
  * clients.
