@@ -37,7 +37,7 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 }
 #else
 /**
- * @brief This function return a human readable text for the given PC/SC error
+ * @brief This function returns a human readable text for the given PC/SC error
  * code.
  *
  * @ingroup API
@@ -50,7 +50,7 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
  * LONG rv;
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * if (rv != SCARD_S_SUCCESS)
- *     printf("SCardReleaseContext: %s (0x%lX)\n",
+ *     printf("SCardEstablishContext: %s (0x%lX)\n",
  *         pcsc_stringify_error(rv), rv);
  * @endcode
  */
