@@ -2312,9 +2312,6 @@ error:
  * PIN pads, biometrics, or other extensions to the normal smart card reader
  * that are not normally handled by PC/SC.
  *
- * @note the API of this function changed. In pcsc-lite 1.2.0 and before the
- * API was not Windows(R) PC/SC compatible. This has been corrected.
- *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwControlCode Control code for the operation.\n
