@@ -54,12 +54,12 @@
  *	  is \p 0x8010001F in pcsc-lite but \p 0x80100022 in Windows WinSCard.
  *	  You should not have any problem if you always use the symbolic name.
  *	  @par
- *	  The value \p 0x8010001F is also used by \ref SCARD_E_UNEXPECTED on
+ *	  The value \p 0x8010001F is also used for \ref SCARD_E_UNEXPECTED on
  *	  pcsc-lite but \ref SCARD_E_UNEXPECTED is never returned by
- *	  pcsc-lite. So \p 0x8010001F does always means
+ *	  pcsc-lite. So \p 0x8010001F does always mean
  *	  \ref SCARD_E_UNSUPPORTED_FEATURE.
  *	  @par
- *	  Applications like rdekstop that allow a Windows application to
+ *	  Applications like rdesktop that allow a Windows application to
  *	  talk to pcsc-lite should take care of this difference and convert
  *	  the value between the two worlds.
  * -# SCardConnect()
@@ -70,15 +70,15 @@
  *    Windows.
  * -# SCardEstablishContext()
  *    @par
- *    Each thread of an application shall use its own SCARDCONTEXT.
+ *    Each thread of an application shall use its own \ref SCARDCONTEXT.
  *    SCardCancel() is the only exception to the rule.  On Windows the
- *    same SCARDCONTEXT can be shared by different threads of same
+ *    same \ref SCARDCONTEXT can be shared by different threads of same
  *    application.
- * -# CardConnect() & SCardReconnect()
+ * -# SCardConnect() & SCardReconnect()
  *    @par
- *    pdwActiveProtocol is not set to SCARD_PROTOCOL_UNDEFINED if
- *    SCARD_SHARE_DIRECT is used but the card has already negociated its
- *    protocol
+ *    pdwActiveProtocol is not set to \ref SCARD_PROTOCOL_UNDEFINED if
+ *    \ref SCARD_SHARE_DIRECT is used but the card has @b already
+ *    negotiated its protocol.
  */
 
 #include "config.h"
@@ -411,7 +411,7 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
  * @brief Creates an Application Context to the PC/SC Resource Manager.
  *
  * This must be the first WinSCard function called in a PC/SC application.
- * Each thread of an application shall use its own SCARDCONTEXT.
+ * Each thread of an application shall use its own \ref SCARDCONTEXT.
  *
  * @ingroup API
  * @param[in] dwScope Scope of the establishment.
@@ -424,12 +424,12 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
  * @param[in] pvReserved2 Reserved for future use.
  * @param[out] phContext Returned Application Context.
  *
- * @return Connection status.
+ * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_PARAMETER \p phContext is null (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE )
  * @retval SCARD_E_NO_MEMORY There is no free slot to store \p hContext (\ref SCARD_E_NO_MEMORY)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  *
@@ -572,7 +572,7 @@ end:
  * @retval SCARD_E_INVALID_PARAMETER \p phContext is null. (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE)
  * @retval SCARD_E_NO_MEMORY There is no free slot to store \p hContext (\ref SCARD_E_NO_MEMORY)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  */
@@ -716,7 +716,7 @@ again:
  *
  * @return Connection status.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
@@ -832,7 +832,7 @@ error:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hContext handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p phCard or \p pdwActiveProtocol is NULL (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NO_SMARTCARD No smart card present (\ref SCARD_E_NO_SMARTCARD)
  * @retval SCARD_E_NOT_READY Could not allocate the desired port (\ref SCARD_E_NOT_READY)
  * @retval SCARD_E_PROTO_MISMATCH Requested protocol is unknown (\ref SCARD_E_PROTO_MISMATCH)
@@ -977,7 +977,7 @@ end:
  * @param[in] dwInitialization Desired action taken on the card/reader.
  * - \ref SCARD_LEAVE_CARD - Do nothing.
  * - \ref SCARD_RESET_CARD - Reset the card (warm reset).
- * - \ref SCARD_UNPOWER_CARD - Unpower the card (cold reset).
+ * - \ref SCARD_UNPOWER_CARD - Power down the card (cold reset).
  * - \ref SCARD_EJECT_CARD - Eject the card.
  * @param[out] pdwActiveProtocol Established protocol to this connection.
  *
@@ -986,7 +986,7 @@ end:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p phContext is null. (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid sharing mode, requested protocol, or reader name (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NO_SMARTCARD No smart card present (\ref SCARD_E_NO_SMARTCARD)
  * @retval SCARD_E_NOT_READY Could not allocate the desired port (\ref SCARD_E_NOT_READY)
  * @retval SCARD_E_PROTO_MISMATCH Requested protocol is unknown (\ref SCARD_E_PROTO_MISMATCH)
@@ -1108,14 +1108,14 @@ end:
  * @param[in] dwDisposition Reader function to execute.
  * - \ref SCARD_LEAVE_CARD - Do nothing.
  * - \ref SCARD_RESET_CARD - Reset the card (warm reset).
- * - \ref SCARD_UNPOWER_CARD - Unpower the card (cold reset).
+ * - \ref SCARD_UNPOWER_CARD - Power down the card (cold reset).
  * - \ref SCARD_EJECT_CARD - Eject the card.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful(\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_VALUE Invalid \p dwDisposition (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NO_SMARTCARD No smart card present (\ref SCARD_E_NO_SMARTCARD)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
@@ -1217,7 +1217,7 @@ error:
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE Invalid hCard handle (\ref SCARD_E_INVALID_HANDLE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
@@ -1317,14 +1317,14 @@ end:
  * The disposition action is not currently used in this release.
  * - \ref SCARD_LEAVE_CARD - Do nothing.
  * - \ref SCARD_RESET_CARD - Reset the card.
- * - \ref SCARD_UNPOWER_CARD - Unpower the card.
+ * - \ref SCARD_UNPOWER_CARD - Power down the card.
  * - \ref SCARD_EJECT_CARD - Eject the card.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_VALUE Invalid value for \p dwDisposition (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_E_SHARING_VIOLATION Someone else has exclusive rights (\ref SCARD_E_SHARING_VIOLATION)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
@@ -1427,7 +1427,7 @@ end:
  * (*pdwState & 0xFFFF0000). This number of events is incremented
  * for each card insertion or removal in the specified reader. This can
  * be used to detect a card removal/insertion between two calls to
- * SCardStatus()
+ * SCardStatus().
  *
  * If \c *pcchReaderLen is equal to \ref SCARD_AUTOALLOCATE then the function
  * will allocate itself the needed memory for mszReaderName. Use
@@ -1466,7 +1466,7 @@ end:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p pcchReaderLen or \p pcbAtrLen is NULL (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
@@ -1703,9 +1703,9 @@ end:
  * of the cards in a specific set of readers changes.
  *
  * This function receives a structure or list of structures containing
- * reader names. It then blocks for a change in state to occur for a
- * maximum blocking time of \p dwTimeout or forever if \ref INFINITE is
- * used.
+ * reader names. It then blocks waiting for a change in state to occur
+ * for a maximum blocking time of \p dwTimeout or forever if \ref
+ * INFINITE is used.
  *
  * The new event state will be contained in \p dwEventState. A status change
  * might be a card insertion or removal event, a change in ATR, etc.
@@ -1722,16 +1722,13 @@ end:
  *
  * @code
  * typedef struct {
- *   LPCSTR szReader;          // Reader name
+ *   LPCSTR szReader;           // Reader name
  *   LPVOID pvUserData;         // User defined data
  *   DWORD dwCurrentState;      // Current state of reader
  *   DWORD dwEventState;        // Reader state after a state change
  *   DWORD cbAtr;               // ATR Length, usually MAX_ATR_SIZE
  *   BYTE rgbAtr[MAX_ATR_SIZE]; // ATR Value
- * } SCARD_READERSTATE;
- * ...
- * typedef SCARD_READERSTATE *PSCARD_READERSTATE, **LPSCARD_READERSTATE;
- * ...
+ * } SCARD_READERSTATE, *LPSCARD_READERSTATE;
  * @endcode
  *
  * Value of \p dwCurrentState and \p dwEventState:
@@ -2329,7 +2326,7 @@ error:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p pbSendBuffer is NULL or \p cbSendLength is null and the IFDHandler is version 2.0 (without \p dwControlCode) (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid value was presented (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed(\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_E_UNSUPPORTED_FEATURE Driver does not support (\ref SCARD_E_UNSUPPORTED_FEATURE)
@@ -2488,7 +2485,7 @@ end:
  * - \ref SCARD_ATTR_DEVICE_FRIENDLY_NAME\n
  *   Implemented by pcsc-lite if the IFD Handler (driver) returns \ref
  *   IFD_ERROR_TAG.  pcsc-lite then returns the same reader name as
- *   returned by \ref SCardListReaders.
+ *   returned by \ref SCardListReaders().
  * - \ref SCARD_ATTR_DEVICE_IN_USE
  * - \ref SCARD_ATTR_DEVICE_SYSTEM_NAME
  * - \ref SCARD_ATTR_DEVICE_UNIT
@@ -2522,7 +2519,7 @@ end:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER A parameter is NULL and should not (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
@@ -2622,7 +2619,7 @@ end:
  * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbAttrLen is too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER A parameter is NULL and should not (\ref SCARD_E_INVALID_PARAMETER)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
@@ -2752,16 +2749,16 @@ end:
  * @code
  * typedef struct {
  *    DWORD dwProtocol;    // SCARD_PROTOCOL_T0 or SCARD_PROTOCOL_T1
- *    DWORD cbPciLength;   // Length of this structure - not used
+ *    DWORD cbPciLength;   // Length of this structure
  * } SCARD_IO_REQUEST;
  * @endcode
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in,out] pioSendPci Structure of Protocol Control Information.
- * - \ref SCARD_PCI_T0 - Pre-defined T=0 PCI structure.
- * - \ref SCARD_PCI_T1 - Pre-defined T=1 PCI structure.
- * - \ref SCARD_PCI_RAW - Pre-defined RAW PCI structure.
+ * - \ref SCARD_PCI_T0 - Predefined T=0 PCI structure.
+ * - \ref SCARD_PCI_T1 - Predefined T=1 PCI structure.
+ * - \ref SCARD_PCI_RAW - Predefined RAW PCI structure.
  * @param[in] pbSendBuffer APDU to send to the card.
  * @param[in] cbSendLength Length of the APDU.
  * @param[in,out] pioRecvPci Structure of protocol information.
@@ -2774,7 +2771,7 @@ end:
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p pbSendBuffer or \p pbRecvBuffer or \p pcbRecvLength or \p pioSendPci is null (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid Protocol, reader name, etc (\ref SCARD_E_INVALID_VALUE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_E_NOT_TRANSACTED APDU exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_PROTO_MISMATCH Connect protocol is different than desired (\ref SCARD_E_PROTO_MISMATCH)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
@@ -2926,7 +2923,7 @@ end:
 }
 
 /**
- * This function returns a list of currently available readers on the system.
+ * Returns a list of currently available readers on the system.
  *
  * \p mszReaders is a pointer to a character string that is allocated by the
  * application.  If the application sends \p mszGroups and \p mszReaders as
@@ -2949,7 +2946,7 @@ end:
  * @retval SCARD_E_INVALID_PARAMETER \p pcchReaders is NULL (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
  * @retval SCARD_E_NO_READERS_AVAILABLE No readers available (\ref SCARD_E_NO_READERS_AVAILABLE)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  *
  * @code
  * SCARDCONTEXT hContext;
@@ -3133,9 +3130,9 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * then this function will return the size of the buffer needed to allocate in
  * \p pcchGroups.
  *
- * The group names is a multi-string and separated by a nul character (\c
- * '\\0') and ended by a double nul character like
- * \c "SCard$DefaultReaders\\0Group 2\\0\\0".
+ * The group names is a multi-string and separated by a null character (\c
+ * '\0') and ended by a double null character like
+ * \c "SCard$DefaultReaders\0Group 2\0\0".
  *
  * If \c *pcchGroups is equal to \ref SCARD_AUTOALLOCATE then the function
  * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
@@ -3143,7 +3140,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[out] mszGroups List of groups to list readers.
- * @param[in,out] pcchGroups Size of multi-string buffer including NUL's.
+ * @param[in,out] pcchGroups Size of multi-string buffer including NULL's.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
@@ -3151,7 +3148,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p mszGroups is NULL (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
- * @retval SCARD_E_NO_SERVICE The server is not runing (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  *
  * @code
  * SCARDCONTEXT hContext;
@@ -3249,8 +3246,8 @@ end:
 }
 
 /**
- * This function cancels all pending blocking requests on the
- * SCardGetStatusChange() function.
+ * Cancels all pending blocking requests on the SCardGetStatusChange()
+ * function.
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
@@ -3342,8 +3339,8 @@ error:
  * @brief Check if a \ref SCARDCONTEXT is valid.
  *
  * Call this function to determine whether a smart card context handle is still
- * valid. After a smart card context handle has been set by
- * SCardEstablishContext(), it may become not valid if the resource manager
+ * valid. After a smart card context handle has been returned by
+ * SCardEstablishContext(), it may become invalid if the resource manager
  * service has been shut down.
  *
  * @ingroup API

@@ -37,8 +37,7 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 }
 #else
 /**
- * @brief This function returns a human readable text for the given PC/SC error
- * code.
+ * @brief Returns a human readable text for the given PC/SC error code.
  *
  * @ingroup API
  * @param[in] pcscError Error code to be translated to text.
