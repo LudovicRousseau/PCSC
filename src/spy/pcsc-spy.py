@@ -56,7 +56,7 @@ class PCSCspy(object):
             delta_usec += 1000000
         time = " [%d.%09d]" % (delta_sec, delta_usec)
         if not "0x00000000" in rv:
-            print PCSCspy.color_red + " =>" + rv + PCSCspy.color_normal + time
+            print PCSCspy.color_red + " => " + rv + PCSCspy.color_normal + time
         else:
             print " =>", rv + time
 
