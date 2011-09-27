@@ -78,6 +78,20 @@ class PCSCspy(object):
         hContext = self.filedesc.readline().strip()
         self.log_in("hContext: %s" % hContext)
 
+    def log_in_disposition(self):
+        """ log dwDisposition IN parameter """
+        dwDisposition = self.filedesc.readline().strip()
+        dispositions = {0: 'SCARD_LEAVE_CARD',
+            1: 'SCARD_RESET_CARD',
+            2: 'SCARD_UNPOWER_CARD',
+            3: 'SCARD_EJECT_CARD'}
+        try:
+            disposition = dispositions[int(dwDisposition, 16)]
+        except KeyError:
+            disposition = "UNKNOWN"
+        self.log_in("dwDisposition: %s (%s)" % (disposition,
+            dwDisposition))
+
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.filedesc.readline().strip()
@@ -258,7 +272,7 @@ class PCSCspy(object):
         """" SCardDisconnect """
         self.log_name("SCardDisconnect")
         self.log_in_hCard()
-        self.log_in2("dwDisposition")
+        self.log_in_disposition()
         self._log_rv()
 
     def _SCardBeginTransaction(self):
@@ -271,7 +285,7 @@ class PCSCspy(object):
         """ SCardEndTransaction """
         self.log_name("SCardEndTransaction")
         self.log_in_hCard()
-        self.log_in2("dwDisposition")
+        self.log_in_disposition()
         self._log_rv()
 
     def __del__(self):
