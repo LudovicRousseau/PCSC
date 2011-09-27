@@ -92,6 +92,24 @@ class PCSCspy(object):
         self.log_in("dwDisposition: %s (%s)" % (disposition,
             dwDisposition))
 
+    def log_in_attrid(self):
+        """ log dwAttrId IN parameter """
+        dwAttrId = self.filedesc.readline().strip()
+        attrids = {0x00010100: 'SCARD_ATTR_VENDOR_NAME',
+                0x00010102: 'SCARD_ATTR_VENDOR_IFD_VERSION',
+                0x00010103: 'SCARD_ATTR_VENDOR_IFD_SERIAL_NO',
+                0x0007A007: 'SCARD_ATTR_MAXINPUT',
+                0x00090300: 'SCARD_ATTR_ICC_PRESENCE',
+                0x00090301: 'SCARD_ATTR_ICC_INTERFACE_STATUS',
+                0x00090303: 'SCARD_ATTR_ATR_STRING',
+                0x00090303: 'SCARD_ATTR_ATR_STRING',
+                0x7FFF0003: 'SCARD_ATTR_DEVICE_FRIENDLY_NAME'}
+        try:
+            attrid = attrids[int(dwAttrId, 16)]
+        except KeyError:
+            attrid = "UNKNOWN"
+        self.log_in("dwAttrId: %s (%s)" % (attrid, dwAttrId))
+
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.filedesc.readline().strip()
@@ -230,7 +248,7 @@ class PCSCspy(object):
         """ SCardGetAttrib """
         self.log_name("SCardGetAttrib")
         self.log_in_hCard()
-        self.log_in2("dwAttrId")
+        self.log_in_attrid()
         self.log_out2("bAttrLen")
         self.log_out2("bAttr")
         self._log_rv()
@@ -239,7 +257,7 @@ class PCSCspy(object):
         """ SCardSetAttrib """
         self.log_name("SCardSetAttrib")
         self.log_in_hCard()
-        self.log_in2("dwAttrId")
+        self.log_in_attrid()
         self.log_in2("bAttrLen")
         self.log_in2("bAttr")
         self._log_rv()
