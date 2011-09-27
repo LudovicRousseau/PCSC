@@ -122,6 +122,22 @@ class PCSCspy(object):
             sharemode = "UNKNOWN"
         self.log_in("dwShareMode: %s (%s)" % (sharemode, dwShareMode))
 
+    def log_in_dwPreferredProtocols(self):
+        """ log dwPreferredProtocols IN parameter """
+        dwPreferredProtocols = self.filedesc.readline().strip()
+        PreferredProtocols = list()
+        protocol = int(dwPreferredProtocols, 16)
+        if protocol & 1:
+            PreferredProtocols.append("T=0")
+        if protocol & 2:
+            PreferredProtocols.append("T=1")
+        if protocol & 4:
+            PreferredProtocols.append("RAW")
+        if protocol & 8:
+            PreferredProtocols.append("T=15")
+        self.log_in("dwPreferredProtocols: %s (%s)" % (dwPreferredProtocols,
+            ", ".join(PreferredProtocols)))
+
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.filedesc.readline().strip()
@@ -228,7 +244,7 @@ class PCSCspy(object):
         self.log_in_hContext()
         self.log_in2("szReader")
         self.log_in_dwShareMode()
-        self.log_in2("dwPreferredProtocols")
+        self.log_in_dwPreferredProtocols()
         self.log_in2("phCard")
         self.log_in2("pdwActiveProtocol")
         self.log_out2("phCard")
@@ -293,7 +309,7 @@ class PCSCspy(object):
         self.log_name("SCardReconnect")
         self.log_in_hCard()
         self.log_in_dwShareMode()
-        self.log_in2("dwPreferredProtocols")
+        self.log_in_dwPreferredProtocols()
         self.log_in2("dwInitialization")
         self.log_out2("dwActiveProtocol")
         self._log_rv()
