@@ -312,8 +312,6 @@ static LONG load_lib(void)
 	get_symbol(SCardGetAttrib);
 	get_symbol(SCardSetAttrib);
 
-	dlclose(handle);
-
 	return SCARD_S_SUCCESS;
 }
 
