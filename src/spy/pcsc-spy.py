@@ -110,6 +110,18 @@ class PCSCspy(object):
             attrid = "UNKNOWN"
         self.log_in("dwAttrId: %s (%s)" % (attrid, dwAttrId))
 
+    def log_in_dwShareMode(self):
+        """ log dwShareMode IN parameter """
+        dwShareMode = self.filedesc.readline().strip()
+        sharemodes = {1: 'SCARD_SHARE_EXCLUSIVE',
+                2: 'SCARD_SHARE_SHARED',
+                3: 'SCARD_SHARE_DIRECT'}
+        try:
+            sharemode = sharemodes[int(dwShareMode, 16)]
+        except KeyError:
+            sharemode = "UNKNOWN"
+        self.log_in("dwShareMode: %s (%s)" % (sharemode, dwShareMode))
+
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.filedesc.readline().strip()
@@ -215,7 +227,7 @@ class PCSCspy(object):
         self.log_name("SCardConnect")
         self.log_in_hContext()
         self.log_in2("szReader")
-        self.log_in2("dwShareMode")
+        self.log_in_dwShareMode()
         self.log_in2("dwPreferredProtocols")
         self.log_in2("phCard")
         self.log_in2("pdwActiveProtocol")
@@ -280,7 +292,7 @@ class PCSCspy(object):
         """ SCardReconnect """
         self.log_name("SCardReconnect")
         self.log_in_hCard()
-        self.log_in2("dwShareMode")
+        self.log_in_dwShareMode()
         self.log_in2("dwPreferredProtocols")
         self.log_in2("dwInitialization")
         self.log_out2("dwActiveProtocol")
