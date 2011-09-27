@@ -150,8 +150,10 @@ class PCSCspy(object):
             protocol = "RAW"
         elif protocol & 8:
             protocol = "T=15"
-        self.log_out("dwActiveProtocol: %s (%s)" % (dwActiveProtocol,
-            protocol))
+        else:
+            protocol = "UNKNOWN"
+        self.log_out("dwActiveProtocol: %s (%s)" % (protocol,
+            dwActiveProtocol))
 
     def log_out_hContext(self):
         """ log hContext OUT parameter """
