@@ -261,6 +261,19 @@ class PCSCspy(object):
         self.log_in2("dwDisposition")
         self._log_rv()
 
+    def _SCardBeginTransaction(self):
+        """ SCardBeginTransaction """
+        self.log_name("SCardBeginTransaction")
+        self.log_in_hCard()
+        self._log_rv()
+
+    def _SCardEndTransaction(self):
+        """ SCardEndTransaction """
+        self.log_name("SCardEndTransaction")
+        self.log_in_hCard()
+        self.log_in2("dwDisposition")
+        self._log_rv()
+
     def __del__(self):
         """ cleanup """
         os.unlink(self.fifo)
@@ -327,6 +340,10 @@ class PCSCspy(object):
                     self._SCardReconnect()
                 elif fct == 'SCardDisconnect':
                     self._SCardDisconnect()
+                elif fct == 'SCardBeginTransaction':
+                    self._SCardBeginTransaction()
+                elif fct == 'SCardEndTransaction':
+                    self._SCardEndTransaction()
                 else:
                     print "Unknown function:", fct
 

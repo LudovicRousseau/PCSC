@@ -438,6 +438,7 @@ PCSC_API p_SCardBeginTransaction(SCardBeginTransaction)
 	LONG rv;
 
 	Enter();
+	spy_long(hCard);
 	rv = spy.SCardBeginTransaction(hCard);
 	Quit();
 	return rv;
@@ -448,6 +449,8 @@ PCSC_API p_SCardEndTransaction(SCardEndTransaction)
 	LONG rv;
 
 	Enter();
+	spy_long(hCard);
+	spy_long(dwDisposition);
 	rv = spy.SCardEndTransaction(hCard, dwDisposition);
 	Quit();
 	return rv;
