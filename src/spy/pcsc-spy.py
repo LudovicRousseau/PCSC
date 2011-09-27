@@ -211,8 +211,8 @@ class PCSCspy(object):
         self.log_in2("dwTimeout:")
         readers = int(self.filedesc.readline().strip(), 16)
         self.log_in("cReaders: %d" % readers)
-        self._log_readers(readers, direction = 0)
-        self._log_readers(readers, direction = 1)
+        self._log_readers(readers, direction=0)
+        self._log_readers(readers, direction=1)
         self._log_rv()
 
     def _SCardFreeMemory(self):
