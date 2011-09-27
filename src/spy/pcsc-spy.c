@@ -632,7 +632,7 @@ PCSC_API p_SCardGetAttrib(SCardGetAttrib)
 		const unsigned char *s = pbAttr;
 
 		if (autoallocate)
-			s = *(char **)pbAttr;
+			s = *(unsigned char **)pbAttr;
 
 		spy_buffer(s, *pcbAttrLen);
 	}
