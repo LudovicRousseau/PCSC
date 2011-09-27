@@ -171,7 +171,7 @@ static void spy_enter(const char *fname)
     spy_line(">|%d|%d|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
 }
 
-static void spy_quit(const char *fname, int rv)
+static void spy_quit(const char *fname, LONG rv)
 {
     struct timeval profile_time;
 
