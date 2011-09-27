@@ -603,6 +603,10 @@ PCSC_API p_SCardCancel(SCardCancel)
 PCSC_API p_SCardGetAttrib(SCardGetAttrib)
 {
 	LONG rv;
+    int autoallocate = 0;
+
+    if (pcbAttrLen)
+        autoallocate = *pcbAttrLen == SCARD_AUTOALLOCATE;
 
 	Enter();
 	spy_long(hCard);
@@ -611,7 +615,14 @@ PCSC_API p_SCardGetAttrib(SCardGetAttrib)
     if (NULL == pcbAttrLen)
         spy_buffer(NULL, 0);
     else
-        spy_buffer(pbAttr, *pcbAttrLen);
+	{
+		const unsigned char *s = pbAttr;
+
+		if (autoallocate)
+			s = *(char **)pbAttr;
+
+		spy_buffer(s, *pcbAttrLen);
+	}
 	Quit();
 	return rv;
 }
