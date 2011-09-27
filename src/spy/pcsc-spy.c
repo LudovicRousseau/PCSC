@@ -288,11 +288,12 @@ static LONG load_lib(void)
 	handle = dlopen(LIBPCSC, RTLD_LAZY);
 	if (NULL == handle)
 	{
-		spy_line("%s", dlerror());
+		log_line("%s", dlerror());
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
-#define get_symbol(s) spy.s = dlsym(handle, #s)
+#define get_symbol(s) do { spy.s = dlsym(handle, #s); if (NULL == spy.s) { log_line("%s", dlerror()); return SCARD_F_INTERNAL_ERROR; } } while (0)
+
 	get_symbol(SCardEstablishContext);
 	get_symbol(SCardReleaseContext);
 	get_symbol(SCardIsValidContext);
@@ -330,7 +331,9 @@ PCSC_API p_SCardEstablishContext(SCardEstablishContext)
 		init = 1;
 
 		/* load the real library */
-		load_lib();
+		rv = load_lib();
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
 
 		/* check if we can log */
 		home = getenv("HOME");
@@ -617,3 +620,4 @@ PCSC_API p_SCardSetAttrib(SCardSetAttrib)
 	Quit();
 	return rv;
 }
+
