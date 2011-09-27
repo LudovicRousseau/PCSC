@@ -217,7 +217,8 @@ static void spy_buffer(const unsigned char *buffer, size_t length)
         spy_line("NULL");
     else
     {
-        char log_buffer[length * 3 +1], *p;
+		/* "78 79 7A (xyz)" */
+        char log_buffer[length * 4 +1+2], *p;
         size_t i;
 
         p = log_buffer;
@@ -227,6 +228,18 @@ static void spy_buffer(const unsigned char *buffer, size_t length)
             snprintf(p, 4, "%02X ", buffer[i]);
             p += 3;
         }
+
+		*p++ = '(';
+		for (i=0; i<length; i++)
+		{
+			if (buffer[i] >= ' ')
+				*p++ = buffer[i];
+			else
+				*p++ = '.';
+		}
+		*p++ = ')';
+		*p = '\0';
+
         spy_line(log_buffer);
     }
 }
