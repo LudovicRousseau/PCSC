@@ -73,6 +73,8 @@
 
 #define p_SCardSetAttrib(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr, DWORD cbAttrLen)
 
+#define p_pcsc_stringify_error(fct) char *(fct)(const LONG pcscError)
+
 /* fake function to just return en error code */
 static LONG internal_error(void)
 {
@@ -100,6 +102,7 @@ static struct
 	p_SCardCancel(*SCardCancel);
 	p_SCardGetAttrib(*SCardGetAttrib);
 	p_SCardSetAttrib(*SCardSetAttrib);
+	p_pcsc_stringify_error(*pcsc_stringify_error);
 } spy = {
 	/* initialized with the fake internal_error() function */
 	.SCardEstablishContext = (p_SCardEstablishContext(*))internal_error,
@@ -119,7 +122,8 @@ static struct
 	.SCardFreeMemory = (p_SCardFreeMemory(*))internal_error,
 	.SCardCancel = (p_SCardCancel(*))internal_error,
 	.SCardGetAttrib = (p_SCardGetAttrib(*))internal_error,
-	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error
+	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error,
+	.pcsc_stringify_error = (p_pcsc_stringify_error(*))internal_error
 };
 
 #define LOG log_line("%s:%d", __FILE__, __LINE__)
@@ -173,7 +177,7 @@ static void spy_quit(const char *fname, int rv)
 
     gettimeofday(&profile_time, NULL);
     spy_line("<|%d|%d|%s|%s (0x%08X)", profile_time.tv_sec,
-        profile_time.tv_usec, fname, pcsc_stringify_error(rv), rv);
+        profile_time.tv_usec, fname, spy.pcsc_stringify_error(rv), rv);
 }
 
 #define Enter() spy_enter(__FUNCTION__)
@@ -312,6 +316,7 @@ static LONG load_lib(void)
 	get_symbol(SCardCancel);
 	get_symbol(SCardGetAttrib);
 	get_symbol(SCardSetAttrib);
+	get_symbol(pcsc_stringify_error);
 
 	return SCARD_S_SUCCESS;
 }
