@@ -160,6 +160,38 @@ class PCSCspy(object):
         hContext = self.filedesc.readline().strip()
         self.log_out("hContext: %s" % hContext)
 
+    def _get_state(self, dwState):
+        SCardStates = {0: 'SCARD_STATE_UNAWARE',
+            1: 'SCARD_STATE_IGNORE',
+            2: 'SCARD_STATE_CHANGED',
+            4: 'SCARD_STATE_UNKNOWN',
+            8: 'SCARD_STATE_UNAVAILABLE',
+            16: 'SCARD_STATE_EMPTY',
+            32: 'SCARD_STATE_PRESENT',
+            64: 'SCARD_STATE_ATRMATCH',
+            128: 'SCARD_STATE_EXCLUSIVE',
+            256: 'SCARD_STATE_INUSE',
+            512: 'SCARD_STATE_MUTE',
+            1024: 'SCARD_STATE_UNPOWERED'}
+
+        state = list()
+        for bit in SCardStates.keys():
+            if dwState & bit:
+                state.append(SCardStates[bit])
+        return ", ".join(state)
+
+    def log_dwCurrentState(self, log):
+        """ log dwCurrentState IN/OUT parameter """
+        dwCurrentState = self.filedesc.readline().strip()
+        state = self._get_state(int(dwCurrentState, 16))
+        log(" dwCurrentState: %s (%s)" % (state, dwCurrentState))
+
+    def log_dwEventState(self, log):
+        """ log dwEventState IN/OUT parameter """
+        dwEventState = self.filedesc.readline().strip()
+        state = self._get_state(int(dwEventState, 16))
+        log(" dwEventState: %s (%s)" % (state, dwEventState))
+
     def log_in2(self, header):
         """ generic log IN parameter """
         data = self.filedesc.readline().strip()
@@ -189,12 +221,14 @@ class PCSCspy(object):
 
     def _log_readers(self, readers, direction):
         log = self.log_in2
+        raw_log = self.log_in
         if (direction == 1):
             log = self.log_out2
+            raw_log = self.log_out
         for index in range(readers):
             log("szReader:")
-            log(" dwCurrentState:")
-            log(" dwEventState:")
+            self.log_dwCurrentState(raw_log)
+            self.log_dwEventState(raw_log)
             log(" Atr length:")
             log(" Atr:")
 
