@@ -138,6 +138,21 @@ class PCSCspy(object):
         self.log_in("dwPreferredProtocols: %s (%s)" % (dwPreferredProtocols,
             ", ".join(PreferredProtocols)))
 
+    def log_out_dwActiveProtocol(self):
+        """ log dwActiveProtocol OUT parameter """
+        dwActiveProtocol = self.filedesc.readline().strip()
+        protocol = int(dwActiveProtocol, 16)
+        if protocol & 1:
+            protocol = "T=0"
+        elif protocol & 2:
+            protocol = "T=1"
+        elif protocol & 4:
+            protocol = "RAW"
+        elif protocol & 8:
+            protocol = "T=15"
+        self.log_out("dwActiveProtocol: %s (%s)" % (dwActiveProtocol,
+            protocol))
+
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.filedesc.readline().strip()
@@ -248,7 +263,7 @@ class PCSCspy(object):
         self.log_in2("phCard")
         self.log_in2("pdwActiveProtocol")
         self.log_out2("phCard")
-        self.log_out2("pdwActiveProtocol")
+        self.log_out_dwActiveProtocol()
         self._log_rv()
 
     def _SCardTransmit(self):
@@ -311,7 +326,7 @@ class PCSCspy(object):
         self.log_in_dwShareMode()
         self.log_in_dwPreferredProtocols()
         self.log_in2("dwInitialization")
-        self.log_out2("dwActiveProtocol")
+        self.log_out_dwActiveProtocol()
         self._log_rv()
 
     def _SCardDisconnect(self):
