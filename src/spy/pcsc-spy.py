@@ -258,6 +258,24 @@ class PCSCspy(object):
         state = self._get_state(int(dwEventState, 16))
         log(" dwEventState: %s (%s)" % (state, dwEventState))
 
+    def log_dwControlCode(self):
+        """ log SCardControl() dwControlCode """
+        dwControlCode = self.filedesc.readline().strip()
+
+        def SCARD_CTL_CODE(code):
+            return 0x42000000 + code
+
+        CLASS2_IOCTL_MAGIC = 0x330000
+        ControlCodes = {
+            SCARD_CTL_CODE(1): "IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE",
+            SCARD_CTL_CODE(3400): "CM_IOCTL_GET_FEATURE_REQUEST"
+            }
+        try:
+            code = ControlCodes[int(dwControlCode, 16)]
+        except KeyError:
+            code = "UNKNOWN"
+        self.log_in("dwControlCode: %s (%s)" % (code, dwControlCode))
+
     def log_in2(self, header):
         """ generic log IN parameter """
         data = self.filedesc.readline().strip()
@@ -385,7 +403,7 @@ class PCSCspy(object):
         """ SCardControl """
         self.log_name("SCarControl")
         self.log_in_hCard()
-        self.log_in2("dwControlCode")
+        self.log_dwControlCode()
         self.log_in2("bSendLength")
         self.log_in2("bSendBuffer")
         self.log_out2("bRecvLength")
