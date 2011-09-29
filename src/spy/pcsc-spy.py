@@ -168,7 +168,6 @@ class PCSCspy(object):
                 0x00090300: 'SCARD_ATTR_ICC_PRESENCE',
                 0x00090301: 'SCARD_ATTR_ICC_INTERFACE_STATUS',
                 0x00090303: 'SCARD_ATTR_ATR_STRING',
-                0x00090303: 'SCARD_ATTR_ATR_STRING',
                 0x7FFF0003: 'SCARD_ATTR_DEVICE_FRIENDLY_NAME'}
         try:
             attrid = attrids[int(dwAttrId, 16)]
