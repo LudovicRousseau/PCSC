@@ -196,11 +196,13 @@ class PCSCspy(object):
         """ generic log IN parameter """
         data = self.filedesc.readline().strip()
         self.log_in("%s %s" % (header, data))
+        return data
 
     def log_out2(self, header):
         """ generic log OUT parameter """
         data = self.filedesc.readline().strip()
         self.log_out("%s %s" % (header, data))
+        return data
 
     def log_out_n_str(self, size_name, field_name):
         """ log multi-lines entries """
