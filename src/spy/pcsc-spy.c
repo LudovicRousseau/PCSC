@@ -176,7 +176,7 @@ static void spy_quit(const char *fname, LONG rv)
     struct timeval profile_time;
 
     gettimeofday(&profile_time, NULL);
-    spy_line("<|%d|%d|%s|%s (0x%08X)", profile_time.tv_sec,
+    spy_line("<|%d|%d|%s|%s|0x%08X", profile_time.tv_sec,
         profile_time.tv_usec, fname, spy.pcsc_stringify_error(rv), rv);
 }
 
