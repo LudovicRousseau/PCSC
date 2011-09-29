@@ -227,6 +227,7 @@ class PCSCspy(object):
         self.log_out("hContext: %s" % hContext)
 
     def _get_state(self, dwState):
+        """ parse dwCurrentState and dwEventState """
         SCardStates = {0: 'SCARD_STATE_UNAWARE',
             1: 'SCARD_STATE_IGNORE',
             2: 'SCARD_STATE_CHANGED',
@@ -288,6 +289,7 @@ class PCSCspy(object):
         print PCSCspy.color_blue + name + PCSCspy.color_normal
 
     def _log_readers(self, readers, direction):
+        """ log SCARD_READERSTATE structure """
         log = self.log_in2
         raw_log = self.log_in
         if (direction == 1):
@@ -465,6 +467,8 @@ class PCSCspy(object):
             os.mkfifo(self.fifo)
         except (OSError):
             print "fifo %s already present. Reusing it." % self.fifo
+
+        self.sec = self.usec = 0
 
         self.filedesc = open(self.fifo, 'r')
         #import sys
