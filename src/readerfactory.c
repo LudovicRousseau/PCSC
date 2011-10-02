@@ -122,7 +122,7 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	if (strlen(readerName) > MAX_READERNAME - sizeof(" 00 00"))
 	{
 		Log3(PCSC_LOG_ERROR,
-			"Reader name too long: %ld chars instead of max %ld",
+			"Reader name too long: %zd chars instead of max %zd",
 			strlen(readerName), MAX_READERNAME - sizeof(" 00 00"));
 		return SCARD_E_INVALID_VALUE;
 	}
