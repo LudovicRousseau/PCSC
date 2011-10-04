@@ -262,19 +262,13 @@ class PCSCspy(object):
         """ log SCardControl() dwControlCode """
         dwControlCode = self.filedesc.readline().strip()
 
-        def SCARD_CTL_CODE(code):
-            return 0x42000000 + code
-
-        CLASS2_IOCTL_MAGIC = 0x330000
-        ControlCodes = {
-            SCARD_CTL_CODE(1): "IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE",
-            SCARD_CTL_CODE(3400): "CM_IOCTL_GET_FEATURE_REQUEST"
-            }
         try:
-            code = ControlCodes[int(dwControlCode, 16)]
+            code = self.ControlCodes[int(dwControlCode, 16)]
         except KeyError:
             code = "UNKNOWN"
         self.log_in("dwControlCode: %s (%s)" % (code, dwControlCode))
+
+        return int(dwControlCode, 16)
 
     def log_in2(self, header):
         """ generic log IN parameter """
@@ -403,11 +397,58 @@ class PCSCspy(object):
         """ SCardControl """
         self.log_name("SCarControl")
         self.log_in_hCard()
-        self.log_dwControlCode()
+        dwControlCode = self.log_dwControlCode()
         self.log_in2("bSendLength")
         self.log_in2("bSendBuffer")
-        self.log_out2("bRecvLength")
-        self.log_out2("bRecvBuffer")
+        bRecvLength = self.log_out2("bRecvLength")
+        bRecvBuffer = self.log_out2("bRecvBuffer")
+
+        def hex2int(data, lengh):
+            return [int(x, 16) for x in data.split(" ")]
+
+        if dwControlCode == self.CM_IOCTL_GET_FEATURE_REQUEST:
+            bRecvLength = int(bRecvLength, 16)
+
+            # remove the ASCII part at the end
+            bRecvBuffer = bRecvBuffer[0:bRecvLength*3-1]
+            bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
+
+            features = {0x01: "FEATURE_VERIFY_PIN_START",
+                0x02: "FEATURE_VERIFY_PIN_FINISH",
+                0x03: "FEATURE_MODIFY_PIN_START",
+                0x04: "FEATURE_MODIFY_PIN_FINISH",
+                0x05: "FEATURE_GET_KEY_PRESSED",
+                0x06: "FEATURE_VERIFY_PIN_DIRECT",
+                0x07: "FEATURE_MODIFY_PIN_DIRECT",
+                0x08: "FEATURE_MCT_READER_DIRECT",
+                0x09: "FEATURE_MCT_UNIVERSAL",
+                0x0A: "FEATURE_IFD_PIN_PROPERTIES",
+                0x0B: "FEATURE_ABORT",
+                0x0C: "FEATURE_SET_SPE_MESSAGE",
+                0x0D: "FEATURE_VERIFY_PIN_DIRECT_APP_ID",
+                0x0E: "FEATURE_MODIFY_PIN_DIRECT_APP_ID",
+                0x0F: "FEATURE_WRITE_DISPLAY",
+                0x10: "FEATURE_GET_KEY",
+                0x11: "FEATURE_IFD_DISPLAY_PROPERTIES",
+                0x12: "FEATURE_GET_TLV_PROPERTIES",
+                0x13: "FEATURE_CCID_ESC_COMMAND"}
+
+            # parse GET_FEATURE_REQUEST results
+            while bRecvBuffer:
+                tag = bRecvBuffer[0]
+                length = bRecvBuffer[1]
+                value = bRecvBuffer[2:2+length]
+                value_int = value[3] + 256 * (value[2] + 256 * (value[1] + 256 *value[0]))
+                try:
+                    self.ControlCodes[value_int] = features[tag]
+                except KeyError:
+                    self.ControlCodes[value_int] = "UNKNOWN"
+
+                print "  Tag %s is 0x%X" % (self.ControlCodes[value_int],
+                        value_int)
+
+                bRecvBuffer = bRecvBuffer[2+length:]
+
         self._log_rv()
 
     def _SCardGetAttrib(self):
@@ -490,6 +531,15 @@ class PCSCspy(object):
         self.filedesc = open(self.fifo, 'r')
         #import sys
         #self.filedesc = sys.stdin
+
+        def SCARD_CTL_CODE(code):
+            return 0x42000000 + code
+
+        self.CM_IOCTL_GET_FEATURE_REQUEST = SCARD_CTL_CODE(3400)
+        self.ControlCodes = {
+            SCARD_CTL_CODE(1): "IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE",
+            SCARD_CTL_CODE(3400): "CM_IOCTL_GET_FEATURE_REQUEST"
+            }
 
     def loop(self):
         """ loop reading logs """
