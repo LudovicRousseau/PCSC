@@ -407,31 +407,12 @@ class PCSCspy(object):
             return [int(x, 16) for x in data.split(" ")]
 
         if dwControlCode == self.CM_IOCTL_GET_FEATURE_REQUEST:
+            print "  parsing CM_IOCTL_GET_FEATURE_REQUEST results:"
             bRecvLength = int(bRecvLength, 16)
 
             # remove the ASCII part at the end
             bRecvBuffer = bRecvBuffer[0:bRecvLength*3-1]
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
-
-            features = {0x01: "FEATURE_VERIFY_PIN_START",
-                0x02: "FEATURE_VERIFY_PIN_FINISH",
-                0x03: "FEATURE_MODIFY_PIN_START",
-                0x04: "FEATURE_MODIFY_PIN_FINISH",
-                0x05: "FEATURE_GET_KEY_PRESSED",
-                0x06: "FEATURE_VERIFY_PIN_DIRECT",
-                0x07: "FEATURE_MODIFY_PIN_DIRECT",
-                0x08: "FEATURE_MCT_READER_DIRECT",
-                0x09: "FEATURE_MCT_UNIVERSAL",
-                0x0A: "FEATURE_IFD_PIN_PROPERTIES",
-                0x0B: "FEATURE_ABORT",
-                0x0C: "FEATURE_SET_SPE_MESSAGE",
-                0x0D: "FEATURE_VERIFY_PIN_DIRECT_APP_ID",
-                0x0E: "FEATURE_MODIFY_PIN_DIRECT_APP_ID",
-                0x0F: "FEATURE_WRITE_DISPLAY",
-                0x10: "FEATURE_GET_KEY",
-                0x11: "FEATURE_IFD_DISPLAY_PROPERTIES",
-                0x12: "FEATURE_GET_TLV_PROPERTIES",
-                0x13: "FEATURE_CCID_ESC_COMMAND"}
 
             # parse GET_FEATURE_REQUEST results
             while bRecvBuffer:
@@ -440,7 +421,8 @@ class PCSCspy(object):
                 value = bRecvBuffer[2:2+length]
                 value_int = value[3] + 256 * (value[2] + 256 * (value[1] + 256 *value[0]))
                 try:
-                    self.ControlCodes[value_int] = features[tag]
+                    self.ControlCodes[value_int] = self.features[tag]
+                    self.__dict__[self.features[tag]] = value_int
                 except KeyError:
                     self.ControlCodes[value_int] = "UNKNOWN"
 
@@ -448,6 +430,42 @@ class PCSCspy(object):
                         value_int)
 
                 bRecvBuffer = bRecvBuffer[2+length:]
+
+        elif dwControlCode == self.FEATURE_GET_TLV_PROPERTIES:
+            print "  parsing FEATURE_GET_TLV_PROPERTIES results:"
+            bRecvLength = int(bRecvLength, 16)
+
+            # remove the ASCII part at the end
+            bRecvBuffer = bRecvBuffer[0:bRecvLength*3-1]
+            bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
+
+            tlv_properties = {
+                1: "PCSCv2_PART10_PROPERTY_wLcdLayout",
+                2: "PCSCv2_PART10_PROPERTY_bEntryValidationCondition",
+                3: "PCSCv2_PART10_PROPERTY_bTimeOut2",
+                4: "PCSCv2_PART10_PROPERTY_wLcdMaxCharacters",
+                5: "PCSCv2_PART10_PROPERTY_wLcdMaxLines",
+                6: "PCSCv2_PART10_PROPERTY_bMinPINSize",
+                7: "PCSCv2_PART10_PROPERTY_bMaxPINSize",
+                8: "PCSCv2_PART10_PROPERTY_sFirmwareID",
+                9: "PCSCv2_PART10_PROPERTY_bPPDUSupport"}
+
+            # parse GET_TLV_PROPERTIES results
+            while bRecvBuffer:
+                tag = bRecvBuffer[0]
+                length = bRecvBuffer[1]
+                value = bRecvBuffer[2:2 + length]
+
+                try:
+                    tag_text = tlv_properties[tag]
+                except KeyError:
+                    tag_text = "UNKNOWN"
+
+                print "  Tag:", tag_text
+                print "   Length: ", length
+                print "   Value:", value
+
+                bRecvBuffer = bRecvBuffer[2 + length:]
 
         self._log_rv()
 
@@ -532,6 +550,26 @@ class PCSCspy(object):
         #import sys
         #self.filedesc = sys.stdin
 
+        self.features = {0x01: "FEATURE_VERIFY_PIN_START",
+            0x02: "FEATURE_VERIFY_PIN_FINISH",
+            0x03: "FEATURE_MODIFY_PIN_START",
+            0x04: "FEATURE_MODIFY_PIN_FINISH",
+            0x05: "FEATURE_GET_KEY_PRESSED",
+            0x06: "FEATURE_VERIFY_PIN_DIRECT",
+            0x07: "FEATURE_MODIFY_PIN_DIRECT",
+            0x08: "FEATURE_MCT_READER_DIRECT",
+            0x09: "FEATURE_MCT_UNIVERSAL",
+            0x0A: "FEATURE_IFD_PIN_PROPERTIES",
+            0x0B: "FEATURE_ABORT",
+            0x0C: "FEATURE_SET_SPE_MESSAGE",
+            0x0D: "FEATURE_VERIFY_PIN_DIRECT_APP_ID",
+            0x0E: "FEATURE_MODIFY_PIN_DIRECT_APP_ID",
+            0x0F: "FEATURE_WRITE_DISPLAY",
+            0x10: "FEATURE_GET_KEY",
+            0x11: "FEATURE_IFD_DISPLAY_PROPERTIES",
+            0x12: "FEATURE_GET_TLV_PROPERTIES",
+            0x13: "FEATURE_CCID_ESC_COMMAND"}
+
         def SCARD_CTL_CODE(code):
             return 0x42000000 + code
 
@@ -540,6 +578,9 @@ class PCSCspy(object):
             SCARD_CTL_CODE(1): "IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE",
             SCARD_CTL_CODE(3400): "CM_IOCTL_GET_FEATURE_REQUEST"
             }
+        # dwControlCode not yet known
+        for key in self.features.keys():
+            self.__dict__[self.features[key]] = -1
 
     def loop(self):
         """ loop reading logs """
