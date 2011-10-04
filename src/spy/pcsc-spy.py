@@ -534,22 +534,30 @@ class PCSCspy(object):
 
     def __del__(self):
         """ cleanup """
-        os.unlink(self.fifo)
+        from stat import S_ISFIFO
+        file_stat = os.stat(self.fifo)
 
-    def __init__(self):
-        self.fifo = os.path.expanduser('~/pcsc-spy')
+        #  remove the log fifo only if it is a FIFO and not a log file
+        if S_ISFIFO(file_stat.st_mode):
+            os.unlink(self.fifo)
 
-        # create the FIFO file
-        try:
-            os.mkfifo(self.fifo)
-        except (OSError):
-            print "fifo %s already present. Reusing it." % self.fifo
+    def __init__(self, logfile=None):
+        """ constructor """
+
+        # use default fifo file?
+        if logfile == None:
+            logfile = os.path.expanduser('~/pcsc-spy')
+
+            # create the FIFO file
+            try:
+                os.mkfifo(logfile)
+            except (OSError):
+                print "fifo %s already present. Reusing it." % logfile
 
         self.sec = self.usec = 0
 
+        self.fifo = logfile 
         self.filedesc = open(self.fifo, 'r')
-        #import sys
-        #self.filedesc = sys.stdin
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
             0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -642,11 +650,16 @@ class PCSCspy(object):
             line = self.filedesc.readline()
 
 
-def main():
+def main(logfile=None):
     """ main """
-    spy = PCSCspy()
+    spy = PCSCspy(logfile)
     spy.loop()
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    logfile = None
+    if len(sys.argv) > 1:
+        logfile = sys.argv[1]
+
+    main(logfile)
