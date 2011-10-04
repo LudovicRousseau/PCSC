@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_builddir)/src/PCSC
+AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC
 
 lib_LTLIBRARIES = libpcscspy.la
 
