@@ -411,15 +411,16 @@ class PCSCspy(object):
             bRecvLength = int(bRecvLength, 16)
 
             # remove the ASCII part at the end
-            bRecvBuffer = bRecvBuffer[0:bRecvLength*3-1]
+            bRecvBuffer = bRecvBuffer[0:bRecvLength * 3 - 1]
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
 
             # parse GET_FEATURE_REQUEST results
             while bRecvBuffer:
                 tag = bRecvBuffer[0]
                 length = bRecvBuffer[1]
-                value = bRecvBuffer[2:2+length]
-                value_int = value[3] + 256 * (value[2] + 256 * (value[1] + 256 *value[0]))
+                value = bRecvBuffer[2:2 + length]
+                value_int = value[3] + 256 * (value[2] + 256
+                    * (value[1] + 256 * value[0]))
                 try:
                     self.ControlCodes[value_int] = self.features[tag]
                     self.__dict__[self.features[tag]] = value_int
@@ -427,16 +428,16 @@ class PCSCspy(object):
                     self.ControlCodes[value_int] = "UNKNOWN"
 
                 print "  Tag %s is 0x%X" % (self.ControlCodes[value_int],
-                        value_int)
+                    value_int)
 
-                bRecvBuffer = bRecvBuffer[2+length:]
+                bRecvBuffer = bRecvBuffer[2 + length:]
 
         elif dwControlCode == self.FEATURE_GET_TLV_PROPERTIES:
             print "  parsing FEATURE_GET_TLV_PROPERTIES results:"
             bRecvLength = int(bRecvLength, 16)
 
             # remove the ASCII part at the end
-            bRecvBuffer = bRecvBuffer[0:bRecvLength*3-1]
+            bRecvBuffer = bRecvBuffer[0:bRecvLength * 3 - 1]
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
 
             tlv_properties = {
