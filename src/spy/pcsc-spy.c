@@ -146,6 +146,16 @@ static void log_line(const char *fmt, ...)
 }
 #endif
 
+static void spy_line_direct(char *line)
+{
+	/* spying disabled */
+	if (Log_fd < 0)
+		return;
+
+	write(Log_fd, line, strlen(line));
+	write(Log_fd, "\n", 1);
+}
+
 static void spy_line(const char *fmt, ...)
 {
 	va_list args;
@@ -235,7 +245,7 @@ static void spy_buffer(const unsigned char *buffer, size_t length)
         }
 		*p = '\0';
 
-        spy_line(log_buffer);
+        spy_line_direct(log_buffer);
     }
 }
 
