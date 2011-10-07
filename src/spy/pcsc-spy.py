@@ -344,7 +344,7 @@ class PCSCspy(object):
             while data_buffer:
                 line = data_buffer[:width]
                 data_buffer = data_buffer[width:]
-                hex_dump = " ".join("%02x" % c for c in line)
+                hex_dump = " ".join("%02X" % c for c in line)
                 ascii_dump = quotechars(line)
                 if len(line) < width:
                     hex_dump += "   " * (width - len(line))
