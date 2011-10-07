@@ -353,7 +353,8 @@ class PCSCspy(object):
             return result
 
         def quotechars(data_buffer):
-            return ''.join(['.', chr(c)][c > 31] for c in data_buffer)
+            return ''.join(['.', chr(c)][c > 31 and c < 127]
+                for c in data_buffer)
 
         hex_buffer = self.filedesc.readline().strip()
         log(field)
