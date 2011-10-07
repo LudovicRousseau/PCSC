@@ -481,6 +481,14 @@ launch:
 		else
 		{
 			int pid;
+			struct stat mystat;
+
+			/* If the daemon is not present then just fail without waiting */
+			if (stat(PCSCD_BINARY, &mystat))
+			{
+				Log2(PCSC_LOG_CRITICAL, "stat " PCSCD_BINARY " failed: %s", strerror(errno));
+				return SCARD_E_NO_SERVICE;
+			}
 
 			pid = fork();
 
