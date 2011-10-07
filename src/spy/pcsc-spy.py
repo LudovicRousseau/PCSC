@@ -134,6 +134,16 @@ class PCSCspy(object):
         """ generic log for OUT line """
         print PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
 
+    def log_in_multi(self, lines, padding=""):
+        """ generic log for IN lines """
+        for line in lines:
+            self.log_in(padding + line)
+
+    def log_out_multi(self, lines, padding=""):
+        """ generic log for OUT lines """
+        for line in lines:
+            self.log_out(padding + line)
+
     def log_in_hCard(self):
         """ log hCard IN parameter """
         hContext = self.filedesc.readline().strip()
@@ -313,6 +323,39 @@ class PCSCspy(object):
             log(" Atr length:")
             log(" Atr:")
 
+    def log_buffer(self, field, direction):
+        log = self.log_in
+        log_multi = self.log_in_multi
+        if direction == "out":
+            log = self.log_out
+            log_multi = self.log_out_multi
+
+        def hexdump(data_buffer, width=16):
+            result = []
+            offset = 0
+            while data_buffer:
+                line = data_buffer[:width]
+                data_buffer = data_buffer[width:]
+                hex_dump = " ".join("%02x" % c for c in line)
+                ascii_dump = quotechars(line)
+                if len(line) < width:
+                    hex_dump += "   " * (width - len(line))
+                result.append("%04X %s %s" % (offset, hex_dump, ascii_dump))
+                offset += width
+            return result
+
+        def quotechars(data_buffer):
+            return ''.join(['.', chr(c)][c > 31] for c in data_buffer)
+
+        hex_buffer = self.filedesc.readline().strip()
+        log(field)
+        if hex_buffer != "NULL":
+            int_buffer = [int(x, 16) for x in hex_buffer.split(" ")]
+            formated_buffer = hexdump(int_buffer)
+            log_multi(formated_buffer, " ")
+
+        return hex_buffer
+
     def _SCardEstablishContext(self):
         """ SCardEstablishContext """
         self.log_name("SCardEstablishContext")
@@ -388,9 +431,9 @@ class PCSCspy(object):
         self.log_name("SCardTransmit")
         self.log_in_hCard()
         self.log_in2("bSendLength")
-        self.log_in2("bSendBuffer")
+        self.log_buffer("bSendBuffer", "in")
         self.log_out2("bRecvLength")
-        self.log_out2("bRecvBuffer")
+        self.log_buffer("bRecvBuffer", "out")
         self._log_rv()
 
     def _SCardControl(self):
@@ -399,9 +442,9 @@ class PCSCspy(object):
         self.log_in_hCard()
         dwControlCode = self.log_dwControlCode()
         self.log_in2("bSendLength")
-        self.log_in2("bSendBuffer")
+        self.log_buffer("bSendBuffer", "in")
         bRecvLength = self.log_out2("bRecvLength")
-        bRecvBuffer = self.log_out2("bRecvBuffer")
+        bRecvBuffer = self.log_buffer("bRecvBuffer", "out")
 
         def hex2int(data, lengh):
             return [int(x, 16) for x in data.split(" ")]
@@ -410,8 +453,6 @@ class PCSCspy(object):
             print "  parsing CM_IOCTL_GET_FEATURE_REQUEST results:"
             bRecvLength = int(bRecvLength, 16)
 
-            # remove the ASCII part at the end
-            bRecvBuffer = bRecvBuffer[0:bRecvLength * 3 - 1]
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
 
             # parse GET_FEATURE_REQUEST results
@@ -476,7 +517,7 @@ class PCSCspy(object):
         self.log_in_hCard()
         self.log_in_attrid()
         self.log_out2("bAttrLen")
-        self.log_out2("bAttr")
+        self.log_buffer("bAttr", "out")
         self._log_rv()
 
     def _SCardSetAttrib(self):
@@ -485,7 +526,7 @@ class PCSCspy(object):
         self.log_in_hCard()
         self.log_in_attrid()
         self.log_in2("bAttrLen")
-        self.log_in2("bAttr")
+        self.log_buffer("bAttr", "in")
         self._log_rv()
 
     def _SCardStatus(self):
