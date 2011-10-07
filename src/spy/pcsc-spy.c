@@ -158,6 +158,11 @@ static void spy_line(const char *fmt, ...)
 
 	va_start(args, fmt);
 	size = vsnprintf(line, sizeof line, fmt, args);
+	if ((size_t)size >= sizeof line)
+	{
+		printf("Buffer is too small. Exiting!\n");
+		exit(-1);
+	}
 	write(Log_fd, line, size);
 	write(Log_fd, "\n", 1);
 	va_end(args);
