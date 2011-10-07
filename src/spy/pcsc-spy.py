@@ -358,7 +358,9 @@ class PCSCspy(object):
 
         hex_buffer = self.filedesc.readline().strip()
         log(field)
-        if hex_buffer != "NULL" and hex_buffer != "":
+        if hex_buffer == "NULL":
+            log(" NULL")
+        elif hex_buffer != "":
             int_buffer = [int(x, 16) for x in hex_buffer.split(" ")]
             formated_buffer = hexdump(int_buffer)
             log_multi(formated_buffer, " ")
