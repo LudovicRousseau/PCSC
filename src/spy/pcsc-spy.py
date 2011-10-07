@@ -283,13 +283,21 @@ class PCSCspy(object):
     def log_in2(self, header):
         """ generic log IN parameter """
         data = self.filedesc.readline().strip()
-        self.log_in("%s %s" % (header, data))
+        if data.startswith("0x"):
+            decimal = int(data, 16)
+            self.log_in("%s %s (%d)" % (header, data, decimal))
+        else:
+            self.log_in("%s %s" % (header, data))
         return data
 
     def log_out2(self, header):
         """ generic log OUT parameter """
         data = self.filedesc.readline().strip()
-        self.log_out("%s %s" % (header, data))
+        if data.startswith("0x"):
+            decimal = int(data, 16)
+            self.log_out("%s %s (%d)" % (header, data, decimal))
+        else:
+            self.log_out("%s %s" % (header, data))
         return data
 
     def log_out_n_str(self, size_name, field_name):
