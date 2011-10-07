@@ -480,7 +480,7 @@ launch:
 		}
 		else
 		{
-			int pid;
+			int pid, stat_loc;
 			struct stat mystat;
 
 			/* If the daemon is not present then just fail without waiting */
@@ -524,8 +524,14 @@ launch:
 			/* father process */
 			daemon_launched = TRUE;
 
-			if (waitpid(pid, NULL, 0) < 0)
+			if (waitpid(pid, &stat_loc, 0) < 0)
 				Log2(PCSC_LOG_CRITICAL, "waitpid failed: %s", strerror(errno));
+			else
+			{
+				Log2(PCSC_LOG_INFO, "return value: %d", stat_loc);
+				if (stat_loc)
+					return SCARD_E_NO_SERVICE;
+			}
 
 			goto again;
 		}
