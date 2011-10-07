@@ -761,7 +761,7 @@ static void print_usage (char const * const progname)
 	printf("  -c, --config		path to reader.conf\n");
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stdout instead of syslog\n");
-	printf("  -T, --color       force use of colored logs\n");
+	printf("  -T, --color		force use of colored logs\n");
 	printf("  -h, --help		display usage information\n");
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
