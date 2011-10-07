@@ -597,7 +597,7 @@ class PCSCspy(object):
 
         self.sec = self.usec = 0
 
-        self.fifo = logfile 
+        self.fifo = logfile
         self.filedesc = open(self.fifo, 'r')
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
