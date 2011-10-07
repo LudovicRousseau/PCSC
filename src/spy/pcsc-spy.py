@@ -313,7 +313,7 @@ class PCSCspy(object):
         """ log SCARD_READERSTATE structure """
         log = self.log_in2
         raw_log = self.log_in
-        if (direction == 1):
+        if (direction == "out"):
             log = self.log_out2
             raw_log = self.log_out
         for index in range(readers):
@@ -402,8 +402,8 @@ class PCSCspy(object):
         self.log_in2("dwTimeout:")
         readers = int(self.filedesc.readline().strip(), 16)
         self.log_in("cReaders: %d" % readers)
-        self._log_readers(readers, direction=0)
-        self._log_readers(readers, direction=1)
+        self._log_readers(readers, direction="in")
+        self._log_readers(readers, direction="out")
         self._log_rv()
 
     def _SCardFreeMemory(self):
