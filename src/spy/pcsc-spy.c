@@ -291,12 +291,24 @@ static LONG load_lib(void)
 {
 	void *handle;
 
+#define LIBPCSC_NOSPY "libpcsclite_nospy.so.1"
 #define LIBPCSC "libpcsclite.so.1"
-	handle = dlopen(LIBPCSC, RTLD_LAZY);
+
+	/* first try to load the NOSPY library
+	 * this is used for programs doing an explicit dlopen like
+	 * Perl and Python wrappers */
+	handle = dlopen(LIBPCSC_NOSPY, RTLD_LAZY);
 	if (NULL == handle)
 	{
 		log_line("%s", dlerror());
-		return SCARD_F_INTERNAL_ERROR;
+
+		/* load the normal library */
+		handle = dlopen(LIBPCSC, RTLD_LAZY);
+		if (NULL == handle)
+		{
+			log_line("%s", dlerror());
+			return SCARD_F_INTERNAL_ERROR;
+		}
 	}
 
 #define get_symbol(s) do { spy.s = dlsym(handle, #s); if (NULL == spy.s) { log_line("%s", dlerror()); return SCARD_F_INTERNAL_ERROR; } } while (0)
@@ -643,3 +655,11 @@ PCSC_API p_SCardSetAttrib(SCardSetAttrib)
 	return rv;
 }
 
+PCSC_API p_pcsc_stringify_error(pcsc_stringify_error)
+{
+	return spy.pcsc_stringify_error(pcscError);
+}
+
+PCSC_API const SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, sizeof(SCARD_IO_REQUEST) };
+PCSC_API const SCARD_IO_REQUEST g_rgSCardT1Pci = { SCARD_PROTOCOL_T1, sizeof(SCARD_IO_REQUEST) };
+PCSC_API const SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(SCARD_IO_REQUEST) };
