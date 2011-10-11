@@ -501,33 +501,6 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Record our pid to make it easier
-	 * to kill the correct pcscd
-	 */
-	{
-		int f;
-		int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-
-		f = open(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode);
-		if (f != -1)
-		{
-			char pid[PID_ASCII_SIZE];
-
-			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			(void)write(f, pid, strlen(pid));
-			(void)close(f);
-
-			/* set mode so that the file is world readable even is umask is
-			 * restrictive
-			 * The file is used by libpcsclite */
-			(void)chmod(PCSCLITE_RUN_PID, mode);
-		}
-		else
-			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
-				strerror(errno));
-	}
-
-	/*
 	 * Allocate memory for reader structures
 	 */
 	rv = RFAllocateReaderSpace(customMaxReaderHandles);
@@ -574,6 +547,35 @@ int main(int argc, char **argv)
 		if (pid)
 			/* father */
 			return EXIT_SUCCESS;
+	}
+
+	/*
+	 * Record our pid to make it easier
+	 * to kill the correct pcscd
+	 *
+	 * Do not fork after this point or the stored pid will be wrong
+	 */
+	{
+		int f;
+		int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+
+		f = open(PCSCLITE_RUN_PID, O_RDWR | O_CREAT, mode);
+		if (f != -1)
+		{
+			char pid[PID_ASCII_SIZE];
+
+			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
+			(void)write(f, pid, strlen(pid));
+			(void)close(f);
+
+			/* set mode so that the file is world readable even is umask is
+			 * restrictive
+			 * The file is used by libpcsclite */
+			(void)chmod(PCSCLITE_RUN_PID, mode);
+		}
+		else
+			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
+				strerror(errno));
 	}
 
 	/*
