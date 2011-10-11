@@ -326,10 +326,16 @@ int main(int argc, char **argv)
 		Log1(PCSC_LOG_CRITICAL, "Too many file descriptors received");
 		return EXIT_FAILURE;
 	}
-	else if (rv == 1)
-		SocketActivated = TRUE;
 	else
-		SocketActivated = FALSE;
+	{
+		if (rv == 1)
+		{
+			SocketActivated = TRUE;
+			Log1(PCSC_LOG_INFO, "Started by systemd");
+		}
+		else
+			SocketActivated = FALSE;
+	}
 
 	/*
 	 * test the presence of /var/run/pcscd/pcscd.comm
