@@ -170,6 +170,7 @@ static void log_line(const int priority, const char *DebugBuffer)
 		{
 			printf("%.8d %s\n", delta, DebugBuffer);
 		}
+		fflush(stdout);
 	}
 } /* log_msg */
 
