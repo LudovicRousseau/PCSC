@@ -531,7 +531,7 @@ int main(int argc, char **argv)
 
 	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
-	if (AutoExit)
+	if (AutoExit && !SocketActivated)
 	{
 		int pid;
 
