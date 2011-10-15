@@ -719,6 +719,12 @@ static void signal_trap(int sig)
 		at_exit();
 	}
 
+	if (SIGALRM == sig)
+	{
+		/* normal exit without error */
+		ExitValue = EXIT_SUCCESS;
+	}
+
 	/* the signal handler is called several times for the same Ctrl-C */
 	if (AraKiri == FALSE)
 	{
