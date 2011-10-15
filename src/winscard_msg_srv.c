@@ -98,7 +98,11 @@ static int ProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
  */
 INTERNAL int32_t InitializeSocket(void)
 {
-	struct sockaddr_un serv_adr;
+	union
+	{
+		struct sockaddr sa;
+		struct sockaddr_un un;
+	} sa;
 
 	/*
 	 * Create the common shared connection socket
@@ -110,13 +114,12 @@ INTERNAL int32_t InitializeSocket(void)
 		return -1;
 	}
 
-	serv_adr.sun_family = AF_UNIX;
-	strncpy(serv_adr.sun_path, PCSCLITE_CSOCK_NAME,
-		sizeof(serv_adr.sun_path));
+	memset(&sa, 0, sizeof sa);
+	sa.un.sun_family = AF_UNIX;
+	strncpy(sa.un.sun_path, PCSCLITE_CSOCK_NAME, sizeof sa.un.sun_path);
 	(void)remove(PCSCLITE_CSOCK_NAME);
 
-	if (bind(commonSocket, (struct sockaddr *) &serv_adr,
-			sizeof(serv_adr.sun_family) + strlen(serv_adr.sun_path) + 1) < 0)
+	if (bind(commonSocket, &sa.sa, sizeof sa) < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Unable to bind common socket: %s",
 			strerror(errno));
