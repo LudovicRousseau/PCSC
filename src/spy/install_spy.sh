@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# exit on the first error
+set -e
+
 cd /usr/lib
 
 if [ -f libpcsclite_nospy.so.1 ]

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# exit on the first error
+set -e
+
 cd /usr/lib
 
 # Use the real library again
