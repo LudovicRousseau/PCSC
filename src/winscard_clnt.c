@@ -113,11 +113,6 @@
 /* Profile the execution time of WinSCard calls */
 #undef DO_PROFILE
 
-/* Check that handles are not shared between (forked) processes
- * This check is disabled since some systems uses the same PID for
- * different threads of a same process */
-#undef DO_CHECK_SAME_PROCESS
-
 
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	0x1000
@@ -367,17 +362,6 @@ static LONG SCardRemoveHandle(SCARDHANDLE);
 static void SCardInvalidateHandles(void);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
-
-#ifdef DO_CHECK_SAME_PROCESS
-pid_t client_pid = 0;
-static LONG SCardCheckSameProcess(void);
-#define CHECK_SAME_PROCESS \
-	rv = SCardCheckSameProcess(); \
-	if (rv != SCARD_S_SUCCESS) \
-		return rv;
-#else
-#define CHECK_SAME_PROCESS
-#endif
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 
@@ -762,8 +746,6 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	API_TRACE_IN("%ld", hContext)
 	PROFILE_START
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this context has been opened
 	 * and get currentContextMap
@@ -908,8 +890,6 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	 */
 	if (strlen(szReader) > MAX_READERNAME)
 		return SCARD_E_INVALID_VALUE;
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this context has been opened
@@ -1061,8 +1041,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this handle has been opened
 	 */
@@ -1166,8 +1144,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	PROFILE_START
 	API_TRACE_IN("%ld %ld", hCard, dwDisposition)
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this handle has been opened
 	 */
@@ -1270,8 +1246,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this handle has been opened
@@ -1379,8 +1353,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this handle has been opened
@@ -1568,8 +1540,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 
 	*pcchReaderLen = 0;
 	*pcbAtrLen = 0;
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this handle has been opened
@@ -1873,8 +1843,6 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		rv = SCARD_S_SUCCESS;
 		goto error;
 	}
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this context has been opened
@@ -2391,8 +2359,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 	if (NULL != lpBytesReturned)
 		*lpBytesReturned = 0;
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this handle has been opened
 	 */
@@ -2688,8 +2654,6 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this handle has been opened
 	 */
@@ -2837,8 +2801,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	if (pbSendBuffer == NULL || pbRecvBuffer == NULL ||
 			pcbRecvLength == NULL || pioSendPci == NULL)
 		return SCARD_E_INVALID_PARAMETER;
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this handle has been opened
@@ -3016,8 +2978,6 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	if (pcchReaders == NULL)
 		return SCARD_E_INVALID_PARAMETER;
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this context has been opened
 	 */
@@ -3132,8 +3092,6 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 
 	PROFILE_START
 
-	CHECK_SAME_PROCESS
-
 	/*
 	 * Make sure this context has been opened
 	 */
@@ -3211,8 +3169,6 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	/* Multi-string with two trailing \0 */
 	const char ReaderGroup[] = "SCard$DefaultReaders\0";
 	const unsigned int dwGroups = sizeof(ReaderGroup);
-
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this context has been opened
@@ -3392,9 +3348,6 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	API_TRACE_IN("%ld", hContext)
 
 	rv = SCARD_S_SUCCESS;
-
-	/* Check if the _same_ server is running */
-	CHECK_SAME_PROCESS
 
 	/*
 	 * Make sure this context has been opened
@@ -3746,22 +3699,6 @@ static void SCardInvalidateHandles(void)
 
 	(void)SCardUnlockThread();
 }
-
-#ifdef DO_CHECK_SAME_PROCESS
-static LONG SCardCheckSameProcess(void)
-{
-	/* after fork() need to restart */
-	if ((client_pid && client_pid != getpid()))
-	{
-		Log1(PCSC_LOG_INFO, "Client forked");
-		return SCardInvalidateHandles();
-	}
-
-	client_pid = getpid();
-
-	return SCARD_S_SUCCESS;
-}
-#endif
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 {
