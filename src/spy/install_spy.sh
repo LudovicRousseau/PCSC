@@ -2,6 +2,12 @@
 
 cd /usr/lib
 
+if [ -f libpcsclite_nospy.so.1 ]
+then
+	echo "File libpcsclite_nospy.so.1 already exists"
+	exit
+fi
+
 # backup the real library
 cp libpcsclite.so.1 libpcsclite_nospy.so.1
 
