@@ -21,6 +21,8 @@
 # $Id$
 
 import os
+from Queue import Queue
+from threading import Thread
 
 
 class PCSCspy(object):
@@ -48,7 +50,7 @@ class PCSCspy(object):
 
     def _log_rv(self):
         """ log the return value """
-        line = self.filedesc.readline().strip()
+        line = self.queue.get()
         (code, rv, sec, usec) = self._parse_rv(line)
         delta_sec = sec - self.sec
         delta_usec = usec - self.usec
@@ -146,17 +148,17 @@ class PCSCspy(object):
 
     def log_in_hCard(self):
         """ log hCard IN parameter """
-        hContext = self.filedesc.readline().strip()
+        hContext = self.queue.get()
         self.log_in("hCard: %s" % hContext)
 
     def log_in_hContext(self):
         """ log hContext IN parameter """
-        hContext = self.filedesc.readline().strip()
+        hContext = self.queue.get()
         self.log_in("hContext: %s" % hContext)
 
     def log_in_disposition(self):
         """ log dwDisposition IN parameter """
-        dwDisposition = self.filedesc.readline().strip()
+        dwDisposition = self.queue.get()
         dispositions = {0: 'SCARD_LEAVE_CARD',
             1: 'SCARD_RESET_CARD',
             2: 'SCARD_UNPOWER_CARD',
@@ -170,7 +172,7 @@ class PCSCspy(object):
 
     def log_in_attrid(self):
         """ log dwAttrId IN parameter """
-        dwAttrId = self.filedesc.readline().strip()
+        dwAttrId = self.queue.get()
         attrids = {0x00010100: 'SCARD_ATTR_VENDOR_NAME',
                 0x00010102: 'SCARD_ATTR_VENDOR_IFD_VERSION',
                 0x00010103: 'SCARD_ATTR_VENDOR_IFD_SERIAL_NO',
@@ -187,7 +189,7 @@ class PCSCspy(object):
 
     def log_in_dwShareMode(self):
         """ log dwShareMode IN parameter """
-        dwShareMode = self.filedesc.readline().strip()
+        dwShareMode = self.queue.get()
         sharemodes = {1: 'SCARD_SHARE_EXCLUSIVE',
                 2: 'SCARD_SHARE_SHARED',
                 3: 'SCARD_SHARE_DIRECT'}
@@ -199,7 +201,7 @@ class PCSCspy(object):
 
     def log_in_dwPreferredProtocols(self):
         """ log dwPreferredProtocols IN parameter """
-        dwPreferredProtocols = self.filedesc.readline().strip()
+        dwPreferredProtocols = self.queue.get()
         PreferredProtocols = list()
         protocol = int(dwPreferredProtocols, 16)
         if protocol & 1:
@@ -215,7 +217,7 @@ class PCSCspy(object):
 
     def log_out_dwActiveProtocol(self):
         """ log dwActiveProtocol OUT parameter """
-        dwActiveProtocol = self.filedesc.readline().strip()
+        dwActiveProtocol = self.queue.get()
         protocol = int(dwActiveProtocol, 16)
         if protocol & 1:
             protocol = "T=0"
@@ -232,7 +234,7 @@ class PCSCspy(object):
 
     def log_out_hContext(self):
         """ log hContext OUT parameter """
-        hContext = self.filedesc.readline().strip()
+        hContext = self.queue.get()
         self.log_out("hContext: %s" % hContext)
 
     def _get_state(self, dwState):
@@ -258,19 +260,19 @@ class PCSCspy(object):
 
     def log_dwCurrentState(self, log):
         """ log dwCurrentState IN/OUT parameter """
-        dwCurrentState = self.filedesc.readline().strip()
+        dwCurrentState = self.queue.get()
         state = self._get_state(int(dwCurrentState, 16))
         log(" dwCurrentState: %s (%s)" % (state, dwCurrentState))
 
     def log_dwEventState(self, log):
         """ log dwEventState IN/OUT parameter """
-        dwEventState = self.filedesc.readline().strip()
+        dwEventState = self.queue.get()
         state = self._get_state(int(dwEventState, 16))
         log(" dwEventState: %s (%s)" % (state, dwEventState))
 
     def log_dwControlCode(self):
         """ log SCardControl() dwControlCode """
-        dwControlCode = self.filedesc.readline().strip()
+        dwControlCode = self.queue.get()
 
         try:
             code = self.ControlCodes[int(dwControlCode, 16)]
@@ -282,7 +284,7 @@ class PCSCspy(object):
 
     def log_in2(self, header):
         """ generic log IN parameter """
-        data = self.filedesc.readline().strip()
+        data = self.queue.get()
         if data.startswith("0x"):
             decimal = int(data, 16)
             self.log_in("%s %s (%d)" % (header, data, decimal))
@@ -292,7 +294,7 @@ class PCSCspy(object):
 
     def log_out2(self, header):
         """ generic log OUT parameter """
-        data = self.filedesc.readline().strip()
+        data = self.queue.get()
         if data.startswith("0x"):
             decimal = int(data, 16)
             self.log_out("%s %s (%d)" % (header, data, decimal))
@@ -302,12 +304,12 @@ class PCSCspy(object):
 
     def log_out_n_str(self, size_name, field_name):
         """ log multi-lines entries """
-        data = self.filedesc.readline().strip()
+        data = self.queue.get()
         self.log_out("%s %s" % (size_name, data))
         size = int(data, 16)
         data_read = 0
         while data_read < size:
-            data = self.filedesc.readline().strip()
+            data = self.queue.get()
             self.log_out("%s %s" % (field_name, data))
             if data == 'NULL':
                 break
@@ -356,7 +358,7 @@ class PCSCspy(object):
             return ''.join(['.', chr(c)][c > 31 and c < 127]
                 for c in data_buffer)
 
-        hex_buffer = self.filedesc.readline().strip()
+        hex_buffer = self.queue.get()
         log(field)
         if hex_buffer == "NULL":
             log(" NULL")
@@ -370,7 +372,7 @@ class PCSCspy(object):
     def _SCardEstablishContext(self):
         """ SCardEstablishContext """
         self.log_name("SCardEstablishContext")
-        dwScope = self.filedesc.readline().strip()
+        dwScope = self.queue.get()
         scopes = {0: 'SCARD_SCOPE_USER',
                 1: 'SCARD_SCOPE_TERMINAL',
                 2: 'SCARD_SCOPE_SYSTEM'}
@@ -411,7 +413,7 @@ class PCSCspy(object):
         self.log_name("SCardGetStatusChange")
         self.log_in_hContext()
         self.log_in2("dwTimeout:")
-        readers = int(self.filedesc.readline().strip(), 16)
+        readers = int(self.queue.get(), 16)
         self.log_in("cReaders: %d" % readers)
         self._log_readers(readers, direction="in")
         self._log_readers(readers, direction="out")
@@ -584,32 +586,17 @@ class PCSCspy(object):
         self.log_in_disposition()
         self._log_rv()
 
-    def __del__(self):
-        """ cleanup """
-        from stat import S_ISFIFO
-        file_stat = os.stat(self.fifo)
+    def _SCardCancel(self):
+        """ SCardCancel """
+        self.log_name("SCardCancel")
+        self.log_in_hCard()
+        self._log_rv()
 
-        #  remove the log fifo only if it is a FIFO and not a log file
-        if S_ISFIFO(file_stat.st_mode):
-            os.unlink(self.fifo)
-
-    def __init__(self, logfile=None):
+    def __init__(self, queue):
         """ constructor """
 
-        # use default fifo file?
-        if logfile == None:
-            logfile = os.path.expanduser('~/pcsc-spy')
-
-            # create the FIFO file
-            try:
-                os.mkfifo(logfile)
-            except (OSError):
-                print "fifo %s already present. Reusing it." % logfile
-
-        self.sec = self.usec = 0
-
-        self.fifo = logfile
-        self.filedesc = open(self.fifo, 'r')
+        # communication queue
+        self.queue = queue
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
             0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -643,20 +630,15 @@ class PCSCspy(object):
         for key in self.features.keys():
             self.__dict__[self.features[key]] = -1
 
-    def loop(self):
-        """ loop reading logs """
-
-        # check version
-        version = self.filedesc.readline().strip()
-        if version != "PCSC SPY VERSION: 1":
-            print "Wrong version:", version
-            return
-
-        line = self.filedesc.readline()
+    def worker(self, *args):
+        line = self.queue.get()
         while line != '':
             # Enter function?
             if line[0] != '>':
-                print "Garbage: ", line
+                if line == 'EXIT':
+                    return
+                else:
+                    print "Garbage: ", line
             else:
                 # dispatch
                 (direction, sec, usec, fct) = line.strip().split('|')
@@ -696,15 +678,72 @@ class PCSCspy(object):
                     self._SCardBeginTransaction()
                 elif fct == 'SCardEndTransaction':
                     self._SCardEndTransaction()
+                elif fct == 'SCardCancel':
+                    self._SCardCancel()
                 else:
                     print "Unknown function:", fct
 
-            line = self.filedesc.readline()
+            line = self.queue.get()
+
+class PCSCdemultiplexer(object):
+    def __init__(self, logfile=None):
+        """ constructor """
+
+        # use default fifo file?
+        if logfile == None:
+            logfile = os.path.expanduser('~/pcsc-spy')
+
+            # create the FIFO file
+            try:
+                os.mkfifo(logfile)
+            except (OSError):
+                print "fifo %s already present. Reusing it." % logfile
+
+        self.sec = self.usec = 0
+
+        self.fifo = logfile
+        self.filedesc2 = open(self.fifo, 'r')
+
+        self.queues = dict()
+
+    def __del__(self):
+        """ cleanup """
+        from stat import S_ISFIFO
+        file_stat = os.stat(self.fifo)
+
+        #  remove the log fifo only if it is a FIFO and not a log file
+        if S_ISFIFO(file_stat.st_mode):
+            os.unlink(self.fifo)
+
+    def loop(self):
+        """ loop reading logs """
+
+        # dispatch
+        line = self.filedesc2.readline().strip()
+        threads = dict()
+        while line != '':
+            (thread, tail) = line.split('@')
+
+            try:
+                queue = self.queues[thread]
+            except KeyError:
+                queue = self.queues[thread] = Queue()
+                # new worker
+                spy = PCSCspy(queue)
+                threads[thread] = Thread(target=spy.worker)
+                threads[thread].start()
+
+            queue.put(tail)
+
+            line = self.filedesc2.readline().strip()
+
+        for thread in self.queues.keys():
+            self.queues[thread].put('EXIT')
 
 
 def main(logfile=None):
     """ main """
-    spy = PCSCspy(logfile)
+    spy = PCSCdemultiplexer(logfile)
     spy.loop()
 
 

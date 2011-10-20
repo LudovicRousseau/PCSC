@@ -27,11 +27,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 #include "misc.h"
 #include <winscard.h>
-
-#define VERSION 1
 
 #define DEBUG
 
@@ -130,6 +129,7 @@ static struct
 
 static int Log_fd = -1;
 static void *Lib_handle = NULL;
+static pthread_mutex_t Log_fd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #ifdef DEBUG
 static void log_line(const char *fmt, ...)
@@ -149,12 +149,18 @@ static void log_line(const char *fmt, ...)
 
 static void spy_line_direct(char *line)
 {
+	char threadid[30];
+
 	/* spying disabled */
 	if (Log_fd < 0)
 		return;
 
+	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
+	pthread_mutex_lock(&Log_fd_mutex);
+	write(Log_fd, threadid, strlen(threadid));
 	write(Log_fd, line, strlen(line));
 	write(Log_fd, "\n", 1);
+	pthread_mutex_unlock(&Log_fd_mutex);
 }
 
 static void spy_line(const char *fmt, ...)
@@ -162,6 +168,7 @@ static void spy_line(const char *fmt, ...)
 	va_list args;
 	char line[256];
 	int size;
+	char threadid[30];
 
 	/* spying disabled */
 	if (Log_fd < 0)
@@ -174,8 +181,12 @@ static void spy_line(const char *fmt, ...)
 		printf("Buffer is too small. Exiting!\n");
 		exit(-1);
 	}
+	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
+	pthread_mutex_lock(&Log_fd_mutex);
+	write(Log_fd, threadid, strlen(threadid));
 	write(Log_fd, line, size);
 	write(Log_fd, "\n", 1);
+	pthread_mutex_unlock(&Log_fd_mutex);
 	va_end(args);
 }
 
@@ -381,8 +392,6 @@ PCSC_API p_SCardEstablishContext(SCardEstablishContext)
 		{
 			log_line("open %s failed: %s", log_pipe, strerror(errno));
 		}
-		else
-			spy_line("PCSC SPY VERSION: %d", VERSION);
 	}
 
 	Enter();
@@ -625,6 +634,7 @@ PCSC_API p_SCardCancel(SCardCancel)
 	LONG rv;
 
 	Enter();
+	spy_long(hContext);
 	rv = spy.SCardCancel(hContext);
 	Quit();
 	return rv;
