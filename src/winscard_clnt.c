@@ -364,6 +364,7 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE,
 	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
 static LONG SCardRemoveHandle(SCARDHANDLE);
 
+static void SCardInvalidateHandles(void);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
@@ -448,9 +449,19 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	int daemon_launched = FALSE;
 	int retries = 0;
 #endif
+	static int first_time = TRUE;
 
 	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
 	PROFILE_START
+
+	/* Some setup for the first execution */
+	if (first_time)
+	{
+		first_time = FALSE;
+
+		/* Invalidate all the handles in the son after a fork */
+		pthread_atfork(NULL, NULL, SCardInvalidateHandles);
+	}
 
 #ifdef ENABLE_AUTOSTART
 again:
@@ -3717,8 +3728,7 @@ LONG SCardCheckDaemonAvailability(void)
 	return SCARD_S_SUCCESS;
 }
 
-#ifdef DO_CHECK_SAME_PROCESS
-static LONG SCardInvalidateHandles(void)
+static void SCardInvalidateHandles(void)
 {
 	/* invalid all handles */
 	(void)SCardLockThread();
@@ -3735,10 +3745,9 @@ static LONG SCardInvalidateHandles(void)
 	}
 
 	(void)SCardUnlockThread();
-
-	return SCARD_E_INVALID_HANDLE;
 }
 
+#ifdef DO_CHECK_SAME_PROCESS
 static LONG SCardCheckSameProcess(void)
 {
 	/* after fork() need to restart */
