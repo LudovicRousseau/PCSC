@@ -314,7 +314,6 @@ class PCSCspy(object):
         else:
             while data_read < size:
                 data = self.queue.get()
-                print "b", data
                 self.log_out("%s %s" % (field_name, data))
                 if data == 'NULL':
                     break
