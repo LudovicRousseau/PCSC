@@ -124,17 +124,26 @@ class PCSCspy(object):
         rv_text = rvs[int(rv, 16)]
         data = " => " + code + " (" + rv_text + " [" + rv + "]) "
         if "0x00000000" != rv:
-            print PCSCspy.color_red + data + PCSCspy.color_normal + time
+            if self.color:
+                print PCSCspy.color_red + data + PCSCspy.color_normal + time
+            else:
+                print data + time
         else:
             print data + time
 
     def log_in(self, line):
         """ generic log for IN line """
-        print PCSCspy.color_green + " i " + line + PCSCspy.color_normal
+        if self.color:
+            print PCSCspy.color_green + " i " + line + PCSCspy.color_normal
+        else:
+            print " i " + line
 
     def log_out(self, line):
         """ generic log for OUT line """
-        print PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
+        if self.color:
+            print PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
+        else:
+            print " o " + line
 
     def log_in_multi(self, lines, padding=""):
         """ generic log for IN lines """
@@ -321,7 +330,10 @@ class PCSCspy(object):
 
     def log_name(self, name):
         """ log function name """
-        print PCSCspy.color_blue + name + PCSCspy.color_normal
+        if self.color:
+            print PCSCspy.color_blue + name + PCSCspy.color_normal
+        else:
+            print name
 
     def _log_readers(self, readers, direction):
         """ log SCARD_READERSTATE structure """
@@ -596,11 +608,13 @@ class PCSCspy(object):
         self.log_in_hCard()
         self._log_rv()
 
-    def __init__(self, queue):
+    def __init__(self, queue, color=True):
         """ constructor """
 
         # communication queue
         self.queue = queue
+
+        self.color = color
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
             0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -690,7 +704,7 @@ class PCSCspy(object):
             line = self.queue.get()
 
 class PCSCdemultiplexer(object):
-    def __init__(self, logfile=None):
+    def __init__(self, logfile=None, color=True):
         """ constructor """
 
         # use default fifo file?
@@ -709,6 +723,7 @@ class PCSCdemultiplexer(object):
         self.filedesc2 = open(self.fifo, 'r')
 
         self.queues = dict()
+        self.color = color
 
     def __del__(self):
         """ cleanup """
@@ -733,7 +748,7 @@ class PCSCdemultiplexer(object):
             except KeyError:
                 queue = self.queues[thread] = Queue()
                 # new worker
-                spy = PCSCspy(queue)
+                spy = PCSCspy(queue, self.color)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
 
@@ -745,16 +760,30 @@ class PCSCdemultiplexer(object):
             self.queues[thread].put('EXIT')
 
 
-def main(logfile=None):
+def main(logfile=None, color=True):
     """ main """
-    spy = PCSCdemultiplexer(logfile)
+    spy = PCSCdemultiplexer(logfile, color)
     spy.loop()
 
 
 if __name__ == "__main__":
     import sys
-    logfile = None
-    if len(sys.argv) > 1:
-        logfile = sys.argv[1]
+    import getopt
 
-    main(logfile)
+    logfile = None
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "n", ["nocolor"])
+    except getopt.GetoptError:
+        print "Usage: %s [-n|--nocolor]"
+        sys.exit(1)
+
+    color = True
+    for o, a in opts:
+        if o == "-n":
+            color = False
+    print args
+
+    if len(args) > 0:
+        logfile = args[0]
+
+    main(logfile, color=color)
