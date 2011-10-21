@@ -31,6 +31,15 @@ extern "C" {
 #include <errno.h>
 #include <sys/types.h>
 
+#ifndef SIMCLIST_NO_DUMPRESTORE
+#   ifndef _WIN32
+#       include <sys/time.h>    /* list_dump_info_t's struct timeval */
+#   else
+#       include <time.h>
+#   endif
+#endif
+
+
 /* Be friend of both C90 and C99 compilers */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     /* "inline" and "restrict" are keywords */
@@ -49,13 +58,13 @@ typedef int32_t list_hash_t;
 
 #ifndef SIMCLIST_NO_DUMPRESTORE
 typedef struct {
-    uint16_t version;       /* dump version */
-    int64_t timestamp;      /* when the list has been dumped, microseconds from UNIX epoch */
+    uint16_t version;           /* dump version */
+    struct timeval timestamp;   /* when the list has been dumped, seconds since UNIX epoch */
     uint32_t list_size;
     uint32_t list_numels;
-    list_hash_t list_hash;       /* hash of the list when dumped, or 0 if invalid */
+    list_hash_t list_hash;      /* hash of the list when dumped, or 0 if invalid */
     uint32_t dumpsize;
-    int consistent;         /* 1 if the dump is verified complete/consistent; 0 otherwise */
+    int consistent;             /* 1 if the dump is verified complete/consistent; 0 otherwise */
 } list_dump_info_t;
 #endif
 
@@ -458,7 +467,7 @@ int list_delete_at(list_t *restrict l, unsigned int pos);
  * @param l     list to operate
  * @param posstart  [0,size-1] position index of the first element to be deleted
  * @param posend    [posstart,size-1] position of the last element to be deleted
- * @return      the number of elements successfully removed
+ * @return      the number of elements successfully removed on success, <0 on error
  */
 int list_delete_range(list_t *restrict l, unsigned int posstart, unsigned int posend);
 
@@ -471,7 +480,7 @@ int list_delete_range(list_t *restrict l, unsigned int posstart, unsigned int po
  * @see list_size()
  *
  * @param l     list to operate
- * @return      the number of elements in the list before cleaning
+ * @return      the number of elements removed on success, <0 on error
  */
 int list_clear(list_t *restrict l);
 
@@ -578,7 +587,7 @@ int list_concat(const list_t *l1, const list_t *l2, list_t *restrict dest);
  *
  * @param l     list to operate
  * @param versus positive: order small to big; negative: order big to small
- * @return      0: sorting went OK      non-0: errors happened
+ * @return      0 iff sorting was successful
  *
  * @see list_attributes_comparator()
  */
