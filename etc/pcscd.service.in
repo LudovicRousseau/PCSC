@@ -1,7 +1,6 @@
 [Unit]
 Description=PC/SC Smart Card Daemon
 Requires=pcscd.socket
-After=syslog.target
 
 [Service]
 ExecStart=@sbindir_exp@/pcscd --foreground
