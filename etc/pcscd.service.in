@@ -8,5 +8,4 @@ ExecReload=@sbindir_exp@/pcscd --hotplug
 StandardOutput=syslog
 
 [Install]
-WantedBy=multi-user.target
 Also=pcscd.socket
