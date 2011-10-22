@@ -3,7 +3,7 @@ Description=PC/SC Smart Card Daemon
 Requires=pcscd.socket
 
 [Service]
-ExecStart=@sbindir_exp@/pcscd --foreground
+ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit
 ExecReload=@sbindir_exp@/pcscd --hotplug
 StandardOutput=syslog
 
