@@ -387,20 +387,6 @@ int main(int argc, char **argv)
 				Log1(PCSC_LOG_CRITICAL, "Hotplug failed");
 				return EXIT_FAILURE;
 			}
-
-			if (!SocketActivated)
-			{
-				Log1(PCSC_LOG_CRITICAL,
-					"file " PCSCLITE_CSOCK_NAME " already exists.");
-				Log1(PCSC_LOG_CRITICAL,
-					"Maybe another pcscd is running?");
-				Log1(PCSC_LOG_CRITICAL,
-					"I can't read process pid from " PCSCLITE_RUN_PID);
-				Log1(PCSC_LOG_CRITICAL, "Remove " PCSCLITE_CSOCK_NAME);
-				Log1(PCSC_LOG_CRITICAL,
-					"if pcscd is not running to clear this message.");
-				return EXIT_FAILURE;
-			}
 		}
 	}
 	else
