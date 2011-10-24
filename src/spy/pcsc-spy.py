@@ -506,8 +506,6 @@ class PCSCspy(object):
             print "  parsing FEATURE_GET_TLV_PROPERTIES results:"
             bRecvLength = int(bRecvLength, 16)
 
-            # remove the ASCII part at the end
-            bRecvBuffer = bRecvBuffer[0:bRecvLength * 3 - 1]
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
 
             tlv_properties = {
