@@ -538,6 +538,14 @@ class PCSCspy(object):
 
                 bRecvBuffer = bRecvBuffer[2 + length:]
 
+        elif dwControlCode == self.FEATURE_IFD_PIN_PROPERTIES:
+            print "  parsing FEATURE_IFD_PIN_PROPERTIES results:"
+            bRecvBuffer = hex2int(bRecvBuffer, int(bRecvLength, 16))
+
+            print "  wLcdLayout:", bRecvBuffer[0], bRecvBuffer[1]
+            print "  bEntryValidationCondition:", bRecvBuffer[2]
+            print "  bTimeOut2:", bRecvBuffer[3]
+
         self._log_rv()
 
     def _SCardGetAttrib(self):
