@@ -24,6 +24,24 @@ import os
 from Queue import Queue
 from threading import Thread
 
+def hexdump(data_buffer, width=16):
+    def quotechars(data_buffer):
+        return ''.join(['.', chr(c)][c > 31 and c < 127]
+            for c in data_buffer)
+
+    result = []
+    offset = 0
+    while data_buffer:
+        line = data_buffer[:width]
+        data_buffer = data_buffer[width:]
+        hex_dump = " ".join("%02X" % c for c in line)
+        ascii_dump = quotechars(line)
+        if len(line) < width:
+            hex_dump += "   " * (width - len(line))
+        result.append("%04X %s %s" % (offset, hex_dump, ascii_dump))
+        offset += width
+    return result
+
 
 class PCSCspy(object):
     """ PC/SC spy """
@@ -356,24 +374,6 @@ class PCSCspy(object):
             log = self.log_out
             log_multi = self.log_out_multi
 
-        def hexdump(data_buffer, width=16):
-            result = []
-            offset = 0
-            while data_buffer:
-                line = data_buffer[:width]
-                data_buffer = data_buffer[width:]
-                hex_dump = " ".join("%02X" % c for c in line)
-                ascii_dump = quotechars(line)
-                if len(line) < width:
-                    hex_dump += "   " * (width - len(line))
-                result.append("%04X %s %s" % (offset, hex_dump, ascii_dump))
-                offset += width
-            return result
-
-        def quotechars(data_buffer):
-            return ''.join(['.', chr(c)][c > 31 and c < 127]
-                for c in data_buffer)
-
         hex_buffer = self.queue.get()
         log(field)
         if hex_buffer == "NULL":
@@ -470,8 +470,8 @@ class PCSCspy(object):
         self.log_name("SCarControl")
         self.log_in_hCard()
         dwControlCode = self.log_dwControlCode()
-        self.log_in2("bSendLength")
-        self.log_buffer("bSendBuffer", "in")
+        bSendLength = self.log_in2("bSendLength")
+        bSendBuffer = self.log_buffer("bSendBuffer", "in")
         bRecvLength = self.log_out2("bRecvLength")
         bRecvBuffer = self.log_buffer("bRecvBuffer", "out")
 
@@ -543,6 +543,33 @@ class PCSCspy(object):
             print "  wLcdLayout:", bRecvBuffer[0], bRecvBuffer[1]
             print "  bEntryValidationCondition:", bRecvBuffer[2]
             print "  bTimeOut2:", bRecvBuffer[3]
+
+        elif dwControlCode == self.FEATURE_VERIFY_PIN_DIRECT:
+            print "  parsing FEATURE_VERIFY_PIN_DIRECT:"
+            bSendBuffer = hex2int(bSendBuffer, int(bSendLength, 16))
+
+            print "  bTimerOut:", bSendBuffer[0]
+            print "  bTimerOut2:", bSendBuffer[1]
+            print "  bmFormatString:", bSendBuffer[2]
+            print "  bmPINBlockString:", bSendBuffer[3]
+            print "  bmPINLengthFormat:", bSendBuffer[4]
+            print "  wPINMaxExtraDigit: 0x%02X%02X" % (bSendBuffer[6],
+                bSendBuffer[5])
+            print "   Min:", bSendBuffer[6]
+            print "   Max:", bSendBuffer[5]
+            print "  bEntryValidationCondition:", bSendBuffer[7]
+            print "  bNumberMessage:", bSendBuffer[8]
+            print "  wLangId: 0x%02X%02X" % (bSendBuffer[10], bSendBuffer[9])
+            print "  bMsgIndex:", bSendBuffer[11]
+            print "  bTeoPrologue:", bSendBuffer[12], bSendBuffer[13], \
+                bSendBuffer[14]
+            print "  ulDataLength:", bSendBuffer[15] + \
+                bSendBuffer[16] * 256 + bSendBuffer[17] * 2 ** 16 + \
+                bSendBuffer[18] * 2 ** 24
+            print "  APDU:"
+            result = hexdump(bSendBuffer[19:])
+            for line in result:
+                print "  ", line
 
         self._log_rv()
 
@@ -708,6 +735,7 @@ class PCSCspy(object):
                     print "Unknown function:", fct
 
             line = self.queue.get()
+
 
 class PCSCdemultiplexer(object):
     def __init__(self, logfile=None, color=True):
