@@ -781,7 +781,6 @@ if __name__ == "__main__":
     for o, a in opts:
         if o == "-n":
             color = False
-    print args
 
     if len(args) > 0:
         logfile = args[0]
