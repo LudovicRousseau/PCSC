@@ -43,9 +43,6 @@
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
 #define MAX_DEVICENAME		255
 
-#define MAX_BUFFER_SIZE			264	/**< Maximum Tx/Rx Buffer for get/set attributes */
-#define MAX_BUFFER_SIZE_EXTENDED	(4 + 3 + (1<<16) + 3)	/**< max APDU (64K + APDU + Lc + Le) Tx/Rx Buffer */
-
 /** Different values for struct ReaderContext powerState field */
 enum
 {
