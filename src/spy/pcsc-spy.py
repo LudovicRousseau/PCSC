@@ -160,25 +160,25 @@ class PCSCspy(object):
         data = " => " + code + " (" + rv_text + " [" + rv + "]) "
         if "0x00000000" != rv:
             if self.color:
-                print PCSCspy.color_red + data + PCSCspy.color_normal + time
+                print self.indent + PCSCspy.color_red + data + PCSCspy.color_normal + time
             else:
-                print data + time
+                print self.indent + data + time
         else:
-            print data + time
+            print self.indent + data + time
 
     def log_in(self, line):
         """ generic log for IN line """
         if self.color:
-            print PCSCspy.color_green + " i " + line + PCSCspy.color_normal
+            print self.indent + PCSCspy.color_green + " i " + line + PCSCspy.color_normal
         else:
-            print " i " + line
+            print self.indent + " i " + line
 
     def log_out(self, line):
         """ generic log for OUT line """
         if self.color:
-            print PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
+            print self.indent + PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
         else:
-            print " o " + line
+            print self.indent + " o " + line
 
     def log_in_multi(self, lines, padding=""):
         """ generic log for IN lines """
@@ -366,9 +366,9 @@ class PCSCspy(object):
     def log_name(self, name):
         """ log function name """
         if self.color:
-            print PCSCspy.color_blue + name + PCSCspy.color_normal
+            print self.indent + PCSCspy.color_blue + name + PCSCspy.color_normal
         else:
-            print name
+            print self.indent + name
 
     def _log_readers(self, readers, direction):
         """ log SCARD_READERSTATE structure """
@@ -658,7 +658,7 @@ class PCSCspy(object):
         self.log_in_hCard()
         self._log_rv()
 
-    def __init__(self, queue, stats, color=True):
+    def __init__(self, queue, stats, indent, color=True):
         """ constructor """
 
         # communication queue
@@ -666,6 +666,7 @@ class PCSCspy(object):
 
         self.color = color
         self.stats = stats
+        self.indent = " " * indent
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
             0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -799,6 +800,7 @@ class PCSCdemultiplexer(object):
         self.stats = dict()
 
         threads = dict()
+        indent = 0
 
         # dispatch
         line = self.filedesc2.readline().strip()
@@ -815,9 +817,10 @@ class PCSCdemultiplexer(object):
             except KeyError:
                 queue = self.queues[thread] = Queue()
                 # new worker
-                spy = PCSCspy(queue, self.stats, self.color)
+                spy = PCSCspy(queue, self.stats, indent, self.color)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
+                indent += 4
 
             queue.put(tail)
 
