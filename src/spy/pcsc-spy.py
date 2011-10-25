@@ -23,6 +23,8 @@
 import os
 from Queue import Queue
 from threading import Thread
+from operator import attrgetter
+
 
 def hexdump(data_buffer, width=16):
     def quotechars(data_buffer):
@@ -43,6 +45,34 @@ def hexdump(data_buffer, width=16):
     return result
 
 
+def _parse_rv(line):
+    """ parse the return value line """
+    if line == "":
+        raise Exception("Empty line (application exited?)")
+
+    (direction, sec, usec, function, code, rv) = line.split('|')
+    if direction != '<':
+        raise Exception("Wrong line:", line)
+
+    sec = int(sec)
+    usec = int(usec)
+
+    return (code, rv, sec, usec)
+
+
+class StatRecord(object):
+    """ Record to store statistics """
+
+    def __init__(self, name):
+        self.name = name
+        self.executions = list()
+        self.total_time = 0
+        self.occurences = 0
+
+    def __repr__(self):
+        return self.name + ": " + repr(self.executions)
+
+
 class PCSCspy(object):
     """ PC/SC spy """
 
@@ -52,30 +82,17 @@ class PCSCspy(object):
     color_magenta = "\x1b[35m"
     color_normal = "\x1b[0m"
 
-    def _parse_rv(self, line):
-        """ parse the return value line """
-        if line == "":
-            raise Exception("Empty line (application exited?)")
-
-        (direction, sec, usec, function, code, rv) = line.split('|')
-        if direction != '<':
-            raise Exception("Wrong line:", line)
-
-        sec = int(sec)
-        usec = int(usec)
-
-        return (code, rv, sec, usec)
-
     def _log_rv(self):
         """ log the return value """
         line = self.queue.get()
-        (code, rv, sec, usec) = self._parse_rv(line)
+        (code, rv, sec, usec) = _parse_rv(line)
         delta_sec = sec - self.sec
         delta_usec = usec - self.usec
         if delta_usec < 0:
             delta_sec -= 1
             delta_usec += 1000000
         time = " [%d.%09d]" % (delta_sec, delta_usec)
+        self.execution_time = delta_sec + delta_usec / 1000000.
 
         rvs = {
             0x00000000: "SCARD_S_SUCCESS",
@@ -641,13 +658,14 @@ class PCSCspy(object):
         self.log_in_hCard()
         self._log_rv()
 
-    def __init__(self, queue, color=True):
+    def __init__(self, queue, stats, color=True):
         """ constructor """
 
         # communication queue
         self.queue = queue
 
         self.color = color
+        self.stats = stats
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
             0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -734,6 +752,12 @@ class PCSCspy(object):
                 else:
                     print "Unknown function:", fct
 
+            try:
+                record = self.stats[fct]
+            except KeyError:
+                record = self.stats[fct] = StatRecord(fct)
+            record.executions.append(self.execution_time)
+
             line = self.queue.get()
 
 
@@ -771,9 +795,18 @@ class PCSCdemultiplexer(object):
     def loop(self):
         """ loop reading logs """
 
+        # for statistics
+        self.stats = dict()
+
+        threads = dict()
+
         # dispatch
         line = self.filedesc2.readline().strip()
-        threads = dict()
+
+        (thread, tail) = line.split('@')
+        (direction, sec, usec, fct) = tail.strip().split('|')
+        start_time = int(sec) + int(usec) / 1000000.
+
         while line != '':
             (thread, tail) = line.split('@')
 
@@ -782,7 +815,7 @@ class PCSCdemultiplexer(object):
             except KeyError:
                 queue = self.queues[thread] = Queue()
                 # new worker
-                spy = PCSCspy(queue, self.color)
+                spy = PCSCspy(queue, self.stats, self.color)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
 
@@ -790,8 +823,35 @@ class PCSCdemultiplexer(object):
 
             line = self.filedesc2.readline().strip()
 
+        # tell the workers to exit
         for thread in self.queues.keys():
             self.queues[thread].put('EXIT')
+
+        # wait for all the workers to finish
+        for thread in threads:
+            threads[thread].join()
+
+        (code, rv, sec, usec) = _parse_rv(tail)
+        end_time = sec + usec / 1000000.
+        total_time = end_time - start_time
+
+        # compute some statistics
+        for fct in self.stats:
+            record = self.stats[fct]
+            record.occurences = len(record.executions)
+            record.total_time = sum(record.executions)
+
+        records = [self.stats[fct] for fct in self.stats]
+
+        # display statistics sorted by total_time
+        print
+        print "Results sorted by total execution time"
+        print "total time: %f sec" % total_time
+        for record in sorted(records, key=attrgetter('total_time'),
+            reverse=True):
+            print "%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
+                record.occurences, record.total_time / total_time * 100.,
+                record.name)
 
 
 def main(logfile=None, color=True):
