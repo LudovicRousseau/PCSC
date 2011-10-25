@@ -797,7 +797,7 @@ class PCSCdemultiplexer(object):
         """ loop reading logs """
 
         # for statistics
-        self.stats = dict()
+        stats = dict()
 
         threads = dict()
         indent = 0
@@ -816,8 +816,9 @@ class PCSCdemultiplexer(object):
                 queue = self.queues[thread]
             except KeyError:
                 queue = self.queues[thread] = Queue()
+                stats[thread] = dict()
                 # new worker
-                spy = PCSCspy(queue, self.stats, indent, self.color)
+                spy = PCSCspy(queue, stats[thread], indent, self.color)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
                 indent += 4
@@ -839,22 +840,24 @@ class PCSCdemultiplexer(object):
         total_time = end_time - start_time
 
         # compute some statistics
-        for fct in self.stats:
-            record = self.stats[fct]
-            record.occurences = len(record.executions)
-            record.total_time = sum(record.executions)
+        for thread in stats:
+            stat = stats[thread]
+            for fct in stat:
+                record = stat[fct]
+                record.occurences = len(record.executions)
+                record.total_time = sum(record.executions)
 
-        records = [self.stats[fct] for fct in self.stats]
+            records = [stat[fct] for fct in stat]
 
-        # display statistics sorted by total_time
-        print
-        print "Results sorted by total execution time"
-        print "total time: %f sec" % total_time
-        for record in sorted(records, key=attrgetter('total_time'),
-            reverse=True):
-            print "%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
-                record.occurences, record.total_time / total_time * 100.,
-                record.name)
+            # display statistics sorted by total_time
+            print
+            print "Results sorted by total execution time"
+            print "total time: %f sec" % total_time
+            for record in sorted(records, key=attrgetter('total_time'),
+                reverse=True):
+                print "%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
+                    record.occurences, record.total_time / total_time * 100.,
+                    record.name)
 
 
 def main(logfile=None, color=True):
