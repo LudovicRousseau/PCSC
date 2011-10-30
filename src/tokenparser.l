@@ -92,6 +92,7 @@ static void eval_value(char *pcToken, list_t *list_values)
 	int r;
 	size_t len;
 	char *value;
+	char *amp;
 
 	/* <string>foobar</string>
 	 * 012345678 : 8 is the first string character index */
@@ -105,6 +106,19 @@ static void eval_value(char *pcToken, list_t *list_values)
 	assert(value);
 
 	(void)strlcpy(value, &pcToken[8], len);
+
+	/* convert the firt &amp; into & */
+	amp = strstr(value, "&amp;");
+	if (amp)
+	{
+		char *p;
+
+		/* just skip "amp;" substring (4 letters) */
+		for (p = amp+1; *p; p++)
+		{
+			*p = *(p+4);
+		}
+	}
 
 	r = list_append(list_values, value);
 	assert(r >= 0);
