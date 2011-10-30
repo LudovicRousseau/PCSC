@@ -50,7 +50,7 @@ static list_t *ListValues;
 "\n"                                            {}
 \<key\>([A-Z]|[a-z]|[0-9]|[ \t])+\<\/key\>      { eval_key(yytext, ListKeys); }
 [ \t]                                           {}
-\<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'"])+\<\/string\> { eval_value(yytext, ListValues); }
+\<string\>([A-Z]|[a-z]|[0-9]|[ \t]|[!@#$%^&*()\-+/_\:?.,=~'";])+\<\/string\> { eval_value(yytext, ListValues); }
 .                                               { tperrorCheck(yytext); }
 %%
 
