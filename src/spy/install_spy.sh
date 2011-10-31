@@ -5,14 +5,16 @@ set -e
 
 cd /usr/lib
 
-if [ -f libpcsclite_nospy.so.1 ]
-then
-	echo "File libpcsclite_nospy.so.1 already exists"
-	exit
-fi
+NOSPY=libpcsclite_nospy.so.1
 
-# backup the real library
-cp libpcsclite.so.1 libpcsclite_nospy.so.1
+if [ -f $NOSPY ]
+then
+	echo "File $NOSPY already exists"
+else
+	# backup the real library
+	cp libpcsclite.so.1 $NOSPY
+fi
 
 # link to the spy library
 ln -sf libpcscspy.so.0.0.0 libpcsclite.so.1.0.0
+ln -sf libpcsclite.so.1.0.0 libpcsclite.so.1
