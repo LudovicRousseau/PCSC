@@ -192,8 +192,8 @@ class PCSCspy(object):
 
     def log_in_hCard(self):
         """ log hCard IN parameter """
-        hContext = self.queue.get()
-        self.log_in("hCard: %s" % hContext)
+        hCard = self.queue.get()
+        self.log_in("hCard: %s" % hCard)
 
     def log_in_hContext(self):
         """ log hContext IN parameter """
