@@ -881,7 +881,7 @@ if __name__ == "__main__":
 
     color = True
     for o, a in opts:
-        if o == "-n":
+        if o == "-n" or o == "--nocolor":
             color = False
 
     if len(args) > 0:
