@@ -339,6 +339,8 @@ class PCSCspy(object):
     def log_out2(self, header):
         """ generic log OUT parameter """
         data = self.queue.get()
+        if data == "EXIT":
+            raise Exception("Exit")
         if data.startswith("0x"):
             decimal = int(data, 16)
             self.log_out("%s %s (%d)" % (header, data, decimal))
