@@ -91,7 +91,10 @@ class PCSCspy(object):
         if delta_usec < 0:
             delta_sec -= 1
             delta_usec += 1000000
-        time = " [%d.%09d]" % (delta_sec, delta_usec)
+        if self.diffable:
+            time = " [??.??]"
+        else:
+            time = " [%d.%09d]" % (delta_sec, delta_usec)
         self.execution_time = delta_sec + delta_usec / 1000000.
 
         rvs = {
@@ -193,12 +196,18 @@ class PCSCspy(object):
     def log_in_hCard(self):
         """ log hCard IN parameter """
         hCard = self.queue.get()
-        self.log_in("hCard: %s" % hCard)
+        if self.diffable:
+            self.log_in("hCard: 0x????")
+        else:
+            self.log_in("hCard: %s" % hCard)
 
     def log_in_hContext(self):
         """ log hContext IN parameter """
         hContext = self.queue.get()
-        self.log_in("hContext: %s" % hContext)
+        if self.diffable:
+            self.log_in("hContext: 0x????")
+        else:
+            self.log_in("hContext: %s" % hContext)
 
     def log_in_disposition(self):
         """ log dwDisposition IN parameter """
@@ -279,7 +288,10 @@ class PCSCspy(object):
     def log_out_hContext(self):
         """ log hContext OUT parameter """
         hContext = self.queue.get()
-        self.log_out("hContext: %s" % hContext)
+        if self.diffable:
+            self.log_out("hContext: 0x????")
+        else:
+            self.log_out("hContext: %s" % hContext)
 
     def _get_state(self, dwState):
         """ parse dwCurrentState and dwEventState """
@@ -660,13 +672,14 @@ class PCSCspy(object):
         self.log_in_hCard()
         self._log_rv()
 
-    def __init__(self, queue, stats, indent, color=True):
+    def __init__(self, queue, stats, indent=0, color=True, diffable=False):
         """ constructor """
 
         # communication queue
         self.queue = queue
 
         self.color = color
+        self.diffable = diffable
         self.stats = stats
         self.indent = " " * indent
 
@@ -765,7 +778,7 @@ class PCSCspy(object):
 
 
 class PCSCdemultiplexer(object):
-    def __init__(self, logfile=None, color=True):
+    def __init__(self, logfile=None, color=True, diffable=False):
         """ constructor """
 
         # use default fifo file?
@@ -785,6 +798,7 @@ class PCSCdemultiplexer(object):
 
         self.queues = dict()
         self.color = color
+        self.diffable = diffable
 
     def __del__(self):
         """ cleanup """
@@ -820,7 +834,8 @@ class PCSCdemultiplexer(object):
                 queue = self.queues[thread] = Queue()
                 stats[thread] = dict()
                 # new worker
-                spy = PCSCspy(queue, stats[thread], indent, self.color)
+                spy = PCSCspy(queue, stats[thread], indent=indent,
+                    color=self.color, diffable=self.diffable)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
                 indent += 4
@@ -862,9 +877,9 @@ class PCSCdemultiplexer(object):
                     record.name)
 
 
-def main(logfile=None, color=True):
+def main(logfile=None, color=True, diffable=False):
     """ main """
-    spy = PCSCdemultiplexer(logfile, color)
+    spy = PCSCdemultiplexer(logfile, color, diffable)
     spy.loop()
 
 
@@ -874,17 +889,20 @@ if __name__ == "__main__":
 
     logfile = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "n", ["nocolor"])
+        opts, args = getopt.getopt(sys.argv[1:], "nd", ["nocolor", "diffable"])
     except getopt.GetoptError:
-        print "Usage: %s [-n|--nocolor]"
+        print "Usage: %s [-n|--nocolor] [-d|--diffable]"
         sys.exit(1)
 
     color = True
+    diffable = False
     for o, a in opts:
         if o == "-n" or o == "--nocolor":
             color = False
+        if o == "-d" or o == "--diffable":
+            diffable = True
 
     if len(args) > 0:
         logfile = args[0]
 
-    main(logfile, color=color)
+    main(logfile, color=color, diffable=diffable)
