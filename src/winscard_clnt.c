@@ -392,6 +392,26 @@ inline static LONG SCardUnlockThread(void)
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
 	/*@out@*/ LPSCARDCONTEXT);
 
+static int sd_booted(void) {
+#if defined(DISABLE_SYSTEMD) || !defined(__linux__)
+        return 0;
+#else
+
+        struct stat a, b;
+
+        /* We simply test whether the systemd cgroup hierarchy is
+         * mounted */
+
+        if (lstat("/sys/fs/cgroup", &a) < 0)
+                return 0;
+
+        if (lstat("/sys/fs/cgroup/systemd", &b) < 0)
+                return 0;
+
+        return a.st_dev != b.st_dev;
+#endif
+}
+
 /**
  * @brief Creates an Application Context to the PC/SC Resource Manager.
  *
@@ -457,7 +477,7 @@ again:
 		rv = SCardCheckDaemonAvailability();
 
 #ifdef ENABLE_AUTOSTART
-	if (SCARD_E_NO_SERVICE == rv)
+	if (!sd_booted() && SCARD_E_NO_SERVICE == rv)
 	{
 launch:
 		if (daemon_launched)
