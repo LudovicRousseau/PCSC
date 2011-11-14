@@ -392,26 +392,6 @@ inline static LONG SCardUnlockThread(void)
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
 	/*@out@*/ LPSCARDCONTEXT);
 
-static int sd_booted(void) {
-#if defined(DISABLE_SYSTEMD) || !defined(__linux__)
-        return 0;
-#else
-
-        struct stat a, b;
-
-        /* We simply test whether the systemd cgroup hierarchy is
-         * mounted */
-
-        if (lstat("/sys/fs/cgroup", &a) < 0)
-                return 0;
-
-        if (lstat("/sys/fs/cgroup/systemd", &b) < 0)
-                return 0;
-
-        return a.st_dev != b.st_dev;
-#endif
-}
-
 /**
  * @brief Creates an Application Context to the PC/SC Resource Manager.
  *
@@ -449,10 +429,6 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
-#ifdef ENABLE_AUTOSTART
-	int daemon_launched = FALSE;
-	int retries = 0;
-#endif
 	static int first_time = TRUE;
 
 	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
@@ -467,91 +443,11 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 		pthread_atfork(NULL, NULL, SCardInvalidateHandles);
 	}
 
-#ifdef ENABLE_AUTOSTART
-again:
-#endif
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
 	if (SCARD_E_INVALID_HANDLE == rv)
 		/* we reconnected to a daemon or we got called from a forked child */
 		rv = SCardCheckDaemonAvailability();
-
-#ifdef ENABLE_AUTOSTART
-	if (!sd_booted() && SCARD_E_NO_SERVICE == rv)
-	{
-launch:
-		if (daemon_launched)
-		{
-			retries++;
-			if (retries < 50)	/* 50 x 100ms = 5 seconds */
-			{
-				/* give some more time to the server to start */
-				SYS_USleep(100*1000);	/* 100 ms */
-				goto again;
-			}
-
-			/* the server failed to start (in time) */
-			goto end;
-		}
-		else
-		{
-			int pid, stat_loc;
-			struct stat mystat;
-
-			/* If the daemon is not present then just fail without waiting */
-			if (stat(PCSCD_BINARY, &mystat))
-			{
-				Log2(PCSC_LOG_CRITICAL, "stat " PCSCD_BINARY " failed: %s", strerror(errno));
-				return SCARD_E_NO_SERVICE;
-			}
-
-			pid = fork();
-
-			if (pid < 0)
-			{
-				Log2(PCSC_LOG_CRITICAL, "fork failed: %s", strerror(errno));
-				rv = SCARD_F_INTERNAL_ERROR;
-				goto end;
-			}
-
-			if (0 == pid)
-			{
-				int i, max;
-				char *param = getenv("PCSCLITE_PCSCD_ARGS");
-
-				/* close all file handles except stdin, stdout and
-				 * stderr so that pcscd does not confiscate ressources
-				 * allocated by the application */
-				max = sysconf(_SC_OPEN_MAX);
-				if (-1 == max)
-					max = 1024;
-				for (i=3; i<max; i++)
-					(void)close(i);
-
-				/* son process */
-				execl(PCSCD_BINARY, "pcscd", "--auto-exit", param,
-					(char *)NULL);
-				Log2(PCSC_LOG_CRITICAL, "exec " PCSCD_BINARY " failed: %s",
-					strerror(errno));
-				exit(1);
-			}
-
-			/* father process */
-			daemon_launched = TRUE;
-
-			if (waitpid(pid, &stat_loc, 0) < 0)
-				Log2(PCSC_LOG_CRITICAL, "waitpid failed: %s", strerror(errno));
-			else
-			{
-				Log2(PCSC_LOG_INFO, "return value: %d", stat_loc);
-				if (stat_loc)
-					return SCARD_E_NO_SERVICE;
-			}
-
-			goto again;
-		}
-	}
-#endif
 
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
@@ -560,17 +456,6 @@ launch:
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
 		pvReserved2, phContext);
 	(void)SCardUnlockThread();
-
-#ifdef ENABLE_AUTOSTART
-	/* SCardEstablishContextTH may fail if the previous pcscd crashed
-	 * without cleaning /var/run/pcscd/pcscd.comm */
-	if (SCARD_E_NO_SERVICE == rv)
-	{
-		retries++;
-		if (retries <= 1)
-			goto launch;
-	}
-#endif
 
 end:
 	PROFILE_END(rv)

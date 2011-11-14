@@ -517,24 +517,6 @@ int main(int argc, char **argv)
 
 	Log1(PCSC_LOG_INFO, "pcsc-lite " VERSION " daemon ready.");
 
-	if (AutoExit && !SocketActivated)
-	{
-		int pid;
-
-		/* create a new session so that Ctrl-C on the application will
-		 * not also quit pcscd */
-		setsid();
-
-		/* fork() so that pcscd always return in --auto-exit mode */
-		pid = fork();
-		if (-1 == pid )
-			Log2(PCSC_LOG_CRITICAL, "fork() failed: %s", strerror(errno));
-
-		if (pid)
-			/* father */
-			return EXIT_SUCCESS;
-	}
-
 	/*
 	 * Record our pid to make it easier
 	 * to kill the correct pcscd
