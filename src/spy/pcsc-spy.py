@@ -21,6 +21,7 @@
 # $Id$
 
 import os
+import signal
 from Queue import Queue
 from threading import Thread
 from operator import attrgetter
@@ -882,6 +883,9 @@ def main(logfile=None, color=True, diffable=False):
     spy = PCSCdemultiplexer(logfile, color, diffable)
     spy.loop()
 
+def signal_handler(sig, frame):
+    print 'Ctrl-C, exiting.'
+    os.kill(os.getpid(), signal.SIGQUIT)
 
 if __name__ == "__main__":
     import sys
@@ -905,4 +909,5 @@ if __name__ == "__main__":
     if len(args) > 0:
         logfile = args[0]
 
+    signal.signal(signal.SIGINT, signal_handler)
     main(logfile, color=color, diffable=diffable)
