@@ -2,8 +2,8 @@
 PCSC spy HOWTO
 ==============
 
-To able to spy the PC/SC layer the application flow must be modified so
-that all PC/SC calls are redirected. Two options are available:
+To be able to spy the PC/SC layer, the application flow must be modified
+so that all PC/SC calls are redirected. Two options are available:
 - the application is linked with libpcsclite.so.1
 - the application loads the libpcsclite.so.1 library using dlopen(3)
 
