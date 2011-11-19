@@ -1,3 +1,29 @@
+pcsc-lite-1.8.0: Ludovic Rousseau
+19 November 2011
+- PC/SC spy tool
+- Support systemd socket activation (the auto start of pcscd from the
+  library has been removed. Use systemd instead)
+- SCardGetStatusChange(): check all the readers are already known and
+  return SCARD_E_UNKNOWN_READER if a reader name is not present.
+  Windows XP has this behavior.
+- SCardEstablishContext(): Invalidate all the handles in the son after a
+  fork
+- Add define of FEATURE_EXECUTE_PACE from PCSC v2 Part 10 Amendment 1
+  2011-06-03
+- Fix some memory leaks repoted by Coverity
+- Enable silent build by default
+- log_line(): correctly calculate delta time when no color is used
+  The update of last_time was only done in case of colorization
+  (LogDoColor). So on unsupported consoles the time was wrong.
+- log_xxd_always(): Use a variable-length array
+  The debug message buffer is no more with a fixed size (around 600
+  bytes of buffer to log) but uses a variable-length array.
+  It is now possible to log extended APDU of 64kB.
+  The variable-length array feature is available in GCC in C90 mode and
+  is mandatory in C99 standard.
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.7.4: Ludovic Rousseau
 23 June 2011
 - Fix a stupid bug from the previous version. T=1 cards were not
