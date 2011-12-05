@@ -246,6 +246,7 @@ void bundleRelease(list_t *l)
 		list_destroy(&elt->values);
 
 		/* free the key */
+		free(elt->key);
 		free(elt);
 	}
 
