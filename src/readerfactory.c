@@ -498,6 +498,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 		{
 			(void)pthread_mutex_destroy(sContext->mMutex);
 			free(sContext->mMutex);
+			sContext->mMutex = NULL;
 			free(sContext->library);
 			free(sContext->device);
 			free(sContext->pMutex);
@@ -515,7 +516,6 @@ LONG RFRemoveReader(const char *readerName, int port)
 
 		sContext->version = 0;
 		sContext->port = 0;
-		sContext->mMutex = NULL;
 		sContext->contexts = 0;
 		sContext->slot = 0;
 		sContext->hLockId = 0;
