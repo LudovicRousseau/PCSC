@@ -114,7 +114,7 @@ static void eval_value(char *pcToken, list_t *list_values)
 		char *p;
 
 		/* just skip "amp;" substring (4 letters) */
-		for (p = amp+1; *p; p++)
+		for (p = amp+1; *(p+4); p++)
 		{
 			*p = *(p+4);
 		}
