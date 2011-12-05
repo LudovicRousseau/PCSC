@@ -514,6 +514,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 			sContext->pFeeds = NULL;
 		}
 
+		(void)pthread_mutex_destroy(&sContext->powerState_lock);
 		sContext->version = 0;
 		sContext->port = 0;
 		sContext->contexts = 0;
@@ -538,6 +539,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 			free(currentHandle);
 		}
 		(void)pthread_mutex_unlock(&sContext->handlesList_lock);
+		(void)pthread_mutex_destroy(&sContext->handlesList_lock);
 		list_destroy(&(sContext->handlesList));
 		dwNumReadersContexts -= 1;
 
