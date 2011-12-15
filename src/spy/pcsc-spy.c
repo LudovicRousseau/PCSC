@@ -178,8 +178,8 @@ static void spy_line(const char *fmt, ...)
 	size = vsnprintf(line, sizeof line, fmt, args);
 	if ((size_t)size >= sizeof line)
 	{
-		printf("Buffer is too small. Exiting!\n");
-		exit(-1);
+		printf("libpcsc-spy: Buffer is too small!\n");
+		return;
 	}
 	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
 	pthread_mutex_lock(&Log_fd_mutex);
