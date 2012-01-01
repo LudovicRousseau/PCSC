@@ -583,6 +583,8 @@ don't mind loading a new driver for each reader then ignore Lun.
 @param[in] Tag Tag of the desired data value
 - \ref TAG_IFD_ATR
   Return the ATR and its size (implementation is mandatory).
+- \ref TAG_IFD_SLOTNUM
+  Unused/deprecated
 - \ref SCARD_ATTR_ATR_STRING
   Same as \ref TAG_IFD_ATR but this one is not mandatory. It is defined
   in Microsoft PC/SC SCardGetAttrib().
@@ -604,9 +606,22 @@ don't mind loading a new driver for each reader then ignore Lun.
   <tt>Value[0] = 1</tt> indicates the driver supports simultaneous slot
   accesses.
 - \ref TAG_IFD_POLLING_THREAD
-  If the driver provide a polling thread then @p Value is a pointer to this function
+  Unused/deprecated
+- \ref TAG_IFD_POLLING_THREAD_WITH_TIMEOUT
+  If the driver provides a polling thread then @p Value is a pointer to
+  this function. The function prototype is:
+@verbatim
+  RESPONSECODE foo(DWORD Lun, int timeout);
+@endverbatim
 - \ref TAG_IFD_POLLING_THREAD_KILLABLE
-  Tell if the polling thread can be killed (SYS_ThreadCancel()) by pcscd
+  Tell if the polling thread can be killed (pthread_kill()) by pcscd
+- \ref TAG_IFD_STOP_POLLING_THREAD
+  Returns a pointer in @p Value to the function used to stop the polling
+  thread returned by \ref TAG_IFD_POLLING_THREAD_WITH_TIMEOUT. The
+  function prototype is:
+@verbatim
+  RESPONSECODE foo(DWORD Lun);
+@endverbatim
 @param[in,out] Length Length of the desired data value
 @param[out] Value Value of the desired data
 
