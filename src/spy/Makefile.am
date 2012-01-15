@@ -9,4 +9,4 @@ libpcscspy_la_LIBADD = -ldl
 
 man_MANS = pcsc-spy.1
 
-EXTRA_DIST = pcsc-spy.py install_spy.sh uninstall_spy.sh
+EXTRA_DIST = install_spy.sh uninstall_spy.sh
