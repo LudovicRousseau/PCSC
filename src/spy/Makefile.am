@@ -7,4 +7,6 @@ libpcscspy_la_SOURCES = \
 	pcsc-spy.c
 libpcscspy_la_LIBADD = -ldl
 
-EXTRA_DIST = pcsc-spy.py install_spy.sh uninstall_spy.sh README.txt
+man_MANS = pcsc-spy.1
+
+EXTRA_DIST = pcsc-spy.py install_spy.sh uninstall_spy.sh
