@@ -4,7 +4,7 @@ lib_LTLIBRARIES = libpcscspy.la
 dist_bin_SCRIPTS = pcsc-spy
 
 libpcscspy_la_SOURCES = \
-	pcsc-spy.c
+	libpcscspy.c
 libpcscspy_la_LIBADD = -ldl
 
 man_MANS = pcsc-spy.1
