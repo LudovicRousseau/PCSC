@@ -7,6 +7,6 @@ libpcscspy_la_SOURCES = \
 	libpcscspy.c
 libpcscspy_la_LIBADD = -ldl
 
-man_MANS = pcsc-spy.1
+dist_man_MANS = pcsc-spy.1
 
 EXTRA_DIST = install_spy.sh uninstall_spy.sh
