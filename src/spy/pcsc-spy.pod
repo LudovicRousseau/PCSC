@@ -30,17 +30,22 @@ available:
 
 =item B<-d>, B<--diffable>
 
-remove the variable parts (like handler values) from the output so that
-two execution can be more easily compared
+Demove the variable parts (like handler values) from the output so that
+two execution can be more easily compared.
 
 =item B<-h>, B<--help>
 
-display a short help text
+Display a short help text.
 
 =item B<-n>, B<--nocolor>
 
-disable the output colorization (if you want redirect the output in a
-file for example)
+Disable the output colorization (if you want redirect the output in a
+file for example).
+
+=item B<-v>, B<--version>
+
+Print the version of the F<pcsc-spy> program plus a copyright, a list of
+authors.
 
 =back
 

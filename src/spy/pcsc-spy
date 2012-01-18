@@ -890,7 +890,7 @@ def signal_handler(sig, frame):
 
 
 def print_usage():
-    print "Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help]"
+    print "Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help] [-v|--version]"
 
 if __name__ == "__main__":
     import sys
@@ -898,8 +898,8 @@ if __name__ == "__main__":
 
     logfile = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ndh", ["nocolor",
-            "diffable", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "ndhv", ["nocolor",
+            "diffable", "help", "version"])
     except getopt.GetoptError:
         print_usage()
         sys.exit(1)
@@ -913,6 +913,11 @@ if __name__ == "__main__":
             diffable = True
         if o == "-h" or o == "--help":
             print_usage()
+            sys.exit(1)
+        if o == "-v" or o == "--version":
+            print "pcsc-spy version 1.0"
+            print "Copyright (c) 2011-2012, Ludovic Rousseau <ludovic.rousseau@free.fr>"
+            print
             sys.exit(1)
 
     if len(args) > 0:
