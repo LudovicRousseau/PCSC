@@ -1,0 +1,100 @@
+=head1 NAME
+
+pcsc-spy - A PC/SC spy command
+
+=head1 SYNOPSIS
+
+pcsc-spy [B<-n>|B<--nocolor>] [B<-d>|B<--diffable>] [B<-h>|B<--help>]
+[F<fifo_filename>]
+
+=head1 DESCRIPTION
+
+pcsc-spy displays PC/SC calls of an application. It must be used with
+the F<libpcscspy.so> library.
+
+To be able to spy the PC/SC layer, the application flow must be
+modified so that all PC/SC calls are redirected. Two options are
+available:
+
+=over
+
+=item - the application is linked with F<libpcsclite.so.1>
+
+=item - the application loads the F<libpcsclite.so.1> library using dlopen(3)
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-d>, B<--diffable>
+
+remove the variable parts (like handler values) from the output so that
+two execution can be more easily compared
+
+=item B<-h>, B<--help>
+
+display a short help text
+
+=item B<-n>, B<--nocolor>
+
+disable the output colorization (if you want redirect the output in a
+file for example)
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Applications linked with libpcsclite.so.1
+
+We will use the standard LD_PRELOAD loader option to load our spying
+library.
+
+Example:
+ LD_PRELOAD=/usr/lib/libpcscspy.so opensc-tool -a
+
+=head2 Application loading libpcsclite.so.1
+
+This is the case for the PC/SC wrappers like pyscard (for Python) and
+pcsc-perl (for Perl). The LD_PRELOAD mechanism can't be used. Instead
+we replace the F<libpcsclite.so.1> library by the spying one.
+
+You may use F<install_spy.sh> and F<uninstall_spy.sh> to install and
+uninstall the spying library.
+
+Using the spying library without F<pcsc-spy> is not a problem but has
+side effects:
+
+- a line "libpcsclite_nospy.so.1: cannot open shared object file:
+No such file or directory" will be displayed
+
+- some CPU time will be lost because of the PC/SC calls redirection
+
+=head2 Starting the spy tool
+
+ pcsc-spy
+
+If a command argument is passed we use it instead of the default
+F<~/pcsc-spy> FIFO file. It is then possible to record an execution log
+and use pcsc-spy multiple times on the same log.
+
+To create the log file just do:
+
+ mkfifo ~/pcsc-spy
+ cat ~/pcsc-spy > logfile
+
+and run your PC/SC application.
+
+=head1 FILES
+
+F<~/pcsc-spy> FIFO file is used by F<libpcsclite.so.1> to send the raw
+log lines
+
+=head1 SEE ALSO
+
+L<pcscd(8)>
+
+=head1 AUTHOR
+
+This manual page was written by Ludovic Rousseau <rousseau@free.fr>

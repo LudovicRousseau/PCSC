@@ -7,6 +7,13 @@ libpcscspy_la_SOURCES = \
 	libpcscspy.c
 libpcscspy_la_LIBADD = -ldl
 
-dist_man_MANS = pcsc-spy.1
+man_MANS = pcsc-spy.1
 
-EXTRA_DIST = install_spy.sh uninstall_spy.sh
+%.1: %.pod
+	pod2man \
+		--center="PC/SC lite" \
+		--release="$(PACKAGE_NAME) $(PACKAGE_VERSION)" \
+		$^ > $@
+
+EXTRA_DIST = install_spy.sh uninstall_spy.sh pcsc-spy.pod
+CLEANFILES = pcsc-spy.1
