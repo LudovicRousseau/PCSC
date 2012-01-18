@@ -890,7 +890,7 @@ def signal_handler(sig, frame):
 
 
 def print_usage():
-    print "Usage: %s [-n|--nocolor] [-d|--diffable] [-h|--help]"
+    print "Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help]"
 
 if __name__ == "__main__":
     import sys
