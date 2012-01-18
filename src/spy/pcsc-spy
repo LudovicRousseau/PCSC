@@ -883,9 +883,14 @@ def main(logfile=None, color=True, diffable=False):
     spy = PCSCdemultiplexer(logfile, color, diffable)
     spy.loop()
 
+
 def signal_handler(sig, frame):
     print 'Ctrl-C, exiting.'
     os.kill(os.getpid(), signal.SIGQUIT)
+
+
+def print_usage():
+    print "Usage: %s [-n|--nocolor] [-d|--diffable] [-h|--help]"
 
 if __name__ == "__main__":
     import sys
@@ -893,9 +898,10 @@ if __name__ == "__main__":
 
     logfile = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "nd", ["nocolor", "diffable"])
+        opts, args = getopt.getopt(sys.argv[1:], "ndh", ["nocolor",
+            "diffable", "help"])
     except getopt.GetoptError:
-        print "Usage: %s [-n|--nocolor] [-d|--diffable]"
+        print_usage()
         sys.exit(1)
 
     color = True
@@ -905,6 +911,9 @@ if __name__ == "__main__":
             color = False
         if o == "-d" or o == "--diffable":
             diffable = True
+        if o == "-h" or o == "--help":
+            print_usage()
+            sys.exit(1)
 
     if len(args) > 0:
         logfile = args[0]
