@@ -34,6 +34,10 @@
 
 #define DEBUG
 
+#ifdef __APPLE__
+#define SCardControl SCardControl132
+#endif
+
 /* function prototypes */
 
 #define p_SCardEstablishContext(fct) LONG(fct)(DWORD dwScope, LPCVOID pvReserved1, LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
