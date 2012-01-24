@@ -271,7 +271,7 @@ static void spy_str(const char *str)
     spy_line("%s", str);
 }
 
-static void spy_n_str(const char *str, unsigned long *len, int autoallocate)
+static void spy_n_str(const char *str, ULONG *len, int autoallocate)
 {
     spy_ptr_ulong(len);
     if (NULL == len)
