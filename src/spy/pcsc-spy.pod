@@ -91,6 +91,20 @@ To create the log file just do:
 
 and run your PC/SC application.
 
+=head2 Mac OS X
+
+The installation is not automatic. In the pcsc-lite/src/spy directory do:
+ make framework
+
+Then copy the PCSC.framework directory in /tmp
+ cp -a PCSC.framework /tmp
+
+Copy the official PCSC.framework (binary only) in /tmp
+ cp /System/Library/Frameworks/PCSC.framework/PCSC /tmp
+
+Run the application to debug as:
+ DYLD_FRAMEWORK_PATH=/tmp pcsctest
+
 =head1 FILES
 
 F<~/pcsc-spy> FIFO file is used by F<libpcsclite.so.1> to send the raw
