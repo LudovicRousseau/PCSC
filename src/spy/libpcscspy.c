@@ -344,6 +344,12 @@ static LONG load_lib(void)
 
 #define get_symbol(s) do { spy.s = dlsym(Lib_handle, #s); if (NULL == spy.s) { log_line("%s", dlerror()); return SCARD_F_INTERNAL_ERROR; } } while (0)
 
+	if (SCardEstablishContext == dlsym(Lib_handle, "SCardEstablishContext"))
+	{
+		log_line("Symbols dlsym error");
+		return SCARD_F_INTERNAL_ERROR;
+	}
+
 	get_symbol(SCardEstablishContext);
 	get_symbol(SCardReleaseContext);
 	get_symbol(SCardIsValidContext);
