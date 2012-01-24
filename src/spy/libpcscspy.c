@@ -322,8 +322,19 @@ static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
 static LONG load_lib(void)
 {
 
+#ifdef __APPLE__
+/* We should be able to directly use this
+ * #define LIBPCSC_NOSPY "/System/Library/Frameworks/PCSC.framework/PCSC"
+ * but for a yet unknown reason the dlsym() returns symbols from the spy
+ * library and not from the framework.
+ * Just copying the framework in /tmp does solve the problem.
+ */
+#define LIBPCSC_NOSPY "/tmp/PCSC"
+#define LIBPCSC "/tmp/PCSC"
+#else
 #define LIBPCSC_NOSPY "libpcsclite_nospy.so.1"
 #define LIBPCSC "libpcsclite.so.1"
+#endif
 
 	/* first try to load the NOSPY library
 	 * this is used for programs doing an explicit dlopen like
@@ -364,7 +375,9 @@ static LONG load_lib(void)
 	get_symbol(SCardTransmit);
 	get_symbol(SCardListReaderGroups);
 	get_symbol(SCardListReaders);
-	get_symbol(SCardFreeMemory);
+	/* Mac OS X do not have SCardFreeMemory() */
+	if (dlsym(Lib_handle, "SCardFreeMemory"))
+		get_symbol(SCardFreeMemory);
 	get_symbol(SCardCancel);
 	get_symbol(SCardGetAttrib);
 	get_symbol(SCardSetAttrib);
