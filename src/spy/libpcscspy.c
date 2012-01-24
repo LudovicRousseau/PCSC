@@ -80,6 +80,11 @@ static LONG internal_error(void)
 	return SCARD_F_INTERNAL_ERROR;
 }
 
+static const char * internal_stringify_error(void)
+{
+	return "No spy pcsc_stringify_error() function";
+}
+
 /* contains pointers to real functions */
 static struct
 {
@@ -122,7 +127,7 @@ static struct
 	.SCardCancel = (p_SCardCancel(*))internal_error,
 	.SCardGetAttrib = (p_SCardGetAttrib(*))internal_error,
 	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error,
-	.pcsc_stringify_error = (p_pcsc_stringify_error(*))internal_error
+	.pcsc_stringify_error = (p_pcsc_stringify_error(*))internal_stringify_error
 };
 
 #define LOG log_line("%s:%d", __FILE__, __LINE__)
