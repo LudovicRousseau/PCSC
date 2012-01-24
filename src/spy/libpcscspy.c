@@ -294,7 +294,7 @@ static void spy_n_str(const char *str, unsigned long *len, int autoallocate)
 
             do
             {
-                spy_line("%s", s);
+				spy_line("%s", s);
                 length += strlen(s)+1;
                 s += strlen(s)+1;
             } while(length < *len);
