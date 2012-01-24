@@ -220,7 +220,7 @@ static void spy_long(long arg)
 	spy_line("0x%08lX", arg);
 }
 
-static void spy_ptr_long(long *arg)
+static void spy_ptr_long(LONG *arg)
 {
 	if (arg)
 		spy_line("0x%08lX", *arg);
@@ -228,7 +228,7 @@ static void spy_ptr_long(long *arg)
 		spy_line("NULL");
 }
 
-static void spy_ptr_ulong(unsigned long *arg)
+static void spy_ptr_ulong(ULONG *arg)
 {
 	if (arg)
 		spy_line("0x%08lX", *arg);
