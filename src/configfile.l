@@ -249,10 +249,21 @@ int DBGetReaderListDir(const char *readerconf_dir,
 			char filename[FILENAME_MAX];
 			int r;
 
-			/* skip . and .. */
-			if ((strcmp(direntry->d_name, ".") == 0) ||
-				(strcmp(direntry->d_name, "..") == 0))
+			/* skip non regular files */
+			if (direntry->d_type != DT_REG)
+			{
+				Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
+					direntry->d_name);
 				continue;
+			}
+
+			/* skip files starting with . like ., .., .svn, etc */
+			if ('.' == direntry->d_name[0])
+			{
+				Log2(PCSC_LOG_DEBUG, "Skipping hidden file: %s",
+					direntry->d_name);
+				continue;
+			}
 
 			snprintf(filename, sizeof(filename), "%s/%s",
 				readerconf_dir, direntry->d_name);
