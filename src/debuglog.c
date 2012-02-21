@@ -202,6 +202,10 @@ void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
 		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
 		return;
 
+	/* len is an error value? */
+	if (len < 0)
+		return;
+
 	log_xxd_always(priority, msg, buffer, len);
 } /* log_xxd */
 
