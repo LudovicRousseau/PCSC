@@ -170,6 +170,8 @@ class PCSCspy(object):
         else:
             print self.indent + data + time
 
+        return rv_text
+
     def log_in(self, line):
         """ generic log for IN line """
         if self.color:
@@ -507,6 +509,12 @@ class PCSCspy(object):
         bRecvLength = self.log_out2("bRecvLength")
         bRecvBuffer = self.log_buffer("bRecvBuffer", "out")
 
+        rv_text = self._log_rv()
+
+        # do not parse the received buffer in case of error
+        if rv_text != "SCARD_S_SUCCESS":
+            return
+
         def hex2int(data, lengh):
             return [int(x, 16) for x in data.split(" ")]
 
@@ -602,8 +610,6 @@ class PCSCspy(object):
             result = hexdump(bSendBuffer[19:])
             for line in result:
                 print "  ", line
-
-        self._log_rv()
 
     def _SCardGetAttrib(self):
         """ SCardGetAttrib """
