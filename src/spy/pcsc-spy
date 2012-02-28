@@ -748,7 +748,7 @@ class PCSCspy(object):
                     self._SCardConnect()
                 elif fct == 'SCardTransmit':
                     self._SCardTransmit()
-                elif fct == 'SCardControl':
+                elif fct == 'SCardControl' or fct == 'SCardControl132':
                     self._SCardControl()
                 elif fct == 'SCardGetAttrib':
                     self._SCardGetAttrib()
