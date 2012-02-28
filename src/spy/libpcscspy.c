@@ -36,6 +36,10 @@
 
 #ifdef __APPLE__
 #define SCardControl SCardControl132
+
+PCSC_API int32_t SCardControl132(SCARDHANDLE hCard, uint32_t dwControlCode,
+        const void *pbSendBuffer, uint32_t cbSendLength,
+        void *pbRecvBuffer, uint32_t cbRecvLength, uint32_t *lpBytesReturned);
 #endif
 
 /* function prototypes */
