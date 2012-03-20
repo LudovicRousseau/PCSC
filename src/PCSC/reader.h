@@ -230,6 +230,9 @@ typedef struct {
 #define PCSCv2_PART10_PROPERTY_bMaxPINSize 7
 #define PCSCv2_PART10_PROPERTY_sFirmwareID 8
 #define PCSCv2_PART10_PROPERTY_bPPDUSupport 9
+#define PCSCv2_PART10_PROPERTY_dwMaxAPDUDataSize 10
+#define PCSCv2_PART10_PROPERTY_wIdVendor 11
+#define PCSCv2_PART10_PROPERTY_wIdProduct 12
 
 #endif
 
