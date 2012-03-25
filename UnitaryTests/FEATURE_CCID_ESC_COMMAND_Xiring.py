@@ -20,6 +20,10 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+# You have to enable the use of Escape commands with the
+# DRIVER_OPTION_CCID_EXCHANGE_AUTHORIZED bit in the ifdDriverOptions
+# option of the CCID driver Info.plist file
+
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (getFeatureRequest, hasFeature,
     getTlvProperties, FEATURE_CCID_ESC_COMMAND, SCARD_SHARE_DIRECT)
@@ -42,10 +46,15 @@ tlv = getTlvProperties(card_connection)
 if tlv['PCSCv2_PART10_PROPERTY_wIdVendor'] == 0x0F14 \
     and (tlv['PCSCv2_PART10_PROPERTY_wIdProduct'] in [0x0037, 0x0038]):
 
-    # proprietary escape command for Xiring readers
+    # proprietary escape command for Xiring Leo readers
     version = [ord(c) for c in "VERSION"]
     res = card_connection.control(ccid_esc_command, version)
     print res
-    print ''.join([chr(x) for x in res])
+    print "VERSION:", ''.join([chr(x) for x in res])
+
+    serial = [ord(c) for c in "GET_SN"]
+    res = card_connection.control(ccid_esc_command, serial)
+    print res
+    print "GET_SN:", ''.join([chr(x) for x in res])
 else:
     print "Xiring Leo reader not found"
