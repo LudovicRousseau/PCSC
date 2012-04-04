@@ -21,6 +21,7 @@
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND, getFeatureRequest, hasFeature)
+from smartcard.Exceptions import SmartcardException
 
 
 def test_bit(value, bit):
@@ -43,7 +44,12 @@ def main():
     # Proprietary command for Gemalto readers
     # This is implemented by the Gemalto Pinpad v2 and C200 readers
     firmware_features = [0x6A]
-    res = card_connection.control(ccid_esc_command, firmware_features)
+    try:
+        res = card_connection.control(ccid_esc_command, firmware_features)
+    except SmartcardException, ex:
+        print "Failed:", ex
+        return
+
     print res
     print "LogicalLCDLineNumber (Logical number of LCD lines):", res[0]
     print "LogicalLCDRowNumber (Logical number of characters per LCD line):", res[1]
