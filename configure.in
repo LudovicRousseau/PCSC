@@ -1,12 +1,12 @@
 # -*- mode: m4; -*-
 # Process this file with autoconf to produce a configure script
 
-AC_PREREQ(2.58)
+AC_PREREQ([2.69])
 
-AC_INIT(pcsc-lite, 1.8.3)
+AC_INIT([pcsc-lite],[1.8.3])
 AC_CONFIG_SRCDIR(src/pcscdaemon.c)
 AM_INIT_AUTOMAKE(1.8 dist-bzip2 no-dist-gzip)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_MACRO_DIR(m4)
 
@@ -87,7 +87,7 @@ CFLAGS="$saved_CFLAGS"
 # Add libtool support
 # Static lib is disabled by default. Use --enable-static if needed
 LT_INIT(disable-static)
-AM_PROG_LIBTOOL
+LT_INIT
 # Automatically update the libtool script if it becomes out-of-date
 #AC_SUBST(LIBTOOL_DEPS)
 
@@ -152,7 +152,7 @@ AC_CHECK_LIB(rt, mq_getattr, [LIBS="$LIBS -lrt"])
 
 # --disable-serial
 AC_ARG_ENABLE(serial,
-	AC_HELP_STRING([--disable-serial],[do not use serial reader.conf file]),
+	AS_HELP_STRING([--disable-serial],[do not use serial reader.conf file]),
 	[ use_serial="${enableval}" ], [ use_serial="yes" ] )
 AM_CONDITIONAL(ENABLE_SERIAL, test "$use_serial" != "no")
 if test "$use_serial" != "no"; then
@@ -162,7 +162,7 @@ fi
 
 # --disable-usb
 AC_ARG_ENABLE(usb,
-	AC_HELP_STRING([--disable-usb],[do not use usb hotplug]),
+	AS_HELP_STRING([--disable-usb],[do not use usb hotplug]),
 	[ use_usb="${enableval}" ], [ use_usb="yes" ] )
 AM_CONDITIONAL(ENABLE_USB, test "$use_usb" != "no")
 if test "$use_usb" != "no"; then
@@ -172,7 +172,7 @@ fi
 
 # --enable-libudev
 AC_ARG_ENABLE(libudev,
-	AC_HELP_STRING([--disable-libudev],[do not use libudev]),
+	AS_HELP_STRING([--disable-libudev],[do not use libudev]),
 	[ use_libudev="${enableval}" ],
 	[	if test "$PCSC_ARCH" != "Linux" ; then
 			use_libudev="no"
@@ -221,7 +221,7 @@ fi
 
 # --enable-libusb
 AC_ARG_ENABLE(libusb,
-	AC_HELP_STRING([--enable-libusb],[use libusb]),
+	AS_HELP_STRING([--enable-libusb],[use libusb]),
 	[ use_libusb="${enableval}" ],
 	[ if test "x$use_libudev" = xyes ; then use_libusb="${use_libusb-no}" ;
 	else use_libusb="${use_libusb-yes}" ; fi ] )
@@ -290,7 +290,7 @@ AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_sy
 
 # --enable-embedded
 AC_ARG_ENABLE(embedded,
-  AC_HELP_STRING([--enable-embedded], [limit RAM and CPU ressources by disabling features (log)]),
+  AS_HELP_STRING([--enable-embedded],[limit RAM and CPU ressources by disabling features (log)]),
   [ use_embedded="${enableval}" ])
 
 if test x$use_embedded = xyes; then
@@ -300,7 +300,7 @@ fi
 
 # --enable-usbdropdir=DIR
 AC_ARG_ENABLE(usbdropdir,
-  AC_HELP_STRING([--enable-usbdropdir=DIR],[directory containing USB
+  AS_HELP_STRING([--enable-usbdropdir=DIR],[directory containing USB
 				  drivers (default /usr/local/lib/pcsc/drivers)]),
 [usbdropdir="${enableval}"], [usbdropdir=false])
 if test x${usbdropdir} = xfalse ; then
@@ -317,7 +317,7 @@ PCSCLITE_FEATURES="${PCSCLITE_FEATURES} usbdropdir=${usbdropdir}"
 
 # --enable-debugatr
 AC_ARG_ENABLE(debugatr,
-  AC_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
+  AS_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
 [ case "${enableval}" in
   yes)	debugatr=true ;;
   no)	debugatr=false ;;
@@ -331,7 +331,7 @@ fi
 
 # --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
-  AC_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
+  AS_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
 				  (default /var/run/pcscd)]),
 [ipcdir="${enableval}"], [ipcdir=false])
 
@@ -345,8 +345,7 @@ CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 # --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
-AC_HELP_STRING([--enable-confdir=DIR],
-	[directory containing reader configurations (default /etc/reader.conf.d)]),
+AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configurations (default /etc/reader.conf.d)]),
 	[confdir="${enableval}"],
 	[confdir="${sysconfdir}/reader.conf.d"])
 
