@@ -122,8 +122,8 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 #else
 	{
 		/* Use device name only if defined */
-		if (rContext->lpcDevice[0] != '\0')
-			rv = IFDHCreateChannelByName(rContext->slot, rContext->lpcDevice);
+		if (rContext->device[0] != '\0')
+			rv = IFDHCreateChannelByName(rContext->slot, rContext->device);
 		else
 			rv = IFDHCreateChannel(rContext->slot, rContext->port);
 	}
