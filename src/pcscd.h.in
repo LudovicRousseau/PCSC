@@ -30,8 +30,6 @@
 
 #define PCSCLITE_CSOCK_NAME		PCSCLITE_IPC_DIR "/pcscd.comm"
 
-#define PCSCLITE_SVC_IDENTITY		0x01030000	/**< Service ID */
-
 #define PCSCLITE_VERSION_NUMBER		"@VERSION@"	/**< Current version */
 #define PCSCLITE_STATUS_POLL_RATE	400000		/**< Status polling rate */
 #define PCSCLITE_LOCK_POLL_RATE		100000		/**< Lock polling rate */
