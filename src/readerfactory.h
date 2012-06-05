@@ -103,7 +103,6 @@
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
 		SCARDHANDLE hLockId;	/**< Lock Id */
-		DWORD dwIdentity;		/**< Shared ID High Nibble */
 		int LockCount;			/**< number of recursive locks */
 		int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */

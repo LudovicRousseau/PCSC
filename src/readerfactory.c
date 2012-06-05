@@ -189,8 +189,6 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	sReadersContexts[dwContext]->pFeeds = NULL;
 	sReadersContexts[dwContext]->pMutex = NULL;
 	sReadersContexts[dwContext]->pthCardEvent = NULL;
-	sReadersContexts[dwContext]->dwIdentity =
-		(dwContext + 1) << IDENTITY_SHIFT;
 
 	lrv = list_init(&sReadersContexts[dwContext]->handlesList);
 	if (lrv < 0)
@@ -386,8 +384,6 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 		sReadersContexts[dwContextB]->contexts = 0;
 		sReadersContexts[dwContextB]->hLockId = 0;
 		sReadersContexts[dwContextB]->LockCount = 0;
-		sReadersContexts[dwContextB]->dwIdentity =
-			(dwContextB + 1) << IDENTITY_SHIFT;
 
 		lrv = list_init(&sReadersContexts[dwContextB]->handlesList);
 		if (lrv < 0)
@@ -522,7 +518,6 @@ LONG RFRemoveReader(const char *readerName, int port)
 		sContext->hLockId = 0;
 		sContext->LockCount = 0;
 		sContext->vHandle = NULL;
-		sContext->dwIdentity = 0;
 
 		(void)pthread_mutex_lock(&sContext->handlesList_lock);
 		while (list_size(&(sContext->handlesList)) != 0)
