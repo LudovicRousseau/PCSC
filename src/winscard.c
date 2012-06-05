@@ -528,10 +528,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFFindReaderHandle(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
@@ -771,10 +767,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	/* get rContext corresponding to hCard */
 	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1030,10 +1022,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFFindReaderHandle(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	/*
 	 * Make sure some event has not occurred
 	 */
@@ -1072,10 +1060,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	/* get rContext corresponding to hCard */
 	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1283,10 +1267,6 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFFindReaderHandle(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	if (IFD_HVERSION_2_0 == rContext->version)
 	{
 		/* we must wrap a API 3.0 client in an API 2.0 driver */
@@ -1327,10 +1307,6 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -1407,10 +1383,6 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	rv = RFFindReaderHandle(hCard);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	/*
 	 * Make sure some event has not occurred
 	 */
@@ -1466,10 +1438,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
-	rv = RFFindReaderHandle(hCard);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
