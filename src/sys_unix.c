@@ -86,7 +86,11 @@ INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 		iInitialized = 1;
 	}
 
-	iRandNum = ((rand()+0.0)/RAND_MAX * (fEnd - fStart)) + fStart;
+	if (-1 == fEnd)
+		/* full int range */
+		iRandNum = rand();
+	else
+		iRandNum = ((rand()+0.0)/RAND_MAX * (fEnd - fStart)) + fStart;
 
 	return iRandNum;
 }
