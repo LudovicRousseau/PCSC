@@ -1015,47 +1015,27 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 
 SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 {
-	USHORT randHandle;
+	SCARDHANDLE randHandle;
+	READER_CONTEXT *dummy_reader;
+	LONG ret;
 
-	/* Create a random handle with 16 bits check to see if it already is
-	 * used. */
-	/* FIXME: THIS IS NOT STRONG ENOUGH: A 128-bit token should be
-	 * generated.  The client and server would associate token and hCard
-	 * for authentication. */
-	randHandle = SYS_RandomInt(10, 65000);
-
-	int i;
-again:
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	do
 	{
-		if (sReadersContexts[i]->vHandle != 0)
-		{
-			RDR_CLIHANDLES *currentHandle;
-			list_t * l = &sReadersContexts[i]->handlesList;
+		/* Create a random handle with 32 bits check to see if it already is
+		 * used. */
+		/* FIXME: THIS IS NOT STRONG ENOUGH: A 128-bit token should be
+		 * generated.  The client and server would associate token and hCard
+		 * for authentication. */
+		randHandle = SYS_RandomInt(0, -1);
 
-			(void)pthread_mutex_lock(&sReadersContexts[i]->handlesList_lock);
-			list_iterator_start(l);
-			while (list_iterator_hasnext(l))
-			{
-				currentHandle = list_iterator_next(l);
-				if (((LONG)rContext->dwIdentity + randHandle) ==
-					(currentHandle->hCard))
-				{
-					/* Get a new handle and loop again */
-					randHandle = SYS_RandomInt(10, 65000);
-					list_iterator_stop(l);
-					(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
-					goto again;
-				}
-			}
-			list_iterator_stop(l);
-			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
-		}
+		/* do we already use this hCard somewhere? */
+		ret = RFReaderInfoById(randHandle, &dummy_reader);
 	}
+	while (SCARD_S_SUCCESS == ret);
 
 	/* Once the for loop is completed w/o restart a good handle was
 	 * found and the loop can be exited. */
-	return rContext->dwIdentity + randHandle;
+	return randHandle;
 }
 
 LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
