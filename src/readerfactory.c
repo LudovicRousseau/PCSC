@@ -712,20 +712,24 @@ LONG RFReaderInfoNamePort(int port, const char *readerName,
 	return SCARD_E_INVALID_VALUE;
 }
 
-LONG RFReaderInfoById(DWORD dwIdentity, READER_CONTEXT * * sReader)
+LONG RFReaderInfoById(SCARDHANDLE hCard, READER_CONTEXT * * sReader)
 {
 	int i;
 
-	/* Strip off the lower nibble and get the identity */
-	dwIdentity = dwIdentity >> IDENTITY_SHIFT;
-	dwIdentity = dwIdentity << IDENTITY_SHIFT;
-
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (dwIdentity == sReadersContexts[i]->dwIdentity)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
-			*sReader = sReadersContexts[i];
-			return SCARD_S_SUCCESS;
+			RDR_CLIHANDLES * currentHandle;
+			(void)pthread_mutex_lock(&sReadersContexts[i]->handlesList_lock);
+			currentHandle = list_seek(&sReadersContexts[i]->handlesList,
+				&hCard);
+			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
+			if (currentHandle != NULL)
+			{
+				*sReader = sReadersContexts[i];
+				return SCARD_S_SUCCESS;
+			}
 		}
 	}
 
