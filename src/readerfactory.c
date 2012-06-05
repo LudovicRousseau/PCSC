@@ -1058,27 +1058,6 @@ again:
 	return rContext->dwIdentity + randHandle;
 }
 
-LONG RFFindReaderHandle(SCARDHANDLE hCard)
-{
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		if (sReadersContexts[i]->vHandle != 0)
-		{
-			RDR_CLIHANDLES * currentHandle;
-			(void)pthread_mutex_lock(&sReadersContexts[i]->handlesList_lock);
-			currentHandle = list_seek(&sReadersContexts[i]->handlesList,
-				&hCard);
-			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
-			if (currentHandle != NULL)
-				return SCARD_S_SUCCESS;
-		}
-	}
-
-	return SCARD_E_INVALID_HANDLE;
-}
-
 LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
 {
 	(void)hCard;
