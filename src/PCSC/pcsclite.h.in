@@ -194,7 +194,7 @@ extern const SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 /** Maximum readers context (a slot is count as a reader) */
 #define PCSCLITE_MAX_READERS_CONTEXTS			16
 
-#define MAX_READERNAME			100
+#define MAX_READERNAME			128
 
 #ifndef SCARD_ATR_LENGTH
 #define SCARD_ATR_LENGTH		MAX_ATR_SIZE	/**< Maximum ATR size */
