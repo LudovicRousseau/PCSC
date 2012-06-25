@@ -700,8 +700,9 @@ LONG RFReaderInfoNamePort(int port, const char *readerName,
 			tmplen = strlen(lpcStripReader);
 			lpcStripReader[tmplen - 6] = 0;
 
-			if ((strcmp(readerName, lpcStripReader) == 0) &&
-				(port == sReadersContexts[i]->port))
+			/* Compare only the significant part of the reader name */
+			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
+				&& (port == sReadersContexts[i]->port))
 			{
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
