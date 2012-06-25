@@ -504,9 +504,8 @@ static void HPRescanUsbBus(struct udev *udev)
 		if ((READER_ABSENT == readerTracker[i].status)
 			&& (readerTracker[i].fullName != NULL))
 		{
-
-			Log3(PCSC_LOG_INFO, "Removing USB device[%d]: %s", i,
-				readerTracker[i].devpath);
+			Log4(PCSC_LOG_INFO, "Removing USB device[%d]: %s at %s", i,
+				readerTracker[i].fullName, readerTracker[i].devpath);
 
 			RFRemoveReader(readerTracker[i].fullName,
 				PCSCLITE_HP_BASE_PORT + i);
