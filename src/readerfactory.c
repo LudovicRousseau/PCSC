@@ -106,7 +106,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	return EHInitializeEventStructures();
 }
 
-LONG RFAddReader(const char *readerName, int port, const char *library,
+LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	const char *device)
 {
 	DWORD dwContext = 0, dwGetSize;
@@ -114,17 +114,22 @@ LONG RFAddReader(const char *readerName, int port, const char *library,
 	LONG rv, parentNode;
 	int i, j;
 	int lrv = 0;
+	char *readerName = NULL;
 
-	if ((readerName == NULL) || (library == NULL) || (device == NULL))
+	if ((readerNameLong == NULL) || (library == NULL) || (device == NULL))
 		return SCARD_E_INVALID_VALUE;
+
+	/* allocate memory that is automatically freed */
+	readerName = alloca(strlen(readerNameLong));
+	strcpy(readerName, readerNameLong);
 
 	/* Reader name too long? also count " 00 00"*/
 	if (strlen(readerName) > MAX_READERNAME - sizeof(" 00 00"))
 	{
 		Log3(PCSC_LOG_ERROR,
-			"Reader name too long: %zd chars instead of max %zd",
+			"Reader name too long: %zd chars instead of max %zd. Truncating!",
 			strlen(readerName), MAX_READERNAME - sizeof(" 00 00"));
-		return SCARD_E_INVALID_VALUE;
+		readerName[MAX_READERNAME - sizeof(" 00 00")] = '\0';
 	}
 
 	/* Same name, same port - duplicate reader cannot be used */
