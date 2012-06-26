@@ -954,6 +954,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
+	/* Retry loop for blocking behaviour */
+retry:
+
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
@@ -964,9 +967,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 * -> another thread may have called SCardReleaseContext
 		 * -> so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
-
-	/* Retry loop for blocking behaviour */
-retry:
 
 	scReconnectStruct.hCard = hCard;
 	scReconnectStruct.dwShareMode = dwShareMode;
@@ -994,6 +994,7 @@ retry:
 
 	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
+		(void)pthread_mutex_unlock(currentContextMap->mMutex);
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
