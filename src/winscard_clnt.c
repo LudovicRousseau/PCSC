@@ -1160,33 +1160,33 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
-	(void)pthread_mutex_lock(currentContextMap->mMutex);
-
-	/* check the handle is still valid */
-	rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
-		&pChannelMap);
-	if (rv == -1)
-		/* the handle is now invalid
-		 * -> another thread may have called SCardReleaseContext
-		 * -> so the mMutex has been unlocked */
-		return SCARD_E_INVALID_HANDLE;
-
-	scBeginStruct.hCard = hCard;
-	scBeginStruct.rv = SCARD_S_SUCCESS;
-
 	/*
 	 * Query the server every so often until the sharing violation ends
 	 * and then hold the lock for yourself.
 	 */
 
-	do
+	for(;;)
 	{
+		(void)pthread_mutex_lock(currentContextMap->mMutex);
+
+		/* check the handle is still valid */
+		rv = SCardGetContextAndChannelFromHandle(hCard, &currentContextMap,
+			&pChannelMap);
+		if (rv == -1)
+			/* the handle is now invalid
+			 * -> another thread may have called SCardReleaseContext
+			 * -> so the mMutex has been unlocked */
+			return SCARD_E_INVALID_HANDLE;
+
+		scBeginStruct.hCard = hCard;
+		scBeginStruct.rv = SCARD_S_SUCCESS;
+
 		rv = MessageSendWithHeader(SCARD_BEGIN_TRANSACTION,
 			currentContextMap->dwClientID,
 			sizeof(scBeginStruct), (void *) &scBeginStruct);
 
 		if (rv != SCARD_S_SUCCESS)
-			goto end;
+			break;
 
 		/*
 		 * Read a message from the server
@@ -1195,13 +1195,18 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 			currentContextMap->dwClientID);
 
 		if (rv != SCARD_S_SUCCESS)
-			goto end;
+			break;
 
 		rv = scBeginStruct.rv;
+
+		if (SCARD_E_SHARING_VIOLATION != rv)
+			break;
+
+		(void)pthread_mutex_unlock(currentContextMap->mMutex);
+		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 	}
 	while (SCARD_E_SHARING_VIOLATION == rv);
 
-end:
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
 	PROFILE_END(rv)
