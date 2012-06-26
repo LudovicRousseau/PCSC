@@ -2719,6 +2719,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 		return SCARD_E_INVALID_HANDLE;
 	}
 
+	/* Retry loop for blocking behaviour */
+retry:
+
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
@@ -2736,9 +2739,6 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 		rv = SCARD_E_INSUFFICIENT_BUFFER;
 		goto end;
 	}
-
-	/* Retry loop for blocking behaviour */
-retry:
 
 	scTransmitStruct.hCard = hCard;
 	scTransmitStruct.cbSendLength = cbSendLength;
@@ -2800,6 +2800,7 @@ retry:
 
 	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
+		(void)pthread_mutex_unlock(currentContextMap->mMutex);
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
