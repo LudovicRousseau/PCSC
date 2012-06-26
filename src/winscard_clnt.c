@@ -1454,6 +1454,9 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
+	/* Retry loop for blocking behaviour */
+retry:
+
 	(void)pthread_mutex_lock(currentContextMap->mMutex);
 
 	/* check the handle is still valid */
@@ -1484,9 +1487,6 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
 		goto end;
 	}
 
-	/* Retry loop for blocking behaviour */
-retry:
-
 	/* initialise the structure */
 	memset(&scStatusStruct, 0, sizeof(scStatusStruct));
 	scStatusStruct.hCard = hCard;
@@ -1510,6 +1510,7 @@ retry:
 
 	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
+		(void)pthread_mutex_unlock(currentContextMap->mMutex);
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
