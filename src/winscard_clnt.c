@@ -68,12 +68,6 @@
  *    shared mode (like with \ref SCARD_SHARE_SHARED) and not in
  *    exclusive mode (like with \ref SCARD_SHARE_EXCLUSIVE) as on
  *    Windows.
- * -# SCardEstablishContext()
- *    @par
- *    Each thread of an application shall use its own \ref SCARDCONTEXT.
- *    SCardCancel() is the only exception to the rule.  On Windows the
- *    same \ref SCARDCONTEXT can be shared by different threads of same
- *    application.
  * -# SCardConnect() & SCardReconnect()
  *    @par
  *    pdwActiveProtocol is not set to \ref SCARD_PROTOCOL_UNDEFINED if
