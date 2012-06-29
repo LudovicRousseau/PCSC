@@ -1058,14 +1058,14 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure some event has not occurred
 	 */
 	rv = RFCheckReaderEventState(rContext, hCard);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	rv = RFLockSharing(hCard, rContext);
 
@@ -1076,6 +1076,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 
+exit:
 	return rv;
 }
 
