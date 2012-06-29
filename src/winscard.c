@@ -765,16 +765,16 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (hCard == 0)
 		return SCARD_E_INVALID_HANDLE;
 
-	/* get rContext corresponding to hCard */
-	rv = RFReaderInfoById(hCard, &rContext);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
-
 	if ((dwDisposition != SCARD_LEAVE_CARD)
 		&& (dwDisposition != SCARD_UNPOWER_CARD)
 		&& (dwDisposition != SCARD_RESET_CARD)
 		&& (dwDisposition != SCARD_EJECT_CARD))
 		return SCARD_E_INVALID_VALUE;
+
+	/* get rContext corresponding to hCard */
+	rv = RFReaderInfoById(hCard, &rContext);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	/*
 	 * wait until a possible transaction is finished
