@@ -1351,21 +1351,21 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure some event has not occurred
 	 */
 	rv = RFCheckReaderEventState(rContext, hCard);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	rv = IFDGetCapabilities(rContext, dwAttrId, pcbAttrLen, pbAttr);
 	switch(rv)
@@ -1402,6 +1402,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			rv = SCARD_E_NOT_TRANSACTED;
 	}
 
+exit:
 	return rv;
 }
 
