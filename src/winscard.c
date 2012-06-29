@@ -1298,32 +1298,38 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	if (IFD_HVERSION_2_0 == rContext->version)
 		if (NULL == pbSendBuffer || 0 == cbSendLength)
-			return SCARD_E_INVALID_PARAMETER;
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto exit;
+		}
 
 	/*
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	if (IFD_HVERSION_2_0 == rContext->version)
 	{
 		/* we must wrap a API 3.0 client in an API 2.0 driver */
 		*lpBytesReturned = cbRecvLength;
-		return IFDControl_v2(rContext, (PUCHAR)pbSendBuffer,
+		rv = IFDControl_v2(rContext, (PUCHAR)pbSendBuffer,
 			cbSendLength, pbRecvBuffer, lpBytesReturned);
 	}
 	else
 		if (IFD_HVERSION_3_0 == rContext->version)
-			return IFDControl(rContext, dwControlCode, pbSendBuffer,
+			rv = IFDControl(rContext, dwControlCode, pbSendBuffer,
 				cbSendLength, pbRecvBuffer, cbRecvLength, lpBytesReturned);
 		else
-			return SCARD_E_UNSUPPORTED_FEATURE;
+			rv = SCARD_E_UNSUPPORTED_FEATURE;
+
+exit:
+	return rv;
 }
 
 LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
