@@ -294,6 +294,7 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 	char fullname[MAX_READERNAME];
 	struct _driverTracker *driver, *classdriver;
 	const char *sSerialNumber = NULL, *sInterfaceName = NULL;
+	const char *sInterfaceNumber;
 	LONG ret;
 	int bInterfaceNumber;
 
@@ -310,8 +311,12 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", driver->readerName);
 
-	bInterfaceNumber = atoi(udev_device_get_sysattr_value(dev,
-		"bInterfaceNumber"));
+	sInterfaceNumber = udev_device_get_sysattr_value(dev, "bInterfaceNumber");
+	if (sInterfaceNumber)
+		bInterfaceNumber = atoi(sInterfaceNumber);
+	else
+		bInterfaceNumber = 0;
+
 	(void)snprintf(deviceName, sizeof(deviceName),
 		"usb:%04x/%04x:libudev:%d:%s", driver->manuID, driver->productID,
 		bInterfaceNumber, devpath);
