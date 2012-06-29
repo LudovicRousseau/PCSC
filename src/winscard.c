@@ -1486,21 +1486,21 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure some event has not occurred
 	 */
 	rv = RFCheckReaderEventState(rContext, hCard);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Check for some common errors
@@ -1509,7 +1509,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	{
 		if (rContext->readerState->readerState & SCARD_ABSENT)
 		{
-			return SCARD_E_NO_SMARTCARD;
+			rv = SCARD_E_NO_SMARTCARD;
+			goto exit;
 		}
 	}
 
@@ -1519,7 +1520,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 		{
 			if (pioSendPci->dwProtocol != rContext->readerState->cardProtocol)
 			{
-				return SCARD_E_PROTO_MISMATCH;
+				rv = SCARD_E_PROTO_MISMATCH;
+				goto exit;
 			}
 		}
 	}
@@ -1584,7 +1586,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	{
 		*pcbRecvLength = 0;
 		Log2(PCSC_LOG_ERROR, "Card not transacted: 0x%08lX", rv);
-		return rv;
+		goto exit;
 	}
 
 	/*
@@ -1593,13 +1595,16 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	if (tempRxLength < dwRxLength)
 	{
 		*pcbRecvLength = 0;
-		return SCARD_E_INSUFFICIENT_BUFFER;
+		rv = SCARD_E_INSUFFICIENT_BUFFER;
+		goto exit;
 	}
 
 	/*
 	 * Successful return
 	 */
 	*pcbRecvLength = dwRxLength;
-	return SCARD_S_SUCCESS;
+
+exit:
+	return rv;
 }
 
