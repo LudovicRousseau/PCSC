@@ -534,14 +534,14 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure no one has a lock on this reader
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	if (dwInitialization == SCARD_RESET_CARD ||
 		dwInitialization == SCARD_UNPOWER_CARD)
@@ -593,13 +593,15 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			if (rv == SCARD_W_REMOVED_CARD)
 			{
 				rContext->readerState->readerState = SCARD_ABSENT;
-				return SCARD_E_NO_SMARTCARD;
+				rv = SCARD_E_NO_SMARTCARD;
+				goto exit;
 			}
 			else
 			{
 				rContext->readerState->readerState =
 					SCARD_PRESENT | SCARD_SWALLOWED;
-				return SCARD_W_UNRESPONSIVE_CARD;
+				rv = SCARD_W_UNRESPONSIVE_CARD;
+				goto exit;
 			}
 		}
 	}
@@ -609,11 +611,17 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			uint32_t readerState = rContext->readerState->readerState;
 
 			if (readerState & SCARD_ABSENT)
-				return SCARD_E_NO_SMARTCARD;
+			{
+				rv = SCARD_E_NO_SMARTCARD;
+				goto exit;
+			}
 
 			if ((readerState & SCARD_PRESENT)
 				&& (readerState & SCARD_SWALLOWED))
-				return SCARD_W_UNRESPONSIVE_CARD;
+			{
+				rv = SCARD_W_UNRESPONSIVE_CARD;
+				goto exit;
+			}
 		}
 
 	/*******************************************
@@ -653,13 +661,15 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
 					(void)pthread_mutex_unlock(rContext->mMutex);
-					return SCARD_W_UNRESPONSIVE_CARD;
+					rv = SCARD_W_UNRESPONSIVE_CARD;
+					goto exit;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
 					(void)pthread_mutex_unlock(rContext->mMutex);
-					return SCARD_E_PROTO_MISMATCH;
+					rv = SCARD_E_PROTO_MISMATCH;
+					goto exit;
 				}
 
 				/* use negotiated protocol */
@@ -672,7 +682,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				(void)pthread_mutex_unlock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
-					return SCARD_E_PROTO_MISMATCH;
+				{
+					rv = SCARD_E_PROTO_MISMATCH;
+					goto exit;
+				}
 			}
 		}
 	}
@@ -716,7 +729,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				(void)RFLockSharing(hCard, rContext);
 			} else
 			{
-				return SCARD_E_SHARING_VIOLATION;
+				rv = SCARD_E_SHARING_VIOLATION;
+				goto exit;
 			}
 		}
 	} else if (dwShareMode == SCARD_SHARE_SHARED)
@@ -750,7 +764,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			rContext->contexts = PCSCLITE_SHARING_LAST_CONTEXT;
 		}
 	} else
-		return SCARD_E_INVALID_VALUE;
+	{
+		rv = SCARD_E_INVALID_VALUE;
+		goto exit;
+	}
 
 	/*
 	 * Clear a previous event to the application
@@ -762,7 +779,10 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 */
 	rContext->readerState->readerSharing = rContext->contexts;
 
-	return SCARD_S_SUCCESS;
+	rv = SCARD_S_SUCCESS;
+
+exit:
+	return rv;
 }
 
 LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
