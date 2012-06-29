@@ -835,12 +835,12 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		if (rv != SCARD_E_SHARING_VIOLATION)
 		{
-			return rv;
+			goto exit;
 		}
 		else
 		{
 			if (SCARD_LEAVE_CARD != dwDisposition)
-				return rv;
+				goto exit;
 		}
 	}
 
@@ -1034,7 +1034,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 */
 	rContext->readerState->readerSharing = rContext->contexts;
 
-	return SCARD_S_SUCCESS;
+	rv = SCARD_S_SUCCESS;
+
+exit:
+	return rv;
 }
 
 LONG SCardBeginTransaction(SCARDHANDLE hCard)
