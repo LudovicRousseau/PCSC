@@ -235,7 +235,6 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		szReader, dwPreferredProtocols);
 
 	rv = RFReaderInfo((LPSTR) szReader, &rContext);
-
 	if (rv != SCARD_S_SUCCESS)
 	{
 		Log2(PCSC_LOG_ERROR, "Reader %s Not Found", szReader);
@@ -247,7 +246,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*******************************************
 	 *
@@ -261,7 +260,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	if (rContext->contexts == PCSCLITE_SHARING_EXCLUSIVE_CONTEXT)
 	{
 		Log1(PCSC_LOG_ERROR, "Error Reader Exclusive");
-		return SCARD_E_SHARING_VIOLATION;
+		rv = SCARD_E_SHARING_VIOLATION;
+		goto exit;
 	}
 
 	/*
@@ -288,7 +288,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		if (!(readerState & SCARD_PRESENT))
 		{
 			Log1(PCSC_LOG_DEBUG, "Card Not Inserted");
-			return SCARD_E_NO_SMARTCARD;
+			rv = SCARD_E_NO_SMARTCARD;
+			goto exit;
 		}
 
 		/* Power on (again) the card if needed */
@@ -320,7 +321,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			(void)pthread_mutex_unlock(&rContext->powerState_lock);
-			return SCARD_W_UNPOWERED_CARD;
+			rv = SCARD_W_UNPOWERED_CARD;
+			goto exit;
 		}
 
 		/* the card is now in use */
@@ -366,13 +368,15 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				if (SET_PROTOCOL_PPS_FAILED == ret)
 				{
 					(void)pthread_mutex_unlock(rContext->mMutex);
-					return SCARD_W_UNRESPONSIVE_CARD;
+					rv = SCARD_W_UNRESPONSIVE_CARD;
+					goto exit;
 				}
 
 				if (SET_PROTOCOL_WRONG_ARGUMENT == ret)
 				{
 					(void)pthread_mutex_unlock(rContext->mMutex);
-					return SCARD_E_PROTO_MISMATCH;
+					rv = SCARD_E_PROTO_MISMATCH;
+					goto exit;
 				}
 
 				/* use negotiated protocol */
@@ -385,7 +389,10 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				(void)pthread_mutex_unlock(rContext->mMutex);
 
 				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
-					return SCARD_E_PROTO_MISMATCH;
+				{
+					rv = SCARD_E_PROTO_MISMATCH;
+					goto exit;
+				}
 			}
 		}
 	}
@@ -439,7 +446,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			(void)RFDestroyReaderHandle(*phCard);
 			*phCard = 0;
-			return SCARD_E_SHARING_VIOLATION;
+			rv = SCARD_E_SHARING_VIOLATION;
+			goto exit;
 		}
 	}
 	else
@@ -469,9 +477,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 		*phCard = 0;
 
-		PROFILE_END
-
-		return SCARD_F_INTERNAL_ERROR;
+		rv = SCARD_F_INTERNAL_ERROR;
+		goto exit;
 	}
 
 	/*
@@ -479,9 +486,10 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 */
 	rContext->readerState->readerSharing = rContext->contexts;
 
+exit:
 	PROFILE_END
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
