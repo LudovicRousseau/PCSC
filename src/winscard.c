@@ -721,26 +721,30 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			/*
 			 * Do nothing - we are already exclusive
 			 */
-		} else
+		}
+		else
 		{
 			if (rContext->contexts == PCSCLITE_SHARING_LAST_CONTEXT)
 			{
 				rContext->contexts = PCSCLITE_SHARING_EXCLUSIVE_CONTEXT;
 				(void)RFLockSharing(hCard, rContext);
-			} else
+			}
+			else
 			{
 				rv = SCARD_E_SHARING_VIOLATION;
 				goto exit;
 			}
 		}
-	} else if (dwShareMode == SCARD_SHARE_SHARED)
+	}
+	else if (dwShareMode == SCARD_SHARE_SHARED)
 	{
 		if (rContext->contexts != PCSCLITE_SHARING_EXCLUSIVE_CONTEXT)
 		{
 			/*
 			 * Do nothing - in sharing mode already
 			 */
-		} else
+		}
+		else
 		{
 			/*
 			 * We are in exclusive mode but want to share now
@@ -748,14 +752,16 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			(void)RFUnlockSharing(hCard, rContext);
 			rContext->contexts = PCSCLITE_SHARING_LAST_CONTEXT;
 		}
-	} else if (dwShareMode == SCARD_SHARE_DIRECT)
+	}
+	else if (dwShareMode == SCARD_SHARE_DIRECT)
 	{
 		if (rContext->contexts != PCSCLITE_SHARING_EXCLUSIVE_CONTEXT)
 		{
 			/*
 			 * Do nothing - in sharing mode already
 			 */
-		} else
+		}
+		else
 		{
 			/*
 			 * We are in exclusive mode but want to share now
@@ -763,7 +769,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			(void)RFUnlockSharing(hCard, rContext);
 			rContext->contexts = PCSCLITE_SHARING_LAST_CONTEXT;
 		}
-	} else
+	}
+	else
 	{
 		rv = SCARD_E_INVALID_VALUE;
 		goto exit;
