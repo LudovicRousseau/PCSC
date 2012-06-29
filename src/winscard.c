@@ -1243,10 +1243,13 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	if (rContext->readerState->cardAtrLength > MAX_ATR_SIZE)
-		return SCARD_F_INTERNAL_ERROR;
+	{
+		rv = SCARD_F_INTERNAL_ERROR;
+		goto exit;
+	}
 
 	/*
 	 * This is a client side function however the server maintains the
@@ -1259,15 +1262,16 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 	 */
 	rv = RFCheckReaderEventState(rContext, hCard);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
+exit:
 	return rv;
 }
 
