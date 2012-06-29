@@ -1425,30 +1425,33 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	 */
 	rv = RFCheckSharing(hCard, rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure the reader is working properly
 	 */
 	rv = RFCheckReaderStatus(rContext);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	/*
 	 * Make sure some event has not occurred
 	 */
 	rv = RFCheckReaderEventState(rContext, hCard);
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto exit;
 
 	rv = IFDSetCapabilities(rContext, dwAttrId, cbAttrLen, (PUCHAR)pbAttr);
 	if (rv == IFD_SUCCESS)
-		return SCARD_S_SUCCESS;
+		rv = SCARD_S_SUCCESS;
 	else
 		if (rv == IFD_ERROR_TAG)
-			return SCARD_E_UNSUPPORTED_FEATURE;
+			rv = SCARD_E_UNSUPPORTED_FEATURE;
 		else
-			return SCARD_E_NOT_TRANSACTED;
+			rv = SCARD_E_NOT_TRANSACTED;
+
+exit:
+	return rv;
 }
 
 LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
