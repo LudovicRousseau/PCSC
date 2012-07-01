@@ -467,13 +467,11 @@ int main(int argc, char **argv)
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
 	 */
-	rv = stat(PCSCLITE_IPC_DIR, &fStatBuf);
-	if (rv < 0)
 	{
 		int mode = S_IROTH | S_IXOTH | S_IRGRP | S_IXGRP | S_IRWXU;
 
 		rv = mkdir(PCSCLITE_IPC_DIR, mode);
-		if (rv != 0)
+		if ((rv != 0) && (errno != EEXIST))
 		{
 			Log2(PCSC_LOG_CRITICAL,
 				"cannot create " PCSCLITE_IPC_DIR ": %s", strerror(errno));
