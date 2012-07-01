@@ -120,7 +120,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		return SCARD_E_INVALID_VALUE;
 
 	/* allocate memory that is automatically freed */
-	readerName = alloca(strlen(readerNameLong));
+	readerName = alloca(strlen(readerNameLong)+1);
 	strcpy(readerName, readerNameLong);
 
 	/* Reader name too long? also count " 00 00"*/
