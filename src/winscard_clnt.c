@@ -1200,7 +1200,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 		(void)pthread_mutex_unlock(currentContextMap->mMutex);
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 	}
-	while (SCARD_E_SHARING_VIOLATION == rv);
 
 	(void)pthread_mutex_unlock(currentContextMap->mMutex);
 
