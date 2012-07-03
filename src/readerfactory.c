@@ -474,8 +474,8 @@ LONG RFRemoveReader(const char *readerName, int port)
 	if (readerName == NULL)
 		return SCARD_E_INVALID_VALUE;
 
-	while (SCARD_S_SUCCESS ==
-		RFReaderInfoNamePort(port, readerName, &sContext))
+	rv = RFReaderInfoNamePort(port, readerName, &sContext);
+	if (SCARD_S_SUCCESS == rv)
 	{
 		/* Try to destroy the thread */
 		if (sContext -> pthThread)
