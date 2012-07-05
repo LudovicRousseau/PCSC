@@ -109,6 +109,8 @@
 		int * pMutex;			/**< Number of client to mutex */
 		int powerState;			/**< auto power off state */
 		pthread_mutex_t powerState_lock;	/**< powerState mutex */
+		int reference;			/**< number of users of the structure */
+		pthread_mutex_t reference_lock;	 /**< reference mutex */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use READER_STATE * here since eventhandler.h can't be
@@ -116,6 +118,12 @@
 	};
 
 	typedef struct ReaderContext READER_CONTEXT;
+
+	LONG _RefReader(READER_CONTEXT * sReader);
+	LONG _UnrefReader(READER_CONTEXT * sReader);
+
+#define REF_READER(reader) { LONG rv; Log2(PCSC_LOG_CRITICAL, "RefReader() count was: %d", reader->reference); rv = _RefReader(reader); if (rv != SCARD_S_SUCCESS) return rv; }
+#define UNREF_READER(reader) {Log2(PCSC_LOG_CRITICAL, "UnrefReader() count was: %d", reader->reference); _UnrefReader(reader);}
 
 	LONG RFAllocateReaderSpace(unsigned int);
 	LONG RFAddReader(const char *, int, const char *, const char *);

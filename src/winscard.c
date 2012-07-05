@@ -487,6 +487,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	rContext->readerState->readerSharing = rContext->contexts;
 
 exit:
+	UNREF_READER(rContext)
+
 	PROFILE_END
 
 	return rv;
@@ -789,6 +791,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	rv = SCARD_S_SUCCESS;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1037,6 +1041,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	rv = SCARD_S_SUCCESS;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1077,6 +1083,8 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1211,6 +1219,8 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1272,6 +1282,8 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 		goto exit;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1329,6 +1341,8 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
 			rv = SCARD_E_UNSUPPORTED_FEATURE;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1403,6 +1417,8 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 	}
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1451,6 +1467,8 @@ LONG SCardSetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			rv = SCARD_E_NOT_TRANSACTED;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 
@@ -1605,6 +1623,8 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	*pcbRecvLength = dwRxLength;
 
 exit:
+	UNREF_READER(rContext)
+
 	return rv;
 }
 

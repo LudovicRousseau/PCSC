@@ -58,6 +58,7 @@ static int ConfigFileCRC = 0;
 static pthread_mutex_t LockMutex = PTHREAD_MUTEX_INITIALIZER;
 
 #define IDENTITY_SHIFT 16
+static LONG removeReader(READER_CONTEXT * sReader);
 
 static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
 {
@@ -77,6 +78,33 @@ static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
 	return 0;
 }
 
+
+LONG _RefReader(READER_CONTEXT * sReader)
+{
+	if (0 == sReader->reference)
+		return SCARD_E_READER_UNAVAILABLE;
+
+	pthread_mutex_lock(&sReader->reference_lock);
+	sReader->reference += 1;
+	pthread_mutex_unlock(&sReader->reference_lock);
+
+	return SCARD_S_SUCCESS;
+}
+
+LONG _UnrefReader(READER_CONTEXT * sReader)
+{
+	if (0 == sReader->reference)
+		return SCARD_E_READER_UNAVAILABLE;
+
+	pthread_mutex_lock(&sReader->reference_lock);
+	sReader->reference -= 1;
+	pthread_mutex_unlock(&sReader->reference_lock);
+
+	if (0 == sReader->reference)
+		removeReader(sReader);
+
+	return SCARD_S_SUCCESS;
+}
 
 LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 {
@@ -217,6 +245,11 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	(void)pthread_mutex_init(&sReadersContexts[dwContext]->powerState_lock,
 		NULL);
 	sReadersContexts[dwContext]->powerState = POWER_STATE_UNPOWERED;
+
+	/* reference count */
+	(void)pthread_mutex_init(&sReadersContexts[dwContext]->reference_lock,
+		NULL);
+	sReadersContexts[dwContext]->reference = 1;
 
 	/* If a clone to this reader exists take some values from that clone */
 	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
@@ -411,6 +444,11 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 			NULL);
 		sReadersContexts[dwContextB]->powerState = POWER_STATE_UNPOWERED;
 
+		/* reference count */
+		(void)pthread_mutex_init(&sReadersContexts[dwContextB]->reference_lock,
+			NULL);
+		sReadersContexts[dwContextB]->reference = 1;
+
 		/* Call on the parent driver to see if the slots are thread safe */
 		dwGetSize = sizeof(ucThread);
 		rv = IFDGetCapabilities((sReadersContexts[dwContext]),
@@ -476,6 +514,21 @@ LONG RFRemoveReader(const char *readerName, int port)
 
 	rv = RFReaderInfoNamePort(port, readerName, &sContext);
 	if (SCARD_S_SUCCESS == rv)
+	{
+		/* first to derefence RFReaderInfoNamePort() */
+		UNREF_READER(sContext)
+
+		/* second to remove the reader */
+		UNREF_READER(sContext)
+	}
+
+	return SCARD_S_SUCCESS;
+}
+
+LONG removeReader(READER_CONTEXT * sContext)
+{
+	LONG rv;
+
 	{
 		/* Try to destroy the thread */
 		if (sContext -> pthThread)
@@ -673,6 +726,9 @@ LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 			if (strcmp(readerName,
 				sReadersContexts[i]->readerState->readerName) == 0)
 			{
+				/* Increase reference count */
+				REF_READER(sReadersContexts[i])
+
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
 			}
@@ -704,6 +760,9 @@ LONG RFReaderInfoNamePort(int port, const char *readerName,
 			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
 				&& (port == sReadersContexts[i]->port))
 			{
+				/* Increase reference count */
+				REF_READER(sReadersContexts[i])
+
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
 			}
@@ -728,6 +787,9 @@ LONG RFReaderInfoById(SCARDHANDLE hCard, READER_CONTEXT * * sReader)
 			(void)pthread_mutex_unlock(&sReadersContexts[i]->handlesList_lock);
 			if (currentHandle != NULL)
 			{
+				/* Increase reference count */
+				REF_READER(sReadersContexts[i])
+
 				*sReader = sReadersContexts[i];
 				return SCARD_S_SUCCESS;
 			}
