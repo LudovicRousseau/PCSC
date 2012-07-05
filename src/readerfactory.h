@@ -122,8 +122,8 @@
 	LONG _RefReader(READER_CONTEXT * sReader);
 	LONG _UnrefReader(READER_CONTEXT * sReader);
 
-#define REF_READER(reader) { LONG rv; Log2(PCSC_LOG_CRITICAL, "RefReader() count was: %d", reader->reference); rv = _RefReader(reader); if (rv != SCARD_S_SUCCESS) return rv; }
-#define UNREF_READER(reader) {Log2(PCSC_LOG_CRITICAL, "UnrefReader() count was: %d", reader->reference); _UnrefReader(reader);}
+#define REF_READER(reader) { LONG rv; Log2(PCSC_LOG_DEBUG, "RefReader() count was: %d", reader->reference); rv = _RefReader(reader); if (rv != SCARD_S_SUCCESS) return rv; }
+#define UNREF_READER(reader) {Log2(PCSC_LOG_DEBUG, "UnrefReader() count was: %d", reader->reference); _UnrefReader(reader);}
 
 	LONG RFAllocateReaderSpace(unsigned int);
 	LONG RFAddReader(const char *, int, const char *, const char *);
