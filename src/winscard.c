@@ -1028,7 +1028,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 		if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
 		{
-			Log1(PCSC_LOG_INFO, "Stoping polling thread");
+			Log1(PCSC_LOG_INFO, "Stopping polling thread");
 			fct(rContext->slot);
 		}
 	}

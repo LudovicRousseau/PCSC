@@ -170,7 +170,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 
 		if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
 		{
-			Log1(PCSC_LOG_INFO, "Request stoping of polling thread");
+			Log1(PCSC_LOG_INFO, "Request stopping of polling thread");
 			fct(rContext->slot);
 		}
 		else
