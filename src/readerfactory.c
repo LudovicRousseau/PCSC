@@ -506,20 +506,29 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 
 LONG RFRemoveReader(const char *readerName, int port)
 {
-	LONG rv;
-	READER_CONTEXT * sContext;
+	char lpcStripReader[MAX_READERNAME];
+	int i;
 
 	if (readerName == NULL)
 		return SCARD_E_INVALID_VALUE;
 
-	rv = RFReaderInfoNamePort(port, readerName, &sContext);
-	if (SCARD_S_SUCCESS == rv)
+	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		/* first to derefence RFReaderInfoNamePort() */
-		UNREF_READER(sContext)
+		if (sReadersContexts[i]->vHandle != 0)
+		{
+			strncpy(lpcStripReader,
+				sReadersContexts[i]->readerState->readerName,
+				sizeof(lpcStripReader));
+			lpcStripReader[strlen(lpcStripReader) - 6] = 0;
 
-		/* second to remove the reader */
-		UNREF_READER(sContext)
+			/* Compare only the significant part of the reader name */
+			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
+				&& (port == sReadersContexts[i]->port))
+			{
+				/* remove the reader */
+				UNREF_READER(sReadersContexts[i])
+			}
+		}
 	}
 
 	return SCARD_S_SUCCESS;
@@ -736,40 +745,6 @@ LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 	}
 
 	return SCARD_E_UNKNOWN_READER;
-}
-
-LONG RFReaderInfoNamePort(int port, const char *readerName,
-	READER_CONTEXT * * sReader)
-{
-	char lpcStripReader[MAX_READERNAME];
-	int i;
-
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		if (sReadersContexts[i]->vHandle != 0)
-		{
-			int tmplen;
-
-			strncpy(lpcStripReader,
-				sReadersContexts[i]->readerState->readerName,
-				sizeof(lpcStripReader));
-			tmplen = strlen(lpcStripReader);
-			lpcStripReader[tmplen - 6] = 0;
-
-			/* Compare only the significant part of the reader name */
-			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
-				&& (port == sReadersContexts[i]->port))
-			{
-				/* Increase reference count */
-				REF_READER(sReadersContexts[i])
-
-				*sReader = sReadersContexts[i];
-				return SCARD_S_SUCCESS;
-			}
-		}
-	}
-
-	return SCARD_E_INVALID_VALUE;
 }
 
 LONG RFReaderInfoById(SCARDHANDLE hCard, READER_CONTEXT * * sReader)

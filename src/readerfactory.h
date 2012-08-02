@@ -130,7 +130,6 @@
 	LONG RFRemoveReader(const char *, int);
 	LONG RFSetReaderName(READER_CONTEXT *, const char *, const char *, int);
 	LONG RFReaderInfo(const char *, /*@out@*/ struct ReaderContext **);
-	LONG RFReaderInfoNamePort(int, const char *, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(SCARDHANDLE, /*@out@*/ struct ReaderContext **);
 	LONG RFCheckSharing(SCARDHANDLE, READER_CONTEXT *);
 	LONG RFLockSharing(SCARDHANDLE, READER_CONTEXT *);
