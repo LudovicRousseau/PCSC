@@ -13,7 +13,7 @@
 
 /**
  * @file
- * @defgroup IFDHandler
+ * @defgroup IFDHandler IFDHandler
  * @brief This provides reader specific low-level calls.
 
 The routines specified hereafter will allow you to write an IFD handler
