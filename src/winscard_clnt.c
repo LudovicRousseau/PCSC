@@ -17,7 +17,7 @@
 
 /**
  * @file
- * @defgroup API
+ * @defgroup API API
  * @brief Handles smart card reader communications and
  * forwarding requests over message queues.
  *
