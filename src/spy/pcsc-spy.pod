@@ -57,7 +57,7 @@ We will use the standard LD_PRELOAD loader option to load our spying
 library.
 
 Example:
- LD_PRELOAD=/usr/lib/libpcscspy.so opensc-tool -a
+ LD_PRELOAD=/usr/lib/libpcscspy.so pcsc_scan
 
 =head2 Application loading libpcsclite.so.1
 
