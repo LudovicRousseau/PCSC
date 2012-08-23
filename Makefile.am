@@ -1,4 +1,4 @@
-SUBDIRS = m4 src etc doc
+SUBDIRS = src etc doc
 
 fix-rights:
 	$(MAKE) -C src $@
@@ -12,7 +12,9 @@ EXTRA_DIST = \
 	bootstrap \
 	ChangeLog.svn \
 	DRIVERS SECURITY \
-	HELP
+	HELP \
+	m4/acx_pthread.m4 \
+	m4/as-ac-expand.m4
 
 DISTCLEANFILES = ChangeLog.svn
 
