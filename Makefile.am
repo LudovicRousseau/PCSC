@@ -8,7 +8,11 @@ ACLOCAL_AMFLAGS = -I m4
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-systemdsystemunitdir=$$dc_install_base/$(systemdsystemunitdir)
 
-EXTRA_DIST = DRIVERS SECURITY bootstrap HELP ChangeLog.svn
+EXTRA_DIST = \
+	bootstrap \
+	ChangeLog.svn \
+	DRIVERS SECURITY \
+	HELP
 
 DISTCLEANFILES = ChangeLog.svn
 
