@@ -81,7 +81,7 @@ INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
 /**
  * Max string size dumping a maxmium of 2 lines of 80 characters
  */
-#define DEBUG_BUF_SIZE 160
+#define DEBUG_BUF_SIZE 2048
 
 static char LogMsgType = DEBUGLOG_NO_DEBUG;
 static char LogCategory = DEBUG_CATEGORY_NOTHING;
