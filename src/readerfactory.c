@@ -1057,6 +1057,8 @@ SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 	READER_CONTEXT *dummy_reader;
 	LONG ret;
 
+	(void)rContext;
+
 	do
 	{
 		/* Create a random handle with 32 bits check to see if it already is
