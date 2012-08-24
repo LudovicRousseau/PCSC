@@ -147,15 +147,15 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	int lrv;
 	int listSize;
 	SCONTEXT * newContext = NULL;
+	LONG retval = SCARD_E_NO_MEMORY;
 
 	(void)pthread_mutex_lock(&contextsList_lock);
-	listSize = list_size(&contextsList);
-	(void)pthread_mutex_unlock(&contextsList_lock);
 
+	listSize = list_size(&contextsList);
 	if (listSize >= contextMaxThreadCounter)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Too many context running: %d", listSize);
-		goto error;
+		goto out;
 	}
 
 	/* Create the context for this thread. */
@@ -163,7 +163,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	if (NULL == newContext)
 	{
 		Log1(PCSC_LOG_CRITICAL, "Could not allocate new context");
-		goto error;
+		goto out;
 	}
 	memset(newContext, 0, sizeof(*newContext));
 
@@ -174,7 +174,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
-		goto error;
+		goto out;
 	}
 
 	/* request to store copies, and provide the metric function */
@@ -192,20 +192,18 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		Log2(PCSC_LOG_CRITICAL,
 			"list_attributes_comparator failed with return value: %d", lrv);
 		list_destroy(&(newContext->cardsList));
-		goto error;
+		goto out;
 	}
 
 	(void)pthread_mutex_init(&newContext->cardsList_lock, NULL);
 
-	(void)pthread_mutex_lock(&contextsList_lock);
 	lrv = list_append(&contextsList, newContext);
-	(void)pthread_mutex_unlock(&contextsList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
 			lrv);
 		list_destroy(&(newContext->cardsList));
-		goto error;
+		goto out;
 	}
 
 	rv = ThreadCreate(&(newContext->pthThread), THREAD_ATTR_DETACHED,
@@ -215,26 +213,30 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		int lrv2;
 
 		Log2(PCSC_LOG_CRITICAL, "ThreadCreate failed: %s", strerror(rv));
-		(void)pthread_mutex_lock(&contextsList_lock);
 		lrv2 = list_delete(&contextsList, newContext);
-		(void)pthread_mutex_unlock(&contextsList_lock);
 		if (lrv2 < 0)
 			Log2(PCSC_LOG_CRITICAL, "list_delete failed with error %d", lrv2);
 		list_destroy(&(newContext->cardsList));
-		goto error;
+		goto out;
 	}
 
 	/* disable any suicide alarm */
 	if (AutoExit)
 		alarm(0);
 
-	return SCARD_S_SUCCESS;
+	retval = SCARD_S_SUCCESS;
 
-error:
-	if (newContext)
-		free(newContext);
-	(void)close(*pdwClientID);
-	return SCARD_E_NO_MEMORY;
+out:
+	(void)pthread_mutex_unlock(&contextsList_lock);
+
+	if (retval != SCARD_S_SUCCESS)
+	{
+		if (newContext)
+			free(newContext);
+		(void)close(*pdwClientID);
+	}
+
+	return retval;
 }
 
 /*
