@@ -3307,20 +3307,20 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	}
 	(void)pthread_mutex_init(newContextMap->mMutex, NULL);
 
-	lrv = list_init(&(newContextMap->channelMapList));
+	lrv = list_init(&newContextMap->channelMapList);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d", lrv);
 		goto error;
 	}
 
-	lrv = list_attributes_seeker(&(newContextMap->channelMapList),
+	lrv = list_attributes_seeker(&newContextMap->channelMapList,
 		CHANNEL_MAP_seeker);
 	if (lrv <0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
 			"list_attributes_seeker failed with return value: %d", lrv);
-		list_destroy(&(newContextMap->channelMapList));
+		list_destroy(&newContextMap->channelMapList);
 		goto error;
 	}
 
@@ -3329,7 +3329,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
 			lrv);
-		list_destroy(&(newContextMap->channelMapList));
+		list_destroy(&newContextMap->channelMapList);
 		goto error;
 	}
 
@@ -3417,10 +3417,10 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 	free(targetContextMap->mMutex);
 	targetContextMap->mMutex = NULL;
 
-	listSize = list_size(&(targetContextMap->channelMapList));
+	listSize = list_size(&targetContextMap->channelMapList);
 	for (list_index = 0; list_index < listSize; list_index++)
 	{
-		currentChannelMap = list_get_at(&(targetContextMap->channelMapList),
+		currentChannelMap = list_get_at(&targetContextMap->channelMapList,
 			list_index);
 		if (NULL == currentChannelMap)
 		{
@@ -3435,7 +3435,7 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 		}
 
 	}
-	list_destroy(&(targetContextMap->channelMapList));
+	list_destroy(&targetContextMap->channelMapList);
 
 	lrv = list_delete(&contextMapList, targetContextMap);
 	if (lrv < 0)
@@ -3466,7 +3466,7 @@ static LONG SCardAddHandle(SCARDHANDLE hCard, SCONTEXTMAP * currentContextMap,
 	newChannelMap->hCard = hCard;
 	newChannelMap->readerName = strdup(readerName);
 
-	lrv = list_append(&(currentContextMap->channelMapList), newChannelMap);
+	lrv = list_append(&currentContextMap->channelMapList, newChannelMap);
 	if (lrv < 0)
 	{
 		free(newChannelMap->readerName);
@@ -3493,7 +3493,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 
 	free(currentChannelMap->readerName);
 
-	lrv = list_delete(&(currentContextMap->channelMapList), currentChannelMap);
+	lrv = list_delete(&currentContextMap->channelMapList, currentChannelMap);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
@@ -3544,7 +3544,7 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 				list_index);
 			continue;
 		}
-		currentChannelMap = list_seek(&(currentContextMap->channelMapList),
+		currentChannelMap = list_seek(&currentContextMap->channelMapList,
 			&hCard);
 		if (currentChannelMap != NULL)
 		{
