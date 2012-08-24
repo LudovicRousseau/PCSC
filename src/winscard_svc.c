@@ -825,12 +825,16 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 	SCONTEXT * threadContext)
 {
+	LONG retval = SCARD_E_INVALID_VALUE;
+
 	if (threadContext->hContext == hContext)
 	{
 		/*
 		 * Find an empty spot to put the hCard value
 		 */
 		int listLength, lrv;
+
+		(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 
 		listLength = list_size(&(threadContext->cardsList));
 		if (listLength >= contextMaxCardHandles)
@@ -839,22 +843,24 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 				"Too many card handles for thread context @%p: %d (max is %d)"
 				"Restart pcscd with --max-card-handle-per-thread value",
 				threadContext, listLength, contextMaxCardHandles);
-			return SCARD_E_NO_MEMORY;
+			retval = SCARD_E_NO_MEMORY;
+		}
+		else
+		{
+			lrv = list_append(&(threadContext->cardsList), &hCard);
+			if (lrv < 0)
+			{
+				Log2(PCSC_LOG_CRITICAL,
+					"list_append failed with return value: %d", lrv);
+				retval = SCARD_E_NO_MEMORY;
+			}
+			retval = SCARD_S_SUCCESS;
 		}
 
-		(void)pthread_mutex_lock(&threadContext->cardsList_lock);
-		lrv = list_append(&(threadContext->cardsList), &hCard);
 		(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
-		if (lrv < 0)
-		{
-			Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
-				lrv);
-			return SCARD_E_NO_MEMORY;
-		}
-		return SCARD_S_SUCCESS;
 	}
 
-	return SCARD_E_INVALID_VALUE;
+	return retval;
 }
 
 static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
