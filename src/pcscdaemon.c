@@ -406,6 +406,7 @@ int main(int argc, char **argv)
 	if (!setToForeground)
 	{
 		int pid;
+		int fd;
 
 		if (pipe(pipefd) == -1)
 		{
@@ -422,9 +423,17 @@ int main(int argc, char **argv)
 
 		/* like in daemon(3): redirect standard input, standard output
 		 * and standard error to /dev/null */
-		(void)close(0);
-		(void)close(1);
-		(void)close(2);
+		fd = open("/dev/null", O_RDWR);
+		if (fd != -1)
+		{
+			dup2(fd, STDIN_FILENO);
+			dup2(fd, STDOUT_FILENO);
+			dup2(fd, STDERR_FILENO);
+
+			/* do not close stdin, stdout or stderr */
+			if (fd > 2)
+				close(fd);
+		}
 
 		if (pid)
 		/* in the father */
