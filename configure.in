@@ -66,11 +66,10 @@ AM_PROG_CC_C_O
 AM_PROG_AR
 
 # Special check for pthread support
-ACX_PTHREAD(
-[
+AX_PTHREAD([
  AC_DEFINE(HAVE_PTHREAD, 1,
   [Define if you have POSIX threads libraries and header files.])
-], [
+],[
  AC_MSG_ERROR([POSIX thread support required])
 ])
 

@@ -13,7 +13,7 @@ EXTRA_DIST = \
 	ChangeLog.svn \
 	DRIVERS SECURITY \
 	HELP \
-	m4/acx_pthread.m4 \
+	m4/ax_pthread.m4 \
 	m4/as-ac-expand.m4
 
 DISTCLEANFILES = ChangeLog.svn
