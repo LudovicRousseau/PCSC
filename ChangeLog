@@ -1,3 +1,14 @@
+pcsc-lite-1.8.6: Ludovic Rousseau
+30 August 2012
+- Fix a problem when only serial drivers are used (no hotplug/USB
+  driver)
+- increase log buffer size from 160 to 2048. Some "long" log lines where
+  truncated.
+- Fix redirection of stdin, stdout and stderr to /dev/null when pcscd is
+  started as a daemon (default)
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.8.5: Ludovic Rousseau
 4 August 2012
 - Fix crash when a reader is unplugged while pcscd is in the middle of a
