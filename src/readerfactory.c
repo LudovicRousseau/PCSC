@@ -1071,7 +1071,8 @@ SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 
 		/* do we already use this hCard somewhere? */
 		ret = RFReaderInfoById(randHandle, &dummy_reader);
-		UNREF_READER(dummy_reader)
+		if (SCARD_S_SUCCESS == ret)
+			UNREF_READER(dummy_reader)
 	}
 	while (SCARD_S_SUCCESS == ret);
 
