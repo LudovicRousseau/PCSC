@@ -1054,13 +1054,14 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 {
 	SCARDHANDLE randHandle;
-	READER_CONTEXT *dummy_reader;
 	LONG ret;
 
 	(void)rContext;
 
 	do
 	{
+		READER_CONTEXT *dummy_reader;
+
 		/* Create a random handle with 32 bits check to see if it already is
 		 * used. */
 		/* FIXME: THIS IS NOT STRONG ENOUGH: A 128-bit token should be
