@@ -102,7 +102,7 @@
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
-		SCARDHANDLE hLockId;	/**< Lock Id */
+		volatile SCARDHANDLE hLockId;	/**< Lock Id */
 		int LockCount;			/**< number of recursive locks */
 		int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */
