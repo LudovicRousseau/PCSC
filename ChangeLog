@@ -1,3 +1,8 @@
+pcsc-lite-1.8.7: Ludovic Rousseau
+28 November 2012
+- Fix a problem when a reader is unplugged (and the reader is still in use)
+
+
 pcsc-lite-1.8.6: Ludovic Rousseau
 30 August 2012
 - Fix a problem when only serial drivers are used (no hotplug/USB
