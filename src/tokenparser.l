@@ -107,7 +107,7 @@ static void eval_value(char *pcToken, list_t *list_values)
 
 	(void)strlcpy(value, &pcToken[8], len);
 
-	/* convert the firt &amp; into & */
+	/* convert the first &amp; into & */
 	amp = strstr(value, "&amp;");
 	if (amp)
 	{
