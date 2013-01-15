@@ -91,7 +91,7 @@ int evaluatetoken(char *pcToken)
 			{
 				size_t n, p;
 
-				pcFriendlyname = malloc(strlen(pcCurrent) - 1);
+				pcFriendlyname = malloc(strlen(pcCurrent) + 1);
 				for (n = 0, p = 0; n < strlen(pcCurrent); n++)
 				{
 					if (pcCurrent[n] != '"')
