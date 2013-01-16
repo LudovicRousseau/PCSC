@@ -107,9 +107,9 @@ static void eval_value(char *pcToken, list_t *list_values)
 
 	(void)strlcpy(value, &pcToken[8], len);
 
-	/* convert the first &amp; into & */
-	amp = strstr(value, "&amp;");
-	if (amp)
+	/* for all &amp; in the string */
+	amp = value;
+	while ((amp = strstr(amp, "&amp;")) != NULL)
 	{
 		char *p;
 
@@ -120,6 +120,9 @@ static void eval_value(char *pcToken, list_t *list_values)
 		}
 		/* terminate the now shorter string */
 		*p = '\0';
+
+		/* skip the & and continue */
+		amp++;
 	}
 
 	r = list_append(list_values, value);
