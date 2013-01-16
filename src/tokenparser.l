@@ -118,6 +118,8 @@ static void eval_value(char *pcToken, list_t *list_values)
 		{
 			*p = *(p+4);
 		}
+		/* terminate the now shorter string */
+		*p = '\0';
 	}
 
 	r = list_append(list_values, value);
