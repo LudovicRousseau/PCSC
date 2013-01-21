@@ -170,9 +170,9 @@ static void spy_line_direct(char *line)
 
 	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
 	pthread_mutex_lock(&Log_fd_mutex);
-	write(Log_fd, threadid, strlen(threadid));
-	write(Log_fd, line, strlen(line));
-	write(Log_fd, "\n", 1);
+	(void)write(Log_fd, threadid, strlen(threadid));
+	(void)write(Log_fd, line, strlen(line));
+	(void)write(Log_fd, "\n", 1);
 	pthread_mutex_unlock(&Log_fd_mutex);
 }
 
@@ -197,9 +197,9 @@ static void spy_line(const char *fmt, ...)
 	}
 	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
 	pthread_mutex_lock(&Log_fd_mutex);
-	write(Log_fd, threadid, strlen(threadid));
-	write(Log_fd, line, size);
-	write(Log_fd, "\n", 1);
+	(void)write(Log_fd, threadid, strlen(threadid));
+	(void)write(Log_fd, line, size);
+	(void)write(Log_fd, "\n", 1);
 	pthread_mutex_unlock(&Log_fd_mutex);
 }
 
