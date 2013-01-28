@@ -152,6 +152,13 @@ static LONG HPReadBundleValues(void)
 			GET_KEY(PCSCLITE_HP_PRODKEY_NAME, &productIDs)
 			GET_KEY(PCSCLITE_HP_NAMEKEY_NAME, &readerNames)
 
+			if  ((list_size(manuIDs) != list_size(productIDs))
+				|| (list_size(manuIDs) != list_size(readerNames)))
+			{
+				Log2(PCSC_LOG_CRITICAL, "Error parsing %s", fullPath);
+				return -1;
+			}
+
 			/* Get CFBundleName */
 			rv = LTPBundleFindValueWithKey(&plist, PCSCLITE_HP_CFBUNDLE_NAME,
 				&values);
