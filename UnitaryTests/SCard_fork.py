@@ -56,15 +56,16 @@ if pid == 0:
     elif hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
     else:
-        print "test FAILED. SCARD_E_INVALID_HANDLE was expected"
+        print "test FAILED got %s. SCARD_E_INVALID_HANDLE was expected" % SCardGetErrorMessage(hresult)
         print
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+        print "son: SCardReleaseContext()", SCardGetErrorMessage(hresult)
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
         hresult = SCardReleaseContext(hcontext)
-        print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+        print "son: SCardReleaseContext()", SCardGetErrorMessage(hresult)
         if hresult != SCARD_S_SUCCESS:
             raise ReleaseContextException(hresult)
 
@@ -74,11 +75,14 @@ else:
     # give some time to the son
     time.sleep(1)
 
+    print "father: SCardDisconnect..."
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+    print "father: SCardDisconnect()", SCardGetErrorMessage(hresult)
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
+    print "father: SCardReleaseContext..."
     hresult = SCardReleaseContext(hcontext)
-    print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+    print "father: SCardReleaseContext()", SCardGetErrorMessage(hresult)
     if hresult != SCARD_S_SUCCESS:
         raise ReleaseContextException(hresult)
