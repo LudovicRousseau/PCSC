@@ -568,7 +568,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
 				rContext->readerState->cardAtr, &dwAtrLen);
 		}
-		rContext->readerState->cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
