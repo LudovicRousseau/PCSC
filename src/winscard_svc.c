@@ -856,7 +856,8 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 					"list_append failed with return value: %d", lrv);
 				retval = SCARD_E_NO_MEMORY;
 			}
-			retval = SCARD_S_SUCCESS;
+			else
+				retval = SCARD_S_SUCCESS;
 		}
 
 		(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
