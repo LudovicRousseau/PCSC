@@ -26,7 +26,6 @@ int main(void)
 	DWORD dwReaders = sizeof(mszReaders);
 	unsigned char pbAtr[265];	/* 264 is OK */
 	DWORD dwAtrLen;
-	int i;
 
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 	printf("%lX\n", rv);
@@ -45,6 +44,8 @@ int main(void)
 
 	if (SCARD_S_SUCCESS == rv)
 	{
+		int i;
+
 		for (i=0; i<dwAtrLen; i++)
 			printf("%02X ", pbAtr[i]);
 		printf("\n");
