@@ -222,7 +222,9 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	uint32_t readerState;
 	int32_t readerSharing;
 	DWORD dwCurrentState;
+#ifndef DISABLE_AUTO_POWER_ON
 	DWORD dwAtrLen;
+#endif
 
 	/*
 	 * Zero out everything
