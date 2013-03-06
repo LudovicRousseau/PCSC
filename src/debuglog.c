@@ -229,12 +229,12 @@ void DebugLogSetLogType(const int dbgtype)
 	if ((DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
 		|| (DEBUGLOG_STDOUT_COLOR_DEBUG == LogMsgType))
 	{
-		const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode", "xterm-256color" };
 		char *term;
 
 		term = getenv("TERM");
 		if (term)
 		{
+			const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode", "xterm-256color" };
 			unsigned int i;
 
 			/* for each known color terminal */

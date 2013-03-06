@@ -56,12 +56,12 @@ static void log_init(void)
 	/* log to stderr and stderr is a tty? */
 	if (isatty(fileno(stderr)))
 	{
-		const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };
 		char *term;
 
 		term = getenv("TERM");
 		if (term)
 		{
+			const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };
 			unsigned int i;
 
 			/* for each known color terminal */
