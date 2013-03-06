@@ -352,7 +352,6 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				rContext->readerState->readerState = SCARD_PRESENT;
 				rContext->powerState = POWER_STATE_UNPOWERED;
 				Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
-				readerState = SCARD_PRESENT;
 				rv = IFD_SUCCESS;
 				Log1(PCSC_LOG_INFO, "Skip card power on");
 #else
