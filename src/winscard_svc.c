@@ -834,7 +834,7 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		/*
 		 * Find an empty spot to put the hCard value
 		 */
-		int listLength, lrv;
+		int listLength;
 
 		(void)pthread_mutex_lock(&threadContext->cardsList_lock);
 
@@ -849,6 +849,8 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		}
 		else
 		{
+			int lrv;
+
 			lrv = list_append(&threadContext->cardsList, &hCard);
 			if (lrv < 0)
 			{
