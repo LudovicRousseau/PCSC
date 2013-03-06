@@ -548,7 +548,6 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	if (desc.iSerialNumber)
 	{
 		libusb_device_handle *device;
-		unsigned char serialNumber[MAX_READERNAME];
 		char fullname[MAX_READERNAME];
 		int ret;
 
@@ -559,6 +558,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		}
 		else
 		{
+			unsigned char serialNumber[MAX_READERNAME];
+
 			ret = libusb_get_string_descriptor_ascii(device, desc.iSerialNumber,
 				serialNumber, MAX_READERNAME);
 			libusb_close(device);
