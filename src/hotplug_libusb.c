@@ -548,7 +548,6 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	if (desc.iSerialNumber)
 	{
 		libusb_device_handle *device;
-		char fullname[MAX_READERNAME];
 		int ret;
 
 		ret = libusb_open(dev, &device);
@@ -572,6 +571,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 			}
 			else
 			{
+				char fullname[MAX_READERNAME];
+
 				snprintf(fullname, sizeof(fullname), "%s (%s)",
 					driver->readerName, serialNumber);
 				readerTracker[i].fullName = strdup(fullname);
