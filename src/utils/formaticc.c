@@ -141,6 +141,8 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 		(void)SCardReleaseContext(hContext);
 		printf("Error connecting to reader %ld\n", rv);
 		free(mszReaders);
+		(int)fclose(fp);
+		(int)fclose(fo);
 		return 1;
 	}
 
