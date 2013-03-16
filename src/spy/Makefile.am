@@ -8,7 +8,7 @@ libpcscspy_la_SOURCES = \
 
 man_MANS = pcsc-spy.1
 
-%.1: %.pod
+pcsc-spy.1: pcsc-spy.pod
 	pod2man \
 		--center="PC/SC lite" \
 		--release="$(PACKAGE_NAME) $(PACKAGE_VERSION)" \
