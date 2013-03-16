@@ -128,8 +128,9 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([char foo;])],
 CFLAGS="$saved_CFLAGS"
 AC_SUBST(SYMBOL_VISIBILITY)
 
-AC_SUBST(LIBDL)
-AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
+AC_SEARCH_LIBS([dlopen], [dl dld], [], [
+  AC_MSG_ERROR([unable to find the dlopen() function])
+])
 
 # Use 'uname' output as an architecture define
 PCSC_ARCH=`uname | sed -e s,/,_,`

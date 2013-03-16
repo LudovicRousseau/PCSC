@@ -5,7 +5,6 @@ dist_bin_SCRIPTS = pcsc-spy
 
 libpcscspy_la_SOURCES = \
 	libpcscspy.c
-libpcscspy_la_LIBADD = -ldl
 
 man_MANS = pcsc-spy.1
 
