@@ -22,6 +22,7 @@
 
 import os
 import signal
+import time
 from Queue import Queue
 from threading import Thread
 from operator import attrgetter
@@ -841,7 +842,14 @@ class PCSCdemultiplexer(object):
         start_time = int(sec) + int(usec) / 1000000.
 
         while line != '':
+            previous_thread = thread
             (thread, tail) = line.split('@')
+
+            # in case the thread changes
+            if previous_thread != thread:
+                # schedule the other thread so it has time to emtpy its
+                # queue
+                time.sleep(.01)
 
             try:
                 queue = self.queues[thread]
