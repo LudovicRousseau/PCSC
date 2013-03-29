@@ -54,11 +54,9 @@ pcscd_SOURCES = \
 	parser.h \
 	pcscdaemon.c \
 	pcscd.h \
-	pcscd.h.in \
 	PCSC/debuglog.h \
 	PCSC/ifdhandler.h \
 	PCSC/pcsclite.h \
-	PCSC/pcsclite.h.in \
 	PCSC/winscard.h \
 	PCSC/wintypes.h \
 	powermgt_generic.c \
