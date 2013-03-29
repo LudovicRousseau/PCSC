@@ -829,7 +829,15 @@ class PCSCdemultiplexer(object):
         line = self.filedesc2.readline().strip()
 
         (thread, tail) = line.split('@')
-        (direction, sec, usec, fct) = tail.strip().split('|')
+        res = tail.strip().split('|')
+        # check the first line format
+        if res[0] != ">":
+            print "Wrong format!"
+            print "First line Should start with a '>' but got:"
+            print tail
+            return
+        (direction, sec, usec, fct) = res
+
         start_time = int(sec) + int(usec) / 1000000.
 
         while line != '':
