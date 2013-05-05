@@ -156,6 +156,7 @@ static LONG HPReadBundleValues(void)
 				|| (list_size(manuIDs) != list_size(readerNames)))
 			{
 				Log2(PCSC_LOG_CRITICAL, "Error parsing %s", fullPath);
+				(void)closedir(hpDir);
 				return -1;
 			}
 
