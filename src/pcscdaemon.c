@@ -623,7 +623,7 @@ int main(int argc, char **argv)
 		char buf = 0;
 
 		/* write a 0 (success) to father process */
-		write(pipefd[1], &buf, 1);
+		(void)write(pipefd[1], &buf, 1);
 		close(pipefd[1]);
 	}
 
@@ -645,7 +645,7 @@ static void at_exit(void)
 
 		/* write the error code to father process */
 		buf = ExitValue;
-		write(pipefd[1], &buf, 1);
+		(void)write(pipefd[1], &buf, 1);
 		close(pipefd[1]);
 	}
 
