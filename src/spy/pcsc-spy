@@ -30,8 +30,7 @@ from operator import attrgetter
 
 def hexdump(data_buffer, width=16):
     def quotechars(data_buffer):
-        return ''.join(['.', chr(c)][c > 31 and c < 127]
-            for c in data_buffer)
+        return ''.join(['.', chr(c)][c > 31 and c < 127] for c in data_buffer)
 
     result = []
     offset = 0
