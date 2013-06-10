@@ -1390,7 +1390,8 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			/* Special case SCARD_ATTR_DEVICE_FRIENDLY_NAME as it is better
 			 * implemented in pcscd (it knows the friendly name)
 			 */
-			if (dwAttrId == SCARD_ATTR_DEVICE_FRIENDLY_NAME)
+			if ((SCARD_ATTR_DEVICE_FRIENDLY_NAME == dwAttrId)
+				|| (SCARD_ATTR_DEVICE_SYSTEM_NAME == dwAttrId))
 			{
 				unsigned int len = strlen(rContext->readerState->readerName)+1;
 
@@ -1403,7 +1404,6 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 					rv = SCARD_S_SUCCESS;
 				}
 				*pcbAttrLen = len;
-
 			}
 			else
 				rv = SCARD_E_UNSUPPORTED_FEATURE;
