@@ -1394,15 +1394,15 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			{
 				unsigned int len = strlen(rContext->readerState->readerName)+1;
 
-				*pcbAttrLen = len;
 				if (len > *pcbAttrLen)
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
 					(void)strlcpy((char *)pbAttr,
-						rContext->readerState->readerName, *pcbAttrLen);
+						rContext->readerState->readerName, len);
 					rv = SCARD_S_SUCCESS;
 				}
+				*pcbAttrLen = len;
 
 			}
 			else
