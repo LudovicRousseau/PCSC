@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@/PCSC
 usbdropdir=@usbdropdir@
+serialconfdir=@confdir_exp@
 
 Name: PCSC Lite
 Description: PC/SC smart card interface

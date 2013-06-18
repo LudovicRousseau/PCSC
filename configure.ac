@@ -353,6 +353,7 @@ AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configuration
 # Setup dist stuff
 AC_SUBST(usbdropdir)
 AC_SUBST(ipcdir)
+AC_SUBST(serialconfdir)
 AC_SUBST(host_to_ccid_16)
 AC_SUBST(host_to_ccid_32)
 AS_AC_EXPAND(confdir_exp,$confdir)
@@ -396,6 +397,7 @@ ipcdir:                 ${ipcdir}
 use serial:             ${use_serial}
 use usb:                ${use_usb}
 systemd unit directory: ${with_systemdsystemunitdir}
+serial config dir.:     ${confdir_exp}
 
 PCSCLITE_FEATURES:      ${PCSCLITE_FEATURES}
 
