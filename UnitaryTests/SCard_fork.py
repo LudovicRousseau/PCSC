@@ -60,7 +60,7 @@ if pid == 0:
         print
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
-        print "son: SCardReleaseContext()", SCardGetErrorMessage(hresult)
+        print "son: SCardDisconnect()", SCardGetErrorMessage(hresult)
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
