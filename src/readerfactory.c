@@ -456,6 +456,12 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 
 		if (rv == IFD_SUCCESS && dwGetSize == 1 && ucThread[0] == 1)
 		{
+			Log1(PCSC_LOG_INFO, "Driver is slot thread safe");
+
+			sReadersContexts[dwContextB]->library =
+				strdup(sReadersContexts[dwContext]->library);
+			sReadersContexts[dwContextB]->device =
+				strdup(sReadersContexts[dwContext]->device);
 			sReadersContexts[dwContextB]->mMutex =
 				malloc(sizeof(pthread_mutex_t));
 			(void)pthread_mutex_init(sReadersContexts[dwContextB]->mMutex,
