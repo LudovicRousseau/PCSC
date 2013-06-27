@@ -510,12 +510,20 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 		kret = (*usbdev)->GetLocationID(usbdev, &usbAddress);
 		(*usbdev)->Release(usbdev);
 
+#ifdef DEBUG_HOTPLUG
+		Log4(PCSC_LOG_DEBUG, "Found USB device 0x%04X:0x%04X at 0x%X",
+			vendorId, productId, usbAddress);
+#endif
 		HPDriver *driver;
 		for (driver = driverBundle; driver->m_vendorId; ++driver)
 		{
 			if ((driver->m_vendorId == vendorId)
 				&& (driver->m_productId == productId))
 			{
+#ifdef DEBUG_HOTPLUG
+				Log4(PCSC_LOG_DEBUG, "Adding USB device %04X:%04X at 0x%X",
+					vendorId, productId, usbAddress);
+#endif
 				*readerList =
 					HPDeviceListInsert(*readerList, driver, usbAddress);
 			}
