@@ -295,8 +295,8 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			CFStringRef strValue = blobValue;
 
 #ifdef DEBUG_HOTPLUG
-			Log3(PCSC_LOG_DEBUG, "Driver without alias: %s",
-				driverBundle, driverBundle->m_libPath);
+			Log3(PCSC_LOG_DEBUG, "Driver without alias: %s %s",
+				driverBundle->m_friendlyName, driverBundle->m_libPath);
 #endif
 
 			driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
