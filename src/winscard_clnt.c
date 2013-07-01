@@ -353,7 +353,6 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE,
 	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
 static LONG SCardRemoveHandle(SCARDHANDLE);
 
-static void SCardInvalidateHandles(void);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
@@ -423,19 +422,9 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
 	LONG rv;
-	static int first_time = TRUE;
 
 	API_TRACE_IN("%ld, %p, %p", dwScope, pvReserved1, pvReserved2)
 	PROFILE_START
-
-	/* Some setup for the first execution */
-	if (first_time)
-	{
-		first_time = FALSE;
-
-		/* Invalidate all the handles in the son after a fork */
-		pthread_atfork(NULL, NULL, SCardInvalidateHandles);
-	}
 
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
@@ -3621,25 +3610,6 @@ LONG SCardCheckDaemonAvailability(void)
 	}
 
 	return SCARD_S_SUCCESS;
-}
-
-static void SCardInvalidateHandles(void)
-{
-	/* invalid all handles */
-	(void)SCardLockThread();
-
-	while (list_size(&contextMapList) != 0)
-	{
-		SCONTEXTMAP * currentContextMap;
-
-		currentContextMap = list_get_at(&contextMapList, 0);
-		if (currentContextMap != NULL)
-			(void)SCardCleanContext(currentContextMap);
-		else
-			Log1(PCSC_LOG_CRITICAL, "list_get_at returned NULL");
-	}
-
-	(void)SCardUnlockThread();
 }
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
