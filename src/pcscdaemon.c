@@ -634,9 +634,14 @@ int main(int argc, char **argv)
 	if (pipefd[1] >= 0)
 	{
 		char buf = 0;
+		ssize_t r;
 
 		/* write a 0 (success) to father process */
-		(void)write(pipefd[1], &buf, 1);
+		r = write(pipefd[1], &buf, 1);
+		if (r < 0)
+		{
+			Log2(PCSC_LOG_ERROR, "write() failed: %s", strerror(errno));
+		}
 		close(pipefd[1]);
 	}
 
@@ -655,10 +660,15 @@ static void at_exit(void)
 	if (pipefd[1] >= 0)
 	{
 		char buf;
+		ssize_t r;
 
 		/* write the error code to father process */
 		buf = ExitValue;
-		(void)write(pipefd[1], &buf, 1);
+		r = write(pipefd[1], &buf, 1);
+		if (r < 0)
+		{
+			Log2(PCSC_LOG_ERROR, "write() failed: %s", strerror(errno));
+		}
 		close(pipefd[1]);
 	}
 
