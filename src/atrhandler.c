@@ -92,6 +92,11 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 		TCi = (Y1i & 0x04) ? pucAtr[p++] : -1;
 		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
 
+		/* We don't use TBi and TCi but we must calculate them because
+		 * of the p++ in the formulae */
+		(void)TBi;
+		(void)TCi;
+
 #ifdef ATR_DEBUG
 		Log9(PCSC_LOG_DEBUG,
 			"TA%d: %02X, TB%d: %02X, TC%d: %02X, TD%d: %02X",
