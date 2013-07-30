@@ -185,10 +185,14 @@ wait_for_card_again:
 		do
 		{
 			char input[80];
+			char *r;
 
 			printf("Enter the reader number\t\t: ");
-			(void)fgets(input, sizeof(input), stdin);
-			iReader = atoi(input);
+			r = fgets(input, sizeof(input), stdin);
+			if (NULL == r)
+				iReader = -1;
+			else
+				iReader = atoi(input);
 
 			if (iReader > p || iReader <= 0)
 				printf("Invalid Value - try again\n");
