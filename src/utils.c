@@ -41,11 +41,19 @@ pid_t GetDaemonPid(void)
 	if (fd >= 0)
 	{
 		char pid_ascii[PID_ASCII_SIZE];
+		ssize_t r;
 
-		(void)read(fd, pid_ascii, PID_ASCII_SIZE);
+		r = read(fd, pid_ascii, sizeof pid_ascii);
+		if (r < 0)
+		{
+			Log2(PCSC_LOG_CRITICAL, "Reading " PCSCLITE_RUN_PID " failed: %s",
+				strerror(errno));
+			pid = -1;
+		}
+		else
+			pid = atoi(pid_ascii);
 		(void)close(fd);
 
-		pid = atoi(pid_ascii);
 	}
 	else
 	{

@@ -538,9 +538,16 @@ int main(int argc, char **argv)
 		if (f != -1)
 		{
 			char pid[PID_ASCII_SIZE];
+			ssize_t r;
 
 			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			(void)write(f, pid, strlen(pid));
+			r = write(f, pid, strlen(pid));
+			if (r < 0)
+			{
+				Log2(PCSC_LOG_CRITICAL,
+					"writting " PCSCLITE_RUN_PID " failed: %s",
+					strerror(errno));
+			}
 			(void)close(f);
 
 			/* set mode so that the file is world readable even is umask is
