@@ -149,6 +149,7 @@ int main(int argc, char **argv)
 	int customMaxThreadCardHandles = 0;
 	int opt;
 	int limited_rights = FALSE;
+	int r;
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
 	static struct option long_options[] = {
@@ -398,7 +399,12 @@ int main(int argc, char **argv)
 
 	/* like in daemon(3): changes the current working directory to the
 	 * root ("/") */
-	(void)chdir("/");
+	r = chdir("/");
+	if (r < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "chdir() failed: %s", strerror(errno));
+		return EXIT_FAILURE;
+	}
 
 	/*
 	 * If this is set to one the user has asked it not to fork
