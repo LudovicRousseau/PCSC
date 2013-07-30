@@ -541,7 +541,7 @@ int main(int argc, char **argv)
 			ssize_t r;
 
 			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			r = write(f, pid, strlen(pid));
+			r = write(f, pid, strlen(pid) + 1);
 			if (r < 0)
 			{
 				Log2(PCSC_LOG_CRITICAL,
