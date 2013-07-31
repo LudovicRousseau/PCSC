@@ -544,11 +544,11 @@ int main(int argc, char **argv)
 		if (f != -1)
 		{
 			char pid[PID_ASCII_SIZE];
-			ssize_t r;
+			ssize_t rr;
 
 			(void)snprintf(pid, sizeof(pid), "%u\n", (unsigned) getpid());
-			r = write(f, pid, strlen(pid) + 1);
-			if (r < 0)
+			rr = write(f, pid, strlen(pid) + 1);
+			if (rr < 0)
 			{
 				Log2(PCSC_LOG_CRITICAL,
 					"writting " PCSCLITE_RUN_PID " failed: %s",
@@ -634,11 +634,11 @@ int main(int argc, char **argv)
 	if (pipefd[1] >= 0)
 	{
 		char buf = 0;
-		ssize_t r;
+		ssize_t rr;
 
 		/* write a 0 (success) to father process */
-		r = write(pipefd[1], &buf, 1);
-		if (r < 0)
+		rr = write(pipefd[1], &buf, 1);
+		if (rr < 0)
 		{
 			Log2(PCSC_LOG_ERROR, "write() failed: %s", strerror(errno));
 		}
