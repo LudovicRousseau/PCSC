@@ -28,7 +28,7 @@ static int iOldLinenumber;
 static char *pcPrevious;
 static char *pcCurrent;
 static char *pcFriendlyname;
-static const char *pcDevicename;
+static char *pcDevicename;
 static char *pcLibpath;
 static char *pcChannelid;
 static int badError;
@@ -182,6 +182,7 @@ int evaluatetoken(char *pcToken)
 		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
 	{
 		int channelId;
+		static char* defaultDeviceName = "";
 
 		if (0 == reader_list_size)
 		{
@@ -201,7 +202,7 @@ int evaluatetoken(char *pcToken)
 
 		/* the DEVICENAME parameter is optional */
 		if (NULL == pcDevicename)
-			pcDevicename = "";
+			pcDevicename = defaultDeviceName;
 
 		channelId = strtoul(pcChannelid, NULL, 0);
 		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);
@@ -209,9 +210,17 @@ int evaluatetoken(char *pcToken)
 		reader_list[reader_list_size-2].pcLibpath = strdup(pcLibpath),
 		reader_list[reader_list_size-2].channelId = channelId;
 
+		free(pcFriendlyname);
 		pcFriendlyname = NULL;
+
+		if (pcDevicename != defaultDeviceName)
+			free(pcDevicename);
 		pcDevicename = NULL;
+
+		free(pcLibpath);
 		pcLibpath = NULL;
+
+		free(pcChannelid);
 		pcChannelid = NULL;
 	}
 
