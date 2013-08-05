@@ -1290,6 +1290,14 @@ void RFCleanupReaders(void)
 			free(sReadersContexts[i]);
 		}
 	}
+
+#ifdef USE_SERIAL
+	if (ConfigFile)
+	{
+		free(ConfigFile);
+		ConfigFile = NULL;
+	}
+#endif
 }
 
 /**
