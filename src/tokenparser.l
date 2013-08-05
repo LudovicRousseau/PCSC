@@ -203,6 +203,7 @@ int bundleParse(const char *fileName, list_t *l)
 	{
 		(void)yylex();
 	} while (!feof(file));
+	yylex_destroy();
 
 	(void)fclose(file);
 

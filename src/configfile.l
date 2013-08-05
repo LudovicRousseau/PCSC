@@ -328,6 +328,7 @@ int DBGetReaderList(const char *readerconf, SerialReader **caller_reader_list)
 		(void)yylex();
 	}
 	while (!feof(configFile));
+	yylex_destroy();
 
 	(void)fclose(configFile);
 
