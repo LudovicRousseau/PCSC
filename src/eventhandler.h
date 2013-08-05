@@ -42,6 +42,7 @@
 	LONG EHUnregisterClientForEvent(int32_t filedes);
 	LONG EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
+	LONG EHDeinitializeEventStructures(void);
 	LONG EHSpawnEventHandler(READER_CONTEXT *);
 	LONG EHDestroyEventHandler(READER_CONTEXT *);
 

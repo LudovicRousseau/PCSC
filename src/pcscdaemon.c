@@ -46,6 +46,7 @@
 #include "configfile.h"
 #include "powermgt_generic.h"
 #include "utils.h"
+#include "eventhandler.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -96,6 +97,7 @@ static void SVCServiceRunLoop(void)
 
 			/* now stop all the drivers */
 			RFCleanupReaders();
+			EHDeinitializeEventStructures();
 			ContextsDeinitialize();
 			at_exit();
 		}

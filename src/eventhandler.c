@@ -128,6 +128,14 @@ LONG EHInitializeEventStructures(void)
 	return SCARD_S_SUCCESS;
 }
 
+LONG EHDeinitializeEventStructures(void)
+{
+	list_destroy(&ClientsWaitingForEvent);
+	pthread_mutex_destroy(&ClientsWaitingForEvent_lock);
+
+	return SCARD_S_SUCCESS;
+}
+
 LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 {
 	int rv;
