@@ -86,6 +86,20 @@ static void SVCServiceRunLoop(void)
 
 	while (TRUE)
 	{
+		if (AraKiri)
+		{
+			/* stop the hotpug thread and waits its exit */
+#ifdef USE_USB
+			(void)HPStopHotPluggables();
+#endif
+			(void)SYS_Sleep(1);
+
+			/* now stop all the drivers */
+			RFCleanupReaders();
+			ContextsDeinitialize();
+			at_exit();
+		}
+
 		switch (rsp = ProcessEventsServer(&dwClientID))
 		{
 
@@ -119,20 +133,6 @@ static void SVCServiceRunLoop(void)
 			Log2(PCSC_LOG_ERROR, "ProcessEventsServer unknown retval: %d",
 				rsp);
 			break;
-		}
-
-		if (AraKiri)
-		{
-			/* stop the hotpug thread and waits its exit */
-#ifdef USE_USB
-			(void)HPStopHotPluggables();
-#endif
-			(void)SYS_Sleep(1);
-
-			/* now stop all the drivers */
-			RFCleanupReaders();
-			ContextsDeinitialize();
-			at_exit();
 		}
 	}
 }
