@@ -182,7 +182,7 @@ int evaluatetoken(char *pcToken)
 		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
 	{
 		int channelId;
-		static char* defaultDeviceName = "";
+		static char* defaultDeviceName = (char *)"";
 
 		if (0 == reader_list_size)
 		{
