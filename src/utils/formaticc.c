@@ -18,8 +18,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __APPLE__
+#include <PCSC/winscard.h>
+#include <PCSC/wintypes.h>
+#else
 #include <wintypes.h>
 #include <winscard.h>
+#endif
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 64
