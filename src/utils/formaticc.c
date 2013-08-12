@@ -246,7 +246,10 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 		}
 
 		if (rv != SCARD_S_SUCCESS)
-			fprintf(fo, ".error %ld\n", rv);
+		{
+			fprintf(fo, ".error 0x%08lX\n", rv);
+			printf("Error: 0x%08lX\n", rv);
+		}
 		else
 		{
 			fprintf(fo, "%02ld ", dwRecvLength);
