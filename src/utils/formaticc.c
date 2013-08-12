@@ -182,6 +182,13 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 		if (fgets(line, sizeof(line), fp) == NULL)
 			break;
 
+		/* comments */
+		if ('#' == line[0])
+		{
+			printf("%s", line);
+			continue;
+		}
+
 		line_ptr = line;
 		if (sscanf(line_ptr, "%x", &x) == 0)
 			break;
