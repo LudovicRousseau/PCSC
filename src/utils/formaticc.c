@@ -210,8 +210,11 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 			line_ptr++;
 		}
 
-		printf("Processing Command %03d of length %03lX: %s", cnum,
-			dwSendLength, line);
+		printf("Processing Command %03d of length %03lX: ", cnum,
+			dwSendLength);
+		for (i=0; i<dwSendLength; i++)
+			printf("%02X ", s[i]);
+		printf("\n");
 
 		memset(r, 0x00, MAX_BUFFER_SIZE);
 		dwRecvLength = MAX_BUFFER_SIZE;
@@ -240,11 +243,16 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 		else
 		{
 			fprintf(fo, "%02ld ", dwRecvLength);
+			printf("Received %ld bytes: ", dwRecvLength);
 
 			for (i = 0; i < dwRecvLength; i++)
+			{
 				fprintf(fo, "%02X ", r[i]);
+				printf("%02X ", r[i]);
+			}
 
 			fprintf(fo, "\n");
+			printf("\n");
 		}
 
 		if (rv == SCARD_W_RESET_CARD)
