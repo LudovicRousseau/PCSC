@@ -37,7 +37,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	SCARD_IO_REQUEST sRecvPci;
 	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwSendLength, dwRecvLength, dwPref, dwReaders;
-	LPSTR mszReaders;
+	LPSTR mszReaders = NULL;
 	BYTE s[MAX_BUFFER_SIZE], r[MAX_BUFFER_SIZE];
 	LPCSTR mszGroups;
 	LONG rv;
@@ -102,9 +102,19 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	}
 
 	mszGroups = NULL;
-	(void)SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
+	rv = SCardListReaders(hContext, mszGroups, NULL, &dwReaders);
+	if (rv != SCARD_S_SUCCESS)
+	{
+		printf("SCardListReaders error line %d: %08X\n", __LINE__, rv);
+		goto releasecontext;
+	}
 	mszReaders = malloc(sizeof(char) * dwReaders);
-	(void)SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
+	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
+	if (rv != SCARD_S_SUCCESS)
+	{
+		printf("SCardListReaders error line %d: %08X\n", __LINE__, rv);
+		goto releasecontext;
+	}
 
 	/*
 	 * Have to understand the multi-string here
@@ -136,26 +146,32 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	rgReaderStates[0].dwCurrentState = SCARD_STATE_EMPTY;
 
 	printf("Please insert a smart card\n");
-	(void)SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+	rv  = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+	if (rv != SCARD_S_SUCCESS)
+	{
+		printf("SCardGetStatusChange error line %d: %08X\n", __LINE__, rv);
+		goto releasecontext;
+	}
+
 	rv = SCardConnect(hContext, &mszReaders[iList[iReader]],
 		SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&hCard, &dwPref);
-
 	if (rv != SCARD_S_SUCCESS)
 	{
-		(void)SCardReleaseContext(hContext);
-		printf("Error connecting to reader %ld\n", rv);
-		free(mszReaders);
-		(int)fclose(fp);
-		(int)fclose(fo);
-		return 1;
+		printf("SCardConnect error line %d: %08X\n", __LINE__, rv);
+		goto releasecontext;
 	}
 
 	/*
 	 * Now lets get some work done
 	 */
 
-	(void)SCardBeginTransaction(hCard);
+	rv = SCardBeginTransaction(hCard);
+	if (rv != SCARD_S_SUCCESS)
+	{
+		printf("SCardBeginTransaction error line %d: %08X\n", __LINE__, rv);
+		goto disconnect;
+	}
 
 	cnum = 0;
 
@@ -181,9 +197,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 			if (sscanf(line_ptr, "%x", &x) == 0)
 			{
 				printf("Corrupt APDU: %s\n", line);
-				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
-				(void)SCardReleaseContext(hContext);
-				free(mszReaders);
+				goto disconnect;
 				return 1;
 			}
 			s[i] = x;
@@ -217,10 +231,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 			else
 			{
 				printf("Invalid Protocol\n");
-				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
-				(void)SCardReleaseContext(hContext);
-				free(mszReaders);
-				return 1;
+				goto endtransaction;
 			}
 		}
 
@@ -238,16 +249,24 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 
 		if (rv == SCARD_W_RESET_CARD)
 		{
-			(void)SCardReconnect(hCard, SCARD_SHARE_SHARED,
+			rv = SCardReconnect(hCard, SCARD_SHARE_SHARED,
 				SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 				SCARD_RESET_CARD, &dwPref);
+			if (rv != SCARD_S_SUCCESS)
+			{
+				printf("SCardReconnect error line %d: %08X\n", __LINE__, rv);
+				goto endtransaction;
+			}
 		}
 
 	}
 	while (1);
 
+endtransaction:
 	(void)SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
+disconnect:
 	(void)SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
+releasecontext:
 	(void)SCardReleaseContext(hContext);
 	free(mszReaders);
 
