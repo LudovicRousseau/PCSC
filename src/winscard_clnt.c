@@ -1555,15 +1555,15 @@ retry:
 	if (SCARD_AUTOALLOCATE == dwReaderLen)
 	{
 		dwReaderLen = *pcchReaderLen;
+		if (NULL == mszReaderName)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		bufReader = malloc(dwReaderLen);
 		if (NULL == bufReader)
 		{
 			rv = SCARD_E_NO_MEMORY;
-			goto end;
-		}
-		if (NULL == mszReaderName)
-		{
-			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(char **)mszReaderName = bufReader;
@@ -1583,15 +1583,15 @@ retry:
 	if (SCARD_AUTOALLOCATE == dwAtrLen)
 	{
 		dwAtrLen = *pcbAtrLen;
+		if (NULL == pbAtr)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		bufAtr = malloc(dwAtrLen);
 		if (NULL == bufAtr)
 		{
 			rv = SCARD_E_NO_MEMORY;
-			goto end;
-		}
-		if (NULL == pbAtr)
-		{
-			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(LPBYTE *)pbAtr = bufAtr;
@@ -3130,15 +3130,15 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 
 	if (SCARD_AUTOALLOCATE == *pcchGroups)
 	{
+		if (NULL == mszGroups)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		buf = malloc(dwGroups);
 		if (NULL == buf)
 		{
 			rv = SCARD_E_NO_MEMORY;
-			goto end;
-		}
-		if (NULL == mszGroups)
-		{
-			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(char **)mszGroups = buf;
