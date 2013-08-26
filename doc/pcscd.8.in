@@ -40,6 +40,9 @@ use critical log level.
 The log levels are ordered as: debug < info < error < critical. Use a
 log level l will log this level and all the levels above it.
 .TP
+.B --force-reader-polling
+ignore the IFD_GENERATE_HOTPLUG reader capability
+.TP
 .BR \-h ", " \-\-help
 Displays information about the pcscd command line
 .TP
