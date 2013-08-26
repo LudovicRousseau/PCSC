@@ -20,6 +20,9 @@ Specifies the file \fIfile\fP as an alternate location for
 Runs pcscd in the foreground and sends log messages to stderr instead of
 syslog(3).
 .TP
+.BR \-T ", " \-\-color
+force use of colored logs.
+.TP
 .BR \-d ", " \-\-debug
 use the lowest log level. Any log message of this level or above will be
 sent to stderr or syslog(3) depending on the use of
