@@ -31,10 +31,10 @@ sent to stderr or syslog(3) depending on the use of
 .B \-\-info
 use info log level. This is the default log level.
 .TP
-.B \-\-error
+.BR \-e ", " \-\-error
 use error log level.
 .TP
-.B \-\-critical
+.BR \-C ", " \-\-critical
 use critical log level.
 .PP
 The log levels are ordered as: debug < info < error < critical. Use a
