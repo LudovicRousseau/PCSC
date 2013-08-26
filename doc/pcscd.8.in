@@ -43,6 +43,23 @@ log level l will log this level and all the levels above it.
 .B --force-reader-polling
 ignore the IFD_GENERATE_HOTPLUG reader capability
 .TP
+.BR \-t ", " \-\-max-thread
+maximum number of threads (default 200).
+
+This is the maximum number of clients (SCardEstablishContext) that pcscd
+can handle.
+.TP
+.BR \-s ", " \-\-max-card-handle-per-thread
+maximum number of card handle per thread (default: 200).
+
+This is the maximum number of card handle (SCardConnect) per client
+(SCardEstablishContext).
+.TP
+.BR \-r ", " \-\-max-card-handle-per-reader
+maximum number of card handle per reader (default: 200)
+
+This is the maximum number of card handle (SCardConnect) per reader.
+.TP
 .BR \-h ", " \-\-help
 Displays information about the pcscd command line
 .TP
