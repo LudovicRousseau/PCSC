@@ -1090,6 +1090,7 @@ exit:
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
+	LONG rv2;
 	READER_CONTEXT * rContext = NULL;
 
 	/*
@@ -1213,7 +1214,13 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Unlock any blocks on this context
 	 */
-	(void)RFUnlockSharing(hCard, rContext);
+	/* we do not want to lose the previous rv value
+	 * So we use another variable */
+	rv2 = RFUnlockSharing(hCard, rContext);
+	if (rv2 != SCARD_S_SUCCESS)
+		/* if rv is already in error then do not change its value */
+		if (rv == SCARD_S_SUCCESS)
+			rv = rv2;
 
 	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
 

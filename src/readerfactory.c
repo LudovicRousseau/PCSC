@@ -950,9 +950,14 @@ LONG RFUnlockSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 	if (SCARD_S_SUCCESS == rv)
 	{
 		if (rContext->LockCount > 0)
+		{
 			rContext->LockCount -= 1;
-		if (0 == rContext->LockCount)
-			rContext->hLockId = 0;
+			if (0 == rContext->LockCount)
+				rContext->hLockId = 0;
+		}
+		else
+			/* rContext->LockCount == 0 */
+			rv = SCARD_E_NOT_TRANSACTED;
 	}
 	(void)pthread_mutex_unlock(&LockMutex);
 
