@@ -60,6 +60,8 @@ char SocketActivated = FALSE;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
 static int pipefd[] = {-1, -1};
+char Add_Serial_In_Name = TRUE;
+char Add_Interface_In_Name = TRUE;
 
 /*
  * Some internal functions
@@ -171,10 +173,12 @@ int main(int argc, char **argv)
 		{"max-card-handle-per-thread", 1, NULL, 's'},
 		{"max-card-handle-per-reader", 1, NULL, 'r'},
 		{"auto-exit", 0, NULL, 'x'},
+		{"reader-name-no-serial", 0, NULL, 'S'},
+		{"reader-name-no-interface", 0, NULL, 'I'},
 		{NULL, 0, NULL, 0}
 	};
 #endif
-#define OPT_STRING "c:fTdhvaeCHt:r:s:x"
+#define OPT_STRING "c:fTdhvaeCHt:r:s:xSI"
 
 	newReaderConfig = NULL;
 	setToForeground = FALSE;
@@ -304,6 +308,14 @@ int main(int argc, char **argv)
 				AutoExit = TRUE;
 				Log2(PCSC_LOG_INFO, "Auto exit after %d seconds of inactivity",
 					TIME_BEFORE_SUICIDE);
+				break;
+
+			case 'S':
+				Add_Serial_In_Name = FALSE;
+				break;
+
+			case 'I':
+				Add_Interface_In_Name = FALSE;
 				break;
 
 			default:
@@ -790,6 +802,8 @@ static void print_usage (char const * const progname)
 	printf("  -s, --max-card-handle-per-thread	maximum number of card handle per thread (default: %d)\n", PCSC_MAX_CONTEXT_CARD_HANDLES);
 	printf("  -r, --max-card-handle-per-reader	maximum number of card handle per reader (default: %d)\n", PCSC_MAX_READER_HANDLES);
 	printf("  -x, --auto-exit	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE);
+	printf("  -S, --reader-name-no-serial    do not include the USB serial number in the name\n");
+	printf("  -I, --reader-name-no-interface do not include the USB interface name in the name\n");
 #else
 	printf("  -a    log APDU commands and results\n");
 	printf("  -c	path to reader.conf\n");

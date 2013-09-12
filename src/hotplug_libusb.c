@@ -46,7 +46,6 @@
 #include "utils.h"
 
 #undef DEBUG_HOTPLUG
-#define ADD_SERIAL_NUMBER
 
 /* format is "%d:%d:%d", bus_number, device_address, interface */
 #define BUS_DEVICE_STRSIZE	10+1+10+1+10+1
@@ -57,6 +56,8 @@
 
 #define FALSE			0
 #define TRUE			1
+
+extern char Add_Serial_In_Name;
 
 /* we use the default libusb context */
 #define ctx NULL
@@ -544,8 +545,7 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		sizeof(readerTracker[i].bus_device));
 	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
 
-#ifdef ADD_SERIAL_NUMBER
-	if (desc.iSerialNumber)
+	if (Add_Serial_In_Name && desc.iSerialNumber)
 	{
 		libusb_device_handle *device;
 		int ret;
@@ -580,7 +580,6 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		}
 	}
 	else
-#endif
 		readerTracker[i].fullName = strdup(driver->readerName);
 
 	if (RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
