@@ -15,6 +15,7 @@
  */
 
 #include "config.h"
+#include "misc.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -65,7 +66,7 @@ static void log_init(void)
 			unsigned int i;
 
 			/* for each known color terminal */
-			for (i = 0; i < sizeof(terms) / sizeof(terms[0]); i++)
+			for (i = 0; i < COUNT_OF(terms); i++)
 			{
 				/* we found a supported term? */
 				if (0 == strcmp(terms[i], term))
