@@ -55,4 +55,8 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
+#ifndef COUNT_OF
+#define COUNT_OF(arr) (sizeof(arr)/sizeof(arr[0]))
+#endif
+
 #endif /* __misc_h__ */
