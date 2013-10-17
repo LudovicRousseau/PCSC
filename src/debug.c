@@ -22,6 +22,8 @@
 #include <string.h>
 #include <stdio.h>
 
+/* We shall not export the log_msg() sumbol */
+#undef PCSC_API
 #include "debuglog.h"
 #include "strlcpycat.h"
 
