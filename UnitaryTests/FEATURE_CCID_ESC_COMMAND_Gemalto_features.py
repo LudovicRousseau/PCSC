@@ -49,7 +49,7 @@ def main():
 
     ccid_esc_command = hasFeature(feature_list, FEATURE_CCID_ESC_COMMAND)
     if ccid_esc_command is None:
-        raise Exception("The reader does not support FEATURE_CCID_ESC_COMMAND")
+        raise Exception("FEATURE_CCID_ESC_COMMAND is not supported or allowed")
 
     # Proprietary command for Gemalto readers
     # This is implemented by the Gemalto Pinpad v2 and C200 readers
