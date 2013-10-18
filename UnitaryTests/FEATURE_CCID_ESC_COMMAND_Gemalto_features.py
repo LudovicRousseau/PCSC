@@ -20,7 +20,10 @@
 
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND, getFeatureRequest, hasFeature)
+    SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND,
+    FEATURE_GET_TLV_PROPERTIES, getTlvProperties,
+    PCSCv2_PART10_PROPERTY_wIdVendor, PCSCv2_PART10_PROPERTY_wIdProduct,
+    getFeatureRequest, hasFeature)
 from smartcard.Exceptions import SmartcardException
 from itertools import izip
 
@@ -46,6 +49,13 @@ def main():
         disposition=SCARD_LEAVE_CARD)
 
     feature_list = getFeatureRequest(card_connection)
+
+    get_tlv_properties = hasFeature(feature_list, FEATURE_GET_TLV_PROPERTIES)
+    if get_tlv_properties:
+        tlv = getTlvProperties(card_connection)
+        print "Reader:   ", readers()[0]
+        print "IdVendor:  0x%04X" % tlv['PCSCv2_PART10_PROPERTY_wIdVendor']
+        print "IdProduct: 0x%04X" % tlv['PCSCv2_PART10_PROPERTY_wIdProduct']
 
     ccid_esc_command = hasFeature(feature_list, FEATURE_CCID_ESC_COMMAND)
     if ccid_esc_command is None:
