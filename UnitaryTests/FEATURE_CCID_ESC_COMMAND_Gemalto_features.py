@@ -2,7 +2,7 @@
 
 """
 #   FEATURE_CCID_ESC_COMMAND.py: Unitary test for FEATURE_CCID_ESC_COMMAND
-#   Copyright (C) 2011  Ludovic Rousseau
+#   Copyright (C) 2011-2013  Ludovic Rousseau
 """
 
 #   This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,16 @@ from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND, getFeatureRequest, hasFeature)
 from smartcard.Exceptions import SmartcardException
+from itertools import izip
+
+
+USBLangID = {0x0409: "English (United States)",
+        0x040C: "French (Standard)",
+        0x0425: "Estonian",
+        0x0419: "Russian",
+        0x0415: "Polish",
+        0x0416: "Portuguese (Brazil)"
+        }
 
 
 def test_bit(value, bit):
@@ -57,32 +67,59 @@ def main():
     print "  b0 indicates if scrolling available:", test_bit(res[2], 0)
     print "EntryValidationCondition:", res[3]
 
-    print "VerifyPinStart:", test_bit(res[4], 0)
-    print "VerifyPinFinish:", test_bit(res[4], 1)
-    print "ModifyPinStart:", test_bit(res[4], 2)
-    print "ModifyPinFinish:", test_bit(res[4], 3)
-    print "GetKeyPressed:", test_bit(res[4], 4)
-    print "VerifyPinDirect:", test_bit(res[4], 5)
-    print "ModifyPinDirect:", test_bit(res[4], 6)
-    print "Abort:", test_bit(res[4], 7)
+    print "PC/SCv2 features:"
+    print " VerifyPinStart:", test_bit(res[4], 0)
+    print " VerifyPinFinish:", test_bit(res[4], 1)
+    print " ModifyPinStart:", test_bit(res[4], 2)
+    print " ModifyPinFinish:", test_bit(res[4], 3)
+    print " GetKeyPressed:", test_bit(res[4], 4)
+    print " VerifyPinDirect:", test_bit(res[4], 5)
+    print " ModifyPinDirect:", test_bit(res[4], 6)
+    print " Abort:", test_bit(res[4], 7)
 
-    print "GetKey:", test_bit(res[5], 0)
-    print "WriteDisplay:", test_bit(res[5], 1)
-    print "SetSpeMessage:", test_bit(res[5], 2)
+    print " GetKey:", test_bit(res[5], 0)
+    print " WriteDisplay:", test_bit(res[5], 1)
+    print " SetSpeMessage:", test_bit(res[5], 2)
     # bits 3-7 are RFU
     # bytes 6 and 7 are RFU
 
-    print "bTimeOut2:", test_bit(res[8], 0)
-    # bits 1-7 are RFU
+    print " bTimeOut2:", test_bit(res[8], 0)
+    bListSupportedLanguages = test_bit(res[8], 1)
+    print " bListSupportedLanguages:", bListSupportedLanguages
+    if bListSupportedLanguages:
+        try:
+            # Reader is able to indicate the list of supported languages
+            # through CCID-ESC 0x6B
+            languages = card_connection.control(ccid_esc_command, [0x6B])
+        except SmartcardException, ex:
+            print "Failed:", ex
+        print " ", languages
+        languages = iter(languages)
+        for low, high in izip(languages, languages):
+            lang_x = high * 256 + low
+            try:
+                lang_t = USBLangID[lang_x]
+            except KeyError:
+                lang_t = "unkonwn"
+            print "  0x%04X: %s" % (lang_x, lang_t)
+
+    print " bNumberMessageFix:", test_bit(res[8], 2)
+    print " bPPDUSupportOverXferBlock:", test_bit(res[8], 3)
+    print " bPPDUSupportOverEscape:", test_bit(res[8], 4)
+    # bits 5-7 are RFU
     # bytes 9, 10 and 11 and RFU
 
     print "VersionNumber:", res[12]
     print "MinimumPINSize:", res[13]
     print "MaximumPINSize:", res[14]
-    print "Firewall:", test_bit(res[15], 0)
+    Firewall = test_bit(res[15], 0)
+    print "Firewall:", Firewall
     # bits 1-7 are RFU
 
-    # bytes 16-20 are RFU
+    if Firewall:
+        print "FirewalledCommand_SW1: 0x%02X" % res[16]
+        print "FirewalledCommand_SW2: 0x%02X" % res[17]
+    # bytes 18-20 are RFU
 
 if __name__ == "__main__":
     main()
