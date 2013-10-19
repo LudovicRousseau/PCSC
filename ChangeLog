@@ -1,3 +1,8 @@
+pcsc-lite-1.8.10: Ludovic Rousseau
+19 October 2013
+- do not export the internal log_msg symbol from libpcsclite.so.1
+
+
 pcsc-lite-1.8.9: Ludovic Rousseau
 16 October 2013
 - SCardEndTransaction(): Return an error if is called with no
@@ -43,10 +48,12 @@ pcsc-lite-1.8.9: Ludovic Rousseau
   --force-reader-polling, --error, --critical and --color
 - Some other minor improvements and bug corrections
 
+
 pcsc-lite-1.8.8: Ludovic Rousseau
 16 January 2013
 - /etc/reader.conf: handle FRIENDLYNAME with no " delimiters (serial readers)
 - Info.plist: Correctly handle reader names containing & (USB readers)
+
 
 pcsc-lite-1.8.7: Ludovic Rousseau
 28 November 2012
