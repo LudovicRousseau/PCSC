@@ -565,7 +565,7 @@ int main(int argc, char **argv)
 			if (rr < 0)
 			{
 				Log2(PCSC_LOG_CRITICAL,
-					"writting " PCSCLITE_RUN_PID " failed: %s",
+					"writing " PCSCLITE_RUN_PID " failed: %s",
 					strerror(errno));
 			}
 			(void)close(f);
