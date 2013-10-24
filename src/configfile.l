@@ -178,12 +178,14 @@ int evaluatetoken(char *pcToken)
 		pcPrevious = NULL;
 	}
 
-	if (pcFriendlyname != NULL &&
-		pcLibpath != NULL && pcChannelid != NULL && badError != 1)
+	/* CHANNELID and DEVICENAME are both optional but not at the same time */
+	if (pcFriendlyname && pcLibpath && badError != 1
+		&& (pcChannelid || pcDevicename))
 	{
 		int channelId;
 		static char* defaultDeviceName = (char *)"";
 
+		Log2(PCSC_LOG_DEBUG, "Add reader: %s", pcFriendlyname);
 		if (0 == reader_list_size)
 		{
 			/* one real reader and one end marker */
@@ -204,7 +206,10 @@ int evaluatetoken(char *pcToken)
 		if (NULL == pcDevicename)
 			pcDevicename = defaultDeviceName;
 
-		channelId = strtoul(pcChannelid, NULL, 0);
+		if (pcChannelid)
+			channelId = strtoul(pcChannelid, NULL, 0);
+		else
+			channelId = 0;
 		reader_list[reader_list_size-2].pcFriendlyname = strdup(pcFriendlyname);
 		reader_list[reader_list_size-2].pcDevicename = strdup(pcDevicename);
 		reader_list[reader_list_size-2].pcLibpath = strdup(pcLibpath),
@@ -220,7 +225,8 @@ int evaluatetoken(char *pcToken)
 		free(pcLibpath);
 		pcLibpath = NULL;
 
-		free(pcChannelid);
+		if (pcChannelid)
+			free(pcChannelid);
 		pcChannelid = NULL;
 	}
 
