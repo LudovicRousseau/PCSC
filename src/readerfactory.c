@@ -798,7 +798,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	int rv;
 	void *f;
 
-	rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName");
+	rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName", TRUE);
 	if (SCARD_S_SUCCESS == rv)
 	{
 		/* Ifd Handler 3.0 found */
@@ -806,7 +806,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	}
 	else
 	{
-		rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel");
+		rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel", FALSE);
 		if (SCARD_S_SUCCESS == rv)
 		{
 			/* Ifd Handler 2.0 found */
@@ -826,7 +826,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
 	void *f1 = NULL; \
-	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, FALSE); \
 	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
@@ -858,7 +858,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
 	void *f1 = NULL; \
-	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s); \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, FALSE); \
 	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \

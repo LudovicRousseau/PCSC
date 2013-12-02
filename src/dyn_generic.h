@@ -19,6 +19,6 @@
 
 	int DYN_LoadLibrary(void **, char *);
 	int DYN_CloseLibrary(void **);
-	int DYN_GetAddress(void *, /*@out@*/ void **, const char *);
+	int DYN_GetAddress(void *, /*@out@*/ void **, const char *, int);
 
 #endif

@@ -60,7 +60,8 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction)
+INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle,
+	const char *pcFunction, int mayfail)
 {
 	char pcFunctionName[256];
 	int rv = SCARD_S_SUCCESS;
@@ -78,7 +79,8 @@ INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFun
 
 	if (*pvFHandle == NULL)
 	{
-		Log3(PCSC_LOG_CRITICAL, "%s: %s", pcFunction, dlerror());
+		Log3(mayfail ? PCSC_LOG_INFO : PCSC_LOG_CRITICAL, "%s: %s",
+			pcFunction, dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
 	}
 #endif
