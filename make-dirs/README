@@ -1,5 +1,0 @@
-If you are more comfortable using traditional Makefiles, this is the
-spot for you.  Simply find the Makefile you want to use in this
-directory, modify it to your liking and change config.h to reflect the
-behavior you want.  Then go into the src/ directory and symlink Makefile
-from that directory to the one you chose in this one.
