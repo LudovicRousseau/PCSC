@@ -11,7 +11,8 @@ then
 else
 	files="$@"
 fi
-inc="-I. -Isrc -Isrc/PCSC -I/usr/include/hal -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include "
-opt="-warnposix -unrecog -type -predboolint -likelybool"
+inc="-I. -Isrc -Isrc/PCSC -I/usr/include/hal -I/usr/include/dbus-1.0
+-I/usr/lib/dbus-1.0/include -I/usr/include/x86_64-linux-gnu "
+opt="-warnposix -unrecog -type -predboolint -likelybool -preproc"
 
 splint $inc $opt $files
