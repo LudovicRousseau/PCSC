@@ -2960,15 +2960,15 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 
 	if (SCARD_AUTOALLOCATE == *pcchReaders)
 	{
+		if (NULL == mszReaders)
+		{
+			rv = SCARD_E_INVALID_PARAMETER;
+			goto end;
+		}
 		buf = malloc(dwReadersLen);
 		if (NULL == buf)
 		{
 			rv = SCARD_E_NO_MEMORY;
-			goto end;
-		}
-		if (NULL == mszReaders)
-		{
-			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
 		}
 		*(char **)mszReaders = buf;
