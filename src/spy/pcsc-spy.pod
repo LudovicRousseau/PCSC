@@ -30,7 +30,7 @@ available:
 
 =item B<-d>, B<--diffable>
 
-Demove the variable parts (like handler values) from the output so that
+Remove the variable parts (like handler values) from the output so that
 two execution can be more easily compared.
 
 =item B<-h>, B<--help>
@@ -53,10 +53,11 @@ authors.
 
 =head2 Applications linked with libpcsclite.so.1
 
-We will use the standard LD_PRELOAD loader option to load our spying
+We will use the standard C<LD_PRELOAD> loader option to load our spying
 library.
 
 Example:
+
  LD_PRELOAD=/usr/lib/libpcscspy.so pcsc_scan
 
 =head2 Application loading libpcsclite.so.1
@@ -94,15 +95,19 @@ and run your PC/SC application.
 =head2 Mac OS X
 
 The installation is not automatic. In the pcsc-lite/src/spy directory do:
+
  make framework
 
 Then copy the PCSC.framework directory in /tmp
+
  cp -a PCSC.framework /tmp
 
 Copy the official PCSC.framework (binary only) in /tmp
+
  cp /System/Library/Frameworks/PCSC.framework/PCSC /tmp
 
 Run the application to debug as:
+
  DYLD_FRAMEWORK_PATH=/tmp pcsctest
 
 =head1 FILES
