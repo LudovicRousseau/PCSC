@@ -462,6 +462,7 @@ static void ContextThread(LPVOID newContext)
 
 				READ_BODY(coStr)
 
+				coStr.szReader[sizeof(coStr.szReader)-1] = 0;
 				hCard = coStr.hCard;
 				dwActiveProtocol = coStr.dwActiveProtocol;
 
