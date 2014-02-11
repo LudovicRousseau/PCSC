@@ -35,6 +35,8 @@ libpcsclite_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_
 libpcsclite_la_LIBADD = $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 
 pcscd_SOURCES = \
+	auth.c \
+	auth.h \
 	atrhandler.c \
 	atrhandler.h \
 	configfile.h \
@@ -84,12 +86,14 @@ pcscd_SOURCES = \
 	winscard_svc.c \
 	winscard_svc.h
 pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
+	$(POLKIT_CFLAGS) \
 	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
 pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
 	$(LIBUSB_LIBS) $(IOKIT) $(LIBUDEV_LIBS) \
-	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS)
+	$(PTHREAD_LIBS) $(PTHREAD_CFLAGS) \
+	$(POLKIT_LIBS) 
 
 fix-rights: install-sbinPROGRAMS
 	chgrp pcscd $(DESTDIR)$(sbindir)/pcscd

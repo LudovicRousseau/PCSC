@@ -280,6 +280,29 @@ if test x$use_libusb = xyes; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} libusb"
 fi
 
+# --enable-polkit
+POLKIT_MINIMUM=0.111
+AC_ARG_ENABLE(polkit,
+	AS_HELP_STRING([--enable-polkit],
+		[Build with polkit support]),
+		use_polkit=$withval, use_polkit=no)
+if test "$use_polkit" != "no"; then
+	PKG_CHECK_MODULES(POLKIT, [polkit-gobject-1 >= $POLKIT_MINIMUM], [use_polkit=yes], [use_polkit=no])
+	if test "$use_polkit" != "no";then
+		AC_DEFINE([HAVE_POLKIT], 1, [Build polkit access control support])
+		polkit_policy_dir=$($PKG_CONFIG polkit-gobject-1 --variable=policydir)
+		AC_SUBST(POLICY_DIR, [$polkit_policy_dir])
+	else
+	        use_polkit=no
+	        AC_MSG_ERROR([[
+*** 
+*** polkit >= $POLKIT_MINIMUM was not found. Access control will be disabled.
+*** You may get it from http://www.freedesktop.org/software/polkit/
+*** ]])
+	fi
+fi
+AM_CONDITIONAL(ENABLE_POLKIT, test "$use_polkit" != "no")
+
 # --with-systemdsystemunitdir=DIR
 AC_ARG_WITH([systemdsystemunitdir],
   AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
@@ -389,6 +412,8 @@ PTHREAD_LIBS:        ${PTHREAD_LIBS}
 PCSC_ARCH:           ${PCSC_ARCH}
 
 pcscd binary            ${PCSCD_BINARY}
+polkit support:         ${use_polkit}
+polkit policy dir:      ${polkit_policy_dir}
 libudev support:        ${use_libudev}
 libusb support:         ${use_libusb}
 USB drop directory:     ${usbdropdir}

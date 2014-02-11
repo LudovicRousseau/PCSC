@@ -68,6 +68,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readerfactory.h"
 #include "eventhandler.h"
 #include "simclist.h"
+#include "auth.h"
 
 /**
  * @brief Represents an Application Context on the Server side.
@@ -323,6 +324,16 @@ static void ContextThread(LPVOID newContext)
 	SCONTEXT * threadContext = (SCONTEXT *) newContext;
 	int32_t filedes = threadContext->dwClientID;
 
+	if (IsClientAuthorized(filedes, "access_pcsc", NULL) == 0)
+	{
+		Log1(PCSC_LOG_CRITICAL, "Rejected unauthorized PC/SC client");
+		goto exit;
+	}
+	else
+	{
+		Log1(PCSC_LOG_DEBUG, "Authorized PC/SC client");
+	}
+
 	Log3(PCSC_LOG_DEBUG, "Thread is started: dwClientID=%d, threadContext @%p",
 		threadContext->dwClientID, threadContext);
 
@@ -465,6 +476,16 @@ static void ContextThread(LPVOID newContext)
 				coStr.szReader[sizeof(coStr.szReader)-1] = 0;
 				hCard = coStr.hCard;
 				dwActiveProtocol = coStr.dwActiveProtocol;
+
+				if (IsClientAuthorized(filedes, "access_card", coStr.szReader) == 0)
+				{
+					Log2(PCSC_LOG_CRITICAL, "Rejected unauthorized client for '%s'", coStr.szReader);
+					goto exit;
+				}
+				else
+				{
+					Log2(PCSC_LOG_DEBUG, "Authorized client for '%s'", coStr.szReader);
+				}
 
 				coStr.rv = SCardConnect(coStr.hContext, coStr.szReader,
 					coStr.dwShareMode, coStr.dwPreferredProtocols,

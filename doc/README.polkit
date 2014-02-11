@@ -1,0 +1,39 @@
+When pcsc-lite is compiled using the --enable-polkit option then
+polkit will be used to control access to the pcsc-lite daemon.
+
+That allows more fine grained access control to smart cards that
+is tied to the system processes rather than solely depending on
+the smart card controls (e.g., only console users can access the 
+card and so on). 
+
+Polkit is documented at:
+http://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
+
+A default polkit policy is shipped with pcsc-lite in
+org.debian.pcsc-lite.policy.  The policy file allows restricting access
+to the daemon as well as access to smart cards.
+
+Polkit allows for additional rules, e.g., restricting access to
+particular smart cards. The rules are javascript files placed
+in /usr/share/polkit-1/rules.d/. To make specific smart card 
+reader accessible by the web server (run as www-data user) you 
+may use the following rules:
+
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.debian.pcsc-lite.access_card" &&
+        action.lookup("reader") == 'name of reader' &&
+        subject.user == "www-data") {
+            return polkit.Result.YES;
+    }
+});
+
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.debian.pcsc-lite.access_pcsc" &&
+        subject.user == "www-data") {
+            return polkit.Result.YES;
+    }
+});
+
+
+Note that the name of the reader can be obtained using "opensc-tool -l"
+or "pcsc_scan".
