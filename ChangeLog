@@ -1,3 +1,11 @@
+pcsc-lite-1.8.11: Ludovic Rousseau
+14 February 2014
+- Add polkit support. See doc/README.polkit
+- /etc/reader.conf: CHANNELID and DEVICENAME are both optional but not
+  at the same time
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.8.10: Ludovic Rousseau
 19 October 2013
 - do not export the internal log_msg symbol from libpcsclite.so.1
