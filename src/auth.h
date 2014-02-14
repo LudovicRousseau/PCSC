@@ -1,5 +1,5 @@
 /*
- * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ * MUSCLE SmartCard Development ( http://musclecard.com/ )
  *
  * Copyright (C) 2013 Red Hat
  *
