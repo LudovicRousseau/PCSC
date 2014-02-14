@@ -1,10 +1,10 @@
 DRIVERS
 
-To install USB drivers, download the driver from http://www.linuxnet.com/
-and copy it to a temporary location.  After you have unarchived the files
-copy the directory to /usr/local/pcsc/drivers/.  If the directory
-/usr/local/pcsc/drivers/ does not exist create it before copying the driver
-directory to it.
+To install USB drivers, download the driver from
+http://musclecard.com/software.html and copy it to a temporary location.
+After you have unarchived the files copy the directory to
+/usr/local/pcsc/drivers/.  If the directory /usr/local/pcsc/drivers/
+does not exist create it before copying the driver directory to it.
 
 Example Mac OS X, Linux 2.4:
 

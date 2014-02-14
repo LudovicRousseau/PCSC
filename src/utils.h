@@ -1,5 +1,5 @@
 /*
- * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
  *
  * Copyright (C) 2006-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>

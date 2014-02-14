@@ -1,8 +1,8 @@
 /*
- * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
  *
  * Copyright (C) 2000-2003
- *  David Corcoran <corcoran@linuxnet.com>
+ *  David Corcoran <corcoran@musclecard.com>
  * Copyright (C) 2002-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
@@ -154,7 +154,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char *argv[])
 	}
 
 	fprintf(fd, "%s", "# Configuration file for pcsc-lite\n");
-	fprintf(fd, "%s", "# David Corcoran <corcoran@linuxnet.com\n");
+	fprintf(fd, "%s", "# David Corcoran <corcoran@musclecard.com\n");
 
 	fprintf(fd, "%s", "\n\n");
 

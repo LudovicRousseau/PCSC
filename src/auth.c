@@ -1,5 +1,5 @@
 /*
- * MUSCLE SmartCard Development ( http://musclecard.com/ )
+ * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
  *
  * Copyright (C) 2013 Red Hat
  *

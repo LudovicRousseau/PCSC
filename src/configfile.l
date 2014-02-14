@@ -1,10 +1,10 @@
 /*
  * Reads lexical config files and updates database.
  *
- * MUSCLE SmartCard Development ( http://www.linuxnet.com )
+ * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
  *
  * Copyright (C) 1999-2002
- *  David Corcoran <corcoran@linuxnet.com>
+ *  David Corcoran <corcoran@musclecard.com>
  * Copyright (C) 2004
  *  Damien Sauveron <damien.sauveron@labri.fr>
  * Copyright (C) 2004-2010
