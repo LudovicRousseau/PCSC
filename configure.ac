@@ -285,7 +285,7 @@ POLKIT_MINIMUM=0.111
 AC_ARG_ENABLE(polkit,
 	AS_HELP_STRING([--enable-polkit],
 		[Build with polkit support]),
-		use_polkit=$withval, use_polkit=no)
+		use_polkit=$enableval, use_polkit=no)
 if test "$use_polkit" != "no"; then
 	PKG_CHECK_MODULES(POLKIT, [polkit-gobject-1 >= $POLKIT_MINIMUM], [use_polkit=yes], [use_polkit=no])
 	if test "$use_polkit" != "no";then
