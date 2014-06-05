@@ -567,6 +567,11 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 	fd_set fds;
 
 	udev_monitor = udev_monitor_new_from_netlink(udev, "udev");
+	if (NULL == udev_monitor)
+	{
+		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
+		return;
+	}
 
 	/* filter only the interfaces */
 	r = udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "usb",
@@ -586,6 +591,11 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 
 	/* udev monitor file descriptor */
 	fd = udev_monitor_get_fd(udev_monitor);
+	if (fd < 0)
+	{
+		Log2(PCSC_LOG_ERROR, "udev_monitor_get_fd() error: %d", fd);
+		return;
+	}
 
 	while (!AraKiriHotPlug)
 	{
