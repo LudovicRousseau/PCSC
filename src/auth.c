@@ -147,7 +147,7 @@ cleanup1:
 
 #else
 
-int IsClientAuthorized(int socket, const char* action, const char* reader)
+unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 {
 	return 1;
 }
