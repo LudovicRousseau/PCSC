@@ -41,6 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 %{
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include "wintypes.h"
 #include "pcscd.h"
@@ -290,13 +291,35 @@ int DBGetReaderListDir(const char *readerconf_dir,
 			char filename[FILENAME_MAX];
 			int r;
 
+			snprintf(filename, sizeof(filename), "%s/%s",
+				readerconf_dir, direntry->d_name);
+
 			/* skip non regular files */
-			if (direntry->d_type != DT_REG)
+			if (direntry->d_type == DT_UNKNOWN)
 			{
-				Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
-					direntry->d_name);
-				continue;
+				struct stat st;
+
+				if (lstat(filename, &st) != 0)
+				{
+					Log2(PCSC_LOG_DEBUG, "Skipping non statable file: %s",
+						direntry->d_name);
+					continue;
+				}
+
+				if (!S_ISREG(st.st_mode))
+				{
+					Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
+						direntry->d_name);
+					continue;
+				}
 			}
+			else
+				if (direntry->d_type != DT_REG)
+				{
+					Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
+						direntry->d_name);
+					continue;
+				}
 
 			/* skip files starting with . like ., .., .svn, etc */
 			if ('.' == direntry->d_name[0])
@@ -305,9 +328,6 @@ int DBGetReaderListDir(const char *readerconf_dir,
 					direntry->d_name);
 				continue;
 			}
-
-			snprintf(filename, sizeof(filename), "%s/%s",
-				readerconf_dir, direntry->d_name);
 
 			/* each call to DBGetReaderList() will append to the list */
 			r = DBGetReaderList(filename, caller_reader_list);
