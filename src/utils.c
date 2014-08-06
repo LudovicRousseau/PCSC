@@ -155,6 +155,7 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
 	pthread_attr_t attr;
+	size_t stack_size;
 	int ret;
 
 	ret = pthread_attr_init(&attr);
@@ -167,6 +168,25 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 	{
 		(void)pthread_attr_destroy(&attr);
 		return ret;
+	}
+
+	/* stack size of 0x400000 (4 MB) bytes minimum for musl C lib */
+	ret = pthread_attr_getstacksize(&attr, &stack_size);
+	if (ret)
+	{
+		(void)pthread_attr_destroy(&attr);
+		return ret;
+	}
+
+	if (stack_size < 0x400000)
+	{
+		stack_size = 0x400000;
+		ret = pthread_attr_setstacksize(&attr, stack_size);
+		if (ret)
+		{
+			(void)pthread_attr_destroy(&attr);
+			return ret;
+		}
 	}
 
 	ret = pthread_create(pthThread, &attr, pvFunction, pvArg);
