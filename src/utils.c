@@ -167,14 +167,14 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 	if (ret)
 		goto error;
 
-	/* stack size of 0x400000 (4 MB) bytes minimum for musl C lib */
+	/* stack size of 0x40000 (256 KB) bytes minimum for musl C lib */
 	ret = pthread_attr_getstacksize(&attr, &stack_size);
 	if (ret)
 		goto error;
 
-	if (stack_size < 0x400000)
+	if (stack_size < 0x40000)
 	{
-		stack_size = 0x400000;
+		stack_size = 0x40000;
 		ret = pthread_attr_setstacksize(&attr, stack_size);
 		if (ret)
 			goto error;
