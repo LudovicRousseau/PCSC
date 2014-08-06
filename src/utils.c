@@ -165,34 +165,24 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 	ret = pthread_attr_setdetachstate(&attr,
 		attributes & THREAD_ATTR_DETACHED ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
 	if (ret)
-	{
-		(void)pthread_attr_destroy(&attr);
-		return ret;
-	}
+		goto error;
 
 	/* stack size of 0x400000 (4 MB) bytes minimum for musl C lib */
 	ret = pthread_attr_getstacksize(&attr, &stack_size);
 	if (ret)
-	{
-		(void)pthread_attr_destroy(&attr);
-		return ret;
-	}
+		goto error;
 
 	if (stack_size < 0x400000)
 	{
 		stack_size = 0x400000;
 		ret = pthread_attr_setstacksize(&attr, stack_size);
 		if (ret)
-		{
-			(void)pthread_attr_destroy(&attr);
-			return ret;
-		}
+			goto error;
 	}
 
 	ret = pthread_create(pthThread, &attr, pvFunction, pvArg);
-	if (ret)
-		return ret;
 
-	ret = pthread_attr_destroy(&attr);
+error:
+	pthread_attr_destroy(&attr);
 	return ret;
 }
