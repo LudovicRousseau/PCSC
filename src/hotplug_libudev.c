@@ -372,6 +372,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 			readerTracker[i].fullName = NULL;
 			free(readerTracker[i].sysname);
 			readerTracker[i].sysname = NULL;
+			break;
 		}
 	}
 }
