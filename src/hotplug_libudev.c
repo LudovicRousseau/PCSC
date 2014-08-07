@@ -78,7 +78,7 @@ extern char Add_Serial_In_Name;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
-static struct udev *udev;
+static struct udev *Udev;
 
 
 /**
@@ -569,7 +569,7 @@ static void HPEstablishUSBNotifications(void *notused)
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
-	udev_monitor = udev_monitor_new_from_netlink(udev, "udev");
+	udev_monitor = udev_monitor_new_from_netlink(Udev, "udev");
 	if (NULL == udev_monitor)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
@@ -600,7 +600,7 @@ static void HPEstablishUSBNotifications(void *notused)
 		pthread_exit(NULL);
 	}
 
-	HPScanUSB(udev);
+	HPScanUSB(Udev);
 
 	pfd.fd = fd;
 	pfd.events = POLLIN;
@@ -681,7 +681,7 @@ LONG HPStopHotPluggables(void)
 	if (driverSize <= 0)
 		return 0;
 
-	if (!udev)
+	if (!Udev)
 		return 0;
 
 	pthread_cancel(usbNotifyThread);
@@ -696,9 +696,9 @@ LONG HPStopHotPluggables(void)
 	}
 	free(driverTracker);
 
-	udev_unref(udev);
+	udev_unref(Udev);
 
-	udev = NULL;
+	Udev = NULL;
 	driverSize = -1;
 
 	Log1(PCSC_LOG_INFO, "Hotplug stopped");
@@ -720,8 +720,8 @@ ULONG HPRegisterForHotplugEvents(void)
 	}
 
 	/* Create the udev object */
-	udev = udev_new();
-	if (!udev)
+	Udev = udev_new();
+	if (!Udev)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_new() failed");
 		return SCARD_F_INTERNAL_ERROR;
