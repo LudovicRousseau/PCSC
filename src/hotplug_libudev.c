@@ -3,6 +3,8 @@
  *
  * Copyright (C) 2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
+ * Copyright (C) 2014
+ *  Stefani Seibold <stefani@seibold.net>
  *
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -35,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * @brief This provides a search API for hot pluggble devices using libudev
+ * @brief This provides a search API for hot plugable devices using libudev
  */
 
 #include "config.h"
@@ -47,6 +49,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <pthread.h>
 #include <libudev.h>
+#include <poll.h>
 
 #include "debuglog.h"
 #include "parser.h"
@@ -56,6 +59,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils.h"
 #include "strlcpycat.h"
 
+#ifndef TEMP_FAILURE_RETRY
+#define TEMP_FAILURE_RETRY(expression) \
+  (__extension__							      \
+    ({ long int __result;						      \
+       do __result = (long int) (expression);				      \
+       while (__result == -1L && errno == EINTR);			      \
+       __result; }))
+#endif
+
 #undef DEBUG_HOTPLUG
 
 #define FALSE			0
@@ -64,11 +76,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern char Add_Interface_In_Name;
 extern char Add_Serial_In_Name;
 
-pthread_mutex_t usbNotifierMutex;
-
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
-static char AraKiriHotPlug = FALSE;
+static struct udev *udev;
+
 
 /**
  * keep track of drivers in a dynamically allocated array
@@ -89,21 +100,14 @@ static struct _driverTracker
  * We start with a big array size to avoid reallocation. */
 #define DRIVER_TRACKER_INITIAL_SIZE 200
 
-typedef enum {
- READER_ABSENT,
- READER_PRESENT,
- READER_FAILED
-} readerState_t;
-
 /**
  * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
  */
 static struct _readerTracker
 {
-	readerState_t status;	/** reader state */
-	char bInterfaceNumber;	/** interface number on the device */
 	char *devpath;	/**< device name seen by udev */
 	char *fullName;	/**< full reader name (including serial number) */
+	char *sysname;	/**< sysfs path */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
 
@@ -321,8 +325,59 @@ static LONG HPReadBundleValues(void)
 }
 
 
-static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
-	const char *devpath)
+static void HPRemoveDevice(struct udev_device *dev)
+{
+	int i;
+	const char *devpath;
+	struct udev_device *parent;
+	const char *sysname;
+
+	/* The device pointed to by dev contains information about
+	   the interface. In order to get information about the USB
+	   device, get the parent device with the subsystem/devtype pair
+	   of "usb"/"usb_device". This will be several levels up the
+	   tree, but the function will find it.*/
+	parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
+		"usb_device");
+	if (!parent)
+		return;
+
+	devpath = udev_device_get_devnode(parent);
+	if (!devpath)
+	{
+		/* the device disapeared? */
+		Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
+		return;
+	}
+
+	sysname = udev_device_get_sysname(dev);
+	if (!sysname)
+	{
+		Log1(PCSC_LOG_ERROR, "udev_device_get_sysname() failed");
+		return;
+	}
+
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		if (readerTracker[i].fullName && !strcmp(sysname, readerTracker[i].sysname))
+		{
+			Log4(PCSC_LOG_INFO, "Removing USB device[%d]: %s at %s", i,
+				readerTracker[i].fullName, readerTracker[i].devpath);
+
+			RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
+
+			free(readerTracker[i].devpath);
+			readerTracker[i].devpath = NULL;
+			free(readerTracker[i].fullName);
+			readerTracker[i].fullName = NULL;
+			free(readerTracker[i].sysname);
+			readerTracker[i].sysname = NULL;
+		}
+	}
+}
+
+
+static void HPAddDevice(struct udev_device *dev)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
@@ -332,6 +387,27 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 	const char *sInterfaceNumber;
 	LONG ret;
 	int bInterfaceNumber;
+	const char *devpath;
+	struct udev_device *parent;
+	const char *sysname;
+
+	/* The device pointed to by dev contains information about
+	   the interface. In order to get information about the USB
+	   device, get the parent device with the subsystem/devtype pair
+	   of "usb"/"usb_device". This will be several levels up the
+	   tree, but the function will find it.*/
+	parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
+		"usb_device");
+	if (!parent)
+		return;
+
+	devpath = udev_device_get_devnode(parent);
+	if (!devpath)
+	{
+		/* the device disapeared? */
+		Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
+		return;
+	}
 
 	driver = get_driver(parent, devpath, &classdriver);
 	if (NULL == driver)
@@ -342,6 +418,20 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 			devpath);
 #endif
 		return;
+	}
+
+	sysname = udev_device_get_sysname(dev);
+	if (!sysname)
+	{
+		Log1(PCSC_LOG_ERROR, "udev_device_get_sysname() failed");
+		return;
+	}
+
+	/* check for duplicated add */
+	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		if (readerTracker[i].fullName && !strcmp(sysname, readerTracker[i].sysname))
+			return;
 	}
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", driver->readerName);
@@ -357,8 +447,6 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 		bInterfaceNumber, devpath);
 	deviceName[sizeof(deviceName) -1] = '\0';
 
-	(void)pthread_mutex_lock(&usbNotifierMutex);
-
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -370,7 +458,6 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", i);
-		(void)pthread_mutex_unlock(&usbNotifierMutex);
 		return;
 	}
 
@@ -406,8 +493,7 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 
 	readerTracker[i].fullName = strdup(fullname);
 	readerTracker[i].devpath = strdup(devpath);
-	readerTracker[i].status = READER_PRESENT;
-	readerTracker[i].bInterfaceNumber = bInterfaceNumber;
+	readerTracker[i].sysname = strdup(sysname);
 
 	ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + i,
 		driver->libraryPath, deviceName);
@@ -425,33 +511,21 @@ static void HPAddDevice(struct udev_device *dev, struct udev_device *parent,
 			{
 				Log2(PCSC_LOG_ERROR, "Failed adding USB device: %s",
 						driver->readerName);
-
-				readerTracker[i].status = READER_FAILED;
-
 				(void)CheckForOpenCT();
 			}
 		}
 		else
 		{
-			readerTracker[i].status = READER_FAILED;
-
 			(void)CheckForOpenCT();
 		}
 	}
-
-	(void)pthread_mutex_unlock(&usbNotifierMutex);
 } /* HPAddDevice */
 
 
-static void HPRescanUsbBus(struct udev *udev)
+static void HPScanUSB(struct udev *udev)
 {
-	int i, j;
 	struct udev_enumerate *enumerate;
 	struct udev_list_entry *devices, *dev_list_entry;
-
-	/* all reader are marked absent */
-	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		readerTracker[i].status = READER_ABSENT;
 
 	/* Create a list of the devices in the 'usb' subsystem. */
 	enumerate = udev_enumerate_new(udev);
@@ -462,71 +536,18 @@ static void HPRescanUsbBus(struct udev *udev)
 	/* For each item enumerated */
 	udev_list_entry_foreach(dev_list_entry, devices)
 	{
+		struct udev_device *dev;
 		const char *devpath;
-		struct udev_device *dev, *parent;
-		struct _driverTracker *driver, *classdriver;
-		int newreader;
-		int bInterfaceNumber;
-		const char *interface;
 
 		/* Get the filename of the /sys entry for the device
 		   and create a udev_device object (dev) representing it */
 		devpath = udev_list_entry_get_name(dev_list_entry);
 		dev = udev_device_new_from_syspath(udev, devpath);
 
-		/* The device pointed to by dev contains information about
-		   the interface. In order to get information about the USB
-		   device, get the parent device with the subsystem/devtype pair
-		   of "usb"/"usb_device". This will be several levels up the
-		   tree, but the function will find it.*/
-		parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
-			"usb_device");
-		if (!parent)
-			continue;
-
-		devpath = udev_device_get_devnode(parent);
-		if (!devpath)
-		{
-			/* the device disapeared? */
-			Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
-			continue;
-		}
-
-		driver = get_driver(parent, devpath, &classdriver);
-		if (NULL == driver)
-			/* no driver known for this device */
-			continue;
-
 #ifdef DEBUG_HOTPLUG
 		Log2(PCSC_LOG_DEBUG, "Found matching USB device: %s", devpath);
 #endif
-
-		newreader = TRUE;
-		bInterfaceNumber = 0;
-		interface = udev_device_get_sysattr_value(dev, "bInterfaceNumber");
-		if (interface)
-			bInterfaceNumber = atoi(interface);
-
-		/* Check if the reader is a new one */
-		for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
-		{
-			if (readerTracker[j].devpath
-				&& (strcmp(readerTracker[j].devpath, devpath) == 0)
-				&& (bInterfaceNumber == readerTracker[j].bInterfaceNumber))
-			{
-				/* The reader is already known */
-				readerTracker[j].status = READER_PRESENT;
-				newreader = FALSE;
-#ifdef DEBUG_HOTPLUG
-				Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s", devpath);
-#endif
-				break;
-			}
-		}
-
-		/* New reader found */
-		if (newreader)
-			HPAddDevice(dev, parent, devpath);
+		HPAddDevice(dev);
 
 		/* free device */
 		udev_device_unref(dev);
@@ -534,43 +555,24 @@ static void HPRescanUsbBus(struct udev *udev)
 
 	/* Free the enumerator object */
 	udev_enumerate_unref(enumerate);
-
-	pthread_mutex_lock(&usbNotifierMutex);
-	/* check if all the previously found readers are still present */
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		if ((READER_ABSENT == readerTracker[i].status)
-			&& (readerTracker[i].fullName != NULL))
-		{
-			Log4(PCSC_LOG_INFO, "Removing USB device[%d]: %s at %s", i,
-				readerTracker[i].fullName, readerTracker[i].devpath);
-
-			RFRemoveReader(readerTracker[i].fullName,
-				PCSCLITE_HP_BASE_PORT + i);
-
-			readerTracker[i].status = READER_ABSENT;
-			free(readerTracker[i].devpath);
-			readerTracker[i].devpath = NULL;
-			free(readerTracker[i].fullName);
-			readerTracker[i].fullName = NULL;
-
-		}
-	}
-	pthread_mutex_unlock(&usbNotifierMutex);
 }
 
-static void HPEstablishUSBNotifications(struct udev *udev)
+
+static void HPEstablishUSBNotifications(void *notused)
 {
 	struct udev_monitor *udev_monitor;
-	int r, i;
+	int r;
 	int fd;
-	fd_set fds;
+	struct pollfd pfd;
+
+	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
 	udev_monitor = udev_monitor_new_from_netlink(udev, "udev");
 	if (NULL == udev_monitor)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
-		return;
+		pthread_exit(NULL);
 	}
 
 	/* filter only the interfaces */
@@ -579,14 +581,14 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 	if (r)
 	{
 		Log2(PCSC_LOG_ERROR, "udev_monitor_filter_add_match_subsystem_devtype() error: %d\n", r);
-		return;
+		pthread_exit(NULL);
 	}
 
 	r = udev_monitor_enable_receiving(udev_monitor);
 	if (r)
 	{
 		Log2(PCSC_LOG_ERROR, "udev_monitor_enable_receiving() error: %d\n", r);
-		return;
+		pthread_exit(NULL);
 	}
 
 	/* udev monitor file descriptor */
@@ -594,74 +596,59 @@ static void HPEstablishUSBNotifications(struct udev *udev)
 	if (fd < 0)
 	{
 		Log2(PCSC_LOG_ERROR, "udev_monitor_get_fd() error: %d", fd);
-		return;
+		pthread_exit(NULL);
 	}
 
-	while (!AraKiriHotPlug)
+	HPScanUSB(udev);
+
+	pfd.fd = fd;
+	pfd.events = POLLIN;
+
+	for (;;)
 	{
-		struct udev_device *dev, *parent;
-		const char *action, *devpath;
+		struct udev_device *dev;
 
 #ifdef DEBUG_HOTPLUG
 		Log0(PCSC_LOG_INFO);
 #endif
-
-		FD_ZERO(&fds);
-		FD_SET(fd, &fds);
+		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
 		/* wait for a udev event */
-		r = select(fd+1, &fds, NULL, NULL, NULL);
+		r = TEMP_FAILURE_RETRY(poll(&pfd, 1, -1));
 		if (r < 0)
 		{
 			Log2(PCSC_LOG_ERROR, "select(): %s", strerror(errno));
-			return;
+			pthread_exit(NULL);
 		}
+
+		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
 		dev = udev_monitor_receive_device(udev_monitor);
-		if (!dev)
+		if (dev)
 		{
-			Log1(PCSC_LOG_ERROR, "udev_monitor_receive_device() error\n");
-			return;
+			const char *action = udev_device_get_action(dev);
+
+			if (action)
+			{
+				if (!strcmp("remove", action))
+				{
+					Log1(PCSC_LOG_INFO, "USB Device removed");
+					HPRemoveDevice(dev);
+				}
+				else
+				if (!strcmp("add", action))
+				{
+					Log1(PCSC_LOG_INFO, "USB Device add");
+					HPAddDevice(dev);
+				}
+			}
+
+			/* free device */
+			udev_device_unref(dev);
 		}
-
-		action = udev_device_get_action(dev);
-		if (0 == strcmp("remove", action))
-		{
-			Log1(PCSC_LOG_INFO, "Device removed");
-			HPRescanUsbBus(udev);
-			continue;
-		}
-
-		if (strcmp("add", action))
-			continue;
-
-		parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
-			"usb_device");
-		devpath = udev_device_get_devnode(parent);
-		if (!devpath)
-		{
-			/* the device disapeared? */
-			Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
-			continue;
-		}
-
-		HPAddDevice(dev, parent, devpath);
-
-		/* free device */
-		udev_device_unref(dev);
-
 	}
 
-	for (i=0; i<driverSize; i++)
-	{
-		/* free strings allocated by strdup() */
-		free(driverTracker[i].bundleName);
-		free(driverTracker[i].libraryPath);
-		free(driverTracker[i].readerName);
-	}
-	free(driverTracker);
-
-	Log1(PCSC_LOG_INFO, "Hotplug stopped");
+	pthread_exit(NULL);
 } /* HPEstablishUSBNotifications */
 
 
@@ -674,10 +661,9 @@ LONG HPSearchHotPluggables(void)
 
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		readerTracker[i].status = READER_ABSENT;
-		readerTracker[i].bInterfaceNumber = 0;
 		readerTracker[i].devpath = NULL;
 		readerTracker[i].fullName = NULL;
+		readerTracker[i].sysname = NULL;
 	}
 
 	return HPReadBundleValues();
@@ -689,8 +675,32 @@ LONG HPSearchHotPluggables(void)
  */
 LONG HPStopHotPluggables(void)
 {
-	AraKiriHotPlug = TRUE;
+	int i;
 
+	if (driverSize <= 0)
+		return 0;
+
+	if (!udev)
+		return 0;
+
+	pthread_cancel(usbNotifyThread);
+	pthread_join(usbNotifyThread, NULL);
+
+	for (i=0; i<driverSize; i++)
+	{
+		/* free strings allocated by strdup() */
+		free(driverTracker[i].bundleName);
+		free(driverTracker[i].libraryPath);
+		free(driverTracker[i].readerName);
+	}
+	free(driverTracker);
+
+	udev_unref(udev);
+
+	udev = NULL;
+	driverSize = -1;
+
+	Log1(PCSC_LOG_INFO, "Hotplug stopped");
 	return 0;
 } /* HPStopHotPluggables */
 
@@ -700,10 +710,6 @@ LONG HPStopHotPluggables(void)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
-	struct udev *udev;
-
-	(void)pthread_mutex_init(&usbNotifierMutex, NULL);
-
 	if (driverSize <= 0)
 	{
 		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: "
@@ -717,13 +723,15 @@ ULONG HPRegisterForHotplugEvents(void)
 	if (!udev)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_new() failed");
-		return 0;
+		return SCARD_F_INTERNAL_ERROR;
 	}
 
-	HPRescanUsbBus(udev);
-
-	(void)ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
-		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, udev);
+	if (ThreadCreate(&usbNotifyThread, 0,
+		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL))
+	{
+		Log1(PCSC_LOG_ERROR, "ThreadCreate() failed");
+		return SCARD_F_INTERNAL_ERROR;
+	}
 
 	return 0;
 } /* HPRegisterForHotplugEvents */
