@@ -101,9 +101,9 @@ enum {
 #define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) do { } while(0)
 #define LogXxd(priority, msg, buffer, size) do { } while(0)
 
-#define DebugLogA(a) 
-#define DebugLogB(a, b) 
-#define DebugLogC(a, b,c) 
+#define DebugLogA(a)
+#define DebugLogB(a, b)
+#define DebugLogC(a, b,c)
 
 #else
 
