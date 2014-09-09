@@ -81,6 +81,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* functions used by libpcsclite only */
 
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
+#endif
+
 char *getSocketName(void)
 {
 	static char socketName[sizeof(struct sockaddr_un)];
@@ -119,7 +123,7 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 	int ret;
 	char *socketName;
 
-	ret = socket(PF_UNIX, SOCK_STREAM, 0);
+	ret = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (ret < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "Error: create on client socket: %s",
