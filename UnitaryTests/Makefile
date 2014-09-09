@@ -10,7 +10,8 @@ CFLAGS := -Wall -O2 -g -DVERSION=\"$(VERSION)\" $(PCSC_CFLAGS)
 LDLIBS := $(PCSC_LDLIBS)
 
 PROGRAMS := SCardBeginTransaction \
-	BufferOverflow
+	BufferOverflow \
+	exec
 
 all: $(PROGRAMS)
 
