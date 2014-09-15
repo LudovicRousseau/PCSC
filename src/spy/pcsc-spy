@@ -792,7 +792,7 @@ class PCSCdemultiplexer(object):
         """ constructor """
 
         # use default fifo file?
-        if logfile == None:
+        if logfile is None:
             logfile = os.path.expanduser('~/pcsc-spy')
 
             # create the FIFO file
