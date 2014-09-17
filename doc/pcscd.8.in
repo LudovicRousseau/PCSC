@@ -92,7 +92,8 @@ file.  pcscd locates the driver using the
 file.  See the
 .BR reader.conf (5)
 manual page for more information.
-Drivers are available at \fIhttp://www.musclecard.com/drivers.html\fP.
+.PP
+Some drivers are available at \fIhttp://pcsclite.alioth.debian.org/musclecard.com/drivers.html\fP.
 .
 .SH "USB SMART CARD READER DRIVERS"
 USB smart card reader drivers are located in
