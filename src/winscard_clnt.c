@@ -1703,7 +1703,7 @@ end:
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] dwTimeout Maximum waiting time (in milliseconds) for status
- *            change, zero (or \ref INFINITE) for infinite.
+ *            change, \ref INFINITE for infinite.
  * @param[in,out] rgReaderStates Structures of readers with current states.
  * @param[in] cReaders Number of structures.
  *
