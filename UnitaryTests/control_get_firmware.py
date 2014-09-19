@@ -42,7 +42,7 @@ for reader in readers():
     else:
         print " Not a Gemalto reader"
         try:
-            res = properties['PCSCv2_PART10_PROPERTY_sFirmwareID']
-            print " Firmware:", frimware
+            firmware = properties['PCSCv2_PART10_PROPERTY_sFirmwareID']
+            print " Firmware:", firmware
         except KeyError:
             print " PCSCv2_PART10_PROPERTY_sFirmwareID not supported"
