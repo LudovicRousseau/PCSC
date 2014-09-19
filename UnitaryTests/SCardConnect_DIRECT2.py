@@ -33,7 +33,6 @@
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
-import sys
 
 SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
 
