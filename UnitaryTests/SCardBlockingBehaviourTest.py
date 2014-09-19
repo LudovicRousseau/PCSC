@@ -246,7 +246,7 @@ def main():
             failed = True
         else:
             failed = False
-        hresult = SCardEndTransaction(hcard, SCARD_LEAVE_CARD)
+        SCardEndTransaction(hcard, SCARD_LEAVE_CARD)
 
         # Leave enough time to terminate the test thread
         time.sleep(1)
