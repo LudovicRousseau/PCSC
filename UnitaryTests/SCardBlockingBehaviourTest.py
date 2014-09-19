@@ -231,7 +231,7 @@ def main():
 
     for testTarget in tests.keys():
         # Start test function in a new thread
-        hresult = SCardBeginTransaction(hcard)
+        SCardBeginTransaction(hcard)
         unblocked = False
         print
         print "Testing %s, expecting" % testTarget,
