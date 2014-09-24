@@ -1,3 +1,11 @@
+pcsc-lite-1.8.12: Ludovic Rousseau
+24 September 2014
+- make hotplug using libudev (default) more robust
+- add ReiserFS file system support (for configuration files)
+- add musl libC support (increase the thread stack)
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.8.11: Ludovic Rousseau
 14 February 2014
 - Add polkit support. See doc/README.polkit
