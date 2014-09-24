@@ -9,6 +9,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-systemdsystemunitdir=$$dc_install_base/$(systemdsystemunitdir)
 
 EXTRA_DIST = \
+	GPL-3.0.txt \
 	bootstrap \
 	ChangeLog.svn \
 	DRIVERS SECURITY \
