@@ -72,6 +72,10 @@ the
 .I @confdir_exp@/reader.conf
 file to detect added or removed non-USB readers (serial or PCMCIA).
 .
+.TP
+.BR \-x ", " \-\-auto-exit
+pcscd will quit after 60 seconds of inactivity. This is used when pcscd
+os started on demand by systemd.
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite. It is a resource manager that
 coordinates communications with smart card readers and smart cards and
