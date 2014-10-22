@@ -40,22 +40,22 @@ use critical log level.
 The log levels are ordered as: debug < info < error < critical. Use a
 log level l will log this level and all the levels above it.
 .TP
-.B --force-reader-polling
+.B \-\-force\-reader\-polling
 ignore the IFD_GENERATE_HOTPLUG reader capability
 .TP
-.BR \-t ", " \-\-max-thread
+.BR \-t ", " \-\-max\-thread
 maximum number of threads (default 200).
 
 This is the maximum number of clients (SCardEstablishContext) that pcscd
 can handle.
 .TP
-.BR \-s ", " \-\-max-card-handle-per-thread
+.BR \-s ", " \-\-max\-card\-handle\-per\-thread
 maximum number of card handle per thread (default: 200).
 
 This is the maximum number of card handle (SCardConnect) per client
 (SCardEstablishContext).
 .TP
-.BR \-r ", " \-\-max-card-handle-per-reader
+.BR \-r ", " \-\-max\-card\-handle\-per\-reader
 maximum number of card handle per reader (default: 200)
 
 This is the maximum number of card handle (SCardConnect) per reader.
@@ -73,7 +73,7 @@ the
 file to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .TP
-.BR \-x ", " \-\-auto-exit
+.BR \-x ", " \-\-auto\-exit
 pcscd will quit after 60 seconds of inactivity. This is used when pcscd
 os started on demand by systemd.
 .TP
