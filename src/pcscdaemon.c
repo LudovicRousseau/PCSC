@@ -381,7 +381,8 @@ int main(int argc, char **argv)
 
 	rv = stat(PCSCLITE_CSOCK_NAME, &fStatBuf);
 
-	if (rv == 0)
+	/* if the file exist and pcscd was _not_ started by systemd */
+	if (rv == 0 && !SocketActivated)
 	{
 		pid_t pid;
 
