@@ -597,8 +597,6 @@ static void HPEstablishUSBNotifications(void *notused)
 		pthread_exit(NULL);
 	}
 
-	HPScanUSB(Udev);
-
 	pfd.fd = fd;
 	pfd.events = POLLIN;
 
@@ -723,6 +721,9 @@ ULONG HPRegisterForHotplugEvents(void)
 		Log1(PCSC_LOG_ERROR, "udev_new() failed");
 		return SCARD_F_INTERNAL_ERROR;
 	}
+
+	/* scan the USB bus at least once before accepting client connections */
+	HPScanUSB(Udev);
 
 	if (ThreadCreate(&usbNotifyThread, 0,
 		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL))
