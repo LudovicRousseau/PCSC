@@ -432,7 +432,6 @@ static void HPEstablishUSBNotifications(int pipefd[2])
 
 	/* signal that the initially connected readers are now visible */
 	write(pipefd[1], &c, 1);
-	close(pipefd[1]);
 
 	/* if at least one driver do not have IFD_GENERATE_HOTPLUG */
 	do_polling = FALSE;
@@ -509,7 +508,10 @@ LONG HPSearchHotPluggables(void)
 
 		/* Wait for initial readers to setup */
 		read(pipefd[0], &c, 1);
+
+		/* cleanup pipe fd */
 		close(pipefd[0]);
+		close(pipefd[1]);
 	}
 
 	return 0;
