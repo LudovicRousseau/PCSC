@@ -150,6 +150,10 @@ cleanup1:
 
 unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 {
+	(void)socket;
+	(void)action;
+	(void)reader;
+
 	return 1;
 }
 
