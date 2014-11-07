@@ -556,38 +556,15 @@ static void HPScanUSB(struct udev *udev)
 }
 
 
-static void HPEstablishUSBNotifications(void *notused)
+static void HPEstablishUSBNotifications(void *arg)
 {
-	struct udev_monitor *udev_monitor;
+	struct udev_monitor *udev_monitor = arg;
 	int r;
 	int fd;
 	struct pollfd pfd;
 
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-
-	udev_monitor = udev_monitor_new_from_netlink(Udev, "udev");
-	if (NULL == udev_monitor)
-	{
-		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
-		pthread_exit(NULL);
-	}
-
-	/* filter only the interfaces */
-	r = udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "usb",
-		"usb_interface");
-	if (r)
-	{
-		Log2(PCSC_LOG_ERROR, "udev_monitor_filter_add_match_subsystem_devtype() error: %d\n", r);
-		pthread_exit(NULL);
-	}
-
-	r = udev_monitor_enable_receiving(udev_monitor);
-	if (r)
-	{
-		Log2(PCSC_LOG_ERROR, "udev_monitor_enable_receiving() error: %d\n", r);
-		pthread_exit(NULL);
-	}
 
 	/* udev monitor file descriptor */
 	fd = udev_monitor_get_fd(udev_monitor);
@@ -706,6 +683,9 @@ LONG HPStopHotPluggables(void)
  */
 ULONG HPRegisterForHotplugEvents(void)
 {
+	struct udev_monitor *udev_monitor;
+	int r;
+
 	if (driverSize <= 0)
 	{
 		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: "
@@ -722,11 +702,34 @@ ULONG HPRegisterForHotplugEvents(void)
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
+	udev_monitor = udev_monitor_new_from_netlink(Udev, "udev");
+	if (NULL == udev_monitor)
+	{
+		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
+		pthread_exit(NULL);
+	}
+
+	/* filter only the interfaces */
+	r = udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "usb",
+		"usb_interface");
+	if (r)
+	{
+		Log2(PCSC_LOG_ERROR, "udev_monitor_filter_add_match_subsystem_devtype() error: %d\n", r);
+		pthread_exit(NULL);
+	}
+
+	r = udev_monitor_enable_receiving(udev_monitor);
+	if (r)
+	{
+		Log2(PCSC_LOG_ERROR, "udev_monitor_enable_receiving() error: %d\n", r);
+		pthread_exit(NULL);
+	}
+
 	/* scan the USB bus at least once before accepting client connections */
 	HPScanUSB(Udev);
 
 	if (ThreadCreate(&usbNotifyThread, 0,
-		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, NULL))
+		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, udev_monitor))
 	{
 		Log1(PCSC_LOG_ERROR, "ThreadCreate() failed");
 		return SCARD_F_INTERNAL_ERROR;
