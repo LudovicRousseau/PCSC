@@ -1,3 +1,12 @@
+pcsc-lite-1.8.13: Ludovic Rousseau
+7 November 2014
+- fix a systemd + libudev hotplug bug introduced in version 1.8.12.
+  The list of readers was not (yet) available just after the start of pcscd
+- Make the license more 3-clause BSD like
+- fix a rare race condition in the (non default) libusb hotplug
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.8.12: Ludovic Rousseau
 24 September 2014
 - make hotplug using libudev (default) more robust
