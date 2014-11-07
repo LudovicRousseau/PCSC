@@ -47,6 +47,7 @@
 #include <sys/un.h>
 #include <stdio.h>
 #include "debuglog.h"
+#include "auth.h"
 
 #include <errno.h>
 

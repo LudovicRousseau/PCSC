@@ -101,7 +101,7 @@ fix-rights: install-sbinPROGRAMS
 
 update-systemd:
 	curl -O http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c
-	curl -O http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.h
+	curl -O http://cgit.freedesktop.org/systemd/systemd/plain/src/systemd/sd-daemon.h
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
