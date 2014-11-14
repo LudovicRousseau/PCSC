@@ -122,6 +122,8 @@ same driver supports many different readers.
    <string>SCM Microsystems USB Reader</string>
 @endverbatim
 
+The reader name must use the ASCII character set.
+
 @subsection CFBundleExecutable
 
    The executable name which exists in the particular platform's directory.

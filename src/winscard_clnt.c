@@ -2884,6 +2884,9 @@ end:
  * If \c *pcchReaders is equal to \ref SCARD_AUTOALLOCATE then the function
  * will allocate itself the needed memory. Use SCardFreeMemory() to release it.
  *
+ * Encoding:
+ * The reader names and group names are encoded using UTF-8.
+ *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
  * @param[in] mszGroups List of groups to list readers (not used).
