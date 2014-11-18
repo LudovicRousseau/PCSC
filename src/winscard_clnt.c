@@ -873,7 +873,7 @@ end:
  * reset the card in shared mode. When this occurs any other application trying
  * to access certain commands will be returned the value \ref
  * SCARD_W_RESET_CARD. When this occurs SCardReconnect() must be called in
- * order to acknowledge that the card was reset and allow it to change it's
+ * order to acknowledge that the card was reset and allow it to change its
  * state accordingly.
  *
  * @ingroup API
@@ -1350,7 +1350,7 @@ end:
  * @brief Returns the current status of the reader connected to
  * by \p hCard.
  *
- * It's friendly name will be stored in \p szReaderName. \p pcchReaderLen will
+ * Its friendly name will be stored in \p szReaderName. \p pcchReaderLen will
  * be the size of the allocated buffer for \p szReaderName, while \p pcbAtrLen
  * will be the size of the allocated buffer for \p pbAtr. If either of these is
  * too small, the function will return with \ref SCARD_E_INSUFFICIENT_BUFFER
@@ -2690,7 +2690,7 @@ end:
  * connected to by SCardConnect().
  *
  * The card responds from the APDU and stores this response in \p pbRecvBuffer
- * and it's length in \p pcbRecvLength.
+ * and its length in \p pcbRecvLength.
  * \p pioSendPci and \p pioRecvPci are structures containing the following:
  * @code
  * typedef struct {
