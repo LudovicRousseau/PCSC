@@ -108,7 +108,7 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 
 	result = polkit_authority_check_authorization_sync(authority, subject,
 		action_name, details,
-		POLKIT_CHECK_AUTHORIZATION_FLAGS_NONE,
+		POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION,
 		NULL,
 		&error);
 
