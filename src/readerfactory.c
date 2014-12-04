@@ -692,7 +692,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 
 						/*
 						 * tells the caller who the parent of this
-						 * clone is so it can use it's shared
+						 * clone is so it can use its shared
 						 * resources like mutex/etc.
 						 */
 						parent = i;
