@@ -11,8 +11,8 @@
     <description>Access to the PC/SC daemon</description>
     <message>Authentication is required to access the PC/SC daemon</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
   </action>
@@ -21,8 +21,8 @@
     <description>Access to the smart card</description>
     <message>Authentication is required to access the smart card</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
   </action>
