@@ -67,8 +67,7 @@ Displays information about the pcscd command line
 Displays the program version number
 .TP
 .BR \-H ", " \-\-hotplug
-Ask pcscd to rescan the USB buses for added or removed readers and re-read
-the
+Ask pcscd to re-read the
 .I @confdir_exp@/reader.conf
 file to detect added or removed non-USB readers (serial or PCMCIA).
 .
