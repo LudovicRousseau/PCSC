@@ -47,7 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #include "misc.h"
 #include "pcsclite.h"
-#include "strlcpycat.h"
+#include "string.h"
 
 #ifdef NO_LOG
 PCSC_API char* pcsc_stringify_error(const long pcscError)
@@ -79,99 +79,100 @@ PCSC_API char* pcsc_stringify_error(const long pcscError)
 PCSC_API char* pcsc_stringify_error(const LONG pcscError)
 {
 	static char strError[75];
+	const char *msg = NULL;
 
 	switch (pcscError)
 	{
 	case SCARD_S_SUCCESS:
-		(void)strlcpy(strError, "Command successful.", sizeof(strError));
+		msg = "Command successful.";
 		break;
 	case SCARD_F_INTERNAL_ERROR:
-		(void)strlcpy(strError, "Internal error.", sizeof(strError));
+		msg = "Internal error.";
 		break;
 	case SCARD_E_CANCELLED:
-		(void)strlcpy(strError, "Command cancelled.", sizeof(strError));
+		msg = "Command cancelled.";
 		break;
 	case SCARD_E_INVALID_HANDLE:
-		(void)strlcpy(strError, "Invalid handle.", sizeof(strError));
+		msg = "Invalid handle.";
 		break;
 	case SCARD_E_INVALID_PARAMETER:
-		(void)strlcpy(strError, "Invalid parameter given.", sizeof(strError));
+		msg = "Invalid parameter given.";
 		break;
 	case SCARD_E_INVALID_TARGET:
-		(void)strlcpy(strError, "Invalid target given.", sizeof(strError));
+		msg = "Invalid target given.";
 		break;
 	case SCARD_E_NO_MEMORY:
-		(void)strlcpy(strError, "Not enough memory.", sizeof(strError));
+		msg = "Not enough memory.";
 		break;
 	case SCARD_F_WAITED_TOO_LONG:
-		(void)strlcpy(strError, "Waited too long.", sizeof(strError));
+		msg = "Waited too long.";
 		break;
 	case SCARD_E_INSUFFICIENT_BUFFER:
-		(void)strlcpy(strError, "Insufficient buffer.", sizeof(strError));
+		msg = "Insufficient buffer.";
 		break;
 	case SCARD_E_UNKNOWN_READER:
-		(void)strlcpy(strError, "Unknown reader specified.", sizeof(strError));
+		msg = "Unknown reader specified.";
 		break;
 	case SCARD_E_TIMEOUT:
-		(void)strlcpy(strError, "Command timeout.", sizeof(strError));
+		msg = "Command timeout.";
 		break;
 	case SCARD_E_SHARING_VIOLATION:
-		(void)strlcpy(strError, "Sharing violation.", sizeof(strError));
+		msg = "Sharing violation.";
 		break;
 	case SCARD_E_NO_SMARTCARD:
-		(void)strlcpy(strError, "No smart card inserted.", sizeof(strError));
+		msg = "No smart card inserted.";
 		break;
 	case SCARD_E_UNKNOWN_CARD:
-		(void)strlcpy(strError, "Unknown card.", sizeof(strError));
+		msg = "Unknown card.";
 		break;
 	case SCARD_E_CANT_DISPOSE:
-		(void)strlcpy(strError, "Cannot dispose handle.", sizeof(strError));
+		msg = "Cannot dispose handle.";
 		break;
 	case SCARD_E_PROTO_MISMATCH:
-		(void)strlcpy(strError, "Card protocol mismatch.", sizeof(strError));
+		msg = "Card protocol mismatch.";
 		break;
 	case SCARD_E_NOT_READY:
-		(void)strlcpy(strError, "Subsystem not ready.", sizeof(strError));
+		msg = "Subsystem not ready.";
 		break;
 	case SCARD_E_INVALID_VALUE:
-		(void)strlcpy(strError, "Invalid value given.", sizeof(strError));
+		msg = "Invalid value given.";
 		break;
 	case SCARD_E_SYSTEM_CANCELLED:
-		(void)strlcpy(strError, "System cancelled.", sizeof(strError));
+		msg = "System cancelled.";
 		break;
 	case SCARD_F_COMM_ERROR:
-		(void)strlcpy(strError, "RPC transport error.", sizeof(strError));
+		msg = "RPC transport error.";
 		break;
 	case SCARD_F_UNKNOWN_ERROR:
-		(void)strlcpy(strError, "Unknown error.", sizeof(strError));
+		msg = "Unknown error.";
 		break;
 	case SCARD_E_INVALID_ATR:
-		(void)strlcpy(strError, "Invalid ATR.", sizeof(strError));
+		msg = "Invalid ATR.";
 		break;
 	case SCARD_E_NOT_TRANSACTED:
-		(void)strlcpy(strError, "Transaction failed.", sizeof(strError));
+		msg = "Transaction failed.";
 		break;
 	case SCARD_E_READER_UNAVAILABLE:
-		(void)strlcpy(strError, "Reader is unavailable.", sizeof(strError));
+		msg = "Reader is unavailable.";
 		break;
 	/* case SCARD_P_SHUTDOWN: */
 	case SCARD_E_PCI_TOO_SMALL:
-		(void)strlcpy(strError, "PCI struct too small.", sizeof(strError));
+		msg = "PCI struct too small.";
 		break;
 	case SCARD_E_READER_UNSUPPORTED:
-		(void)strlcpy(strError, "Reader is unsupported.", sizeof(strError));
+		msg = "Reader is unsupported.";
 		break;
 	case SCARD_E_DUPLICATE_READER:
-		(void)strlcpy(strError, "Reader already exists.", sizeof(strError));
+		msg = "Reader already exists.";
 		break;
 	case SCARD_E_CARD_UNSUPPORTED:
-		(void)strlcpy(strError, "Card is unsupported.", sizeof(strError));
+		msg = "Card is unsupported.";
 		break;
 	case SCARD_E_NO_SERVICE:
-		(void)strlcpy(strError, "Service not available.", sizeof(strError));
+		msg = "Service not available.";
 		break;
 	case SCARD_E_SERVICE_STOPPED:
-		(void)strlcpy(strError, "Service was stopped.", sizeof(strError));
+		msg = "Service was stopped.";
 		break;
 	/* case SCARD_E_UNEXPECTED: */
 	/* case SCARD_E_ICC_CREATEORDER: */
@@ -187,25 +188,25 @@ PCSC_API char* pcsc_stringify_error(const LONG pcscError)
 	/* case SCARD_E_NO_SUCH_CERTIFICATE: */
 	/* case SCARD_E_CERTIFICATE_UNAVAILABLE: */
 	case SCARD_E_NO_READERS_AVAILABLE:
-		(void)strlcpy(strError, "Cannot find a smart card reader.", sizeof(strError));
+		msg = "Cannot find a smart card reader.";
 		break;
 	/* case SCARD_E_COMM_DATA_LOST: */
 	/* case SCARD_E_NO_KEY_CONTAINER: */
 	/* case SCARD_E_SERVER_TOO_BUSY: */
 	case SCARD_W_UNSUPPORTED_CARD:
-		(void)strlcpy(strError, "Card is not supported.", sizeof(strError));
+		msg = "Card is not supported.";
 		break;
 	case SCARD_W_UNRESPONSIVE_CARD:
-		(void)strlcpy(strError, "Card is unresponsive.", sizeof(strError));
+		msg = "Card is unresponsive.";
 		break;
 	case SCARD_W_UNPOWERED_CARD:
-		(void)strlcpy(strError, "Card is unpowered.", sizeof(strError));
+		msg = "Card is unpowered.";
 		break;
 	case SCARD_W_RESET_CARD:
-		(void)strlcpy(strError, "Card was reset.", sizeof(strError));
+		msg = "Card was reset.";
 		break;
 	case SCARD_W_REMOVED_CARD:
-		(void)strlcpy(strError, "Card was removed.", sizeof(strError));
+		msg = "Card was removed.";
 		break;
 	/* case SCARD_W_SECURITY_VIOLATION: */
 	/* case SCARD_W_WRONG_CHV: */
@@ -215,12 +216,18 @@ PCSC_API char* pcsc_stringify_error(const LONG pcscError)
 	/* case SCARD_W_CARD_NOT_AUTHENTICATED: */
 
 	case SCARD_E_UNSUPPORTED_FEATURE:
-		(void)strlcpy(strError, "Feature not supported.", sizeof(strError));
+		msg = "Feature not supported.";
 		break;
 	default:
 		(void)snprintf(strError, sizeof(strError)-1, "Unknown error: 0x%08lX",
 			pcscError);
 	};
+
+	if (msg)
+		(void)strncpy(strError, msg, sizeof(strError));
+	else
+		(void)snprintf(strError, sizeof(strError)-1, "Unknown error: 0x%08lX",
+			pcscError);
 
 	/* add a null byte */
 	strError[sizeof(strError)-1] = '\0';
