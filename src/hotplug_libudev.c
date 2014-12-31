@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #if defined(HAVE_LIBUDEV) && defined(USE_USB)
 
+#define _GNU_SOURCE		/* for asprintf(3) */
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -379,7 +380,7 @@ static void HPAddDevice(struct udev_device *dev)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
-	char fullname[MAX_READERNAME];
+	char *fullname;
 	struct _driverTracker *driver, *classdriver;
 	const char *sSerialNumber = NULL, *sInterfaceName = NULL;
 	const char *sInterfaceNumber;
@@ -466,14 +467,18 @@ static void HPAddDevice(struct udev_device *dev)
 		sSerialNumber = udev_device_get_sysattr_value(parent, "serial");
 
 	/* name from the Info.plist file */
-	strlcpy(fullname, driver->readerName, sizeof(fullname));
+	fullname = strdup(driver->readerName);
 
 	/* interface name from the device (if any) */
 	if (sInterfaceName)
 	{
-		strlcat(fullname, " [", sizeof(fullname));
-		strlcat(fullname, sInterfaceName, sizeof(fullname));
-		strlcat(fullname, "]", sizeof(fullname));
+		char *result;
+
+		/* create a new name */
+		asprintf(&result, "%s [%s]", fullname, sInterfaceName);
+
+		free(fullname);
+		fullname = result;
 	}
 
 	/* serial number from the device (if any) */
@@ -483,9 +488,13 @@ static void HPAddDevice(struct udev_device *dev)
 		 * interface name */
 		if (!sInterfaceName || NULL == strstr(sInterfaceName, sSerialNumber))
 		{
-			strlcat(fullname, " (", sizeof(fullname));
-			strlcat(fullname, sSerialNumber, sizeof(fullname));
-			strlcat(fullname, ")", sizeof(fullname));
+			char *result;
+
+			/* create a new name */
+			asprintf(&result, "%s (%s)", fullname, sSerialNumber);
+
+			free(fullname);
+			fullname = result;
 		}
 	}
 
@@ -517,6 +526,8 @@ static void HPAddDevice(struct udev_device *dev)
 			(void)CheckForOpenCT();
 		}
 	}
+
+	free(fullname);
 } /* HPAddDevice */
 
 
