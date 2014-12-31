@@ -380,7 +380,7 @@ static void HPAddDevice(struct udev_device *dev)
 {
 	int i;
 	char *deviceName = NULL;
-	char *fullname;
+	char *fullname = NULL;
 	struct _driverTracker *driver, *classdriver;
 	const char *sSerialNumber = NULL, *sInterfaceName = NULL;
 	const char *sInterfaceNumber;
