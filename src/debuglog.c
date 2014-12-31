@@ -301,9 +301,6 @@ void DebugLogSetLevel(const int level)
 
 INTERNAL int DebugLogSetCategory(const int dbginfo)
 {
-#define DEBUG_INFO_LENGTH 80
-	char text[DEBUG_INFO_LENGTH];
-
 	/* use a negative number to UNset
 	 * typically use ~DEBUG_CATEGORY_APDU
 	 */
@@ -312,13 +309,8 @@ INTERNAL int DebugLogSetCategory(const int dbginfo)
 	else
 		LogCategory |= dbginfo;
 
-	/* set to empty string */
-	text[0] = '\0';
-
 	if (LogCategory & DEBUG_CATEGORY_APDU)
-		strlcat(text, " APDU", sizeof(text));
-
-	Log2(PCSC_LOG_INFO, "Debug options:%s", text);
+		Log1(PCSC_LOG_INFO, "Debug options: APDU");
 
 	return LogCategory;
 }
