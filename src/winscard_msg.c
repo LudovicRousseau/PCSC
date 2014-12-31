@@ -68,7 +68,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "winscard_msg.h"
 #include "sys_generic.h"
 #include "utils.h"
-#include "strlcpycat.h"
 
 #ifdef PCSCD
 
@@ -93,9 +92,12 @@ char *getSocketName(void)
 
 		socketNameEnv = getenv("PCSCLITE_CSOCK_NAME");
 		if (socketNameEnv)
-			strlcpy(socketName, socketNameEnv, sizeof(socketName));
+			strncpy(socketName, socketNameEnv, sizeof(socketName));
 		else
-			strlcpy(socketName, PCSCLITE_CSOCK_NAME, sizeof(socketName));
+			strncpy(socketName, PCSCLITE_CSOCK_NAME, sizeof(socketName));
+
+		/* Ensure a NUL byte */
+		socketName[sizeof socketName -1] = '\0';
 	}
 
 	return socketName;
