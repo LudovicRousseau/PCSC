@@ -55,7 +55,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "misc.h"
 #include "debuglog.h"
 #include "sys_generic.h"
-#include "strlcpycat.h"
 
 #ifdef NO_LOG
 
@@ -203,10 +202,10 @@ static void log_xxd_always(const int priority, const char *msg,
 	char DebugBuffer[len*3 + strlen(msg) +1];
 	int i;
 	char *c;
-	size_t l;
 
-	l = strlcpy(DebugBuffer, msg, sizeof(DebugBuffer));
-	c = DebugBuffer + l;
+	/* DebugBuffer is always big enough for msg */
+	strcpy(DebugBuffer, msg);
+	c = DebugBuffer + strlen(DebugBuffer);
 
 	for (i = 0; (i < len); ++i)
 	{
