@@ -48,7 +48,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* We shall not export the log_msg() sumbol */
 #undef PCSC_API
 #include "debuglog.h"
-#include "strlcpycat.h"
 
 #define DEBUG_BUF_SIZE 2048
 
