@@ -25,7 +25,6 @@ libpcsclite_la_SOURCES = \
 	error.c \
 	winscard_clnt.c \
 	simclist.c \
-	strlcat.c \
 	strlcpy.c \
 	sys_unix.c \
 	utils.c \
@@ -71,7 +70,6 @@ pcscd_SOURCES = \
 	sd-daemon.h \
 	simclist.c \
 	simclist.h \
-	strlcat.c \
 	strlcpy.c \
 	strlcpycat.h \
 	sys_generic.h \
