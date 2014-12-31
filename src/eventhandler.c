@@ -56,7 +56,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sys_generic.h"
 #include "ifdwrapper.h"
 #include "prothandler.h"
-#include "strlcpycat.h"
 #include "utils.h"
 #include "winscard_svc.h"
 #include "simclist.h"
