@@ -43,8 +43,6 @@ src/libpcsclite.la
 src/libpcsclite_la-debug.lo
 src/libpcsclite_la-error.lo
 src/libpcsclite_la-simclist.lo
-src/libpcsclite_la-strlcat.lo
-src/libpcsclite_la-strlcpy.lo
 src/libpcsclite_la-sys_unix.lo
 src/libpcsclite_la-utils.lo
 src/libpcsclite_la-winscard_clnt.lo
@@ -74,8 +72,6 @@ src/pcscd-prothandler.o
 src/pcscd-readerfactory.o
 src/pcscd-sd-daemon.o
 src/pcscd-simclist.o
-src/pcscd-strlcat.o
-src/pcscd-strlcpy.o
 src/pcscd-sys_unix.o
 src/pcscd-tokenparser.o
 src/pcscd-utils.o
