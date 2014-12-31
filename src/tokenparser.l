@@ -52,7 +52,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "simclist.h"
 #include "debuglog.h"
 #include "parser.h"
-#include "strlcpycat.h"
 
 static void eval_key(char *pcToken, list_t *list_key);
 static void eval_value(char *pcToken, list_t *list_values);
@@ -97,7 +96,8 @@ static void eval_key(char *pcToken, list_t *list_key)
 	len++;	/* final NULL byte */
 
 	elt->key = malloc(len);
-	(void)strlcpy(elt->key, &pcToken[5], len);
+	memcpy(elt->key, &pcToken[5], len-1);
+	elt->key[len-1] = '\0';
 
 	r = list_init(&elt->values);
 	assert(r >= 0);
@@ -128,7 +128,8 @@ static void eval_value(char *pcToken, list_t *list_values)
 	value = malloc(len);
 	assert(value);
 
-	(void)strlcpy(value, &pcToken[8], len);
+	memcpy(value, &pcToken[8], len-1);
+	value[len-1] = '\0';
 
 	/* for all &amp; in the string */
 	amp = value;
