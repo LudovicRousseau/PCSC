@@ -34,8 +34,6 @@ pcscd (daemon)
  powermgt_macosx.c (this file is OS dependant)
  prothandler.c
  readerfactory.c
- strlcat.c
- strlcpy.c
  sys_unix.c (this file is OS dependant)
  thread_unix.c (this file is OS dependant)
  tokenparser.l
@@ -50,8 +48,6 @@ libpcsclite.la (client library)
  dyn_macosx.c
  dyn_unix.c
  error.c
- strlcat.c
- strlcpy.c
  sys_unix.c
  thread_unix.c
  winscard_clnt.c or winscard_scf.c
