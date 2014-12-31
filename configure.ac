@@ -108,9 +108,6 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(daemon flock getopt_long nanosleep strerror vsnprintf)
 
-# strlcpy, strlcat from OpenBSD
-AC_CHECK_FUNCS(strlcpy strlcat)
-
 # C Compiler features
 AC_C_INLINE
 if test "$GCC" = "yes"; then
