@@ -120,7 +120,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "eventhandler.h"
 #include "utils.h"
 #include "reader.h"
-#include "strlcpycat.h"
 
 #undef DO_PROFILE
 #ifdef DO_PROFILE
@@ -1429,8 +1428,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
-					(void)strlcpy((char *)pbAttr,
-						rContext->readerState->readerName, len);
+					strcpy((char *)pbAttr, rContext->readerState->readerName);
 					rv = SCARD_S_SUCCESS;
 				}
 				*pcbAttrLen = len;
