@@ -61,7 +61,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "eventhandler.h"
 #include "ifdwrapper.h"
 #include "hotplug.h"
-#include "strlcpycat.h"
 #include "configfile.h"
 #include "utils.h"
 
@@ -409,7 +408,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 
 		/* Copy the previous reader name and increment the slot number */
 		tmpReader = sReadersContexts[dwContextB]->readerState->readerName;
-		(void)strlcpy(tmpReader,
+		memcpy(tmpReader,
 			sReadersContexts[dwContext]->readerState->readerName,
 			sizeof(sReadersContexts[dwContextB]->readerState->readerName));
 		snprintf(tmpReader + strlen(tmpReader) - 2, 3, "%02X", j);
