@@ -115,7 +115,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pcscd.h"
 #include "winscard.h"
 #include "debuglog.h"
-#include "strlcpycat.h"
 
 #include "readerfactory.h"
 #include "eventhandler.h"
@@ -819,7 +818,8 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		 *    so the mMutex has been unlocked */
 		return SCARD_E_INVALID_HANDLE;
 
-	strlcpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
+	strncpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
+	scConnectStruct.szReader[sizeof scConnectStruct.szReader -1] = '\0';
 
 	scConnectStruct.hContext = hContext;
 	scConnectStruct.dwShareMode = dwShareMode;
