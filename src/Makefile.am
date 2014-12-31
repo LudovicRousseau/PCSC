@@ -25,7 +25,6 @@ libpcsclite_la_SOURCES = \
 	error.c \
 	winscard_clnt.c \
 	simclist.c \
-	strlcpy.c \
 	sys_unix.c \
 	utils.c \
 	winscard_msg.c
@@ -70,8 +69,6 @@ pcscd_SOURCES = \
 	sd-daemon.h \
 	simclist.c \
 	simclist.h \
-	strlcpy.c \
-	strlcpycat.h \
 	sys_generic.h \
 	sys_unix.c \
 	$(USB_CONFIG) \
