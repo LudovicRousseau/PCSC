@@ -379,7 +379,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 static void HPAddDevice(struct udev_device *dev)
 {
 	int i;
-	char deviceName[MAX_DEVICENAME];
+	char *deviceName = NULL;
 	char *fullname;
 	struct _driverTracker *driver, *classdriver;
 	const char *sSerialNumber = NULL, *sInterfaceName = NULL;
@@ -441,10 +441,8 @@ static void HPAddDevice(struct udev_device *dev)
 	else
 		bInterfaceNumber = 0;
 
-	(void)snprintf(deviceName, sizeof(deviceName),
-		"usb:%04x/%04x:libudev:%d:%s", driver->manuID, driver->productID,
-		bInterfaceNumber, devpath);
-	deviceName[sizeof(deviceName) -1] = '\0';
+	asprintf(&deviceName, "usb:%04x/%04x:libudev:%d:%s",
+		driver->manuID, driver->productID, bInterfaceNumber, devpath);
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -528,6 +526,7 @@ static void HPAddDevice(struct udev_device *dev)
 	}
 
 	free(fullname);
+	free(deviceName);
 } /* HPAddDevice */
 
 
