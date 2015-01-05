@@ -450,10 +450,6 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 
 	/* Check if the server is running */
 	rv = SCardCheckDaemonAvailability();
-	if (SCARD_E_INVALID_HANDLE == rv)
-		/* we reconnected to a daemon or we got called from a forked child */
-		rv = SCardCheckDaemonAvailability();
-
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
