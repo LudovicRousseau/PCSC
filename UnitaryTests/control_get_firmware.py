@@ -33,16 +33,21 @@ for reader in readers():
     properties = getTlvProperties(cardConnection)
 
     # Gemalto devices supports a control code to get firmware
-    if properties['PCSCv2_PART10_PROPERTY_wIdVendor'] == 0x08E6:
-        get_firmware = [0x02]
-        IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
-        res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
-            get_firmware)
-        print " Firmware:", "".join([chr(x) for x in res])
+    key = 'PCSCv2_PART10_PROPERTY_wIdVendor'
+    if key in properties:
+        if properties[key] == 0x08E6:
+            get_firmware = [0x02]
+            IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
+            res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
+                get_firmware)
+            print " Firmware:", "".join([chr(x) for x in res])
+        else:
+            print " Not a Gemalto reader"
+            key = 'PCSCv2_PART10_PROPERTY_sFirmwareID'
+            if key in properties:
+                firmware = properties[key]
+                print " Firmware:", firmware
+            else:
+                print " %s not supported" % key
     else:
-        print " Not a Gemalto reader"
-        try:
-            firmware = properties['PCSCv2_PART10_PROPERTY_sFirmwareID']
-            print " Firmware:", firmware
-        except KeyError:
-            print " PCSCv2_PART10_PROPERTY_sFirmwareID not supported"
+        print " %s not supported" % key
