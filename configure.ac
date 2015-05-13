@@ -107,6 +107,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(daemon flock getopt_long nanosleep strerror vsnprintf)
+AC_CHECK_FUNCS([strlcpy strlcat], [], [], [#include <string.h>])
 
 # C Compiler features
 AC_C_INLINE
