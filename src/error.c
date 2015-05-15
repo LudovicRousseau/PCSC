@@ -50,7 +50,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "string.h"
 
 #ifdef NO_LOG
-PCSC_API char* pcsc_stringify_error(const long pcscError)
+PCSC_API char* pcsc_stringify_error(const LONG pcscError)
 {
 	static char strError[] = "0x12345678";
 
