@@ -638,11 +638,17 @@ static void ContextThread(LPVOID newContext)
 				ioSendPci.cbPciLength = trStr.ioSendPciLength;
 				ioRecvPci.dwProtocol = trStr.ioRecvPciProtocol;
 				ioRecvPci.cbPciLength = trStr.ioRecvPciLength;
-				cbRecvLength = trStr.pcbRecvLength;
+				cbRecvLength = sizeof pbRecvBuffer;
 
 				trStr.rv = SCardTransmit(trStr.hCard, &ioSendPci,
 					pbSendBuffer, trStr.cbSendLength, &ioRecvPci,
 					pbRecvBuffer, &cbRecvLength);
+
+				if (cbRecvLength > trStr.pcbRecvLength)
+					/* The client buffer is not large enough.
+					 * The pbRecvBuffer buffer will NOT be sent a few
+					 * lines bellow. So no buffer overflow is expected. */
+					trStr.rv = SCARD_E_INSUFFICIENT_BUFFER;
 
 				trStr.ioSendPciProtocol = ioSendPci.dwProtocol;
 				trStr.ioSendPciLength = ioSendPci.cbPciLength;
