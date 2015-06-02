@@ -17,7 +17,7 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 # SCardReconnect() should block instead of returning SCARD_E_SHARING_VIOLATION
-# when the reconnection requets exclusive access and the reader is
+# when the reconnection requests exclusive access and the reader is
 # already shared.
 
 from smartcard.scard import *
