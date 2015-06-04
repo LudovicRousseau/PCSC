@@ -1241,7 +1241,6 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwDisposition Action to be taken on the reader.
- * The disposition action is not currently used in this release.
  * - \ref SCARD_LEAVE_CARD - Do nothing.
  * - \ref SCARD_RESET_CARD - Reset the card.
  * - \ref SCARD_UNPOWER_CARD - Power down the card.
