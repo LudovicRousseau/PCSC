@@ -96,6 +96,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *    pdwActiveProtocol is not set to \ref SCARD_PROTOCOL_UNDEFINED if
  *    \ref SCARD_SHARE_DIRECT is used but the card has @b already
  *    negotiated its protocol.
+ * -# SCardReconnect()
+ *    @par
+ *    Any transaction help by the process is still valid after
+ *    SCardReconnect() returned. On Windows the transactions are
+ *    released and a new call to SCardBeginTransaction() must be done.
  */
 
 #include "config.h"
