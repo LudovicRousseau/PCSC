@@ -98,8 +98,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *    negotiated its protocol.
  * -# SCardReconnect()
  *    @par
- *    Any transaction help by the process is still valid after
- *    SCardReconnect() returned. On Windows the transactions are
+ *    Any PC/SC transaction held by the process is still valid after
+ *    SCardReconnect() returned. On Windows the PC/SC transactions are
  *    released and a new call to SCardBeginTransaction() must be done.
  */
 
