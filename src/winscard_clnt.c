@@ -949,6 +949,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
+	API_TRACE_IN("%ld %ld %ld", hCard, dwShareMode, dwPreferredProtocols)
 
 	if (pdwActiveProtocol == NULL)
 		return SCARD_E_INVALID_PARAMETER;
@@ -1018,6 +1019,7 @@ end:
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("%ld", *pdwActiveProtocol)
 
 	return rv;
 }
@@ -1169,6 +1171,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
+	API_TRACE_IN("%ld", hCard)
 
 	/*
 	 * Make sure this handle has been opened
@@ -1233,6 +1236,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
@@ -1285,6 +1289,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	CHANNEL_MAP * pChannelMap;
 
 	PROFILE_START
+	API_TRACE_IN("%ld", hCard)
 
 	/*
 	 * Make sure this handle has been opened
@@ -1342,6 +1347,7 @@ end:
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
 
 	PROFILE_END(rv)
+	API_TRACE_OUT("")
 
 	return rv;
 }
