@@ -28,6 +28,7 @@ from smartcard.Exceptions import SmartcardException
 from itertools import izip
 
 
+# http://www.usb.org/developers/docs/USB_LANGIDs.pdf
 USBLangID = {0x0409: "English (United States)",
         0x040C: "French (Standard)",
         0x0425: "Estonian",
