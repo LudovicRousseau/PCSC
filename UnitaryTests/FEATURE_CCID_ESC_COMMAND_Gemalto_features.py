@@ -35,6 +35,7 @@ USBLangID = {0x0409: "English (United States)",
         0x0415: "Polish",
         0x0416: "Portuguese (Brazil)",
         0x0405: "Czech",
+        0x040A: "Spanish (Traditional Sort)",
         0x041B: "Slovak"
         }
 
