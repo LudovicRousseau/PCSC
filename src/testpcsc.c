@@ -373,8 +373,18 @@ wait_for_card_again:
 	rv = SCardGetAttrib(hCard, SCARD_ATTR_VENDOR_IFD_VERSION, buf.as_char, &dwBufLen);
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
-		printf("Vendor IFD version\t\t: " GREEN "0x%08lX\n" NORMAL,
-			buf.as_DWORD);
+	{
+		printf("Vendor IFD version\t\t: ");
+		if (dwBufLen == sizeof(DWORD))
+			printf(GREEN "0x%08lX\n" NORMAL, buf.as_DWORD);
+		else
+		{
+			if (dwBufLen == sizeof(uint32_t))
+				printf(GREEN "0x%08X\n" NORMAL, buf.as_uint32_t);
+			else
+				printf(RED "Unsupported size\n" NORMAL);
+		}
+	}
 
 	printf("Testing SCardGetAttrib\t\t: ");
 	dwBufLen = sizeof(buf);
