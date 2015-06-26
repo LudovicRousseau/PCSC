@@ -144,6 +144,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 		/* Zero out each value in the struct */
 		memset(readerStates[i].readerName, 0, MAX_READERNAME);
 		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
+		readerStates[i].eventCounter = 0;
 		readerStates[i].readerState = 0;
 		readerStates[i].readerSharing = 0;
 		readerStates[i].cardAtrLength = READER_NOT_INITIALIZED;
