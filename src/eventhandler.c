@@ -366,6 +366,8 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				dwCurrentState = SCARD_ABSENT;
 
 				rContext->readerState->eventCounter++;
+				if (rContext->readerState->eventCounter > 0xFFFF)
+					rContext->readerState->eventCounter = 0;
 
 				(void)EHSignalEventToClients();
 			}
@@ -414,6 +416,8 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				dwCurrentState = SCARD_PRESENT;
 
 				rContext->readerState->eventCounter++;
+				if (rContext->readerState->eventCounter > 0xFFFF)
+					rContext->readerState->eventCounter = 0;
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", readerName);
 
