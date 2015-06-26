@@ -374,15 +374,28 @@ wait_for_card_again:
 	test_rv(rv, hContext, DONT_PANIC);
 	if (rv == SCARD_S_SUCCESS)
 	{
+		int valid = 1;	/* valid value by default */
+		long value;
 		printf("Vendor IFD version\t\t: ");
 		if (dwBufLen == sizeof(DWORD))
-			printf(GREEN "0x%08lX\n" NORMAL, buf.as_DWORD);
+			value = buf.as_DWORD;
 		else
 		{
 			if (dwBufLen == sizeof(uint32_t))
-				printf(GREEN "0x%08X\n" NORMAL, buf.as_uint32_t);
+				value = buf.as_uint32_t;
 			else
+			{
 				printf(RED "Unsupported size\n" NORMAL);
+				valid = 0;	/* invalid value */
+			}
+		}
+
+		if (valid)
+		{
+			int M = (value & 0xFF000000) >> 24;		/* Major */
+			int m = (value & 0x00FF0000) >> 16;		/* Minor */
+			int b = (value & 0x0000FFFF);			/* build */
+			printf(GREEN "%d.%d.%d\n" NORMAL, M, m, b);
 		}
 	}
 
