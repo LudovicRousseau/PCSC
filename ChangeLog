@@ -1,3 +1,20 @@
+1.8.14: Ludovic Rousseau
+5 August 2015
+- Threading: lock the PC/SC context in a safe way
+- Threading: lock the card context in a safe way
+- SCardGetStatusChange(): fix card movement rare bug
+- Doxygen:
+  . SCardTransmit() may return SCARD_E_INSUFFICIENT_BUFFER
+  . SCardEndTransaction() The disposition IS used and the dwDisposition
+    parameter HAS an effect.
+  . SCardReconnect() do not release locks
+  . fix typos
+- Move the source code repository from subversion to git
+- Use asprintf(3) instead of strlcat(3) and strlcpy(3)
+- Allow to use pcscd in a remote session (polkit issue)
+- Some other minor improvements and bug corrections
+
+
 pcsc-lite-1.8.13: Ludovic Rousseau
 7 November 2014
 - fix a systemd + libudev hotplug bug introduced in version 1.8.12.
