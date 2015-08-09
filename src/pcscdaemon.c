@@ -681,6 +681,7 @@ int main(int argc, char **argv)
 			Log2(PCSC_LOG_ERROR, "write() failed: %s", strerror(errno));
 		}
 		close(pipefd[1]);
+		pipefd[1] = -1;
 	}
 
 	SVCServiceRunLoop();
