@@ -20,5 +20,5 @@ EXTRA_DIST = \
 DISTCLEANFILES = ChangeLog.git
 
 ChangeLog.git:
-	git log --stat > $@
+	git log --stat --decorate=short > $@
 
