@@ -440,8 +440,13 @@ static void HPAddDevice(struct udev_device *dev)
 	else
 		bInterfaceNumber = 0;
 
-	asprintf(&deviceName, "usb:%04x/%04x:libudev:%d:%s",
+	i = asprintf(&deviceName, "usb:%04x/%04x:libudev:%d:%s",
 		driver->manuID, driver->productID, bInterfaceNumber, devpath);
+	if (-1 ==  i)
+	{
+		Log1(PCSC_LOG_ERROR, "asprintf() failed");
+		return;
+	}
 
 	/* find a free entry */
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -472,7 +477,12 @@ static void HPAddDevice(struct udev_device *dev)
 		char *result;
 
 		/* create a new name */
-		asprintf(&result, "%s [%s]", fullname, sInterfaceName);
+		i= asprintf(&result, "%s [%s]", fullname, sInterfaceName);
+		if (-1 ==  i)
+		{
+			Log1(PCSC_LOG_ERROR, "asprintf() failed");
+			goto exit;
+		}
 
 		free(fullname);
 		fullname = result;
@@ -488,7 +498,12 @@ static void HPAddDevice(struct udev_device *dev)
 			char *result;
 
 			/* create a new name */
-			asprintf(&result, "%s (%s)", fullname, sSerialNumber);
+			i = asprintf(&result, "%s (%s)", fullname, sSerialNumber);
+			if (-1 ==  i)
+			{
+				Log1(PCSC_LOG_ERROR, "asprintf() failed");
+				goto exit;
+			}
 
 			free(fullname);
 			fullname = result;
@@ -524,6 +539,7 @@ static void HPAddDevice(struct udev_device *dev)
 		}
 	}
 
+exit:
 	free(fullname);
 	free(deviceName);
 } /* HPAddDevice */
