@@ -3218,6 +3218,7 @@ error:
  * SCardGetContextTH().
  *
  * @param[in] hContext Application Context whose index will be find.
+ * @param[in] lock if TRUE then the context (if available)
  *
  * @return Index corresponding to the Application Context or -1 if it is
  * not found.
