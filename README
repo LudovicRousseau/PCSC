@@ -112,6 +112,3 @@ directory.  For questions, please email me at:
 On some plateforms (GNU/Linux on mips and mipsel, FreeBSD and possibly
 other *BSD suystems) you must use:
 $ ./configure LDFLAGS="-lpthread"
-
- $Id$
-

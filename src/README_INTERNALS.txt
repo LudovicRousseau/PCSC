@@ -226,8 +226,6 @@ Inter-thread communication:
     /* Set the thread to 0 to exit thread */
 	rContext->dwLockId = 0xFFFF;
 
-
-$Id$
 -- 
 Ludovic Rousseau <ludovic.rouseau@free.fr>
 
