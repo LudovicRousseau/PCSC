@@ -375,7 +375,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 
 static void HPAddDevice(struct udev_device *dev)
 {
-	int i, a;
+	int index, a;
 	char *deviceName = NULL;
 	char *fullname = NULL;
 	struct _driverTracker *driver, *classdriver;
@@ -424,9 +424,9 @@ static void HPAddDevice(struct udev_device *dev)
 	}
 
 	/* check for duplicated add */
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (index=0; index<PCSCLITE_MAX_READERS_CONTEXTS; index++)
 	{
-		if (readerTracker[i].fullName && !strcmp(sysname, readerTracker[i].sysname))
+		if (readerTracker[index].fullName && !strcmp(sysname, readerTracker[index].sysname))
 			return;
 	}
 
@@ -447,16 +447,16 @@ static void HPAddDevice(struct udev_device *dev)
 	}
 
 	/* find a free entry */
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (index=0; index<PCSCLITE_MAX_READERS_CONTEXTS; index++)
 	{
-		if (NULL == readerTracker[i].fullName)
+		if (NULL == readerTracker[index].fullName)
 			break;
 	}
 
-	if (PCSCLITE_MAX_READERS_CONTEXTS == i)
+	if (PCSCLITE_MAX_READERS_CONTEXTS == index)
 	{
 		Log2(PCSC_LOG_ERROR,
-			"Not enough reader entries. Already found %d readers", i);
+			"Not enough reader entries. Already found %d readers", index);
 		return;
 	}
 
@@ -508,11 +508,11 @@ static void HPAddDevice(struct udev_device *dev)
 		}
 	}
 
-	readerTracker[i].fullName = strdup(fullname);
-	readerTracker[i].devpath = strdup(devpath);
-	readerTracker[i].sysname = strdup(sysname);
+	readerTracker[index].fullName = strdup(fullname);
+	readerTracker[index].devpath = strdup(devpath);
+	readerTracker[index].sysname = strdup(sysname);
 
-	ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + i,
+	ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + index,
 		driver->libraryPath, deviceName);
 	if ((SCARD_S_SUCCESS != ret) && (SCARD_E_UNKNOWN_READER != ret))
 	{
@@ -522,7 +522,7 @@ static void HPAddDevice(struct udev_device *dev)
 		if (classdriver && driver != classdriver)
 		{
 			/* the reader can also be used by the a class driver */
-			ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + i,
+			ret = RFAddReader(fullname, PCSCLITE_HP_BASE_PORT + index,
 				classdriver->libraryPath, deviceName);
 			if ((SCARD_S_SUCCESS != ret) && (SCARD_E_UNKNOWN_READER != ret))
 			{
@@ -540,12 +540,12 @@ static void HPAddDevice(struct udev_device *dev)
 	if (SCARD_S_SUCCESS != ret)
 	{
 		/* adding the reader failed */
-		free(readerTracker[i].devpath);
-		readerTracker[i].devpath = NULL;
-		free(readerTracker[i].fullName);
-		readerTracker[i].fullName = NULL;
-		free(readerTracker[i].sysname);
-		readerTracker[i].sysname = NULL;
+		free(readerTracker[index].devpath);
+		readerTracker[index].devpath = NULL;
+		free(readerTracker[index].fullName);
+		readerTracker[index].fullName = NULL;
+		free(readerTracker[index].sysname);
+		readerTracker[index].sysname = NULL;
 	}
 
 exit:
