@@ -375,7 +375,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 
 static void HPAddDevice(struct udev_device *dev)
 {
-	int i;
+	int i, a;
 	char *deviceName = NULL;
 	char *fullname = NULL;
 	struct _driverTracker *driver, *classdriver;
@@ -438,9 +438,9 @@ static void HPAddDevice(struct udev_device *dev)
 	else
 		bInterfaceNumber = 0;
 
-	i = asprintf(&deviceName, "usb:%04x/%04x:libudev:%d:%s",
+	a = asprintf(&deviceName, "usb:%04x/%04x:libudev:%d:%s",
 		driver->manuID, driver->productID, bInterfaceNumber, devpath);
-	if (-1 ==  i)
+	if (-1 ==  a)
 	{
 		Log1(PCSC_LOG_ERROR, "asprintf() failed");
 		return;
@@ -475,8 +475,8 @@ static void HPAddDevice(struct udev_device *dev)
 		char *result;
 
 		/* create a new name */
-		i= asprintf(&result, "%s [%s]", fullname, sInterfaceName);
-		if (-1 ==  i)
+		a = asprintf(&result, "%s [%s]", fullname, sInterfaceName);
+		if (-1 ==  a)
 		{
 			Log1(PCSC_LOG_ERROR, "asprintf() failed");
 			goto exit;
@@ -496,8 +496,8 @@ static void HPAddDevice(struct udev_device *dev)
 			char *result;
 
 			/* create a new name */
-			i = asprintf(&result, "%s (%s)", fullname, sSerialNumber);
-			if (-1 ==  i)
+			a = asprintf(&result, "%s (%s)", fullname, sSerialNumber);
+			if (-1 ==  a)
 			{
 				Log1(PCSC_LOG_ERROR, "asprintf() failed");
 				goto exit;
