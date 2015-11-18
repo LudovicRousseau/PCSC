@@ -537,6 +537,17 @@ static void HPAddDevice(struct udev_device *dev)
 		}
 	}
 
+	if (SCARD_S_SUCCESS != ret)
+	{
+		/* adding the reader failed */
+		free(readerTracker[i].devpath);
+		readerTracker[i].devpath = NULL;
+		free(readerTracker[i].fullName);
+		readerTracker[i].fullName = NULL;
+		free(readerTracker[i].sysname);
+		readerTracker[i].sysname = NULL;
+	}
+
 exit:
 	free(fullname);
 	free(deviceName);
