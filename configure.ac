@@ -370,6 +370,17 @@ AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configuration
 	[confdir="${enableval}"],
 	[confdir="${sysconfdir}/reader.conf.d"])
 
+# --enable-filter
+AC_ARG_ENABLE(filter,
+  AS_HELP_STRING([--enable-filter],[allow to filter readers using
+				  PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES]),
+  [ use_filter="${enableval}" ], [ use_filter="no" ])
+
+if test x$use_filter = xyes; then
+  AC_DEFINE(FILTER_NAMES, 1, [Filter reader names])
+  PCSCLITE_FEATURES="${PCSCLITE_FEATURES} filter"
+fi
+
 # Setup dist stuff
 AC_SUBST(usbdropdir)
 AC_SUBST(ipcdir)
@@ -420,6 +431,7 @@ use serial:             ${use_serial}
 use usb:                ${use_usb}
 systemd unit directory: ${with_systemdsystemunitdir}
 serial config dir.:     ${confdir_exp}
+filter:                 ${use_filter}
 
 PCSCLITE_FEATURES:      ${PCSCLITE_FEATURES}
 

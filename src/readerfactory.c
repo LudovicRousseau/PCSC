@@ -168,6 +168,45 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	if ((readerNameLong == NULL) || (library == NULL) || (device == NULL))
 		return SCARD_E_INVALID_VALUE;
 
+#ifdef FILTER_NAMES
+	const char *ro_filter = getenv("PCSCLITE_FILTER_IGNORE_READER_NAMES");
+	if (ro_filter)
+	{
+		char *filter, *next;
+
+		/* get a RW copy of the env string */
+		filter = alloca(strlen(ro_filter)+1);
+		strcpy(filter, ro_filter);
+
+		while (filter)
+		{
+			/* ':' is the separator */
+			next = strchr(filter, ':');
+			if (next)
+			{
+				/* NUL terminate the current pattern */
+				*next = '\0';
+			}
+
+			/* if filter is non empty and found in the reader name */
+			if (*filter && strstr(readerNameLong, filter))
+			{
+				Log3(PCSC_LOG_ERROR,
+					"Reader name \"%s\" contains \"%s\": ignored",
+					readerNameLong, filter);
+				return SCARD_E_READER_UNAVAILABLE;
+			}
+
+			if (next)
+				/* next pattern */
+				filter = next+1;
+			else
+				/* end */
+				filter = NULL;
+		}
+	}
+#endif
+
 	/* allocate memory that is automatically freed */
 	readerName = alloca(strlen(readerNameLong)+1);
 	strcpy(readerName, readerNameLong);
@@ -535,9 +574,19 @@ LONG RFRemoveReader(const char *readerName, int port)
 {
 	char lpcStripReader[MAX_READERNAME];
 	int i;
+#ifdef FILTER_NAMES
+	const char *extend;
+#endif
+	int extend_size = 0;
 
 	if (readerName == NULL)
 		return SCARD_E_INVALID_VALUE;
+
+#ifdef FILTER_NAMES
+	extend = getenv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
+	if (extend)
+		extend_size = strlen(extend);
+#endif
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
@@ -546,7 +595,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 			strncpy(lpcStripReader,
 				sReadersContexts[i]->readerState->readerName,
 				sizeof(lpcStripReader));
-			lpcStripReader[strlen(lpcStripReader) - 6] = 0;
+			lpcStripReader[strlen(lpcStripReader) - 6 - extend_size] = 0;
 
 			/* Compare only the significant part of the reader name */
 			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
@@ -648,6 +697,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	int supportedChannels = 0;
 	int usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
 	int i;
+	const char *extend = "";
 
 	/* Clear the list */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -738,9 +788,15 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 		}
 	}
 
+#ifdef FILTER_NAMES
+	extend = getenv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
+	if (NULL == extend)
+		extend = "";
+#endif
+
 	snprintf(rContext->readerState->readerName,
-		sizeof(rContext->readerState->readerName), "%s %02X 00",
-		readerName, i);
+		sizeof(rContext->readerState->readerName), "%s%s %02X 00",
+		readerName, extend, i);
 
 	/* Set the slot in 0xDDDDCCCC */
 	rContext->slot = i << 16;
