@@ -1,3 +1,11 @@
+1.8.15: Ludovic Rousseau
+25 December 2015
+- Add support of remove and/or customize PC/SC reader names using
+  PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES
+  See http://ludovicrousseau.blogspot.fr/2015/12/remove-andor-customize-pcsc-reader-names.html
+- Some other minor improvements and bug corrections
+
+
 1.8.14: Ludovic Rousseau
 5 August 2015
 - Threading: lock the PC/SC context in a safe way
