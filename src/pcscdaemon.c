@@ -796,7 +796,7 @@ static void print_version (void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@musclecard.com>.\n");
-	printf("Copyright (C) 2001-2011 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
+	printf("Copyright (C) 2001-2015 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
 	printf("Copyright (C) 2003-2004 by Damien Sauveron <sauveron@labri.fr>.\n");
 	printf("Report bugs to <pcsclite-muscle@lists.alioth.debian.org>.\n");
 
