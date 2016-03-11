@@ -2323,6 +2323,8 @@ end:
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
+ * @retval SCARD_E_UNSUPPORTED_FEATURE the \p dwAttrId attribute is not supported by the driver (\ref SCARD_E_UNSUPPORTED_FEATURE)
+ * @retval SCARD_E_NOT_TRANSACTED the driver returned an error (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbAttrLen is too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
