@@ -2541,17 +2541,18 @@ end:
  *
  * The card responds from the APDU and stores this response in \p pbRecvBuffer
  * and its length in \p pcbRecvLength.
+ *
  * \p pioSendPci and \p pioRecvPci are structures containing the following:
  * @code
  * typedef struct {
- *    DWORD dwProtocol;    // SCARD_PROTOCOL_T0 or SCARD_PROTOCOL_T1
+ *    DWORD dwProtocol;    // SCARD_PROTOCOL_T0, SCARD_PROTOCOL_T1 or SCARD_PROTOCOL_RAW
  *    DWORD cbPciLength;   // Length of this structure
  * } SCARD_IO_REQUEST;
  * @endcode
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param[in,out] pioSendPci Structure of Protocol Control Information.
+ * @param[in] pioSendPci Structure of Protocol Control Information.
  * - \ref SCARD_PCI_T0 - Predefined T=0 PCI structure.
  * - \ref SCARD_PCI_T1 - Predefined T=1 PCI structure.
  * - \ref SCARD_PCI_RAW - Predefined RAW PCI structure.
