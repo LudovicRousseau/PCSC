@@ -127,10 +127,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Display, on stderr, a trace of the WinSCard calls with arguments and
  * results */
-#undef DO_TRACE
+//#define DO_TRACE
 
 /* Profile the execution time of WinSCard calls */
-#undef DO_PROFILE
+//#define DO_PROFILE
 
 
 /** used for backward compatibility */
