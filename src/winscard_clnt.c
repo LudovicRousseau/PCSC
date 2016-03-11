@@ -2558,7 +2558,7 @@ end:
  * - \ref SCARD_PCI_RAW - Predefined RAW PCI structure.
  * @param[in] pbSendBuffer APDU to send to the card.
  * @param[in] cbSendLength Length of the APDU.
- * @param[in,out] pioRecvPci Structure of protocol information.
+ * @param[in,out] pioRecvPci Structure of protocol information. This parameter can be NULL if no PCI is returned.
  * @param[out] pbRecvBuffer Response from the card.
  * @param[in,out] pcbRecvLength Length of the response.
  *
@@ -2581,7 +2581,6 @@ end:
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
  * DWORD dwActiveProtocol, dwSendLength, dwRecvLength;
- * SCARD_IO_REQUEST pioRecvPci;
  * BYTE pbRecvBuffer[10];
  * BYTE pbSendBuffer[] = { 0xC0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00 };
  * ...
@@ -2591,7 +2590,7 @@ end:
  * dwSendLength = sizeof(pbSendBuffer);
  * dwRecvLength = sizeof(pbRecvBuffer);
  * rv = SCardTransmit(hCard, SCARD_PCI_T0, pbSendBuffer, dwSendLength,
- *          &pioRecvPci, pbRecvBuffer, &dwRecvLength);
+ *          NULL, pbRecvBuffer, &dwRecvLength);
  * @endcode
  */
 LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
