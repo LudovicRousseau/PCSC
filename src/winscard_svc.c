@@ -580,6 +580,10 @@ static void ContextThread(LPVOID newContext)
 				{
 					uint32_t fd = psTargetContext->dwClientID;
 					caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
+
+					/* the client should not receive the event
+					 * notification now the waiting has been cancelled */
+					EHUnregisterClientForEvent(fd);
 				}
 				else
 					caStr.rv = SCARD_E_INVALID_HANDLE;
