@@ -2162,7 +2162,7 @@ error:
  * SCARDHANDLE hCard;
  * DWORD dwActiveProtocol, dwSendLength, dwRecvLength;
  * BYTE pbRecvBuffer[10];
- * BYTE pbSendBuffer[] = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10 0x00 };
+ * BYTE pbSendBuffer[] = { 0x06, 0x00, 0x0A, 0x01, 0x01, 0x10, 0x00 };
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
@@ -2756,7 +2756,7 @@ end:
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * dwReaders = SCARD_AUTOALLOCATE
+ * dwReaders = SCARD_AUTOALLOCATE;
  * rv = SCardListReaders(hContext, NULL, (LPSTR)&mszReaders, &dwReaders);
  * rv = SCardFreeMemory(hContext, mszReaders);
  * @endcode
@@ -3028,12 +3028,13 @@ end:
  * LONG rv;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
- * rgReaderStates.szReader = strdup("Reader X");
+ * rgReaderStates.szReader = "Reader X";
  * rgReaderStates.dwCurrentState = SCARD_STATE_EMPTY;
+ * cReaders = 1;
+ * ...
+ * rv = SCardGetStatusChange(hContext, INFINITE, &rgReaderStates, cReaders);
  * ...
  * / * Spawn off thread for following function * /
- * ...
- * rv = SCardGetStatusChange(hContext, 0, rgReaderStates, cReaders);
  * rv = SCardCancel(hContext);
  * @endcode
  */
