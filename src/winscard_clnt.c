@@ -2919,7 +2919,7 @@ LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid Scope Handle (\ref SCARD_E_INVALID_HANDLE)
- * @retval SCARD_E_INVALID_PARAMETER \p mszGroups is NULL (\ref SCARD_E_INVALID_PARAMETER)
+ * @retval SCARD_E_INVALID_PARAMETER \p mszGroups is NULL and \p *pcchGroups == \ref SCARD_AUTOALLOCATE (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
  * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  *
