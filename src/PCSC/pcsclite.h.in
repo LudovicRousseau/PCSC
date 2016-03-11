@@ -234,6 +234,7 @@ extern const SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 #define SCARD_SCOPE_USER		0x0000	/**< Scope in user space */
 #define SCARD_SCOPE_TERMINAL		0x0001	/**< Scope in terminal */
 #define SCARD_SCOPE_SYSTEM		0x0002	/**< Scope in system */
+#define SCARD_SCOPE_GLOBAL		0x0003	/**< Scope is global */
 
 #define SCARD_PROTOCOL_UNDEFINED	0x0000	/**< protocol not set */
 #define SCARD_PROTOCOL_UNSET SCARD_PROTOCOL_UNDEFINED	/* backward compat */
