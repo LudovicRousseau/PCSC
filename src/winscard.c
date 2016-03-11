@@ -1250,7 +1250,7 @@ exit:
 	return rv;
 }
 
-LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR szReaderNames,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1259,7 +1259,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 
 	/* These parameters are not used by the client
 	 * Client side code uses readerStates[] instead */
-	(void)mszReaderNames;
+	(void)szReaderNames;
 	(void)pcchReaderLen;
 	(void)pdwState;
 	(void)pdwProtocol;

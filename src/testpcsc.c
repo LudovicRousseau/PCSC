@@ -80,7 +80,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
 	DWORD dwPref, dwReaders = 0;
-	char *pcReaders = NULL, *mszReaders;
+	char *pcReader = NULL, *mszReaders;
 #ifdef USE_AUTOALLOCATE
 	unsigned char *pbAtr = NULL;
 #else
@@ -426,19 +426,19 @@ wait_for_card_again:
 #ifdef USE_AUTOALLOCATE
 	dwReaderLen = SCARD_AUTOALLOCATE;
 	dwAtrLen = SCARD_AUTOALLOCATE;
-	rv = SCardStatus(hCard, (LPSTR)&pcReaders, &dwReaderLen, &dwState, &dwProt,
+	rv = SCardStatus(hCard, (LPSTR)&pcReader, &dwReaderLen, &dwState, &dwProt,
 		(LPBYTE)&pbAtr, &dwAtrLen);
 #else
 	dwReaderLen = 100;
-	pcReaders   = malloc(sizeof(char) * 100);
+	pcReader    = malloc(sizeof(char) * 100);
 	dwAtrLen    = MAX_ATR_SIZE;
 
-	rv = SCardStatus(hCard, pcReaders, &dwReaderLen, &dwState, &dwProt,
+	rv = SCardStatus(hCard, pcReader, &dwReaderLen, &dwState, &dwProt,
 		pbAtr, &dwAtrLen);
 #endif
 	test_rv(rv, hContext, PANIC);
 
-	printf("Current Reader Name\t\t: " GREEN "%s\n" NORMAL, pcReaders);
+	printf("Current Reader Name\t\t: " GREEN "%s\n" NORMAL, pcReader);
 	printf("Current Reader State\t\t: " GREEN "0x%.4lx\n" NORMAL, dwState);
 	printf("Current Reader Protocol\t\t: T=" GREEN "%ld\n" NORMAL, dwProt - 1);
 	printf("Current Reader ATR Size\t\t: " GREEN "%ld" NORMAL " bytes\n",
@@ -453,14 +453,14 @@ wait_for_card_again:
 
 #ifdef USE_AUTOALLOCATE
 	printf("Testing SCardFreeMemory\t\t: ");
-	rv = SCardFreeMemory(hContext, pcReaders);
+	rv = SCardFreeMemory(hContext, pcReader);
 	test_rv(rv, hContext, PANIC);
 	printf("Testing SCardFreeMemory\t\t: ");
 	rv = SCardFreeMemory(hContext, pbAtr);
 	test_rv(rv, hContext, PANIC);
 #else
-	if (pcReaders)
-		free(pcReaders);
+	if (pcReader)
+		free(pcReader);
 #endif
 
 	if (rv != SCARD_S_SUCCESS)

@@ -1277,7 +1277,7 @@ end:
  * SCardStatus().
  *
  * If \c *pcchReaderLen is equal to \ref SCARD_AUTOALLOCATE then the function
- * will allocate itself the needed memory for mszReaderName. Use
+ * will allocate itself the needed memory for szReaderName. Use
  * SCardFreeMemory() to release it.
  *
  * If \c *pcbAtrLen is equal to \ref SCARD_AUTOALLOCATE then the function will
@@ -1286,8 +1286,8 @@ end:
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
- * @param[in,out] mszReaderName Friendly name of this reader.
- * @param[in,out] pcchReaderLen Size of the \p szReaderName multistring.
+ * @param[in,out] szReaderName Friendly name of this reader.
+ * @param[in,out] pcchReaderLen Size of the \p szReaderName.
  * @param[out] pdwState Current state of this reader. \p pdwState
  * is a DWORD possibly OR'd with the following values:
  * - \ref SCARD_ABSENT - There is no card in the reader.
@@ -1353,7 +1353,7 @@ end:
  *          &dwProtocol, (LPBYTE)&pbAtr, &dwAtrLen);
  * @endcode
  */
-LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderName,
+LONG SCardStatus(SCARDHANDLE hCard, LPSTR szReaderName,
 	LPDWORD pcchReaderLen, LPDWORD pdwState,
 	LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
 {
@@ -1473,7 +1473,7 @@ retry:
 	if (SCARD_AUTOALLOCATE == dwReaderLen)
 	{
 		dwReaderLen = *pcchReaderLen;
-		if (NULL == mszReaderName)
+		if (NULL == szReaderName)
 		{
 			rv = SCARD_E_INVALID_PARAMETER;
 			goto end;
@@ -1484,10 +1484,10 @@ retry:
 			rv = SCARD_E_NO_MEMORY;
 			goto end;
 		}
-		*(char **)mszReaderName = bufReader;
+		*(char **)szReaderName = bufReader;
 	}
 	else
-		bufReader = mszReaderName;
+		bufReader = szReaderName;
 
 	/* return SCARD_E_INSUFFICIENT_BUFFER only if buffer pointer is non NULL */
 	if (bufReader)
