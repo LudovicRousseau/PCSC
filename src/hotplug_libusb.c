@@ -263,19 +263,17 @@ static LONG HPReadBundleValues(void)
 	driverSize = listCount;
 	closedir(hpDir);
 
-	rv = TRUE;
 	if (driverSize == 0)
 	{
 		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
 		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
-		rv = FALSE;
 	}
 #ifdef DEBUG_HOTPLUG
 	else
 		Log2(PCSC_LOG_INFO, "Found drivers for %d readers", listCount);
 #endif
 
-	return rv;
+	return driverSize;
 }
 
 static void HPRescanUsbBus(void)
@@ -490,7 +488,7 @@ LONG HPSearchHotPluggables(void)
 		readerTracker[i].fullName = NULL;
 	}
 
-	if (HPReadBundleValues())
+	if (HPReadBundleValues() > 0)
 	{
 		int pipefd[2];
 		char c;
