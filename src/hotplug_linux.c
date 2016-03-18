@@ -225,7 +225,7 @@ end:
 	}
 
 	closedir(hpDir);
-	return 0;
+	return bundleSize;
 }
 
 static void HPEstablishUSBNotifications(void)
@@ -425,10 +425,9 @@ LONG HPSearchHotPluggables(void)
 			bundleTracker[i].deviceNumber[j].id = 0;
 	}
 
-	HPReadBundleValues();
-
-	ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
-		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
+	if (HPReadBundleValues() > 0)
+		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, 0);
 
 	return 0;
 }
