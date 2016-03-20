@@ -1,3 +1,16 @@
+1.8.16: Ludovic Rousseau
+20 March 2016
+- SCardCancel() was not correctly handled
+  When a SCardGetStatusChange() was cancelled then a next PC/SC call
+  after the SCardGetStatusChange() may fail with a strange error code if
+  the event waited in SCardGetStatusChange() occurs.
+- Doxygen: fix different documentation issues
+- SCARD_SCOPE_GLOBAL is now defined in a public header (even if never used)
+- Enable Trace and Profile features using compiler flags and without
+  modifying the source code
+- Some other minor improvements and bug corrections
+
+
 1.8.15: Ludovic Rousseau
 25 December 2015
 - Add support of remove and/or customize PC/SC reader names using
