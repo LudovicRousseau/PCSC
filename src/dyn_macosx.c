@@ -114,6 +114,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
 	int mayfail)
 {
+	(void)mayfail;
 
 	CFBundleRef bundle = (CFBundleRef) pvLHandle;
 	CFStringRef cfName = CFStringCreateWithCString(NULL, pcFunction,
