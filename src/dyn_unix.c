@@ -47,7 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "debuglog.h"
 #include "dyn_generic.h"
 
-INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+INTERNAL LONG DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
 	*pvLHandle = NULL;
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -63,7 +63,7 @@ INTERNAL int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	return SCARD_S_SUCCESS;
 }
 
-INTERNAL int DYN_CloseLibrary(void **pvLHandle)
+INTERNAL LONG DYN_CloseLibrary(void **pvLHandle)
 {
 #ifndef PCSCLITE_STATIC_DRIVER
 	int ret;
@@ -81,11 +81,11 @@ INTERNAL int DYN_CloseLibrary(void **pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-INTERNAL int DYN_GetAddress(void *pvLHandle, void **pvFHandle,
+INTERNAL LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle,
 	const char *pcFunction, int mayfail)
 {
 	char pcFunctionName[256];
-	int rv = SCARD_S_SUCCESS;
+	LONG rv = SCARD_S_SUCCESS;
 
 	/* Some platforms might need a leading underscore for the symbol */
 	(void)snprintf(pcFunctionName, sizeof(pcFunctionName), "_%s", pcFunction);

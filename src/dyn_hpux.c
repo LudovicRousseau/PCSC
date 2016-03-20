@@ -45,7 +45,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "debuglog.h"
 #include "dyn_generic.h"
 
-int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+LONG DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 {
 
 	shl_t myHandle;
@@ -65,7 +65,7 @@ int DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	return SCARD_S_SUCCESS;
 }
 
-int DYN_CloseLibrary(void **pvLHandle)
+LONG DYN_CloseLibrary(void **pvLHandle)
 {
 
 	int rv;
@@ -82,7 +82,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
+LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
 	int mayfail)
 {
 
