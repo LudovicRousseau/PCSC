@@ -2319,6 +2319,10 @@ end:
  * - \ref SCARD_ATTR_VENDOR_IFD_VERSION
  * - \ref SCARD_ATTR_VENDOR_NAME
  * @param[out] pbAttr Pointer to a buffer that receives the attribute.
+ * If this value is NULL, SCardGetAttrib() ignores the buffer length
+ * supplied in \p pcbAttrLen, writes the length of the buffer that would
+ * have been returned if this parameter had not been NULL to \p pcbAttrLen,
+ * and returns a success code.
  * @param[in,out] pcbAttrLen Length of the \p pbAttr buffer in bytes.
  *
  * @return Error code.
@@ -2340,14 +2344,19 @@ end:
  * SCARDCONTEXT hContext;
  * SCARDHANDLE hCard;
  * DWORD dwActiveProtocol;
- * unsigned char pbAtr[MAX_ATR_SIZE];
- * DWORD dwAtrLen;
+ * unsigned char *pbAttr;
+ * DWORD dwAttrLen;
  * ...
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardConnect(hContext, "Reader X", SCARD_SHARE_SHARED,
  *          SCARD_PROTOCOL_RAW, &hCard, &dwActiveProtocol);
- * dwAtrLen = sizeof(pbAtr);
- * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+ * rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, NULL, &dwAttrLen);
+ * if (SCARD_S_SUCCESS == rv)
+ * {
+ *     pbAttr = malloc(dwAttrLen);
+ *     rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAttr, &dwAttrLen);
+ *     free(pbAttr);
+ * }
  * @endcode
  *
  * @code
