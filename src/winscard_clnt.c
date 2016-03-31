@@ -2323,14 +2323,14 @@ end:
  * supplied in \p pcbAttrLen, writes the length of the buffer that would
  * have been returned if this parameter had not been NULL to \p pcbAttrLen,
  * and returns a success code.
- * @param[in,out] pcbAttrLen Length of the \p pbAttr buffer in bytes.
+ * @param[in,out] pcbAttrLen Length of the \p pbAttr buffer in bytes and receives the actual length of the received attribute.
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_UNSUPPORTED_FEATURE the \p dwAttrId attribute is not supported by the driver (\ref SCARD_E_UNSUPPORTED_FEATURE)
  * @retval SCARD_E_NOT_TRANSACTED the driver returned an error (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbAttrLen is too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
- * @retval SCARD_E_INSUFFICIENT_BUFFER Reader buffer not large enough (\ref SCARD_E_INSUFFICIENT_BUFFER)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER \p pbAttr buffer not large enough. In that case the expected buffer size is indicated in \p *pcbAttrLen (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER A parameter is NULL and should not (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
