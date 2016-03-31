@@ -2499,11 +2499,16 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 
 	scGetSetStruct.hCard = hCard;
 	scGetSetStruct.dwAttrId = dwAttrId;
-	scGetSetStruct.cbAttrLen = *pcbAttrLen;
 	scGetSetStruct.rv = SCARD_E_NO_SERVICE;
 	memset(scGetSetStruct.pbAttr, 0, sizeof(scGetSetStruct.pbAttr));
 	if (SCARD_SET_ATTRIB == command)
+	{
 		memcpy(scGetSetStruct.pbAttr, pbAttr, *pcbAttrLen);
+		scGetSetStruct.cbAttrLen = *pcbAttrLen;
+	}
+	else
+		/* we can get up to the communication buffer size */
+		scGetSetStruct.cbAttrLen = sizeof scGetSetStruct.pbAttr;
 
 	rv = MessageSendWithHeader(command, currentContextMap->dwClientID,
 		sizeof(scGetSetStruct), &scGetSetStruct);
@@ -2527,7 +2532,12 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		 */
 		if (*pcbAttrLen < scGetSetStruct.cbAttrLen)
 		{
+			/* restrict the value of scGetSetStruct.cbAttrLen to avoid a
+			 * buffer overflow in the memcpy() bellow */
+			DWORD correct_value = scGetSetStruct.cbAttrLen;
 			scGetSetStruct.cbAttrLen = *pcbAttrLen;
+			*pcbAttrLen = correct_value;
+
 			scGetSetStruct.rv = SCARD_E_INSUFFICIENT_BUFFER;
 		}
 		else
