@@ -290,7 +290,9 @@ int DBGetReaderListDir(const char *readerconf_dir,
 				readerconf_dir, direntry->d_name);
 
 			/* skip non regular files */
+#ifndef __sun
 			if (direntry->d_type == DT_UNKNOWN)
+#endif
 			{
 				struct stat st;
 
@@ -308,6 +310,7 @@ int DBGetReaderListDir(const char *readerconf_dir,
 					continue;
 				}
 			}
+#ifndef __sun
 			else
 				if (direntry->d_type != DT_REG)
 				{
@@ -315,7 +318,7 @@ int DBGetReaderListDir(const char *readerconf_dir,
 						direntry->d_name);
 					continue;
 				}
-
+#endif
 			/* skip files starting with . like ., .., .svn, etc */
 			if ('.' == direntry->d_name[0])
 			{
