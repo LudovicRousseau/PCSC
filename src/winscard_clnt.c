@@ -794,6 +794,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
+	memset(scConnectStruct.szReader, 0, sizeof scConnectStruct.szReader);
 	strncpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
 	scConnectStruct.szReader[sizeof scConnectStruct.szReader -1] = '\0';
 
