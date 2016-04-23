@@ -49,6 +49,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include "alloca.h"
 
 #include "misc.h"
 #include "pcscd.h"
