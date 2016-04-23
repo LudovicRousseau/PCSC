@@ -62,6 +62,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "configfile.h"
 #include "utils.h"
 
+#ifdef __sun
+#include <alloca.h>
+#endif
+
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0

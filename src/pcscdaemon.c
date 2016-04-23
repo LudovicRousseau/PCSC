@@ -400,7 +400,7 @@ int main(int argc, char **argv)
 				Log1(PCSC_LOG_CRITICAL,
 					"file " PCSCLITE_CSOCK_NAME " already exists.");
 				Log2(PCSC_LOG_CRITICAL,
-					"Another pcscd (pid: %d) seems to be running.", pid);
+					"Another pcscd (pid: %d) seems to be running.", (int)pid);
 				return EXIT_FAILURE;
 			}
 			else
