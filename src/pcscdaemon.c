@@ -81,6 +81,7 @@ char SocketActivated = FALSE;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
 static int pipefd[] = {-1, -1};
+static int signal_handler_fd[] = {-1, -1};
 char Add_Serial_In_Name = TRUE;
 char Add_Interface_In_Name = TRUE;
 
@@ -89,7 +90,6 @@ char Add_Interface_In_Name = TRUE;
  */
 static void at_exit(void);
 static void clean_temp_files(void);
-static void signal_reload(int sig);
 static void signal_trap(int);
 static void print_version (void);
 static void print_usage (char const * const);
@@ -152,6 +152,10 @@ static void SVCServiceRunLoop(void)
 			/* Nothing to do in case of a syscall interrupted
 			 * It happens when SIGUSR1 (reload) or SIGINT (Ctrl-C) is received
 			 * We just try again */
+
+			/* we wait a bit so that the signal handler thread can do
+			 * its job and set AraKiri if needed */
+			SYS_USleep(1000);
 			break;
 
 		default:
@@ -161,6 +165,93 @@ static void SVCServiceRunLoop(void)
 		}
 	}
 }
+
+/**
+ * thread dedicated to handle signals
+ *
+ * a signal handler can not call any function. See signal(7) for a list
+ * of function that are safe to call from a signal handler.
+ * The functions syslog(), gettimeofday() and remove() are NOT safe.
+ */
+static void *signal_thread(void *arg)
+{
+	(void)arg;
+
+	while (TRUE)
+	{
+		int r;
+		int sig;
+
+		r = read(signal_handler_fd[0], &sig, sizeof sig);
+		if (r < 0)
+		{
+			Log2(PCSC_LOG_ERROR, "read failed: %s", strerror(errno));
+			return NULL;
+		}
+
+		Log2(PCSC_LOG_INFO, "Received signal: %d", sig);
+
+		/* signal for hotplug */
+		if (SIGUSR1 == sig)
+		{
+#ifdef USE_USB
+			if (! AraKiri)
+				HPReCheckSerialReaders();
+#endif
+			/* Reenable the signal handler.
+			 * This is needed on Solaris and HPUX. */
+			(void)signal(SIGUSR1, signal_trap);
+
+			continue;
+		}
+
+		/* do not wait if asked to terminate
+		 * avoids waiting after the reader(s) in shutdown for example */
+		if (SIGTERM == sig)
+		{
+			Log1(PCSC_LOG_INFO, "Direct suicide");
+			at_exit();
+		}
+
+		if (SIGALRM == sig)
+		{
+			/* normal exit without error */
+			ExitValue = EXIT_SUCCESS;
+		}
+
+		/* the signal handler is called several times for the same Ctrl-C */
+		if (AraKiri == FALSE)
+		{
+			Log1(PCSC_LOG_INFO, "Preparing for suicide");
+			AraKiri = TRUE;
+
+			/* if still in the init/loading phase the AraKiri will not be
+			 * seen by the main event loop
+			 */
+			if (Init)
+			{
+				Log1(PCSC_LOG_INFO, "Suicide during init");
+				at_exit();
+			}
+		}
+		else
+		{
+			/* if pcscd do not want to die */
+			static int lives = 2;
+
+			lives--;
+			/* no live left. Something is blocking the normal death. */
+			if (0 == lives)
+			{
+				Log1(PCSC_LOG_INFO, "Forced suicide");
+				at_exit();
+			}
+		}
+	}
+
+	return NULL;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -515,6 +606,20 @@ int main(int argc, char **argv)
 	/* exits on SIGALARM to allow pcscd to suicide if not used */
 	(void)signal(SIGALRM, signal_trap);
 
+	if (pipe(signal_handler_fd) == -1)
+	{
+		Log2(PCSC_LOG_CRITICAL, "pipe() failed: %s", strerror(errno));
+		return EXIT_FAILURE;
+	}
+
+	pthread_t signal_handler_thread;
+	rv = pthread_create(&signal_handler_thread, NULL, signal_thread, NULL);
+	if (rv)
+	{
+		Log2(PCSC_LOG_CRITICAL, "pthread_create failed: %s", strerror(rv));
+		return EXIT_FAILURE;
+	}
+
 	/*
 	 * If PCSCLITE_IPC_DIR does not exist then create it
 	 */
@@ -610,7 +715,7 @@ int main(int argc, char **argv)
 	/*
 	 * Hotplug rescan
 	 */
-	(void)signal(SIGUSR1, signal_reload);
+	(void)signal(SIGUSR1, signal_trap);
 
 	/*
 	 * Initialize the comm structure
@@ -730,66 +835,13 @@ static void clean_temp_files(void)
 			strerror(errno));
 }
 
-static void signal_reload(/*@unused@*/ int sig)
-{
-	(void)signal(SIGUSR1, signal_reload);
-
-	(void)sig;
-
-	if (AraKiri)
-		return;
-
-#ifdef USE_USB
-	HPReCheckSerialReaders();
-#endif
-} /* signal_reload */
-
 static void signal_trap(int sig)
 {
-	Log2(PCSC_LOG_INFO, "Received signal: %d", sig);
+	int r;
 
-	/* do not wait if asked to terminate
-	 * avoids waiting after the reader(s) in shutdown for example */
-	if (SIGTERM == sig)
-	{
-		Log1(PCSC_LOG_INFO, "Direct suicide");
-		at_exit();
-	}
-
-	if (SIGALRM == sig)
-	{
-		/* normal exit without error */
-		ExitValue = EXIT_SUCCESS;
-	}
-
-	/* the signal handler is called several times for the same Ctrl-C */
-	if (AraKiri == FALSE)
-	{
-		Log1(PCSC_LOG_INFO, "Preparing for suicide");
-		AraKiri = TRUE;
-
-		/* if still in the init/loading phase the AraKiri will not be
-		 * seen by the main event loop
-		 */
-		if (Init)
-		{
-			Log1(PCSC_LOG_INFO, "Suicide during init");
-			at_exit();
-		}
-	}
-	else
-	{
-		/* if pcscd do not want to die */
-		static int lives = 2;
-
-		lives--;
-		/* no live left. Something is blocking the normal death. */
-		if (0 == lives)
-		{
-			Log1(PCSC_LOG_INFO, "Forced suicide");
-			at_exit();
-		}
-	}
+	r = write(signal_handler_fd[1], &sig, sizeof sig);
+	if (r < 0)
+		Log2(PCSC_LOG_ERROR, "write failed: %s", strerror(errno));
 }
 
 static void print_version (void)
