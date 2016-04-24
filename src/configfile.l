@@ -290,7 +290,9 @@ int DBGetReaderListDir(const char *readerconf_dir,
 				readerconf_dir, direntry->d_name);
 
 			/* skip non regular files */
+#ifdef HAVE_STRUCT_DIRENT_D_TYPE
 			if (direntry->d_type == DT_UNKNOWN)
+#endif
 			{
 				struct stat st;
 
@@ -309,7 +311,9 @@ int DBGetReaderListDir(const char *readerconf_dir,
 				}
 			}
 			else
+#ifdef HAVE_STRUCT_DIRENT_D_TYPE
 				if (direntry->d_type != DT_REG)
+#endif
 				{
 					Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
 						direntry->d_name);
