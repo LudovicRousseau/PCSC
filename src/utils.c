@@ -94,11 +94,12 @@ int SendHotplugSignal(void)
 
 	if (pid != -1)
 	{
-		Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%d)", pid);
+		Log2(PCSC_LOG_INFO, "Send hotplug signal to pcscd (pid=%ld)",
+			(long)pid);
 		if (kill(pid, SIGUSR1) < 0)
 		{
-			Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%d): %s",
-				pid, strerror(errno));
+			Log3(PCSC_LOG_CRITICAL, "Can't signal pcscd (pid=%ld): %s",
+				(long)pid, strerror(errno));
 			return EXIT_FAILURE ;
 		}
 		(void)SYS_Sleep(1);
