@@ -2,7 +2,7 @@
 
 """
 #   SCardGetAttrib.py: get SCARD_ATTR_VENDOR_IFD_SERIAL_NO PC/SC attribute
-#   Copyright (C) 2010  Ludovic Rousseau
+#   Copyright (C) 2010,2016  Ludovic Rousseau
 """
 
 #   This program is free software; you can redistribute it and/or modify
@@ -18,10 +18,12 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-# SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in revision 4956
+# SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in ccid 1.3.13
+# SCARD_ATTR_ATR_STRING support has been added in ccid 0.9.0
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
+from smartcard.util import toHexString
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -38,10 +40,14 @@ for reader in readers:
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
-    hresult, attrib = SCardGetAttrib(hcard, SCARD_ATTR_VENDOR_IFD_SERIAL_NO)
-    print reader, ":",
-    print "".join([chr(x) for x in attrib])
-    print SCardGetErrorMessage(hresult)
+    print "reader:", reader
+    for attribute in (SCARD_ATTR_VENDOR_IFD_SERIAL_NO, SCARD_ATTR_ATR_STRING):
+        hresult, attrib = SCardGetAttrib(hcard, attribute)
+        print hex(attribute),
+        if hresult != SCARD_S_SUCCESS:
+            print SCardGetErrorMessage(hresult)
+        else:
+            print attrib, toHexString(attrib)
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
