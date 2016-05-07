@@ -192,7 +192,7 @@ static void log_line(const int priority, const char *DebugBuffer)
 		}
 		fflush(stdout);
 	}
-} /* log_msg */
+} /* log_line */
 
 static void log_xxd_always(const int priority, const char *msg,
 	const unsigned char *buffer, const int len)
