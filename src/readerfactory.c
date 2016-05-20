@@ -1027,15 +1027,25 @@ LONG RFUnlockSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 	rv = RFCheckSharing(hCard, rContext);
 	if (SCARD_S_SUCCESS == rv)
 	{
-		if (rContext->LockCount > 0)
+		if (PCSCLITE_SHARING_EXCLUSIVE_CONTEXT == rContext->contexts)
 		{
-			rContext->LockCount -= 1;
-			if (0 == rContext->LockCount)
-				rContext->hLockId = 0;
+			if (rContext->LockCount > 1)
+				rContext->LockCount -= 1;
+			else
+				rv = SCARD_E_NOT_TRANSACTED;
 		}
 		else
-			/* rContext->LockCount == 0 */
-			rv = SCARD_E_NOT_TRANSACTED;
+		{
+			if (rContext->LockCount > 0)
+			{
+				rContext->LockCount -= 1;
+				if (0 == rContext->LockCount)
+					rContext->hLockId = 0;
+			}
+			else
+				/* rContext->LockCount == 0 */
+				rv = SCARD_E_NOT_TRANSACTED;
+		}
 	}
 	(void)pthread_mutex_unlock(&LockMutex);
 
