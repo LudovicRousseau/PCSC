@@ -23,7 +23,7 @@
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
-from smartcard.util import toHexString
+from smartcard.util import toHexString, toASCIIString
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -47,7 +47,7 @@ for reader in readers:
         if hresult != SCARD_S_SUCCESS:
             print SCardGetErrorMessage(hresult)
         else:
-            print attrib, toHexString(attrib)
+            print attrib, toHexString(attrib), toASCIIString(attrib)
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
