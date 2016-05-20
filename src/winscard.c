@@ -1137,6 +1137,18 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv != SCARD_S_SUCCESS)
 		goto exit;
 
+	/*
+	 * Error if another transaction is ongoing and a card action is
+	 * requested
+	 */
+	if ((dwDisposition != SCARD_LEAVE_CARD) && (rContext->hLockId != 0)
+		&& (rContext->hLockId != hCard))
+	{
+		Log1(PCSC_LOG_INFO, "No card reset within a transaction");
+		rv = SCARD_E_SHARING_VIOLATION;
+		goto exit;
+	}
+
 	if (dwDisposition == SCARD_RESET_CARD ||
 		dwDisposition == SCARD_UNPOWER_CARD)
 	{
