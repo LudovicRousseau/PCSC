@@ -1624,9 +1624,17 @@ end:
  * rgReaderStates[1].szReader = "\\\\?PnP?\\Notification";
  * rgReaderStates[1].dwCurrentState = SCARD_STATE_UNAWARE;
  * ...
+ * // Get current state
  * rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 2);
  * printf("reader state: 0x%04X\n", rgReaderStates[0].dwEventState);
  * printf("reader state: 0x%04X\n", rgReaderStates[1].dwEventState);
+ *
+ * // Wait for card insertion
+ * if (rgReaderStates[0].dwEventState & SCARD_STATE_EMPTY)
+ * {
+ *     rgReaderStates[0].dwCurrentState = rgReaderStates[0].dwEventState;
+ *     rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 2);
+ * }
  * @endcode
  */
 LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
