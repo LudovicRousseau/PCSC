@@ -1,3 +1,14 @@
+1.8.17: Ludovic Rousseau
+29 May 2016
+- Fix SCardEndTransaction() issue with a SCARD_SHARE_EXCLUSIVE connection
+- Fix an issue when used with systemd (problem in signal handler)
+- SCardGetAttrib(): set pcbAttrLen when buffer is too small
+- Doxygen: SCardGetAttrib() pbAttr can be NULL
+- Doxygen: SCardGetAttrib() *pcbAttrLen contains the buffer size
+- fix compilation warnings and link errors on SunOS
+- Some other minor improvements
+
+
 1.8.16: Ludovic Rousseau
 20 March 2016
 - SCardCancel() was not correctly handled
