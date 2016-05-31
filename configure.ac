@@ -94,7 +94,7 @@ LT_INIT
 # Checks for header files
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([getopt.h sys/filio.h syslog.h dl.h fcntl.h ])
+AC_CHECK_HEADERS([getopt.h sys/filio.h syslog.h dl.h fcntl.h alloca.h])
 
 # Checks for typedefs, structures, and compiler characteristics
 AC_C_CONST
