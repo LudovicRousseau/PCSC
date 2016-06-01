@@ -310,15 +310,15 @@ int DBGetReaderListDir(const char *readerconf_dir,
 					continue;
 				}
 			}
-			else
 #ifdef HAVE_STRUCT_DIRENT_D_TYPE
+			else
 				if (direntry->d_type != DT_REG)
-#endif
 				{
 					Log2(PCSC_LOG_DEBUG, "Skipping non regular file: %s",
 						direntry->d_name);
 					continue;
 				}
+#endif
 
 			/* skip files starting with . like ., .., .svn, etc */
 			if ('.' == direntry->d_name[0])
