@@ -168,7 +168,9 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 	if (ret)
 		goto error;
 
-	if (stack_size < 0x40000)
+	/* A stack_size of 0 indicates the default size on Solaris.
+	 * The default size is more than 256 KB so do not shrink it. */
+	if ((stack_size != 0) && (stack_size < 0x40000))
 	{
 		stack_size = 0x40000;
 		ret = pthread_attr_setstacksize(&attr, stack_size);
