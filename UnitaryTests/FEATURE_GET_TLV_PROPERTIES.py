@@ -3,7 +3,7 @@
 """
 #   FEATURE_GET_TLV_PROPERTIES.py: Unitary test for
 #   FEATURE_GET_TLV_PROPERTIES
-#   Copyright (C) 2012  Ludovic Rousseau
+#   Copyright (C) 2012,2016  Ludovic Rousseau
 
 """
 
