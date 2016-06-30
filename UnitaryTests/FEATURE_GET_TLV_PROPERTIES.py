@@ -27,16 +27,20 @@
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import getTlvProperties, SCARD_SHARE_DIRECT
 
-# use the first reader
-card_connection = readers()[0].createConnection()
-card_connection.connect(mode=SCARD_SHARE_DIRECT)
+# for each reader
+for reader in readers():
+    print
+    print "Reader:", reader
 
-# get the TLV PROPERTIES
-tlv = getTlvProperties(card_connection)
+    card_connection = reader.createConnection()
+    card_connection.connect(mode=SCARD_SHARE_DIRECT)
 
-for key in sorted(tlv):
-    if key in ["PCSCv2_PART10_PROPERTY_wIdProduct",
-            "PCSCv2_PART10_PROPERTY_wIdVendor"]:
-        print "%s: 0x%04X" % (key, tlv[key])
-    else:
-        print "%s: %s" % (key, tlv[key])
+    # get the TLV PROPERTIES
+    tlv = getTlvProperties(card_connection)
+
+    for key in sorted(tlv):
+        if key in ["PCSCv2_PART10_PROPERTY_wIdProduct",
+                "PCSCv2_PART10_PROPERTY_wIdVendor"]:
+            print "%s: 0x%04X" % (key, tlv[key])
+        else:
+            print "%s: %s" % (key, tlv[key])
