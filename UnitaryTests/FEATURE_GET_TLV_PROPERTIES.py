@@ -25,8 +25,7 @@
 # option of the CCID driver Info.plist file
 
 from smartcard.System import readers
-from smartcard.pcsc.PCSCPart10 import (getFeatureRequest, hasFeature,
-    getTlvProperties, FEATURE_CCID_ESC_COMMAND, SCARD_SHARE_DIRECT)
+from smartcard.pcsc.PCSCPart10 import getTlvProperties, SCARD_SHARE_DIRECT
 
 # use the first reader
 card_connection = readers()[0].createConnection()
