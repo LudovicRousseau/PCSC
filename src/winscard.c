@@ -190,6 +190,8 @@ static void profile_end(const char *f, int line)
 /** used for backward compatibility */
 #define SCARD_PROTOCOL_ANY_OLD	 0x1000
 
+static pthread_mutex_t LockMutex = PTHREAD_MUTEX_INITIALIZER;
+
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 	/*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
@@ -444,6 +446,11 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Prepare the SCARDHANDLE identity
 	 */
+
+	/* we need a lock to avoid concurent generation of handles leading
+	 * to a possible hCard handle duplication */
+	(void)pthread_mutex_lock(&LockMutex);
+
 	*phCard = RFCreateReaderHandle(rContext);
 
 	Log2(PCSC_LOG_DEBUG, "hCard Identity: %lx", *phCard);
@@ -467,6 +474,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			(void)RFDestroyReaderHandle(*phCard);
 			*phCard = 0;
 			rv = SCARD_E_SHARING_VIOLATION;
+			(void)pthread_mutex_unlock(&LockMutex);
 			goto exit;
 		}
 	}
@@ -482,6 +490,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Add this handle to the handle list
 	 */
 	rv = RFAddReaderHandle(rContext, *phCard);
+
+	(void)pthread_mutex_unlock(&LockMutex);
 
 	if (rv != SCARD_S_SUCCESS)
 	{
