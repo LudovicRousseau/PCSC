@@ -45,8 +45,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	int SYS_USleep(int);
 
-	int SYS_Daemon(int, int);
-
 	int SYS_RandomInt(int, int);
 
 	void SYS_InitRandom(void);
