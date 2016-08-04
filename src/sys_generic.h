@@ -49,6 +49,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	int SYS_RandomInt(int, int);
 
-	int SYS_GetSeed(void);
+	void SYS_InitRandom(void);
 
 #endif							/* __sys_generic_h__ */

@@ -98,14 +98,7 @@ INTERNAL int SYS_USleep(int iTimeVal)
 
 INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 {
-	static int iInitialized = 0;
 	int iRandNum = 0;
-
-	if (0 == iInitialized)
-	{
-		srand(SYS_GetSeed());
-		iInitialized = 1;
-	}
 
 	if (-1 == fEnd)
 		/* full int range */
@@ -116,7 +109,10 @@ INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 	return iRandNum;
 }
 
-INTERNAL int SYS_GetSeed(void)
+/**
+ * Initialize the random generator
+ */
+INTERNAL void SYS_InitRandom(void)
 {
 	struct timeval tv;
 	struct timezone tz;
@@ -131,6 +127,7 @@ INTERNAL int SYS_GetSeed(void)
 	{
 		myseed = (long) time(NULL);
 	}
-	return myseed;
+
+	srand(myseed);
 }
 
