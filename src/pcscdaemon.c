@@ -309,6 +309,9 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	/* Init the PRNG */
+	SYS_InitRandom();
+
 	/*
 	 * By default we create a daemon (not connected to any output)
 	 * so log to syslog to have error messages.
