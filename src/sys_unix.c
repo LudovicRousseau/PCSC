@@ -96,6 +96,14 @@ INTERNAL int SYS_USleep(int iTimeVal)
 #endif
 }
 
+/**
+ * Generate a pseudo random number
+ *
+ * @param[in] fStart minimal value
+ * @param[in] fEnd maximal value or -1 for a full range
+ *
+ * @return a random number between fStart and fEnd
+ */
 INTERNAL int SYS_RandomInt(int fStart, int fEnd)
 {
 	int iRandNum = 0;
