@@ -909,7 +909,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 				rContext->readerState->readerState = SCARD_PRESENT;
 			else
 			{
-				Log3(PCSC_LOG_ERROR, "Error powering down card: %d 0x%04X",
+				Log3(PCSC_LOG_ERROR, "Error powering down card: %ld 0x%04lX",
 					rv, rv);
 				if (rv == SCARD_W_REMOVED_CARD)
 					rContext->readerState->readerState = SCARD_ABSENT;
