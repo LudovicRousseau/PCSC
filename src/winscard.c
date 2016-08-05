@@ -234,7 +234,6 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 {
 	LONG rv;
 	READER_CONTEXT * rContext = NULL;
-	uint32_t readerState;
 
 	(void)hContext;
 	PROFILE_START
@@ -303,11 +302,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 * presence of a card or not
 	 *
 	 *******************************************/
-	readerState = rContext->readerState->readerState;
-
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
-		if (!(readerState & SCARD_PRESENT))
+		if (!(rContext->readerState->readerState & SCARD_PRESENT))
 		{
 			Log1(PCSC_LOG_DEBUG, "Card Not Inserted");
 			rv = SCARD_E_NO_SMARTCARD;
@@ -327,7 +324,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 
 			if (rv == IFD_SUCCESS)
 			{
-				readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+				rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 				Log1(PCSC_LOG_DEBUG, "power up complete.");
 				LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
@@ -339,7 +336,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					rv, rv);
 		}
 
-		if (! (readerState & SCARD_POWERED))
+		if (! (rContext->readerState->readerState & SCARD_POWERED))
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			(void)pthread_mutex_unlock(&rContext->powerState_lock);
