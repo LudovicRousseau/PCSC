@@ -1,3 +1,12 @@
+1.8.18: Ludovic Rousseau
+10 August 2016
+- SCardDisconnect(): much faster with SCARD_UNPOWER_CARD
+- SCardConnect(): Fix a possible duplicated hCard context
+- Fix compilation on FreeBSD
+- Fix compilation on Solaris
+- Some other minor improvements
+
+
 1.8.17: Ludovic Rousseau
 29 May 2016
 - Fix SCardEndTransaction() issue with a SCARD_SHARE_EXCLUSIVE connection
