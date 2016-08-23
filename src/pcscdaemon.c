@@ -264,7 +264,6 @@ int main(int argc, char **argv)
 	int customMaxReaderHandles = 0;
 	int customMaxThreadCardHandles = 0;
 	int opt;
-	int limited_rights = FALSE;
 	int r;
 #ifdef HAVE_GETOPT_LONG
 	int option_index = 0;
@@ -318,9 +317,6 @@ int main(int argc, char **argv)
 	 */
 	DebugLogSetLogType(DEBUGLOG_SYSLOG_DEBUG);
 
-	/* if the process is setuid or setgid it may have some restrictions */
-	limited_rights = (getgid() != getegid()) && (getuid() != 0);
-
 	/*
 	 * Handle any command line arguments
 	 */
@@ -338,11 +334,6 @@ int main(int argc, char **argv)
 				break;
 #endif
 			case 'c':
-				if (limited_rights)
-				{
-					Log1(PCSC_LOG_CRITICAL, "Can't use a user specified config file");
-					return EXIT_FAILURE;
-				}
 				Log2(PCSC_LOG_INFO, "using new config file: %s", optarg);
 				newReaderConfig = optarg;
 				break;
@@ -381,11 +372,6 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 
 			case 'a':
-				if (limited_rights)
-				{
-					Log1(PCSC_LOG_CRITICAL, "Can't log APDU (restricted)");
-					return EXIT_FAILURE;
-				}
 				(void)DebugLogSetCategory(DEBUG_CATEGORY_APDU);
 				break;
 
@@ -397,24 +383,18 @@ int main(int argc, char **argv)
 
 			case 't':
 				customMaxThreadCounter = optarg ? atoi(optarg) : 0;
-				if (limited_rights && (customMaxThreadCounter < PCSC_MAX_CONTEXT_THREADS))
-					customMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 				Log2(PCSC_LOG_INFO, "setting customMaxThreadCounter to: %d",
 					customMaxThreadCounter);
 				break;
 
 			case 'r':
 				customMaxReaderHandles = optarg ? atoi(optarg) : 0;
-				if (limited_rights && (customMaxReaderHandles < PCSC_MAX_READER_HANDLES))
-					customMaxReaderHandles = PCSC_MAX_READER_HANDLES;
 				Log2(PCSC_LOG_INFO, "setting customMaxReaderHandles to: %d",
 					customMaxReaderHandles);
 				break;
 
 			case 's':
 				customMaxThreadCardHandles = optarg ? atoi(optarg) : 0;
-				if (limited_rights && (customMaxThreadCardHandles < PCSC_MAX_CONTEXT_CARD_HANDLES))
-					customMaxThreadCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 				Log2(PCSC_LOG_INFO, "setting customMaxThreadCardHandles to: %d",
 					customMaxThreadCardHandles);
 				break;
