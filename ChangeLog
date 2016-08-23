@@ -314,7 +314,7 @@ pcsc-lite-1.6.5: Ludovic Rousseau
 - SCardCancelTransaction() is no more provided. This function is not
   provided by Microsoft and is deprecated since 2005 in pcsc-lite.
 - Parsing the CCID Info.plist (159 readers supported) was, on a i386
-  machine, done in 264306 µs and is now done 5547 µs => gain x47 or 4600%
+  machine, done in 264306 Âµs and is now done 5547 Âµs => gain x47 or 4600%
   See http://ludovicrousseau.blogspot.com/2010/08/ram-and-cpu-improvements-in-pcsc-lite.html
 - It is now possible to configure the local socket name to use using the
   environment variable PCSCLITE_CSOCK_NAME
@@ -485,7 +485,7 @@ pcsc-lite-1.6.0: Ludovic Rousseau
   this feature and SCF is now dead and replaced by JSR 268
   (javax.smartcardio)
 - Better handling of PCSCLITE_STATIC_DRIVER as can be used on platforms
-  using µClinux (without dynamic loader).  This is used to statically
+  using ÂµClinux (without dynamic loader).  This is used to statically
   link the reader driver to pcscd. Since the link is static you must
   define the IFDHandler API version at compilation time. Either define
   IFDHANDLERv1, IFDHANDLERv2 or IFDHANDLERv3
@@ -780,7 +780,7 @@ pcsc-lite-1.3.3: Ludovic Rousseau
 - PCSC/pcsclite.h: add SCARD_E_NO_READERS_AVAILABLE
 - SCardControl(): do not limit cbSendLength to MAX_BUFFER_SIZE bytes
   since we now transparently support up to MAX_BUFFER_SIZE_EXTENDED
-  bytes.  Thanks to Martin Führlinger for the bug report
+  bytes.  Thanks to Martin FÃ¼hrlinger for the bug report
 - SCardGetAttrib()/SCardSetAttrib(): if the driver returns IFD_ERROR_TAG
   we return SCARD_E_UNSUPPORTED_FEATURE instead of the generic error
   code SCARD_E_NOT_TRANSACTED
