@@ -1607,6 +1607,7 @@ end:
  * @retval SCARD_E_INVALID_VALUE Invalid States, reader name, etc (\ref SCARD_E_INVALID_VALUE)
  * @retval SCARD_E_INVALID_HANDLE Invalid hContext handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_READER_UNAVAILABLE The reader is unavailable (\ref SCARD_E_READER_UNAVAILABLE)
+ * @retval SCARD_E_UNKNOWN_READER The reader name is unknown (\ref SCARD_E_UNKNOWN_READER)
  * @retval SCARD_E_TIMEOUT The user-specified timeout value has expired (\ref SCARD_E_TIMEOUT)
  * @retval SCARD_E_CANCELLED The call has been cancelled by a call to
  * SCardCancel() (\ref SCARD_E_CANCELLED)
