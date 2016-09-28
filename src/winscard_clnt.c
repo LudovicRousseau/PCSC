@@ -44,8 +44,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Here is exposed the API for client applications.
  *
+ * \anchor differences
  * @attention
- * Known differences with Microsoft Windows WinSCard implementation:
+ * Known \ref differences with Microsoft Windows WinSCard implementation:
  *
  * -# SCardStatus()
  *    @par
