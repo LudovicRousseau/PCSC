@@ -93,7 +93,7 @@ class PCSCspy(object):
         if self.diffable:
             time = " [??.??]"
         else:
-            time = " [%d.%09d]" % (delta_sec, delta_usec)
+            time = " [%d.%06d]" % (delta_sec, delta_usec)
         self.execution_time = delta_sec + delta_usec / 1000000.
 
         rvs = {
