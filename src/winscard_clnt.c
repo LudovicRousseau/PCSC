@@ -100,6 +100,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *    Any PC/SC transaction held by the process is still valid after
  *    SCardReconnect() returned. On Windows the PC/SC transactions are
  *    released and a new call to SCardBeginTransaction() must be done.
+ * -# SCardConnect() within a transaction
+ *    @par
+ *    SCardConnect() will block if a transaction
+ *    (SCardBeginTransaction() / SCardEndTransaction()) is running for
+ *    the requested card/reader.  Under Windows SCardConnect() would
+ *    return successfully immediately.
  */
 
 #include "config.h"
