@@ -617,16 +617,17 @@ don't mind loading a new driver for each reader then ignore Lun.
 - \ref TAG_IFD_THREAD_SAFE
   If the driver supports more than one reader (see
   \ref TAG_IFD_SIMULTANEOUS_ACCESS above) this tag indicates if the
-  driver supports access to multiple readers at the same time.\n
-  <tt>Value[0] = 1</tt> indicates the driver supports simultaneous accesses.
+  driver supports access to multiple readers at the same time.
+  - <tt>Value[0] = 0</tt>: the driver DOES NOT support simultaneous accesses.
+  - <tt>Value[0] = 1</tt>: the driver supports simultaneous accesses.
 - \ref TAG_IFD_SLOTS_NUMBER
   Return the number of slots in this reader in <tt>Value[0]</tt>.
 - \ref TAG_IFD_SLOT_THREAD_SAFE
   If the reader has more than one slot (see \ref TAG_IFD_SLOTS_NUMBER
   above) this tag indicates if the driver supports access to multiple
-  slots of the same reader at the same time.\n
-  <tt>Value[0] = 1</tt> indicates the driver supports simultaneous slot
-  accesses.
+  slots of the same reader at the same time.
+  - <tt>value[0] = 0</tt>: the driver supports only 1 slot access at a time.
+  - <tt>value[0] = 1</tt>: the driver supports simultaneous slot accesses.
 - \ref TAG_IFD_POLLING_THREAD
   Unused/deprecated
 - \ref TAG_IFD_POLLING_THREAD_WITH_TIMEOUT
@@ -637,6 +638,10 @@ don't mind loading a new driver for each reader then ignore Lun.
 @endverbatim
 - \ref TAG_IFD_POLLING_THREAD_KILLABLE
   Tell if the polling thread can be killed (pthread_kill()) by pcscd
+  - <tt>value[0] = 0</tt>: the driver can NOT be stopped using
+	pthread_cancel(). The driver must then implement
+	\ref TAG_IFD_STOP_POLLING_THREAD
+  - <tt>value[0] = 1</tt>: the driver can be stopped using pthread_cancel()
 - \ref TAG_IFD_STOP_POLLING_THREAD
   Returns a pointer in @p Value to the function used to stop the polling
   thread returned by \ref TAG_IFD_POLLING_THREAD_WITH_TIMEOUT. The
@@ -649,6 +654,8 @@ don't mind loading a new driver for each reader then ignore Lun.
 
 @return Error codes
 @retval IFD_SUCCESS Successful (\ref IFD_SUCCESS)
+@retval IFD_ERROR_INSUFFICIENT_BUFFER Buffer is too small (\ref IFD_ERROR_INSUFFICIENT_BUFFER)
+@retval IFD_COMMUNICATION_ERROR Error has occurred (\ref IFD_COMMUNICATION_ERROR)
 @retval IFD_ERROR_TAG Invalid tag given (\ref IFD_ERROR_TAG)
 @retval IFD_NO_SUCH_DEVICE The reader is no more present (\ref IFD_NO_SUCH_DEVICE)
  */
