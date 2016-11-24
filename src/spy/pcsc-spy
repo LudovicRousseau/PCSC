@@ -880,6 +880,7 @@ class PCSCdemultiplexer(object):
         total_time = end_time - start_time
 
         # compute some statistics
+        thread_n = 1
         for thread in stats:
             stat = stats[thread]
             for fct in stat:
@@ -891,6 +892,7 @@ class PCSCdemultiplexer(object):
 
             # display statistics sorted by total_time
             print
+            print "Thread %d/%d" % (thread_n, len(stats))
             print "Results sorted by total execution time"
             print "total time: %f sec" % total_time
             for record in sorted(records, key=attrgetter('total_time'),
@@ -898,6 +900,8 @@ class PCSCdemultiplexer(object):
                 print "%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
                     record.occurences, record.total_time / total_time * 100.,
                     record.name)
+
+            thread_n += 1
 
 
 def main(logfile=None, color=True, diffable=False):
