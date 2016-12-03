@@ -419,7 +419,7 @@ static void ContextThread(LPVOID newContext)
 
 				READ_BODY(waStr)
 
-				/* add the client fd to the list */
+				/* remove the client fd from the list */
 				waStr.rv = EHUnregisterClientForEvent(filedes);
 
 				WRITE_BODY(waStr)
