@@ -422,7 +422,10 @@ static void ContextThread(LPVOID newContext)
 				/* remove the client fd from the list */
 				waStr.rv = EHUnregisterClientForEvent(filedes);
 
-				WRITE_BODY(waStr)
+				/* send the response only if the client was still in the
+				 * list */
+				if (waStr.rv != SCARD_F_INTERNAL_ERROR)
+					WRITE_BODY(waStr)
 			}
 			break;
 
