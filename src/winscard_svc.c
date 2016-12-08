@@ -304,15 +304,23 @@ static const char *CommandsText[] = {
 #endif
 
 #define READ_BODY(v) \
-	if (header.size != sizeof(v)) { goto wrong_length; } \
-	ret = MessageReceive(&v, sizeof(v), filedes); \
-	if (ret != SCARD_S_SUCCESS) { Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); goto exit; }
+	do { \
+		if (header.size != sizeof(v)) \
+			goto wrong_length;  \
+		ret = MessageReceive(&v, sizeof(v), filedes); \
+		if (ret != SCARD_S_SUCCESS) { \
+			Log2(PCSC_LOG_DEBUG, "Client die: %d", filedes); \
+			goto exit; \
+		} \
+	} while (0)
 
 #define WRITE_BODY(v) \
 	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
 #define WRITE_BODY_WITH_COMMAND(command, v) \
-	Log4(PCSC_LOG_DEBUG, "%s rv=0x%X for client %d", command, v.rv, filedes); \
-	ret = MessageSend(&v, sizeof(v), filedes);
+	do { \
+		Log4(PCSC_LOG_DEBUG, "%s rv=0x%X for client %d", command, v.rv, filedes); \
+		ret = MessageSend(&v, sizeof(v), filedes); \
+	} while (0)
 
 static void ContextThread(LPVOID newContext)
 {
@@ -357,7 +365,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct version_struct veStr;
 
-				READ_BODY(veStr)
+				READ_BODY(veStr);
 
 				Log3(PCSC_LOG_DEBUG, "Client is protocol version %d:%d",
 					veStr.major, veStr.minor);
@@ -380,7 +388,7 @@ static void ContextThread(LPVOID newContext)
 				veStr.minor = PROTOCOL_VERSION_MINOR;
 
 				/* send back the response */
-				WRITE_BODY(veStr)
+				WRITE_BODY(veStr);
 			}
 			break;
 
@@ -402,7 +410,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct wait_reader_state_change waStr;
 
-				READ_BODY(waStr)
+				READ_BODY(waStr);
 
 				/* add the client fd to the list */
 				EHRegisterClientForEvent(filedes);
@@ -417,7 +425,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct wait_reader_state_change waStr;
 
-				READ_BODY(waStr)
+				READ_BODY(waStr);
 
 				/* remove the client fd from the list */
 				waStr.rv = EHUnregisterClientForEvent(filedes);
@@ -425,7 +433,7 @@ static void ContextThread(LPVOID newContext)
 				/* send the response only if the client was still in the
 				 * list */
 				if (waStr.rv != SCARD_F_INTERNAL_ERROR)
-					WRITE_BODY(waStr)
+					WRITE_BODY(waStr);
 			}
 			break;
 
@@ -434,7 +442,7 @@ static void ContextThread(LPVOID newContext)
 				struct establish_struct esStr;
 				SCARDCONTEXT hContext;
 
-				READ_BODY(esStr)
+				READ_BODY(esStr);
 
 				hContext = esStr.hContext;
 				esStr.rv = SCardEstablishContext(esStr.dwScope, 0, 0,
@@ -444,7 +452,7 @@ static void ContextThread(LPVOID newContext)
 				if (esStr.rv == SCARD_S_SUCCESS)
 					esStr.rv = MSGAddContext(esStr.hContext, threadContext);
 
-				WRITE_BODY(esStr)
+				WRITE_BODY(esStr);
 			}
 			break;
 
@@ -452,14 +460,14 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct release_struct reStr;
 
-				READ_BODY(reStr)
+				READ_BODY(reStr);
 
 				reStr.rv = SCardReleaseContext(reStr.hContext);
 
 				if (reStr.rv == SCARD_S_SUCCESS)
 					reStr.rv = MSGRemoveContext(reStr.hContext, threadContext);
 
-				WRITE_BODY(reStr)
+				WRITE_BODY(reStr);
 			}
 			break;
 
@@ -469,7 +477,7 @@ static void ContextThread(LPVOID newContext)
 				SCARDHANDLE hCard;
 				DWORD dwActiveProtocol;
 
-				READ_BODY(coStr)
+				READ_BODY(coStr);
 
 				coStr.szReader[sizeof(coStr.szReader)-1] = 0;
 				hCard = coStr.hCard;
@@ -496,7 +504,7 @@ static void ContextThread(LPVOID newContext)
 					coStr.rv = MSGAddHandle(coStr.hContext, coStr.hCard,
 						threadContext);
 
-				WRITE_BODY(coStr)
+				WRITE_BODY(coStr);
 			}
 			break;
 
@@ -505,7 +513,7 @@ static void ContextThread(LPVOID newContext)
 				struct reconnect_struct rcStr;
 				DWORD dwActiveProtocol;
 
-				READ_BODY(rcStr)
+				READ_BODY(rcStr);
 
 				if (MSGCheckHandleAssociation(rcStr.hCard, threadContext))
 					goto exit;
@@ -515,7 +523,7 @@ static void ContextThread(LPVOID newContext)
 					&dwActiveProtocol);
 				rcStr.dwActiveProtocol = dwActiveProtocol;
 
-				WRITE_BODY(rcStr)
+				WRITE_BODY(rcStr);
 			}
 			break;
 
@@ -523,7 +531,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct disconnect_struct diStr;
 
-				READ_BODY(diStr)
+				READ_BODY(diStr);
 
 				if (MSGCheckHandleAssociation(diStr.hCard, threadContext))
 					goto exit;
@@ -533,7 +541,7 @@ static void ContextThread(LPVOID newContext)
 				if (SCARD_S_SUCCESS == diStr.rv)
 					diStr.rv = MSGRemoveHandle(diStr.hCard, threadContext);
 
-				WRITE_BODY(diStr)
+				WRITE_BODY(diStr);
 			}
 			break;
 
@@ -541,14 +549,14 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct begin_struct beStr;
 
-				READ_BODY(beStr)
+				READ_BODY(beStr);
 
 				if (MSGCheckHandleAssociation(beStr.hCard, threadContext))
 					goto exit;
 
 				beStr.rv = SCardBeginTransaction(beStr.hCard);
 
-				WRITE_BODY(beStr)
+				WRITE_BODY(beStr);
 			}
 			break;
 
@@ -556,7 +564,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct end_struct enStr;
 
-				READ_BODY(enStr)
+				READ_BODY(enStr);
 
 				if (MSGCheckHandleAssociation(enStr.hCard, threadContext))
 					goto exit;
@@ -564,7 +572,7 @@ static void ContextThread(LPVOID newContext)
 				enStr.rv = SCardEndTransaction(enStr.hCard,
 					enStr.dwDisposition);
 
-				WRITE_BODY(enStr)
+				WRITE_BODY(enStr);
 			}
 			break;
 
@@ -572,7 +580,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct cancel_struct caStr;
 				SCONTEXT * psTargetContext = NULL;
-				READ_BODY(caStr)
+				READ_BODY(caStr);
 
 				/* find the client */
 				(void)pthread_mutex_lock(&contextsList_lock);
@@ -591,7 +599,7 @@ static void ContextThread(LPVOID newContext)
 				else
 					caStr.rv = SCARD_E_INVALID_HANDLE;
 
-				WRITE_BODY(caStr)
+				WRITE_BODY(caStr);
 			}
 			break;
 
@@ -599,7 +607,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct status_struct stStr;
 
-				READ_BODY(stStr)
+				READ_BODY(stStr);
 
 				if (MSGCheckHandleAssociation(stStr.hCard, threadContext))
 					goto exit;
@@ -608,7 +616,7 @@ static void ContextThread(LPVOID newContext)
 				stStr.rv = SCardStatus(stStr.hCard, NULL, NULL, NULL,
 					NULL, 0, NULL);
 
-				WRITE_BODY(stStr)
+				WRITE_BODY(stStr);
 			}
 			break;
 
@@ -621,7 +629,7 @@ static void ContextThread(LPVOID newContext)
 				SCARD_IO_REQUEST ioRecvPci;
 				DWORD cbRecvLength;
 
-				READ_BODY(trStr)
+				READ_BODY(trStr);
 
 				if (MSGCheckHandleAssociation(trStr.hCard, threadContext))
 					goto exit;
@@ -661,7 +669,7 @@ static void ContextThread(LPVOID newContext)
 				trStr.ioRecvPciLength = ioRecvPci.cbPciLength;
 				trStr.pcbRecvLength = cbRecvLength;
 
-				WRITE_BODY(trStr)
+				WRITE_BODY(trStr);
 
 				/* write received buffer */
 				if (SCARD_S_SUCCESS == trStr.rv)
@@ -676,7 +684,7 @@ static void ContextThread(LPVOID newContext)
 				unsigned char pbRecvBuffer[MAX_BUFFER_SIZE_EXTENDED];
 				DWORD dwBytesReturned;
 
-				READ_BODY(ctStr)
+				READ_BODY(ctStr);
 
 				if (MSGCheckHandleAssociation(ctStr.hCard, threadContext))
 					goto exit;
@@ -705,7 +713,7 @@ static void ContextThread(LPVOID newContext)
 
 				ctStr.dwBytesReturned = dwBytesReturned;
 
-				WRITE_BODY(ctStr)
+				WRITE_BODY(ctStr);
 
 				/* write received buffer */
 				if (SCARD_S_SUCCESS == ctStr.rv)
@@ -718,7 +726,7 @@ static void ContextThread(LPVOID newContext)
 				struct getset_struct gsStr;
 				DWORD cbAttrLen;
 
-				READ_BODY(gsStr)
+				READ_BODY(gsStr);
 
 				if (MSGCheckHandleAssociation(gsStr.hCard, threadContext))
 					goto exit;
@@ -734,7 +742,7 @@ static void ContextThread(LPVOID newContext)
 
 				gsStr.cbAttrLen = cbAttrLen;
 
-				WRITE_BODY(gsStr)
+				WRITE_BODY(gsStr);
 			}
 			break;
 
@@ -742,7 +750,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct getset_struct gsStr;
 
-				READ_BODY(gsStr)
+				READ_BODY(gsStr);
 
 				if (MSGCheckHandleAssociation(gsStr.hCard, threadContext))
 					goto exit;
@@ -754,7 +762,7 @@ static void ContextThread(LPVOID newContext)
 				gsStr.rv = SCardSetAttrib(gsStr.hCard, gsStr.dwAttrId,
 					gsStr.pbAttr, gsStr.cbAttrLen);
 
-				WRITE_BODY(gsStr)
+				WRITE_BODY(gsStr);
 			}
 			break;
 
@@ -791,7 +799,7 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
 
 	waStr.rv = rv;
-	WRITE_BODY_WITH_COMMAND("SIGNAL", waStr)
+	WRITE_BODY_WITH_COMMAND("SIGNAL", waStr);
 
 	return ret;
 } /* MSGSignalClient */
