@@ -815,6 +815,12 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 	LONG rv;
 	int lrv;
 
+	if (0 == threadContext->hContext)
+	{
+		Log1(PCSC_LOG_ERROR, "Invalidated handle");
+		return SCARD_E_INVALID_HANDLE;
+	}
+
 	if (threadContext->hContext != hContext)
 		return SCARD_E_INVALID_VALUE;
 
@@ -894,6 +900,12 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 {
 	LONG retval = SCARD_E_INVALID_VALUE;
 
+	if (0 == threadContext->hContext)
+	{
+		Log1(PCSC_LOG_ERROR, "Invalidated handle");
+		return SCARD_E_INVALID_HANDLE;
+	}
+
 	if (threadContext->hContext == hContext)
 	{
 		/*
@@ -933,6 +945,7 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 	return retval;
 }
 
+/* Pre-condition: MSGCheckHandleAssociation must succeed. */
 static LONG MSGRemoveHandle(SCARDHANDLE hCard, SCONTEXT * threadContext)
 {
 	int lrv;
