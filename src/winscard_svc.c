@@ -881,7 +881,6 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		UNREF_READER(rContext)
 	}
 	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
-	list_destroy(&threadContext->cardsList);
 
 	/* We only mark the context as no longer in use.
 	 * The memory is freed in MSGCleanupCLient() */
@@ -991,6 +990,10 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 		(void)SCardReleaseContext(threadContext->hContext);
 		(void)MSGRemoveContext(threadContext->hContext, threadContext);
 	}
+
+	(void)pthread_mutex_lock(&threadContext->cardsList_lock);
+	list_destroy(&threadContext->cardsList);
+	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 
 	Log3(PCSC_LOG_DEBUG,
 		"Thread is stopping: dwClientID=%d, threadContext @%p",
