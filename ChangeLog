@@ -1,3 +1,8 @@
+1.8.20: Ludovic Rousseau
+30 December 2016
+- Fix a crash and potential security issue in pcscd
+
+
 1.8.19: Ludovic Rousseau
 9 December 2016
 - SCardGetStatusChange(): Fix a (rare) race condition
