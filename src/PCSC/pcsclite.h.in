@@ -300,7 +300,7 @@ extern const SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 /*
  * Gets a stringified error response
  */
-char *pcsc_stringify_error(const LONG);
+const char *pcsc_stringify_error(const LONG);
 
 #ifdef __cplusplus
 }

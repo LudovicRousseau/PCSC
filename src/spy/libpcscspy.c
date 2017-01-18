@@ -78,7 +78,7 @@ PCSC_API int32_t SCardControl132(SCARDHANDLE hCard, uint32_t dwControlCode,
 
 #define p_SCardSetAttrib(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr, DWORD cbAttrLen)
 
-#define p_pcsc_stringify_error(fct) char *(fct)(const LONG pcscError)
+#define p_pcsc_stringify_error(fct) const char *(fct)(const LONG pcscError)
 
 /* fake function to just return en error code */
 static LONG internal_error(void)

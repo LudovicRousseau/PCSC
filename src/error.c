@@ -48,7 +48,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "string.h"
 
 #ifdef NO_LOG
-PCSC_API char* pcsc_stringify_error(const LONG pcscError)
+PCSC_API const char* pcsc_stringify_error(const LONG pcscError)
 {
 	static char strError[] = "0x12345678";
 
@@ -74,7 +74,7 @@ PCSC_API char* pcsc_stringify_error(const LONG pcscError)
  *         pcsc_stringify_error(rv), rv);
  * @endcode
  */
-PCSC_API char* pcsc_stringify_error(const LONG pcscError)
+PCSC_API const char* pcsc_stringify_error(const LONG pcscError)
 {
 	/* Use a Thread-local storage so that the returned buffer
 	 * is thread safe */
