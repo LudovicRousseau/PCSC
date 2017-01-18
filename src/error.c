@@ -78,7 +78,7 @@ PCSC_API const char* pcsc_stringify_error(const LONG pcscError)
 {
 	/* Use a Thread-local storage so that the returned buffer
 	 * is thread safe */
-	__thread static char strError[75];
+	static __thread char strError[75];
 	const char *msg = NULL;
 
 	switch (pcscError)
