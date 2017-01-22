@@ -60,6 +60,11 @@ PCSC_API const char* pcsc_stringify_error(const LONG pcscError)
 /**
  * @brief Returns a human readable text for the given PC/SC error code.
  *
+ * @warning
+ * The returned string uses a Thread-Local Storage (TLS) buffer and is valid:
+ * -# only while the thread on which it was obtained is alive.
+ * -# until the next call to this function on the same thread.
+ *
  * @ingroup API
  * @param[in] pcscError Error code to be translated to text.
  *
