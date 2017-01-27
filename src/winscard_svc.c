@@ -580,6 +580,7 @@ static void ContextThread(LPVOID newContext)
 			{
 				struct cancel_struct caStr;
 				SCONTEXT * psTargetContext = NULL;
+
 				READ_BODY(caStr);
 
 				/* find the client */
@@ -587,6 +588,10 @@ static void ContextThread(LPVOID newContext)
 				psTargetContext = (SCONTEXT *) list_seek(&contextsList,
 					&caStr.hContext);
 				(void)pthread_mutex_unlock(&contextsList_lock);
+
+				/* default value = error */
+				caStr.rv = SCARD_E_INVALID_HANDLE;
+
 				if (psTargetContext != NULL)
 				{
 					uint32_t fd = psTargetContext->dwClientID;
@@ -596,8 +601,6 @@ static void ContextThread(LPVOID newContext)
 					 * notification now the waiting has been cancelled */
 					EHUnregisterClientForEvent(fd);
 				}
-				else
-					caStr.rv = SCARD_E_INVALID_HANDLE;
 
 				WRITE_BODY(caStr);
 			}
