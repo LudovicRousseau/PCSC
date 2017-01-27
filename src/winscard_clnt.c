@@ -3072,6 +3072,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	LONG rv = SCARD_S_SUCCESS;
 	uint32_t dwClientID = 0;
 	struct cancel_struct scCancelStruct;
+	char cancellable;
 
 	PROFILE_START
 	API_TRACE_IN("%ld", hContext)
@@ -3079,14 +3080,17 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, FALSE);
+	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
 	if (NULL == currentContextMap)
 	{
 		rv = SCARD_E_INVALID_HANDLE;
 		goto error;
 	}
 
-	if (! currentContextMap->cancellable)
+	cancellable = currentContextMap->cancellable;
+	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+
+	if (! cancellable)
 	{
 		rv = SCARD_S_SUCCESS;
 		goto error;
