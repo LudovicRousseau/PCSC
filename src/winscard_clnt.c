@@ -367,7 +367,7 @@ PCSC_API const SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(S
 
 
 static LONG SCardAddContext(SCARDCONTEXT, DWORD);
-static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT, int);
+static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT);
 static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT);
 static LONG SCardRemoveContext(SCARDCONTEXT);
 static LONG SCardCleanContext(SCONTEXTMAP *);
@@ -680,7 +680,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	 * Make sure this context has been opened
 	 * and get currentContextMap
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 	{
 		rv = SCARD_E_INVALID_HANDLE;
@@ -810,7 +810,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -1718,7 +1718,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 	{
 		rv = SCARD_E_INVALID_HANDLE;
@@ -2831,7 +2831,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 	{
 		PROFILE_END(SCARD_E_INVALID_HANDLE)
@@ -3011,7 +3011,7 @@ LONG SCardListReaderGroups(SCARDCONTEXT hContext, LPSTR mszGroups,
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 		return SCARD_E_INVALID_HANDLE;
 
@@ -3098,7 +3098,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, TRUE);
+	currentContextMap = SCardGetAndLockContext(hContext);
 	if (NULL == currentContextMap)
 	{
 		rv = SCARD_E_INVALID_HANDLE;
@@ -3269,12 +3269,11 @@ error:
  * SCardGetContextTH().
  *
  * @param[in] hContext Application Context whose index will be find.
- * @param[in] lock if TRUE then the context (if available)
  *
  * @return Index corresponding to the Application Context or -1 if it is
  * not found.
  */
-static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext, int lock)
+static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext)
 {
 	SCONTEXTMAP * currentContextMap;
 
@@ -3282,7 +3281,7 @@ static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext, int lock)
 	currentContextMap = SCardGetContextTH(hContext);
 
 	/* lock the context (if available) */
-	if (lock && NULL != currentContextMap)
+	if (NULL != currentContextMap)
 		(void)pthread_mutex_lock(&currentContextMap->mMutex);
 
 	(void)SCardUnlockThread();
