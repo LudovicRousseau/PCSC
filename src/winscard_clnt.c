@@ -319,6 +319,11 @@ struct _psContextMap
 	list_t channelMapList;
 	char cancellable;				/**< We are in a cancellable call */
 };
+/**
+ * @brief Represents the an Application Context on the Client side.
+ *
+ * typedef of _psContextMap
+ */
 typedef struct _psContextMap SCONTEXTMAP;
 
 static list_t contextMapList;
@@ -3262,16 +3267,20 @@ error:
 }
 
 /**
- * @brief Get the index from the Application Context vector \c _psContextMap
- * for the passed context.
+ * @brief Get the \ref SCONTEXTMAP * from the Application Context
+ * vector \c _psContextMap for the passed context.
  *
  * This function is a thread-safe wrapper to the function
  * SCardGetContextTH().
  *
- * @param[in] hContext Application Context whose index will be find.
+ * If the context is valid then \c &currentContextMap->mMutex lock is
+ * acquired. The mutex lock needs to be released when the structure is
+ * no more used.
  *
- * @return Index corresponding to the Application Context or -1 if it is
- * not found.
+ * @param[in] hContext Application Context whose SCONTEXTMAP will be find.
+ *
+ * @return context map corresponding to the Application Context or NULL
+ * if it is not found.
  */
 static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext)
 {
