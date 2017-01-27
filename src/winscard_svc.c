@@ -595,11 +595,15 @@ static void ContextThread(LPVOID newContext)
 				if (psTargetContext != NULL)
 				{
 					uint32_t fd = psTargetContext->dwClientID;
-					caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
+					LONG rv;
 
 					/* the client should not receive the event
 					 * notification now the waiting has been cancelled */
-					EHUnregisterClientForEvent(fd);
+					rv = EHUnregisterClientForEvent(fd);
+
+					/* signal the client only if it was still waiting */
+					if (SCARD_S_SUCCESS == rv)
+						caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
 				}
 
 				WRITE_BODY(caStr);
