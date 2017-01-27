@@ -408,6 +408,26 @@ inline static LONG SCardUnlockThread(void)
 	return pthread_mutex_unlock(&clientMutex);
 }
 
+/**
+ * @brief Tell if a context index from the Application Context vector \c
+ * _psContextMap is valid or not.
+ *
+ * @param[in] hContext Application Context whose index will be find.
+ *
+ * @return \c TRUE if the context exists
+ * @return \c FALSE if the context does not exist
+ */
+static int SCardGetContextValidity(SCARDCONTEXT hContext)
+{
+	SCONTEXTMAP * currentContextMap;
+
+	(void)SCardLockThread();
+	currentContextMap = SCardGetContextTH(hContext);
+	(void)SCardUnlockThread();
+
+	return currentContextMap != NULL;
+}
+
 static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
 	/*@out@*/ LPSCARDCONTEXT);
 
@@ -2908,15 +2928,13 @@ end:
 LONG SCardFreeMemory(SCARDCONTEXT hContext, LPCVOID pvMem)
 {
 	LONG rv = SCARD_S_SUCCESS;
-	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, FALSE);
-	if (NULL == currentContextMap)
+	if (! SCardGetContextValidity(hContext))
 		return SCARD_E_INVALID_HANDLE;
 
 	free((void *)pvMem);
@@ -3157,7 +3175,6 @@ error:
 LONG SCardIsValidContext(SCARDCONTEXT hContext)
 {
 	LONG rv;
-	SCONTEXTMAP * currentContextMap;
 
 	PROFILE_START
 	API_TRACE_IN("%ld", hContext)
@@ -3167,8 +3184,7 @@ LONG SCardIsValidContext(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext, FALSE);
-	if (currentContextMap == NULL)
+	if (! SCardGetContextValidity(hContext))
 		rv = SCARD_E_INVALID_HANDLE;
 
 	PROFILE_END(rv)
