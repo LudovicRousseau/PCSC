@@ -129,7 +129,7 @@ def SCardBeginTransactionTest(hcontextTest, hcardTest, readerName):
     unblocked = True
 
 
-#def TemplateTest(hcontextTest, hcardTest, readerName):
+# def TemplateTest(hcontextTest, hcardTest, readerName):
 #    global unblocked
 #    testFunctionName = sys._getframe().f_code.co_name
 #    print("Test thread for %s" % testFunctionName)
@@ -211,7 +211,7 @@ def main():
     BLUE = "\033[0;34m"
     NORMAL = "\033[00m"
 
-    #if len(sys.argv) < 4:
+    # if len(sys.argv) < 4:
     #    print(usage)
     #    sys.exit(1)
     # Allow to specify test name
@@ -238,7 +238,7 @@ def main():
         else:
             print("non blocking")
         thread.start_new_thread(tests[testTarget][0], (hcontextTest, hcardTest, readerName))
-        #print("Thread started")
+        # print("Thread started")
         time.sleep(1)
         if (unblocked and tests[testTarget][1]) or ((not unblocked) and (not tests[testTarget][1])):
             failed = True
