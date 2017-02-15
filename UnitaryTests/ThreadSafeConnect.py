@@ -20,6 +20,7 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardListReaders, SCardConnect, SCardDisconnect,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD,
@@ -36,7 +37,7 @@ def stress(*args):
     stress method
     """
     thread = args[0]
-    print "Starting thread:", thread
+    print("Starting thread:", thread)
 
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
@@ -54,19 +55,19 @@ def stress(*args):
             raise BaseSCardException(hresult)
 
         log = "%d:%d" % (thread, j)
-        print log,
+        print(log, end=' ')
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
-    print
+    print()
 
     hresult = SCardReleaseContext(hcontext)
     if hresult != SCARD_S_SUCCESS:
         raise ReleaseContextException(hresult)
 
-    print "Exiting thread:", thread
+    print("Exiting thread:", thread)
 
 def main():
     """
@@ -81,11 +82,11 @@ def main():
         thread.start()
 
     for thread in threads:
-        print "joining:", thread.getName(),
+        print("joining:", thread.getName(), end=' ')
         thread.join()
-        print "joined:", thread.getName()
+        print("joined:", thread.getName())
 
-    print "Exiting main"
+    print("Exiting main")
 
 if __name__ == "__main__":
     main()

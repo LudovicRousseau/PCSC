@@ -18,6 +18,7 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys
@@ -30,10 +31,10 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
@@ -44,29 +45,29 @@ if hresult != SCARD_S_SUCCESS:
 hresult, reader, state, protocol, atr = SCardStatus(hcard)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print SCardGetErrorMessage(hresult)
+print(SCardGetErrorMessage(hresult))
 
-print "reader:", reader
-print "state:", hex(state)
-print "protocol:", protocol
-print "atr:", atr
+print("reader:", reader)
+print("state:", hex(state))
+print("protocol:", protocol)
+print("atr:", atr)
 
-print "Press enter"
+print("Press enter")
 sys.stdin.read(1)
 
 hresult, reader, state, protocol, atr = SCardStatus(hcard)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print SCardGetErrorMessage(hresult)
+print(SCardGetErrorMessage(hresult))
 
-print "reader:", reader
-print "state:", hex(state)
-print "protocol:", protocol
-print "atr:", atr
+print("reader:", reader)
+print("state:", hex(state))
+print("protocol:", protocol)
+print("atr:", atr)
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
-print SCardGetErrorMessage(hresult)
+print(SCardGetErrorMessage(hresult))

@@ -20,6 +20,7 @@
 # #define DO_CHECK_SAME_PROCESS
 # or this unitary test will fail
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import time
@@ -33,10 +34,10 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
@@ -52,20 +53,21 @@ if pid == 0:
 
     # expected value
     if hresult == SCARD_E_INVALID_HANDLE:
-        print "test passed"
+        print("test passed")
     elif hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
     else:
-        print "test FAILED got %s. SCARD_E_INVALID_HANDLE was expected" % SCardGetErrorMessage(hresult)
-        print
+        print("test FAILED got %s. SCARD_E_INVALID_HANDLE was expected"
+                % SCardGetErrorMessage(hresult))
+        print()
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
-        print "son: SCardDisconnect()", SCardGetErrorMessage(hresult)
+        print("son: SCardDisconnect()", SCardGetErrorMessage(hresult))
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
         hresult = SCardReleaseContext(hcontext)
-        print "son: SCardReleaseContext()", SCardGetErrorMessage(hresult)
+        print("son: SCardReleaseContext()", SCardGetErrorMessage(hresult))
         if hresult != SCARD_S_SUCCESS:
             raise ReleaseContextException(hresult)
 
@@ -75,14 +77,15 @@ else:
     # give some time to the son
     time.sleep(1)
 
-    print "father: SCardDisconnect..."
+    print("father: SCardDisconnect...")
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
-    print "father: SCardDisconnect()", SCardGetErrorMessage(hresult)
+    print("father: SCardDisconnect()", SCardGetErrorMessage(hresult))
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
-    print "father: SCardReleaseContext..."
+    print("father: SCardReleaseContext...")
     hresult = SCardReleaseContext(hcontext)
-    print "father: SCardReleaseContext()", SCardGetErrorMessage(hresult)
+    print("father: SCardReleaseContext()",
+            SCardGetErrorMessage(hresult))
     if hresult != SCARD_S_SUCCESS:
         raise ReleaseContextException(hresult)

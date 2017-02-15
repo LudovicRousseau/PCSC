@@ -18,6 +18,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, FEATURE_MCT_READER_DIRECT, getFeatureRequest, hasFeature)
@@ -26,7 +27,7 @@ from smartcard.util import toHexString
 
 def parse_info(bytes):
     """ parse the SECODER INFO answer """
-    print "parse the SECODER INFO answer:", toHexString(bytes)
+    print("parse the SECODER INFO answer:", toHexString(bytes))
 
     sw = bytes[-2:]
     del bytes[-2:]
@@ -36,26 +37,27 @@ def parse_info(bytes):
         length = bytes[1]
         data = bytes[2:2 + length]
 
-        print "tag: %02X, length: %2d:" % (tag, length),
+        print("tag: %02X, length: %2d:" % (tag, length), end=' ')
         if tag in [0x40, 0x80, 0x81, 0x83, 0x84]:
-            print "'%s'" % ''.join([chr(x) for x in data])
+            print("'%s'" % ''.join([chr(x) for x in data]))
         else:
-            print toHexString(data)
+            print(toHexString(data))
 
         del bytes[:2 + length]
-    print "SW:", toHexString(sw)
+    print("SW:", toHexString(sw))
 
 
 def parse_select(bytes):
     """ parse the SECODER SELECT APPLICATION answer """
-    print "parse the SECODER SELECT APPLICATION answer:", toHexString(bytes)
+    print("parse the SECODER SELECT APPLICATION answer:",
+            toHexString(bytes))
 
-    print "Activation ID:", toHexString(bytes[0:4])
-    print "Interface Version: '%s'" % ''.join([chr(x) for x in bytes[5:11]])
-    print "Language Code:", toHexString(bytes[11:15])
-    print "CSI:", toHexString(bytes[15:18])
-    print "Application Identifier:", toHexString(bytes[18:23])
-    print "SW:", toHexString(bytes[23:25])
+    print("Activation ID:", toHexString(bytes[0:4]))
+    print("Interface Version: '%s'" % ''.join([chr(x) for x in bytes[5:11]]))
+    print("Language Code:", toHexString(bytes[11:15]))
+    print("CSI:", toHexString(bytes[15:18]))
+    print("Application Identifier:", toHexString(bytes[18:23]))
+    print("SW:", toHexString(bytes[23:25]))
 
 
 def main():
@@ -65,7 +67,7 @@ def main():
         disposition=SCARD_LEAVE_CARD)
 
     feature_list = getFeatureRequest(card_connection)
-    #print getPinProperties(card_connection)
+    #print(getPinProperties(card_connection))
 
     mct_reader_direct = hasFeature(feature_list, FEATURE_MCT_READER_DIRECT)
     if mct_reader_direct is None:

@@ -19,6 +19,7 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
 from smartcard.pcsc.PCSCExceptions import *
@@ -34,13 +35,13 @@ def stress(*args):
     """
     thread = args[0]
     for j in range(0, MAX_ITER):
-        print thread,
+        print(thread, end=' ')
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
         if hresult != SCARD_S_SUCCESS:
             raise EstablishContextException(hresult)
 
         hresult = SCardReleaseContext(hcontext)
-        #print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+        #print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
         if hresult != SCARD_S_SUCCESS:
             raise ReleaseContextException(hresult)
 
@@ -55,7 +56,7 @@ def main():
     for i in range(0, MAX_THREADS):
         thread = threading.Thread(target=stress, args=(i,))
         threads.append(thread)
-        print "start thread", i
+        print("start thread", i)
         thread.start()
 
     for thread in threads:

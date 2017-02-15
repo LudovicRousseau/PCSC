@@ -31,6 +31,7 @@
 # same issue with Reconnect instead of connect
 # bug fixed in revision 4940
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 
@@ -43,10 +44,10 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
@@ -58,7 +59,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print response
+print(response)
 
 # Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
@@ -86,7 +87,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print response
+print(response)
 
 # Reconnect in SCARD_SHARE_DIRECT mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
@@ -109,7 +110,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print response
+print(response)
 
 # Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)

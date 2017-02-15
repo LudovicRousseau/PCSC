@@ -20,6 +20,7 @@
 # SCardCancel() should do nothing if no cancellable call is ongoing
 # bug fixed in revision 5344
 
+from __future__ import print_function
 from smartcard.scard import *
 
 try:
@@ -27,21 +28,21 @@ try:
     if hresult != SCARD_S_SUCCESS:
         raise Exception('Failed to establish context : ' +
                         SCardGetErrorMessage(hresult))
-    print 'Context established!'
+    print('Context established!')
 
     try:
         hresult = SCardCancel(hcontext)
         if hresult != SCARD_S_SUCCESS:
             raise Exception('Failed to cancel context : ' +
                             SCardGetErrorMessage(hresult))
-        print 'context canceled'
+        print('context canceled')
 
     finally:
         hresult = SCardReleaseContext(hcontext)
         if hresult != SCARD_S_SUCCESS:
             raise Exception('Failed to release context: ' +
                             SCardGetErrorMessage(hresult))
-        print 'Released context.'
+        print('Released context.')
 
 except Exception, message:
-    print "Exception:", message
+    print("Exception:", message)

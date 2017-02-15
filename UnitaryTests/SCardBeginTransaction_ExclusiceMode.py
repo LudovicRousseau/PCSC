@@ -19,6 +19,7 @@
 # Alioth bug [#312960] SCardDisconnect when other context has transaction
 # fixed in revisions 5572 and 5574
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 
@@ -29,9 +30,9 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext1, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 hresult, hcontext2 = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:

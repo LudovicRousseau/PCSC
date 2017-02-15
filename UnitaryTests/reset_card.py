@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys
@@ -27,10 +28,10 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
@@ -39,7 +40,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 if len(sys.argv) > 1:
-    print "reset using SCardReconnect"
+    print("reset using SCardReconnect")
 
     # Reconnect after reset
     hresult, dwActiveProtocol = SCardReconnect(hcard,
@@ -47,7 +48,7 @@ if len(sys.argv) > 1:
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 else:
-    print "reset using SCardDisconnect"
+    print("reset using SCardDisconnect")
 
     # Disconnect after reset
     hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)

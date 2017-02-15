@@ -18,6 +18,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE)
@@ -38,8 +39,8 @@ def stress(reader):
             get_firmware)
         after = time()
         delta = after - before
-        print "%d Reader: %s, delta: %d" % (i, reader, delta)
-        print "Firmware:", "".join([chr(x) for x in res])
+        print("%d Reader: %s, delta: %d" % (i, reader, delta))
+        print("Firmware:", "".join([chr(x) for x in res]))
         if delta > 1:
             sys.stderr.write(ctime() + " %f\n" % delta)
         i += 1
@@ -49,10 +50,10 @@ if __name__ == "__main__":
 
     # get all the available readers
     readers = readers()
-    print "Available readers:"
+    print("Available readers:")
     i = 0
     for r in readers:
-        print "%d: %s" % (i, r)
+        print("%d: %s" % (i, r))
         i += 1
 
     try:
@@ -61,6 +62,6 @@ if __name__ == "__main__":
         i = 0
 
     reader = readers[i]
-    print "Using:", reader
+    print("Using:", reader)
 
     stress(reader)

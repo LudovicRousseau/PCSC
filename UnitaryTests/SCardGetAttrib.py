@@ -21,6 +21,7 @@
 # SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in ccid 1.3.13
 # SCARD_ATTR_ATR_STRING support has been added in ccid 0.9.0
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.util import toHexString, toASCIIString
@@ -32,7 +33,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 for reader in readers:
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
@@ -40,14 +41,14 @@ for reader in readers:
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
-    print "reader:", reader
+    print("reader:", reader)
     for attribute in (SCARD_ATTR_VENDOR_IFD_SERIAL_NO, SCARD_ATTR_ATR_STRING):
         hresult, attrib = SCardGetAttrib(hcard, attribute)
-        print hex(attribute),
+        print(hex(attribute), end=' ')
         if hresult != SCARD_S_SUCCESS:
-            print SCardGetErrorMessage(hresult)
+            print(SCardGetErrorMessage(hresult))
         else:
-            print attrib, toHexString(attrib), toASCIIString(attrib)
+            print(attrib, toHexString(attrib), toASCIIString(attrib))
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:

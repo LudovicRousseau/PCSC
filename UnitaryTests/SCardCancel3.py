@@ -24,6 +24,7 @@
 
 # The bug has been fixed in 57b0ba5a200bcbf1c489d39261340324392a8e8a
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import threading
@@ -34,15 +35,15 @@ import sys
 def getstatuschange():
     # this call will be cancelled
     hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
-    print "SCardGetStatusChange()", SCardGetErrorMessage(hresult)
+    print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
     if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
         if SCARD_E_CANCELLED == hresult:
-            print "Cancelled"
+            print("Cancelled")
         else:
             raise BaseSCardException(hresult)
-    print "Finished"
+    print("Finished")
 
-    print "Remove the card and press enter"
+    print("Remove the card and press enter")
     sys.stdin.read(1)
 
     # try another PC/SC call. It should return SCARD_W_REMOVED_CARD and
@@ -52,7 +53,7 @@ def getstatuschange():
         if hresult != SCARD_W_REMOVED_CARD:
             raise BaseSCardException(hresult)
         else:
-            print "Card removed"
+            print("Card removed")
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -61,7 +62,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 readerstates = {}
 for reader in readers:
@@ -69,7 +70,7 @@ for reader in readers:
 hresult, newstates = SCardGetStatusChange(hcontext, 0, readerstates.values())
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print newstates
+print(newstates)
 for state in newstates:
     readername, eventstate, atr = state
     readerstates[readername] = (readername, eventstate)
@@ -84,13 +85,13 @@ t = threading.Thread(target=getstatuschange)
 t.start()
 
 time.sleep(1)
-print "cancel"
+print("cancel")
 hresult = SCardCancel(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    print 'Failed to SCardCancel: ' + SCardGetErrorMessage(hresult)
+    print('Failed to SCardCancel: ' + SCardGetErrorMessage(hresult))
 
 time.sleep(5)
 hresult = SCardReleaseContext(hcontext)
-print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise ReleaseContextException(hresult)

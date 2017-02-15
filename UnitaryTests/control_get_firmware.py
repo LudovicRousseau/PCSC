@@ -18,6 +18,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE, getTlvProperties)
@@ -27,7 +28,7 @@ for reader in readers():
     cardConnection.connect(mode=SCARD_SHARE_DIRECT,
         disposition=SCARD_LEAVE_CARD)
 
-    print "Reader:", reader
+    print("Reader:", reader)
 
     # properties returned by IOCTL_FEATURE_GET_TLV_PROPERTIES
     properties = getTlvProperties(cardConnection)
@@ -40,14 +41,14 @@ for reader in readers():
             IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
             res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
                 get_firmware)
-            print " Firmware:", "".join([chr(x) for x in res])
+            print(" Firmware:", "".join([chr(x) for x in res]))
         else:
-            print " Not a Gemalto reader"
+            print(" Not a Gemalto reader")
             key = 'PCSCv2_PART10_PROPERTY_sFirmwareID'
             if key in properties:
                 firmware = properties[key]
-                print " Firmware:", firmware
+                print(" Firmware:", firmware)
             else:
-                print " %s not supported" % key
+                print(" %s not supported" % key)
     else:
-        print " %s not supported" % key
+        print(" %s not supported" % key)

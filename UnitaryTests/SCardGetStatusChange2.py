@@ -19,31 +19,32 @@
 # Check the return value of SCardGetStatusChange() for unknown readers
 # Before revision 5881 SCardGetStatusChange() returned SCARD_S_SUCCESS
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-print "SCardEstablishContext()", SCardGetErrorMessage(hresult)
+print("SCardEstablishContext()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise EstablishContextException(hresult)
 
 hresult, readers = SCardListReaders(hcontext, [])
-print "SCardListReaders()", SCardGetErrorMessage(hresult)
-print 'PC/SC Readers:', readers
+print("SCardListReaders()", SCardGetErrorMessage(hresult))
+print('PC/SC Readers:', readers)
 
 readers = ["a", "b"]
-print readers
+print(readers)
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 hresult, newstates = SCardGetStatusChange(hcontext, 10, readerstates.values())
-print "SCardGetStatusChange()", SCardGetErrorMessage(hresult)
+print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print newstates
+print(newstates)
 
 hresult = SCardReleaseContext(hcontext)
-print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise ReleaseContextException(hresult)

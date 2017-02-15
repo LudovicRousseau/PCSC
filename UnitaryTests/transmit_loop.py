@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import *
 from smartcard.CardConnection import *
 
@@ -26,10 +27,10 @@ connection.connect()
 SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
 i = 0
 while 1:
-    print "loop:", i
+    print("loop:", i)
     i += 1
     data, sw1, sw2 = connection.transmit(SELECT)
-    print data
-    print "%02x %02x" % (sw1, sw2)
+    print(data)
+    print("%02x %02x" % (sw1, sw2))
 
 connection.disconnect()

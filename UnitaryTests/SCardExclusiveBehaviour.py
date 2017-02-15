@@ -32,6 +32,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.Exceptions import NoReadersException
@@ -47,11 +48,11 @@ def Connect(mode):
     hresult, readers = SCardListReaders(hcontext, [])
     if hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
-    print 'PC/SC Readers:', readers
+    print('PC/SC Readers:', readers)
     if (len(readers) <= 0):
         raise NoReadersException()
     reader = readers[0]
-    print "Using reader:", reader
+    print("Using reader:", reader)
 
     hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
         mode, SCARD_PROTOCOL_ANY)
@@ -74,26 +75,32 @@ def main():
 
     hresult, hcontext1, hcard1, readerName = Connect(SCARD_SHARE_EXCLUSIVE)
     if hresult != SCARD_S_SUCCESS:
-        print "Test1: Error creating first exclusive connection % x" % hresult
+        print("Test1: Error creating first exclusive connection % x" %
+                hresult)
         return
 
     hresult, hcontext2, hcardTest2 = ConnectWithReader(readerName, SCARD_SHARE_SHARED)
     if hresult != SCARD_E_SHARING_VIOLATION:
-        print "Test1: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s" % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION), SCardGetErrorMessage(hresult))
+        print("Test1: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
+                % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
+                        SCardGetErrorMessage(hresult)))
         return
 
     SCardDisconnect(hcard1, 0)
 
     hresult, hcontext1, hcard1 = ConnectWithReader(readerName, SCARD_SHARE_SHARED)
     if hresult != SCARD_S_SUCCESS:
-        print "Testt2: Error creating first shared connection % x" % hresult
+        print("Testt2: Error creating first shared connection % x" %
+                hresult)
         return
 
     hresult, hcontext2, hcardTest2 = ConnectWithReader(readerName, SCARD_SHARE_EXCLUSIVE)
     if hresult != SCARD_E_SHARING_VIOLATION:
-        print "Test2: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s" % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION), SCardGetErrorMessage(hresult))
+        print("Test2: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
+                % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
+                SCardGetErrorMessage(hresult)))
         sys.exit(1)
-    print "Test successful"
+    print("Test successful")
 
 if __name__ == '__main__':
     main()

@@ -20,6 +20,7 @@
 # when the reconnection requests exclusive access and the reader is
 # already shared.
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys
@@ -31,10 +32,10 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
@@ -45,7 +46,7 @@ if hresult != SCARD_S_SUCCESS:
 # start here another application using the reader in SCARD_SHARE_SHARED
 # mode
 
-print "Press enter"
+print("Press enter")
 sys.stdin.read(1)
 
 # Reconnect in SCARD_SHARE_EXCLUSIVE mode

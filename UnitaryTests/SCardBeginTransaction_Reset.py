@@ -20,6 +20,7 @@
 # transaction is ongoing.
 # Test for the patch in 74656f24db3da1532040a1775ceffa225fbc3d00
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from time import sleep
@@ -31,9 +32,9 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext1, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 hresult, hcontext2 = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -57,14 +58,14 @@ if hresult != SCARD_S_SUCCESS:
     # we should get an error here
     # but the card shall not be reseted
     if hresult == SCARD_E_SHARING_VIOLATION:
-        print "We got the expected error"
+        print("We got the expected error")
     else:
         raise BaseSCardException(hresult)
 
 hresult, reader, state, protocol, atr = SCardStatus(hcard1)
 if hresult == SCARD_W_RESET_CARD:
-    print "The test failed"
-    print "The card should not been reseted"
+    print("The test failed")
+    print("The card should not been reseted")
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

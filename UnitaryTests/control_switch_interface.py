@@ -18,6 +18,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE)
@@ -34,24 +35,24 @@ def switch_interface(interface):
         cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
         switch_interface_cmd = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
-        print "Reader:", reader, "=>",
+        print("Reader:", reader, "=>", end=' ')
         try:
             res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
                 switch_interface_cmd)
         except:
-            print "FAILED"
+            print("FAILED")
         else:
             if res != [0, 0, 0, 0]:
-                print "Failed: ",
+                print("Failed: ", end='')
                 err = res[0] * 256 + res[1]
                 if err == 0xFF83:
-                    print "Wrong data parameters"
+                    print("Wrong data parameters")
                 elif err == 0xFF84:
-                    print "Wrong command bytes"
+                    print("Wrong command bytes")
                 else:
-                    print "Unknown error:", [hex(x) for x in res]
+                    print("Unknown error:", [hex(x) for x in res])
             else:
-                print "Success"
+                print("Success")
 
 if __name__ == "__main__":
     import sys

@@ -24,13 +24,14 @@
 # DRIVER_OPTION_CCID_EXCHANGE_AUTHORIZED bit in the ifdDriverOptions
 # option of the CCID driver Info.plist file
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import getTlvProperties, SCARD_SHARE_DIRECT
 
 # for each reader
 for reader in readers():
-    print
-    print "Reader:", reader
+    print()
+    print("Reader:", reader)
 
     card_connection = reader.createConnection()
     card_connection.connect(mode=SCARD_SHARE_DIRECT)
@@ -41,6 +42,6 @@ for reader in readers():
     for key in sorted(tlv):
         if key in ["PCSCv2_PART10_PROPERTY_wIdProduct",
                 "PCSCv2_PART10_PROPERTY_wIdVendor"]:
-            print "%s: 0x%04X" % (key, tlv[key])
+            print("%s: 0x%04X" % (key, tlv[key]))
         else:
-            print "%s: %s" % (key, tlv[key])
+            print("%s: %s" % (key, tlv[key]))

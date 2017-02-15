@@ -34,6 +34,7 @@
 #  * - FIXME: Mac?
 #  */
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 
@@ -63,7 +64,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 
 readerstates = {}
 for reader in readers:
@@ -71,23 +72,23 @@ for reader in readers:
 hresult, newstates = SCardGetStatusChange(hcontext, 0, readerstates.values())
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
-print newstates
+print(newstates)
 for readerState in newstates:
     readername, eventstate, atr = readerState
     readerstates[readername] = (readername, eventstate)
 
-print "Remove the reader"
+print("Remove the reader")
 
 hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
-print "SCardGetStatusChange()", SCardGetErrorMessage(hresult)
+print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
     raise BaseSCardException(hresult)
 for readerState in newstates:
     readername, eventstate, atr = readerState
-    print readername, hex(eventstate)
-    print parseEventState(eventstate)
+    print(readername, hex(eventstate))
+    print(parseEventState(eventstate))
 
 hresult = SCardReleaseContext(hcontext)
-print "SCardReleaseContext()", SCardGetErrorMessage(hresult)
+print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise ReleaseContextException(hresult)

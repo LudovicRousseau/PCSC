@@ -18,6 +18,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from smartcard.System import readers
 from smartcard.scard import (SCARD_ATTR_VENDOR_NAME, SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_ATTR_DEVICE_FRIENDLY_NAME,
@@ -34,26 +35,27 @@ def main():
     try:
         # Vendor name
         name = card_connection.getAttrib(SCARD_ATTR_VENDOR_NAME)
-        print ''.join([chr(char) for char in name])
+        print(''.join([chr(char) for char in name]))
 
         # Vendor-supplied interface device version (DWORD in the form
         # 0xMMmmbbbb where MM = major version, mm = minor version, and
         # bbbb = build number).
         version = card_connection.getAttrib(SCARD_ATTR_VENDOR_IFD_VERSION)
-        print "Version: %d.%d.%d" % (version[3], version[2], version[0])
+        print("Version: %d.%d.%d" % (version[3], version[2],
+                version[0]))
 
         # Vendor-supplied interface device serial number.
         # only for readers with a USB serial number
         serial = card_connection.getAttrib(SCARD_ATTR_VENDOR_IFD_SERIAL_NO)
-        print serial
+        print(serial)
 
         # Reader's display name
         # only with pcsc-lite version >= 1.6.0
         name = card_connection.getAttrib(SCARD_ATTR_DEVICE_FRIENDLY_NAME)
-        print ''.join([chr(char) for char in name])
+        print(''.join([chr(char) for char in name]))
 
     except smartcard.Exceptions.SmartcardException, message:
-        print "Exception:", message
+        print("Exception:", message)
 
 if __name__ == "__main__":
     main()

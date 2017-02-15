@@ -21,6 +21,7 @@
 # has been implemented in revision 4332 but reverted in revision 4940 so
 # that the protocol is not negociated again
 
+from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 
@@ -31,9 +32,9 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print 'PC/SC Readers:', readers
+print('PC/SC Readers:', readers)
 reader = readers[0]
-print "Using reader:", reader
+print("Using reader:", reader)
 
 # the card should be reseted or inserted just before execution
 
@@ -43,7 +44,7 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
-print "dwActiveProtocol:", dwActiveProtocol
+print("dwActiveProtocol:", dwActiveProtocol)
 
 # Reconnect in SCARD_SHARE_DIRECT mode
 hresult, dwActiveProtocol = SCardReconnect(hcard,
@@ -52,7 +53,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
-print "dwActiveProtocol:", dwActiveProtocol
+print("dwActiveProtocol:", dwActiveProtocol)
 if SCARD_PROTOCOL_UNDEFINED != dwActiveProtocol:
     raise Exception('dwActiveProtocol should be SCARD_PROTOCOL_UNDEFINED')
 
@@ -66,7 +67,7 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
-print "dwActiveProtocol:", dwActiveProtocol
+print("dwActiveProtocol:", dwActiveProtocol)
 oldActiveProtocol = dwActiveProtocol
 
 # Reconnect in SCARD_SHARE_DIRECT mode
@@ -76,7 +77,7 @@ if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
-print "dwActiveProtocol:", dwActiveProtocol
+print("dwActiveProtocol:", dwActiveProtocol)
 if oldActiveProtocol != dwActiveProtocol:
     raise Exception('dwActiveProtocol should be like before')
 
