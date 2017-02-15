@@ -67,7 +67,7 @@ def main():
         disposition=SCARD_LEAVE_CARD)
 
     feature_list = getFeatureRequest(card_connection)
-    #print(getPinProperties(card_connection))
+    # print(getPinProperties(card_connection))
 
     mct_reader_direct = hasFeature(feature_list, FEATURE_MCT_READER_DIRECT)
     if mct_reader_direct is None:
