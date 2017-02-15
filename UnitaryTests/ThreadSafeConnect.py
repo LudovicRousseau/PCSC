@@ -69,6 +69,7 @@ def stress(*args):
 
     print("Exiting thread:", thread)
 
+
 def main():
     """
     main
