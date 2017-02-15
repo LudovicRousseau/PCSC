@@ -44,5 +44,5 @@ try:
                             SCardGetErrorMessage(hresult))
         print('Released context.')
 
-except Exception, message:
+except Exception as message:
     print("Exception:", message)
