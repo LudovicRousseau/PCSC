@@ -41,7 +41,7 @@ def stress(*args):
             raise EstablishContextException(hresult)
 
         hresult = SCardReleaseContext(hcontext)
-        #print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
+        # print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
         if hresult != SCARD_S_SUCCESS:
             raise ReleaseContextException(hresult)
 
