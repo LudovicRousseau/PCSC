@@ -69,7 +69,8 @@ print('PC/SC Readers:', readers)
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 0, readerstates.values())
+hresult, newstates = SCardGetStatusChange(hcontext, 0,
+        list(readerstates.values()))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print(newstates)
@@ -79,7 +80,8 @@ for readerState in newstates:
 
 print("Remove the reader")
 
-hresult, newstates = SCardGetStatusChange(hcontext, 10000, readerstates.values())
+hresult, newstates = SCardGetStatusChange(hcontext, 10000,
+        list(readerstates.values()))
 print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
     raise BaseSCardException(hresult)

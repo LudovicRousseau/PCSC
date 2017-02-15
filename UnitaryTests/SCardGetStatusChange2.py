@@ -38,7 +38,8 @@ print(readers)
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 10, readerstates.values())
+hresult, newstates = SCardGetStatusChange(hcontext, 10,
+        list(readerstates.values()))
 print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
