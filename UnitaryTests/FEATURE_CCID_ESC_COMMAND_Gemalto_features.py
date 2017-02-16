@@ -26,7 +26,10 @@ from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     PCSCv2_PART10_PROPERTY_wIdVendor, PCSCv2_PART10_PROPERTY_wIdProduct,
     getFeatureRequest, hasFeature)
 from smartcard.Exceptions import SmartcardException
-from itertools import izip
+try:
+    from itertools import izip
+except ImportError:
+    izip = zip
 
 
 # http://www.usb.org/developers/docs/USB_LANGIDs.pdf
@@ -71,7 +74,7 @@ def main():
     firmware_features = [0x6A]
     try:
         res = card_connection.control(ccid_esc_command, firmware_features)
-    except SmartcardException, ex:
+    except SmartcardException as ex:
         print("Failed:", ex)
         return
 
@@ -106,7 +109,7 @@ def main():
             # Reader is able to indicate the list of supported languages
             # through CCID-ESC 0x6B
             languages = card_connection.control(ccid_esc_command, [0x6B])
-        except SmartcardException, ex:
+        except SmartcardException as ex:
             print("Failed:", ex)
         print(" ", languages)
         languages = iter(languages)
