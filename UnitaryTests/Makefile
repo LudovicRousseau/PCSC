@@ -10,7 +10,7 @@ CFLAGS := -Wall -O2 -g -DVERSION=\"$(VERSION)\" $(PCSC_CFLAGS)
 LDLIBS := $(PCSC_LDLIBS)
 
 PROGRAMS := SCardBeginTransaction \
-	BufferOverflow \
+	BufferOverflow_SCardGetAttrib \
 	BufferOverflow2 \
 	BufferOverflow_SCardControl \
 	exec
