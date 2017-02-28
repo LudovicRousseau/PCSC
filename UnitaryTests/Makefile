@@ -11,7 +11,7 @@ LDLIBS := $(PCSC_LDLIBS)
 
 PROGRAMS := SCardBeginTransaction \
 	BufferOverflow_SCardGetAttrib \
-	BufferOverflow2 \
+	BufferOverflow_SCardTransmit \
 	BufferOverflow_SCardControl \
 	exec
 
