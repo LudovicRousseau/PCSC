@@ -2178,7 +2178,7 @@ error:
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
- * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbSendLength or \p cbRecvLength are too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbRecvLength was not large enough for the reader response. The expected size is now in \p lpBytesReturned (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER \p pbSendBuffer is NULL or \p cbSendLength is null and the IFDHandler is version 2.0 (without \p dwControlCode) (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_INVALID_VALUE Invalid value was presented (\ref SCARD_E_INVALID_VALUE)

@@ -715,8 +715,14 @@ static void ContextThread(LPVOID newContext)
 
 				ctStr.rv = SCardControl(ctStr.hCard, ctStr.dwControlCode,
 					pbSendBuffer, ctStr.cbSendLength,
-					pbRecvBuffer, ctStr.cbRecvLength,
+					pbRecvBuffer, sizeof pbRecvBuffer,
 					&dwBytesReturned);
+
+				if (dwBytesReturned > ctStr.cbRecvLength)
+					/* The client buffer is not large enough.
+					 * The pbRecvBuffer buffer will NOT be sent a few
+					 * lines bellow. So no buffer overflow is expected. */
+					ctStr.rv = SCARD_E_INSUFFICIENT_BUFFER;
 
 				ctStr.dwBytesReturned = dwBytesReturned;
 
