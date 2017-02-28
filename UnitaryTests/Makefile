@@ -12,6 +12,7 @@ LDLIBS := $(PCSC_LDLIBS)
 PROGRAMS := SCardBeginTransaction \
 	BufferOverflow \
 	BufferOverflow2 \
+	BufferOverflow_SCardControl \
 	exec
 
 all: $(PROGRAMS)
