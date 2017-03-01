@@ -257,6 +257,9 @@ int evaluatetoken(char *pcToken)
 
 void tok_error(char *token_error)
 {
+#ifdef NO_LOG
+	(void)token_error;
+#endif
 	Log4(PCSC_LOG_ERROR, "tok_error: invalid value line %d in %s: %s",
 		iOldLinenumber, ConfFile, token_error);
 	badError = 1;
