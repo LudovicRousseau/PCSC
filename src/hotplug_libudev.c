@@ -289,6 +289,9 @@ static LONG HPReadBundleValues(void)
 	}
 	idProduct = strtol(str, NULL, 16);
 
+#ifdef NO_LOG
+	(void)devpath;
+#endif
 	Log4(PCSC_LOG_DEBUG,
 		"Looking for a driver for VID: 0x%04X, PID: 0x%04X, path: %s",
 		idVendor, idProduct, devpath);
