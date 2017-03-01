@@ -245,7 +245,9 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext)
 static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
+#ifndef NO_LOG
 	const char *readerName;
+#endif
 	DWORD dwStatus;
 	uint32_t readerState;
 	int32_t readerSharing;
@@ -259,7 +261,9 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	 */
 	dwStatus = 0;
 
+#ifndef NO_LOG
 	readerName = rContext->readerState->readerName;
+#endif
 
 	rv = IFDStatusICC(rContext, &dwStatus);
 
