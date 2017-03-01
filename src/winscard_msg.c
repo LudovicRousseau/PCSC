@@ -281,6 +281,9 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 			/* you need to set the env variable PCSCLITE_DEBUG=0 since
 			 * this is logged on the client side and not on the pcscd
 			 * side*/
+#ifdef NO_LOG
+			(void)command;
+#endif
 			Log2(PCSC_LOG_INFO, "Command 0x%X not yet finished", command);
 		} else
 		{
