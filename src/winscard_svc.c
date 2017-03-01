@@ -149,6 +149,9 @@ void ContextsDeinitialize(void)
 {
 	int listSize;
 	listSize = list_size(&contextsList);
+#ifdef NO_LOG
+	(void)listSize;
+#endif
 	Log2(PCSC_LOG_DEBUG, "remaining threads: %d", listSize);
 	/* This is currently a no-op. It should terminate the threads properly. */
 
