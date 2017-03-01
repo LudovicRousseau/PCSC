@@ -222,6 +222,9 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
 	/*
 	 * Nothing to do here RPC layer will handle this
 	 */
+#ifdef NO_LOG
+	(void)hContext;
+#endif
 
 	Log2(PCSC_LOG_DEBUG, "Releasing Context: 0x%lX", hContext);
 
