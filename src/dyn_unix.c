@@ -100,6 +100,9 @@ INTERNAL LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle,
 
 	if (*pvFHandle == NULL)
 	{
+#ifdef NO_LOG
+		(void)mayfail;
+#endif
 		Log3(mayfail ? PCSC_LOG_INFO : PCSC_LOG_CRITICAL, "%s: %s",
 			pcFunction, dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
