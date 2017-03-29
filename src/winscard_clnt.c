@@ -3065,8 +3065,9 @@ end:
 }
 
 /**
- * Cancels all pending blocking requests on the \ref SCardGetStatusChange()
- * function. MUST be called with the same \ref SCARDCONTEXT as \ref SCardGetStatusChange().
+ * Cancels a specific blocking \ref SCardGetStatusChange() function.
+ * MUST be called with the same \ref SCARDCONTEXT as \ref
+ * SCardGetStatusChange().
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
