@@ -440,7 +440,9 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
  * @brief Creates an Application Context to the PC/SC Resource Manager.
  *
  * This must be the first WinSCard function called in a PC/SC application.
- * Each thread of an application shall use its own \ref SCARDCONTEXT.
+ * Each thread of an application shall use its own \ref SCARDCONTEXT, unless
+ * calling \ref SCardCancel(), which MUST be called with the same context as the
+ * context used to call \ref SCardGetStatusChange().
  *
  * @ingroup API
  * @param[in] dwScope Scope of the establishment.
@@ -1579,6 +1581,9 @@ end:
  * To wait for a reader event (reader added or removed) you may use the special
  * reader name \c "\\?PnP?\Notification". If a reader event occurs the state of
  * this reader will change and the bit \ref SCARD_STATE_CHANGED will be set.
+ *
+ * To cancel the ongoing call, use \ref SCardCancel() with the same
+ * \ref SCARDCONTEXT.
  *
  * @code
  * typedef struct {
@@ -3060,8 +3065,8 @@ end:
 }
 
 /**
- * Cancels all pending blocking requests on the SCardGetStatusChange()
- * function.
+ * Cancels all pending blocking requests on the \ref SCardGetStatusChange()
+ * function. MUST be called with the same \ref SCARDCONTEXT as \ref SCardGetStatusChange().
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
