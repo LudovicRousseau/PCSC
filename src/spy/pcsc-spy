@@ -22,7 +22,12 @@ from __future__ import print_function
 import os
 import signal
 import time
-from Queue import Queue
+try:
+    # for Python3
+    from queue import Queue
+except ImportError:
+    # for Python2
+    from Queue import Queue
 from threading import Thread
 from operator import attrgetter
 
