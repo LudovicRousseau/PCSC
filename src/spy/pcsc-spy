@@ -18,6 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 import os
 import signal
 import time
@@ -162,27 +163,30 @@ class PCSCspy(object):
         data = " => " + code + " (" + rv_text + " [" + rv + "]) "
         if "0x00000000" != rv:
             if self.color:
-                print self.indent + PCSCspy.color_red + data + PCSCspy.color_normal + time
+                print(self.indent + PCSCspy.color_red + data +
+                        PCSCspy.color_normal + time)
             else:
-                print self.indent + data + time
+                print(self.indent + data + time)
         else:
-            print self.indent + data + time
+            print(self.indent + data + time)
 
         return rv_text
 
     def log_in(self, line):
         """ generic log for IN line """
         if self.color:
-            print self.indent + PCSCspy.color_green + " i " + line + PCSCspy.color_normal
+            print(self.indent + PCSCspy.color_green + " i " + line +
+                    PCSCspy.color_normal)
         else:
-            print self.indent + " i " + line
+            print(self.indent + " i " + line)
 
     def log_out(self, line):
         """ generic log for OUT line """
         if self.color:
-            print self.indent + PCSCspy.color_magenta + " o " + line + PCSCspy.color_normal
+            print(self.indent + PCSCspy.color_magenta + " o " + line +
+                    PCSCspy.color_normal)
         else:
-            print self.indent + " o " + line
+            print(self.indent + " o " + line)
 
     def log_in_multi(self, lines, padding=""):
         """ generic log for IN lines """
@@ -384,9 +388,10 @@ class PCSCspy(object):
     def log_name(self, name):
         """ log function name """
         if self.color:
-            print self.indent + PCSCspy.color_blue + name + PCSCspy.color_normal
+            print(self.indent + PCSCspy.color_blue + name +
+                    PCSCspy.color_normal)
         else:
-            print self.indent + name
+            print(self.indent + name)
 
     def _log_readers(self, readers, direction):
         """ log SCARD_READERSTATE structure """
@@ -520,7 +525,7 @@ class PCSCspy(object):
             return [int(x, 16) for x in data.split(" ")]
 
         if dwControlCode == self.CM_IOCTL_GET_FEATURE_REQUEST:
-            print "  parsing CM_IOCTL_GET_FEATURE_REQUEST results:"
+            print("  parsing CM_IOCTL_GET_FEATURE_REQUEST results:")
             bRecvLength = int(bRecvLength, 16)
 
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
@@ -538,13 +543,13 @@ class PCSCspy(object):
                 except KeyError:
                     self.ControlCodes[value_int] = "UNKNOWN"
 
-                print "  Tag %s is 0x%X" % (self.ControlCodes[value_int],
-                    value_int)
+                print("  Tag %s is 0x%X" % (self.ControlCodes[value_int],
+                    value_int))
 
                 bRecvBuffer = bRecvBuffer[2 + length:]
 
         elif dwControlCode == self.FEATURE_GET_TLV_PROPERTIES:
-            print "  parsing FEATURE_GET_TLV_PROPERTIES results:"
+            print("  parsing FEATURE_GET_TLV_PROPERTIES results:")
             bRecvLength = int(bRecvLength, 16)
 
             bRecvBuffer = hex2int(bRecvBuffer, bRecvLength)
@@ -571,46 +576,47 @@ class PCSCspy(object):
                 except KeyError:
                     tag_text = "UNKNOWN"
 
-                print "  Tag:", tag_text
-                print "   Length: ", length
-                print "   Value:", value
+                print("  Tag:", tag_text)
+                print("   Length: ", length)
+                print("   Value:", value)
 
                 bRecvBuffer = bRecvBuffer[2 + length:]
 
         elif dwControlCode == self.FEATURE_IFD_PIN_PROPERTIES:
-            print "  parsing FEATURE_IFD_PIN_PROPERTIES results:"
+            print("  parsing FEATURE_IFD_PIN_PROPERTIES results:")
             bRecvBuffer = hex2int(bRecvBuffer, int(bRecvLength, 16))
 
-            print "  wLcdLayout:", bRecvBuffer[0], bRecvBuffer[1]
-            print "  bEntryValidationCondition:", bRecvBuffer[2]
-            print "  bTimeOut2:", bRecvBuffer[3]
+            print("  wLcdLayout:", bRecvBuffer[0], bRecvBuffer[1])
+            print("  bEntryValidationCondition:", bRecvBuffer[2])
+            print("  bTimeOut2:", bRecvBuffer[3])
 
         elif dwControlCode == self.FEATURE_VERIFY_PIN_DIRECT:
-            print "  parsing FEATURE_VERIFY_PIN_DIRECT:"
+            print("  parsing FEATURE_VERIFY_PIN_DIRECT:")
             bSendBuffer = hex2int(bSendBuffer, int(bSendLength, 16))
 
-            print "  bTimerOut:", bSendBuffer[0]
-            print "  bTimerOut2:", bSendBuffer[1]
-            print "  bmFormatString:", bSendBuffer[2]
-            print "  bmPINBlockString:", bSendBuffer[3]
-            print "  bmPINLengthFormat:", bSendBuffer[4]
-            print "  wPINMaxExtraDigit: 0x%02X%02X" % (bSendBuffer[6],
-                                                       bSendBuffer[5])
-            print "   Min:", bSendBuffer[6]
-            print "   Max:", bSendBuffer[5]
-            print "  bEntryValidationCondition:", bSendBuffer[7]
-            print "  bNumberMessage:", bSendBuffer[8]
-            print "  wLangId: 0x%02X%02X" % (bSendBuffer[10], bSendBuffer[9])
-            print "  bMsgIndex:", bSendBuffer[11]
-            print "  bTeoPrologue:", bSendBuffer[12], bSendBuffer[13], \
-                bSendBuffer[14]
-            print "  ulDataLength:", bSendBuffer[15] + \
+            print("  bTimerOut:", bSendBuffer[0])
+            print("  bTimerOut2:", bSendBuffer[1])
+            print("  bmFormatString:", bSendBuffer[2])
+            print("  bmPINBlockString:", bSendBuffer[3])
+            print("  bmPINLengthFormat:", bSendBuffer[4])
+            print("  wPINMaxExtraDigit: 0x%02X%02X" % (bSendBuffer[6],
+                                                       bSendBuffer[5]))
+            print("   Min:", bSendBuffer[6])
+            print("   Max:", bSendBuffer[5])
+            print("  bEntryValidationCondition:", bSendBuffer[7])
+            print("  bNumberMessage:", bSendBuffer[8])
+            print("  wLangId: 0x%02X%02X" % (bSendBuffer[10],
+                bSendBuffer[9]))
+            print("  bMsgIndex:", bSendBuffer[11])
+            print("  bTeoPrologue:", bSendBuffer[12], bSendBuffer[13], \
+                bSendBuffer[14])
+            print("  ulDataLength:", bSendBuffer[15] + \
                 bSendBuffer[16] * 256 + bSendBuffer[17] * 2 ** 16 + \
-                bSendBuffer[18] * 2 ** 24
-            print "  APDU:"
+                bSendBuffer[18] * 2 ** 24)
+            print("  APDU:")
             result = hexdump(bSendBuffer[19:])
             for line in result:
-                print "  ", line
+                print("  ", line)
 
     def _SCardGetAttrib(self):
         """ SCardGetAttrib """
@@ -731,7 +737,7 @@ class PCSCspy(object):
                 if line == 'EXIT':
                     return
                 else:
-                    print "Garbage: ", line
+                    print("Garbage: ", line)
             else:
                 # dispatch
                 (direction, sec, usec, fct) = line.strip().split('|')
@@ -774,7 +780,7 @@ class PCSCspy(object):
                 elif fct == 'SCardCancel':
                     self._SCardCancel()
                 else:
-                    print "Unknown function:", fct
+                    print("Unknown function:", fct)
 
             try:
                 record = self.stats[fct]
@@ -797,7 +803,7 @@ class PCSCdemultiplexer(object):
             try:
                 os.mkfifo(logfile)
             except (OSError):
-                print "fifo %s already present. Reusing it." % logfile
+                print("fifo %s already present. Reusing it." % logfile)
 
         self.sec = self.usec = 0
 
@@ -833,9 +839,9 @@ class PCSCdemultiplexer(object):
         res = tail.strip().split('|')
         # check the first line format
         if res[0] != ">":
-            print "Wrong format!"
-            print "First line Should start with a '>' but got:"
-            print tail
+            print("Wrong format!")
+            print("First line Should start with a '>' but got:")
+            print(tail)
             return
         (direction, sec, usec, fct) = res
 
@@ -891,15 +897,15 @@ class PCSCdemultiplexer(object):
             records = [stat[fct] for fct in stat]
 
             # display statistics sorted by total_time
-            print
-            print "Thread %d/%d" % (thread_n, len(stats))
-            print "Results sorted by total execution time"
-            print "total time: %f sec" % total_time
+            print()
+            print("Thread %d/%d" % (thread_n, len(stats)))
+            print("Results sorted by total execution time")
+            print("total time: %f sec" % total_time)
             for record in sorted(records, key=attrgetter('total_time'),
                                  reverse=True):
-                print "%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
+                print("%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
                     record.occurences, record.total_time / total_time * 100.,
-                    record.name)
+                    record.name))
 
             thread_n += 1
 
@@ -911,12 +917,12 @@ def main(logfile=None, color=True, diffable=False):
 
 
 def signal_handler(sig, frame):
-    print 'Ctrl-C, exiting.'
+    print('Ctrl-C, exiting.')
     os.kill(os.getpid(), signal.SIGQUIT)
 
 
 def print_usage():
-    print "Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help] [-v|--version]"
+    print("Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help] [-v|--version]")
 
 if __name__ == "__main__":
     import sys
@@ -941,9 +947,9 @@ if __name__ == "__main__":
             print_usage()
             sys.exit(1)
         if o == "-v" or o == "--version":
-            print "pcsc-spy version 1.0"
-            print "Copyright (c) 2011-2012, Ludovic Rousseau <ludovic.rousseau@free.fr>"
-            print
+            print("pcsc-spy version 1.0")
+            print("Copyright (c) 2011-2012, Ludovic Rousseau <ludovic.rousseau@free.fr>")
+            print()
             sys.exit(1)
 
     if len(args) > 0:
