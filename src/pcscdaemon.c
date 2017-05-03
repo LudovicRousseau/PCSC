@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 		{"version", 0, NULL, 'v'},
 		{"apdu", 0, NULL, 'a'},
 		{"debug", 0, NULL, 'd'},
-		{"info", 0, NULL, 0},
+		{"info", 0, NULL, 'i'},
 		{"error", 0, NULL, 'e'},
 		{"critical", 0, NULL, 'C'},
 		{"hotplug", 0, NULL, 'H'},
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
 		{NULL, 0, NULL, 0}
 	};
 #endif
-#define OPT_STRING "c:fTdhvaeCHt:r:s:xSI"
+#define OPT_STRING "c:fTdhvaieCHt:r:s:xSI"
 
 	newReaderConfig = NULL;
 	setToForeground = FALSE;
@@ -352,6 +352,10 @@ int main(int argc, char **argv)
 
 			case 'd':
 				DebugLogSetLevel(PCSC_LOG_DEBUG);
+				break;
+
+			case 'i':
+				DebugLogSetLevel(PCSC_LOG_INFO);
 				break;
 
 			case 'e':
@@ -846,7 +850,7 @@ static void print_usage(char const * const progname)
 	printf("  -H, --hotplug		ask the daemon to rescan the available readers\n");
 	printf("  -v, --version		display the program version number\n");
 	printf("  -d, --debug		display lower level debug messages\n");
-	printf("      --info		display info level debug messages\n");
+	printf("  -i, --info		display info level debug messages\n");
 	printf("  -e  --error		display error level debug messages (default level)\n");
 	printf("  -C  --critical	display critical only level debug messages\n");
 	printf("  --force-reader-polling ignore the IFD_GENERATE_HOTPLUG reader capability\n");
@@ -862,6 +866,7 @@ static void print_usage(char const * const progname)
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -T    force use of colored logs\n");
 	printf("  -d	display debug messages.\n");
+	printf("  -i	display info messages.\n");
 	printf("  -e	display error messages (default level).\n");
 	printf("  -C	display critical messages.\n");
 	printf("  -h	display usage information\n");
