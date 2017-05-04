@@ -307,7 +307,7 @@ static int CHANNEL_MAP_seeker(const void *el, const void *key)
 }
 
 /**
- * @brief Represents the an Application Context on the Client side.
+ * @brief Represents an Application Context on the Client side.
  *
  * An Application Context contains Channels (\c _psChannelMap).
  */
@@ -320,7 +320,7 @@ struct _psContextMap
 	char cancellable;				/**< We are in a cancellable call */
 };
 /**
- * @brief Represents the an Application Context on the Client side.
+ * @brief Represents an Application Context on the Client side.
  *
  * typedef of _psContextMap
  */
