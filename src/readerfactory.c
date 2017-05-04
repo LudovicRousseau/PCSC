@@ -615,74 +615,72 @@ LONG RFRemoveReader(const char *readerName, int port)
 
 LONG removeReader(READER_CONTEXT * sContext)
 {
+	/* Try to destroy the thread */
+	if (sContext -> pthThread)
+		(void)EHDestroyEventHandler(sContext);
+
+	if ((NULL == sContext->pMutex) || (NULL == sContext->pFeeds))
 	{
-		/* Try to destroy the thread */
-		if (sContext -> pthThread)
-			(void)EHDestroyEventHandler(sContext);
-
-		if ((NULL == sContext->pMutex) || (NULL == sContext->pFeeds))
-		{
-			Log1(PCSC_LOG_ERROR,
+		Log1(PCSC_LOG_ERROR,
 				"Trying to remove an already removed driver");
-			return SCARD_E_INVALID_VALUE;
-		}
+		return SCARD_E_INVALID_VALUE;
+	}
 
-		RFUnInitializeReader(sContext);
+	RFUnInitializeReader(sContext);
 
-		*sContext->pMutex -= 1;
+	*sContext->pMutex -= 1;
 
-		/* free shared resources when the last slot is closed */
-		if (0 == *sContext->pMutex)
-		{
-			(void)pthread_mutex_destroy(sContext->mMutex);
-			free(sContext->mMutex);
-			sContext->mMutex = NULL;
-			free(sContext->library);
-			free(sContext->device);
-			free(sContext->pMutex);
-			sContext->pMutex = NULL;
-		}
+	/* free shared resources when the last slot is closed */
+	if (0 == *sContext->pMutex)
+	{
+		(void)pthread_mutex_destroy(sContext->mMutex);
+		free(sContext->mMutex);
+		sContext->mMutex = NULL;
+		free(sContext->library);
+		free(sContext->device);
+		free(sContext->pMutex);
+		sContext->pMutex = NULL;
+	}
 
-		*sContext->pFeeds -= 1;
+	*sContext->pFeeds -= 1;
 
-		/* Added by Dave to free the pFeeds variable */
-		if (*sContext->pFeeds == 0)
-		{
-			free(sContext->pFeeds);
-			sContext->pFeeds = NULL;
-		}
+	/* Added by Dave to free the pFeeds variable */
+	if (*sContext->pFeeds == 0)
+	{
+		free(sContext->pFeeds);
+		sContext->pFeeds = NULL;
+	}
 
-		(void)pthread_mutex_destroy(&sContext->powerState_lock);
-		sContext->version = 0;
-		sContext->port = 0;
-		sContext->contexts = 0;
-		sContext->slot = 0;
-		sContext->hLockId = 0;
-		sContext->LockCount = 0;
-		sContext->vHandle = NULL;
+	(void)pthread_mutex_destroy(&sContext->powerState_lock);
+	sContext->version = 0;
+	sContext->port = 0;
+	sContext->contexts = 0;
+	sContext->slot = 0;
+	sContext->hLockId = 0;
+	sContext->LockCount = 0;
+	sContext->vHandle = NULL;
 
-		(void)pthread_mutex_lock(&sContext->handlesList_lock);
-		while (list_size(&sContext->handlesList) != 0)
-		{
-			int lrv;
-			RDR_CLIHANDLES *currentHandle;
+	(void)pthread_mutex_lock(&sContext->handlesList_lock);
+	while (list_size(&sContext->handlesList) != 0)
+	{
+		int lrv;
+		RDR_CLIHANDLES *currentHandle;
 
-			currentHandle = list_get_at(&sContext->handlesList, 0);
-			lrv = list_delete_at(&sContext->handlesList, 0);
-			if (lrv < 0)
-				Log2(PCSC_LOG_CRITICAL,
+		currentHandle = list_get_at(&sContext->handlesList, 0);
+		lrv = list_delete_at(&sContext->handlesList, 0);
+		if (lrv < 0)
+			Log2(PCSC_LOG_CRITICAL,
 					"list_delete_at failed with return value: %d", lrv);
 
-			free(currentHandle);
-		}
-		(void)pthread_mutex_unlock(&sContext->handlesList_lock);
-		(void)pthread_mutex_destroy(&sContext->handlesList_lock);
-		list_destroy(&sContext->handlesList);
-		dwNumReadersContexts -= 1;
-
-		/* signal an event to clients */
-		(void)EHSignalEventToClients();
+		free(currentHandle);
 	}
+	(void)pthread_mutex_unlock(&sContext->handlesList_lock);
+	(void)pthread_mutex_destroy(&sContext->handlesList_lock);
+	list_destroy(&sContext->handlesList);
+	dwNumReadersContexts -= 1;
+
+	/* signal an event to clients */
+	(void)EHSignalEventToClients();
 
 	return SCARD_S_SUCCESS;
 }
