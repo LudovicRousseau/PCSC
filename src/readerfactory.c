@@ -615,8 +615,6 @@ LONG RFRemoveReader(const char *readerName, int port)
 
 LONG removeReader(READER_CONTEXT * sContext)
 {
-	LONG rv;
-
 	{
 		/* Try to destroy the thread */
 		if (sContext -> pthThread)
@@ -629,9 +627,7 @@ LONG removeReader(READER_CONTEXT * sContext)
 			return SCARD_E_INVALID_VALUE;
 		}
 
-		rv = RFUnInitializeReader(sContext);
-		if (rv != SCARD_S_SUCCESS)
-			return rv;
+		RFUnInitializeReader(sContext);
 
 		*sContext->pMutex -= 1;
 
@@ -1124,7 +1120,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFUnInitializeReader(READER_CONTEXT * rContext)
+void RFUnInitializeReader(READER_CONTEXT * rContext)
 {
 	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
 		rContext->readerState->readerName);
@@ -1149,7 +1145,7 @@ LONG RFUnInitializeReader(READER_CONTEXT * rContext)
 	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
-	return SCARD_S_SUCCESS;
+	return;
 }
 
 SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
