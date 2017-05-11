@@ -65,7 +65,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	LONG EHInitializeEventStructures(void);
 	LONG EHDeinitializeEventStructures(void);
 	LONG EHSpawnEventHandler(READER_CONTEXT *);
-	LONG EHDestroyEventHandler(READER_CONTEXT *);
+	void EHDestroyEventHandler(READER_CONTEXT *);
 
 /** One application is using the reader */
 #define PCSCLITE_SHARING_LAST_CONTEXT       1

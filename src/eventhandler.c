@@ -156,7 +156,7 @@ LONG EHDeinitializeEventStructures(void)
 	return SCARD_S_SUCCESS;
 }
 
-LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
+void EHDestroyEventHandler(READER_CONTEXT * rContext)
 {
 	int rv;
 	DWORD dwGetSize;
@@ -165,7 +165,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 	if ('\0' == rContext->readerState->readerName[0])
 	{
 		Log1(PCSC_LOG_INFO, "Thread already stomped.");
-		return SCARD_S_SUCCESS;
+		return;
 	}
 
 	/*
@@ -215,7 +215,7 @@ LONG EHDestroyEventHandler(READER_CONTEXT * rContext)
 
 	Log1(PCSC_LOG_INFO, "Thread stomped.");
 
-	return SCARD_S_SUCCESS;
+	return;
 }
 
 LONG EHSpawnEventHandler(READER_CONTEXT * rContext)

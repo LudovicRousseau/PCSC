@@ -617,7 +617,7 @@ LONG removeReader(READER_CONTEXT * sContext)
 {
 	/* Try to destroy the thread */
 	if (sContext -> pthThread)
-		(void)EHDestroyEventHandler(sContext);
+		EHDestroyEventHandler(sContext);
 
 	if ((NULL == sContext->pMutex) || (NULL == sContext->pFeeds))
 	{
