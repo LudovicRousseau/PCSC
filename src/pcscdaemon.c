@@ -91,8 +91,8 @@ char Add_Interface_In_Name = TRUE;
 static void at_exit(void);
 static void clean_temp_files(void);
 static void signal_trap(int);
-static void print_version (void);
-static void print_usage (char const * const);
+static void print_version(void);
+static void print_usage(char const * const);
 
 /**
  * @brief The Server's Message Queue Listener function.
@@ -827,7 +827,7 @@ static void signal_trap(int sig)
 		Log2(PCSC_LOG_ERROR, "write failed: %s", strerror(errno));
 }
 
-static void print_version (void)
+static void print_version(void)
 {
 	printf("%s version %s.\n",  PACKAGE, VERSION);
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@musclecard.com>.\n");
@@ -838,7 +838,7 @@ static void print_version (void)
 	printf ("Enabled features:%s\n", PCSCLITE_FEATURES);
 }
 
-static void print_usage (char const * const progname)
+static void print_usage(char const * const progname)
 {
 	printf("Usage: %s options\n", progname);
 	printf("Options:\n");
