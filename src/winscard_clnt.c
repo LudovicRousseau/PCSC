@@ -398,9 +398,9 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
  *
  * Wrapper to the function pthread_mutex_lock().
  */
-inline static LONG SCardLockThread(void)
+inline static void SCardLockThread(void)
 {
-	return pthread_mutex_lock(&clientMutex);
+	pthread_mutex_lock(&clientMutex);
 }
 
 /**
@@ -408,9 +408,9 @@ inline static LONG SCardLockThread(void)
  *
  * Wrapper to the function pthread_mutex_unlock().
  */
-inline static LONG SCardUnlockThread(void)
+inline static void SCardUnlockThread(void)
 {
-	return pthread_mutex_unlock(&clientMutex);
+	pthread_mutex_unlock(&clientMutex);
 }
 
 /**
@@ -426,9 +426,9 @@ static int SCardGetContextValidity(SCARDCONTEXT hContext)
 {
 	SCONTEXTMAP * currentContextMap;
 
-	(void)SCardLockThread();
+	SCardLockThread();
 	currentContextMap = SCardGetContextTH(hContext);
-	(void)SCardUnlockThread();
+	SCardUnlockThread();
 
 	return currentContextMap != NULL;
 }
@@ -484,10 +484,10 @@ LONG SCardEstablishContext(DWORD dwScope, LPCVOID pvReserved1,
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
-	(void)SCardLockThread();
+	SCardLockThread();
 	rv = SCardEstablishContextTH(dwScope, pvReserved1,
 		pvReserved2, phContext);
-	(void)SCardUnlockThread();
+	SCardUnlockThread();
 
 end:
 	PROFILE_END(rv)
@@ -720,9 +720,9 @@ end:
 	/*
 	 * Remove the local context from the stack
 	 */
-	(void)SCardLockThread();
+	SCardLockThread();
 	(void)SCardRemoveContext(hContext);
-	(void)SCardUnlockThread();
+	SCardUnlockThread();
 
 error:
 	PROFILE_END(rv)
@@ -3292,14 +3292,14 @@ static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext)
 {
 	SCONTEXTMAP * currentContextMap;
 
-	(void)SCardLockThread();
+	SCardLockThread();
 	currentContextMap = SCardGetContextTH(hContext);
 
 	/* lock the context (if available) */
 	if (NULL != currentContextMap)
 		(void)pthread_mutex_lock(&currentContextMap->mMutex);
 
-	(void)SCardUnlockThread();
+	SCardUnlockThread();
 
 	return currentContextMap;
 }
@@ -3448,14 +3448,14 @@ static LONG SCardGetContextChannelAndLockFromHandle(SCARDHANDLE hCard,
 	if (0 == hCard)
 		return -1;
 
-	(void)SCardLockThread();
+	SCardLockThread();
 	rv = SCardGetContextAndChannelFromHandleTH(hCard, targetContextMap,
 		targetChannelMap);
 
 	if (SCARD_S_SUCCESS == rv)
 		(void)pthread_mutex_lock(&(*targetContextMap)->mMutex);
 
-	(void)SCardUnlockThread();
+	SCardUnlockThread();
 
 	return rv;
 }
