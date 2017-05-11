@@ -382,7 +382,7 @@ static LONG SCardGetContextChannelAndLockFromHandle(SCARDHANDLE,
 	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
 static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE,
 	/*@out@*/ SCONTEXTMAP * *, /*@out@*/ CHANNEL_MAP * *);
-static LONG SCardRemoveHandle(SCARDHANDLE);
+static void SCardRemoveHandle(SCARDHANDLE);
 
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
@@ -1081,7 +1081,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		goto end;
 
 	if (SCARD_S_SUCCESS == scDisconnectStruct.rv)
-		(void)SCardRemoveHandle(hCard);
+		SCardRemoveHandle(hCard);
 	rv = scDisconnectStruct.rv;
 
 end:
@@ -3414,7 +3414,7 @@ static LONG SCardAddHandle(SCARDHANDLE hCard, SCONTEXTMAP * currentContextMap,
 	return SCARD_S_SUCCESS;
 }
 
-static LONG SCardRemoveHandle(SCARDHANDLE hCard)
+static void SCardRemoveHandle(SCARDHANDLE hCard)
 {
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * currentChannelMap;
@@ -3424,7 +3424,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 	rv = SCardGetContextAndChannelFromHandleTH(hCard, &currentContextMap,
 		&currentChannelMap);
 	if (rv == -1)
-		return SCARD_E_INVALID_HANDLE;
+		return;
 
 	free(currentChannelMap->readerName);
 
@@ -3437,7 +3437,7 @@ static LONG SCardRemoveHandle(SCARDHANDLE hCard)
 
 	free(currentChannelMap);
 
-	return SCARD_S_SUCCESS;
+	return;
 }
 
 static LONG SCardGetContextChannelAndLockFromHandle(SCARDHANDLE hCard,
