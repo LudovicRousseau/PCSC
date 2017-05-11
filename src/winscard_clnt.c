@@ -375,7 +375,7 @@ static LONG SCardAddContext(SCARDCONTEXT, DWORD);
 static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT);
 static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT);
 static void SCardRemoveContext(SCARDCONTEXT);
-static LONG SCardCleanContext(SCONTEXTMAP *);
+static void SCardCleanContext(SCONTEXTMAP *);
 
 static LONG SCardAddHandle(SCARDHANDLE, SCONTEXTMAP *, LPCSTR);
 static LONG SCardGetContextChannelAndLockFromHandle(SCARDHANDLE,
@@ -3339,7 +3339,7 @@ static void SCardRemoveContext(SCARDCONTEXT hContext)
 		SCardCleanContext(currentContextMap);
 }
 
-static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
+static void SCardCleanContext(SCONTEXTMAP * targetContextMap)
 {
 	int list_index, lrv;
 	int listSize;
@@ -3379,7 +3379,7 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 
 	free(targetContextMap);
 
-	return SCARD_S_SUCCESS;
+	return;
 }
 
 /*
