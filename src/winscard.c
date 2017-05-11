@@ -471,7 +471,6 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		}
 		else
 		{
-			(void)RFDestroyReaderHandle(*phCard);
 			*phCard = 0;
 			rv = SCARD_E_SHARING_VIOLATION;
 			(void)pthread_mutex_unlock(&LockMutex);
@@ -498,7 +497,6 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		/*
 		 * Clean up - there is no more room
 		 */
-		(void)RFDestroyReaderHandle(*phCard);
 		if (rContext->contexts == PCSCLITE_SHARING_EXCLUSIVE_CONTEXT)
 			rContext->contexts = PCSCLITE_SHARING_NO_CONTEXT;
 		else
@@ -995,7 +993,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	 * Remove and destroy this handle
 	 */
 	(void)RFRemoveReaderHandle(rContext, hCard);
-	(void)RFDestroyReaderHandle(hCard);
 
 	/*
 	 * For exclusive connection reset it to no connections

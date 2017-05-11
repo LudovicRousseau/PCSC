@@ -1176,12 +1176,6 @@ SCARDHANDLE RFCreateReaderHandle(READER_CONTEXT * rContext)
 	return randHandle;
 }
 
-LONG RFDestroyReaderHandle(/*@unused@*/ SCARDHANDLE hCard)
-{
-	(void)hCard;
-	return SCARD_S_SUCCESS;
-}
-
 LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	int listLength, lrv;
