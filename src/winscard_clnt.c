@@ -3348,7 +3348,7 @@ static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
 	CHANNEL_MAP * currentChannelMap;
 
 	targetContextMap->hContext = 0;
-	(void)ClientCloseSession(targetContextMap->dwClientID);
+	ClientCloseSession(targetContextMap->dwClientID);
 	targetContextMap->dwClientID = 0;
 	(void)pthread_mutex_destroy(&targetContextMap->mMutex);
 

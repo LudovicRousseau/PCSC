@@ -278,7 +278,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 	char *getSocketName(void);
 	int32_t ClientSetupSession(uint32_t *);
-	int32_t ClientCloseSession(uint32_t);
+	void ClientCloseSession(uint32_t);
 	LONG MessageReceiveTimeout(uint32_t command, /*@out@*/ void *buffer,
 		uint64_t buffer_size, int32_t filedes, long timeOut);
 	LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,

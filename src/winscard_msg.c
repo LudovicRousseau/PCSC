@@ -169,9 +169,9 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
  *
  * @retval 0 Success.
  */
-INTERNAL int ClientCloseSession(uint32_t dwClientID)
+INTERNAL void ClientCloseSession(uint32_t dwClientID)
 {
-	return close(dwClientID);
+	close(dwClientID);
 }
 
 /**
