@@ -1254,7 +1254,7 @@ end:
 	return rv;
 }
 
-LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
+void RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 {
 	/* Set all the handles for that reader to the event */
 	int list_index, listSize;
@@ -1284,7 +1284,7 @@ LONG RFSetReaderEventState(READER_CONTEXT * rContext, DWORD dwEvent)
 		rContext->LockCount = 0;
 	}
 
-	return SCARD_S_SUCCESS;
+	return;
 }
 
 LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)

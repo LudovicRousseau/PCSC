@@ -583,7 +583,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Notify the card has been reset
 		 */
-		(void)RFSetReaderEventState(rContext, SCARD_RESET);
+		RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
 		 * Currently pcsc-lite keeps the card powered constantly
@@ -888,7 +888,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Notify the card has been reset
 		 */
-		(void)RFSetReaderEventState(rContext, SCARD_RESET);
+		RFSetReaderEventState(rContext, SCARD_RESET);
 
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
@@ -1164,7 +1164,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Notify the card has been reset
 		 */
-		(void)RFSetReaderEventState(rContext, SCARD_RESET);
+		RFSetReaderEventState(rContext, SCARD_RESET);
 
 		/*
 		 * Set up the status bit masks on readerState
