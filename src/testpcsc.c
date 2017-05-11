@@ -463,12 +463,6 @@ wait_for_card_again:
 		free(pcReader);
 #endif
 
-	if (rv != SCARD_S_SUCCESS)
-	{
-		(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
-		(void)SCardReleaseContext(hContext);
-	}
-
 	printf("Press enter: ");
 	(void)getchar();
 	printf("Testing SCardReconnect\t\t: ");
