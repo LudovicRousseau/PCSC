@@ -65,7 +65,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hotplug.h"
 #include "readerfactory.h"
 #include "configfile.h"
-#include "powermgt_generic.h"
 #include "utils.h"
 #include "eventhandler.h"
 
@@ -748,11 +747,6 @@ int main(int argc, char **argv)
 
 	RFWaitForReaderInit();
 #endif
-
-	/*
-	 * Set up the power management callback routine
-	 */
-	(void)PMRegisterForPowerEvents();
 
 	/* initialisation succeeded */
 	if (pipefd[1] >= 0)

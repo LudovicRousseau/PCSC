@@ -59,8 +59,6 @@ pcscd_SOURCES = \
 	PCSC/pcsclite.h \
 	PCSC/winscard.h \
 	PCSC/wintypes.h \
-	powermgt_generic.c \
-	powermgt_generic.h \
 	prothandler.c \
 	prothandler.h \
 	readerfactory.c \
