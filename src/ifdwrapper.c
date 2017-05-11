@@ -288,13 +288,8 @@ LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	 * Check that the card is inserted first
 	 */
 	rv = IFDStatusICC(rContext, &dwStatus);
-	if (rv != IFD_SUCCESS)
-	{
-		if (rv == IFD_NO_SUCH_DEVICE)
-			return SCARD_E_READER_UNAVAILABLE;
-
-		return SCARD_E_NOT_TRANSACTED;
-	}
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
 
 	if (dwStatus & SCARD_ABSENT)
 		return SCARD_W_REMOVED_CARD;
