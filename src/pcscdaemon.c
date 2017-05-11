@@ -371,7 +371,7 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 
 			case 'a':
-				(void)DebugLogSetCategory(DEBUG_CATEGORY_APDU);
+				DebugLogSetCategory(DEBUG_CATEGORY_APDU);
 				break;
 
 			case 'H':

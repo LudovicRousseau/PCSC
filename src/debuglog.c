@@ -81,7 +81,7 @@ void DebugLogSetLevel(const int level)
 	(void)level;
 }
 
-INTERNAL int DebugLogSetCategory(const int dbginfo)
+INTERNAL void DebugLogSetCategory(const int dbginfo)
 {
 	(void)dbginfo;
 
@@ -296,7 +296,7 @@ void DebugLogSetLevel(const int level)
 	}
 }
 
-INTERNAL int DebugLogSetCategory(const int dbginfo)
+INTERNAL void DebugLogSetCategory(const int dbginfo)
 {
 	/* use a negative number to UNset
 	 * typically use ~DEBUG_CATEGORY_APDU
@@ -308,8 +308,6 @@ INTERNAL int DebugLogSetCategory(const int dbginfo)
 
 	if (LogCategory & DEBUG_CATEGORY_APDU)
 		Log1(PCSC_LOG_INFO, "Debug options: APDU");
-
-	return LogCategory;
 }
 
 INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,

@@ -125,7 +125,7 @@ PCSC_API void log_xxd(const int priority, const char *msg,
 
 void DebugLogSuppress(const int);
 void DebugLogSetLogType(const int);
-int DebugLogSetCategory(const int);
+void DebugLogSetCategory(const int);
 void DebugLogCategory(const int, const unsigned char *, const int);
 PCSC_API void DebugLogSetLevel(const int level);
 
