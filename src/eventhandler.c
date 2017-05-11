@@ -502,7 +502,6 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 			/*
 			 * Exit and notify the caller
 			 */
-			(void)EHSignalEventToClients();
 			Log1(PCSC_LOG_INFO, "Die");
 			rContext->hLockId = 0;
 			(void)pthread_exit(NULL);
