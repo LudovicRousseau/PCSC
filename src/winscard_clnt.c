@@ -374,7 +374,7 @@ PCSC_API const SCARD_IO_REQUEST g_rgSCardRawPci = { SCARD_PROTOCOL_RAW, sizeof(S
 static LONG SCardAddContext(SCARDCONTEXT, DWORD);
 static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT);
 static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT);
-static LONG SCardRemoveContext(SCARDCONTEXT);
+static void SCardRemoveContext(SCARDCONTEXT);
 static LONG SCardCleanContext(SCONTEXTMAP *);
 
 static LONG SCardAddHandle(SCARDHANDLE, SCONTEXTMAP *, LPCSTR);
@@ -721,7 +721,7 @@ end:
 	 * Remove the local context from the stack
 	 */
 	SCardLockThread();
-	(void)SCardRemoveContext(hContext);
+	SCardRemoveContext(hContext);
 	SCardUnlockThread();
 
 error:
@@ -3330,15 +3330,13 @@ static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT hContext)
  * @retval SCARD_S_SUCCESS Success (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_INVALID_HANDLE The context \p hContext was not found (\ref SCARD_E_INVALID_HANDLE)
  */
-static LONG SCardRemoveContext(SCARDCONTEXT hContext)
+static void SCardRemoveContext(SCARDCONTEXT hContext)
 {
 	SCONTEXTMAP * currentContextMap;
 	currentContextMap = SCardGetContextTH(hContext);
 
-	if (NULL == currentContextMap)
-		return SCARD_E_INVALID_HANDLE;
-	else
-		return SCardCleanContext(currentContextMap);
+	if (NULL != currentContextMap)
+		SCardCleanContext(currentContextMap);
 }
 
 static LONG SCardCleanContext(SCONTEXTMAP * targetContextMap)
