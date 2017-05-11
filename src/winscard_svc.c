@@ -93,7 +93,7 @@ static LONG MSGAddContext(SCARDCONTEXT, SCONTEXT *);
 static LONG MSGRemoveContext(SCARDCONTEXT, SCONTEXT *);
 static LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, SCONTEXT *);
 static LONG MSGRemoveHandle(SCARDHANDLE, SCONTEXT *);
-static LONG MSGCleanupClient(SCONTEXT *);
+static void MSGCleanupClient(SCONTEXT *);
 
 static void ContextThread(LPVOID pdwIndex);
 
@@ -803,7 +803,7 @@ wrong_length:
 	Log2(PCSC_LOG_DEBUG, "Wrong length: %d", filedes);
 exit:
 	(void)close(filedes);
-	(void)MSGCleanupClient(threadContext);
+	MSGCleanupClient(threadContext);
 	(void)pthread_exit((LPVOID) NULL);
 }
 
@@ -1009,7 +1009,7 @@ static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard,
 /* Should be called just prior to exiting the thread as it de-allocates
  * the thread memory strucutres
  */
-static LONG MSGCleanupClient(SCONTEXT * threadContext)
+static void MSGCleanupClient(SCONTEXT * threadContext)
 {
 	int lrv;
 	int listSize;
@@ -1051,5 +1051,5 @@ static LONG MSGCleanupClient(SCONTEXT * threadContext)
 		alarm(TIME_BEFORE_SUICIDE);
 	}
 
-	return 0;
+	return;
 }
