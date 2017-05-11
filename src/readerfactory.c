@@ -680,7 +680,7 @@ LONG removeReader(READER_CONTEXT * sContext)
 	dwNumReadersContexts -= 1;
 
 	/* signal an event to clients */
-	(void)EHSignalEventToClients();
+	EHSignalEventToClients();
 
 	return SCARD_S_SUCCESS;
 }

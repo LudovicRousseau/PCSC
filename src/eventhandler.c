@@ -111,9 +111,8 @@ LONG EHUnregisterClientForEvent(int32_t filedes)
 /**
  * Sends an asynchronous event to any waiting client
  */
-LONG EHSignalEventToClients(void)
+void EHSignalEventToClients(void)
 {
-	LONG rv = SCARD_S_SUCCESS;
 	int32_t filedes;
 
 	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
@@ -122,15 +121,13 @@ LONG EHSignalEventToClients(void)
 	while (list_iterator_hasnext(&ClientsWaitingForEvent))
 	{
         filedes = *(int32_t *)list_iterator_next(&ClientsWaitingForEvent);
-		rv = MSGSignalClient(filedes, SCARD_S_SUCCESS);
+		MSGSignalClient(filedes, SCARD_S_SUCCESS);
 	}
 	(void)list_iterator_stop(&ClientsWaitingForEvent);
 
 	(void)list_clear(&ClientsWaitingForEvent);
 
 	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
-
-	return rv;
 } /* EHSignalEventToClients */
 
 LONG EHInitializeEventStructures(void)
@@ -324,7 +321,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 	rContext->readerState->readerState = readerState;
 	rContext->readerState->readerSharing = readerSharing = rContext->contexts;
 
-	(void)EHSignalEventToClients();
+	EHSignalEventToClients();
 
 	while (1)
 	{
@@ -345,7 +342,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 			dwCurrentState = SCARD_UNKNOWN;
 
-			(void)EHSignalEventToClients();
+			EHSignalEventToClients();
 		}
 
 		if (dwStatus & SCARD_ABSENT)
@@ -371,7 +368,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 				if (rContext->readerState->eventCounter > 0xFFFF)
 					rContext->readerState->eventCounter = 0;
 
-				(void)EHSignalEventToClients();
+				EHSignalEventToClients();
 			}
 
 		}
@@ -423,7 +420,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", readerName);
 
-				(void)EHSignalEventToClients();
+				EHSignalEventToClients();
 
 				if (rv == IFD_SUCCESS)
 				{
@@ -448,7 +445,7 @@ static void EHStatusHandlerThread(READER_CONTEXT * rContext)
 		{
 			readerSharing = rContext->contexts;
 			rContext->readerState->readerSharing = readerSharing;
-			(void)EHSignalEventToClients();
+			EHSignalEventToClients();
 		}
 
 		if (rContext->pthCardEvent)

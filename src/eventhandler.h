@@ -61,7 +61,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	LONG EHTryToUnregisterClientForEvent(int32_t filedes);
 	LONG EHRegisterClientForEvent(int32_t filedes);
 	LONG EHUnregisterClientForEvent(int32_t filedes);
-	LONG EHSignalEventToClients(void);
+	void EHSignalEventToClients(void);
 	LONG EHInitializeEventStructures(void);
 	LONG EHDeinitializeEventStructures(void);
 	LONG EHSpawnEventHandler(READER_CONTEXT *);
