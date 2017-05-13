@@ -883,9 +883,6 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		DWORD dwAtrLen;
 
-		/* invalidate ATR */
-		rContext->readerState->cardAtrLength = 0;
-
 		/*
 		 * Notify the card has been reset
 		 */
@@ -940,6 +937,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			}
 			else
 			{
+				rContext->readerState->cardAtrLength = 0;
 				Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
 				if (rv == SCARD_W_REMOVED_CARD)
