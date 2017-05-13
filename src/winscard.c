@@ -904,27 +904,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
-		if (SCARD_UNPOWER_CARD == dwDisposition)
+		if (rv == SCARD_S_SUCCESS)
 		{
-			if (rv == SCARD_S_SUCCESS)
+			if (SCARD_UNPOWER_CARD == dwDisposition)
 				rContext->readerState->readerState = SCARD_PRESENT;
 			else
-			{
-				Log3(PCSC_LOG_ERROR, "Error powering down card: %ld 0x%04lX",
-					rv, rv);
-				if (rv == SCARD_W_REMOVED_CARD)
-					rContext->readerState->readerState = SCARD_ABSENT;
-				else
-					rContext->readerState->readerState =
-						SCARD_PRESENT | SCARD_SWALLOWED;
-			}
-		}
-		else
-		{
-			/*
-			 * Set up the status bit masks on readerState
-			 */
-			if (rv == SCARD_S_SUCCESS)
 			{
 				rContext->readerState->cardAtrLength = dwAtrLen;
 				rContext->readerState->readerState =
@@ -935,17 +919,23 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 					rContext->readerState->cardAtr,
 					rContext->readerState->cardAtrLength);
 			}
+		}
+		else
+		{
+			if (SCARD_UNPOWER_CARD == dwDisposition)
+				Log3(PCSC_LOG_ERROR, "Error powering down card: %ld 0x%04lX",
+					rv, rv);
 			else
 			{
 				rContext->readerState->cardAtrLength = 0;
 				Log1(PCSC_LOG_ERROR, "Error resetting card.");
-
-				if (rv == SCARD_W_REMOVED_CARD)
-					rContext->readerState->readerState = SCARD_ABSENT;
-				else
-					rContext->readerState->readerState =
-						SCARD_PRESENT | SCARD_SWALLOWED;
 			}
+
+			if (rv == SCARD_W_REMOVED_CARD)
+				rContext->readerState->readerState = SCARD_ABSENT;
+			else
+				rContext->readerState->readerState =
+					SCARD_PRESENT | SCARD_SWALLOWED;
 		}
 	}
 	else if (dwDisposition == SCARD_EJECT_CARD)
