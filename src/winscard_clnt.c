@@ -2800,19 +2800,28 @@ end:
  * LPSTR mszReaders;
  * DWORD dwReaders;
  * LONG rv;
- * ...
+ *
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * rv = SCardListReaders(hContext, NULL, NULL, &dwReaders);
  * mszReaders = malloc(sizeof(char)*dwReaders);
  * rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
+ *
+ * char *p = mszReaders;
+ * while (*p)
+ * {
+ *	 printf("Reader: %s\n", p);
+ *	 p += strlen(p) +1;
+ * }
  * @endcode
+ *
+ * or, with auto allocation:
  *
  * @code
  * SCARDCONTEXT hContext;
  * LPSTR mszReaders;
  * DWORD dwReaders;
  * LONG rv;
- * ...
+ *
  * rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
  * dwReaders = SCARD_AUTOALLOCATE;
  * rv = SCardListReaders(hContext, NULL, (LPSTR)&mszReaders, &dwReaders);
