@@ -1,3 +1,21 @@
+1.8.21: Ludovic Rousseau
+20 May 2017
+- SCardCancel():
+  . fix a race condition bug
+  . fix a possible use after free
+  . improve Doxygen documentation
+- SCardGetStatusChange(): fix a race condition when a reader is removed
+- SCardDisconnect(): fix status update for SCARD_UNPOWER_CARD
+- pcsc_stringify_error(): use Thread-local storage
+- pcsc_stringify_error() now returns a const char *
+- SCardControl() may return SCARD_E_INSUFFICIENT_BUFFER when
+  pbRecvBuffer is not big enough to receive the card response.
+- Fix compilation error with GCC 4.9
+- UnitaryTests: add support of Python 3
+- pcsc-spy: add support of Python 3
+- Some other minor improvements
+
+
 1.8.20: Ludovic Rousseau
 30 December 2016
 - Fix a crash and potential security issue in pcscd
