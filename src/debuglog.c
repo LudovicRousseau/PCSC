@@ -282,7 +282,7 @@ void DebugLogSetLevel(const int level)
 			break;
 
 		case PCSC_LOG_INFO:
-			Log1(PCSC_LOG_INFO, "debug level=notice");
+			Log1(PCSC_LOG_INFO, "debug level=info");
 			break;
 
 		case PCSC_LOG_DEBUG:
@@ -291,7 +291,7 @@ void DebugLogSetLevel(const int level)
 
 		default:
 			LogLevel = PCSC_LOG_INFO;
-			Log2(PCSC_LOG_CRITICAL, "unknown level (%d), using level=notice",
+			Log2(PCSC_LOG_CRITICAL, "unknown level (%d), using level=info",
 				level);
 	}
 }
