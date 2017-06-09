@@ -223,7 +223,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		readerName[MAX_READERNAME - sizeof(" 00 00")] = '\0';
 	}
 
-	/* Same name, same port - duplicate reader cannot be used */
+	/* Same name, same port, same device - duplicate reader cannot be used */
 	if (dwNumReadersContexts != 0)
 	{
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
@@ -240,8 +240,9 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
 
-				if ((strcmp(readerName, lpcStripReader) == 0) &&
-					(port == sReadersContexts[i]->port))
+				if ((strcmp(readerName, lpcStripReader) == 0)
+					&& (port == sReadersContexts[i]->port)
+					&& (strcmp(device, sReadersContexts[i]->device) == 0))
 				{
 					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
 					return SCARD_E_DUPLICATE_READER;
