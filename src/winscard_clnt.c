@@ -3118,15 +3118,17 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	/*
 	 * Make sure this context has been opened
 	 */
-	currentContextMap = SCardGetAndLockContext(hContext);
+	(void)SCardLockThread();
+	currentContextMap = SCardGetContextTH(hContext);
+
 	if (NULL == currentContextMap)
 	{
+		(void)SCardUnlockThread();
 		rv = SCARD_E_INVALID_HANDLE;
 		goto error;
 	}
-
 	cancellable = currentContextMap->cancellable;
-	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+	(void)SCardUnlockThread();
 
 	if (! cancellable)
 	{
