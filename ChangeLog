@@ -1,3 +1,9 @@
+1.8.22: Ludovic Rousseau
+17 June 2017
+- SCardCancel() was broken in 1.8.21. The call was bloking.
+- Enable use of info level logging for pcscd using -i/--info
+
+
 1.8.21: Ludovic Rousseau
 20 May 2017
 - SCardCancel():
