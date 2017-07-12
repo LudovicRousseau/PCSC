@@ -508,7 +508,10 @@ int list_insert_at(list_t *restrict l, const void *data, unsigned int pos) {
         size_t datalen = l->attrs.meter(data);
         lent->data = (struct list_entry_s *)malloc(datalen);
         if (NULL == lent->data)
+        {
+            free(lent);
             return -1;
+        }
         memcpy(lent->data, data, datalen);
     } else {
         lent->data = (void*)data;
@@ -517,7 +520,11 @@ int list_insert_at(list_t *restrict l, const void *data, unsigned int pos) {
     /* actually append element */
     prec = list_findpos(l, pos-1);
     if (NULL == prec)
+    {
+        free(lent->data);
+        free(lent);
         return -1;
+    }
     succ = prec->next;
 
     prec->next = lent;
