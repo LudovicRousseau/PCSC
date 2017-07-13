@@ -57,10 +57,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
+#ifdef USE_LIBSYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 
 #include "misc.h"
 #include "pcscd.h"
-#include "sd-daemon.h"
 #include "winscard.h"
 #include "debuglog.h"
 #include "winscard_msg.h"
@@ -174,6 +176,7 @@ INTERNAL int32_t InitializeSocket(void)
  * @retval 0 Success
  * @retval -1 Passed FD is not an UNIX socket.
  */
+#ifdef USE_LIBSYSTEMD
 INTERNAL int32_t ListenExistingSocket(int fd)
 {
 	if (!sd_is_socket(fd, AF_UNIX, SOCK_STREAM, -1))
@@ -185,6 +188,7 @@ INTERNAL int32_t ListenExistingSocket(int fd)
 	commonSocket = fd;
 	return 0;
 }
+#endif
 
 /**
  * @brief Looks for messages sent by clients.

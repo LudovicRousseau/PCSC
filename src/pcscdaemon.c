@@ -53,12 +53,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif
+#ifdef USE_LIBSYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 
 #include "misc.h"
 #include "pcsclite.h"
 #include "pcscd.h"
 #include "debuglog.h"
-#include "sd-daemon.h"
 #include "winscard_msg.h"
 #include "winscard_svc.h"
 #include "sys_generic.h"
@@ -430,6 +432,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+#ifdef USE_LIBSYSTEMD
 	/*
 	 * Check if systemd passed us any file descriptors
 	 */
@@ -449,6 +452,7 @@ int main(int argc, char **argv)
 		else
 			SocketActivated = FALSE;
 	}
+#endif
 
 	/*
 	 * test the presence of /var/run/pcscd/pcscd.comm
@@ -706,9 +710,11 @@ int main(int argc, char **argv)
 	/*
 	 * Initialize the comm structure
 	 */
+#ifdef USE_LIBSYSTEMD
 	if (SocketActivated)
 		rv = ListenExistingSocket(SD_LISTEN_FDS_START + 0);
 	else
+#endif
 		rv = InitializeSocket();
 
 	if (rv)

@@ -63,8 +63,6 @@ pcscd_SOURCES = \
 	prothandler.h \
 	readerfactory.c \
 	readerfactory.h \
-	sd-daemon.c \
-	sd-daemon.h \
 	simclist.c \
 	simclist.h \
 	sys_generic.h \
@@ -79,9 +77,9 @@ pcscd_SOURCES = \
 	winscard_svc.c \
 	winscard_svc.h
 pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
-	$(POLKIT_CFLAGS) \
+	$(POLKIT_CFLAGS) $(LIBSYSTEMD_CFLAGS) \
 	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
-pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
+pcscd_LDFLAGS = $(LDFLAGS) $(LIBSYSTEMD_LIBS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
 	$(LIBUSB_LIBS) $(IOKIT) $(LIBUDEV_LIBS) \
@@ -91,10 +89,6 @@ pcscd_LDADD = \
 fix-rights: install-sbinPROGRAMS
 	chgrp pcscd $(DESTDIR)$(sbindir)/pcscd
 	chmod g+s $(DESTDIR)$(sbindir)/pcscd
-
-update-systemd:
-	curl -O http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c
-	curl -O http://cgit.freedesktop.org/systemd/systemd/plain/src/systemd/sd-daemon.h
 
 testpcsc_SOURCES = testpcsc.c
 testpcsc_LDADD = libpcsclite.la
