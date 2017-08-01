@@ -152,7 +152,7 @@ AC_CHECK_LIB(rt, mq_getattr, [LIBS="$LIBS -lrt"])
 
 # check for libsystemd
 AC_ARG_ENABLE(libsystemd,
-	AS_HELP_STRING([--disable)libsystemd],[do not use libsystemd]),
+	AS_HELP_STRING([--disable-libsystemd],[do not use libsystemd]),
 	[ use_libsystemd="${enableval}" ], [ use_libsystemd="yes" ] )
 if test "$use_libsystemd" != "no"; then
 	PKG_CHECK_MODULES(LIBSYSTEMD, libsystemd,,
