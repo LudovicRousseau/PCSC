@@ -416,8 +416,8 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		 * reader so we can just return SCARD_S_SUCCESS. */
 		return SCARD_S_SUCCESS;
 
-	if (rv == IFD_SUCCESS && dwGetSize == 1 && nbSlots == 1)
-		/* Reader has this defined and it only has one slot */
+	if (1 == nbSlots)
+		/* Reader has only one slot */
 		return SCARD_S_SUCCESS;
 
 	/*
