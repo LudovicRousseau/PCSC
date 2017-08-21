@@ -410,12 +410,13 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	rv = IFDGetCapabilities((sReadersContexts[dwContext]),
 		TAG_IFD_SLOTS_NUMBER, &dwGetSize, ucGetData);
 
-	if (rv != IFD_SUCCESS || dwGetSize != 1 || ucGetData[0] == 0)
+	int nbSlots = ucGetData[0];
+	if (rv != IFD_SUCCESS || dwGetSize != 1 || nbSlots == 0)
 		/* Reader does not have this defined.  Must be a single slot
 		 * reader so we can just return SCARD_S_SUCCESS. */
 		return SCARD_S_SUCCESS;
 
-	if (rv == IFD_SUCCESS && dwGetSize == 1 && ucGetData[0] == 1)
+	if (rv == IFD_SUCCESS && dwGetSize == 1 && nbSlots == 1)
 		/* Reader has this defined and it only has one slot */
 		return SCARD_S_SUCCESS;
 
@@ -425,7 +426,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	 */
 
 	/* Initialize the rest of the slots */
-	for (j = 1; j < ucGetData[0]; j++)
+	for (j = 1; j < nbSlots; j++)
 	{
 		char *tmpReader = NULL;
 		DWORD dwContextB = 0;
