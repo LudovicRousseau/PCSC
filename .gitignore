@@ -79,10 +79,8 @@ src/pcscd-hotplug_linux.o
 src/pcscd-hotplug_macosx.o
 src/pcscd-ifdwrapper.o
 src/pcscd-pcscdaemon.o
-src/pcscd-powermgt_generic.o
 src/pcscd-prothandler.o
 src/pcscd-readerfactory.o
-src/pcscd-sd-daemon.o
 src/pcscd-simclist.o
 src/pcscd-sys_unix.o
 src/pcscd-tokenparser.o
