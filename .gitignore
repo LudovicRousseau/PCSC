@@ -1,4 +1,5 @@
 aclocal.m4
+ar-lib
 autom4te.cache/
 compile
 config.guess
@@ -53,6 +54,7 @@ src/Makefile
 src/Makefile.in
 src/pcscd
 src/pcscd-atrhandler.o
+src/pcscd-auth.o
 src/pcscd-configfile.o
 src/pcscd-debuglog.o
 src/pcscd-dyn_hpux.o
@@ -88,11 +90,17 @@ src/pcsc-wirecheck-gen.o
 src/pcsc-wirecheck-main.o
 src/spy/.deps/
 src/spy/libpcscspy.la
+src/spy/libpcscspy.lo
 src/spy/.libs/
 src/spy/pcsc-spy.lo
+src/spy/pcsc-spy.1
 src/tags
 src/testpcsc
 src/testpcsc.o
 src/tokenparser.c
 stamp-h1
 ylwrap
+UnitaryTests/BufferOverflow_SCardGetAttrib
+UnitaryTests/BufferOverflow_SCardTransmit
+UnitaryTests/SCardBeginTransaction
+ChangeLog.git
