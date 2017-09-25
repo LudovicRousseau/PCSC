@@ -2058,6 +2058,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			{
 				struct wait_reader_state_change waitStatusStruct;
 				struct timeval before, after;
+				DWORD dwClientID = currentContextMap->dwClientID;
 
 				gettimeofday(&before, NULL);
 
@@ -2074,12 +2075,21 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				if (rv != SCARD_S_SUCCESS)
 					goto end;
 
+				(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+
 				/*
 				 * Read a message from the server
 				 */
 				rv = MessageReceiveTimeout(CMD_WAIT_READER_STATE_CHANGE,
 					&waitStatusStruct, sizeof(waitStatusStruct),
-					currentContextMap->dwClientID, dwTime);
+					dwClientID, dwTime);
+
+				currentContextMap = SCardGetAndLockContext(hContext);
+				if (NULL == currentContextMap)
+				{
+					rv = SCARD_E_INVALID_HANDLE;
+					goto error;
+				}
 
 				/* another thread can do SCardCancel() */
 				currentContextMap->cancellable = FALSE;
