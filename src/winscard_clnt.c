@@ -2081,7 +2081,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					&waitStatusStruct, sizeof(waitStatusStruct),
 					currentContextMap->dwClientID, dwTime);
 
-				/* another thread can do SCardCancel() */
+				/* SCardCancel() will return immediatly with success
+				 * because something changed on the daemon side. */
 				currentContextMap->cancellable = FALSE;
 
 				/* timeout */
