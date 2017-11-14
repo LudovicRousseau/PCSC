@@ -13,7 +13,12 @@ DIR=$(echo $DIR | cut -d'=' -f2 | cut -d' ' -f2)
 # get the directory part only: /usr/lib/x86_64-linux-gnu
 DIR=$(dirname $DIR)
 
+# find the spying library
+SPY=$(ldconfig --print-cache | grep libpcscspy.so)
+SPY=$(echo $SPY | cut -d'=' -f2 | cut -d' ' -f2)
+
 echo "Using directory:" $DIR
+echo "Spying library is:" $SPY
 
 cd $DIR
 
@@ -28,5 +33,5 @@ else
 fi
 
 # link to the spy library
-ln -sf libpcscspy.so.0.0.0 libpcsclite.so.1.0.0
+ln -sf $SPY libpcsclite.so.1.0.0
 ln -sf libpcsclite.so.1.0.0 libpcsclite.so.1
