@@ -651,8 +651,11 @@ class PCSCspy(object):
         self.log_out2("mszReaderName")
         self.log_out2("dwState")
         self.log_out2("dwProtocol")
-        self.log_out2("bAtrLen")
-        self.log_out2("bAtr")
+        data = self.log_out2("bAtrLen")
+        if not data == "NULL":
+            self.log_out2("bAtr")
+        else:
+            self.log_out("bAtr")
         self._log_rv()
 
     def _SCardReconnect(self):
