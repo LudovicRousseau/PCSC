@@ -1,3 +1,11 @@
+1.8.23: Ludovic Rousseau
+18 December 2017
+- use libsystemd instead sd-daemon.{c,h}
+- install_spy.sh: add support of Ubuntu
+- spy: add support SCardStatus() with NULL pcbAtrLen
+- Some other minor improvements
+
+
 1.8.22: Ludovic Rousseau
 17 June 2017
 - SCardCancel() was broken in 1.8.21. The call was bloking.
