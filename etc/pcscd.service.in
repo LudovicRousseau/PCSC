@@ -1,6 +1,7 @@
 [Unit]
 Description=PC/SC Smart Card Daemon
 Requires=pcscd.socket
+Documentation=man:pcscd(8)
 
 [Service]
 ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit
