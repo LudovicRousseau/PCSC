@@ -1583,4 +1583,3 @@ static int list_attrOk(const list_t *restrict l) {
 }
 
 #endif
-
