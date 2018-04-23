@@ -411,24 +411,21 @@ static void ContextThread(LPVOID newContext)
 
 			case CMD_WAIT_READER_STATE_CHANGE:
 			{
-				struct wait_reader_state_change waStr;
+				/* nothing to read */
 
-				READ_BODY(waStr);
+#ifdef USE_USB
+				/* wait until all readers are ready */
+				RFWaitForReaderInit();
+#endif
 
-				/* add the client fd to the list */
+				/* add the client fd to the list and dump the readers state */
 				EHRegisterClientForEvent(filedes);
-
-				/* We do not send anything here.
-				 * Either the client will timeout or the server will
-				 * answer if an event occurs */
 			}
 			break;
 
 			case CMD_STOP_WAITING_READER_STATE_CHANGE:
 			{
-				struct wait_reader_state_change waStr;
-
-				READ_BODY(waStr);
+				struct wait_reader_state_change waStr = {0};
 
 				/* remove the client fd from the list */
 				waStr.rv = EHUnregisterClientForEvent(filedes);
@@ -810,7 +807,7 @@ exit:
 LONG MSGSignalClient(uint32_t filedes, LONG rv)
 {
 	uint32_t ret;
-	struct wait_reader_state_change waStr;
+	struct wait_reader_state_change waStr = {0};
 
 	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
 
@@ -819,6 +816,18 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 
 	return ret;
 } /* MSGSignalClient */
+
+LONG MSGSendReaderStates(uint32_t filedes)
+{
+	uint32_t ret;
+
+	Log2(PCSC_LOG_DEBUG, "Send reader states: %d", filedes);
+
+	/* dump the readers state */
+	ret = MessageSend(readerStates, sizeof(readerStates), filedes);
+
+	return ret;
+}
 
 static LONG MSGAddContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 {

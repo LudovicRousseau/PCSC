@@ -69,6 +69,8 @@ LONG EHRegisterClientForEvent(int32_t filedes)
 
 	(void)list_append(&ClientsWaitingForEvent, &filedes);
 
+	(void)MSGSendReaderStates(filedes);
+
 	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 
 	return SCARD_S_SUCCESS;

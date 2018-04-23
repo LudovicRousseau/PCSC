@@ -388,6 +388,8 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
+static LONG getReaderStatesAndRegisterForEvents(SCONTEXTMAP * currentContextMap);
+static LONG unregisterFromEvents(SCONTEXTMAP * currentContextMap);
 
 /*
  * Thread safety functions
@@ -1736,7 +1738,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 
 	/* synchronize reader states with daemon */
-	rv = getReaderStates(currentContextMap);
+	rv = getReaderStatesAndRegisterForEvents(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
@@ -2056,23 +2058,15 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			/* Only sleep once for each cycle of reader checks. */
 			{
-				struct wait_reader_state_change waitStatusStruct;
+				struct wait_reader_state_change waitStatusStruct = {0};
 				struct timeval before, after;
 
 				gettimeofday(&before, NULL);
 
-				waitStatusStruct.timeOut = dwTime;
 				waitStatusStruct.rv = SCARD_S_SUCCESS;
 
 				/* another thread can do SCardCancel() */
 				currentContextMap->cancellable = TRUE;
-
-				rv = MessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE,
-					currentContextMap->dwClientID,
-					sizeof(waitStatusStruct), &waitStatusStruct);
-
-				if (rv != SCARD_S_SUCCESS)
-					goto end;
 
 				/*
 				 * Read a message from the server
@@ -2089,20 +2083,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				if (SCARD_E_TIMEOUT == rv)
 				{
 					/* ask server to remove us from the event list */
-					rv = MessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
-						currentContextMap->dwClientID,
-						sizeof(waitStatusStruct), &waitStatusStruct);
-
-					if (rv != SCARD_S_SUCCESS)
-						goto end;
-
-					/* Read a message from the server */
-					rv = MessageReceive(&waitStatusStruct,
-						sizeof(waitStatusStruct),
-						currentContextMap->dwClientID);
-
-					if (rv != SCARD_S_SUCCESS)
-						goto end;
+					rv = unregisterFromEvents(currentContextMap);
 				}
 
 				if (rv != SCARD_S_SUCCESS)
@@ -2116,7 +2097,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 
 				/* synchronize reader states with daemon */
-				rv = getReaderStates(currentContextMap);
+				rv = getReaderStatesAndRegisterForEvents(currentContextMap);
 				if (rv != SCARD_S_SUCCESS)
 					goto end;
 
@@ -2147,6 +2128,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 end:
 	Log1(PCSC_LOG_DEBUG, "Event Loop End");
+
+	(void)unregisterFromEvents(currentContextMap);
 
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
 
@@ -3547,5 +3530,51 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 		return rv;
 
 	return SCARD_S_SUCCESS;
+}
+
+static LONG getReaderStatesAndRegisterForEvents(SCONTEXTMAP * currentContextMap)
+{
+	int32_t dwClientID = currentContextMap->dwClientID;
+	LONG rv;
+
+	/* Get current reader states from server and register on event list */
+	rv = MessageSendWithHeader(CMD_WAIT_READER_STATE_CHANGE, dwClientID,
+		0, NULL);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/* Read a message from the server */
+	rv = MessageReceive(&readerStates, sizeof(readerStates), dwClientID);
+	return rv;
+}
+
+static LONG unregisterFromEvents(SCONTEXTMAP * currentContextMap)
+{
+	int32_t dwClientID = currentContextMap->dwClientID;
+	LONG rv;
+	struct wait_reader_state_change waitStatusStruct = {0};
+
+	/* ask server to remove us from the event list */
+	rv = MessageSendWithHeader(CMD_STOP_WAITING_READER_STATE_CHANGE,
+		dwClientID, 0, NULL);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/* This message can be the response to
+	 * CMD_STOP_WAITING_READER_STATE_CHANGE, an event notification or a
+	 * cancel notification.
+	 * The server side ensures, that no more messages will be sent to
+	 * the client. */
+
+	rv = MessageReceive(&waitStatusStruct, sizeof(waitStatusStruct),
+		dwClientID);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/* if we received a cancel event the return value will be set
+	 * accordingly */
+	rv = waitStatusStruct.rv;
+
+	return rv;
 }
 
