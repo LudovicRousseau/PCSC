@@ -1,7 +1,7 @@
 /*
  * This handles GCC attributes
  *
- * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
+ * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
  * Copyright (C) 2005-2010
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>

@@ -4,7 +4,7 @@
  "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
 <policyconfig>
   <vendor>The PCSC-lite Project</vendor>
-  <vendor_url>http://pcsclite.alioth.debian.org/</vendor_url>
+  <vendor_url>https://pcsclite.apdu.fr/</vendor_url>
 <!--  <icon_name>smart-card</icon_name> -->
 
   <action id="org.debian.pcsc-lite.access_pcsc">

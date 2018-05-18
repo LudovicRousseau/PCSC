@@ -1,5 +1,5 @@
 /*
- * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
+ * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
  * Copyright (C) 1999-2004
  *  David Corcoran <corcoran@musclecard.com>
@@ -98,9 +98,8 @@ also. You may chose not to support this feature but it is useful when
 reader vendors OEM products so you only distribute one driver.
 
 
-The CCID driver from Ludovic Rousseau
-http://pcsclite.alioth.debian.org/ccid.html uses this feature since the
-same driver supports many different readers.
+The CCID driver from Ludovic Rousseau https://ccid.apdu.fr/ uses this
+feature since the same driver supports many different readers.
 
 @subsection ifdProductID
 

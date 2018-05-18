@@ -102,7 +102,7 @@ file.  See the
 .BR reader.conf (5)
 manual page for more information.
 .PP
-Some drivers are available at \fIhttp://pcsclite.alioth.debian.org/musclecard.com/drivers.html\fP.
+Some drivers are available at \fIhttps://muscle.apdu.fr/musclecard.com/drivers.html\fP.
 .
 .SH "USB SMART CARD READER DRIVERS"
 USB smart card reader drivers are located in

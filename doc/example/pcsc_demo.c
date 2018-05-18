@@ -1,7 +1,7 @@
 /*
  * Sample program to use PC/SC API.
  *
- * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
+ * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
  * Copyright (C) 2003-2011
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>

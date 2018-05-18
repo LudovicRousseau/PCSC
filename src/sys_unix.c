@@ -1,7 +1,7 @@
 /*
  * This handles abstract system level calls.
  *
- * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
+ * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@musclecard.com>

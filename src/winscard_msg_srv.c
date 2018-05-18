@@ -1,5 +1,5 @@
 /*
- * MUSCLE SmartCard Development ( http://pcsclite.alioth.debian.org/pcsclite.html )
+ * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
  * Copyright (C) 2001-2004
  *  David Corcoran <corcoran@musclecard.com>
