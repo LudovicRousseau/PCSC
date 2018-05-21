@@ -40,7 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The routines specified hereafter will allow you to write an IFD handler
 for the PC/SC Lite resource manager. Please use the complement
 developer's kit complete with headers and Makefile at:
-http://www.musclecard.com/drivers.html
+https://muscle.apdu.fr/musclecard.com/sourcedrivers.html
 
 This gives a common API for communication to most readers in a
 homogeneous fashion. This document assumes that the driver developer is
