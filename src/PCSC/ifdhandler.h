@@ -82,7 +82,7 @@ Example:
     <string>0x04E6</string>
 @endverbatim
 
-You may have an OEM of this reader in which an additional @c <string>
+You may have an OEM of this reader in which an additional @c \<string>
 can be used like in the below example:
 
 @verbatim
