@@ -72,7 +72,7 @@ void tok_error(char *pcToken_error);
 "\n"                                      { iLinenumber++; }
 (\"[^"\n]*["\n])|(\'[^'\n]*['\n])         { (void)evaluatetoken(yytext); }
 [ \t]                                     {}
-([A-Z]|[a-z]|[0-9]|[\\\/\-\.\_\@:])+      { (void)evaluatetoken(yytext); }
+([A-Z]|[a-z]|[0-9]|[=\\\/\-\.\_\@:])+      { (void)evaluatetoken(yytext); }
 .                     { iOldLinenumber = iLinenumber; tok_error(yytext); }
 %%
 
