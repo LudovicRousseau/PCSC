@@ -5,4 +5,4 @@ set -x
 
 rm -rf api
 make doxygen
-rsync --recursive --verbose --update --rsh=ssh api anonscm.debian.org:pcsclite_htdocs/
+rsync --recursive --verbose --update --rsh=ssh api pcsclite.apdu.fr:Serveurs_web/pcsclite.apdu.fr/
