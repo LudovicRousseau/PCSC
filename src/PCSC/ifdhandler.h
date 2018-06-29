@@ -202,7 +202,7 @@ It has the following syntax:
 # Configuration file for pcsc-lite
 # David Corcoran <corcoran@musclecard.com>
 
-FRIENDLYNAME  Generic Reader
+FRIENDLYNAME  "Generic Reader"
 DEVICENAME    /dev/ttyS0
 LIBPATH       /usr/lib/pcsc/drivers/libgen_ifd.so
 CHANNELID     1
