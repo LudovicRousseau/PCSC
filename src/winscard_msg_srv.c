@@ -164,6 +164,7 @@ INTERNAL int32_t InitializeSocket(void)
 	return 0;
 }
 
+#ifdef USE_LIBSYSTEMD
 /**
  * @brief Acquires a socket passed in from systemd.
  *
@@ -176,7 +177,6 @@ INTERNAL int32_t InitializeSocket(void)
  * @retval 0 Success
  * @retval -1 Passed FD is not an UNIX socket.
  */
-#ifdef USE_LIBSYSTEMD
 INTERNAL int32_t ListenExistingSocket(int fd)
 {
 	if (!sd_is_socket(fd, AF_UNIX, SOCK_STREAM, -1))
