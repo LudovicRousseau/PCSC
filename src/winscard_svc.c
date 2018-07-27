@@ -811,7 +811,11 @@ exit:
 LONG MSGSignalClient(uint32_t filedes, LONG rv)
 {
 	uint32_t ret;
-	struct wait_reader_state_change waStr = {0};
+	struct wait_reader_state_change waStr =
+	{
+		.timeOut = 0,
+		.rv = 0
+	};
 
 	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
 
