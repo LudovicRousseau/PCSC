@@ -2129,7 +2129,10 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 end:
 	Log1(PCSC_LOG_DEBUG, "Event Loop End");
 
-	(void)unregisterFromEvents(currentContextMap);
+	/* if SCardCancel() has been used then the client is already
+	 * unregistered */
+	if (SCARD_E_CANCELLED != rv)
+		(void)unregisterFromEvents(currentContextMap);
 
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
 
