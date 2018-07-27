@@ -425,7 +425,11 @@ static void ContextThread(LPVOID newContext)
 
 			case CMD_STOP_WAITING_READER_STATE_CHANGE:
 			{
-				struct wait_reader_state_change waStr = {0};
+				struct wait_reader_state_change waStr =
+				{
+					.timeOut = 0,
+					.rv = 0
+				};
 
 				/* remove the client fd from the list */
 				waStr.rv = EHUnregisterClientForEvent(filedes);
