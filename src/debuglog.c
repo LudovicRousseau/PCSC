@@ -48,6 +48,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "pcsclite.h"
 #include "misc.h"
@@ -139,6 +140,7 @@ static void log_line(const int priority, const char *DebugBuffer)
 		struct timeval new_time = { 0, 0 };
 		struct timeval tmp;
 		int delta;
+		pthread_t thread_id;
 
 		gettimeofday(&new_time, NULL);
 		if (0 == last_time.tv_sec)
@@ -157,6 +159,8 @@ static void log_line(const int priority, const char *DebugBuffer)
 			delta = 99999999;
 
 		last_time = new_time;
+
+		thread_id = pthread_self();
 
 		if (LogDoColor)
 		{
@@ -183,7 +187,13 @@ static void log_line(const int priority, const char *DebugBuffer)
 					break;
 			}
 
-			printf("%s%.8d%s %s%s%s\n", time_pfx, delta, time_sfx,
+#ifdef __APPLE__
+#define THREAD_FORMAT "%p"
+#else
+#define THREAD_FORMAT "%ld"
+#endif
+			printf("%s%.8d%s [" THREAD_FORMAT "] %s%s%s\n",
+				time_pfx, delta, time_sfx, thread_id,
 				color_pfx, DebugBuffer, color_sfx);
 		}
 		else
