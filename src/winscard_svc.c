@@ -861,7 +861,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 	while (list_size(&threadContext->cardsList) != 0)
 	{
 		READER_CONTEXT * rContext = NULL;
-		SCARDHANDLE hCard, hLockId;
+		SCARDHANDLE hCard;
 		void *ptr;
 
 		/*
@@ -885,10 +885,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			return rv;
 		}
 
-		hLockId = rContext->hLockId;
-		rContext->hLockId = 0;
-
-		if (hCard != hLockId)
+		if (hCard != rContext->hLockId)
 		{
 			/*
 			 * if the card is locked by someone else we do not reset it
@@ -898,18 +895,21 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		}
 		else
 		{
+			/* release the lock */
+			rContext->hLockId = 0;
+
 			/*
 			 * We will use SCardStatus to see if the card has been
 			 * reset there is no need to reset each time
 			 * Disconnect is called
 			 */
 			rv = SCardStatus(hCard, NULL, NULL, NULL, NULL, NULL, NULL);
-		}
 
-		if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
-			(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
-		else
-			(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+			if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
+				(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
+			else
+				(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+		}
 
 		/* Remove entry from the list */
 		lrv = list_delete_at(&threadContext->cardsList, 0);
