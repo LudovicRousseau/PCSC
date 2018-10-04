@@ -885,7 +885,7 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			return rv;
 		}
 
-		if (hCard != rContext->hLockId)
+		if ((rContext->hLockId != 0) && (hCard != rContext->hLockId))
 		{
 			/*
 			 * if the card is locked by someone else we do not reset it
