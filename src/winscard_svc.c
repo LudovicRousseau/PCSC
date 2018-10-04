@@ -899,6 +899,9 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 				 * and simulate a card removal
 				 */
 				rv = SCARD_W_REMOVED_CARD;
+
+				/* decrement card use */
+				(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 			}
 			else
 			{
