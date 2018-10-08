@@ -66,7 +66,7 @@ enum
 	POWER_STATE_UNPOWERED,	/**< auto power off */
 	POWER_STATE_POWERED,	/**< powered */
 	POWER_STATE_GRACE_PERIOD,	/**< card was in use */
-	POWER_STATE_INUSE		/**< card is used */
+	POWER_STATE_IN_USE		/**< card is used */
 };
 
 /** time to wait before powering down an unused card */
