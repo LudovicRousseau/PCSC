@@ -1,3 +1,16 @@
+1.8.24: Ludovic Rousseau
+12 October 2018
+- the project moved to https://pcsclite.apdu.fr/
+- SCardGetStatusChange(): Fix a rare race condition
+- SCardReleaseContext(): do not release a lock owned by another context
+- SCardReconnect(): suspend card auto power off
+- Allow "=" in serial driver filenames
+- Add the thread id in the pcscd log lines
+- pcsc-spy: correctly handle incomplete log file
+- Simclist: avoid to divide by zero in list_findpos()
+- Some other minor improvements
+
+
 1.8.23: Ludovic Rousseau
 18 December 2017
 - use libsystemd instead sd-daemon.{c,h}
