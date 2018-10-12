@@ -593,7 +593,7 @@ static void HPScanUSB(struct udev *udev)
 }
 
 
-static void HPEstablishUSBNotifications(void *arg)
+static void * HPEstablishUSBNotifications(void *arg)
 {
 	struct udev_monitor *udev_monitor = arg;
 	int r;
