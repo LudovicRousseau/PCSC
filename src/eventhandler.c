@@ -61,7 +61,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static list_t ClientsWaitingForEvent;	/**< list of client file descriptors */
 pthread_mutex_t ClientsWaitingForEvent_lock;	/**< lock for the above list */
 
-static void EHStatusHandlerThread(READER_CONTEXT *);
+static void * EHStatusHandlerThread(READER_CONTEXT *);
 
 LONG EHRegisterClientForEvent(int32_t filedes)
 {
@@ -241,7 +241,7 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext)
 		return SCARD_S_SUCCESS;
 }
 
-static void EHStatusHandlerThread(READER_CONTEXT * rContext)
+static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 {
 	LONG rv;
 #ifndef NO_LOG
