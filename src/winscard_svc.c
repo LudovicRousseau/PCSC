@@ -95,7 +95,7 @@ static LONG MSGAddHandle(SCARDCONTEXT, SCARDHANDLE, SCONTEXT *);
 static LONG MSGRemoveHandle(SCARDHANDLE, SCONTEXT *);
 static void MSGCleanupClient(SCONTEXT *);
 
-static void ContextThread(LPVOID pdwIndex);
+static void * ContextThread(LPVOID pdwIndex);
 
 extern READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
 
@@ -325,7 +325,7 @@ static const char *CommandsText[] = {
 		ret = MessageSend(&v, sizeof(v), filedes); \
 	} while (0)
 
-static void ContextThread(LPVOID newContext)
+static void * ContextThread(LPVOID newContext)
 {
 	SCONTEXT * threadContext = (SCONTEXT *) newContext;
 	int32_t filedes = threadContext->dwClientID;
