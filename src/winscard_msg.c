@@ -79,9 +79,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SOCK_CLOEXEC 0
 #endif
 
+#define member_size(type, member) sizeof(((type *)0)->member)
+
 char *getSocketName(void)
 {
-	static char socketName[sizeof(struct sockaddr_un)];
+	static char socketName[member_size(struct sockaddr_un, sun_path)];
 
 	if ('\0' == socketName[0])
 	{
