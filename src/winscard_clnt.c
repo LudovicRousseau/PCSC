@@ -595,7 +595,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		rv = MessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
 			&veStr);
 		if (rv != SCARD_S_SUCCESS)
-			return rv;
+			goto cleanup;
 
 		/* Read a message from the server */
 		rv = MessageReceive(&veStr, sizeof(veStr), dwClientID);
@@ -603,14 +603,18 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		{
 			Log1(PCSC_LOG_CRITICAL,
 				"Your pcscd is too old and does not support CMD_VERSION");
-			return SCARD_F_COMM_ERROR;
+			rv = SCARD_F_COMM_ERROR;
+			goto cleanup;
 		}
 
 		Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
 			veStr.major, veStr.minor);
 
 		if (veStr.rv != SCARD_S_SUCCESS)
-			return veStr.rv;
+		{
+			rv = veStr.rv;
+			goto cleanup;
+		}
 	}
 
 again:
@@ -625,7 +629,7 @@ again:
 		sizeof(scEstablishStruct), (void *) &scEstablishStruct);
 
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto cleanup;
 
 	/*
 	 * Read the response from the server
@@ -634,10 +638,13 @@ again:
 		dwClientID);
 
 	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		goto cleanup;
 
 	if (scEstablishStruct.rv != SCARD_S_SUCCESS)
-		return scEstablishStruct.rv;
+	{
+		rv = scEstablishStruct.rv;
+		goto cleanup;
+	}
 
 	/* check we do not reuse an existing hContext */
 	if (NULL != SCardGetContextTH(scEstablishStruct.hContext))
@@ -651,6 +658,11 @@ again:
 	 * Allocate the new hContext - if allocator full return an error
 	 */
 	rv = SCardAddContext(*phContext, dwClientID);
+
+	return rv;
+
+cleanup:
+	ClientCloseSession(dwClientID);
 
 	return rv;
 }
