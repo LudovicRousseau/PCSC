@@ -98,7 +98,7 @@ time.sleep(1)
 
 print("SCardReleaseContext hcontext1")
 hresult = SCardReleaseContext(hcontext1)
-if hresult != SCARD_S_SUCCESS:
+if hresult not in (SCARD_S_SUCCESS, SCARD_E_SHARING_VIOLATION):
     raise ReleaseContextException(hresult)
 
 time.sleep(2)
