@@ -583,9 +583,6 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 */
 		RFSetReaderEventState(rContext, SCARD_RESET);
 
-		/*
-		 * Currently pcsc-lite keeps the card powered constantly
-		 */
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwInitialization)
 			rv = IFDPowerICC(rContext, IFD_RESET,
@@ -1137,9 +1134,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		DWORD dwAtrLen;
 
-		/*
-		 * Currently pcsc-lite keeps the card always powered
-		 */
 		dwAtrLen = sizeof(rContext->readerState->cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
