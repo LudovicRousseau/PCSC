@@ -190,7 +190,7 @@ static void log_line(const int priority, const char *DebugBuffer)
 #ifdef __APPLE__
 #define THREAD_FORMAT "%p"
 #else
-#define THREAD_FORMAT "%ld"
+#define THREAD_FORMAT "%lu"
 #endif
 			printf("%s%.8d%s [" THREAD_FORMAT "] %s%s%s\n",
 				time_pfx, delta, time_sfx, thread_id,
