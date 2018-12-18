@@ -685,12 +685,13 @@ int main(int argc, char **argv)
 					"writing " PCSCLITE_RUN_PID " failed: %s",
 					strerror(errno));
 			}
-			(void)close(f);
 
 			/* set mode so that the file is world readable even is umask is
 			 * restrictive
 			 * The file is used by libpcsclite */
-			(void)chmod(PCSCLITE_RUN_PID, mode);
+			(void)fchmod(f, mode);
+
+			(void)close(f);
 		}
 		else
 			Log2(PCSC_LOG_CRITICAL, "cannot create " PCSCLITE_RUN_PID ": %s",
