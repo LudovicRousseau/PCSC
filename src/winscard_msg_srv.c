@@ -118,6 +118,7 @@ static int ProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
  * @retval -1 Can not create the socket.
  * @retval -1 Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME.
  * @retval -1 Can not put the socket in listen mode.
+ * @retval -1 Can not open the file \c PCSCLITE_CSOCK_NAME for changing permissions
  */
 INTERNAL int32_t InitializeSocket(void)
 {
@@ -126,6 +127,9 @@ INTERNAL int32_t InitializeSocket(void)
 		struct sockaddr sa;
 		struct sockaddr_un un;
 	} sa;
+
+	int fd;
+	int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 
 	/*
 	 * Create the common shared connection socket
@@ -157,9 +161,18 @@ INTERNAL int32_t InitializeSocket(void)
 	}
 
 	/*
-	 * Chmod the public entry channel
+	 * Chmod the public entry channel securely
 	 */
-	(void)chmod(PCSCLITE_CSOCK_NAME, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	if ((fd = open(PCSCLITE_CSOCK_NAME, O_RDWR)) == -1)
+	{
+		Log2(PCSC_LOG_CRITICAL, "Cannot open %s",
+			 strerror(errno));
+		return -1;
+	}
+	
+	(void)fchmod(fd, mode);
+
+	(void)close(fd);
 
 	return 0;
 }
