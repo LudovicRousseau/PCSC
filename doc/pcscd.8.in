@@ -73,7 +73,8 @@ file to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .TP
 .BR \-x ", " \-\-auto\-exit
-pcscd will quit after 60 seconds of inactivity. This is used when pcscd
+pcscd will quit after 60 seconds of inactivity after the release of
+the last PC/SC context. This is used when pcscd
 os started on demand by systemd.
 .TP
 .BR \-S ", " \-\-reader\-name\-no\-serial
