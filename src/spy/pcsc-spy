@@ -861,7 +861,7 @@ class PCSCdemultiplexer(object):
 
             # in case the thread changes
             if previous_thread != thread:
-                # schedule the other thread so it has time to emtpy its
+                # schedule the other thread so it has time to empty its
                 # queue
                 time.sleep(.01)
 
