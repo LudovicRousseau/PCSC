@@ -855,9 +855,12 @@ class PCSCdemultiplexer(object):
 
         start_time = int(sec) + int(usec) / 1000000.
 
+        lastest_result = ""
         while line != '':
             previous_thread = thread
             (thread, tail) = line.split('@')
+            if "<" in tail:
+                lastest_result = tail
 
             # in case the thread changes
             if previous_thread != thread:
@@ -889,13 +892,9 @@ class PCSCdemultiplexer(object):
         for thread in threads:
             threads[thread].join()
 
-        try:
-            (code, rv, sec, usec) = _parse_rv(tail)
-            end_time = sec + usec / 1000000.
-            total_time = end_time - start_time
-        except ValueError:
-            # we have no return value of the latest PC/SC call
-            total_time = -1
+        (code, rv, sec, usec) = _parse_rv(lastest_result)
+        end_time = sec + usec / 1000000.
+        total_time = end_time - start_time
 
         # compute some statistics
         thread_n = 1
