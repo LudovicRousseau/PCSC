@@ -1,3 +1,12 @@
+1.8.25: Ludovic Rousseau
+25 March 2019
+- Fix a socket issue when pcscd is used inside LXC container
+- pcsc-spy: always provide a total time of execution
+- Fix resource leak if SCardEstablishContext() fails
+- Fix realloc(3) error handling (possible memory leak)
+- Remove usage of function chmod(2) to use fchmod(2) (fix race condition)
+
+
 1.8.24: Ludovic Rousseau
 12 October 2018
 - the project moved to https://pcsclite.apdu.fr/
