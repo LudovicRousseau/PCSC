@@ -144,6 +144,12 @@ esac
 AC_DEFINE_UNQUOTED(PCSC_ARCH, "$PCSC_ARCH", [PC/SC target architecture])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} $PCSC_ARCH $host"
 
+# --disable-documentation
+AC_ARG_ENABLE(documentation,
+	AS_HELP_STRING([--disable-documentation],[do not build documentation]),
+	[ enable_doc="${enableval}" ], [ enable_doc="yes" ] )
+AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
+
 # See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 
@@ -446,6 +452,7 @@ use libsystemd:         ${use_libsystemd}
 systemd unit directory: ${with_systemdsystemunitdir}
 serial config dir.:     ${confdir_exp}
 filter:                 ${use_filter}
+documentation:          ${enable_doc}
 
 PCSCLITE_FEATURES:      ${PCSCLITE_FEATURES}
 
