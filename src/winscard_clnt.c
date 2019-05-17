@@ -2329,7 +2329,7 @@ end:
  * - \ref SCARD_ATTR_CURRENT_W
  * - \ref SCARD_ATTR_DEFAULT_CLK
  * - \ref SCARD_ATTR_DEFAULT_DATA_RATE
- * - \ref SCARD_ATTR_DEVICE_FRIENDLY_NAME\n
+ * - \ref SCARD_ATTR_DEVICE_FRIENDLY_NAME
  *   Implemented by pcsc-lite if the IFD Handler (driver) returns \ref
  *   IFD_ERROR_TAG.  pcsc-lite then returns the same reader name as
  *   returned by \ref SCardListReaders().
