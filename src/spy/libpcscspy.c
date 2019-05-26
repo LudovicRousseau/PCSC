@@ -629,7 +629,10 @@ PCSC_API p_SCardListReaderGroups(SCardListReaderGroups)
 	spy_long(hContext);
 	spy_ptr_ulong(pcchGroups);
 	rv = spy.SCardListReaderGroups(hContext, mszGroups, pcchGroups);
-    spy_n_str(mszGroups, pcchGroups, autoallocate);
+	if (SCARD_S_SUCCESS == rv)
+		spy_n_str(mszGroups, pcchGroups, autoallocate);
+	else
+		spy_n_str(NULL, pcchGroups, 0);
 	Quit();
 	return rv;
 }
@@ -646,7 +649,10 @@ PCSC_API p_SCardListReaders(SCardListReaders)
 	spy_long(hContext);
     spy_str(mszGroups);
 	rv = spy.SCardListReaders(hContext, mszGroups, mszReaders, pcchReaders);
-    spy_n_str(mszReaders, pcchReaders, autoallocate);
+	if (SCARD_S_SUCCESS == rv)
+		spy_n_str(mszReaders, pcchReaders, autoallocate);
+	else
+		spy_n_str(NULL, pcchReaders, 0);
 	Quit();
 	return rv;
 }
