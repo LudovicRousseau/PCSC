@@ -216,9 +216,18 @@ int evaluatetoken(char *pcToken)
 		}
 		else
 		{
+			SerialReader *new_reader_list = NULL;
 			reader_list_size++;
-			reader_list = realloc(reader_list, reader_list_size *
+			new_reader_list = realloc(reader_list, reader_list_size *
 				sizeof(SerialReader));
+			if (new_reader_list == NULL) {
+				free(reader_list);
+			}
+			reader_list = new_reader_list;
+		}
+		if (reader_list == NULL) {
+			tok_error("No Memory");
+			return 1;
 		}
 
 		/* end marker */
