@@ -36,8 +36,8 @@
 #define SCardControl SCardControl132
 
 PCSC_API int32_t SCardControl132(SCARDHANDLE hCard, uint32_t dwControlCode,
-        const void *pbSendBuffer, uint32_t cbSendLength,
-        void *pbRecvBuffer, uint32_t cbRecvLength, uint32_t *lpBytesReturned);
+		const void *pbSendBuffer, uint32_t cbSendLength,
+		void *pbRecvBuffer, uint32_t cbRecvLength, uint32_t *lpBytesReturned);
 #endif
 
 /* function prototypes */
@@ -207,19 +207,19 @@ static void spy_line(const char *fmt, ...)
 
 static void spy_enter(const char *fname)
 {
-    struct timeval profile_time;
+	struct timeval profile_time;
 
-    gettimeofday(&profile_time, NULL);
-    spy_line(">|%d|%d|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
+	gettimeofday(&profile_time, NULL);
+	spy_line(">|%d|%d|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
 }
 
 static void spy_quit(const char *fname, LONG rv)
 {
-    struct timeval profile_time;
+	struct timeval profile_time;
 
-    gettimeofday(&profile_time, NULL);
-    spy_line("<|%d|%d|%s|%s|0x%08X", profile_time.tv_sec,
-        profile_time.tv_usec, fname, spy.pcsc_stringify_error(rv), rv);
+	gettimeofday(&profile_time, NULL);
+	spy_line("<|%d|%d|%s|%s|0x%08X", profile_time.tv_sec,
+		profile_time.tv_usec, fname, spy.pcsc_stringify_error(rv), rv);
 }
 
 #define Enter() spy_enter(__FUNCTION__)
@@ -248,85 +248,85 @@ static void spy_ptr_ulong(ULONG *arg)
 
 static void spy_pvoid(const void *ptr)
 {
-    spy_line("%p", ptr);
+	spy_line("%p", ptr);
 }
 
 static void spy_buffer(const unsigned char *buffer, size_t length)
 {
-    spy_long(length);
+	spy_long(length);
 
-    if (NULL == buffer)
-        spy_line("NULL");
-    else
-    {
+	if (NULL == buffer)
+		spy_line("NULL");
+	else
+	{
 		/* "78 79 7A" */
-        char log_buffer[length * 3 +1], *p;
-        size_t i;
+		char log_buffer[length * 3 +1], *p;
+		size_t i;
 
-        p = log_buffer;
-        log_buffer[0] = '\0';
-        for (i=0; i<length; i++)
-        {
-            snprintf(p, 4, "%02X ", buffer[i]);
-            p += 3;
-        }
+		p = log_buffer;
+		log_buffer[0] = '\0';
+		for (i=0; i<length; i++)
+		{
+			snprintf(p, 4, "%02X ", buffer[i]);
+			p += 3;
+		}
 		*p = '\0';
 
-        spy_line_direct(log_buffer);
-    }
+		spy_line_direct(log_buffer);
+	}
 }
 
 static void spy_str(const char *str)
 {
-    spy_line("%s", str);
+	spy_line("%s", str);
 }
 
 static void spy_n_str(const char *str, ULONG *len, int autoallocate)
 {
-    spy_ptr_ulong(len);
-    if (NULL == len)
-    {
-        spy_line("\"\"");
-    }
-    else
-    {
-        if (NULL == str)
-        {
-            spy_line("NULL");
-        }
-        else
-        {
-            const char *s = str;
-            unsigned int length = 0;
+	spy_ptr_ulong(len);
+	if (NULL == len)
+	{
+		spy_line("\"\"");
+	}
+	else
+	{
+		if (NULL == str)
+		{
+			spy_line("NULL");
+		}
+		else
+		{
+			const char *s = str;
+			unsigned int length = 0;
 
-            if (autoallocate)
-                s = *(char **)str;
+			if (autoallocate)
+				s = *(char **)str;
 
-            do
-            {
+			do
+			{
 				spy_line("%s", s);
-                length += strlen(s)+1;
-                s += strlen(s)+1;
-            } while(length < *len);
-        }
-    }
+				length += strlen(s)+1;
+				s += strlen(s)+1;
+			} while(length < *len);
+		}
+	}
 }
 
 
 static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
 {
-    int i;
+	int i;
 
-    for (i=0; i<cReaders; i++)
-    {
-        spy_str(rgReaderStates[i].szReader);
-        spy_long(rgReaderStates[i].dwCurrentState);
-        spy_long(rgReaderStates[i].dwEventState);
-        if (rgReaderStates[i].cbAtr <= MAX_ATR_SIZE)
-            spy_buffer(rgReaderStates[i].rgbAtr, rgReaderStates[i].cbAtr);
-        else
-            spy_buffer(NULL, rgReaderStates[i].cbAtr);
-    }
+	for (i=0; i<cReaders; i++)
+	{
+		spy_str(rgReaderStates[i].szReader);
+		spy_long(rgReaderStates[i].dwCurrentState);
+		spy_long(rgReaderStates[i].dwEventState);
+		if (rgReaderStates[i].cbAtr <= MAX_ATR_SIZE)
+			spy_buffer(rgReaderStates[i].rgbAtr, rgReaderStates[i].cbAtr);
+		else
+			spy_buffer(NULL, rgReaderStates[i].cbAtr);
+	}
 }
 
 static LONG load_lib(void)
@@ -465,15 +465,15 @@ PCSC_API p_SCardConnect(SCardConnect)
 
 	Enter();
 	spy_long(hContext);
-    spy_str(szReader);
-    spy_long(dwShareMode);
-    spy_long(dwPreferredProtocols);
-    spy_ptr_long(phCard);
-    spy_ptr_ulong(pdwActiveProtocol);
+	spy_str(szReader);
+	spy_long(dwShareMode);
+	spy_long(dwPreferredProtocols);
+	spy_ptr_long(phCard);
+	spy_ptr_ulong(pdwActiveProtocol);
 	rv = spy.SCardConnect(hContext, szReader, dwShareMode,
 		dwPreferredProtocols, phCard, pdwActiveProtocol);
-    spy_ptr_long(phCard);
-    spy_ptr_ulong(pdwActiveProtocol);
+	spy_ptr_long(phCard);
+	spy_ptr_ulong(pdwActiveProtocol);
 	Quit();
 	return rv;
 }
@@ -484,12 +484,12 @@ PCSC_API p_SCardReconnect(SCardReconnect)
 
 	Enter();
 	spy_long(hCard);
-    spy_long(dwShareMode);
-    spy_long(dwPreferredProtocols);
-    spy_long(dwInitialization);
+	spy_long(dwShareMode);
+	spy_long(dwPreferredProtocols);
+	spy_long(dwInitialization);
 	rv = spy.SCardReconnect(hCard, dwShareMode, dwPreferredProtocols,
 		dwInitialization, pdwActiveProtocol);
-    spy_ptr_ulong(pdwActiveProtocol);
+	spy_ptr_ulong(pdwActiveProtocol);
 	Quit();
 	return rv;
 }
@@ -500,7 +500,7 @@ PCSC_API p_SCardDisconnect(SCardDisconnect)
 
 	Enter();
 	spy_long(hCard);
-    spy_long(dwDisposition);
+	spy_long(dwDisposition);
 	rv = spy.SCardDisconnect(hCard, dwDisposition);
 	Quit();
 	return rv;
@@ -532,36 +532,36 @@ PCSC_API p_SCardEndTransaction(SCardEndTransaction)
 PCSC_API p_SCardStatus(SCardStatus)
 {
 	LONG rv;
-    int autoallocate_ReaderName = 0, autoallocate_Atr = 0;
+	int autoallocate_ReaderName = 0, autoallocate_Atr = 0;
 
-    if (pcchReaderLen)
-        autoallocate_ReaderName = *pcchReaderLen == SCARD_AUTOALLOCATE;
+	if (pcchReaderLen)
+		autoallocate_ReaderName = *pcchReaderLen == SCARD_AUTOALLOCATE;
 
-    if (pcbAtrLen)
-        autoallocate_Atr = *pcbAtrLen == SCARD_AUTOALLOCATE;
+	if (pcbAtrLen)
+		autoallocate_Atr = *pcbAtrLen == SCARD_AUTOALLOCATE;
 
 	Enter();
 	spy_long(hCard);
-    spy_ptr_ulong(pcchReaderLen);
-    spy_ptr_ulong(pcbAtrLen);
+	spy_ptr_ulong(pcchReaderLen);
+	spy_ptr_ulong(pcbAtrLen);
 	rv = spy.SCardStatus(hCard, mszReaderName, pcchReaderLen, pdwState,
 		pdwProtocol, pbAtr, pcbAtrLen);
-    spy_n_str(mszReaderName, pcchReaderLen, autoallocate_ReaderName);
-    spy_ptr_ulong(pdwState);
-    spy_ptr_ulong(pdwProtocol);
-    if (NULL == pcbAtrLen)
-        spy_line("NULL");
-    else
-    {
-        LPBYTE buffer;
+	spy_n_str(mszReaderName, pcchReaderLen, autoallocate_ReaderName);
+	spy_ptr_ulong(pdwState);
+	spy_ptr_ulong(pdwProtocol);
+	if (NULL == pcbAtrLen)
+		spy_line("NULL");
+	else
+	{
+		LPBYTE buffer;
 
-        if (autoallocate_Atr)
-            buffer = *(LPBYTE *)pbAtr;
-        else
-            buffer = pbAtr;
+		if (autoallocate_Atr)
+			buffer = *(LPBYTE *)pbAtr;
+		else
+			buffer = pbAtr;
 
-        spy_buffer(buffer, *pcbAtrLen);
-    }
+		spy_buffer(buffer, *pcbAtrLen);
+	}
 	Quit();
 	return rv;
 }
@@ -572,12 +572,12 @@ PCSC_API p_SCardGetStatusChange(SCardGetStatusChange)
 
 	Enter();
 	spy_long(hContext);
-    spy_long(dwTimeout);
-    spy_long(cReaders);
-    spy_readerstate(rgReaderStates, cReaders);
+	spy_long(dwTimeout);
+	spy_long(cReaders);
+	spy_readerstate(rgReaderStates, cReaders);
 	rv = spy.SCardGetStatusChange(hContext, dwTimeout, rgReaderStates,
 		cReaders);
-    spy_readerstate(rgReaderStates, cReaders);
+	spy_readerstate(rgReaderStates, cReaders);
 	Quit();
 	return rv;
 }
@@ -588,14 +588,14 @@ PCSC_API p_SCardControl(SCardControl)
 
 	Enter();
 	spy_long(hCard);
-    spy_long(dwControlCode);
-    spy_buffer(pbSendBuffer, cbSendLength);
+	spy_long(dwControlCode);
+	spy_buffer(pbSendBuffer, cbSendLength);
 	rv = spy.SCardControl(hCard, dwControlCode, pbSendBuffer, cbSendLength,
 		pbRecvBuffer, cbRecvLength, lpBytesReturned);
-    if (lpBytesReturned)
-        spy_buffer(pbRecvBuffer, *lpBytesReturned);
-    else
-        spy_buffer(NULL, 0);
+	if (lpBytesReturned)
+		spy_buffer(pbRecvBuffer, *lpBytesReturned);
+	else
+		spy_buffer(NULL, 0);
 	Quit();
 	return rv;
 }
@@ -606,13 +606,13 @@ PCSC_API p_SCardTransmit(SCardTransmit)
 
 	Enter();
 	spy_long(hCard);
-    spy_buffer(pbSendBuffer, cbSendLength);
+	spy_buffer(pbSendBuffer, cbSendLength);
 	rv = spy.SCardTransmit(hCard, pioSendPci, pbSendBuffer, cbSendLength,
 		pioRecvPci, pbRecvBuffer, pcbRecvLength);
-    if (pcbRecvLength)
-        spy_buffer(pbRecvBuffer, *pcbRecvLength);
-    else
-        spy_buffer(NULL, 0);
+	if (pcbRecvLength)
+		spy_buffer(pbRecvBuffer, *pcbRecvLength);
+	else
+		spy_buffer(NULL, 0);
 	Quit();
 	return rv;
 }
@@ -620,10 +620,10 @@ PCSC_API p_SCardTransmit(SCardTransmit)
 PCSC_API p_SCardListReaderGroups(SCardListReaderGroups)
 {
 	LONG rv;
-    int autoallocate = 0;
+	int autoallocate = 0;
 
-    if (pcchGroups)
-        autoallocate = *pcchGroups == SCARD_AUTOALLOCATE;
+	if (pcchGroups)
+		autoallocate = *pcchGroups == SCARD_AUTOALLOCATE;
 
 	Enter();
 	spy_long(hContext);
@@ -640,14 +640,14 @@ PCSC_API p_SCardListReaderGroups(SCardListReaderGroups)
 PCSC_API p_SCardListReaders(SCardListReaders)
 {
 	LONG rv;
-    int autoallocate = 0;
+	int autoallocate = 0;
 
-    if (pcchReaders)
-        autoallocate = *pcchReaders == SCARD_AUTOALLOCATE;
+	if (pcchReaders)
+		autoallocate = *pcchReaders == SCARD_AUTOALLOCATE;
 
 	Enter();
 	spy_long(hContext);
-    spy_str(mszGroups);
+	spy_str(mszGroups);
 	rv = spy.SCardListReaders(hContext, mszGroups, mszReaders, pcchReaders);
 	if (SCARD_S_SUCCESS == rv)
 		spy_n_str(mszReaders, pcchReaders, autoallocate);
@@ -663,7 +663,7 @@ PCSC_API p_SCardFreeMemory(SCardFreeMemory)
 
 	Enter();
 	spy_long(hContext);
-    spy_pvoid(pvMem);
+	spy_pvoid(pvMem);
 	rv = spy.SCardFreeMemory(hContext, pvMem);
 	Quit();
 	return rv;
@@ -683,18 +683,18 @@ PCSC_API p_SCardCancel(SCardCancel)
 PCSC_API p_SCardGetAttrib(SCardGetAttrib)
 {
 	LONG rv;
-    int autoallocate = 0;
+	int autoallocate = 0;
 
-    if (pcbAttrLen)
-        autoallocate = *pcbAttrLen == SCARD_AUTOALLOCATE;
+	if (pcbAttrLen)
+		autoallocate = *pcbAttrLen == SCARD_AUTOALLOCATE;
 
 	Enter();
 	spy_long(hCard);
-    spy_long(dwAttrId);
+	spy_long(dwAttrId);
 	rv = spy.SCardGetAttrib(hCard, dwAttrId, pbAttr, pcbAttrLen);
-    if (NULL == pcbAttrLen)
-        spy_buffer(NULL, 0);
-    else
+	if (NULL == pcbAttrLen)
+		spy_buffer(NULL, 0);
+	else
 	{
 		LPBYTE buffer;
 
@@ -715,8 +715,8 @@ PCSC_API p_SCardSetAttrib(SCardSetAttrib)
 
 	Enter();
 	spy_long(hCard);
-    spy_long(dwAttrId);
-    spy_buffer(pbAttr, cbAttrLen);
+	spy_long(dwAttrId);
+	spy_buffer(pbAttr, cbAttrLen);
 	rv = spy.SCardSetAttrib(hCard, dwAttrId, pbAttr, cbAttrLen);
 	Quit();
 	return rv;
