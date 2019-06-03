@@ -553,14 +553,14 @@ PCSC_API p_SCardStatus(SCardStatus)
         spy_line("NULL");
     else
     {
-        if (autoallocate_Atr)
-        {
-            const unsigned char *b = *(unsigned char **)pbAtr;
+        LPBYTE buffer;
 
-            spy_buffer(b, *pcbAtrLen);
-        }
+        if (autoallocate_Atr)
+            buffer = *(LPBYTE *)pbAtr;
         else
-            spy_buffer(pbAtr, *pcbAtrLen);
+            buffer = pbAtr;
+
+        spy_buffer(buffer, *pcbAtrLen);
     }
 	Quit();
 	return rv;
@@ -696,12 +696,14 @@ PCSC_API p_SCardGetAttrib(SCardGetAttrib)
         spy_buffer(NULL, 0);
     else
 	{
-		const unsigned char *s = pbAttr;
+		LPBYTE buffer;
 
 		if (autoallocate)
-			s = *(unsigned char **)pbAttr;
+			buffer = *(LPBYTE *)pbAttr;
+		else
+			buffer = pbAttr;
 
-		spy_buffer(s, *pcbAttrLen);
+		spy_buffer(buffer, *pcbAttrLen);
 	}
 	Quit();
 	return rv;
