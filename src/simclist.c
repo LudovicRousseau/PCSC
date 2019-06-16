@@ -1222,7 +1222,7 @@ int list_dump_filedescriptor(const list_t *restrict l, int fd, size_t *restrict 
                     /* speculation confirmed */
                     WRITE_ERRCHECK(fd, ser_buf, bufsize);
                 } else {                        /* speculation found broken */
-                    WRITE_ERRCHECK(fd, & bufsize, sizeof(size_t));
+                    WRITE_ERRCHECK(fd, &bufsize, sizeof(bufsize));
                     WRITE_ERRCHECK(fd, ser_buf, bufsize);
                 }
                 free(ser_buf);
@@ -1245,7 +1245,7 @@ int list_dump_filedescriptor(const list_t *restrict l, int fd, size_t *restrict 
                     }
                     WRITE_ERRCHECK(fd, x->data, bufsize);
                 } else {
-                    WRITE_ERRCHECK(fd, &bufsize, sizeof(size_t));
+                    WRITE_ERRCHECK(fd, &bufsize, sizeof(bufsize));
                     WRITE_ERRCHECK(fd, x->data, bufsize);
                 }
             }
