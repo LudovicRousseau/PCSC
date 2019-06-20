@@ -44,7 +44,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	(__GNUC__ >= 4 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)) || \
 	defined(__SUNPRO_C) && __SUNPRO_C >= 0x590
 #define INTERNAL __attribute__ ((visibility("hidden")))
+#ifndef PCSC_API
 #define PCSC_API __attribute__ ((visibility("default")))
+#endif
 #elif defined(__SUNPRO_C) && __SUNPRO_C >= 0x550
 /* http://wikis.sun.com/display/SunStudio/Macros+for+Shared+Library+Symbol+Visibility */
 #define INTERNAL __hidden
