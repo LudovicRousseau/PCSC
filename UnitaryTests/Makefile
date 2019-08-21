@@ -7,6 +7,7 @@ else
 endif
 
 CFLAGS := -Wall -O2 -g -DVERSION=\"$(VERSION)\" $(PCSC_CFLAGS)
+CPPFLAGS := $(CFLAGS)
 LDLIBS := $(PCSC_LDLIBS)
 
 PROGRAMS := SCardBeginTransaction \
