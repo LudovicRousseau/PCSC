@@ -383,7 +383,7 @@ static void * ContextThread(LPVOID newContext)
 						veStr.major, veStr.minor);
 					Log3(PCSC_LOG_CRITICAL, "Server protocol is %d:%d",
 						PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
-					veStr.rv = SCARD_E_NO_SERVICE;
+					veStr.rv = SCARD_E_SERVICE_STOPPED;
 				}
 
 				/* set the server protocol version */
