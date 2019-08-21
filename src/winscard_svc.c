@@ -379,9 +379,11 @@ static void * ContextThread(LPVOID newContext)
 				if ((veStr.major != PROTOCOL_VERSION_MAJOR)
 					|| (veStr.minor != PROTOCOL_VERSION_MINOR))
 				{
-					Log3(PCSC_LOG_CRITICAL, "Client protocol is %d:%d",
+					Log1(PCSC_LOG_CRITICAL,
+						"Communication protocol mismatch!");
+					Log3(PCSC_LOG_ERROR, "Client protocol is %d:%d",
 						veStr.major, veStr.minor);
-					Log3(PCSC_LOG_CRITICAL, "Server protocol is %d:%d",
+					Log3(PCSC_LOG_ERROR, "Server protocol is %d:%d",
 						PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
 					veStr.rv = SCARD_E_SERVICE_STOPPED;
 				}
