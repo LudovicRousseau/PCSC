@@ -80,10 +80,12 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 		return 0;
 	}
 
-	authority = polkit_authority_get_sync(NULL, NULL);
+	authority = polkit_authority_get_sync(NULL, &error);
 	if (authority == NULL)
 	{
-		Log1(PCSC_LOG_CRITICAL, "polkit_authority_get_sync failed");
+		Log2(PCSC_LOG_CRITICAL, "polkit_authority_get_sync failed: %s",
+			error->message);
+		g_error_free(error);
 		return 0;
 	}
 
