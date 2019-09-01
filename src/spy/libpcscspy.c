@@ -210,7 +210,7 @@ static void spy_enter(const char *fname)
 	struct timeval profile_time;
 
 	gettimeofday(&profile_time, NULL);
-	spy_line(">|%d|%d|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
+	spy_line(">|%ld|%ld|%s", profile_time.tv_sec, profile_time.tv_usec, fname);
 }
 
 static void spy_quit(const char *fname, LONG rv)
@@ -218,7 +218,7 @@ static void spy_quit(const char *fname, LONG rv)
 	struct timeval profile_time;
 
 	gettimeofday(&profile_time, NULL);
-	spy_line("<|%d|%d|%s|%s|0x%08X", profile_time.tv_sec,
+	spy_line("<|%ld|%ld|%s|%s|0x%08X", profile_time.tv_sec,
 		profile_time.tv_usec, fname, spy.pcsc_stringify_error(rv), rv);
 }
 
