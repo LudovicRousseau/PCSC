@@ -211,6 +211,7 @@ static void *signal_thread(void *arg)
 		if (SIGTERM == sig)
 		{
 			Log1(PCSC_LOG_INFO, "Direct suicide");
+			ExitValue = EXIT_SUCCESS;
 			at_exit();
 		}
 
