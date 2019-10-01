@@ -112,9 +112,10 @@ char *getSocketName(void)
  * @param[out] pdwClientID Client Connection ID.
  *
  * @retval 0 Success.
- * @retval -1 Can not create the socket.
- * @retval -1 The socket can not open a connection.
- * @retval -1 Can not set the socket to non-blocking.
+ * @retval -1
+ * - Can not create the socket
+ * - or the socket can not open a connection
+ * - or can not set the socket to non-blocking.
  */
 INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
 {
