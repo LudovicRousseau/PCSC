@@ -2366,14 +2366,16 @@ end:
  * @return Error code.
  * @retval SCARD_S_SUCCESS Successful (\ref SCARD_S_SUCCESS)
  * @retval SCARD_E_UNSUPPORTED_FEATURE the \p dwAttrId attribute is not supported by the driver (\ref SCARD_E_UNSUPPORTED_FEATURE)
- * @retval SCARD_E_NOT_TRANSACTED the driver returned an error (\ref SCARD_E_NOT_TRANSACTED)
- * @retval SCARD_E_INSUFFICIENT_BUFFER \p cbAttrLen is too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
- * @retval SCARD_E_INSUFFICIENT_BUFFER \p pbAttr buffer not large enough. In that case the expected buffer size is indicated in \p *pcbAttrLen (\ref SCARD_E_INSUFFICIENT_BUFFER)
+ * @retval SCARD_E_NOT_TRANSACTED
+ * - the driver returned an error (\ref SCARD_E_NOT_TRANSACTED)
+ * - Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
+ * @retval SCARD_E_INSUFFICIENT_BUFFER
+ * - \p cbAttrLen is too big (\ref SCARD_E_INSUFFICIENT_BUFFER)
+ * - \p pbAttr buffer not large enough. In that case the expected buffer size is indicated in \p *pcbAttrLen (\ref SCARD_E_INSUFFICIENT_BUFFER)
  * @retval SCARD_E_INVALID_HANDLE Invalid \p hCard handle (\ref SCARD_E_INVALID_HANDLE)
  * @retval SCARD_E_INVALID_PARAMETER A parameter is NULL and should not (\ref SCARD_E_INVALID_PARAMETER)
  * @retval SCARD_E_NO_MEMORY Memory allocation failed (\ref SCARD_E_NO_MEMORY)
  * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
- * @retval SCARD_E_NOT_TRANSACTED Data exchange not successful (\ref SCARD_E_NOT_TRANSACTED)
  * @retval SCARD_E_READER_UNAVAILABLE The reader has been removed (\ref SCARD_E_READER_UNAVAILABLE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  *
