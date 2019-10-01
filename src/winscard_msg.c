@@ -169,7 +169,6 @@ INTERNAL int ClientSetupSession(uint32_t *pdwClientID)
  *
  * @param[in] dwClientID Client socket handle to be closed.
  *
- * @retval 0 Success.
  */
 INTERNAL void ClientCloseSession(uint32_t dwClientID)
 {
