@@ -673,7 +673,7 @@ don't mind loading a new driver for each reader then ignore @p Lun.
 @param[out] Value Value of the desired data
 
 This function is also called when the application uses the PC/SC
-SCardGetAttrib() function. The list of supported tags is not limited.
+SCardSetAttrib() function. The list of supported tags is not limited.
 
 @return Error codes
 @retval IFD_SUCCESS Successful (\ref IFD_SUCCESS)
