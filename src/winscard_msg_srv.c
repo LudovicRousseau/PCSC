@@ -115,9 +115,10 @@ static int ProcessCommonChannelRequest(/*@out@*/ uint32_t *pdwClientID)
  *
  * @return Error code.
  * @retval 0 Success
- * @retval -1 Can not create the socket.
- * @retval -1 Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME.
- * @retval -1 Can not put the socket in listen mode.
+ * @retval -1
+ * - Can not create the socket
+ * - or Can not bind the socket to the file \c PCSCLITE_CSOCK_NAME
+ * - or Can not put the socket in listen mode.
  */
 INTERNAL int32_t InitializeSocket(void)
 {
