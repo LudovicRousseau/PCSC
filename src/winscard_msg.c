@@ -448,8 +448,9 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
  * @param[in] filedes Socket handle.
  *
  * @retval SCARD_S_SUCCESS Success.
- * @retval SCARD_F_COMM_ERROR Socket is closed.
- * @retval SCARD_F_COMM_ERROR A signal was received.
+ * @retval SCARD_F_COMM_ERROR
+ * - Socket is closed
+ * - or a signal was received.
  */
 INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes)
