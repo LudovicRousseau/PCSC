@@ -351,8 +351,9 @@ INTERNAL LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
  *
  * @retval SCARD_S_SUCCESS Success
  * @retval SCARD_E_TIMEOUT Timeout.
- * @retval SCARD_F_COMM_ERROR Socket is closed.
- * @retval SCARD_F_COMM_ERROR A signal was received.
+ * @retval SCARD_F_COMM_ERROR
+ * - Socket is closed
+ * - or a signal was received.
  */
 INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes)
