@@ -3336,9 +3336,6 @@ static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT hContext)
  *
  * @param[in] hContext Application Context to be removed.
  *
- * @return Error code.
- * @retval SCARD_S_SUCCESS Success (\ref SCARD_S_SUCCESS)
- * @retval SCARD_E_INVALID_HANDLE The context \p hContext was not found (\ref SCARD_E_INVALID_HANDLE)
  */
 static void SCardRemoveContext(SCARDCONTEXT hContext)
 {
