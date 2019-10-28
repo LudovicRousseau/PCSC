@@ -51,6 +51,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/un.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <poll.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -212,15 +213,15 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 	/* repeat until we get the whole message */
 	while (remaining > 0)
 	{
-		fd_set read_fd;
-		struct timeval timeout, now;
-		int selret;
+		struct pollfd read_fd;
+		struct timeval now;
+		int pollret;
 		long delta;
 
 		gettimeofday(&now, NULL);
-		delta = time_sub(&now, &start);
+		delta = time_sub(&now, &start) / 1000;
 
-		if (delta > timeOut*1000)
+		if (delta > timeOut)
 		{
 			/* we already timed out */
 			retval = SCARD_E_TIMEOUT;
@@ -228,22 +229,20 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 		}
 
 		/* remaining time to wait */
-		delta = timeOut*1000 - delta;
+		delta = timeOut - delta;
 
-		FD_ZERO(&read_fd);
-		FD_SET(filedes, &read_fd);
+		read_fd.fd = filedes;
+		read_fd.events = POLLIN;
+		read_fd.revents = 0;
 
-		timeout.tv_sec = delta/1000000;
-		timeout.tv_usec = delta - timeout.tv_sec*1000000;
-
-		selret = select(filedes + 1, &read_fd, NULL, NULL, &timeout);
+		pollret = poll(&read_fd, 1, delta);
 
 		/* try to read only when socket is readable */
-		if (selret > 0)
+		if (pollret > 0)
 		{
 			int readed;
 
-			if (!FD_ISSET(filedes, &read_fd))
+			if (!(read_fd.revents & POLLIN))
 			{
 				/* very strange situation. it should be an assert really */
 				retval = SCARD_F_COMM_ERROR;
@@ -271,7 +270,7 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 					break;
 				}
 			}
-		} else if (selret == 0)
+		} else if (pollret == 0)
 		{
 			/* is the daemon still there? */
 			retval  =  SCardCheckDaemonAvailability();
@@ -369,20 +368,21 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	/* repeat until all data is written */
 	while (remaining > 0)
 	{
-		fd_set write_fd;
-		int selret;
+		struct pollfd write_fd;
+		int pollret;
 
-		FD_ZERO(&write_fd);
-		FD_SET(filedes, &write_fd);
+		write_fd.fd = filedes;
+		write_fd.events = POLLOUT;
+		write_fd.revents = 0;
 
-		selret = select(filedes + 1, NULL, &write_fd, NULL, NULL);
+		pollret = poll(&write_fd, 1, -1);
 
 		/* try to write only when the file descriptor is writable */
-		if (selret > 0)
+		if (pollret > 0)
 		{
 			int written;
 
-			if (!FD_ISSET(filedes, &write_fd))
+			if (!(write_fd.revents & POLLOUT))
 			{
 				/* very strange situation. it should be an assert really */
 				retval = SCARD_F_COMM_ERROR;
@@ -419,7 +419,7 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 					break;
 				}
 			}
-		} else if (selret == 0)
+		} else if (pollret == 0)
 		{
 			/* timeout */
 			retval = SCARD_E_TIMEOUT;
@@ -468,20 +468,21 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 	/* repeat until we get the whole message */
 	while (remaining > 0)
 	{
-		fd_set read_fd;
-		int selret;
+		struct pollfd read_fd;
+		int pollret;
 
-		FD_ZERO(&read_fd);
-		FD_SET(filedes, &read_fd);
+		read_fd.fd = filedes;
+		read_fd.events = POLLIN;
+		read_fd.revents = 0;
 
-		selret = select(filedes + 1, &read_fd, NULL, NULL, NULL);
+		pollret = poll(&read_fd, 1 , -1);
 
 		/* try to read only when socket is readable */
-		if (selret > 0)
+		if (pollret > 0)
 		{
 			int readed;
 
-			if (!FD_ISSET(filedes, &read_fd))
+			if (!(read_fd.revents & POLLIN))
 			{
 				/* very strange situation. it should be an assert really */
 				retval = SCARD_F_COMM_ERROR;
