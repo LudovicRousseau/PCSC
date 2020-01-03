@@ -1,3 +1,22 @@
+1.8.26: Ludovic Rousseau
+3 January 2020
+- Use poll() instead of select() to allow file descriptor higher than FD_SETSIZE
+- Enable reader filtering by default
+- pcsc-spy:
+  . Do not read output buffer after error
+  . Adjust code to handle autoallocated buffers
+  . fix year-2038 issue by using long instead of int
+- Android: fix compilation
+- if client/server protocol mismatch:
+  . log an explicit message
+  . SCardEstablishContext() returns SCARD_E_SERVICE_STOPPED
+- polkit: log the error message if polkit_authority_get_sync() fails
+- Exit with EXIT_SUCCESS on shutdown to please systemd
+- Doxygen: fix minor issues in the documentation
+- Add --disable-documentation option
+- Fix a minor memory leak
+
+
 1.8.25: Ludovic Rousseau
 25 March 2019
 - Fix a socket issue when pcscd is used inside LXC container
