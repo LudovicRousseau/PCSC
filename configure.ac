@@ -389,11 +389,11 @@ AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configuration
 	[confdir="${enableval}"],
 	[confdir="${sysconfdir}/reader.conf.d"])
 
-# --enable-filter
+# --disable-filter
 AC_ARG_ENABLE(filter,
-  AS_HELP_STRING([--enable-filter],[allow to filter readers using
+  AS_HELP_STRING([--disable-filter],[disable reader filtering using
 				  PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES]),
-  [ use_filter="${enableval}" ], [ use_filter="no" ])
+  [ use_filter="${enableval}" ], [ use_filter="yes" ])
 
 if test x$use_filter = xyes; then
   AC_DEFINE(FILTER_NAMES, 1, [Filter reader names])
