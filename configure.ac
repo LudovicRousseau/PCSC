@@ -372,11 +372,11 @@ fi
 # --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
   AS_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
-				  (default /var/run/pcscd)]),
+				  (default /run/pcscd)]),
 [ipcdir="${enableval}"], [ipcdir=false])
 
 if test x${ipcdir} = xfalse ; then
-	ipcdir="/var/run/pcscd"
+	ipcdir="/run/pcscd"
 fi
 AC_DEFINE_UNQUOTED(USE_IPCDIR, "$ipcdir", [directory containing IPC files])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} ipcdir=${ipcdir}"
