@@ -139,6 +139,9 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 			(unsigned)cr.pid, (unsigned)cr.uid, action);
 	}
 
+	if (result)
+		g_object_unref(result);
+
 	g_object_unref(subject);
 cleanup0:
 	g_object_unref(details);
