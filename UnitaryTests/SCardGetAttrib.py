@@ -25,6 +25,7 @@ from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.util import toHexString, toASCIIString
+from struct import unpack
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -42,13 +43,23 @@ for reader in readers:
         raise BaseSCardException(hresult)
 
     print("reader:", reader)
-    for attribute in (SCARD_ATTR_VENDOR_IFD_SERIAL_NO, SCARD_ATTR_ATR_STRING):
+    for attribute in (SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
+            SCARD_ATTR_ATR_STRING, SCARD_ATTR_CHANNEL_ID):
         hresult, attrib = SCardGetAttrib(hcard, attribute)
         print(hex(attribute), end=' ')
         if hresult != SCARD_S_SUCCESS:
             print(SCardGetErrorMessage(hresult))
         else:
             print(attrib, toHexString(attrib), toASCIIString(attrib))
+            if attribute is SCARD_ATTR_CHANNEL_ID:
+                # get the DWORD value
+                DDDDCCCC = unpack("i", bytearray(attrib))[0]
+                DDDD = DDDDCCCC >> 16
+                if DDDD == 0x0020:
+                    bus = (DDDDCCCC & 0xFF00) >> 8
+                    addr = DDDDCCCC & 0xFF
+                    print(" USB: bus: {}, addr: {}".format(bus, addr))
+
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
