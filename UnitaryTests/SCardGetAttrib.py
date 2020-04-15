@@ -57,8 +57,8 @@ for reader in readers:
                 DDDD = DDDDCCCC >> 16
                 if DDDD == 0x0020:
                     bus = (DDDDCCCC & 0xFF00) >> 8
-                    addr = DDDDCCCC & 0xFF
-                    print(" USB: bus: {}, addr: {}".format(bus, addr))
+                    port = DDDDCCCC & 0xFF
+                    print(" USB: bus: {}, port: {}".format(bus, port))
 
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
