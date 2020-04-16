@@ -54,8 +54,8 @@ def main():
         name = card_connection.getAttrib(SCARD_ATTR_DEVICE_FRIENDLY_NAME)
         print(''.join([chr(char) for char in name]))
 
-    except smartcard.Exceptions.SmartcardException, message:
-        print("Exception:", message)
+    except smartcard.Exceptions.SmartcardException as ex:
+        print("Exception:", ex)
 
 if __name__ == "__main__":
     main()
