@@ -1283,11 +1283,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	if (rv != SCARD_S_SUCCESS)
 		goto end;
 
-	/*
-	 * This helps prevent starvation
-	 */
-	randnum = SYS_RandomInt(1000, 10000);
-	(void)SYS_USleep(randnum);
 	rv = scEndStruct.rv;
 
 end:
