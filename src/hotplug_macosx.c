@@ -292,6 +292,8 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				strValue = CFArrayGetValueAtIndex(friendlyNameArray, j);
 				const char *cstr = CFStringGetCStringPtr(strValue,
 					CFStringGetSystemEncoding());
+				if (NULL == cstr)
+					continue;
 
 				driverBundle->m_friendlyName = strdup(cstr);
 				if (!driverBundle->m_libPath)
