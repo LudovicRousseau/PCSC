@@ -296,9 +296,17 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				const char *cstr = CFStringGetCStringPtr(strValue,
 					CFStringGetSystemEncoding());
 				if (NULL == cstr)
-					continue;
+				{
+					char utf8_str[200];
+					if (CFStringGetCString(strValue, utf8_str, sizeof utf8_str,
+						kCFStringEncodingUTF8))
+						driverBundle->m_friendlyName = strdup(utf8_str);
+					else
+						continue;
+				}
+				else
+					driverBundle->m_friendlyName = strdup(cstr);
 
-				driverBundle->m_friendlyName = strdup(cstr);
 				if (!driverBundle->m_libPath)
 					driverBundle->m_libPath = strdup(libPath);
 
