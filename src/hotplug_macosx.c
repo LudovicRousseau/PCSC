@@ -88,6 +88,9 @@ typedef struct HPDevice
  */
 static HPDeviceList sDeviceList = NULL;
 
+static int HPScan(void);
+static HPDriver *Drivers = NULL;
+
 /*
  * A callback to handle the asynchronous appearance of new devices that are
  * candidates for PCSC readers.
@@ -102,7 +105,7 @@ static void HPDeviceAppeared(void *refCon, io_iterator_t iterator)
 	while ((obj = IOIteratorNext(iterator)))
 		kret = IOObjectRelease(obj);
 
-	HPSearchHotPluggables();
+	HPScan();
 }
 
 /*
@@ -119,7 +122,7 @@ static void HPDeviceDisappeared(void *refCon, io_iterator_t iterator)
 	while ((obj = IOIteratorNext(iterator)))
 		kret = IOObjectRelease(obj);
 
-	HPSearchHotPluggables();
+	HPScan();
 }
 
 
@@ -394,22 +397,6 @@ static void HPDriverRelease(HPDriver * driverBundle)
 	{
 		free(driverBundle->m_friendlyName);
 		free(driverBundle->m_libPath);
-	}
-}
-
-/*
- * Releases resources allocated to a driver bundle vector.
- */
-static void HPDriverVectorRelease(HPDriverVector driverBundleVector)
-{
-	if (driverBundleVector)
-	{
-		HPDriver *b;
-
-		for (b = driverBundleVector; b->m_vendorId; ++b)
-			HPDriverRelease(b);
-
-		free(driverBundleVector);
 	}
 }
 
@@ -758,17 +745,22 @@ static void HPDeviceNotificationThread(void)
  */
 LONG HPSearchHotPluggables(void)
 {
-	HPDriver *drivers = HPDriversGetFromDirectory(PCSCLITE_HP_DROPDIR);
+	Drivers = HPDriversGetFromDirectory(PCSCLITE_HP_DROPDIR);
 
-	if (!drivers)
+	if (!Drivers)
 		return 1;
 
+	return 0;
+}
+
+static int HPScan(void)
+{
 	HPDeviceList devices = NULL;
 
-	if (HPDriversMatchUSBDevices(drivers, &devices))
+	if (HPDriversMatchUSBDevices(Drivers, &devices))
 		return -1;
 
-	if (HPDriversMatchPCCardDevices(drivers, &devices))
+	if (HPDriversMatchPCCardDevices(Drivers, &devices))
 		return -1;
 
 	HPDevice *a;
@@ -824,7 +816,6 @@ LONG HPSearchHotPluggables(void)
 
 	HPDeviceListRelease(sDeviceList);
 	sDeviceList = devices;
-	HPDriverVectorRelease(drivers);
 
 	return 0;
 }
