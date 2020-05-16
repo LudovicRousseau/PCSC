@@ -1248,7 +1248,6 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
 	LONG rv;
 	struct end_struct scEndStruct;
-	int randnum;
 	SCONTEXTMAP * currentContextMap;
 	CHANNEL_MAP * pChannelMap;
 
