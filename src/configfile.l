@@ -58,7 +58,7 @@ static SerialReader *reader_list;
 static int reader_list_size;
 const char *ConfFile;
 
-void tok_error(char *pcToken_error);
+void tok_error(const char *pcToken_error);
 
 %}
 
@@ -264,7 +264,7 @@ int evaluatetoken(char *pcToken)
 	return 0;
 }
 
-void tok_error(char *token_error)
+void tok_error(const char *token_error)
 {
 #ifdef NO_LOG
 	(void)token_error;
