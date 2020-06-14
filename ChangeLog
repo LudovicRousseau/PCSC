@@ -1,3 +1,12 @@
+1.9.0: Ludovic Rousseau
+14 June 2020
+- SCardEndTransaction(): greatly improve performances (x300)
+- tokenparser: accept any Unicode character in a reader name
+- Use /run instead of /var/run by default
+- Fix a memory leak from a polkit call
+- Some other minor improvements
+
+
 1.8.26: Ludovic Rousseau
 3 January 2020
 - Use poll() instead of select() to allow file descriptor higher than FD_SETSIZE
