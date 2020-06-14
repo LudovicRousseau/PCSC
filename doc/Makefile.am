@@ -3,7 +3,7 @@
 SUBDIRS = . example
 
 doc_DATA = \
-	README.DAEMON README.polkit
+	README.polkit
 
 man_MANS = pcscd.8 reader.conf.5 
 man_in = pcscd.8.in reader.conf.5.in
