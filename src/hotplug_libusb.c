@@ -121,8 +121,7 @@ static struct _readerTracker
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], int interface,
-	struct _driverTracker *driver);
+	const char bus_device[], struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 
 static LONG HPReadBundleValues(void)
@@ -365,14 +364,8 @@ static void HPRescanUsbBus(void)
 
 					/* New reader found */
 					if (newreader)
-					{
-						if (config_desc->bNumInterfaces > 1)
-							HPAddHotPluggable(dev, desc, bus_device,
-								interface, &driverTracker[i]);
-							else
-							HPAddHotPluggable(dev, desc, bus_device,
-								-1, &driverTracker[i]);
-					}
+						HPAddHotPluggable(dev, desc, bus_device,
+							&driverTracker[i]);
 				}
 			}
 		}
@@ -529,21 +522,15 @@ LONG HPStopHotPluggables(void)
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], int interface,
-	struct _driverTracker *driver)
+	const char bus_device[], struct _driverTracker *driver)
 {
 	int i;
 	char deviceName[MAX_DEVICENAME];
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
-	if (interface >= 0)
-		snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libhal:/org/freedesktop/Hal/devices/usb_device_%04x_%04x_serialnotneeded_if%d",
-			 desc.idVendor, desc.idProduct, desc.idVendor, desc.idProduct,
-			 interface);
-	else
-		snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
-			desc.idVendor, desc.idProduct, bus_device);
+	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
+		desc.idVendor, desc.idProduct, bus_device);
 
 	deviceName[sizeof(deviceName) -1] = '\0';
 
