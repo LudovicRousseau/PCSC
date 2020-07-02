@@ -237,7 +237,7 @@ static void HPEstablishUSBNotifications(void)
 	int deviceNumber;
 	int suspectDeviceNumber;
 	char dirpath[FILENAME_MAX];
-	char filename[FILENAME_MAX];
+	char filename[FILENAME_MAX * 2];
 	int fd, ret;
 	struct usb_device_descriptor usbDescriptor;
 
