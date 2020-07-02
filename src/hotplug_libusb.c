@@ -581,7 +581,7 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 			}
 			else
 			{
-				char fullname[MAX_READERNAME];
+				char fullname[MAX_READERNAME * 2];
 
 				snprintf(fullname, sizeof(fullname), "%s (%s)",
 					driver->readerName, serialNumber);
