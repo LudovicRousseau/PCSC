@@ -403,7 +403,7 @@ static void HPRescanUsbBus(void)
 	libusb_free_device_list(devs, 1);
 }
 
-static void HPEstablishUSBNotifications(int pipefd[2])
+static void * HPEstablishUSBNotifications(int pipefd[2])
 {
 	int i, do_polling;
 	int r;
@@ -415,7 +415,7 @@ static void HPEstablishUSBNotifications(int pipefd[2])
 		Log2(PCSC_LOG_CRITICAL, "libusb_init failed: %d", r);
 		/* emergency exit */
 		kill(getpid(), SIGTERM);
-		return;
+		return NULL;
 	}
 
 	/* scan the USB bus for devices at startup */
@@ -470,6 +470,8 @@ static void HPEstablishUSBNotifications(int pipefd[2])
 		close(rescan_pipe[0]);
 		rescan_pipe[0] = -1;
 	}
+
+	return NULL;
 }
 
 LONG HPSearchHotPluggables(void)
