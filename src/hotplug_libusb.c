@@ -78,6 +78,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FALSE			0
 #define TRUE			1
 
+extern char Add_Interface_In_Name;
 extern char Add_Serial_In_Name;
 
 /* we use the default libusb context */
@@ -121,7 +122,8 @@ static struct _readerTracker
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct _driverTracker *driver);
+	const char bus_device[], struct libusb_interface *idesc,
+	struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 
 static LONG HPReadBundleValues(void)
@@ -365,6 +367,7 @@ static void HPRescanUsbBus(void)
 					/* New reader found */
 					if (newreader)
 						HPAddHotPluggable(dev, desc, bus_device,
+							&config_desc->interface[interface],
 							&driverTracker[i]);
 				}
 			}
@@ -524,9 +527,12 @@ LONG HPStopHotPluggables(void)
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct _driverTracker *driver)
+	const char bus_device[], struct libusb_interface *idesc,
+	struct _driverTracker *driver)
 {
 	int i;
+	uint8_t iInterface = 0;
+	uint8_t iSerialNumber = 0;
 	char deviceName[MAX_DEVICENAME];
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
@@ -556,11 +562,18 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	strncpy(readerTracker[i].bus_device, bus_device,
 		sizeof(readerTracker[i].bus_device));
 	readerTracker[i].bus_device[sizeof(readerTracker[i].bus_device) - 1] = '\0';
+	readerTracker[i].fullName = NULL;
 
-	if (Add_Serial_In_Name && desc.iSerialNumber)
+	if (Add_Interface_In_Name && idesc->num_altsetting > 0)
+		iInterface = idesc->altsetting[0].iInterface;
+
+	if (Add_Serial_In_Name)
+		iSerialNumber = desc.iSerialNumber;
+
+	if (iSerialNumber != 0 || iInterface != 0)
 	{
 		libusb_device_handle *device;
-		int ret;
+		int ret, ret2;
 
 		ret = libusb_open(dev, &device);
 		if (ret < 0)
@@ -569,29 +582,48 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		}
 		else
 		{
+			unsigned char interfaceName[MAX_READERNAME];
 			unsigned char serialNumber[MAX_READERNAME];
+			char fullname[MAX_READERNAME * 3];
+			fullname[0] = '\0';
 
-			ret = libusb_get_string_descriptor_ascii(device, desc.iSerialNumber,
-				serialNumber, MAX_READERNAME);
+			ret = (iInterface == 0) ? 0
+				: libusb_get_string_descriptor_ascii(device, iInterface,
+					interfaceName, MAX_READERNAME);
+			ret2 = (iSerialNumber == 0) ? 0
+				: libusb_get_string_descriptor_ascii(device, iSerialNumber,
+					serialNumber, MAX_READERNAME);
 			libusb_close(device);
 
 			if (ret < 0)
 			{
 				Log2(PCSC_LOG_ERROR,
 					"libusb_get_string_descriptor_ascii failed: %d", ret);
-				readerTracker[i].fullName = strdup(driver->readerName);
 			}
-			else
-			{
-				char fullname[MAX_READERNAME * 2];
 
-				snprintf(fullname, sizeof(fullname), "%s (%s)",
-					driver->readerName, serialNumber);
-				readerTracker[i].fullName = strdup(fullname);
+			if (ret2 < 0)
+			{
+				Log2(PCSC_LOG_ERROR,
+					"libusb_get_string_descriptor_ascii failed: %d", ret2);
 			}
+
+			if (ret > 0 && ret2 > 0) {
+				snprintf(fullname, sizeof(fullname), "%s [%s] (%s)",
+						driver->readerName, interfaceName, serialNumber);
+			} else if (ret > 0) {
+				snprintf(fullname, sizeof(fullname), "%s [%s]",
+						driver->readerName, interfaceName);
+			} else if (ret2 > 0) {
+				snprintf(fullname, sizeof(fullname), "%s (%s)",
+						driver->readerName, serialNumber);
+			}
+
+			if (fullname[0] != '\0')
+				readerTracker[i].fullName = strdup(fullname);
 		}
 	}
-	else
+
+	if (readerTracker[i].fullName == NULL)
 		readerTracker[i].fullName = strdup(driver->readerName);
 
 	if (RFAddReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i,
