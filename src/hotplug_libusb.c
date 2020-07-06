@@ -122,7 +122,8 @@ static struct _readerTracker
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct libusb_interface *idesc,
+	const char bus_device[],
+	const struct libusb_interface *idesc,
 	struct _driverTracker *driver);
 static LONG HPRemoveHotPluggable(int reader_index);
 
@@ -529,7 +530,8 @@ LONG HPStopHotPluggables(void)
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
-	const char bus_device[], struct libusb_interface *idesc,
+	const char bus_device[],
+	const struct libusb_interface *idesc,
 	struct _driverTracker *driver)
 {
 	int i;
