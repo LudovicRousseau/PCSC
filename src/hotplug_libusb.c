@@ -573,7 +573,7 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	if (iSerialNumber != 0 || iInterface != 0)
 	{
 		libusb_device_handle *device;
-		int ret, ret2;
+		int ret;
 
 		ret = libusb_open(dev, &device);
 		if (ret < 0)
@@ -586,36 +586,55 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 			unsigned char serialNumber[MAX_READERNAME];
 			char fullname[MAX_READERNAME * 3];
 			fullname[0] = '\0';
+			int ret_interface = 0;
+			int ret_serial = 0;
 
-			ret = (iInterface == 0) ? 0
-				: libusb_get_string_descriptor_ascii(device, iInterface,
-					interfaceName, MAX_READERNAME);
-			ret2 = (iSerialNumber == 0) ? 0
-				: libusb_get_string_descriptor_ascii(device, iSerialNumber,
-					serialNumber, MAX_READERNAME);
+			if (iInterface)
+			{
+				ret_interface = libusb_get_string_descriptor_ascii(device,
+					iInterface, interfaceName, sizeof interfaceName);
+				if (ret_interface < 0)
+				{
+					Log2(PCSC_LOG_ERROR,
+						"libusb_get_string_descriptor_ascii failed: %d",
+						ret_interface);
+				}
+			}
+
+			if (iSerialNumber)
+			{
+				ret_serial = libusb_get_string_descriptor_ascii(device,
+					iSerialNumber, serialNumber, sizeof serialNumber);
+				if (ret_serial < 0)
+				{
+					Log2(PCSC_LOG_ERROR,
+						"libusb_get_string_descriptor_ascii failed: %d",
+						ret_serial);
+				}
+			}
+
 			libusb_close(device);
 
-			if (ret < 0)
+			if (ret_interface > 0 && ret_serial > 0)
 			{
-				Log2(PCSC_LOG_ERROR,
-					"libusb_get_string_descriptor_ascii failed: %d", ret);
-			}
-
-			if (ret2 < 0)
-			{
-				Log2(PCSC_LOG_ERROR,
-					"libusb_get_string_descriptor_ascii failed: %d", ret2);
-			}
-
-			if (ret > 0 && ret2 > 0) {
 				snprintf(fullname, sizeof(fullname), "%s [%s] (%s)",
-						driver->readerName, interfaceName, serialNumber);
-			} else if (ret > 0) {
-				snprintf(fullname, sizeof(fullname), "%s [%s]",
+					driver->readerName, interfaceName, serialNumber);
+			}
+			else
+			{
+				if (ret_interface > 0)
+				{
+					snprintf(fullname, sizeof(fullname), "%s [%s]",
 						driver->readerName, interfaceName);
-			} else if (ret2 > 0) {
-				snprintf(fullname, sizeof(fullname), "%s (%s)",
-						driver->readerName, serialNumber);
+				}
+				else
+				{
+					if (ret_serial > 0)
+					{
+						snprintf(fullname, sizeof(fullname), "%s (%s)",
+							driver->readerName, serialNumber);
+					}
+				}
 			}
 
 			if (fullname[0] != '\0')
