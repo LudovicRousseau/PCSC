@@ -293,7 +293,8 @@ static void HPRescanUsbBus(void)
 	cnt = libusb_get_device_list(ctx, &devs);
 	if (cnt < 0)
 	{
-		Log1(PCSC_LOG_CRITICAL, "libusb_get_device_list() failed\n");
+		Log2(PCSC_LOG_CRITICAL, "libusb_get_device_list() failed: %s",
+			libusb_error_name(cnt));
 		return;
 	}
 
@@ -309,16 +310,17 @@ static void HPRescanUsbBus(void)
 		int r = libusb_get_device_descriptor(dev, &desc);
 		if (r < 0)
 		{
-			Log3(PCSC_LOG_ERROR, "failed to get device descriptor for %d/%d",
-				bus_number, device_address);
+			Log4(PCSC_LOG_ERROR,
+				"failed to get device descriptor for %d/%d: %s",
+				bus_number, device_address, libusb_error_name(r));
 			continue;
 		}
 
 		r = libusb_get_active_config_descriptor(dev, &config_desc);
 		if (r < 0)
 		{
-			Log3(PCSC_LOG_ERROR, "failed to get device config for %d/%d",
-				bus_number, device_address);
+			Log4(PCSC_LOG_ERROR, "failed to get device config for %d/%d: %s",
+				bus_number, device_address, libusb_error_name(r));
 			continue;
 		}
 
@@ -415,7 +417,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	r = libusb_init(ctx);
 	if (r < 0)
 	{
-		Log2(PCSC_LOG_CRITICAL, "libusb_init failed: %d", r);
+		Log2(PCSC_LOG_CRITICAL, "libusb_init failed: %s", libusb_error_name(r));
 		/* emergency exit */
 		kill(getpid(), SIGTERM);
 		return NULL;
@@ -578,7 +580,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		ret = libusb_open(dev, &device);
 		if (ret < 0)
 		{
-			Log2(PCSC_LOG_ERROR, "libusb_open failed: %d", ret);
+			Log2(PCSC_LOG_ERROR, "libusb_open failed: %s",
+				libusb_error_name(ret));
 		}
 		else
 		{
@@ -596,8 +599,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 				if (ret_interface < 0)
 				{
 					Log2(PCSC_LOG_ERROR,
-						"libusb_get_string_descriptor_ascii failed: %d",
-						ret_interface);
+						"libusb_get_string_descriptor_ascii failed: %s",
+						libusb_error_name(ret_interface));
 				}
 			}
 
@@ -608,8 +611,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 				if (ret_serial < 0)
 				{
 					Log2(PCSC_LOG_ERROR,
-						"libusb_get_string_descriptor_ascii failed: %d",
-						ret_serial);
+						"libusb_get_string_descriptor_ascii failed: %s",
+						libusb_error_name(ret_serial));
 				}
 			}
 
