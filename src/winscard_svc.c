@@ -507,8 +507,14 @@ static void * ContextThread(LPVOID newContext)
 				coStr.dwActiveProtocol = dwActiveProtocol;
 
 				if (coStr.rv == SCARD_S_SUCCESS)
+				{
 					coStr.rv = MSGAddHandle(coStr.hContext, coStr.hCard,
 						threadContext);
+
+					/* if storing the hCard fails we disconnect */
+					if (coStr.rv != SCARD_S_SUCCESS)
+						SCardDisconnect(coStr.hCard, SCARD_LEAVE_CARD);
+				}
 
 				WRITE_BODY(coStr);
 			}
@@ -963,7 +969,7 @@ static LONG MSGAddHandle(SCARDCONTEXT hContext, SCARDHANDLE hCard,
 		if (listLength >= contextMaxCardHandles)
 		{
 			Log4(PCSC_LOG_DEBUG,
-				"Too many card handles for thread context @%p: %d (max is %d)"
+				"Too many card handles for thread context @%p: %d (max is %d). "
 				"Restart pcscd with --max-card-handle-per-thread value",
 				threadContext, listLength, contextMaxCardHandles);
 			retval = SCARD_E_NO_MEMORY;
