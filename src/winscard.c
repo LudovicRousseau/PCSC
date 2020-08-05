@@ -1580,7 +1580,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 		unsigned long i;
 		unsigned long prot = rContext->readerState->cardProtocol;
 
-		for (i = 0 ; prot != 1 ; i++)
+		for (i = 0 ; prot != 1 && i < 16; i++)
 			prot >>= 1;
 
 		sSendPci.Protocol = i;
