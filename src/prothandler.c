@@ -65,7 +65,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 	UCHAR ucChosen;
 
 	/* App has specified no protocol */
-	if (dwPreferred == 0)
+	if (dwPreferred == SCARD_PROTOCOL_UNDEFINED)
 		return SET_PROTOCOL_WRONG_ARGUMENT;
 
 	/* requested protocol is not available */
