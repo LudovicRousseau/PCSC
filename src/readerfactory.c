@@ -1105,10 +1105,8 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 		Log3(PCSC_LOG_CRITICAL, "Open Port 0x%X Failed (%s)",
 			rContext->port, rContext->device);
 
-		/* the reader was not started correctly */
-		rContext->slot = -1;
-
 		/* IFDOpenIFD() failed */
+		/* the reader was not started correctly */
 		rContext->slot = -1;
 
 		if (IFD_NO_SUCH_DEVICE == rv)
