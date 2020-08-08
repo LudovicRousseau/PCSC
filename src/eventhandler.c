@@ -104,7 +104,7 @@ LONG EHUnregisterClientForEvent(int32_t filedes)
 {
 	LONG rv = EHTryToUnregisterClientForEvent(filedes);
 
-	if (rv < 0)
+	if (rv != SCARD_S_SUCCESS)
 		Log2(PCSC_LOG_ERROR, "Can't remove client: %d", filedes);
 
 	return rv;
