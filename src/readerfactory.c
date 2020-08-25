@@ -372,8 +372,12 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	rv = RFInitializeReader(sReadersContexts[dwContext]);
 	if (rv != SCARD_S_SUCCESS)
 	{
+		int log_level = PCSC_LOG_ERROR;
+		if (SCARD_E_UNKNOWN_READER == rv)
+			log_level = PCSC_LOG_INFO;
+
 		/* Cannot connect to reader. Exit gracefully */
-		Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
+		Log2(log_level, "%s init failed.", readerName);
 		(void)RFRemoveReader(readerName, port);
 		return rv;
 	}
@@ -1068,7 +1072,8 @@ LONG RFUnlockAllSharing(SCARDHANDLE hCard, READER_CONTEXT * rContext)
 
 LONG RFInitializeReader(READER_CONTEXT * rContext)
 {
-	LONG rv;
+	LONG rv = SCARD_S_SUCCESS;
+	RESPONSECODE rvd;
 
 	/* Spawn the event handler thread */
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
@@ -1098,24 +1103,29 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 #endif
 
 	/* tries to open the port */
-	rv = IFDOpenIFD(rContext);
+	rvd = IFDOpenIFD(rContext);
 
-	if (rv != IFD_SUCCESS)
+	if (rvd != IFD_SUCCESS)
 	{
-		Log3(PCSC_LOG_CRITICAL, "Open Port 0x%X Failed (%s)",
+		int log_level = PCSC_LOG_CRITICAL;
+		rv = SCARD_E_INVALID_TARGET;
+
+		if (IFD_NO_SUCH_DEVICE == rvd)
+		{
+			/* wrong interface on a composite device? */
+			log_level = PCSC_LOG_INFO;
+			rv = SCARD_E_UNKNOWN_READER;
+		}
+
+		Log3(log_level, "Open Port 0x%X Failed (%s)",
 			rContext->port, rContext->device);
 
 		/* IFDOpenIFD() failed */
 		/* the reader was not started correctly */
 		rContext->slot = -1;
-
-		if (IFD_NO_SUCH_DEVICE == rv)
-			return SCARD_E_UNKNOWN_READER;
-		else
-			return SCARD_E_INVALID_TARGET;
 	}
 
-	return SCARD_S_SUCCESS;
+	return rv;
 }
 
 void RFUnInitializeReader(READER_CONTEXT * rContext)
