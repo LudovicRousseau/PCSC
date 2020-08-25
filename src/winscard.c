@@ -600,7 +600,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		/*
 		 * Set up the status bit masks on readerState
 		 */
-		if (rv == SCARD_S_SUCCESS)
+		if (rv == IFD_SUCCESS)
 		{
 			rContext->readerState->cardAtrLength = dwAtrLen;
 			rContext->readerState->readerState =
@@ -907,7 +907,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		/* the protocol is unset after a power on */
 		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
-		if (rv == SCARD_S_SUCCESS)
+		if (rv == IFD_SUCCESS)
 		{
 			if (SCARD_UNPOWER_CARD == dwDisposition)
 				rContext->readerState->readerState = SCARD_PRESENT;
@@ -1156,7 +1156,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		/*
 		 * Set up the status bit masks on readerState
 		 */
-		if (rv == SCARD_S_SUCCESS)
+		if (rv == IFD_SUCCESS)
 		{
 			rContext->readerState->cardAtrLength = dwAtrLen;
 			rContext->readerState->readerState =
