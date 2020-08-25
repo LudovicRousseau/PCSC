@@ -64,8 +64,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Set the protocol type selection (PTS).
  * This function sets the appropriate protocol to be used on the card.
  */
-LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
-	UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
+RESPONSECODE IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol,
+	UCHAR ucFlags, UCHAR ucPTS1, UCHAR ucPTS2, UCHAR ucPTS3)
 {
 	RESPONSECODE rv;
 
@@ -102,9 +102,9 @@ LONG IFDSetPTS(READER_CONTEXT * rContext, DWORD dwProtocol, UCHAR ucFlags,
 /**
  * Open a communication channel to the IFD.
  */
-LONG IFDOpenIFD(READER_CONTEXT * rContext)
+RESPONSECODE IFDOpenIFD(READER_CONTEXT * rContext)
 {
-	RESPONSECODE rv = 0;
+	RESPONSECODE rv = IFD_SUCCESS;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFDH_create_channel) (DWORD, DWORD) = NULL;
@@ -160,7 +160,7 @@ LONG IFDOpenIFD(READER_CONTEXT * rContext)
 /**
  * Close a communication channel to the IFD.
  */
-LONG IFDCloseIFD(READER_CONTEXT * rContext)
+RESPONSECODE IFDCloseIFD(READER_CONTEXT * rContext)
 {
 	RESPONSECODE rv;
 	int repeat;
@@ -201,7 +201,7 @@ again:
 /**
  * Set capabilities in the reader.
  */
-LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
+RESPONSECODE IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 			DWORD dwLength, PUCHAR pucValue)
 {
 	RESPONSECODE rv;
@@ -232,7 +232,7 @@ LONG IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
  * Other functions int this file will call
  * the driver directly to not cause a deadlock.
  */
-LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
+RESPONSECODE IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 	PDWORD pdwLength, PUCHAR pucValue)
 {
 	RESPONSECODE rv;
@@ -262,7 +262,7 @@ LONG IFDGetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 /**
  * Power up/down or reset's an ICC located in the IFD.
  */
-LONG IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
+RESPONSECODE IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	PUCHAR pucAtr, PDWORD pdwAtrLen)
 {
 	RESPONSECODE rv;
