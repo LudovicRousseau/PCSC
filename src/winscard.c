@@ -1618,6 +1618,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	{
 		*pcbRecvLength = 0;
 		Log2(PCSC_LOG_ERROR, "Card not transacted: 0x%08lX", rv);
+
+        if (SCARD_E_NO_SMARTCARD == rv)
+        {
+            rContext->readerState->cardAtrLength = 0;
+            rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+            rContext->readerState->readerState = SCARD_ABSENT;
+        }
+
 		goto exit;
 	}
 
