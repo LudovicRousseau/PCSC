@@ -548,6 +548,9 @@ LONG IFDTransmit(READER_CONTEXT * rContext, SCARD_IO_HEADER pioTxPci,
 			return SCARD_E_READER_UNAVAILABLE;
 		}
 
+		if (rv == IFD_ICC_NOT_PRESENT)
+			return SCARD_E_NO_SMARTCARD;
+
 		return SCARD_E_NOT_TRANSACTED;
 	}
 }
