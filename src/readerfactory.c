@@ -599,7 +599,7 @@ LONG RFRemoveReader(const char *readerName, int port)
 
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
-		if (sReadersContexts[i]->vHandle != 0)
+		if (sReadersContexts[i] && (sReadersContexts[i]->vHandle != 0))
 		{
 			strncpy(lpcStripReader,
 				sReadersContexts[i]->readerState->readerName,
@@ -1381,6 +1381,8 @@ void RFCleanupReaders(void)
 				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08lX", rv);
 
 			free(sReadersContexts[i]);
+
+			sReadersContexts[i] = NULL;
 		}
 	}
 
