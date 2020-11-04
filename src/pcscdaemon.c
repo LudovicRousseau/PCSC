@@ -839,7 +839,7 @@ static void print_version(void)
 	printf("Copyright (C) 1999-2002 by David Corcoran <corcoran@musclecard.com>.\n");
 	printf("Copyright (C) 2001-2018 by Ludovic Rousseau <ludovic.rousseau@free.fr>.\n");
 	printf("Copyright (C) 2003-2004 by Damien Sauveron <sauveron@labri.fr>.\n");
-	printf("Report bugs to <pcsclite-muscle@lists.alioth.debian.org>.\n");
+	printf("Report bugs to <pcsclite-muscle@lists.infradead.org>.\n");
 
 	printf ("Enabled features:%s\n", PCSCLITE_FEATURES);
 }
