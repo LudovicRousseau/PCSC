@@ -218,8 +218,8 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 	}
 
 #ifdef ATR_DEBUG
-	Log3(PCSC_LOG_DEBUG, "CurrentProtocol: %d, AvailableProtocols: %d",
-		*currentProtocol, *availableProtocols);
+	Log3(PCSC_LOG_DEBUG, "CurrentProtocol: T=%d, AvailableProtocols: %d",
+		*currentProtocol - SCARD_PROTOCOL_T0, *availableProtocols);
 #endif
 
 	return 1; /** @retval 1 Success */
