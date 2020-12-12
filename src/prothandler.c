@@ -126,7 +126,7 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			else
 			{
 				/* no other protocol to use */
-				Log2(PCSC_LOG_INFO, "PTS protocol failed (%d)", rv);
+				Log2(PCSC_LOG_INFO, "PTS protocol failed (%ld)", rv);
 				protocol = SET_PROTOCOL_PPS_FAILED;
 			}
 			break;
