@@ -428,7 +428,10 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	HPRescanUsbBus();
 
 	/* signal that the initially connected readers are now visible */
-	write(pipefd[1], &c, 1);
+	if (write(pipefd[1], &c, 1) == -1) {
+		Log2(PCSC_LOG_ERROR, "write: %s", strerror(errno));
+		return NULL;
+	}
 
 	/* if at least one driver do not have IFD_GENERATE_HOTPLUG */
 	do_polling = FALSE;
@@ -463,7 +466,10 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	{
 		char dummy;
 
-		pipe(rescan_pipe);
+		if (pipe(rescan_pipe) == -1) {
+			Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
+			return NULL;
+		}
 		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
 		{
 			Log1(PCSC_LOG_INFO, "Reload serial configuration");
@@ -506,7 +512,10 @@ LONG HPSearchHotPluggables(void)
 			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, pipefd);
 
 		/* Wait for initial readers to setup */
-		read(pipefd[0], &c, 1);
+		if (read(pipefd[0], &c, 1) == -1) {
+			Log2(PCSC_LOG_ERROR, "read: %s", strerror(errno));
+			return -1;
+		};
 
 		/* cleanup pipe fd */
 		close(pipefd[0]);
@@ -699,7 +708,8 @@ void HPReCheckSerialReaders(void)
 	if (rescan_pipe[1] >= 0)
 	{
 		char dummy = 0;
-		write(rescan_pipe[1], &dummy, sizeof(dummy));
+		if (write(rescan_pipe[1], &dummy, sizeof(dummy)) == -1)
+			Log2(PCSC_LOG_ERROR, "write: %s", strerror(errno));
 	}
 }
 
