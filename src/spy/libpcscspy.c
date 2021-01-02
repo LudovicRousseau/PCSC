@@ -91,6 +91,8 @@ static const char * internal_stringify_error(void)
 	return "No spy pcsc_stringify_error() function";
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 /* contains pointers to real functions */
 static struct
 {
@@ -135,6 +137,7 @@ static struct
 	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error,
 	.pcsc_stringify_error = (p_pcsc_stringify_error(*))internal_stringify_error
 };
+#pragma GCC diagnostic pop
 
 #define LOG log_line("%s:%d", __FILE__, __LINE__)
 
