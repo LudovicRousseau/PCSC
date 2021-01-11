@@ -38,6 +38,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __hotplug_h__
 #define __hotplug_h__
 
+#include "wintypes.h"
+
 #ifndef PCSCLITE_HP_DROPDIR
 #define PCSCLITE_HP_DROPDIR		"/usr/local/pcsc/drivers/"
 #endif

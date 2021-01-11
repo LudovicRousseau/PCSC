@@ -43,6 +43,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
+#include "pcsclite.h"
+#include "wintypes.h"
+
 /** Major version of the current message protocol */
 #define PROTOCOL_VERSION_MAJOR 4
 /** Minor version of the current message protocol */

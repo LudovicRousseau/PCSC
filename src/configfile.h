@@ -35,6 +35,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __configfile_h__
 #define __configfile_h__
 
+#include "readerfactory.h"
+
 #ifdef __cplusplus
 extern "C"
 {

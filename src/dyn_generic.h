@@ -38,6 +38,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __dyn_generic_h__
 #define __dyn_generic_h__
 
+#include "wintypes.h"
+
 	LONG DYN_LoadLibrary(void **, char *);
 	LONG DYN_CloseLibrary(void **);
 	LONG DYN_GetAddress(void *, /*@out@*/ void **, const char *, int);

@@ -38,6 +38,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __prothandler_h__
 #define __prothandler_h__
 
+#include "readerfactory.h"
+#include "wintypes.h"
+
 	DWORD PHSetProtocol(struct ReaderContext *, DWORD, UCHAR, UCHAR);
 
 #define SET_PROTOCOL_WRONG_ARGUMENT -1
