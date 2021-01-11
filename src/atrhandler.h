@@ -39,6 +39,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __atrhandler_h__
 #define __atrhandler_h__
 
+#include "wintypes.h"
+
 	/*
 	 * Decodes the ATR
 	 */

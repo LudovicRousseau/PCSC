@@ -39,6 +39,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __ifdwrapper_h__
 #define __ifdwrapper_h__
 
+#include "ifdhandler.h"
+#include "readerfactory.h"
+#include "wintypes.h"
+
 	RESPONSECODE IFDOpenIFD(READER_CONTEXT *);
 	RESPONSECODE IFDCloseIFD(READER_CONTEXT *);
 	RESPONSECODE IFDPowerICC(READER_CONTEXT *, DWORD, PUCHAR, /*@out@*/ PDWORD);

@@ -41,6 +41,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __winscard_svc_h__
 #define __winscard_svc_h__
 
+#include <stdint.h>
+
+#include "wintypes.h"
+
 	LONG ContextsInitialize(int, int);
 	void ContextsDeinitialize(void);
 	LONG CreateContextThread(uint32_t *);
