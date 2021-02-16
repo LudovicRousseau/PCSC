@@ -1,3 +1,18 @@
+1.9.1: Ludovic Rousseau
+16 February 2021
+- Do not (possibly) lock a reader if allocating hCard fails
+- Fix a hang in SCardTransmit()
+- Do not report an error if the wrong interface is used by the driver
+- Update reader state when a card is removed during an exchange
+- readerfactory: Make sure a freed Reader Context is not accessed
+- PHSetProtocol(): supports T=0&1 cards on T=0 reader
+- hotplug-libusb:
+  . support CCIDCLASSDRIVER
+  . add interface name to reader name
+  . remove obsolete libhal scheme
+- Some other minor improvements
+
+
 1.9.0: Ludovic Rousseau
 14 June 2020
 - SCardEndTransaction(): greatly improve performances (x300)
