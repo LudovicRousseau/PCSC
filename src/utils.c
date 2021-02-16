@@ -50,6 +50,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pcscd.h"
 #include "sys_generic.h"
 
+#ifndef LIBPCSCLITE
 pid_t GetDaemonPid(void)
 {
 	int fd;
@@ -128,6 +129,7 @@ int CheckForOpenCT(void)
 
 	return 0;
 } /* CheckForOpenCT */
+#endif
 
 /**
  * return the difference (as long int) in µs between 2 struct timeval
@@ -147,6 +149,7 @@ long int time_sub(struct timeval *a, struct timeval *b)
 	return r.tv_sec * 1000000 + r.tv_usec;
 } /* time_sub */
 
+#ifndef LIBPCSCLITE
 int ThreadCreate(pthread_t * pthThread, int attributes,
 	PCSCLITE_THREAD_FUNCTION(pvFunction), LPVOID pvArg)
 {
@@ -184,3 +187,4 @@ error:
 	pthread_attr_destroy(&attr);
 	return ret;
 }
+#endif

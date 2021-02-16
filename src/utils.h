@@ -35,16 +35,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "wintypes.h"
 #include "readerfactory.h"
 
-#define PID_ASCII_SIZE 11
-pid_t GetDaemonPid(void);
-int SendHotplugSignal(void);
+long int time_sub(struct timeval *a, struct timeval *b);
 
 /* defined in winscard_clnt.c */
 LONG SCardCheckDaemonAvailability(void);
 
-int CheckForOpenCT(void);
+#ifndef LIBPCSCLITE
 
-long int time_sub(struct timeval *a, struct timeval *b);
+#define PID_ASCII_SIZE 11
+pid_t GetDaemonPid(void);
+int SendHotplugSignal(void);
+
+int CheckForOpenCT(void);
 
 /* thread attributes */
 #define THREAD_ATTR_DEFAULT			0
@@ -54,6 +56,8 @@ long int time_sub(struct timeval *a, struct timeval *b);
 
 int ThreadCreate(pthread_t *, int, PCSCLITE_THREAD_FUNCTION( ),
 	/*@null@*/ LPVOID);
+
+#endif
 
 #endif
 
