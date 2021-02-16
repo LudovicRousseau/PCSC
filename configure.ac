@@ -198,7 +198,7 @@ AC_ARG_ENABLE(libudev,
 		fi ])
 
 # disable libudev check is USB is not used
-if test "$use_usb" == "no"; then
+if test "$use_usb" = "no"; then
 	use_libudev="no"
 fi
 
@@ -244,7 +244,7 @@ AC_ARG_ENABLE(libusb,
 	else use_libusb="${use_libusb-yes}" ; fi ] )
 
 # disable libusb check is USB is not used
-if test "$use_usb" == "no"; then
+if test "$use_usb" = "no"; then
 	use_libusb="no"
 fi
 
