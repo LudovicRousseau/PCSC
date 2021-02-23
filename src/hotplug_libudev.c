@@ -46,6 +46,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pthread.h>
 #include <libudev.h>
 #include <poll.h>
+#include <ctype.h>
 
 #include "debuglog.h"
 #include "parser.h"
@@ -481,15 +482,26 @@ static void HPAddDevice(struct udev_device *dev)
 	{
 		char *result;
 
+		char *tmpInterfaceName = strdup(sInterfaceName);
+
+		/* check the interface name contains only valid ASCII codes */
+		for (size_t i=0; i<strlen(tmpInterfaceName); i++)
+		{
+			if (! isascii(tmpInterfaceName[i]))
+				tmpInterfaceName[i] = '.';
+		}
+
 		/* create a new name */
-		a = asprintf(&result, "%s [%s]", fullname, sInterfaceName);
+		a = asprintf(&result, "%s [%s]", fullname, tmpInterfaceName);
 		if (-1 ==  a)
 		{
 			Log1(PCSC_LOG_ERROR, "asprintf() failed");
+			free(tmpInterfaceName);
 			goto exit;
 		}
 
 		free(fullname);
+		free(tmpInterfaceName);
 		fullname = result;
 	}
 
