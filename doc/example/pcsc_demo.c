@@ -29,11 +29,6 @@
 #include <PCSC/wintypes.h>
 #include <PCSC/winscard.h>
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
 /* PCSC error message pretty print */
 #define PCSC_ERROR(rv, text) \
 if (rv != SCARD_S_SUCCESS) \
