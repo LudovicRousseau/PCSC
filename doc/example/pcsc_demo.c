@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <PCSC/winscard.h>
+#include <winscard.h>
 
 /* PCSC error message pretty print */
 #define PCSC_ERROR(rv, text) \
