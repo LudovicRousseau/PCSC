@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <PCSC/wintypes.h>
 #include <PCSC/winscard.h>
 
 /* PCSC error message pretty print */
