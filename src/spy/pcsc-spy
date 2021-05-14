@@ -703,7 +703,9 @@ class PCSCspy(object):
         self.color = color
         self.diffable = diffable
         self.stats = stats
-        self.indent = " " * indent
+        self.indent = " " * (indent * 4)
+        if display_thread:
+            self.indent += " (t%d) " % indent
 
         self.features = {0x01: "FEATURE_VERIFY_PIN_START",
                          0x02: "FEATURE_VERIFY_PIN_FINISH",
@@ -878,7 +880,7 @@ class PCSCdemultiplexer(object):
                     color=self.color, diffable=self.diffable)
                 threads[thread] = Thread(target=spy.worker)
                 threads[thread].start()
-                indent += 4
+                indent += 1
 
             queue.put(tail)
 
@@ -933,7 +935,7 @@ def signal_handler(sig, frame):
 
 
 def print_usage():
-    print("Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help] [-v|--version]")
+    print("Usage: pcsc-spy [-n|--nocolor] [-d|--diffable] [-h|--help] [-v|--version] [-t|--thread]")
 
 if __name__ == "__main__":
     import sys
@@ -941,14 +943,15 @@ if __name__ == "__main__":
 
     logfile = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ndhv", ["nocolor",
-            "diffable", "help", "version"])
+        opts, args = getopt.getopt(sys.argv[1:], "ndhvt", ["nocolor",
+            "diffable", "help", "version", "thread"])
     except getopt.GetoptError:
         print_usage()
         sys.exit(1)
 
     color = True
     diffable = False
+    display_thread = False
     for o, a in opts:
         if o == "-n" or o == "--nocolor":
             color = False
@@ -962,6 +965,8 @@ if __name__ == "__main__":
             print("Copyright (c) 2011-2012, Ludovic Rousseau <ludovic.rousseau@free.fr>")
             print()
             sys.exit(1)
+        if o == "-t" or o == "--thread":
+            display_thread = True
 
     if len(args) > 0:
         logfile = args[0]
