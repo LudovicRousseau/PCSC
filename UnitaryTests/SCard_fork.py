@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCard_fork.py : Unitary test for handle invalid after fork()
 #   Copyright (C) 2008-2009  Ludovic Rousseau

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardBeginTransaction_Disconnect.py : Unitary test for SCardDisconnect()
 #   Copyright (C) 2009  Ludovic Rousseau

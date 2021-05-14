@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 #   FEATURE_GET_TLV_PROPERTIES.py: Unitary test for

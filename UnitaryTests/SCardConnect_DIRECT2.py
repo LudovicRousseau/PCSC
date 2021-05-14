@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardConnect_DIRECT2.py : Unitary test for SCardReconnect
 #   Copyright (C) 2010  Ludovic Rousseau

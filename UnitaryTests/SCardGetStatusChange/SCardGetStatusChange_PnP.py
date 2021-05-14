@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 #   SCardGetStatusChange.py : Unit tests for unlock a SCardGetStatusChange()

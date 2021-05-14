@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 #   SCardGetAttrib.py: get SCARD_ATTR_VENDOR_IFD_SERIAL_NO PC/SC attribute

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 #   FEATURE_CCID_ESC_COMMAND.py: Unitary test for FEATURE_CCID_ESC_COMMAND

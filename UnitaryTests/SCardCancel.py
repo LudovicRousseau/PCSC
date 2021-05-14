@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardCancel.py : Unitary test for SCardCancel()
 #   Copyright (C) 2008-2009  Ludovic Rousseau

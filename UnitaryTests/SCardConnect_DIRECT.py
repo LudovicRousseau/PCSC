@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardConnect_DIRECT.py : Unitary test for SCardConnect in DIRECT mode
 #   Copyright (C) 2009  Ludovic Rousseau

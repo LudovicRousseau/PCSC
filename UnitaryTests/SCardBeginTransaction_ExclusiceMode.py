@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardBeginTransaction_ExclusiceMode.py : Unitary test for SCardDisconnect()
 #   Copyright (C) 2011  Ludovic Rousseau

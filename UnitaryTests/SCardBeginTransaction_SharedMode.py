@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardBeginTransaction_SharedMode.py : Unitary test for
 #   SCardReleaseContext()

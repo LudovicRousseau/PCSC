@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   transmit_loop.py: call SCardTransmit in an endless loop
 #   Copyright (C) 2010  Ludovic Rousseau

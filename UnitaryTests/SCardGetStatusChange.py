@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardGetStatusChange.py : Unitary test for SCardGetStatusChange()
 #   Copyright (C) 2011  Ludovic Rousseau

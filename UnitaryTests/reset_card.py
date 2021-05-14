@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   reset_card.py: reset a card
 #   Copyright (C) 2010  Ludovic Rousseau

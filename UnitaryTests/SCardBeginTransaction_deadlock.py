@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardBeginTransaction_deadlock.py: Unitary test for locking in
 #   SCardBeginTransaction, SCardTransmit, SCardStatus and SCardReconnect

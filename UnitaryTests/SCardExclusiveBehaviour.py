@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Check the return value of SCardConnect() on a reader already used in
 # SCARD_SHARE_EXCLUSIVE mode

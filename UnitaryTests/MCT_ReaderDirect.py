@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 #   MCT_ReaderDirect.py : Unitary test for Multifunctional Card Terminal

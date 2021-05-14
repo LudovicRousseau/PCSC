@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 #   SCardReconnect.py : Unitary test for SCardReconnect
 #   Copyright (C) 2009-2011  Ludovic Rousseau

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 #   control_switch_interface.py: switch interface on the GemProx DU
