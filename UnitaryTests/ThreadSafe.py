@@ -19,7 +19,6 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
 from smartcard.pcsc.PCSCExceptions import *

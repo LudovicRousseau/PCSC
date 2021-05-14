@@ -24,7 +24,6 @@
 
 # The bug has been fixed in 57b0ba5a200bcbf1c489d39261340324392a8e8a
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import threading

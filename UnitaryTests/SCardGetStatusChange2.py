@@ -19,7 +19,6 @@
 # Check the return value of SCardGetStatusChange() for unknown readers
 # Before revision 5881 SCardGetStatusChange() returned SCARD_S_SUCCESS
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

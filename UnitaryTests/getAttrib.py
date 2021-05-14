@@ -18,7 +18,6 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 from smartcard.System import readers
 from smartcard.scard import (SCARD_ATTR_VENDOR_NAME, SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_ATTR_DEVICE_FRIENDLY_NAME,

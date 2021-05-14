@@ -19,7 +19,6 @@
 # Alioth bug [#312960] SCardDisconnect when other context has transaction
 # fixed in revisions 5572 and 5574
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

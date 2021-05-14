@@ -31,7 +31,6 @@
 # same issue with Reconnect instead of connect
 # bug fixed in revision 4940
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

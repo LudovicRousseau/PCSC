@@ -21,7 +21,6 @@
 # http://archives.neohapsis.com/archives/dev/muscle/2012-q2/0109.html
 # fixed in revisions 6358, 6359, 6360 and 6361
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import threading

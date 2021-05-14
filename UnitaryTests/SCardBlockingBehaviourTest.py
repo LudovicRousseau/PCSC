@@ -29,7 +29,6 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from __future__ import print_function
 import sys
 import thread
 import time

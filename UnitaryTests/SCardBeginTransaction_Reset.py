@@ -20,7 +20,6 @@
 # transaction is ongoing.
 # Test for the patch in 74656f24db3da1532040a1775ceffa225fbc3d00
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from time import sleep

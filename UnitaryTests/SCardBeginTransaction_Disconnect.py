@@ -21,7 +21,6 @@
 # corresponding SCardEndTransaction(). OpenSC "pkcs11-tool -I" exhibits
 # such a behavior.
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

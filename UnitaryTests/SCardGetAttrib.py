@@ -21,7 +21,6 @@
 # SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in ccid 1.3.13
 # SCARD_ATTR_ATR_STRING support has been added in ccid 0.9.0
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.util import toHexString, toASCIIString

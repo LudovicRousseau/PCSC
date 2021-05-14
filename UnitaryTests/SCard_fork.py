@@ -20,7 +20,6 @@
 # #define DO_CHECK_SAME_PROCESS
 # or this unitary test will fail
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import time

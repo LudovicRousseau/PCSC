@@ -21,7 +21,6 @@
 # has been implemented in revision 4332 but reverted in revision 4940 so
 # that the protocol is not negociated again
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

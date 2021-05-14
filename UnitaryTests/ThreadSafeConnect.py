@@ -20,7 +20,6 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardListReaders, SCardConnect, SCardDisconnect,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD,

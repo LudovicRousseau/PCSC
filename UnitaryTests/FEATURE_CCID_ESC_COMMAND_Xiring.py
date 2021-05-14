@@ -24,7 +24,6 @@
 # DRIVER_OPTION_CCID_EXCHANGE_AUTHORIZED bit in the ifdDriverOptions
 # option of the CCID driver Info.plist file
 
-from __future__ import print_function
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (getFeatureRequest, hasFeature,
     getTlvProperties, FEATURE_CCID_ESC_COMMAND, SCARD_SHARE_DIRECT)

@@ -34,7 +34,6 @@
 #  * - FIXME: Mac?
 #  */
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

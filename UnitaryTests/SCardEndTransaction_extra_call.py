@@ -20,7 +20,6 @@
 # SCardEndTransaction() should return SCARD_E_NOT_TRANSACTED if called
 # more times than SCardBeginTransaction()
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 

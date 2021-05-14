@@ -19,7 +19,6 @@
 
 # check te card is not auto powered off after a SCardReconnect()
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys

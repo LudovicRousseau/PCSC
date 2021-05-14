@@ -18,7 +18,6 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys

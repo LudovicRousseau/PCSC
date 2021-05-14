@@ -20,7 +20,6 @@
 # SCardCancel() should do nothing if no cancellable call is ongoing
 # bug fixed in revision 5344
 
-from __future__ import print_function
 from smartcard.scard import *
 
 try:

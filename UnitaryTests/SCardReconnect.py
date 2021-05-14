@@ -20,7 +20,6 @@
 # when the reconnection requests exclusive access and the reader is
 # already shared.
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import sys

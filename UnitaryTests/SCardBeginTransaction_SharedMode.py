@@ -20,7 +20,6 @@
 # SCardReleaseContext() should not release a PC/SC transaction not
 # started by the released context
 
-from __future__ import print_function
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 import threading
