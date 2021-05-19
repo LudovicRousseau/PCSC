@@ -867,7 +867,7 @@ class PCSCdemultiplexer(object):
             if previous_thread != thread:
                 # schedule the other thread so it has time to empty its
                 # queue
-                time.sleep(.01)
+                time.sleep(.001)
 
             try:
                 queue = self.queues[thread]
