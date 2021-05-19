@@ -811,7 +811,7 @@ class PCSCdemultiplexer(object):
             # create the FIFO file
             try:
                 os.mkfifo(logfile)
-            except (OSError):
+            except OSError:
                 print("fifo %s already present. Reusing it." % logfile)
 
         self.sec = self.usec = 0
