@@ -232,15 +232,16 @@ def main():
         unblocked = False
         print()
         print("Testing %s, expecting" % testTarget, end=' ')
-        if tests[testTarget][1]:
+        methodName, shouldBlock = tests[testTarget]
+        if shouldBlock:
             print("blocking")
         else:
             print("non blocking")
-        thread = threading.Thread(target=tests[testTarget][0], args=(hcontextTest, hcardTest, readerName))
+        thread = threading.Thread(target=methodName, args=(hcontextTest, hcardTest, readerName))
         thread.start()
         # print("Thread started")
         time.sleep(1)
-        if (unblocked and tests[testTarget][1]) or ((not unblocked) and (not tests[testTarget][1])):
+        if (unblocked and shouldBlock) or ((not unblocked) and (not shouldBlock)):
             failed = True
         else:
             failed = False
