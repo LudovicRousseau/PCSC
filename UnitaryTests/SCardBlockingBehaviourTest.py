@@ -30,7 +30,7 @@
 
 
 import sys
-import thread
+import threading
 import time
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
@@ -236,7 +236,8 @@ def main():
             print("blocking")
         else:
             print("non blocking")
-        thread.start_new_thread(tests[testTarget][0], (hcontextTest, hcardTest, readerName))
+        thread = threading.Thread(target=tests[testTarget][0], args=(hcontextTest, hcardTest, readerName))
+        thread.start()
         # print("Thread started")
         time.sleep(1)
         if (unblocked and tests[testTarget][1]) or ((not unblocked) and (not tests[testTarget][1])):
@@ -245,8 +246,8 @@ def main():
             failed = False
         SCardEndTransaction(hcard, SCARD_LEAVE_CARD)
 
-        # Leave enough time to terminate the test thread
-        time.sleep(1)
+        # wait for the thread to finish
+        thread.join()
 
         if failed:
             print(RED + "Test for " + testTarget + " FAILED!" + NORMAL)
