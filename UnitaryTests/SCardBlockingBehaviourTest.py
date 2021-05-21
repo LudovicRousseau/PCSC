@@ -222,7 +222,7 @@ def main():
         index = int(sys.argv[1])
     hcontext, hcard, readerName = Connect(index)
     # Creating the test handles here:
-    # the test thread can't created them as
+    # the test thread can't create them as
     # doing it may block on another call
     hcontextTest, hcardTest = ConnectWithReader(readerName)
 
