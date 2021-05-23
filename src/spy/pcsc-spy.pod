@@ -63,7 +63,7 @@ library.
 
 Example:
 
- LD_PRELOAD=/usr/lib/libpcscspy.so pcsc_scan
+ LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libpcscspy.so pcsc_scan
 
 =head2 Application loading libpcsclite.so.1
 
