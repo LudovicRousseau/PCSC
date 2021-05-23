@@ -32,14 +32,6 @@
 
 #define DEBUG
 
-#ifdef __APPLE__
-#define SCardControl SCardControl132
-
-PCSC_API int32_t SCardControl132(SCARDHANDLE hCard, uint32_t dwControlCode,
-		const void *pbSendBuffer, uint32_t cbSendLength,
-		void *pbRecvBuffer, uint32_t cbRecvLength, uint32_t *lpBytesReturned);
-#endif
-
 /* function prototypes */
 
 #define p_SCardEstablishContext(fct) LONG(fct)(DWORD dwScope, LPCVOID pvReserved1, LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
@@ -335,19 +327,8 @@ static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
 static LONG load_lib(void)
 {
 
-#ifdef __APPLE__
-/* We should be able to directly use this
- * #define LIBPCSC_NOSPY "/System/Library/Frameworks/PCSC.framework/PCSC"
- * but for a yet unknown reason the dlsym() returns symbols from the spy
- * library and not from the framework.
- * Just copying the framework in /tmp does solve the problem.
- */
-#define LIBPCSC_NOSPY "/tmp/PCSC"
-#define LIBPCSC "/tmp/PCSC"
-#else
 #define LIBPCSC_NOSPY "libpcsclite_nospy.so.1"
 #define LIBPCSC "libpcsclite.so.1"
-#endif
 
 	/* first try to load the NOSPY library
 	 * this is used for programs doing an explicit dlopen like
