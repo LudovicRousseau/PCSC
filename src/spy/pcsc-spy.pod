@@ -5,7 +5,7 @@ pcsc-spy - A PC/SC spy command
 =head1 SYNOPSIS
 
 pcsc-spy [B<-n>|B<--nocolor>] [B<-d>|B<--diffable>] [B<-h>|B<--help>]
-[F<fifo_filename>]
+[B<-t>|B<--thread>] [F<fifo_filename>]
 
 =head1 DESCRIPTION
 
@@ -46,6 +46,11 @@ file for example).
 
 Print the version of the F<pcsc-spy> program plus a copyright, a list of
 authors.
+
+=item B<-t>, B<--thread>
+
+Add a thread number before each line of log to identify the calls from
+the same threads.
 
 =back
 
