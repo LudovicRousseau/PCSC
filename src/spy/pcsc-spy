@@ -970,8 +970,8 @@ if __name__ == "__main__":
             print_usage()
             sys.exit(1)
         if o == "-v" or o == "--version":
-            print("pcsc-spy version 1.0")
-            print("Copyright (c) 2011-2012, Ludovic Rousseau <ludovic.rousseau@free.fr>")
+            print("pcsc-spy version 1.1")
+            print("Copyright (c) 2011-2021, Ludovic Rousseau <ludovic.rousseau@free.fr>")
             print()
             sys.exit(1)
         if o == "-t" or o == "--thread":
