@@ -5,7 +5,7 @@ pcsc-spy - A PC/SC spy command
 =head1 SYNOPSIS
 
 pcsc-spy [B<-n>|B<--nocolor>] [B<-d>|B<--diffable>] [B<-h>|B<--help>]
-[B<-t>|B<--thread>] [F<fifo_filename>]
+[B<-v>|B<--version>] [B<-t>|B<--thread>] [F<fifo_filename>]
 
 =head1 DESCRIPTION
 
