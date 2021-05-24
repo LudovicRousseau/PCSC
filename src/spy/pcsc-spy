@@ -64,6 +64,9 @@ def _parse_rv(line):
     return (code, rv, sec, usec)
 
 
+class SpyExit(Exception):
+    pass
+
 class StatRecord(object):
     """ Record to store statistics """
 
@@ -89,7 +92,7 @@ class PCSCspy(object):
     def get_line(self):
         line = self.queue.get()
         if line == "EXIT":
-            raise Exception("Exit")
+            raise SpyExit()
         return line
 
     def _log_rv(self):
@@ -795,11 +798,8 @@ class PCSCspy(object):
                         self._SCardCancel()
                     else:
                         print("Unknown function:", fct)
-                except Exception as ex:
-                    if str(ex) == "Exit":
-                        return
-                    else:
-                        raise(ex)
+                except SpyExit:
+                    return
 
             try:
                 record = self.stats[fct]
