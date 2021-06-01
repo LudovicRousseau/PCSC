@@ -4,7 +4,7 @@ Requires=pcscd.socket
 Documentation=man:pcscd(8)
 
 [Service]
-ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit
+ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit $PCSCD_ARGS
 ExecReload=@sbindir_exp@/pcscd --hotplug
 EnvironmentFile=-@sysconfdir@/default/pcscd
 
