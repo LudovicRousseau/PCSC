@@ -6,6 +6,7 @@ Documentation=man:pcscd(8)
 [Service]
 ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit
 ExecReload=@sbindir_exp@/pcscd --hotplug
+EnvironmentFile=-@sysconfdir@/default/pcscd
 
 [Install]
 Also=pcscd.socket
