@@ -114,9 +114,9 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			protocol = ucChosen;
 			break;
 
-		case IFD_NOT_SUPPORTED:
 		case IFD_PROTOCOL_NOT_SUPPORTED:
 		case IFD_ERROR_NOT_SUPPORTED:
+			/* protocol not supported */
 			if (protocol != dwPreferred)
 			{
 				Log3(PCSC_LOG_INFO,
@@ -129,6 +129,12 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 				Log2(PCSC_LOG_INFO, "PTS protocol failed (%ld)", rv);
 				protocol = SET_PROTOCOL_PPS_FAILED;
 			}
+			break;
+
+		case IFD_NOT_SUPPORTED:
+			/* command not supported */
+			Log3(PCSC_LOG_INFO, "Set PTS failed (%ld). Using T=%d", rv,
+				(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
 			break;
 
 		default:
