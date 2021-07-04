@@ -414,8 +414,6 @@ PCSCLITE_CONFIG_DIR="${confdir_exp}"
 AC_SUBST(PCSCLITE_CONFIG_DIR)
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} configdir=${PCSCLITE_CONFIG_DIR}"
 AC_DEFINE_UNQUOTED([PCSCLITE_FEATURES], ["${PCSCLITE_FEATURES}"], [Enabled PC/SC lite features])
-PCSCD_BINARY="${sbindir_exp}/pcscd"
-AC_DEFINE_UNQUOTED([PCSCD_BINARY], ["$PCSCD_BINARY"], [pcscd filename])
 
 cat << EOF
 
@@ -438,7 +436,6 @@ PTHREAD_CFLAGS:      ${PTHREAD_CFLAGS}
 PTHREAD_LIBS:        ${PTHREAD_LIBS}
 PCSC_ARCH:           ${PCSC_ARCH}
 
-pcscd binary            ${PCSCD_BINARY}
 polkit support:         ${use_polkit}
 polkit policy dir:      ${polkit_policy_dir}
 libudev support:        ${use_libudev}
