@@ -350,7 +350,7 @@ if test x${usbdropdir} = xfalse ; then
 		usbdropdir="$ac_default_libdir/pcsc/drivers"
 	fi
 fi
-AS_AC_EXPAND(usbdropdir_exp,$usbdropdir)
+AX_RECURSIVE_EVAL($usbdropdir,usbdropdir_exp)
 usbdropdir=$usbdropdir_exp
 AC_DEFINE_UNQUOTED(PCSCLITE_HP_DROPDIR, "$usbdropdir", [directory containing USB drivers])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} usbdropdir=${usbdropdir}"
@@ -406,8 +406,8 @@ AC_SUBST(ipcdir)
 AC_SUBST(serialconfdir)
 AC_SUBST(host_to_ccid_16)
 AC_SUBST(host_to_ccid_32)
-AS_AC_EXPAND(confdir_exp,$confdir)
-AS_AC_EXPAND(sbindir_exp,$sbindir)
+AX_RECURSIVE_EVAL($confdir,confdir_exp)
+AX_RECURSIVE_EVAL($sbindir,sbindir_exp)
 
 PCSCLITE_CONFIG_DIR="${confdir_exp}"
 AC_SUBST(PCSCLITE_CONFIG_DIR)
