@@ -419,9 +419,8 @@ cat << EOF
 PC/SC lite has been configured with following options:
 
 Version:             ${PACKAGE_VERSION}
-System binaries:     $(eval eval eval echo "${sbindir_exp}")
+System binaries:     ${sbindir_exp}
 Configuration dir:   ${PCSCLITE_CONFIG_DIR}
-
 
 Host:                ${host}
 Compiler:            ${CC}
