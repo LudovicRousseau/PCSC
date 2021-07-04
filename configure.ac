@@ -408,7 +408,6 @@ AC_SUBST(host_to_ccid_16)
 AC_SUBST(host_to_ccid_32)
 AS_AC_EXPAND(confdir_exp,$confdir)
 AS_AC_EXPAND(sbindir_exp,$sbindir)
-AS_AC_EXPAND(localstatedir_exp,$localstatedir)
 
 PCSCLITE_CONFIG_DIR="${confdir_exp}"
 AC_SUBST(PCSCLITE_CONFIG_DIR)
