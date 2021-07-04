@@ -4,7 +4,7 @@ reader.conf \- configuration file for pcscd readers' drivers
 .
 .SH DESCRIPTION
 The
-.I @confdir_exp@/reader.conf
+.I @PCSCLITE_CONFIG_DIR@/reader.conf
 file contains configuration information for serial and (some) PCMCIA
 smart card readers.
 .PP
@@ -14,7 +14,7 @@ uses another mechanism to automatically load USB drivers.
 .
 .SH SYNTAX
 The
-.I @confdir_exp@/reader.conf
+.I @PCSCLITE_CONFIG_DIR@/reader.conf
 is a regular text file. Each reader must be defined by four fields:
 .PP
  FRIENDLYNAME     TEXT_STRING
@@ -57,7 +57,7 @@ serial port number for a serial reader.
 .
 .SH DEBUGGING
 In order to set up your
-.I @confdir_exp@/reader.conf
+.I @PCSCLITE_CONFIG_DIR@/reader.conf
 file correctly you may want to have debug messages from
 .BR pcscd .
 I recommend you to start
