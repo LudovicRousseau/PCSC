@@ -13,9 +13,7 @@ EXTRA_DIST = \
 	bootstrap \
 	ChangeLog.git \
 	SECURITY \
-	HELP \
-	m4/ax_pthread.m4 \
-	m4/as-ac-expand.m4
+	HELP
 
 DISTCLEANFILES = ChangeLog.git
 
