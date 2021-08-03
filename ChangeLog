@@ -1,3 +1,21 @@
+1.9.2: Ludovic Rousseau
+3 August 2021
+- improve NetBSD support
+- pcsc-spy: version 1.1
+  . add option -t|--thread
+  . x10 speed increase
+  . correctly exit at end-of-file
+  . remove, now useless, support of macOS
+- systemd:
+  . use /etc/default/pcscd as EnvironmentFile
+  . use $PCSCD_ARGS to specify more arguments
+- SetProtocol: Handle IFD_NOT_SUPPORTED from the driver
+- hotplug_libudev.c: sanitize interface name
+- pcsc_demo: change licence from GPLv3 to BSD
+- use Python 3 for Python scripts (psc-spy, UnitaryTests)
+- Some other minor improvements
+
+
 1.9.1: Ludovic Rousseau
 16 February 2021
 - Do not (possibly) lock a reader if allocating hCard fails
