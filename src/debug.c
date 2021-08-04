@@ -68,11 +68,7 @@ static void log_init(void)
 {
 	char *e;
 
-#ifdef LIBPCSCLITE
 	e = getenv("PCSCLITE_DEBUG");
-#else
-	e = getenv("MUSCLECARD_DEBUG");
-#endif
 	if (e)
 		LogLevel = atoi(e);
 
