@@ -516,6 +516,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 			SYS_Sleep(HPForceReaderPolling);
 			HPRescanUsbBus();
 		}
+		libusb_exit(ctx);
 	}
 	else
 	{
