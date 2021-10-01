@@ -386,6 +386,7 @@ static void HPRescanUsbBus(void)
 			Log3(PCSC_LOG_DEBUG, "%d/%d is not a supported smart card reader",
 				bus_number, device_address);
 #endif
+			libusb_free_config_descriptor(config_desc);
 			continue;
 		}
 
