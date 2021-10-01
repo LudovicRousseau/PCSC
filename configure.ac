@@ -92,7 +92,6 @@ LT_INIT
 #AC_SUBST(LIBTOOL_DEPS)
 
 # Checks for header files
-AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([getopt.h sys/filio.h syslog.h dl.h fcntl.h alloca.h])
 
@@ -100,7 +99,6 @@ AC_CHECK_HEADERS([getopt.h sys/filio.h syslog.h dl.h fcntl.h alloca.h])
 AC_C_CONST
 AC_TYPE_UID_T
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
 AC_STRUCT_DIRENT_D_TYPE
 
 # Checks for library functions
