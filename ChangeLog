@@ -1,3 +1,8 @@
+1.9.4: Ludovic Rousseau
+1 October 2021
+- fix a memory leak when libusb is used for hotplug (i.e. non-Linux
+  systems)
+
 1.9.3: Ludovic Rousseau
 6 August 2021
 - fix a stupid regression with systemd introduced in the previous version
