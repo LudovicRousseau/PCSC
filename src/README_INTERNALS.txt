@@ -26,7 +26,6 @@ pcscd (daemon)
  eventhandler.c
  hotplug_generic.c
  hotplug_libusb.c
- hotplug_linux.c (this file is OS dependant)
  hotplug_macosx.c (this file is OS dependant)
  ifdwrapper.c
  pcscdaemon.c

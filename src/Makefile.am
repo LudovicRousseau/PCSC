@@ -16,7 +16,6 @@ if ENABLE_USB
 USB_CONFIG = tokenparser.l \
 	hotplug_libudev.c \
 	hotplug_libusb.c \
-	hotplug_linux.c \
 	hotplug_macosx.c
 endif
 
