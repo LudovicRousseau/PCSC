@@ -328,6 +328,7 @@ whichever location your reader resides.
 #define TAG_IFD_POLLING_THREAD_KILLABLE 0x0FB1	/**< the polling thread can be killed */
 #define TAG_IFD_STOP_POLLING_THREAD     0x0FB2	/**< method used to stop the polling thread (instead of just pthread_kill()) */
 #define TAG_IFD_POLLING_THREAD_WITH_TIMEOUT 0x0FB3	/**< driver uses a polling thread with a timeout parameter */
+#define TAG_IFD_DEVICE_REMOVED          0x0FB4	/**< signals the reader has been removed*/
 
 	/*
 	 * IFD Handler version number enummerations
