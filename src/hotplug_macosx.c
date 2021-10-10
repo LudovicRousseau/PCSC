@@ -818,7 +818,8 @@ static int HPScan(void)
 		if (!found)
 		{
 			RFRemoveReader(a->m_driver->m_friendlyName,
-				PCSCLITE_HP_BASE_PORT + a->m_address);
+				PCSCLITE_HP_BASE_PORT + a->m_address,
+				REMOVE_READER_FLAG_REMOVED);
 		}
 	}
 

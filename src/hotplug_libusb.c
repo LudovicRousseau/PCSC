@@ -762,7 +762,7 @@ static LONG HPRemoveHotPluggable(int reader_index)
 		readerTracker[reader_index].bus_device);
 
 	RFRemoveReader(readerTracker[reader_index].fullName,
-		PCSCLITE_HP_BASE_PORT + reader_index);
+		PCSCLITE_HP_BASE_PORT + reader_index, REMOVE_READER_FLAG_REMOVED);
 	free(readerTracker[reader_index].fullName);
 	readerTracker[reader_index].status = READER_ABSENT;
 	readerTracker[reader_index].bus_device[0] = '\0';
