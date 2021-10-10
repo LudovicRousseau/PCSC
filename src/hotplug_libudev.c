@@ -367,7 +367,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 			Log4(PCSC_LOG_INFO, "Removing USB device[%d]: %s at %s", i,
 				readerTracker[i].fullName, readerTracker[i].devpath);
 
-			RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i);
+			RFRemoveReader(readerTracker[i].fullName, PCSCLITE_HP_BASE_PORT + i, REMOVE_READER_FLAG_REMOVED);
 
 			free(readerTracker[i].devpath);
 			readerTracker[i].devpath = NULL;

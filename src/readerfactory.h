@@ -148,7 +148,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	LONG RFAllocateReaderSpace(unsigned int);
 	LONG RFAddReader(const char *, int, const char *, const char *);
-	LONG RFRemoveReader(const char *, int);
+	LONG RFRemoveReader(const char *, int, int);
 	LONG RFSetReaderName(READER_CONTEXT *, const char *, const char *, int);
 	LONG RFReaderInfo(const char *, /*@out@*/ struct ReaderContext **);
 	LONG RFReaderInfoById(SCARDHANDLE, /*@out@*/ struct ReaderContext **);
@@ -173,5 +173,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	void RFWaitForReaderInit(void);
 	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);
+
+#define REMOVE_READER_NO_FLAG 0
+#define REMOVE_READER_FLAG_REMOVED 1
 
 #endif

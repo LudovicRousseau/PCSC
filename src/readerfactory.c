@@ -378,7 +378,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 
 		/* Cannot connect to reader. Exit gracefully */
 		Log2(log_level, "%s init failed.", readerName);
-		(void)RFRemoveReader(readerName, port);
+		(void)RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
 		return rv;
 	}
 
@@ -404,7 +404,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
-			(void)RFRemoveReader(readerName, port);
+			(void)RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
 			return rv;
 		}
 	}
@@ -449,7 +449,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
 		{
 			/* No more slot left return */
-			RFRemoveReader(readerName, port);
+			RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
 			return SCARD_E_NO_MEMORY;
 		}
 
@@ -548,7 +548,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		if (rv != SCARD_S_SUCCESS)
 		{
 			/* Cannot connect to slot. Exit gracefully */
-			(void)RFRemoveReader(readerName, port);
+			(void)RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
 			return rv;
 		}
 
@@ -571,7 +571,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		if (rv != SCARD_S_SUCCESS)
 		{
 			Log2(PCSC_LOG_ERROR, "%s init failed.", readerName);
-			(void)RFRemoveReader(readerName, port);
+			(void)RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
 			return rv;
 		}
 	}
@@ -579,7 +579,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	return SCARD_S_SUCCESS;
 }
 
-LONG RFRemoveReader(const char *readerName, int port)
+LONG RFRemoveReader(const char *readerName, int port, int flags)
 {
 	char lpcStripReader[MAX_READERNAME];
 	int i;
@@ -610,6 +610,24 @@ LONG RFRemoveReader(const char *readerName, int port)
 			if ((strncmp(readerName, lpcStripReader, MAX_READERNAME - sizeof(" 00 00")) == 0)
 				&& (port == sReadersContexts[i]->port))
 			{
+				if (flags & REMOVE_READER_FLAG_REMOVED)
+				{
+					UCHAR tagValue[1];
+					DWORD valueLength;
+					LONG ret;
+
+					/* signal to the driver that the reader has been removed */
+					valueLength = sizeof(tagValue);
+					ret = IFDGetCapabilities(sReadersContexts[i],
+						TAG_IFD_DEVICE_REMOVED, &valueLength, tagValue);
+					if ((IFD_SUCCESS) == ret && (1 == tagValue[0]))
+					{
+						tagValue[0] = 1;
+						ret = IFDSetCapabilities(sReadersContexts[i],
+							TAG_IFD_DEVICE_REMOVED, sizeof tagValue, tagValue);
+					}
+				}
+
 				/* remove the reader */
 				UNREF_READER(sReadersContexts[i])
 			}
@@ -1375,7 +1393,8 @@ void RFCleanupReaders(void)
 			/* strip the 6 last char ' 00 00' */
 			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
 
-			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->port);
+			rv = RFRemoveReader(lpcStripReader, sReadersContexts[i]->port,
+				REMOVE_READER_NO_FLAG);
 
 			if (rv != SCARD_S_SUCCESS)
 				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08lX", rv);
@@ -1542,7 +1561,7 @@ void RFReCheckReaderConf(void)
 						Log2(PCSC_LOG_INFO, "Reader %s disappeared",
 							reader_list[i].pcFriendlyname);
 						(void)RFRemoveReader(reader_list[i].pcFriendlyname,
-							reader_list[r].channelId);
+							reader_list[r].channelId, REMOVE_READER_NO_FLAG);
 					}
 				}
 			}
