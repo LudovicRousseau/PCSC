@@ -29,12 +29,9 @@ pcscd (daemon)
  hotplug_macosx.c (this file is OS dependant)
  ifdwrapper.c
  pcscdaemon.c
- powermgt_generic.c
- powermgt_macosx.c (this file is OS dependant)
  prothandler.c
  readerfactory.c
  sys_unix.c (this file is OS dependant)
- thread_unix.c (this file is OS dependant)
  tokenparser.l
  winscard.c
  winscard_msg.c
@@ -48,7 +45,6 @@ libpcsclite.la (client library)
  dyn_unix.c
  error.c
  sys_unix.c
- thread_unix.c
  winscard_clnt.c or winscard_scf.c
  winscard_msg.c
 
@@ -184,37 +180,6 @@ We can have:
  => new SCardControl
 - libpcsclite1, pcscd (<= 1.2.0)
  => does not work
-
-
-Memory structures
------------------
-
-pcscd side:
-
-- pcscd open/creates a shared memory segment (EHInitializeEventStructures()
-  in eventhandler.c)
-- static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS]; is
-  an array of pointers on READER_STATE. Each entry readerStates[i]
-  points to a memory shared segment. It contains the state of each
-  readers.
-
-- reader contexts are also created and maintained
-- static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
-  is an array of pointers on READER_CONTEXT
-- the structure is allocated by RFAllocateReaderSpace() in
-  readerfactory.c
-- each READER_CONTEXT contains a pointer to a READER_STATE for the
-  context
-
-
-libpcsclite side:
-
-- the library open the shared memory segment (SCardEstablishContextTH()
-  in winscard_clnt.c)
-- each entry readerStates[i] gets a reference to the memory segment of
-  the server.
-
-The memory is READ ONLY on the library side.
 
 
 Inter-thread communication:
