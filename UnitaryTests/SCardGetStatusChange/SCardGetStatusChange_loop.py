@@ -44,22 +44,23 @@ for state in states:
     readerstates[readername] = (readername, eventstate)
 print("values", readerstates.values())
 
-while True:
-    # timeout is 1000 ms
-    (hresult, states) = SCardGetStatusChange(hcontext, 1000, list(readerstates.values()))
-    if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
-        raise Exception("SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult))
+try:
+    while True:
+        # timeout is 1000 ms
+        (hresult, states) = SCardGetStatusChange(hcontext, 1000, list(readerstates.values()))
+        if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
+            raise Exception("SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult))
+        print(SCardGetErrorMessage(hresult))
+        print(states)
+
+        for state in states:
+            print(state)
+            readername, eventstate, atr = state
+            print("readername:", readername)
+            print("eventstate:", hex(eventstate))
+            print("atr:", atr)
+            readerstates[readername] = (readername, eventstate)
+        print("values", readerstates.values())
+except KeyboardInterrupt:
+    hresult = SCardReleaseContext(hcontext)
     print(SCardGetErrorMessage(hresult))
-    print(states)
-
-    for state in states:
-        print(state)
-        readername, eventstate, atr = state
-        print("readername:", readername)
-        print("eventstate:", hex(eventstate))
-        print("atr:", atr)
-        readerstates[readername] = (readername, eventstate)
-    print("values", readerstates.values())
-
-hresult = SCardReleaseContext(hcontext)
-print(SCardGetErrorMessage(hresult))
