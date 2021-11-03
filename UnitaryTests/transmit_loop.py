@@ -25,11 +25,12 @@ connection.connect()
 
 SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
 i = 0
-while True:
-    print("loop:", i)
-    i += 1
-    data, sw1, sw2 = connection.transmit(SELECT)
-    print(data)
-    print("%02x %02x" % (sw1, sw2))
-
-connection.disconnect()
+try:
+    while True:
+        print("loop:", i)
+        i += 1
+        data, sw1, sw2 = connection.transmit(SELECT)
+        print(data)
+        print("%02x %02x" % (sw1, sw2))
+except KeyboardInterrupt:
+    connection.disconnect()
