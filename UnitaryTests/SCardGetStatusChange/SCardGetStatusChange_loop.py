@@ -44,7 +44,7 @@ for state in states:
     readerstates[readername] = (readername, eventstate)
 print("values", readerstates.values())
 
-while 1:
+while True:
     # timeout is 1000 ms
     (hresult, states) = SCardGetStatusChange(hcontext, 1000, list(readerstates.values()))
     if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
