@@ -31,35 +31,35 @@ hresult, readers = SCardListReaders(hcontext, [])
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-print "values", readerstates.values()
-(hresult, states) = SCardGetStatusChange(hcontext, 0, readerstates.values())
-print SCardGetErrorMessage(hresult)
-print states
+print("values", readerstates.values())
+(hresult, states) = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
+print(SCardGetErrorMessage(hresult))
+print(states)
 
 for state in states:
     readername, eventstate, atr = state
-    print "readername:", readername
-    print "eventstate:", hex(eventstate)
-    print "atr:", atr
+    print("readername:", readername)
+    print("eventstate:", hex(eventstate))
+    print("atr:", atr)
     readerstates[readername] = (readername, eventstate)
-print "values", readerstates.values()
+print("values", readerstates.values())
 
 while 1:
     # timeout is 1000 ms
-    (hresult, states) = SCardGetStatusChange(hcontext, 1000, readerstates.values())
+    (hresult, states) = SCardGetStatusChange(hcontext, 1000, list(readerstates.values()))
     if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
-        raise error, "SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult);
-    print SCardGetErrorMessage(hresult)
-    print states
+        raise Exception("SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult))
+    print(SCardGetErrorMessage(hresult))
+    print(states)
 
     for state in states:
-        print state
+        print(state)
         readername, eventstate, atr = state
-        print "readername:", readername
-        print "eventstate:", hex(eventstate)
-        print "atr:", atr
+        print("readername:", readername)
+        print("eventstate:", hex(eventstate))
+        print("atr:", atr)
         readerstates[readername] = (readername, eventstate)
-    print "values", readerstates.values()
+    print("values", readerstates.values())
 
 hresult = SCardReleaseContext(hcontext)
-print SCardGetErrorMessage(hresult)
+print(SCardGetErrorMessage(hresult))
