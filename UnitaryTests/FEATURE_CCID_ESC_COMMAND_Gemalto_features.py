@@ -22,7 +22,6 @@ from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND,
     FEATURE_GET_TLV_PROPERTIES, getTlvProperties,
-    PCSCv2_PART10_PROPERTY_wIdVendor, PCSCv2_PART10_PROPERTY_wIdProduct,
     getFeatureRequest, hasFeature)
 from smartcard.Exceptions import SmartcardException
 try:
