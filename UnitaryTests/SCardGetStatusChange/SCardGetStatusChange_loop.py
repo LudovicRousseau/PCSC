@@ -22,7 +22,6 @@
 from smartcard.System import readers
 from smartcard.scard import *
 
-import sys
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 hresult, readers = SCardListReaders(hcontext, [])
