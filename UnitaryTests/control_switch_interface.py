@@ -21,6 +21,7 @@
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE)
+from smartcard.Exceptions import SmartcardException
 
 IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
 
@@ -38,7 +39,7 @@ def switch_interface(interface):
         try:
             res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
                 switch_interface_cmd)
-        except:
+        except SmartcardException as e:
             print("FAILED")
         else:
             if res != [0, 0, 0, 0]:
