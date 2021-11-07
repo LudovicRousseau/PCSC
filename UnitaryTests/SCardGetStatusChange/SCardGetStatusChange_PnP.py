@@ -23,8 +23,6 @@ from smartcard.System import readers
 from smartcard.scard import *
 from smartcard.util import toHexString
 
-import sys
-
 
 def scardstate2text(cardstate):
     state = list()
