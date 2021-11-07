@@ -23,7 +23,7 @@
 from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
     SCardListReaders, SCardConnect, SCardDisconnect,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD,
-    SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
+    SCARD_SCOPE_USER, SCARD_S_SUCCESS)
 from smartcard.pcsc.PCSCExceptions import *
 import threading
 
