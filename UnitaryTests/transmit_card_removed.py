@@ -28,7 +28,7 @@ SCardStatus() should report that the card is no more present.
 from smartcard.scard import *
 from smartcard.util import toBytes, toHexString
 from smartcard.pcsc.PCSCExceptions import *
-from time import time, sleep
+from time import time
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
