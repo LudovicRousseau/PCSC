@@ -22,7 +22,6 @@
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
-from time import sleep
 
 hresult, hcontext1 = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
