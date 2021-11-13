@@ -760,7 +760,7 @@ int main(int argc, char **argv)
 	RFWaitForReaderInit();
 #endif
 
-	/* initialisation succeeded */
+	/* initialization succeeded */
 	if (pipefd[1] >= 0)
 	{
 		char buf = 0;
