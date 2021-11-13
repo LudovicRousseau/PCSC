@@ -776,6 +776,13 @@ int main(int argc, char **argv)
 		pipefd[1] = -1;
 	}
 
+	if (AutoExit)
+	{
+		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
+			TIME_BEFORE_SUICIDE);
+		alarm(TIME_BEFORE_SUICIDE);
+	}
+
 	SVCServiceRunLoop();
 
 	Log1(PCSC_LOG_ERROR, "SVCServiceRunLoop returned");
