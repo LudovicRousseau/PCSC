@@ -738,7 +738,7 @@ int main(int argc, char **argv)
 
 	(void)signal(SIGPIPE, SIG_IGN);
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
-				 * when the shell is existed */
+				 * when the shell is exited */
 
 #if !defined(PCSCLITE_STATIC_DRIVER) && defined(USE_USB)
 	/*
