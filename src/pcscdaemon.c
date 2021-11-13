@@ -700,7 +700,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * post initialistion
+	 * post initialization
 	 */
 	Init = FALSE;
 
