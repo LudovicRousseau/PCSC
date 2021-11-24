@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -101,6 +102,25 @@ static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
 	return 0;
 }
 
+static void fetchReaderState(READER_CONTEXT * sReader)
+{
+	struct pubReaderStatesList* src = atomic_exchange(&sReader->ehThreadReaderState, NULL);
+	if (!src)
+	{
+		return;
+	}
+
+	// copy all the fields that may be updated on the event handler status thread
+	struct pubReaderStatesList* dst = sReader->readerState;
+	dst->eventCounter = src->eventCounter;
+	dst->readerState = src->readerState;
+	dst->readerSharing = src->readerSharing;
+	memcpy(dst->cardAtr, src->cardAtr, sizeof(src->cardAtr));
+	dst->cardAtrLength = src->cardAtrLength;
+	dst->cardProtocol = src->cardProtocol;
+
+	free(src);
+}
 
 LONG _RefReader(READER_CONTEXT * sReader)
 {
@@ -141,6 +161,7 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	{
 		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
 		sReadersContexts[i]->vHandle = NULL;
+		atomic_init(&sReadersContexts[i]->ehThreadReaderState, NULL);
 
 		/* Zero out each value in the struct */
 		memset(readerStates[i].readerName, 0, MAX_READERNAME);
@@ -1366,6 +1387,7 @@ LONG RFClearReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 
 LONG RFCheckReaderStatus(READER_CONTEXT * rContext)
 {
+	fetchReaderState(rContext);
 	if (rContext->readerState->readerState & SCARD_UNKNOWN)
 		return SCARD_E_READER_UNAVAILABLE;
 	else
@@ -1431,6 +1453,7 @@ void RFWaitForReaderInit(void)
 			/* reader is present */
 			if (sReadersContexts[i]->vHandle != NULL)
 			{
+				fetchReaderState(sReadersContexts[i]);
 				/* but card state is not yet available */
 				if (READER_NOT_INITIALIZED
 					== sReadersContexts[i]->readerState->cardAtrLength)
@@ -1536,6 +1559,7 @@ void RFReCheckReaderConf(void)
 		{
 			if (sReadersContexts[r]->vHandle != 0)
 			{
+				fetchReaderState(sReadersContexts[i]);
 				char lpcStripReader[MAX_READERNAME];
 				int tmplen;
 

@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <inttypes.h>
 #include <pthread.h>
+#include <stdatomic.h>
 
 #include "ifdhandler.h"
 #include "pcscd.h"
@@ -123,9 +124,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
-		volatile SCARDHANDLE hLockId;	/**< Lock Id */
+		_Atomic SCARDHANDLE hLockId;	/**< Lock Id */
 		int LockCount;			/**< number of recursive locks */
-		int32_t contexts;		/**< Number of open contexts */
+		_Atomic int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */
 		int * pMutex;			/**< Number of client to mutex */
 		int powerState;			/**< auto power off state */
@@ -134,6 +135,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		pthread_mutex_t reference_lock;	 /**< reference mutex */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
+		/**< the latest state as updated in the event handler thread. you fetch, you free */
+		struct pubReaderStatesList * _Atomic ehThreadReaderState;
 		/* we can't use READER_STATE * here since eventhandler.h can't be
 		 * included because of circular dependencies */
 	};
