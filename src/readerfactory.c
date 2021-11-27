@@ -1583,3 +1583,18 @@ void RFReCheckReaderConf(void)
 }
 #endif
 
+int RFGetPowerState(READER_CONTEXT * rContext)
+{
+	(void)pthread_mutex_lock(&rContext->powerState_lock);
+	int result = rContext->powerState;
+	(void)pthread_mutex_unlock(&rContext->powerState_lock);
+	return result;
+}
+
+void RFSetPowerState(READER_CONTEXT * rContext, int value)
+{
+	(void)pthread_mutex_lock(&rContext->powerState_lock);
+	rContext->powerState = value;
+	(void)pthread_mutex_unlock(&rContext->powerState_lock);
+}
+

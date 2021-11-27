@@ -173,6 +173,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	void RFWaitForReaderInit(void);
 	int RFStartSerialReaders(const char *readerconf);
 	void RFReCheckReaderConf(void);
+	int RFGetPowerState(READER_CONTEXT *);
+	void RFSetPowerState(READER_CONTEXT *, int value);
 
 #define REMOVE_READER_NO_FLAG 0
 #define REMOVE_READER_FLAG_REMOVED 1
