@@ -898,7 +898,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 			/* SCARD_UNPOWER_CARD */
 			rv = IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 
-			rContext->powerState = POWER_STATE_UNPOWERED;
+			RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 		}
 
