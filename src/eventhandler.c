@@ -285,7 +285,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 		if (rv == IFD_SUCCESS)
 		{
 			readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
-			rContext->powerState = POWER_STATE_POWERED;
+			RFSetPowerState(rContext, POWER_STATE_POWERED);
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 
 			if (rContext->readerState->cardAtrLength > 0)
@@ -300,7 +300,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 		else
 		{
 			readerState = SCARD_PRESENT | SCARD_SWALLOWED;
-			rContext->powerState = POWER_STATE_UNPOWERED;
+			RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 			Log3(PCSC_LOG_ERROR, "Error powering up card: %ld 0x%04lX", rv, rv);
 		}
@@ -383,7 +383,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 				rContext->readerState->cardAtrLength = 0;
 				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 				rContext->readerState->readerState = SCARD_PRESENT;
-				rContext->powerState = POWER_STATE_UNPOWERED;
+				RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 				Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 				rv = IFD_SUCCESS;
 				Log1(PCSC_LOG_INFO, "Skip card power on");
@@ -402,13 +402,13 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 				if (rv == IFD_SUCCESS)
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
-					rContext->powerState = POWER_STATE_POWERED;
+					RFSetPowerState(rContext, POWER_STATE_POWERED);
 					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 				}
 				else
 				{
 					rContext->readerState->readerState = SCARD_PRESENT | SCARD_SWALLOWED;
-					rContext->powerState = POWER_STATE_UNPOWERED;
+					RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 					rContext->readerState->cardAtrLength = 0;
 				}
@@ -456,7 +456,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 			int timeout;
 
 #ifndef DISABLE_ON_DEMAND_POWER_ON
-			if (POWER_STATE_POWERED == rContext->powerState)
+			if (POWER_STATE_POWERED == RFGetPowerState(rContext))
 				/* The card is powered but not yet used */
 				timeout = PCSCLITE_POWER_OFF_GRACE_PERIOD;
 			else
