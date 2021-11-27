@@ -715,10 +715,8 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			}
 
 			/* the card is now in use */
-			(void)pthread_mutex_lock(&rContext->powerState_lock);
-			rContext->powerState = POWER_STATE_IN_USE;
+			RFSetPowerState(rContext, POWER_STATE_IN_USE);
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_IN_USE");
-			(void)pthread_mutex_unlock(&rContext->powerState_lock);
 		}
 	}
 
