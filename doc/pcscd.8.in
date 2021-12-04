@@ -12,9 +12,9 @@ pcscd \- PC/SC Smart Card Daemon
 log APDUs and SW using the debug method (see
 .BR \-\-debug ).
 .TP
-.BR \-c ", " \-\-config " \fIfile\fP"
-Specifies the file \fIfile\fP as an alternate location for
-.IR @PCSCLITE_CONFIG_DIR@/reader.conf .
+.BR \-c ", " \-\-config " \fIdir\fP"
+Specifies the directory \fIdir\fP as an alternate location for
+.IR @PCSCLITE_CONFIG_DIR@/ .
 .TP
 .BR \-f ", " \-\-foreground
 Runs pcscd in the foreground and sends log messages to stderr instead of
@@ -68,8 +68,8 @@ Displays the program version number
 .TP
 .BR \-H ", " \-\-hotplug
 Ask pcscd to re-read the
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
-file to detect added or removed non-USB readers (serial or PCMCIA).
+.I @PCSCLITE_CONFIG_DIR@/my_reader.conf
+files to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .TP
 .BR \-x ", " \-\-auto\-exit
@@ -98,8 +98,8 @@ Smart card reader drivers are placed in the
 directory. Each driver is simply an
 .I .so
 file.  pcscd locates the driver using the
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
-file.  See the
+.I @PCSCLITE_CONFIG_DIR@/my_reader.conf
+files.  See the
 .BR reader.conf (5)
 manual page for more information.
 .PP
@@ -108,18 +108,18 @@ Some drivers are available at \fIhttps://muscle.apdu.fr/musclecard.com/drivers.h
 .SH "USB SMART CARD READER DRIVERS"
 USB smart card reader drivers are located in
 .I @usbdropdir@
-directory as a bundle. You shall not add a USB driver in
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
+directory as a bundle. You shall NOT add a USB driver in a
+.I @PCSCLITE_CONFIG_DIR@/my_reader.conf
 file.
 .
 .SH FILES
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
-: Reader configuration file
+.I @PCSCLITE_CONFIG_DIR@/*
+: Serial reader configuration files
 .PP
 .I @ipcdir@/pcscd.pid
 : process id of the running pcscd
 .PP
-.I @usbdropdir@
+.I @usbdropdir@/
 : directory containing bundles for USB drivers
 .
 .SH "SEE ALSO"
