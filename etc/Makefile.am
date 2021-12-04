@@ -7,6 +7,8 @@ systemdsystemunit_DATA = \
 	pcscd.service \
 	pcscd.socket
 
+CLEANFILES = $(systemdsystemunit_DATA)
+
 edit = sed \
 	-e 's|@sysconfdir[@]|$(sysconfdir)|g' \
 	-e 's|@sbindir_exp[@]|$(sbindir_exp)|g' \
