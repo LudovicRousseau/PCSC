@@ -461,8 +461,6 @@ doc/pcscd.8
 doc/reader.conf.5
 doc/example/Makefile
 etc/Makefile
-etc/pcscd.service
-etc/pcscd.socket
 src/Makefile
 src/libpcsclite.pc
 src/pcscd.h
