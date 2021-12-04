@@ -61,23 +61,20 @@ By running pcscd under a priveledged account you can link to
 libpcsclite.so and it will act as a client to the pcscd allowing multiple
 applications to be run under non-priveledged accounts.
 
-Then type make install to copy etc/reader.conf to
-/etc/reader.conf and the libraries to /usr/local/lib. If you choose
-not to have your reader.conf in /etc then use --enable-confdir=DIR
+Then type "make install" to copy the libraries to /usr/local/lib. If you
+choose not to have your reader configuration file in /etc/reader.conf.d/
+then use --enable-confdir=DIR
 
 You must be root to do make install in the default locations.
 
-Be sure to edit the /etc/reader.conf file to fit your needs and make sure
-your IFD Handler driver is located in the path specified as LIBRARYPATH
-in reader.conf.  If you are using a reader with multiple smart card slots
-all you have to do is define a different FRIENDLYNAME in the reader.conf
-for each reader.  Both will have the same information otherwise.
+Be sure to edit the /etc/reader.conf.d/my_reader.conf file for your
+reader to fit your needs and make sure your IFD Handler driver is
+located in the path specified as LIBRARYPATH in my_reader.conf.  If you
+are using a reader with multiple smart card slots all you have to do is
+define a different FRIENDLYNAME in the my_reader.conf for each reader.
+Both will have the same information otherwise.
 
-There is an config file generator in the utils directory.  It is called
-installifd.  You may use this to generate the /etc/reader.conf file.
-
-USB users shall not use /etc/reader.conf.  pcscd will give
-a warning that the file does not exist or contain anything useful.
+USB users shall not use /etc/reader.conf.d/ to configure USB drivers.
 
 There is a test program with this package:
 
