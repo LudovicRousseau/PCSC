@@ -168,7 +168,7 @@ int evaluatetoken(char *pcToken)
 				if (strstr(pcLibpath, ".bundle") != NULL)
 				{
 					Log1(PCSC_LOG_ERROR, "WARNING *************************************");
-					Log2(PCSC_LOG_ERROR, "WARNING: USB drivers SHOULD NOT be declared in reader.conf: %s", pcLibpath);
+					Log2(PCSC_LOG_ERROR, "WARNING: USB drivers SHOULD NOT be declared in a reader.conf file: %s", pcLibpath);
 					Log1(PCSC_LOG_ERROR, "WARNING *************************************");
 				}
 			}
