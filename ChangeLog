@@ -1,3 +1,11 @@
+1.9.5: Ludovic Rousseau
+4 December 2021
+- pcscd: autoexit even if no client connects
+- Fix variable substitution in systemd units
+- fix potential race conditions with powerState handling
+- Add and use tag TAG_IFD_DEVICE_REMOVED
+- UnitaryTests: port code to Python 3
+
 1.9.4: Ludovic Rousseau
 1 October 2021
 - fix a memory leak when libusb is used for hotplug (i.e. non-Linux
