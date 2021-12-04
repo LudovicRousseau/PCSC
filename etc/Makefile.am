@@ -1,4 +1,8 @@
 if HAVE_SYSTEMD
+EXTRA_DIST = \
+	pcscd.service.in \
+	pcscd.socket.in
+
 systemdsystemunit_DATA = \
 	pcscd.service \
 	pcscd.socket
