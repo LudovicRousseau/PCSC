@@ -167,7 +167,7 @@ fi
 
 # --disable-serial
 AC_ARG_ENABLE(serial,
-	AS_HELP_STRING([--disable-serial],[do not use serial reader.conf file]),
+	AS_HELP_STRING([--disable-serial],[do not use serial reader.conf files]),
 	[ use_serial="${enableval}" ], [ use_serial="yes" ] )
 AM_CONDITIONAL(ENABLE_SERIAL, test "$use_serial" != "no")
 if test "$use_serial" != "no"; then
