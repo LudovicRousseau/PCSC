@@ -383,7 +383,7 @@ CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 # --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
-AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configurations (default /etc/reader.conf.d)]),
+AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configurations (default ${sysconfdir}/reader.conf.d)]),
 	[confdir="${enableval}"],
 	[confdir="${sysconfdir}/reader.conf.d"])
 
