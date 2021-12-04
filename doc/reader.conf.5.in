@@ -1,21 +1,21 @@
-.TH READER.CONF 5 "August 2005" Muscle "PC/SC Lite"
+.TH READER.CONF 5 "December 2021" Muscle "PC/SC Lite"
 .SH NAME
 reader.conf \- configuration file for pcscd readers' drivers
 .
 .SH DESCRIPTION
 The
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
-file contains configuration information for serial and (some) PCMCIA
+.I @PCSCLITE_CONFIG_DIR@/*
+files contain configuration information for serial and (some) PCMCIA
 smart card readers.
 .PP
-USB readers SHALL NOT be configured using this file.
+USB readers SHALL NOT be configured using these files.
 .B pcscd
 uses another mechanism to automatically load USB drivers.
 .
 .SH SYNTAX
 The
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
-is a regular text file. Each reader must be defined by four fields:
+.I @PCSCLITE_CONFIG_DIR@/*
+files are regular text file. Each reader must be defined by four fields:
 .PP
  FRIENDLYNAME     TEXT_STRING
  DEVICENAME       FILENAME
@@ -39,7 +39,8 @@ under FreeBSD.
 .PP
 The "LIBPATH" field is the filename of the driver code. The driver is
 a dynamically loaded piece of code (generally a
-.IR drivername.so* file).
+.IR drivername.so.*
+file).
 .PP
 The "CHANNELID" is no more used for recent drivers (IFD handler 3.0) and
 has been superseded by "DEVICENAME". If you have an old driver this
@@ -57,7 +58,7 @@ serial port number for a serial reader.
 .
 .SH DEBUGGING
 In order to set up your
-.I @PCSCLITE_CONFIG_DIR@/reader.conf
+.I @PCSCLITE_CONFIG_DIR@/my_reader.conf
 file correctly you may want to have debug messages from
 .BR pcscd .
 I recommend you to start
