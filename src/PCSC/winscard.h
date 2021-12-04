@@ -38,7 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __winscard_h__
 #define __winscard_h__
 
-#include <pcsclite.h>
+#include "pcsclite.h"
 
 #ifdef __cplusplus
 extern "C"
