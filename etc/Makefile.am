@@ -8,6 +8,16 @@ edit = sed \
 	-e 's|@sbindir_exp[@]|$(sbindir_exp)|g' \
 	-e 's|@ipcdir[@]|$(ipcdir)|g'
 
-$(systemdsystemunit_DATA): % : %.in
-	$(edit) $< >$@
+$(systemdsystemunit_DATA): Makefile
+	rm -f $@ $@.tmp
+	srcdir=''; \
+	  test -f ./$@.in || srcdir=$(srcdir)/; \
+	  $(edit) $${srcdir}$@.in >$@.tmp
+	chmod +x $@.tmp
+	chmod a-w $@.tmp
+	mv $@.tmp $@
+
+pcscd.service: $(srcdir)/pcscd.service.in
+pcscd.socket: $(srcdir)/pcscd.socket.in
+
 endif
