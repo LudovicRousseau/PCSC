@@ -1,4 +1,4 @@
-.TH PCSCD 8 "January 2007" Muscle "PC/SC Lite"
+.TH PCSCD 8 "December 2021" Muscle "PC/SC Lite"
 .SH NAME
 pcscd \- PC/SC Smart Card Daemon
 .
@@ -15,6 +15,8 @@ log APDUs and SW using the debug method (see
 .BR \-c ", " \-\-config " \fIdir\fP"
 Specifies the directory \fIdir\fP as an alternate location for
 .IR @PCSCLITE_CONFIG_DIR@/ .
+The argument can also be a single configuration file (for backward
+compatibility).
 .TP
 .BR \-f ", " \-\-foreground
 Runs pcscd in the foreground and sends log messages to stderr instead of
