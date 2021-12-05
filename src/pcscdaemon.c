@@ -336,7 +336,7 @@ int main(int argc, char **argv)
 				break;
 #endif
 			case 'c':
-				Log2(PCSC_LOG_INFO, "using new config file: %s", optarg);
+				Log2(PCSC_LOG_INFO, "using new config directory: %s", optarg);
 				newReaderConfig = optarg;
 				break;
 
@@ -640,14 +640,14 @@ int main(int argc, char **argv)
 
 #ifdef USE_SERIAL
 	/*
-	 * Grab the information from the reader.conf
+	 * Grab the information from the reader.conf files
 	 */
 	if (newReaderConfig)
 	{
 		rv = RFStartSerialReaders(newReaderConfig);
 		if (rv != 0)
 		{
-			Log3(PCSC_LOG_CRITICAL, "invalid file %s: %s", newReaderConfig,
+			Log3(PCSC_LOG_CRITICAL, "invalid directory %s: %s", newReaderConfig,
 				strerror(errno));
 			at_exit();
 		}
@@ -857,7 +857,7 @@ static void print_usage(char const * const progname)
 	printf("Options:\n");
 #ifdef HAVE_GETOPT_LONG
 	printf("  -a, --apdu		log APDU commands and results\n");
-	printf("  -c, --config		path to reader.conf\n");
+	printf("  -c, --config		new reader.conf.d path\n");
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stdout instead of syslog\n");
 	printf("  -T, --color		force use of colored logs\n");
@@ -877,7 +877,7 @@ static void print_usage(char const * const progname)
 	printf("  -I, --reader-name-no-interface do not include the USB interface name in the name\n");
 #else
 	printf("  -a    log APDU commands and results\n");
-	printf("  -c	path to reader.conf\n");
+	printf("  -c	new reader.conf.d path\n");
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -T    force use of colored logs\n");
 	printf("  -d	display debug messages.\n");
