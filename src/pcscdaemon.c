@@ -75,7 +75,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FALSE 0
 #endif
 
-char AraKiri = FALSE;
+_Atomic char AraKiri = FALSE;
 static char Init = TRUE;
 char AutoExit = FALSE;
 char SocketActivated = FALSE;
