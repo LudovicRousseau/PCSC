@@ -130,8 +130,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		int * pMutex;			/**< Number of client to mutex */
 		int powerState;			/**< auto power off state */
 		pthread_mutex_t powerState_lock;	/**< powerState mutex */
-		int reference;			/**< number of users of the structure */
-		pthread_mutex_t reference_lock;	 /**< reference mutex */
+		_Atomic int reference;			/**< number of users of the structure */
 
 		struct pubReaderStatesList *readerState; /**< link to the reader state */
 		/* we can't use READER_STATE * here since eventhandler.h can't be

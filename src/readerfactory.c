@@ -107,9 +107,7 @@ LONG _RefReader(READER_CONTEXT * sReader)
 	if (0 == sReader->reference)
 		return SCARD_E_READER_UNAVAILABLE;
 
-	pthread_mutex_lock(&sReader->reference_lock);
 	sReader->reference += 1;
-	pthread_mutex_unlock(&sReader->reference_lock);
 
 	return SCARD_S_SUCCESS;
 }
@@ -119,9 +117,7 @@ LONG _UnrefReader(READER_CONTEXT * sReader)
 	if (0 == sReader->reference)
 		return SCARD_E_READER_UNAVAILABLE;
 
-	pthread_mutex_lock(&sReader->reference_lock);
 	sReader->reference -= 1;
-	pthread_mutex_unlock(&sReader->reference_lock);
 
 	if (0 == sReader->reference)
 		removeReader(sReader);
@@ -311,8 +307,6 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	sReadersContexts[dwContext]->powerState = POWER_STATE_UNPOWERED;
 
 	/* reference count */
-	(void)pthread_mutex_init(&sReadersContexts[dwContext]->reference_lock,
-		NULL);
 	sReadersContexts[dwContext]->reference = 1;
 
 	/* If a clone to this reader exists take some values from that clone */
@@ -514,8 +508,6 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		sReadersContexts[dwContextB]->powerState = POWER_STATE_UNPOWERED;
 
 		/* reference count */
-		(void)pthread_mutex_init(&sReadersContexts[dwContextB]->reference_lock,
-			NULL);
 		sReadersContexts[dwContextB]->reference = 1;
 
 		/* Call on the parent driver to see if the slots are thread safe */
