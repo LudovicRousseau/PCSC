@@ -123,7 +123,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
-		volatile SCARDHANDLE hLockId;	/**< Lock Id */
+		_Atomic SCARDHANDLE hLockId;	/**< Lock Id */
 		int LockCount;			/**< number of recursive locks */
 		int32_t contexts;		/**< Number of open contexts */
 		int * pFeeds;			/**< Number of shared client to lib */
