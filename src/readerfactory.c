@@ -1313,6 +1313,7 @@ LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 {
 	LONG rv;
 	RDR_CLIHANDLES *currentHandle;
+	DWORD dwEventStatus;
 
 	(void)pthread_mutex_lock(&rContext->handlesList_lock);
 	currentHandle = list_seek(&rContext->handlesList, &hCard);
@@ -1324,7 +1325,8 @@ LONG RFCheckReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	switch(currentHandle->dwEventStatus)
+	dwEventStatus = currentHandle->dwEventStatus;
+	switch(dwEventStatus)
 	{
 		case 0:
 			rv = SCARD_S_SUCCESS;

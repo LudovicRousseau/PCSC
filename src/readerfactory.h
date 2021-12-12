@@ -98,7 +98,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	struct RdrCliHandles
 	{
 		SCARDHANDLE hCard;		/**< hCard for this connection */
-		DWORD dwEventStatus;	/**< Recent event that must be sent */
+		_Atomic DWORD dwEventStatus;	/**< Recent event that must be sent */
 	};
 
 	typedef struct RdrCliHandles RDR_CLIHANDLES;
