@@ -19,6 +19,7 @@ jobs:
           "--disable-libudev --disable-libusb",
           "--enable-embedded",
           "--disable-strict",
+          "--enable-debugatr",
         ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
