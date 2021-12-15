@@ -398,6 +398,17 @@ if test x$use_filter = xyes; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} filter"
 fi
 
+# --disable-strict
+AC_ARG_ENABLE(
+	[strict],
+	[AS_HELP_STRING([--disable-strict],[disable strict compile mode @<:@enabled@:>@])],
+	,
+	[enable_strict="yes"]
+)
+if test "${enable_strict}" = "yes"; then
+	CFLAGS="-Wall -Wextra -Wno-unused-parameter -Werror ${CFLAGS}"
+fi
+
 # Setup dist stuff
 AC_SUBST(usbdropdir)
 AC_SUBST(ipcdir)
