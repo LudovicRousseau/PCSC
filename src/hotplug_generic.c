@@ -45,11 +45,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hotplug.h"
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
 #if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(HAVE_LIBUDEV)
 
 LONG HPSearchHotPluggables(void)
