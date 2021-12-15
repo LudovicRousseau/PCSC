@@ -42,7 +42,6 @@ jobs:
           export CFLAGS="-Wall -Wextra -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wold-style-definition -Wpointer-arith -Wredundant-decls -Wshadow -Wstrict-prototypes -Wswitch-enum -Wundef -Wuninitialized -Wunused -Wwrite-strings -Wmissing-noreturn"
           ./configure ${{ matrix.configure_args }}
           make
-          make
 
       - name: distcheck
         shell: bash
