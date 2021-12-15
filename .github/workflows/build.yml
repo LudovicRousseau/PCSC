@@ -13,7 +13,13 @@ jobs:
 
     strategy:
       matrix:
-        configure_args: ["", "--disable-libudev", "--disable-libudev --disable-libusb", "--enable-embedded", "--disable-strict"]
+        configure_args: [
+          "",
+          "--disable-libudev",
+          "--disable-libudev --disable-libusb",
+          "--enable-embedded",
+          "--disable-strict",
+        ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
