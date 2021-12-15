@@ -85,8 +85,6 @@ void DebugLogSetLevel(const int level)
 INTERNAL void DebugLogSetCategory(const int dbginfo)
 {
 	(void)dbginfo;
-
-	return 0;
 }
 
 INTERNAL void DebugLogCategory(const int category, const unsigned char *buffer,
