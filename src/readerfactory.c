@@ -52,6 +52,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
+#include <stdatomic.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -137,6 +138,9 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	{
 		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
 		sReadersContexts[i]->vHandle = NULL;
+		atomic_init(&sReadersContexts[i]->hLockId, 0);
+		atomic_init(&sReadersContexts[i]->contexts, 0);
+		atomic_init(&sReadersContexts[i]->reference, 0);
 
 		/* Zero out each value in the struct */
 		memset(readerStates[i].readerName, 0, MAX_READERNAME);
