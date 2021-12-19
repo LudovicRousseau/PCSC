@@ -1228,7 +1228,7 @@ LONG RFAddReaderHandle(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 	}
 
 	newHandle->hCard = hCard;
-	newHandle->dwEventStatus = 0;
+	atomic_init(&newHandle->dwEventStatus, 0);
 
 	lrv = list_append(&rContext->handlesList, newHandle);
 	if (lrv < 0)
