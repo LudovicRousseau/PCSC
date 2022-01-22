@@ -1916,10 +1916,12 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				/* Check for card presence in the reader */
 				if (readerState & SCARD_PRESENT)
 				{
+#ifndef DISABLE_AUTO_POWER_ON
 					/* card present but not yet powered up */
 					if (0 == rContext->cardAtrLength)
 						/* Allow the status thread to convey information */
 						(void)SYS_USleep(PCSCLITE_STATUS_POLL_RATE + 10);
+#endif
 
 					currReader->cbAtr = rContext->cardAtrLength;
 					memcpy(currReader->rgbAtr, rContext->cardAtr,
