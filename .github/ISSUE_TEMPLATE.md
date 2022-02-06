@@ -11,6 +11,12 @@
 * Smart card reader manufacturer name and reader model name
 * Smart card name
 
+### Issue
+
+* What do you do?
+* What result do you expect?
+* What result do you get instead?
+
 ### Log
 
 Then you shall generate a complete log (do not truncate it).
