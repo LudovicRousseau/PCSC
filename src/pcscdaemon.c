@@ -260,7 +260,9 @@ int main(int argc, char **argv)
 	int rv;
 	char setToForeground;
 	char HotPlug;
-	char *newReaderConfig;
+#ifdef USE_SERIAL
+	char *newReaderConfig = NULL;
+#endif
 	struct stat fStatBuf;
 	int customMaxThreadCounter = 0;
 	int customMaxReaderHandles = 0;
@@ -293,7 +295,6 @@ int main(int argc, char **argv)
 #endif
 #define OPT_STRING "c:fTdhvaieCHt:r:s:xSI"
 
-	newReaderConfig = NULL;
 	setToForeground = FALSE;
 	HotPlug = FALSE;
 
@@ -335,10 +336,12 @@ int main(int argc, char **argv)
 					HPForceReaderPolling = optarg ? abs(atoi(optarg)) : 1;
 				break;
 #endif
+#ifdef USE_SERIAL
 			case 'c':
 				Log2(PCSC_LOG_INFO, "using new config directory: %s", optarg);
 				newReaderConfig = optarg;
 				break;
+#endif
 
 			case 'f':
 				setToForeground = TRUE;
@@ -857,7 +860,9 @@ static void print_usage(char const * const progname)
 	printf("Options:\n");
 #ifdef HAVE_GETOPT_LONG
 	printf("  -a, --apdu		log APDU commands and results\n");
+#ifdef USE_SERIAL
 	printf("  -c, --config		new reader.conf.d path\n");
+#endif
 	printf("  -f, --foreground	run in foreground (no daemon),\n");
 	printf("			send logs to stdout instead of syslog\n");
 	printf("  -T, --color		force use of colored logs\n");
@@ -877,7 +882,9 @@ static void print_usage(char const * const progname)
 	printf("  -I, --reader-name-no-interface do not include the USB interface name in the name\n");
 #else
 	printf("  -a    log APDU commands and results\n");
+#ifdef USE_SERIAL
 	printf("  -c	new reader.conf.d path\n");
+#endif
 	printf("  -f	run in foreground (no daemon), send logs to stdout instead of syslog\n");
 	printf("  -T    force use of colored logs\n");
 	printf("  -d	display debug messages.\n");
