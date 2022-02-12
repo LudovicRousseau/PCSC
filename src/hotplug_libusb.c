@@ -42,6 +42,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #ifdef HAVE_LIBUSB
 
+#define _GNU_SOURCE		/* for asprintf(3) */
 #include <string.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -606,14 +607,12 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	int i;
 	uint8_t iInterface = 0;
 	uint8_t iSerialNumber = 0;
-	char deviceName[MAX_DEVICENAME];
+	char *deviceName;
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
-	snprintf(deviceName, sizeof(deviceName), "usb:%04x/%04x:libusb-1.0:%s",
+	asprintf(&deviceName, "usb:%04x/%04x:libusb-1.0:%s",
 		desc.idVendor, desc.idProduct, bus_device);
-
-	deviceName[sizeof(deviceName) -1] = '\0';
 
 	pthread_mutex_lock(&usbNotifierMutex);
 
@@ -750,6 +749,8 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 		(void)CheckForOpenCT();
 
 	pthread_mutex_unlock(&usbNotifierMutex);
+
+	free(deviceName);
 
 	return 1;
 }	/* End of function */
