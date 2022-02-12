@@ -851,7 +851,7 @@ static void print_version(void)
 	printf("Copyright (C) 2003-2004 by Damien Sauveron <sauveron@labri.fr>.\n");
 	printf("Report bugs to <pcsclite-muscle@lists.infradead.org>.\n");
 
-	printf ("Enabled features:%s\n", PCSCLITE_FEATURES);
+	printf("Enabled features:%s\n", PCSCLITE_FEATURES);
 }
 
 static void print_usage(char const * const progname)
