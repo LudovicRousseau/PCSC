@@ -852,6 +852,8 @@ static void print_version(void)
 	printf("Report bugs to <pcsclite-muscle@lists.infradead.org>.\n");
 
 	printf("Enabled features:%s\n", PCSCLITE_FEATURES);
+	printf("MAX_READERNAME: %d, PCSCLITE_MAX_READERS_CONTEXTS: %d\n",
+		MAX_READERNAME, PCSCLITE_MAX_READERS_CONTEXTS);
 }
 
 static void print_usage(char const * const progname)
