@@ -58,7 +58,6 @@
 #define PCSC_MAX_READER_HANDLES 200
 
 #define PCSCLITE_STATUS_WAIT		200000	/**< Status Change Sleep */
-#define MAX_DEVICENAME		255
 
 /** Different values for struct ReaderContext powerState field */
 enum
