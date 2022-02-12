@@ -788,17 +788,16 @@ static int HPScan(void)
 		}
 		if (!found)
 		{
-			char deviceName[MAX_DEVICENAME];
+			char *deviceName;
 
 			/* the format should be "usb:%04x/%04x" but Apple uses the
 			 * friendly name instead */
-			snprintf(deviceName, sizeof(deviceName),
-				"%s", a->m_driver->m_friendlyName);
-			deviceName[sizeof(deviceName)-1] = '\0';
+			asprintf(&deviceName, "%s", a->m_driver->m_friendlyName);
 
 			RFAddReader(a->m_driver->m_friendlyName,
 				PCSCLITE_HP_BASE_PORT + a->m_address, a->m_driver->m_libPath,
 				deviceName);
+			free(deviceName);
 		}
 	}
 
