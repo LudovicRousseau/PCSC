@@ -55,7 +55,7 @@ pcscd_SOURCES = \
 	pcscd.h.in \
 	PCSC/debuglog.h \
 	PCSC/ifdhandler.h \
-	PCSC/pcsclite.h \
+	PCSC/pcsclite.h.in \
 	PCSC/winscard.h \
 	PCSC/wintypes.h \
 	prothandler.c \
