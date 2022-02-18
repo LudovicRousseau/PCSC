@@ -52,7 +52,7 @@ pcscd_SOURCES = \
 	misc.h \
 	parser.h \
 	pcscdaemon.c \
-	pcscd.h \
+	pcscd.h.in \
 	PCSC/debuglog.h \
 	PCSC/ifdhandler.h \
 	PCSC/pcsclite.h \
