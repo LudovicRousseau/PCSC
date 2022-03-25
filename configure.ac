@@ -61,6 +61,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX([noyywrap])
+if test $LEX = ":"
+then
+	AC_MSG_ERROR([no lex or flex found])
+fi
 PKG_PROG_PKG_CONFIG
 AM_PROG_CC_C_O
 AM_PROG_AR
