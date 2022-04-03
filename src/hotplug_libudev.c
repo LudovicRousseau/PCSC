@@ -465,7 +465,7 @@ static void HPAddDevice(struct udev_device *dev)
 	{
 		Log2(PCSC_LOG_ERROR,
 			"Not enough reader entries. Already found %d readers", index);
-		return;
+		goto exit;
 	}
 
 	if (Add_Interface_In_Name)
