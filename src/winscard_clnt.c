@@ -2271,6 +2271,14 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer,
 
 	if (SCARD_S_SUCCESS == scControlStruct.rv)
 	{
+		if (scControlStruct.dwBytesReturned > cbRecvLength)
+		{
+			if (NULL != lpBytesReturned)
+				*lpBytesReturned = scControlStruct.dwBytesReturned;
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+			goto end;
+		}
+
 		/* read the received buffer */
 		rv = MessageReceive(pbRecvBuffer, scControlStruct.dwBytesReturned,
 			currentContextMap->dwClientID);
