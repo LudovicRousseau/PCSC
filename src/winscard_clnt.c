@@ -2738,6 +2738,13 @@ retry:
 
 	if (SCARD_S_SUCCESS == scTransmitStruct.rv)
 	{
+		if (scTransmitStruct.pcbRecvLength > *pcbRecvLength)
+		{
+			*pcbRecvLength = scTransmitStruct.pcbRecvLength;
+			rv = SCARD_E_INSUFFICIENT_BUFFER;
+			goto end;
+		}
+
 		/* read the received buffer */
 		rv = MessageReceive(pbRecvBuffer, scTransmitStruct.pcbRecvLength,
 			currentContextMap->dwClientID);
