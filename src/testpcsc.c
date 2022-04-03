@@ -203,6 +203,9 @@ wait_for_card_again:
 	}
 
 	if (p > 1)
+	{
+		int again = 0;
+
 		do
 		{
 			char input[80];
@@ -216,9 +219,13 @@ wait_for_card_again:
 				iReader = atoi(input);
 
 			if (iReader > p || iReader <= 0)
+			{
 				printf("Invalid Value - try again\n");
+				again = 1;
+			}
 		}
-		while (iReader > p || iReader <= 0);
+		while (again);
+	}
 	else
 		iReader = 1;
 
