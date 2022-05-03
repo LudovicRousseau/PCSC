@@ -331,27 +331,7 @@ static LONG HPReadBundleValues(void)
 static void HPRemoveDevice(struct udev_device *dev)
 {
 	int i;
-	const char *devpath;
-	struct udev_device *parent;
 	const char *sysname;
-
-	/* The device pointed to by dev contains information about
-	   the interface. In order to get information about the USB
-	   device, get the parent device with the subsystem/devtype pair
-	   of "usb"/"usb_device". This will be several levels up the
-	   tree, but the function will find it.*/
-	parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
-		"usb_device");
-	if (!parent)
-		return;
-
-	devpath = udev_device_get_devnode(parent);
-	if (!devpath)
-	{
-		/* the device disapeared? */
-		Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
-		return;
-	}
 
 	sysname = udev_device_get_sysname(dev);
 	if (!sysname)
