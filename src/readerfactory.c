@@ -619,7 +619,7 @@ LONG RFRemoveReader(const char *readerName, int port, int flags)
 					if ((IFD_SUCCESS) == ret && (1 == tagValue[0]))
 					{
 						tagValue[0] = 1;
-						ret = IFDSetCapabilities(sReadersContexts[i],
+						IFDSetCapabilities(sReadersContexts[i],
 							TAG_IFD_DEVICE_REMOVED, sizeof tagValue, tagValue);
 					}
 				}
