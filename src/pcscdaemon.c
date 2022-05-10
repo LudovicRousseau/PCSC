@@ -751,6 +751,8 @@ int main(int argc, char **argv)
 #ifndef USE_SERIAL
 	if (rv)
 		at_exit();
+#else
+	(void)rv;
 #endif
 
 	rv = HPRegisterForHotplugEvents();
