@@ -1,3 +1,19 @@
+1.9.6: Ludovic Rousseau
+11 May 2022
+- do not fail reader removal in some specific cases (USB/Thunderbolt port)
+- improve documentation regarding /etc/reader.conf.d/
+- SCardGetStatusChange: speedup the case DISABLE_AUTO_POWER_ON
+- configure:
+  . add --disable-strict option
+   By default the compiler arguments are now:
+   -Wall -Wextra -Wno-unused-parameter -Werror ${CFLAGS} 
+  . fail if flex is not found
+- fix different data races
+- pcscdaemon: -v displays internal constants values: 
+  MAX_READERNAME & PCSCLITE_MAX_READERS_CONTEXTS
+- Some other minor improvements
+
+
 1.9.5: Ludovic Rousseau
 4 December 2021
 - pcscd: autoexit even if no client connects
@@ -6,10 +22,12 @@
 - Add and use tag TAG_IFD_DEVICE_REMOVED
 - UnitaryTests: port code to Python 3
 
+
 1.9.4: Ludovic Rousseau
 1 October 2021
 - fix a memory leak when libusb is used for hotplug (i.e. non-Linux
   systems)
+
 
 1.9.3: Ludovic Rousseau
 6 August 2021
