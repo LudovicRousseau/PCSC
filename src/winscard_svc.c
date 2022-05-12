@@ -527,7 +527,7 @@ static void * ContextThread(LPVOID newContext)
 			case SCARD_RECONNECT:
 			{
 				struct reconnect_struct rcStr;
-				DWORD dwActiveProtocol;
+				DWORD dwActiveProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 				READ_BODY(rcStr);
 
