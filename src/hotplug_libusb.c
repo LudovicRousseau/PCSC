@@ -611,8 +611,13 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", bus_device);
 
-	asprintf(&deviceName, "usb:%04x/%04x:libusb-1.0:%s",
+	i = asprintf(&deviceName, "usb:%04x/%04x:libusb-1.0:%s",
 		desc.idVendor, desc.idProduct, bus_device);
+	if (-1 == i)
+	{
+		Log1(PCSC_LOG_ERROR, "asprintf() failed");
+		return 0;
+	}
 
 	pthread_mutex_lock(&usbNotifierMutex);
 
