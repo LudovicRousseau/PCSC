@@ -15,11 +15,11 @@ jobs:
       matrix:
         configure_args: [
           "",
-          "--disable-libudev",
-          "--disable-libudev --disable-libusb",
-          "--enable-embedded",
-          "--disable-strict",
-          "--enable-debugatr",
+          "--enable-strict",
+          "--enable-strict --disable-libudev",
+          "--enable-strict --disable-libudev --disable-libusb",
+          "--enable-strict --enable-embedded",
+          "--enable-strict --enable-debugatr",
         ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -52,6 +52,5 @@ jobs:
 
       - name: distcheck
         shell: bash
-        if: ${{ matrix.configure_args }} == "--disable-strict"
         run: |
           make distcheck
