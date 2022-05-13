@@ -402,15 +402,15 @@ if test x$use_filter = xyes; then
   PCSCLITE_FEATURES="${PCSCLITE_FEATURES} filter"
 fi
 
-# --disable-strict
+# --enable-strict
 AC_ARG_ENABLE(
 	[strict],
-	[AS_HELP_STRING([--disable-strict],[disable strict compile mode @<:@enabled@:>@])],
+	[AS_HELP_STRING([--enable-strict],[enable strict compile mode @<:@enabled@:>@])],
 	,
-	[enable_strict="yes"]
+	[enable_strict="no"]
 )
 if test "${enable_strict}" = "yes"; then
-	CFLAGS="-Wall -Wextra -Wno-unused-parameter -Werror ${CFLAGS}"
+	CFLAGS="-Wall -Wextra -Werror ${CFLAGS}"
 fi
 
 # Setup dist stuff
