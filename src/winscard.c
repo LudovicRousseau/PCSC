@@ -210,7 +210,7 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
 	 * identified by clients and distinguished from others
 	 */
 
-	*phContext = SYS_RandomInt(0, -1);
+	*phContext = SYS_RandomLong();
 
 	Log2(PCSC_LOG_DEBUG, "Establishing Context: 0x%lX", *phContext);
 

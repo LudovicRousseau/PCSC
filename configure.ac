@@ -109,7 +109,7 @@ AC_STRUCT_DIRENT_D_TYPE
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(getopt_long nanosleep strerror vsnprintf)
+AC_CHECK_FUNCS(getopt_long nanosleep strerror vsnprintf getrandom)
 AC_FUNC_ALLOCA
 
 # C Compiler features

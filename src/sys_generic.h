@@ -45,7 +45,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	int SYS_USleep(int);
 
-	int SYS_RandomInt(int, int);
+	long SYS_RandomLong(void);
 
 	void SYS_InitRandom(void);
 

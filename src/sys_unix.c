@@ -39,8 +39,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "config.h"
 #include <sys/time.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <time.h>
+#ifdef HAVE_GETRANDOM
+#include <sys/random.h>
+#endif /* HAVE_GETRANDOM */
 
 #include "misc.h"
 #include "sys_generic.h"
@@ -87,22 +91,34 @@ INTERNAL int SYS_USleep(int iTimeVal)
 /**
  * Generate a pseudo random number
  *
- * @param[in] fStart minimal value
- * @param[in] fEnd maximal value or -1 for a full range
+ * @return a non-negative random number
  *
- * @return a random number between fStart and fEnd
+ * @remark the range is at least up to `2^31`.
+ * @remark this is a CSPRNG when `getrandom()` is available, LCG otherwise.
+ * @warning SYS_InitRandom() should be called (once) before using this function.
+ * @warning not thread safe when system lacks `getrandom()` syscall.
+ * @warning not cryptographically secure when system lacks `getrandom()` syscall.
+ * @warning if interrupted by a signal, this function may return 0.
  */
-INTERNAL int SYS_RandomInt(int fStart, int fEnd)
+INTERNAL long SYS_RandomLong(void)
 {
-	int iRandNum = 0;
+#ifdef HAVE_GETRANDOM
+	unsigned long ul = 0;
+	unsigned char c[sizeof ul] = {0};
+	size_t i;
 
-	if (-1 == fEnd)
-		/* full int range */
-		iRandNum = rand();
-	else
-		iRandNum = ((rand()+0.0)/RAND_MAX * (fEnd - fStart)) + fStart;
-
-	return iRandNum;
+	(void)getrandom(c, sizeof c, 0);
+	// this loop avoids trap representations that may occur in the naive solution
+	for(i = 0; i < sizeof ul; i++) {
+		ul <<= CHAR_BIT;
+		ul |= c[i];
+	}
+	// the casts are for the sake of clarity
+	return (long)(ul & (unsigned long)LONG_MAX);
+#else
+	long r = lrand48(); // this is not thread-safe
+	return r;
+#endif /* HAVE_GETRANDOM */
 }
 
 /**
@@ -110,6 +126,7 @@ INTERNAL int SYS_RandomInt(int fStart, int fEnd)
  */
 INTERNAL void SYS_InitRandom(void)
 {
+#ifndef HAVE_GETRANDOM
 	struct timeval tv;
 	struct timezone tz;
 	long myseed = 0;
@@ -124,6 +141,7 @@ INTERNAL void SYS_InitRandom(void)
 		myseed = (long) time(NULL);
 	}
 
-	srand(myseed);
+	srand48(myseed);
+#endif /* HAVE_GETRANDOM */
 }
 
