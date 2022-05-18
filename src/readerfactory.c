@@ -1396,11 +1396,10 @@ void RFCleanupReaders(void)
 
 			if (rv != SCARD_S_SUCCESS)
 				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08lX", rv);
-
-			free(sReadersContexts[i]);
-
-			sReadersContexts[i] = NULL;
 		}
+
+		free(sReadersContexts[i]);
+		sReadersContexts[i] = NULL;
 	}
 
 #ifdef USE_SERIAL
