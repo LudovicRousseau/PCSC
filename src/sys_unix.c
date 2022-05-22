@@ -45,9 +45,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_GETRANDOM
 #include <sys/random.h>
 #endif /* HAVE_GETRANDOM */
+#include <errno.h>
+#include <string.h>
 
 #include "misc.h"
 #include "sys_generic.h"
+#include "PCSC/debuglog.h"
 
 /**
  * @brief Makes the current process sleep for some seconds.
@@ -106,8 +109,14 @@ INTERNAL long SYS_RandomLong(void)
 	unsigned long ul = 0;
 	unsigned char c[sizeof ul] = {0};
 	size_t i;
+	ssize_t ret;
 
-	(void)getrandom(c, sizeof c, 0);
+	ret = getrandom(c, sizeof c, 0);
+	if (-1 == ret)
+	{
+		Log2(PCSC_LOG_ERROR, "getrandom() failed: %s", strerror(errno));
+		return lrand48();
+	}
 	// this loop avoids trap representations that may occur in the naive solution
 	for(i = 0; i < sizeof ul; i++) {
 		ul <<= CHAR_BIT;
