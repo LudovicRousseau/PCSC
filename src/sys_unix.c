@@ -103,11 +103,11 @@ INTERNAL int SYS_USleep(int iTimeVal)
  * @warning not cryptographically secure when system lacks `getrandom()` syscall.
  * @warning if interrupted by a signal, this function may return 0.
  */
-INTERNAL long SYS_RandomLong(void)
+INTERNAL int SYS_RandomInt(void)
 {
 #ifdef HAVE_GETRANDOM
-	unsigned long ul = 0;
-	unsigned char c[sizeof ul] = {0};
+	unsigned int ui = 0;
+	unsigned char c[sizeof ui] = {0};
 	size_t i;
 	ssize_t ret;
 
@@ -118,14 +118,14 @@ INTERNAL long SYS_RandomLong(void)
 		return lrand48();
 	}
 	// this loop avoids trap representations that may occur in the naive solution
-	for(i = 0; i < sizeof ul; i++) {
-		ul <<= CHAR_BIT;
-		ul |= c[i];
+	for(i = 0; i < sizeof ui; i++) {
+		ui <<= CHAR_BIT;
+		ui |= c[i];
 	}
 	// the casts are for the sake of clarity
-	return (long)(ul & (unsigned long)LONG_MAX);
+	return (int)(ui & (unsigned int)INT_MAX);
 #else
-	long r = lrand48(); // this is not thread-safe
+	int r = lrand48(); // this is not thread-safe
 	return r;
 #endif /* HAVE_GETRANDOM */
 }
