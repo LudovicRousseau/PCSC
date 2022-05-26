@@ -327,6 +327,7 @@ struct _psContextMap
 typedef struct _psContextMap SCONTEXTMAP;
 
 static list_t contextMapList;
+static short contextMapListIsInit = 0;
 
 static int SCONTEXTMAP_seeker(const void *el, const void *key)
 {
@@ -345,12 +346,6 @@ static int SCONTEXTMAP_seeker(const void *el, const void *key)
 
 	return 0;
 }
-
-/**
- * Make sure the initialization code is executed only once.
- */
-static short isExecuted = 0;
-
 
 /**
  * Ensure that some functions be accessed in thread-safe mode.
@@ -498,6 +493,15 @@ end:
 	return rv;
 }
 
+#ifdef DESTRUCTOR
+DESTRUCTOR static void destructor(void) {
+	if (contextMapListIsInit) {
+		list_destroy(&contextMapList);
+        contextMapListIsInit = 0;
+    }
+}
+#endif
+
 /**
  * @brief Creates a communication context to the PC/SC Resource
  * Manager.
@@ -543,13 +547,12 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	 * Do this only once:
 	 * - Initialize context list.
 	 */
-	if (isExecuted == 0)
+	if (!contextMapListIsInit)
 	{
 		int lrv;
 
-		/* NOTE: The list will never be freed (No API call exists to
-		 * "close all contexts".
-		 * Applications which load and unload the library will leak
+		/* NOTE: The list will be freed only if DESTRUCTOR is defined.
+		 * Applications which load and unload the library may leak
 		 * the list's internal structures. */
 		lrv = list_init(&contextMapList);
 		if (lrv < 0)
@@ -575,7 +578,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			sharing_shall_block = FALSE;
 		}
 
-		isExecuted = 1;
+		contextMapListIsInit = 1;
 	}
 
 
