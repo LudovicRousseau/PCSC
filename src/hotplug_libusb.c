@@ -443,6 +443,9 @@ static void HPRescanUsbBus(void)
 			HPRemoveHotPluggable(i);
 	}
 
+	/* free the libusb allocated list & devices */
+	libusb_free_device_list(devs, 1);
+
 	if (AraKiriHotPlug)
 	{
 		int retval;
@@ -460,9 +463,6 @@ static void HPRescanUsbBus(void)
 		Log1(PCSC_LOG_INFO, "Hotplug stopped");
 		pthread_exit(&retval);
 	}
-
-	/* free the libusb allocated list & devices */
-	libusb_free_device_list(devs, 1);
 }
 
 static void * HPEstablishUSBNotifications(int pipefd[2])
