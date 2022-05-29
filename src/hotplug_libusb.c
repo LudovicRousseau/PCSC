@@ -549,6 +549,7 @@ LONG HPSearchHotPluggables(void)
 {
 	int i;
 
+	AraKiriHotPlug = FALSE;
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		readerTracker[i].status = READER_ABSENT;
