@@ -82,5 +82,16 @@ int main(void)
 		printf("\n");
 	}
 
+	length = MAX_BUFFER_SIZE_EXTENDED +1;
+	printf("length: 0x%lX\n", length);
+	rv = SCardTransmit(hCard, SCARD_PCI_T0, bSendBuffer, send_length,
+        &ioRecvPci, bRecvBuffer, &length);
+	printf("SCardTransmit %lX: %s\n", rv, pcsc_stringify_error(rv));
+	printf("Expected length: 0x%lX\n", length);
+	if (SCARD_E_INSUFFICIENT_BUFFER == rv)
+	{
+		printf(BRIGHT_RED "test FAIL\n" NORMAL);
+	}
+
 	return 0;
 }
