@@ -2689,8 +2689,7 @@ retry:
 		return SCARD_E_INVALID_HANDLE;
 	}
 
-	if ((cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
-		|| (*pcbRecvLength > MAX_BUFFER_SIZE_EXTENDED))
+	if (cbSendLength > MAX_BUFFER_SIZE_EXTENDED)
 	{
 		rv = SCARD_E_INSUFFICIENT_BUFFER;
 		goto end;

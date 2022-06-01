@@ -658,8 +658,7 @@ static void * ContextThread(LPVOID newContext)
 					goto exit;
 
 				/* avoids buffer overflow */
-				if ((trStr.pcbRecvLength > sizeof(pbRecvBuffer))
-					|| (trStr.cbSendLength > sizeof(pbSendBuffer)))
+				if (trStr.cbSendLength > sizeof(pbSendBuffer))
 					goto buffer_overflow;
 
 				/* read sent buffer */
