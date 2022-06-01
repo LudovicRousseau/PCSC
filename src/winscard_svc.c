@@ -712,8 +712,7 @@ static void * ContextThread(LPVOID newContext)
 					goto exit;
 
 				/* avoids buffer overflow */
-				if ((ctStr.cbRecvLength > sizeof(pbRecvBuffer))
-					|| (ctStr.cbSendLength > sizeof(pbSendBuffer)))
+				if (ctStr.cbSendLength > sizeof(pbSendBuffer))
 				{
 					goto buffer_overflow;
 				}
