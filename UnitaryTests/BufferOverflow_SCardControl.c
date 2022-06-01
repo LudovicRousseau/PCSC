@@ -77,5 +77,14 @@ int main(void)
 		printf("\n");
 	}
 
+	rv = SCardControl(hCard, CM_IOCTL_GET_FEATURE_REQUEST, NULL, 0,
+        bRecvBuffer, MAX_BUFFER_SIZE_EXTENDED +1, &length);
+	printf("SCardControl %lX: %s\n", rv, pcsc_stringify_error(rv));
+	printf("Expected length: %ld\n", length);
+	if (SCARD_E_INSUFFICIENT_BUFFER == rv)
+	{
+		printf(BRIGHT_RED "test FAIL\n" NORMAL);
+	}
+
 	return 0;
 }
