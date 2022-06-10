@@ -2,6 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC
 
 lib_LTLIBRARIES = libpcscspy.la
 dist_bin_SCRIPTS = pcsc-spy
+dist_doc_DATA = install_spy.sh uninstall_spy.sh
 
 libpcscspy_la_SOURCES = \
 	libpcscspy.c
@@ -16,5 +17,5 @@ pcsc-spy.1: pcsc-spy.pod
 		$(srcdir)/pcsc-spy.pod > $@
 endif
 
-EXTRA_DIST = install_spy.sh uninstall_spy.sh pcsc-spy.pod
+EXTRA_DIST = pcsc-spy.pod
 CLEANFILES = pcsc-spy.1
