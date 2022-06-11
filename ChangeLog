@@ -1,3 +1,13 @@
+1.9.8: Ludovic Rousseau
+11 June 2022
+- Install install_spy.sh & uninstall_spy.sh scripts in docdir
+- SCardTransmit(): do not fail if receive buffer is "too large"
+- SCardControl(): do not fail if receive buffer is "too large"
+- fix some memory leaks on shutdown
+- use a better random number generator
+- Some other minor improvements
+
+
 1.9.7: Ludovic Rousseau
 13 May 2022
 - disable strict compilation by default
