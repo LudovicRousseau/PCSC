@@ -886,47 +886,52 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		hCard = *(int32_t *)ptr;
 
 		/*
-		 * Unlock the sharing
+		 * Unlock the sharing. If the reader or handle already disappeared, skip
+		 * the disconnection part and just delete the orphan handle.
 		 */
 		rv = RFReaderInfoById(hCard, &rContext);
-		if (rv != SCARD_S_SUCCESS)
+		if (rv != SCARD_S_SUCCESS && rv != SCARD_E_READER_UNAVAILABLE &&
+			 rv != SCARD_E_INVALID_VALUE)
 		{
 			(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 			return rv;
 		}
 
-		if (0 == rContext->hLockId)
+		if (rContext)
 		{
-			/* no lock. Just leave the card */
-			(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
-		}
-		else
-		{
-			if (hCard != rContext->hLockId)
+			if (0 == rContext->hLockId)
 			{
-				/*
-				 * if the card is locked by someone else we do not reset it
-				 */
-
-				/* decrement card use */
+				/* no lock. Just leave the card */
 				(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 			}
 			else
 			{
-				/* release the lock */
-				rContext->hLockId = 0;
+				if (hCard != rContext->hLockId)
+				{
+					/*
+					 * if the card is locked by someone else we do not reset it
+					 */
 
-				/*
-				 * We will use SCardStatus to see if the card has been
-				 * reset there is no need to reset each time
-				 * Disconnect is called
-				 */
-				rv = SCardStatus(hCard, NULL, NULL, NULL, NULL, NULL, NULL);
-
-				if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
+					/* decrement card use */
 					(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
+				}
 				else
-					(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+				{
+					/* release the lock */
+					rContext->hLockId = 0;
+
+					/*
+					 * We will use SCardStatus to see if the card has been
+					 * reset there is no need to reset each time
+					 * Disconnect is called
+					 */
+					rv = SCardStatus(hCard, NULL, NULL, NULL, NULL, NULL, NULL);
+
+					if (rv == SCARD_W_RESET_CARD || rv == SCARD_W_REMOVED_CARD)
+						(void)SCardDisconnect(hCard, SCARD_LEAVE_CARD);
+					else
+						(void)SCardDisconnect(hCard, SCARD_RESET_CARD);
+				}
 			}
 		}
 
@@ -936,7 +941,9 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 			Log2(PCSC_LOG_CRITICAL,
 				"list_delete_at failed with return value: %d", lrv);
 
-		UNREF_READER(rContext)
+		if (rContext) {
+			UNREF_READER(rContext)
+		}
 	}
 	(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 
