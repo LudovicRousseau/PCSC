@@ -840,6 +840,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	/* get rContext corresponding to hCard */
 	rv = RFReaderInfoById(hCard, &rContext);
+	/* ignore reader removal */
+	if (SCARD_E_INVALID_VALUE == rv)
+		return SCARD_S_SUCCESS;
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
