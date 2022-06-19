@@ -891,7 +891,8 @@ static LONG MSGRemoveContext(SCARDCONTEXT hContext, SCONTEXT * threadContext)
 		 * orphan handle.
 		 */
 		rv = RFReaderInfoById(hCard, &rContext);
-		if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INVALID_VALUE)
+		if (rv != SCARD_S_SUCCESS && rv != SCARD_E_INVALID_VALUE
+			&& rv != SCARD_E_READER_UNAVAILABLE)
 		{
 			(void)pthread_mutex_unlock(&threadContext->cardsList_lock);
 			return rv;
