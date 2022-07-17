@@ -77,7 +77,7 @@ files to detect added or removed non-USB readers (serial or PCMCIA).
 .BR \-x ", " \-\-auto\-exit
 pcscd will quit after 60 seconds of inactivity after the release of
 the last PC/SC context. This is used when pcscd
-os started on demand by systemd.
+is started on demand by systemd.
 .TP
 .BR \-S ", " \-\-reader\-name\-no\-serial
 Do not include the USB serial number in the reader name.
@@ -90,7 +90,7 @@ coordinates communications with smart card readers and smart cards and
 cryptographic tokens that are connected to the system.
 .PP
 It allows applications to access smart cards and readers using the
-winscard API but without knowing details of the card or reader.
+WinSCard API but without knowing details of the card or reader.
 .PP
 pcscd coordinates the loading of drivers for card readers.
 .
