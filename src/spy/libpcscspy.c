@@ -590,9 +590,13 @@ PCSC_API p_SCardTransmit(SCardTransmit)
 
 	Enter();
 	spy_long(hCard);
+	spy_long(pioSendPci->dwProtocol);
+	spy_long(pioSendPci->cbPciLength);
 	spy_buffer(pbSendBuffer, cbSendLength);
 	rv = spy.SCardTransmit(hCard, pioSendPci, pbSendBuffer, cbSendLength,
 		pioRecvPci, pbRecvBuffer, pcbRecvLength);
+	spy_long(pioRecvPci->dwProtocol);
+	spy_long(pioRecvPci->cbPciLength);
 	if (pcbRecvLength)
 		spy_buffer(pbRecvBuffer, *pcbRecvLength);
 	else

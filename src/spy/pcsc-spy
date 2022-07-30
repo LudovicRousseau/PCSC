@@ -219,6 +219,20 @@ class PCSCspy(object):
         else:
             self.log_in("hCard: %s" % hCard)
 
+    def log_in_scard_io_request(self):
+        """ log SCARD_IO_REQUEST IN parameter """
+        dwProtocol = self.get_line()
+        if self.diffable:
+            self.log_in("pioSendPci.dwProtocol: 0x????")
+        else:
+            self.log_in("pioSendPci.dwProtocol: %s" % dwProtocol)
+
+        cbPciLength = self.get_line()
+        if self.diffable:
+            self.log_in("pioSendPci.cbPciLength: 0x????")
+        else:
+            self.log_in("pioSendPci.cbPciLength: %s" % cbPciLength)
+
     def log_in_hContext(self):
         """ log hContext IN parameter """
         hContext = self.get_line()
@@ -288,6 +302,20 @@ class PCSCspy(object):
             PreferredProtocols.append("T=15")
         self.log_in("dwPreferredProtocols: %s (%s)" % (dwPreferredProtocols,
             ", ".join(PreferredProtocols)))
+
+    def log_out_scard_io_request(self):
+        """ log SCARD_IO_REQUEST OUT parameter """
+        dwProtocol = self.get_line()
+        if self.diffable:
+            self.log_out("pioRecvPci.dwProtocol: 0x????")
+        else:
+            self.log_out("pioRecvPci.dwProtocol: %s" % dwProtocol)
+
+        cbPciLength = self.get_line()
+        if self.diffable:
+            self.log_out("pioRecvPci.cbPciLength: 0x????")
+        else:
+            self.log_out("pioRecvPci.cbPciLength: %s" % cbPciLength)
 
     def log_out_dwActiveProtocol(self):
         """ log dwActiveProtocol OUT parameter """
@@ -510,8 +538,10 @@ class PCSCspy(object):
         """ SCardTransmit """
         self.log_name("SCardTransmit")
         self.log_in_hCard()
+        self.log_in_scard_io_request()
         self.log_in2("bSendLength")
         self.log_buffer("bSendBuffer", "in")
+        self.log_out_scard_io_request()
         self.log_out2("bRecvLength")
         self.log_buffer("bRecvBuffer", "out")
         self._log_rv()
