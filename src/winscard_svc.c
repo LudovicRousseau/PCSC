@@ -321,7 +321,7 @@ static const char *CommandsText[] = {
 	WRITE_BODY_WITH_COMMAND(CommandsText[header.command], v)
 #define WRITE_BODY_WITH_COMMAND(command, v) \
 	do { \
-		Log4(PCSC_LOG_DEBUG, "%s rv=0x%X for client %d", command, v.rv, filedes); \
+		LogRv4(PCSC_LOG_DEBUG, v.rv, "%s for client %d", command, filedes); \
 		ret = MessageSend(&v, sizeof(v), filedes); \
 	} while (0)
 

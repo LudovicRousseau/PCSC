@@ -110,7 +110,27 @@ static char LogLevel = PCSC_LOG_ERROR;
 
 static signed char LogDoColor = 0;	/**< no color by default */
 
-static void log_line(const int priority, const char *DebugBuffer);
+static void log_line(const int priority, const char *DebugBuffer,
+	unsigned int rv);
+
+/*
+ * log a message with the RV value returned by the daemon
+ */
+void log_msg_rv(const int priority, unsigned int rv, const char *fmt, ...)
+{
+	char DebugBuffer[DEBUG_BUF_SIZE];
+	va_list argptr;
+
+	if ((priority < LogLevel) /* log priority lower than threshold? */
+		|| (DEBUGLOG_NO_DEBUG == LogMsgType))
+		return;
+
+	va_start(argptr, fmt);
+	vsnprintf(DebugBuffer, sizeof DebugBuffer, fmt, argptr);
+	va_end(argptr);
+
+	log_line(priority, DebugBuffer, rv);
+}
 
 void log_msg(const int priority, const char *fmt, ...)
 {
@@ -125,10 +145,62 @@ void log_msg(const int priority, const char *fmt, ...)
 	vsnprintf(DebugBuffer, sizeof DebugBuffer, fmt, argptr);
 	va_end(argptr);
 
-	log_line(priority, DebugBuffer);
+	log_line(priority, DebugBuffer, -1);
 } /* log_msg */
 
-static void log_line(const int priority, const char *DebugBuffer)
+/* convert from integer rv value to a string value
+ * SCARD_S_SUCCESS -> "SCARD_S_SUCCESS"
+ */
+static const char * rv2text(unsigned int rv)
+{
+	const char *rv_text = NULL;
+	static __thread char strError[30];
+
+#define CASE(x) \
+		case x: \
+			rv_text = "rv=" #x; \
+			break
+
+	if (rv != (unsigned int)-1)
+	{
+		switch (rv)
+		{
+			CASE(SCARD_S_SUCCESS);
+			CASE(SCARD_E_CANCELLED);
+			CASE(SCARD_E_INSUFFICIENT_BUFFER);
+			CASE(SCARD_E_INVALID_HANDLE);
+			CASE(SCARD_E_INVALID_PARAMETER);
+			CASE(SCARD_E_INVALID_VALUE);
+			CASE(SCARD_E_NO_MEMORY);
+			CASE(SCARD_E_NO_SERVICE);
+			CASE(SCARD_E_NO_SMARTCARD);
+			CASE(SCARD_E_NOT_TRANSACTED);
+			CASE(SCARD_E_PROTO_MISMATCH);
+			CASE(SCARD_E_READER_UNAVAILABLE);
+			CASE(SCARD_E_SHARING_VIOLATION);
+			CASE(SCARD_E_TIMEOUT);
+			CASE(SCARD_E_UNKNOWN_READER);
+			CASE(SCARD_E_UNSUPPORTED_FEATURE);
+			CASE(SCARD_F_COMM_ERROR);
+			CASE(SCARD_F_INTERNAL_ERROR);
+			CASE(SCARD_W_REMOVED_CARD);
+			CASE(SCARD_W_RESET_CARD);
+			CASE(SCARD_W_UNPOWERED_CARD);
+			CASE(SCARD_W_UNRESPONSIVE_CARD);
+			CASE(SCARD_E_NO_READERS_AVAILABLE);
+
+			default:
+				(void)snprintf(strError, sizeof(strError)-1,
+					"Unknown error: 0x%08X", rv);
+				rv_text = strError;
+		}
+	}
+
+	return rv_text;
+}
+
+static void log_line(const int priority, const char *DebugBuffer,
+	unsigned int rv)
 {
 	if (DEBUGLOG_SYSLOG_DEBUG == LogMsgType)
 		syslog(LOG_INFO, "%s", DebugBuffer);
@@ -139,6 +211,7 @@ static void log_line(const int priority, const char *DebugBuffer)
 		struct timeval tmp;
 		int delta;
 		pthread_t thread_id;
+		const char *rv_text = NULL;
 
 		gettimeofday(&new_time, NULL);
 		if (0 == last_time.tv_sec)
@@ -159,6 +232,8 @@ static void log_line(const int priority, const char *DebugBuffer)
 		last_time = new_time;
 
 		thread_id = pthread_self();
+
+		rv_text = rv2text(rv);
 
 		if (LogDoColor)
 		{
@@ -190,13 +265,31 @@ static void log_line(const int priority, const char *DebugBuffer)
 #else
 #define THREAD_FORMAT "%lu"
 #endif
-			printf("%s%.8d%s [" THREAD_FORMAT "] %s%s%s\n",
-				time_pfx, delta, time_sfx, thread_id,
-				color_pfx, DebugBuffer, color_sfx);
+			if (rv_text)
+			{
+				const char * rv_pfx = "", * rv_sfx = "";
+				if (rv != SCARD_S_SUCCESS)
+				{
+					rv_pfx = "\33[31m"; /* Red */
+					rv_sfx = "\33[0m";
+				}
+
+				printf("%s%.8d%s [" THREAD_FORMAT "] %s%s%s, %s%s%s\n",
+					time_pfx, delta, time_sfx, thread_id,
+					color_pfx, DebugBuffer, color_sfx,
+					rv_pfx, rv_text, rv_sfx);
+			}
+			else
+				printf("%s%.8d%s [" THREAD_FORMAT "] %s%s%s\n",
+					time_pfx, delta, time_sfx, thread_id,
+					color_pfx, DebugBuffer, color_sfx);
 		}
 		else
 		{
-			printf("%.8d %s\n", delta, DebugBuffer);
+			if (rv_text)
+				printf("%.8d %s, %s\n", delta, DebugBuffer, rv_text);
+			else
+				printf("%.8d %s\n", delta, DebugBuffer);
 		}
 		fflush(stdout);
 	}
@@ -220,7 +313,7 @@ static void log_xxd_always(const int priority, const char *msg,
 		c += 3;
 	}
 
-	log_line(priority, DebugBuffer);
+	log_line(priority, DebugBuffer, -1);
 } /* log_xxd_always */
 
 void log_xxd(const int priority, const char *msg, const unsigned char *buffer,

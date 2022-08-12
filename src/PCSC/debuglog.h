@@ -92,6 +92,7 @@ enum {
 #define Log2(priority, fmt, data) do {(void)priority; } while(0)
 #define Log3(priority, fmt, data1, data2) do {int p = priority; (void)p; } while(0)
 #define Log4(priority, fmt, data1, data2, data3) do { } while(0)
+#define LogRv4(priority, rv, fmt, data1, data2) do { } while(0)
 #define Log5(priority, fmt, data1, data2, data3, data4) do { } while(0)
 #define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) do { } while(0)
 #define LogXxd(priority, msg, buffer, size) do { } while(0)
@@ -107,6 +108,7 @@ enum {
 #define Log2(priority, fmt, data) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data)
 #define Log3(priority, fmt, data1, data2) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
 #define Log4(priority, fmt, data1, data2, data3) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3)
+#define LogRv4(priority, rv, fmt, data1, data2) log_msg_rv(priority, rv, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2)
 #define Log5(priority, fmt, data1, data2, data3, data4) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3, data4)
 #define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3, data4, data5, data6, data7, data8)
 #define LogXxd(priority, msg, buffer, size) log_xxd(priority, msg, buffer, size)
@@ -116,6 +118,9 @@ enum {
 #define DebugLogC(a, b,c) Log3(PCSC_LOG_INFO, a, b, c)
 
 #endif	/* NO_LOG */
+
+PCSC_API void log_msg_rv(const int priority, unsigned int rv, const char *fmt, ...)
+	__attribute__((format(printf, 3, 4)));
 
 PCSC_API void log_msg(const int priority, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
