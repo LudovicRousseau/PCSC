@@ -335,8 +335,8 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 					rContext->readerState->cardAtrLength);
 			}
 			else
-				Log3(PCSC_LOG_ERROR, "Error powering up card: %ld 0x%04lX",
-					rv, rv);
+				Log2(PCSC_LOG_ERROR, "Error powering up card: %s",
+					rv2text(rv));
 		}
 
 		if (! (rContext->readerState->readerState & SCARD_POWERED))
@@ -927,8 +927,8 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		else
 		{
 			if (SCARD_UNPOWER_CARD == dwDisposition)
-				Log3(PCSC_LOG_ERROR, "Error powering down card: %ld 0x%04lX",
-					rv, rv);
+				Log2(PCSC_LOG_ERROR, "Error powering down card: %s",
+					rv2text(rv));
 			else
 			{
 				rContext->readerState->cardAtrLength = 0;
@@ -1080,7 +1080,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 	if (SCARD_E_SHARING_VIOLATION == rv)
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 
-	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: %s", rv2text(rv));
 
 exit:
 	UNREF_READER(rContext)
@@ -1232,7 +1232,7 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		if (rv == SCARD_S_SUCCESS)
 			rv = rv2;
 
-	Log2(PCSC_LOG_DEBUG, "Status: 0x%08lX", rv);
+	Log2(PCSC_LOG_DEBUG, "Status: %s", rv2text(rv));
 
 exit:
 	UNREF_READER(rContext)
@@ -1618,7 +1618,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	if (rv != SCARD_S_SUCCESS)
 	{
 		*pcbRecvLength = 0;
-		Log2(PCSC_LOG_ERROR, "Card not transacted: 0x%08lX", rv);
+		Log2(PCSC_LOG_ERROR, "Card not transacted: %s", rv2text(rv));
 
         if (SCARD_E_NO_SMARTCARD == rv)
         {

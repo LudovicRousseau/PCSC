@@ -1395,7 +1395,7 @@ void RFCleanupReaders(void)
 				REMOVE_READER_NO_FLAG);
 
 			if (rv != SCARD_S_SUCCESS)
-				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: 0x%08lX", rv);
+				Log2(PCSC_LOG_ERROR, "RFRemoveReader error: %s", rv2text(rv));
 		}
 
 		free(sReadersContexts[i]);
