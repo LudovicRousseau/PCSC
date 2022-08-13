@@ -151,7 +151,7 @@ void log_msg(const int priority, const char *fmt, ...)
 /* convert from integer rv value to a string value
  * SCARD_S_SUCCESS -> "SCARD_S_SUCCESS"
  */
-static const char * rv2text(unsigned int rv)
+const char * rv2text(unsigned int rv)
 {
 	const char *rv_text = NULL;
 	static __thread char strError[30];

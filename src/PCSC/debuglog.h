@@ -96,6 +96,7 @@ enum {
 #define Log5(priority, fmt, data1, data2, data3, data4) do { } while(0)
 #define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) do { } while(0)
 #define LogXxd(priority, msg, buffer, size) do { } while(0)
+#define rv2text(rv) ""
 
 #define DebugLogA(a)
 #define DebugLogB(a, b)
@@ -112,6 +113,7 @@ enum {
 #define Log5(priority, fmt, data1, data2, data3, data4) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3, data4)
 #define Log9(priority, fmt, data1, data2, data3, data4, data5, data6, data7, data8) log_msg(priority, "%s:%d:%s() " fmt, __FILE__, __LINE__, __FUNCTION__, data1, data2, data3, data4, data5, data6, data7, data8)
 #define LogXxd(priority, msg, buffer, size) log_xxd(priority, msg, buffer, size)
+const char * rv2text(unsigned int rv);
 
 #define DebugLogA(a) Log1(PCSC_LOG_INFO, a)
 #define DebugLogB(a, b) Log2(PCSC_LOG_INFO, a, b)
