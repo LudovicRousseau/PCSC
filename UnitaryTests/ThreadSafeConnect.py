@@ -82,9 +82,9 @@ def main():
         thread.start()
 
     for thread in threads:
-        print("joining:", thread.getName(), end=' ')
+        print("joining:", thread.name, end=' ')
         thread.join()
-        print("joined:", thread.getName())
+        print("joined:", thread.name)
 
     print("Exiting main")
 
