@@ -134,9 +134,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#define DO_PROFILE
 
 
-/** used for backward compatibility */
-#define SCARD_PROTOCOL_ANY_OLD	0x1000
-
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0
