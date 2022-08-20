@@ -527,6 +527,7 @@ DESTRUCTOR static void destructor(void)
  * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
+ * @retval SCARD_W_SECURITY_VIOLATION Access was denied by the daemon (Polkit issue?). (\ref SCARD_W_SECURITY_VIOLATION)
  */
 static LONG SCardEstablishContextTH(DWORD dwScope,
 	/*@unused@*/ LPCVOID pvReserved1,
@@ -606,7 +607,6 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		{
 			Log1(PCSC_LOG_CRITICAL,
 				"Your pcscd is too old and does not support CMD_VERSION");
-			rv = SCARD_F_COMM_ERROR;
 			goto cleanup;
 		}
 
