@@ -506,7 +506,11 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					retval = SCARD_F_COMM_ERROR;
+					/* connection reseted by pcscd? */
+					if (ECONNRESET == errno)
+						retval = SCARD_W_SECURITY_VIOLATION;
+					else
+						retval = SCARD_F_COMM_ERROR;
 					break;
 				}
 			}
