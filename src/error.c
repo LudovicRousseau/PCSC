@@ -213,7 +213,9 @@ PCSC_API const char* pcsc_stringify_error(const LONG pcscError)
 	case SCARD_W_REMOVED_CARD:
 		msg = "Card was removed.";
 		break;
-	/* case SCARD_W_SECURITY_VIOLATION: */
+	case SCARD_W_SECURITY_VIOLATION:
+		msg = "Access denied.";
+		break;
 	/* case SCARD_W_WRONG_CHV: */
 	/* case SCARD_W_CHV_BLOCKED: */
 	/* case SCARD_W_EOF: */
