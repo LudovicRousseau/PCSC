@@ -21,6 +21,7 @@
 from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
     SCARD_LEAVE_CARD, SCARD_CTL_CODE, getTlvProperties)
+from smartcard import Exceptions
 
 for reader in readers():
     cardConnection = reader.createConnection()
@@ -30,7 +31,11 @@ for reader in readers():
     print("Reader:", reader)
 
     # properties returned by IOCTL_FEATURE_GET_TLV_PROPERTIES
-    properties = getTlvProperties(cardConnection)
+    try:
+        properties = getTlvProperties(cardConnection)
+    except Exceptions.SmartcardException as e:
+        print(e)
+        continue
 
     # Gemalto devices supports a control code to get firmware
     key = 'PCSCv2_PART10_PROPERTY_wIdVendor'
