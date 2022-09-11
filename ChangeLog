@@ -1,3 +1,13 @@
+1.9.9: Ludovic Rousseau
+11 September 2022
+- SCardEstablishContext() may return SCARD_W_SECURITY_VIOLATION if refused by Polkit
+- Fix SCardReleaseContext() failure on orphan handles
+- Fix SCardDisconnect() on orphan handle
+- pcsc-spy: log the pioSendPci & pioRecvPci SCardTransmit() parameters
+- Improve the log from pcscd: log the return code in text instead of hex
+- Some other minor improvements
+
+
 1.9.8: Ludovic Rousseau
 11 June 2022
 - Install install_spy.sh & uninstall_spy.sh scripts in docdir
