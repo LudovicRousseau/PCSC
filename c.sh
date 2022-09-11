@@ -3,7 +3,7 @@
 set -x
 
 ./configure \
-		--enable-strict \
+        --enable-strict \
         --prefix=/usr \
         --sysconfdir=/etc \
         --enable-maintainer-mode \
