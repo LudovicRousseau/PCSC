@@ -83,9 +83,8 @@ LONG DYN_CloseLibrary(void **pvLHandle)
 }
 
 LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
-	int mayfail)
+	bool mayfail)
 {
-
 	int rv;
 
 	*pvFHandle = 0;

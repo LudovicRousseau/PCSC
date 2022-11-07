@@ -55,6 +55,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <libusb.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #include "misc.h"
 #include "wintypes.h"
@@ -76,11 +77,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define READER_PRESENT		1
 #define READER_FAILED		2
 
-#define FALSE			0
-#define TRUE			1
-
-extern char Add_Interface_In_Name;
-extern char Add_Serial_In_Name;
+extern bool Add_Interface_In_Name;
+extern bool Add_Serial_In_Name;
 
 /* we use the default libusb context */
 #define ctx NULL
@@ -89,7 +87,7 @@ pthread_mutex_t usbNotifierMutex;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
-static char AraKiriHotPlug = FALSE;
+static bool AraKiriHotPlug = false;
 static int rescan_pipe[] = { -1, -1 };
 extern int HPForceReaderPolling;
 
@@ -401,13 +399,13 @@ static void HPRescanUsbBus(void)
 		for (interface = 0; interface < config_desc->bNumInterfaces;
 				interface++)
 		{
-			int newreader;
+			bool newreader;
 
 			/* A known device has been found */
 			snprintf(bus_device, BUS_DEVICE_STRSIZE, "%d:%d:%d",
 					bus_number, device_address, interface);
 			bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
-			newreader = TRUE;
+			newreader = true;
 
 			/* Check if the reader is a new one */
 			for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
@@ -417,7 +415,7 @@ static void HPRescanUsbBus(void)
 				{
 					/* The reader is already known */
 					readerTracker[j].status = READER_PRESENT;
-					newreader = FALSE;
+					newreader = false;
 #ifdef DEBUG_HOTPLUG
 					Log2(PCSC_LOG_DEBUG, "Refresh USB device: %s",
 							bus_device);
@@ -475,7 +473,7 @@ static void HPRescanUsbBus(void)
 
 static void * HPEstablishUSBNotifications(int pipefd[2])
 {
-	int i, do_polling;
+	bool do_polling;
 	int r;
 	char c = 42;	/* magic value */
 
@@ -499,8 +497,8 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	}
 
 	/* if at least one driver do not have IFD_GENERATE_HOTPLUG */
-	do_polling = FALSE;
-	for (i=0; i<driverSize; i++)
+	do_polling = false;
+	for (int i=0; i<driverSize; i++)
 		if (driverTracker[i].libraryPath)
 			if ((driverTracker[i].ifdCapabilities & IFD_GENERATE_HOTPLUG) == 0)
 			{
@@ -516,7 +514,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	{
 		Log2(PCSC_LOG_INFO,
 				"Polling forced every %d second(s)", HPForceReaderPolling);
-		do_polling = TRUE;
+		do_polling = true;
 	}
 
 	if (do_polling)
@@ -557,7 +555,7 @@ LONG HPSearchHotPluggables(void)
 {
 	int i;
 
-	AraKiriHotPlug = FALSE;
+	AraKiriHotPlug = false;
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		readerTracker[i].status = READER_ABSENT;
@@ -596,7 +594,7 @@ LONG HPSearchHotPluggables(void)
 
 LONG HPStopHotPluggables(void)
 {
-	AraKiriHotPlug = TRUE;
+	AraKiriHotPlug = true;
 	if (rescan_pipe[1] >= 0)
 	{
 		close(rescan_pipe[1]);

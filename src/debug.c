@@ -42,6 +42,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /* We shall not export the log_msg() sumbol */
 #undef PCSC_API
@@ -101,12 +102,12 @@ void log_msg(const int priority, const char *fmt, ...)
 {
 	char DebugBuffer[DEBUG_BUF_SIZE];
 	va_list argptr;
-	static int is_initialized = 0;
+	static bool is_initialized = false;
 
 	if (!is_initialized)
 	{
 		log_init();
-		is_initialized = 1;
+		is_initialized = true;
 	}
 
 	if (priority < LogLevel) /* log priority lower than threshold? */

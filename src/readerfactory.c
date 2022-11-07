@@ -53,6 +53,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <alloca.h>
 #endif
 #include <stdatomic.h>
+#include <stdbool.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -65,11 +66,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hotplug.h"
 #include "configfile.h"
 #include "utils.h"
-
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
 
 static READER_CONTEXT * sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
 READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
@@ -712,13 +708,13 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	DWORD valueLength;
 	int currentDigit = -1;
 	int supportedChannels = 0;
-	int usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
+	bool usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
 	int i;
 	const char *extend = "";
 
 	/* Clear the list */
 	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		usedDigits[i] = FALSE;
+		usedDigits[i] = false;
 
 	if (dwNumReadersContexts != 0)
 	{
@@ -770,7 +766,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 						currentDigit = strtol(reader + strlen(reader) - 5, NULL, 16);
 
 						/* This spot is taken */
-						usedDigits[currentDigit] = TRUE;
+						usedDigits[currentDigit] = true;
 					}
 				}
 			}
@@ -786,7 +782,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			/* get the first free digit */
-			if (usedDigits[i] == FALSE)
+			if (usedDigits[i] == false)
 				break;
 		}
 
@@ -892,7 +888,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	int rv;
 	void *f;
 
-	rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName", TRUE);
+	rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannelByName", true);
 	if (SCARD_S_SUCCESS == rv)
 	{
 		/* Ifd Handler 3.0 found */
@@ -900,7 +896,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	}
 	else
 	{
-		rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel", FALSE);
+		rv = DYN_GetAddress(rContext->vHandle, &f, "IFDHCreateChannel", false);
 		if (SCARD_S_SUCCESS == rv)
 		{
 			/* Ifd Handler 2.0 found */
@@ -920,7 +916,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv2(s, code) \
 { \
 	void *f1 = NULL; \
-	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, FALSE); \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, false); \
 	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
@@ -952,7 +948,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 #define GET_ADDRESS_OPTIONALv3(s, code) \
 { \
 	void *f1 = NULL; \
-	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, FALSE); \
+	int rvl = DYN_GetAddress(rContext->vHandle, &f1, "IFDH" #s, false); \
 	if (SCARD_S_SUCCESS != rvl) \
 	{ \
 		code \
@@ -1418,12 +1414,12 @@ void RFCleanupReaders(void)
 #ifdef USE_USB
 void RFWaitForReaderInit(void)
 {
-	int i, need_to_wait;
+	bool need_to_wait;
 
 	do
 	{
-		need_to_wait = FALSE;
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		need_to_wait = false;
+		for (int i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			/* reader is present */
 			if (sReadersContexts[i]->vHandle != NULL)
@@ -1434,7 +1430,7 @@ void RFWaitForReaderInit(void)
 				{
 					Log2(PCSC_LOG_DEBUG, "Waiting init for reader: %s",
 						sReadersContexts[i]->readerState->readerName);
-					need_to_wait = TRUE;
+					need_to_wait = true;
 				}
 			}
 		}
@@ -1523,7 +1519,7 @@ void RFReCheckReaderConf(void)
 	for (i=0; reader_list[i].pcFriendlyname; i++)
 	{
 		int r;
-		char present = FALSE;
+		char present = false;
 
 		Log2(PCSC_LOG_DEBUG, "refresh reader: %s",
 			reader_list[i].pcFriendlyname);
@@ -1549,7 +1545,7 @@ void RFReCheckReaderConf(void)
 					DWORD dwStatus = 0;
 
 					/* the reader was already started */
-					present = TRUE;
+					present = true;
 
 					/* verify the reader is still connected */
 					if (IFDStatusICC(sReadersContexts[r], &dwStatus)

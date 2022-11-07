@@ -112,7 +112,7 @@ int DYN_CloseLibrary(void **pvLHandle)
 }
 
 int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
-	int mayfail)
+	bool mayfail)
 {
 	(void)mayfail;
 

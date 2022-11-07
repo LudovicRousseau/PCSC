@@ -122,11 +122,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef DO_PROFILE
 #ifdef DO_PROFILE
 
-#ifndef FALSE
-#define FALSE 0
-#define TRUE 1
-#endif
-
 #define PROFILE_FILE "/tmp/pcscd_profile"
 #include <stdio.h>
 #include <sys/time.h>
@@ -135,18 +130,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct timeval profile_time_start;
 FILE *fd;
-char profile_tty;
+bool profile_tty;
 
 #define PROFILE_START profile_start(__FUNCTION__);
 #define PROFILE_END profile_end(__FUNCTION__, __LINE__);
 
 static void profile_start(const char *f)
 {
-	static char initialized = FALSE;
+	static bool initialized = false;
 
 	if (!initialized)
 	{
-		initialized = TRUE;
+		initialized = true;
 		fd = fopen(PROFILE_FILE, "a+");
 		if (NULL == fd)
 		{
@@ -158,9 +153,9 @@ static void profile_start(const char *f)
 		fflush(fd);
 
 		if (isatty(fileno(stderr)))
-			profile_tty = TRUE;
+			profile_tty = true;
 		else
-			profile_tty = FALSE;
+			profile_tty = false;
 	}
 
 	gettimeofday(&profile_time_start, NULL);

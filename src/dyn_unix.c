@@ -41,6 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined(HAVE_DLFCN_H) && !defined(HAVE_DL_H) && !defined(__APPLE__)
 #include <dlfcn.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "misc.h"
 #include "pcsclite.h"
@@ -82,7 +83,7 @@ INTERNAL LONG DYN_CloseLibrary(void **pvLHandle)
 }
 
 INTERNAL LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle,
-	const char *pcFunction, int mayfail)
+	const char *pcFunction, bool mayfail)
 {
 	char pcFunctionName[256];
 	LONG rv = SCARD_S_SUCCESS;

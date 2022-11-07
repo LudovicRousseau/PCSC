@@ -52,6 +52,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -71,7 +72,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An Application Context contains Channels (\c hCard).
  */
 
-extern char AutoExit;
+extern bool AutoExit;
 static int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 static int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 

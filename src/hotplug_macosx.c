@@ -775,14 +775,14 @@ static int HPScan(void)
 
 	for (a = devices; a; a = a->m_next)
 	{
-		int found = FALSE;
+		bool found = false;
 		HPDevice *b;
 
 		for (b = sDeviceList; b; b = b->m_next)
 		{
 			if (HPDeviceEquals(a, b))
 			{
-				found = TRUE;
+				found = true;
 				break;
 			}
 		}
@@ -803,14 +803,14 @@ static int HPScan(void)
 
 	for (a = sDeviceList; a; a = a->m_next)
 	{
-		int found = FALSE;
+		bool found = false;
 		HPDevice *b;
 
 		for (b = devices; b; b = b->m_next)
 		{
 			if (HPDeviceEquals(a, b))
 			{
-				found = TRUE;
+				found = true;
 				break;
 			}
 		}

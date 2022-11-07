@@ -50,6 +50,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif
@@ -70,21 +71,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils.h"
 #include "eventhandler.h"
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
-_Atomic char AraKiri = FALSE;
-static char Init = TRUE;
-char AutoExit = FALSE;
-char SocketActivated = FALSE;
+_Atomic bool AraKiri = false;
+static bool Init = true;
+bool AutoExit = false;
+bool SocketActivated = false;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
 static int pipefd[] = {-1, -1};
 static int signal_handler_fd[] = {-1, -1};
-char Add_Serial_In_Name = TRUE;
-char Add_Interface_In_Name = TRUE;
+bool Add_Serial_In_Name = true;
+bool Add_Interface_In_Name = true;
 
 /*
  * Some internal functions
@@ -109,7 +105,7 @@ static void SVCServiceRunLoop(void)
 	LONG rv;
 	uint32_t dwClientID = 0;	/* Connection ID used to reference the Client */
 
-	while (TRUE)
+	while (true)
 	{
 		if (AraKiri)
 		{
@@ -178,7 +174,7 @@ static void *signal_thread(void *arg)
 {
 	(void)arg;
 
-	while (TRUE)
+	while (true)
 	{
 		int r;
 		int sig;
@@ -222,10 +218,10 @@ static void *signal_thread(void *arg)
 		}
 
 		/* the signal handler is called several times for the same Ctrl-C */
-		if (AraKiri == FALSE)
+		if (AraKiri == false)
 		{
 			Log1(PCSC_LOG_INFO, "Preparing for suicide");
-			AraKiri = TRUE;
+			AraKiri = true;
 
 			/* if still in the init/loading phase the AraKiri will not be
 			 * seen by the main event loop
@@ -258,8 +254,8 @@ static void *signal_thread(void *arg)
 int main(int argc, char **argv)
 {
 	int rv;
-	char setToForeground;
-	char HotPlug;
+	bool setToForeground;
+	bool HotPlug;
 #ifdef USE_SERIAL
 	char *newReaderConfig = NULL;
 #endif
@@ -295,8 +291,8 @@ int main(int argc, char **argv)
 #endif
 #define OPT_STRING "c:fTdhvaieCHt:r:s:xSI"
 
-	setToForeground = FALSE;
-	HotPlug = FALSE;
+	setToForeground = false;
+	HotPlug = false;
 
 	/*
 	 * test the version
@@ -344,7 +340,7 @@ int main(int argc, char **argv)
 #endif
 
 			case 'f':
-				setToForeground = TRUE;
+				setToForeground = true;
 				/* debug to stdout instead of default syslog */
 				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
 				Log1(PCSC_LOG_INFO,
@@ -387,7 +383,7 @@ int main(int argc, char **argv)
 			case 'H':
 				/* debug to stdout instead of default syslog */
 				DebugLogSetLogType(DEBUGLOG_STDOUT_DEBUG);
-				HotPlug = TRUE;
+				HotPlug = true;
 				break;
 
 			case 't':
@@ -409,17 +405,17 @@ int main(int argc, char **argv)
 				break;
 
 			case 'x':
-				AutoExit = TRUE;
+				AutoExit = true;
 				Log2(PCSC_LOG_INFO, "Auto exit after %d seconds of inactivity",
 					TIME_BEFORE_SUICIDE);
 				break;
 
 			case 'S':
-				Add_Serial_In_Name = FALSE;
+				Add_Serial_In_Name = false;
 				break;
 
 			case 'I':
-				Add_Interface_In_Name = FALSE;
+				Add_Interface_In_Name = false;
 				break;
 
 			default:
@@ -450,11 +446,11 @@ int main(int argc, char **argv)
 	{
 		if (rv == 1)
 		{
-			SocketActivated = TRUE;
+			SocketActivated = true;
 			Log1(PCSC_LOG_INFO, "Started by systemd");
 		}
 		else
-			SocketActivated = FALSE;
+			SocketActivated = false;
 	}
 #endif
 
@@ -705,7 +701,7 @@ int main(int argc, char **argv)
 	/*
 	 * post initialization
 	 */
-	Init = FALSE;
+	Init = false;
 
 	/*
 	 * Hotplug rescan

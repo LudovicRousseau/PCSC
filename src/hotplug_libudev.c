@@ -47,6 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <libudev.h>
 #include <poll.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "debuglog.h"
 #include "parser.h"
@@ -66,11 +67,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #undef DEBUG_HOTPLUG
 
-#define FALSE			0
-#define TRUE			1
-
-extern char Add_Interface_In_Name;
-extern char Add_Serial_In_Name;
+extern bool Add_Interface_In_Name;
+extern bool Add_Serial_In_Name;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;

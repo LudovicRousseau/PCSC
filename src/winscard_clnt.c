@@ -114,6 +114,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/time.h>
 #include <pthread.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 #include "misc.h"
 #include "pcscd.h"
@@ -134,12 +135,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#define DO_PROFILE
 
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
-static char sharing_shall_block = TRUE;
+static bool sharing_shall_block = true;
 
 #define COLOR_RED "\33[01;31m"
 #define COLOR_GREEN "\33[32m"
@@ -185,14 +181,14 @@ static void trace(const char *func, const char direction, const char *fmt, ...)
 pthread_t threads[MAX_THREADS];
 struct timeval profile_time_start[MAX_THREADS];
 FILE *profile_fd;
-char profile_tty;
+bool profile_tty;
 
 #define PROFILE_START profile_start();
 #define PROFILE_END(rv) profile_end(__FUNCTION__, rv);
 
 static void profile_start(void)
 {
-	static char initialized = FALSE;
+	static bool initialized = false;
 	pthread_t t;
 	int i;
 
@@ -200,7 +196,7 @@ static void profile_start(void)
 	{
 		char filename[80];
 
-		initialized = TRUE;
+		initialized = true;
 		sprintf(filename, "%s-%d", PROFILE_FILE, getuid());
 		profile_fd = fopen(filename, "a+");
 		if (NULL == profile_fd)
@@ -212,9 +208,9 @@ static void profile_start(void)
 		fprintf(profile_fd, "\nStart a new profile\n");
 
 		if (isatty(fileno(stderr)))
-			profile_tty = TRUE;
+			profile_tty = true;
 		else
-			profile_tty = FALSE;
+			profile_tty = false;
 	}
 
 	t = pthread_self();
@@ -314,7 +310,7 @@ struct _psContextMap
 	SCARDCONTEXT hContext;			/**< Application Context ID */
 	pthread_mutex_t mMutex;			/**< Mutex for this context */
 	list_t channelMapList;
-	char cancellable;				/**< We are in a cancellable call */
+	bool cancellable;				/**< We are in a cancellable call */
 };
 /**
  * @brief Represents an Application Context on the Client side.
@@ -418,10 +414,10 @@ inline static void SCardUnlockThread(void)
  *
  * @param[in] hContext Application Context whose index will be find.
  *
- * @return \c TRUE if the context exists
- * @return \c FALSE if the context does not exist
+ * @return \c true if the context exists
+ * @return \c false if the context does not exist
  */
-static int SCardGetContextValidity(SCARDCONTEXT hContext)
+static bool SCardGetContextValidity(SCARDCONTEXT hContext)
 {
 	SCONTEXTMAP * currentContextMap;
 
@@ -576,7 +572,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		if (getenv("PCSCLITE_NO_BLOCKING"))
 		{
 			Log1(PCSC_LOG_INFO, "Disable shared blocking");
-			sharing_shall_block = FALSE;
+			sharing_shall_block = false;
 		}
 
 		isExecuted = 1;
@@ -2077,7 +2073,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				waitStatusStruct.rv = SCARD_S_SUCCESS;
 
 				/* another thread can do SCardCancel() */
-				currentContextMap->cancellable = TRUE;
+				currentContextMap->cancellable = true;
 
 				/*
 				 * Read a message from the server
@@ -2088,7 +2084,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 				/* SCardCancel() will return immediatly with success
 				 * because something changed on the daemon side. */
-				currentContextMap->cancellable = FALSE;
+				currentContextMap->cancellable = false;
 
 				/* timeout */
 				if (SCARD_E_TIMEOUT == rv)
@@ -3123,7 +3119,7 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 	LONG rv = SCARD_S_SUCCESS;
 	uint32_t dwClientID = 0;
 	struct cancel_struct scCancelStruct;
-	char cancellable;
+	bool cancellable;
 
 	PROFILE_START
 	API_TRACE_IN("%ld", hContext)
@@ -3256,7 +3252,7 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 	Log2(PCSC_LOG_DEBUG, "Allocating new SCONTEXTMAP @%p", newContextMap);
 	newContextMap->hContext = hContext;
 	newContextMap->dwClientID = dwClientID;
-	newContextMap->cancellable = FALSE;
+	newContextMap->cancellable = false;
 
 	(void)pthread_mutex_init(&newContextMap->mMutex, NULL);
 
