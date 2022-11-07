@@ -90,7 +90,7 @@ enum {
 #define Log0(priority) do { } while(0)
 #define Log1(priority, fmt) do { } while(0)
 #define Log2(priority, fmt, data) do {(void)priority; } while(0)
-#define Log3(priority, fmt, data1, data2) do {int p = priority; (void)p; } while(0)
+#define Log3(priority, fmt, data1, data2) do {int _p = priority; (void)_p; } while(0)
 #define Log4(priority, fmt, data1, data2, data3) do { } while(0)
 #define LogRv4(priority, rv, fmt, data1, data2) do { } while(0)
 #define Log5(priority, fmt, data1, data2, data3, data4) do { } while(0)
