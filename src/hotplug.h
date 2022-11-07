@@ -57,5 +57,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	ULONG HPRegisterForHotplugEvents(void);
 	LONG HPStopHotPluggables(void);
 	void HPReCheckSerialReaders(void);
+	char * HPGetenv(const char *name);
 
 #endif

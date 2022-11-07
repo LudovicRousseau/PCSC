@@ -75,7 +75,7 @@ extern char Add_Serial_In_Name;
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
 static struct udev *Udev;
-
+static char * hpDirPath = PCSCLITE_HP_DROPDIR;
 
 /**
  * keep track of drivers in a dynamically allocated array
@@ -106,7 +106,6 @@ static struct _readerTracker
 	char *sysname;	/**< sysfs path */
 } readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
 
-
 static LONG HPReadBundleValues(void)
 {
 	LONG rv;
@@ -116,11 +115,15 @@ static LONG HPReadBundleValues(void)
 	char fullLibPath[FILENAME_MAX];
 	int listCount = 0;
 
-	hpDir = opendir(PCSCLITE_HP_DROPDIR);
+	hpDirPath = HPGetenv("PCSCLITE_HP_DROPDIR");
+	if(!hpDirPath)
+		hpDirPath = PCSCLITE_HP_DROPDIR;
+
+	hpDir = opendir(hpDirPath);
 
 	if (NULL == hpDir)
 	{
-		Log1(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log2(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: %s", hpDirPath);
 		Log1(PCSC_LOG_ERROR, "Disabling USB support for pcscd.");
 		return -1;
 	}
@@ -159,7 +162,7 @@ static LONG HPReadBundleValues(void)
 			 * vendor and product ID's for this particular bundle
 			 */
 			(void)snprintf(fullPath, sizeof(fullPath), "%s/%s/Contents/Info.plist",
-				PCSCLITE_HP_DROPDIR, currFP->d_name);
+				hpDirPath, currFP->d_name);
 			fullPath[sizeof(fullPath) - 1] = '\0';
 
 			rv = bundleParse(fullPath, &plist);
@@ -171,7 +174,7 @@ static LONG HPReadBundleValues(void)
 			libraryPath = list_get_at(values, 0);
 			(void)snprintf(fullLibPath, sizeof(fullLibPath),
 				"%s/%s/Contents/%s/%s",
-				PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
+				hpDirPath, currFP->d_name, PCSC_ARCH,
 				libraryPath);
 			fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 
@@ -721,8 +724,7 @@ ULONG HPRegisterForHotplugEvents(void)
 
 	if (driverSize <= 0)
 	{
-		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: "
-			PCSCLITE_HP_DROPDIR);
+		Log2(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: %s", hpDirPath);
 		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
 		return 0;
 	}

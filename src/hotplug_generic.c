@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * No, it's still not a perfect solution design wise.
  */
 
+#include <unistd.h>
 #include "config.h"
 #include "hotplug.h"
 
@@ -65,3 +66,28 @@ void HPReCheckSerialReaders(void)
 }
 
 #endif
+
+#if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+# if __GLIBC_PREREQ(2, 17)
+char * secure_getenv (const char *name);
+# endif
+#endif
+
+char * HPGetenv(const char *name)
+{
+/* Use secure_getenv if we have glibc >= 2.17 */
+#if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+# if __GLIBC_PREREQ(2, 17)
+#  define SECURE_GETENV
+	return secure_getenv(name);
+# endif
+#endif
+
+/* Otherwise, make sure current process is not
+   tainted by uid or gid changes */
+#ifndef SECURE_GETENV
+	if (issetugid())
+		return NULL;
+	return getenv(name);
+#endif
+}

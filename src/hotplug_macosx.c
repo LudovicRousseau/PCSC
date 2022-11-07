@@ -90,6 +90,7 @@ static HPDeviceList sDeviceList = NULL;
 
 static int HPScan(void);
 static HPDriver *Drivers = NULL;
+static char * hpDirPath = PCSCLITE_HP_DROPDIR;
 
 /*
  * A callback to handle the asynchronous appearance of new devices that are
@@ -753,7 +754,12 @@ static void HPDeviceNotificationThread(void)
  */
 LONG HPSearchHotPluggables(void)
 {
-	Drivers = HPDriversGetFromDirectory(PCSCLITE_HP_DROPDIR);
+
+	hpDirPath = HPGetenv("PCSCLITE_HP_DROPDIR");
+	if(!hpDirPath)
+		hpDirPath = PCSCLITE_HP_DROPDIR;
+
+	Drivers = HPDriversGetFromDirectory(hpDirPath);
 
 	if (!Drivers)
 		return 1;
