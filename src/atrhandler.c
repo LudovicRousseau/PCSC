@@ -82,13 +82,13 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 	*currentProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	if (dwLength < 2)
-		return 0;	/** @retval 0 Atr must have TS and T0 */
+		return -1;	/** @retval -1 Atr must have TS and T0 */
 
 	/*
 	 * Decode the TS byte
 	 */
 	if ((pucAtr[0] != 0x3F) && (pucAtr[0] != 0x3B))
-		return 0;	/** @retval 0 Unable to decode TS byte */
+		return -2;	/** @retval -2 Unable to decode TS byte */
 
 	/*
 	 * Here comes the platform dependant stuff
@@ -146,7 +146,7 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 						*currentProtocol = SCARD_PROTOCOL_T1;
 						break;
 					default:
-						return 0; /** @retval 0 Unable to decode LNS */
+						return -3; /** @retval -3 Unable to decode LNS */
 				}
 			}
 
@@ -196,12 +196,12 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 					break;
 
 				default:
-					return 0; /** @retval 0 Unable do decode T protocol */
+					return -4; /** @retval -4 Unable do decode T protocol */
 			}
 		}
 
 		if (p > MAX_ATR_SIZE)
-			return 0;	/** @retval 0 Maximum attribute size */
+			return -5;	/** @retval -5 Maximum attribute size */
 
 		/* next interface characters index */
 		i++;
@@ -222,5 +222,5 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 		*currentProtocol - SCARD_PROTOCOL_T0, *availableProtocols);
 #endif
 
-	return 1; /** @retval 1 Success */
+	return 0; /** @retval 0 Success */
 }
