@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@musclecard.com>
- * Copyright (C) 2002-2010
+ * Copyright (C) 2002-2022
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without
@@ -48,5 +48,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	int SYS_RandomInt(void);
 
 	void SYS_InitRandom(void);
+
+	const char * SYS_GetEnv(const char *name);
 
 #endif							/* __sys_generic_h__ */

@@ -5,7 +5,7 @@
  *
  * Copyright (C) 1999
  *  David Corcoran <corcoran@musclecard.com>
- * Copyright (C) 2002-2010
+ * Copyright (C) 2002-2022
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
+#define _GNU_SOURCE /* for secure_getenv(3) */
 #include <sys/time.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -47,6 +48,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* HAVE_GETRANDOM */
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "misc.h"
 #include "sys_generic.h"
@@ -152,5 +154,27 @@ INTERNAL void SYS_InitRandom(void)
 
 	srand48(myseed);
 #endif /* HAVE_GETRANDOM */
+}
+
+/**
+ * (More) secure version of getenv(3)
+ *
+ * @param[in] name variable environment name
+ *
+ * @return value of the environment variable called "name"
+ */
+INTERNAL const char * SYS_GetEnv(const char *name)
+{
+#ifdef HAVE_SECURE_GETENV
+	return secure_getenv(name);
+#else
+	/* Otherwise, make sure current process is not tainted by uid or gid
+	 * changes */
+#ifdef HAVE_issetugid
+	if (issetugid())
+		return NULL;
+#endif
+	return getenv(name);
+#endif
 }
 
