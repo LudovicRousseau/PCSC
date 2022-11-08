@@ -834,7 +834,7 @@ pthread_t sHotplugWatcherThread;
 /*
  * Sets up callbacks for device hotplug events.
  */
-ULONG HPRegisterForHotplugEvents(void)
+ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 {
 	ThreadCreate(&sHotplugWatcherThread,
 		THREAD_ATTR_DEFAULT,
