@@ -751,9 +751,9 @@ static void HPDeviceNotificationThread(void)
  * matching devices.
  * Adds or removes matching readers as necessary.
  */
-LONG HPSearchHotPluggables(void)
+LONG HPSearchHotPluggables(const char * hpDirPath)
 {
-	Drivers = HPDriversGetFromDirectory(PCSCLITE_HP_DROPDIR);
+	Drivers = HPDriversGetFromDirectory(hpDirPath);
 
 	if (!Drivers)
 		return 1;

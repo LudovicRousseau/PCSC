@@ -129,7 +129,7 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 static LONG HPRemoveHotPluggable(int reader_index);
 static void HPCleanupHotPluggable(int reader_index);
 
-static LONG HPReadBundleValues(void)
+static LONG HPReadBundleValues(const char * hpDirPath)
 {
 	LONG rv;
 	DIR *hpDir;
@@ -138,11 +138,12 @@ static LONG HPReadBundleValues(void)
 	char fullLibPath[FILENAME_MAX];
 	int listCount = 0;
 
-	hpDir = opendir(PCSCLITE_HP_DROPDIR);
+	hpDir = opendir(hpDirPath);
 
 	if (hpDir == NULL)
 	{
-		Log1(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log2(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: %s",
+			hpDirPath);
 		Log1(PCSC_LOG_ERROR, "Disabling USB support for pcscd.");
 		return -1;
 	}
@@ -181,7 +182,7 @@ static LONG HPReadBundleValues(void)
 			 * vendor and product ID's for this particular bundle
 			 */
 			snprintf(fullPath, sizeof(fullPath), "%s/%s/Contents/Info.plist",
-				PCSCLITE_HP_DROPDIR, currFP->d_name);
+				hpDirPath, currFP->d_name);
 			fullPath[sizeof(fullPath) - 1] = '\0';
 
 			rv = bundleParse(fullPath, &plist);
@@ -193,7 +194,7 @@ static LONG HPReadBundleValues(void)
 			libraryPath = list_get_at(values, 0);
 			(void)snprintf(fullLibPath, sizeof(fullLibPath),
 				"%s/%s/Contents/%s/%s",
-				PCSCLITE_HP_DROPDIR, currFP->d_name, PCSC_ARCH,
+				hpDirPath, currFP->d_name, PCSC_ARCH,
 				libraryPath);
 			fullLibPath[sizeof(fullLibPath) - 1] = '\0';
 
@@ -283,7 +284,8 @@ static LONG HPReadBundleValues(void)
 
 	if (driverSize == 0)
 	{
-		Log1(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: " PCSCLITE_HP_DROPDIR);
+		Log2(PCSC_LOG_INFO, "No bundle files in pcsc drivers directory: %s",
+			hpDirPath);
 		Log1(PCSC_LOG_INFO, "Disabling USB support for pcscd");
 	}
 #ifdef DEBUG_HOTPLUG
@@ -551,7 +553,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	return NULL;
 }
 
-LONG HPSearchHotPluggables(void)
+LONG HPSearchHotPluggables(const char * hpDirPath)
 {
 	int i;
 
@@ -563,7 +565,7 @@ LONG HPSearchHotPluggables(void)
 		readerTracker[i].fullName = NULL;
 	}
 
-	if (HPReadBundleValues() > 0)
+	if (HPReadBundleValues(hpDirPath) > 0)
 	{
 		int pipefd[2];
 		char c;
@@ -794,8 +796,10 @@ static void HPCleanupHotPluggable(int reader_index)
 /**
  * Sets up callbacks for device hotplug events.
  */
-ULONG HPRegisterForHotplugEvents(void)
+ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 {
+	(void)hpDirPath;
+
 	(void)pthread_mutex_init(&usbNotifierMutex, NULL);
 	return 0;
 }

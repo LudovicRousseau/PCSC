@@ -53,8 +53,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define PCSCLITE_HP_BASE_PORT		0x200000
 
-	LONG HPSearchHotPluggables(void);
-	ULONG HPRegisterForHotplugEvents(void);
+	LONG HPSearchHotPluggables(const char * hpDirPath);
+	ULONG HPRegisterForHotplugEvents(const char * hpDirPath);
 	LONG HPStopHotPluggables(void);
 	void HPReCheckSerialReaders(void);
 

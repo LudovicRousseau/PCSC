@@ -739,11 +739,16 @@ int main(int argc, char **argv)
 	(void)signal(SIGHUP, SIG_IGN);	/* needed for Solaris. The signal is sent
 				 * when the shell is exited */
 
+	const char *hpDirPath = SYS_GetEnv("PCSCLITE_HP_DROPDIR");
+	if (NULL == hpDirPath)
+		hpDirPath = PCSCLITE_HP_DROPDIR;
+	Log2(PCSC_LOG_INFO, "Using drivers directory: %s", hpDirPath);
+
 #if !defined(PCSCLITE_STATIC_DRIVER) && defined(USE_USB)
 	/*
 	 * Set up the search for USB/PCMCIA devices
 	 */
-	rv = HPSearchHotPluggables();
+	rv = HPSearchHotPluggables(hpDirPath);
 #ifndef USE_SERIAL
 	if (rv)
 		at_exit();
@@ -751,7 +756,7 @@ int main(int argc, char **argv)
 	(void)rv;
 #endif
 
-	rv = HPRegisterForHotplugEvents();
+	rv = HPRegisterForHotplugEvents(hpDirPath);
 	if (rv)
 	{
 		Log1(PCSC_LOG_ERROR, "HPRegisterForHotplugEvents failed");
