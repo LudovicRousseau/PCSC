@@ -52,7 +52,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "misc.h"
 #include "sys_generic.h"
-#include "PCSC/debuglog.h"
+#include "debuglog.h"
 
 /**
  * @brief Makes the current process sleep for some seconds.
