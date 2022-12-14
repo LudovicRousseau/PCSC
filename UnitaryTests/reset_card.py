@@ -18,6 +18,7 @@
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
+from smartcard.util import toHexString
 import sys
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -37,6 +38,13 @@ hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
     SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
+hresult, reader, state, protocol, atr = SCardStatus(hcard)
+if hresult != SCARD_S_SUCCESS:
+    raise BaseSCardException(hresult)
+print("reader:", reader)
+print("state:", hex(state))
+print("protocol:", protocol)
+print("atr:", toHexString(atr))
 
 if len(sys.argv) > 1:
     print("reset using SCardReconnect")
@@ -46,6 +54,14 @@ if len(sys.argv) > 1:
         SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY, SCARD_RESET_CARD)
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
+
+    hresult, reader, state, protocol, atr = SCardStatus(hcard)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
+    print("reader:", reader)
+    print("state:", hex(state))
+    print("protocol:", protocol)
+    print("atr:", toHexString(atr))
 else:
     print("reset using SCardDisconnect")
 
