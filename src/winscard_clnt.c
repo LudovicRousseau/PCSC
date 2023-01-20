@@ -2167,7 +2167,7 @@ error:
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
  * @param[in] dwControlCode Control code for the operation.\n
- * <a href="http://anonscm.debian.org/viewvc/pcsclite/trunk/Drivers/ccid/SCARDCONTOL.txt?view=markup">
+ * <a href="https://salsa.debian.org/rousseau/CCID/-/blob/master/SCARDCONTOL.md">
  * Click here</a> for a list of supported commands by some drivers.
  * @param[in] pbSendBuffer Command to send to the reader.
  * @param[in] cbSendLength Length of the command.
