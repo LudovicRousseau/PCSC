@@ -46,7 +46,7 @@ int main(void)
 
 	/* the libpcsclite/pcscd socket should automatically be closed by
 	 * the exec */
-	printf("You should not see any _socket_ file descriptor bellow:\n");
+	printf("You should not see any _socket_ file descriptor below:\n");
 
 	execl("/bin/sh", "sh", "-c", "ls -l /proc/self/fd", NULL);
 	perror("exec");
