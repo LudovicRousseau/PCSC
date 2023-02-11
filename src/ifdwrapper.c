@@ -228,7 +228,7 @@ RESPONSECODE IFDSetCapabilities(READER_CONTEXT * rContext, DWORD dwTag,
 }
 
 /**
- * Get's capabilities in the reader.
+ * Gets capabilities in the reader.
  * Other functions int this file will call
  * the driver directly to not cause a deadlock.
  */
