@@ -153,7 +153,7 @@
 
 1.8.22: Ludovic Rousseau
 17 June 2017
-- SCardCancel() was broken in 1.8.21. The call was bloking.
+- SCardCancel() was broken in 1.8.21. The call was blocking.
 - Enable use of info level logging for pcscd using -i/--info
 
 
@@ -317,7 +317,7 @@ pcsc-lite-1.8.9: Ludovic Rousseau
 - correctly manage thread safe multi-slot readers
 - Do not use pthread_atfork() any more (fix problem on FreeBSD)
 - fix memory leaks.
-  This was not really a problem unless you embedd pcscd in another
+  This was not really a problem unless you embed pcscd in another
   process and do init/deinit pcscd without exiting the process (as maybe
   used on Android or iOS).
 - pcscd.8 manpage: add documentation for --max-thread,
@@ -890,7 +890,7 @@ pcsc-lite-1.4.4: Ludovic Rousseau
 14 August 2007
 - do not call a Log function in a signal handler and do hotplug
   synchronously. See Debian bug #430492 Thanks to Russell Stuart
-- support LSB init scritp format
+- support LSB init script format
 - better support of Solaris and Mac OS X
 - some other minor improvements and bug corrections
 
@@ -957,7 +957,7 @@ pcsc-lite-1.4.0: Ludovic Rousseau
 pcsc-lite-1.3.3: Ludovic Rousseau
 19 January 2007
 - add -H --hotplug argument to ask the pcscd daemon to rescan the
-  avaiable readers
+  available readers
 - add support for IFD_GENERATE_HOTPLUG bit in driver Info.plist
   ifdCapabilities
 - add --force-reader-polling to ignore the IFD_GENERATE_HOTPLUG bit in
@@ -990,7 +990,7 @@ pcsc-lite-1.3.2: Ludovic Rousseau
 - define MAX_BUFFER_SIZE_EXTENDED as the maximal size allowed for a
   extended APDU (64KB)
 - LPCTSTR and LPTSTR types are deprecated. Use LPCSTR and LPSTR instead
-- Dual licence src/error.c so it can be used bu OpenSC. It is now
+- Dual licence src/error.c so it can be used by OpenSC. It is now
   BSD-like, see the COPYING file and GNU Lesser General Licence 2.1 or
   (at your option) any later version
 - document that the 4 bytes field value in PCSC_TLV_STRUCTURE is always
@@ -1039,7 +1039,7 @@ pcsc-lite-1.2.9-beta10: Ludovic Rousseau
   reader name (between parenthesis)
 - the library libpcsclite.so.1 only exports the symbols defined by the
   API (http://pcsclite.alioth.debian.org/pcsc-lite/). This is needed to
-  be able to use the library in an appliation that also uses flex (like
+  be able to use the library in an application that also uses flex (like
   muscleTool). The problem only occurs with GCC >= 4.0
 - some other minor improvements and bug corrections
 
@@ -1084,7 +1084,7 @@ pcsc-lite-1.2.9-beta8: Ludovic Rousseau
   card driver (like SCARD_CTL_CODE, CM_IOCTL_GET_FEATURE_REQUEST,
   FEATURE_* and HOST_TO_CCID)
 - pcscd: allow a serial hotplug by sending a SIGUSR1 signal. The
-  /etc/reader.conf file is re-read and reader presence/abscence is updated
+  /etc/reader.conf file is re-read and reader presence/absence is updated
 - musclecard library: small bug fixes
 - pcsc-lite SCF: small bug fixes
 - some other minor improvements and bug corrections
@@ -1103,7 +1103,7 @@ pcsc-lite-1.2.9-beta7: Ludovic Rousseau
   file from /etc/reader.conf.d/* files
   This script is called by /etc/init.d/pcscd before starting the daemon
 - add support of SCardGetAttrib() with a NULL pbAttr parameter to only
-  get the needed lenth in pcbAttrLen
+  get the needed length in pcbAttrLen
 - SCardReconnect() now works after a card movement.  Previously
   SCardReconnect() returned "Card was removed" even if the new card is
   reseted.
@@ -1167,7 +1167,7 @@ pcsc-lite-1.2.9-beta5: Ludovic Rousseau
     compile but mark the type deprecated.
     See http://gcc.gnu.org/onlinedocs/gcc-3.1/gcc/Type-Attributes.html
 - src/tokenfactory.c:
-  . TPSearchBundlesForAtr(): use "%s/%s" insead of "%s%s" when
+  . TPSearchBundlesForAtr(): use "%s/%s" instead of "%s%s" when
     generating the MuscleCard bundle name on MacOSX
 - src/winscard.c:
   . SCardControl() (new API) can now be used with a IFDHandler v2.0 or v3.0.
@@ -1231,7 +1231,7 @@ pcsc-lite-1.2.9-beta3: Ludovic Rousseau
     wants to use even if the card only support only one protocol.
 - src/atrhandler.c:
   . add support of specific mode by the presence of TA2 (protocol not
-    negociable)
+    negotiable)
 - src/utils/Makefile.am:
   . install bundleTool and installifd in [...]/sbin/ instead of [...]/bin/
 - doc/example/Makefile.am:
@@ -1354,7 +1354,7 @@ pcsc-lite-1.2.0: Ludovic Rousseau
 
 pcsc-lite-1.2.0-rc3: Ludovic Rousseau
 15 october, 2003
-- src/winscard_msg.c: perform a round-robbin among clients to avoid starvation
+- src/winscard_msg.c: perform a round-robin among clients to avoid starvation
   under heavy load. Patch from Bettina Martelli.
 - src/winscard_clnt.c: send debug to stdout only if the environment variable
   MUSCLECARD_DEBUG is defined
@@ -1493,7 +1493,7 @@ pcsc-lite-1.1.2beta3: Ludovic Rousseau, David Corcoran
 - Support for Sun Microsystems' SCF
 - Patches from Dmitry Djachenko to:
   . init g_rgSCard??Pci variable at compile time
-  . return more meaningfull error codes in SCardReconnect()
+  . return more meaningful error codes in SCardReconnect()
   . return more information in SCardStatus()
   . accept pioRecvPci == NULL in SCardTransmit()
     according to MSDN (July 2002) : SCardTransmit description
