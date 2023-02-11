@@ -74,7 +74,7 @@ class StatRecord(object):
         self.name = name
         self.executions = list()
         self.total_time = 0
-        self.occurences = 0
+        self.occurrences = 0
 
     def __repr__(self):
         return self.name + ": " + repr(self.executions)
@@ -562,7 +562,7 @@ class PCSCspy(object):
         if rv_text != "SCARD_S_SUCCESS":
             return
 
-        def hex2int(data, lengh):
+        def hex2int(data, length):
             return [int(x, 16) for x in data.split(" ")]
 
         if dwControlCode == self.CM_IOCTL_GET_FEATURE_REQUEST:
@@ -943,7 +943,7 @@ class PCSCdemultiplexer(object):
             stat = stats[thread]
             for fct in stat:
                 record = stat[fct]
-                record.occurences = len(record.executions)
+                record.occurrences = len(record.executions)
                 record.total_time = sum(record.executions)
 
             records = [stat[fct] for fct in stat]
@@ -956,7 +956,7 @@ class PCSCdemultiplexer(object):
             for record in sorted(records, key=attrgetter('total_time'),
                                  reverse=True):
                 print("%f sec (%3d calls) %5.2f%% %s" % (record.total_time,
-                    record.occurences, record.total_time / total_time * 100.,
+                    record.occurrences, record.total_time / total_time * 100.,
                     record.name))
 
             thread_n += 1
