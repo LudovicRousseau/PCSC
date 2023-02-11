@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * @brief This provides a search API for hot plugable devices using libudev
+ * @brief This provides a search API for hot pluggable devices using libudev
  */
 
 #include "config.h"
@@ -386,7 +386,7 @@ static void HPAddDevice(struct udev_device *dev)
 	devpath = udev_device_get_devnode(parent);
 	if (!devpath)
 	{
-		/* the device disapeared? */
+		/* the device disappeared? */
 		Log1(PCSC_LOG_ERROR, "udev_device_get_devnode() failed");
 		return;
 	}
