@@ -178,7 +178,7 @@ INTERNAL void ClientCloseSession(uint32_t dwClientID)
 }
 
 /**
- * @brief Called by the Client to get the reponse from the server or vice-versa.
+ * @brief Called by the Client to get the response from the server or vice-versa.
  *
  * Reads the message from the file \c filedes.
  *
@@ -240,7 +240,7 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 		/* try to read only when socket is readable */
 		if (pollret > 0)
 		{
-			int readed;
+			int bytes_read;
 
 			if (!(read_fd.revents & POLLIN))
 			{
@@ -248,14 +248,14 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
-			readed = read(filedes, buffer, remaining);
+			bytes_read = read(filedes, buffer, remaining);
 
-			if (readed > 0)
+			if (bytes_read > 0)
 			{
 				/* we got something */
-				buffer += readed;
-				remaining -= readed;
-			} else if (readed == 0)
+				buffer += bytes_read;
+				remaining -= bytes_read;
+			} else if (bytes_read == 0)
 			{
 				/* peer closed the socket */
 				retval = SCARD_F_COMM_ERROR;
@@ -441,7 +441,7 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 }
 
 /**
- * @brief Called by the Client to get the reponse from the server or vice-versa.
+ * @brief Called by the Client to get the response from the server or vice-versa.
  *
  * Reads the message from the file \c filedes.
  *
@@ -480,7 +480,7 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 		/* try to read only when socket is readable */
 		if (pollret > 0)
 		{
-			int readed;
+			int bytes_read;
 
 			if (!(read_fd.revents & POLLIN))
 			{
@@ -488,14 +488,14 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 				retval = SCARD_F_COMM_ERROR;
 				break;
 			}
-			readed = read(filedes, buffer, remaining);
+			bytes_read = read(filedes, buffer, remaining);
 
-			if (readed > 0)
+			if (bytes_read > 0)
 			{
 				/* we got something */
-				buffer += readed;
-				remaining -= readed;
-			} else if (readed == 0)
+				buffer += bytes_read;
+				remaining -= bytes_read;
+			} else if (bytes_read == 0)
 			{
 				/* peer closed the socket */
 				retval = SCARD_F_COMM_ERROR;
