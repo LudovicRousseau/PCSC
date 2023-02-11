@@ -91,7 +91,7 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 		return -2;	/** @retval -2 Unable to decode TS byte */
 
 	/*
-	 * Here comes the platform dependant stuff
+	 * Here comes the platform dependent stuff
 	 */
 
 	/*
