@@ -436,8 +436,8 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
  *
  * This must be the first WinSCard function called in a PC/SC application.
  * Each thread of an application shall use its own \ref SCARDCONTEXT, unless
- * calling \ref SCardCancel(), which MUST be called with the same context as the
- * context used to call \ref SCardGetStatusChange().
+ * calling SCardCancel(), which MUST be called with the same context as the
+ * context used to call SCardGetStatusChange().
  *
  * @ingroup API
  * @param[in] dwScope Scope of the establishment.
@@ -1589,7 +1589,7 @@ end:
  * reader name \c "\\?PnP?\Notification". If a reader event occurs the state of
  * this reader will change and the bit \ref SCARD_STATE_CHANGED will be set.
  *
- * To cancel the ongoing call, use \ref SCardCancel() with the same
+ * To cancel the ongoing call, use SCardCancel() with the same
  * \ref SCARDCONTEXT.
  *
  * @code
@@ -2334,7 +2334,7 @@ end:
  * - \ref SCARD_ATTR_DEVICE_FRIENDLY_NAME
  *   Implemented by pcsc-lite if the IFD Handler (driver) returns \ref
  *   IFD_ERROR_TAG.  pcsc-lite then returns the same reader name as
- *   returned by \ref SCardListReaders().
+ *   returned by SCardListReaders().
  * - \ref SCARD_ATTR_DEVICE_IN_USE
  * - \ref SCARD_ATTR_DEVICE_SYSTEM_NAME
  * - \ref SCARD_ATTR_DEVICE_UNIT
@@ -3083,8 +3083,8 @@ end:
 }
 
 /**
- * Cancels a specific blocking \ref SCardGetStatusChange() function.
- * MUST be called with the same \ref SCARDCONTEXT as \ref
+ * Cancels a specific blocking SCardGetStatusChange() function.
+ * MUST be called with the same \ref SCARDCONTEXT as
  * SCardGetStatusChange().
  *
  * @ingroup API
