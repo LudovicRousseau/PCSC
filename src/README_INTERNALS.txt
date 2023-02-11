@@ -20,18 +20,18 @@ pcscd (daemon)
  atrhandler.c
  configfile.l
  debuglog.c
- dyn_hpux.c (this file is OS dependant)
- dyn_macosx.c (this file is OS dependant)
- dyn_unix.c (this file is OS dependant)
+ dyn_hpux.c (this file is OS dependent)
+ dyn_macosx.c (this file is OS dependent)
+ dyn_unix.c (this file is OS dependent)
  eventhandler.c
  hotplug_generic.c
  hotplug_libusb.c
- hotplug_macosx.c (this file is OS dependant)
+ hotplug_macosx.c (this file is OS dependent)
  ifdwrapper.c
  pcscdaemon.c
  prothandler.c
  readerfactory.c
- sys_unix.c (this file is OS dependant)
+ sys_unix.c (this file is OS dependent)
  tokenparser.l
  winscard.c
  winscard_msg.c
@@ -60,7 +60,7 @@ Maximum applications
 Maximum contexts by application
 	PCSCLITE_MAX_APPLICATION_CONTEXTS
 
-Maximum of applications contexts that PC/SC Ressources Manager can accept
+Maximum of applications contexts that PC/SC Resources Manager can accept
 	PCSCLITE_MAX_APPLICATIONS_CONTEXTS
  	= PCSCLITE_MAX_APPLICATIONS * PCSCLITE_MAX_APPLICATION_CONTEXTS
 
@@ -91,7 +91,7 @@ PC/SC D1 handles 5 APPLICATIONS_CONTEXTS.
 PC/SC D1 also handles 3 READERS_CONTEXTS. These contexts are created for
 example by the plug of the readers.
 
-The maximum of applications contexts that PC/SC Ressources Manager can
+The maximum of applications contexts that PC/SC Resources Manager can
 accept is thus PCSCLITE_MAX_APPLICATIONS *
 PCSCLITE_MAX_APPLICATION_CONTEXTS.
 
@@ -118,7 +118,7 @@ PC/SC D3                         | | |
                          (7)         |
                 App D ---------------/
 
-For simplify, there are 3 differents roles: Application, PC/SC Daemon
+For simplify, there are 3 different roles: Application, PC/SC Daemon
 and IFDhandler/reader.
 
 Between these role there are some contexts and on the top of them there
