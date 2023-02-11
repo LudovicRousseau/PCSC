@@ -977,7 +977,7 @@ LONG RFBindFunctions(READER_CONTEXT * rContext)
 	}
 	else
 	{
-		/* Who knows what could have happenned for it to get here. */
+		/* Who knows what could have happened for it to get here. */
 		Log1(PCSC_LOG_CRITICAL, "IFD Handler not 1.0/2.0 or 3.0");
 		return SCARD_F_UNKNOWN_ERROR;
 	}
