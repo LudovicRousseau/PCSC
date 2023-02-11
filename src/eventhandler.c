@@ -77,7 +77,7 @@ LONG EHRegisterClientForEvent(int32_t filedes)
 } /* EHRegisterClientForEvent */
 
 /**
- * Try to unregisted a client
+ * Try to unregister a client
  * If no client is found then do not log an error
  */
 LONG EHTryToUnregisterClientForEvent(int32_t filedes)
