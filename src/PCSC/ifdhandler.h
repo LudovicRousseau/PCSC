@@ -213,7 +213,7 @@ The pound sign # denotes a comment.
 @subsection FRIENDLYNAME
 The FRIENDLYNAME field is an arbitrary text used to identify the reader.
 This text is displayed by commands like @c pcsc_scan
-http://ludovic.rousseau.free.fr/softwares/pcsc-tools/ that prints the
+https://pcsc-tools.apdu.fr/ that prints the
 names of all the connected and detected readers.
 
 @subsection DEVICENAME
