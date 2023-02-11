@@ -94,7 +94,7 @@ called "XXXX.bundle" in the usb dropdir directory (--enable-usbdropdir=PATH).
 Here, the string "XXXX" stands for an arbitrary driver name, like in
 "ifd-GemPC430.bundle". An example .bundle-directory can be found in the
 source distribution of the ifd-gempc driver
-(http://ludovic.rousseau.free.fr/softwares/ifd-GemPC/)
+(https://ifd-gempc.apdu.fr/)
 
 SOLARIS:
 Solaris PC/SC applications must link with -lsocket since
