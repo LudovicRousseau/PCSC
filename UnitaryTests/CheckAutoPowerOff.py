@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-# check te card is not auto powered off after a SCardReconnect()
+# check the card is not auto powered off after a SCardReconnect()
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
