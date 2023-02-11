@@ -166,7 +166,7 @@ void ContextsDeinitialize(void)
  *
  * @return Error code.
  * @retval SCARD_S_SUCCESS Success.
- * @retval SCARD_F_INTERNAL_ERROR Exceded the maximum number of simultaneous Application Contexts.
+ * @retval SCARD_F_INTERNAL_ERROR Exceeded the maximum number of simultaneous Application Contexts.
  * @retval SCARD_E_NO_MEMORY Error creating the Context Thread.
  */
 LONG CreateContextThread(uint32_t *pdwClientID)
@@ -210,7 +210,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 
 	/* Adding a comparator
 	 * The stored type is SCARDHANDLE (long) but has only 32 bits
-	 * usefull even on a 64-bit CPU since the API between pcscd and
+	 * useful even on a 64-bit CPU since the API between pcscd and
 	 * libpcscliter uses "int32_t hCard;"
 	 */
 	lrv = list_attributes_comparator(&newContext->cardsList,
@@ -277,7 +277,7 @@ out:
  *
  * For each Client message a new instance of this thread is created.
  *
- * @param[in] dwIndex Index of an avaiable Application Context slot in
+ * @param[in] dwIndex Index of an available Application Context slot in
  * \c SCONTEXT *.
  */
 #ifndef NO_LOG
@@ -683,7 +683,7 @@ static void * ContextThread(LPVOID newContext)
 				if (cbRecvLength > trStr.pcbRecvLength)
 					/* The client buffer is not large enough.
 					 * The pbRecvBuffer buffer will NOT be sent a few
-					 * lines bellow. So no buffer overflow is expected. */
+					 * lines below. So no buffer overflow is expected. */
 					trStr.rv = SCARD_E_INSUFFICIENT_BUFFER;
 
 				trStr.ioSendPciProtocol = ioSendPci.dwProtocol;
@@ -736,7 +736,7 @@ static void * ContextThread(LPVOID newContext)
 				if (dwBytesReturned > ctStr.cbRecvLength)
 					/* The client buffer is not large enough.
 					 * The pbRecvBuffer buffer will NOT be sent a few
-					 * lines bellow. So no buffer overflow is expected. */
+					 * lines below. So no buffer overflow is expected. */
 					ctStr.rv = SCARD_E_INSUFFICIENT_BUFFER;
 
 				ctStr.dwBytesReturned = dwBytesReturned;
@@ -1052,7 +1052,7 @@ static LONG MSGCheckHandleAssociation(SCARDHANDLE hCard,
 
 
 /* Should be called just prior to exiting the thread as it de-allocates
- * the thread memory strucutres
+ * the thread memory structures
  */
 static void MSGCleanupClient(SCONTEXT * threadContext)
 {
