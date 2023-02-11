@@ -28,7 +28,7 @@
 #  * -- 'Refresh-attributes' returns 'SC_ERROR_READER_DETACHED'.
 #  *
 #  * - in Windows (WinSCard):
-#  * -- SCardGetStatusChange failes with SCARD_E_NO_READERS_AVAILABLE;
+#  * -- SCardGetStatusChange fails with SCARD_E_NO_READERS_AVAILABLE;
 #  * -- 'Refresh-attributes' returns 'SC_ERROR_NO_READERS_FOUND'.
 #  *
 #  * - FIXME: Mac?
