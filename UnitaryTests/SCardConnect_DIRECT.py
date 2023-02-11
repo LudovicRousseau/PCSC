@@ -19,7 +19,7 @@
 # MSDN indicates that pdwActiveProtocol must be set to
 # SCARD_PROTOCOL_UNDEFINED if SCARD_SHARE_DIRECT is used. This behavior
 # has been implemented in revision 4332 but reverted in revision 4940 so
-# that the protocol is not negociated again
+# that the protocol is not negotiated again
 
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
