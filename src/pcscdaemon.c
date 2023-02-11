@@ -35,7 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief This is the main pcscd daemon.
  *
  * The function \c main() starts up the communication environment.\n
- * Then an endless loop is calld to look for Client connections. For each
+ * Then an endless loop is called to look for Client connections. For each
  * Client connection a call to \c CreateContextThread() is done.
  */
 
@@ -195,7 +195,7 @@ static void *signal_thread(void *arg)
 			if (! AraKiri)
 				HPReCheckSerialReaders();
 #endif
-			/* Reenable the signal handler.
+			/* Re-enable the signal handler.
 			 * This is needed on Solaris and HPUX. */
 			(void)signal(SIGUSR1, signal_trap);
 
@@ -626,7 +626,7 @@ int main(int argc, char **argv)
 
 		/* set mode so that the directory is world readable and
 		 * executable even is umask is restrictive
-		 * The directory containes files used by libpcsclite */
+		 * The directory contains files used by libpcsclite */
 		(void)chmod(PCSCLITE_IPC_DIR, mode);
 	}
 
