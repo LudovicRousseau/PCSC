@@ -116,7 +116,7 @@ def main():
             try:
                 lang_t = USBLangID[lang_x]
             except KeyError:
-                lang_t = "unkonwn"
+                lang_t = "unknown"
             print("  0x%04X: %s" % (lang_x, lang_t))
 
     print(" bNumberMessageFix:", test_bit(res[8], 2))
