@@ -315,7 +315,7 @@ whichever location your reader resides.
 	SCARD_IO_HEADER, *PSCARD_IO_HEADER;
 
 	/*
-	 * The list of tags should be alot more but this is all I use in the
+	 * The list of tags should be a lot more but this is all I use in the
 	 * meantime
 	 */
 #define TAG_IFD_ATR                     0x0303	/**< ATR */
@@ -459,7 +459,7 @@ port used by each reader.
   @endcode
 
   bInterfaceNumber is the number of the interface on the device. It is
-  only usefull for devices with more than one CCID interface.
+  only useful for devices with more than one CCID interface.
 
   devpath is the filename of the device on the file system.
 
