@@ -19,13 +19,13 @@
 # Scenario
 # use a T=1 card, a TPDU reader
 # Connect in SCARD_SHARE_SHARED
-# driver should negociate PPS
+# driver should negotiate PPS
 # Disconnect
 # Connect in SCARD_SHARE_DIRECT
-# driver should NOT negociate PPS (the card has not been reset)
+# driver should NOT negotiate PPS (the card has not been reset)
 # Disconnect
 # Connect in SCARD_SHARE_SHARED
-# driver should NOT negociate PPS (the card has not been reset)
+# driver should NOT negotiate PPS (the card has not been reset)
 # Disconnect
 
 # same issue with Reconnect instead of connect
