@@ -1109,7 +1109,7 @@ error:
 
 /**
  * @brief Establishes a temporary exclusive access mode for
- * doing a serie of commands in a transaction.
+ * doing a series of commands in a transaction.
  *
  * You might want to use this when you are selecting a few files and then
  * writing a large file so you can make sure that another application will
@@ -2082,7 +2082,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					&waitStatusStruct, sizeof(waitStatusStruct),
 					currentContextMap->dwClientID, dwTime);
 
-				/* SCardCancel() will return immediatly with success
+				/* SCardCancel() will return immediately with success
 				 * because something changed on the daemon side. */
 				currentContextMap->cancellable = false;
 
@@ -2575,7 +2575,7 @@ static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 		if (*pcbAttrLen < scGetSetStruct.cbAttrLen)
 		{
 			/* restrict the value of scGetSetStruct.cbAttrLen to avoid a
-			 * buffer overflow in the memcpy() bellow */
+			 * buffer overflow in the memcpy() below */
 			DWORD correct_value = scGetSetStruct.cbAttrLen;
 			scGetSetStruct.cbAttrLen = *pcbAttrLen;
 			*pcbAttrLen = correct_value;
