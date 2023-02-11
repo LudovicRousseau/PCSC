@@ -26,7 +26,7 @@ allocate/deallocate reader drivers at runtime (default).
 PCSC Lite uses the same winscard API as used under Windows(R).
 
 For security aware persons please read the SECURITY file on possible
-vulnerabilites to pcsclite, how you can fix some, and how some will
+vulnerabilities to pcsclite, how you can fix some, and how some will
 be fixed.
 
 For information on how to install driver please read the DRIVERS file.
@@ -57,7 +57,7 @@ Options:
                                  (default /var/run)
 
 
-By running pcscd under a priveledged account you can link to
+By running pcscd under a privileged account you can link to
 libpcsclite.so and it will act as a client to the pcscd allowing multiple
 applications to be run under non-priveledged accounts.
 
@@ -80,7 +80,7 @@ There is a test program with this package:
 
 testpcsc: Linked to libpcsclite.  Must run /usr/local/pcsc/bin/pcscd
           and then ./testpcsc.  pcscd must be run as root or a hardware
-          priveledged user.  ./testpcsc can be run under any account.
+          privileged user.  ./testpcsc can be run under any account.
 
 LIBUSB SUPPORT:
 Versions after 1.2.0 support libusb. Available on GNU/Linux and *BSD.
@@ -107,5 +107,5 @@ directory.  For questions, please email me at:
 <David Corcoran> corcoran@musclecard.com
 
 On some plateforms (GNU/Linux on mips and mipsel, FreeBSD and possibly
-other *BSD suystems) you must use:
+other *BSD systems) you must use:
 $ ./configure LDFLAGS="-lpthread"
