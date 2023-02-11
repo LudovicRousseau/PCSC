@@ -71,7 +71,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @section Internals
  *
- * PC/SC Lite is formed by a server deamon (<tt>pcscd</tt>) and a client
+ * PC/SC Lite is formed by a server daemon (<tt>pcscd</tt>) and a client
  * library (<tt>libpcsclite.so</tt>) that communicate via IPC.
  *
  * The file \em winscard_clnt.c in the client-side exposes the API for
@@ -442,7 +442,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 * Prepare the SCARDHANDLE identity
 	 */
 
-	/* we need a lock to avoid concurent generation of handles leading
+	/* we need a lock to avoid concurrent generation of handles leading
 	 * to a possible hCard handle duplication */
 	(void)pthread_mutex_lock(&LockMutex);
 
