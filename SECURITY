@@ -6,7 +6,7 @@ handle them.
 Sometimes it is dangerous to run daemons under a root account.  If there is
 a chance to exploit a buffer overflow you can protect sensitive information
 by running it under a different account. It might be useful to create another
-user with hardware priveledges and run pcscd as that user.  Be sure this user
+user with hardware privileges and run pcscd as that user.  Be sure this user
 can manipulate the server sockets.
 
 
