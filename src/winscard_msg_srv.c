@@ -68,7 +68,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "winscard_msg.h"
 
 /**
- * Socket to a file, used for clients-server comminication.
+ * Socket to a file, used for clients-server communication.
  */
 static int commonSocket = 0;
 extern char AraKiri;
