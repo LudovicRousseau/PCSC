@@ -54,6 +54,9 @@
 #if defined(HAVE_POLKIT) && defined(SO_PEERCRED)
 
 #include <polkit/polkit.h>
+#include <stdbool.h>
+
+extern bool disable_polkit;
 
 /* Returns non zero when the client is authorized */
 unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
@@ -67,6 +70,9 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 	PolkitDetails *details;
 	GError *error = NULL;
 	char action_name[128];
+
+	if (disable_polkit)
+		return 1;
 
 	snprintf(action_name, sizeof(action_name), "org.debian.pcsc-lite.%s", action);
 

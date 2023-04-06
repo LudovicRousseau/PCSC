@@ -77,6 +77,7 @@ bool AutoExit = false;
 bool SocketActivated = false;
 static int ExitValue = EXIT_FAILURE;
 int HPForceReaderPolling = 0;
+bool disable_polkit = false;
 static int pipefd[] = {-1, -1};
 static int signal_handler_fd[] = {-1, -1};
 bool Add_Serial_In_Name = true;
@@ -286,6 +287,7 @@ int main(int argc, char **argv)
 		{"auto-exit", 0, NULL, 'x'},
 		{"reader-name-no-serial", 0, NULL, 'S'},
 		{"reader-name-no-interface", 0, NULL, 'I'},
+		{"disable-polkit", 0, NULL, 1},
 		{NULL, 0, NULL, 0}
 	};
 #endif
@@ -330,6 +332,11 @@ int main(int argc, char **argv)
 				if (strcmp(long_options[option_index].name,
 					"force-reader-polling") == 0)
 					HPForceReaderPolling = optarg ? abs(atoi(optarg)) : 1;
+				break;
+			case 1:
+				if (strcmp(long_options[option_index].name,
+					"disable-polkit") == 0)
+					disable_polkit = true;
 				break;
 #endif
 #ifdef USE_SERIAL
@@ -885,6 +892,7 @@ static void print_usage(char const * const progname)
 	printf("  -x, --auto-exit	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE);
 	printf("  -S, --reader-name-no-serial    do not include the USB serial number in the name\n");
 	printf("  -I, --reader-name-no-interface do not include the USB interface name in the name\n");
+	printf("  --disable-polkit	disable polkit support\n");
 #else
 	printf("  -a    log APDU commands and results\n");
 #ifdef USE_SERIAL
