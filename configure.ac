@@ -311,6 +311,7 @@ if test "$use_polkit" != "no"; then
 		AC_DEFINE([HAVE_POLKIT], 1, [Build polkit access control support])
 		polkit_policy_dir=$($PKG_CONFIG polkit-gobject-1 --variable=policydir)
 		AC_SUBST(POLICY_DIR, [$polkit_policy_dir])
+		PCSCLITE_FEATURES="${PCSCLITE_FEATURES} polkit"
 	else
 	        use_polkit=no
 	        AC_MSG_ERROR([[
