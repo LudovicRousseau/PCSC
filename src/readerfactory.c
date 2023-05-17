@@ -1159,6 +1159,7 @@ void RFUnInitializeReader(READER_CONTEXT * rContext)
 	memset(rContext->readerState->cardAtr, 0,
 		sizeof(rContext->readerState->cardAtr));
 	rContext->readerState->readerState = 0;
+	rContext->readerState->eventCounter = 0;
 	rContext->readerState->readerSharing = 0;
 	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
 	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
