@@ -1,3 +1,14 @@
+2.0.0: Ludovic Rousseau
+9 June 2023
+- Adjust USB drivers path at run-time via environment variable PCSCLITE_HP_DROPDIR
+- Add '--disable-polkit' option
+- Reset eventCounter when a reader is removed
+- Add "polkit" in "pcscd -v" output if enabled
+- Doxygen: document SCARD_E_INVALID_VALUE for some functions
+- use secure_getenv(3) if available
+- Some other minor improvements
+
+
 1.9.9: Ludovic Rousseau
 11 September 2022
 - SCardEstablishContext() may return SCARD_W_SECURITY_VIOLATION if refused by Polkit
