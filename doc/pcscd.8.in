@@ -74,8 +74,9 @@ Ask pcscd to re-read the
 files to detect added or removed non-USB readers (serial or PCMCIA).
 .
 .TP
-.BR \-x ", " \-\-auto\-exit
-pcscd will quit after 60 seconds of inactivity after the release of
+.BR \-x ", " \-\-auto\-exit[=timeout]
+pcscd will quit after \fItimeout\fP seconds of inactivity (default: 60)
+after the release of
 the last PC/SC context. This is used when pcscd
 is started on demand by systemd.
 .TP

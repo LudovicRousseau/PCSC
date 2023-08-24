@@ -74,6 +74,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _Atomic bool AraKiri = false;
 static bool Init = true;
 bool AutoExit = false;
+int TimeBeforeSuicide = TIME_BEFORE_SUICIDE_DEFAULT;
 int PowerDownTimeout = PCSCLITE_POWER_OFF_GRACE_PERIOD_DEFAULT;
 bool SocketActivated = false;
 static int ExitValue = EXIT_FAILURE;
@@ -285,7 +286,7 @@ int main(int argc, char **argv)
 		{"max-thread", 1, NULL, 't'},
 		{"max-card-handle-per-thread", 1, NULL, 's'},
 		{"max-card-handle-per-reader", 1, NULL, 'r'},
-		{"auto-exit", 0, NULL, 'x'},
+		{"auto-exit", optional_argument, NULL, 'x'},
 		{"power-down-timeout", 1, NULL, 'P'},
 		{"reader-name-no-serial", 0, NULL, 'S'},
 		{"reader-name-no-interface", 0, NULL, 'I'},
@@ -415,8 +416,11 @@ int main(int argc, char **argv)
 
 			case 'x':
 				AutoExit = true;
+				TimeBeforeSuicide = optarg ?
+					atoi(optarg) :
+					TIME_BEFORE_SUICIDE_DEFAULT;
 				Log2(PCSC_LOG_INFO, "Auto exit after %d seconds of inactivity",
-					TIME_BEFORE_SUICIDE);
+					TimeBeforeSuicide);
 				break;
 
 			case 'P':
@@ -800,8 +804,8 @@ int main(int argc, char **argv)
 	if (AutoExit)
 	{
 		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
-			TIME_BEFORE_SUICIDE);
-		alarm(TIME_BEFORE_SUICIDE);
+			TimeBeforeSuicide);
+		alarm(TimeBeforeSuicide);
 	}
 
 	SVCServiceRunLoop();
@@ -897,7 +901,7 @@ static void print_usage(char const * const progname)
 	printf("  -t, --max-thread	maximum number of threads (default %d)\n", PCSC_MAX_CONTEXT_THREADS);
 	printf("  -s, --max-card-handle-per-thread	maximum number of card handle per thread (default: %d)\n", PCSC_MAX_CONTEXT_CARD_HANDLES);
 	printf("  -r, --max-card-handle-per-reader	maximum number of card handle per reader (default: %d)\n", PCSC_MAX_READER_HANDLES);
-	printf("  -x, --auto-exit	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE);
+	printf("  -x, --auto-exit	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE_DEFAULT);
 	printf("  -P, --power-down-timeout	seconds to wait before powering down inactive reader\n");
 	printf("  -S, --reader-name-no-serial    do not include the USB serial number in the name\n");
 	printf("  -I, --reader-name-no-interface do not include the USB interface name in the name\n");
@@ -919,7 +923,7 @@ static void print_usage(char const * const progname)
 	printf("  -t    maximum number of threads\n");
 	printf("  -s    maximum number of card handle per thread\n");
 	printf("  -r    maximum number of card handle per reader\n");
-	printf("  -x	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE);
+	printf("  -x	pcscd will quit after %d seconds of inactivity\n", TIME_BEFORE_SUICIDE_DEFAULT);
 	printf("  -P	seconds to wait before powering down inactive reader\n");
 #endif
 }

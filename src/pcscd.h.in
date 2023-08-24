@@ -36,7 +36,7 @@
 #ifndef __pcscd_h__
 #define __pcscd_h__
 
-#define TIME_BEFORE_SUICIDE 60
+#define TIME_BEFORE_SUICIDE_DEFAULT 60
 
 #define SCARD_RESET			0x0001	/**< Card was reset */
 #define SCARD_INSERTED			0x0002	/**< Card was inserted */

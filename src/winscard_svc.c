@@ -73,6 +73,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 extern bool AutoExit;
+extern int TimeBeforeSuicide;
 static int contextMaxThreadCounter = PCSC_MAX_CONTEXT_THREADS;
 static int contextMaxCardHandles = PCSC_MAX_CONTEXT_CARD_HANDLES;
 
@@ -1092,8 +1093,8 @@ static void MSGCleanupClient(SCONTEXT * threadContext)
 	if (AutoExit && (listSize < 1))
 	{
 		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
-			TIME_BEFORE_SUICIDE);
-		alarm(TIME_BEFORE_SUICIDE);
+			TimeBeforeSuicide);
+		alarm(TimeBeforeSuicide);
 	}
 
 	return;
