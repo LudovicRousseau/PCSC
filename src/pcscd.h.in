@@ -67,7 +67,8 @@ enum
 };
 
 /** time to wait before powering down an unused card */
-#define PCSCLITE_POWER_OFF_GRACE_PERIOD 5*1000 /* 5 second */
+#define PCSCLITE_POWER_OFF_GRACE_PERIOD_DEFAULT 5 /* in seconds */
+extern int PowerDownTimeout;
 
 /** normal timeout for pthCardEvent driver function when
  * no card or card in use */

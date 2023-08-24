@@ -79,6 +79,10 @@ pcscd will quit after 60 seconds of inactivity after the release of
 the last PC/SC context. This is used when pcscd
 is started on demand by systemd.
 .TP
+.BR \-P ", " \-\-power\-down\-timeout " \fIt\fP"
+If auto power-down is enabled, power down inactive readers in \fIt\fP
+seconds (default: 5).
+.TP
 .BR \-S ", " \-\-reader\-name\-no\-serial
 Do not include the USB serial number in the reader name.
 .TP

@@ -458,7 +458,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 #ifndef DISABLE_ON_DEMAND_POWER_ON
 			if (POWER_STATE_POWERED == RFGetPowerState(rContext))
 				/* The card is powered but not yet used */
-				timeout = PCSCLITE_POWER_OFF_GRACE_PERIOD;
+				timeout = 1000 * PowerDownTimeout;
 			else
 				/* The card is already in use or not used at all */
 #endif
