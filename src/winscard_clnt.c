@@ -355,6 +355,7 @@ static pthread_mutex_t clientMutex = PTHREAD_MUTEX_INITIALIZER;
  * Area used to read status information about the readers.
  */
 static READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+static pthread_mutex_t readerStatesMutex = PTHREAD_MUTEX_INITIALIZER;
 
 /** Protocol Control Information for T=0 */
 PCSC_API const SCARD_IO_REQUEST g_rgSCardT0Pci = { SCARD_PROTOCOL_T0, sizeof(SCARD_IO_REQUEST) };
@@ -1437,6 +1438,9 @@ retry:
 	if (rv == -1)
 		return SCARD_E_INVALID_HANDLE;
 
+	/* lock access to readerStates[] */
+	(void)pthread_mutex_lock(&readerStatesMutex);
+
 	/* synchronize reader states with daemon */
 	rv = getReaderStates(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
@@ -1480,6 +1484,7 @@ retry:
 	if (sharing_shall_block && (SCARD_E_SHARING_VIOLATION == rv))
 	{
 		(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+		(void)pthread_mutex_unlock(&readerStatesMutex);
 		(void)SYS_USleep(PCSCLITE_LOCK_POLL_RATE);
 		goto retry;
 	}
@@ -1562,6 +1567,7 @@ retry:
 
 end:
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+	(void)pthread_mutex_unlock(&readerStatesMutex);
 
 	PROFILE_END(rv)
 
@@ -1743,10 +1749,17 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		goto error;
 	}
 
+	/* lock access to readerStates[] */
+	(void)pthread_mutex_lock(&readerStatesMutex);
+
 	/* synchronize reader states with daemon */
 	rv = getReaderStatesAndRegisterForEvents(currentContextMap);
+
 	if (rv != SCARD_S_SUCCESS)
+	{
+		(void)pthread_mutex_unlock(&readerStatesMutex);
 		goto end;
+	}
 
 	/* check all the readers are already known */
 	for (j=0; j<cReaders; j++)
@@ -1768,10 +1781,12 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 			if (strcasecmp(readerName, "\\\\?PnP?\\Notification") != 0)
 			{
 				rv = SCARD_E_UNKNOWN_READER;
+				(void)pthread_mutex_unlock(&readerStatesMutex);
 				goto end;
 			}
 		}
 	}
+	(void)pthread_mutex_unlock(&readerStatesMutex);
 
 	/* Clear the event state for all readers */
 	for (j = 0; j < cReaders; j++)
@@ -1803,6 +1818,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		{
 			const char *readerName;
 			int i;
+
+			/* lock access to readerStates[] */
+			(void)pthread_mutex_lock(&readerStatesMutex);
 
 			/* Looks for correct readernames */
 			readerName = currReader->szReader;
@@ -2049,6 +2067,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 					dwBreakFlag = 1;
 				}
 			}	/* End of SCARD_STATE_UNKNOWN */
+
+			(void)pthread_mutex_unlock(&readerStatesMutex);
 		}	/* End of SCARD_STATE_IGNORE */
 
 		/* Counter and resetter */
@@ -2105,7 +2125,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				}
 
 				/* synchronize reader states with daemon */
+				(void)pthread_mutex_lock(&readerStatesMutex);
 				rv = getReaderStatesAndRegisterForEvents(currentContextMap);
+				(void)pthread_mutex_unlock(&readerStatesMutex);
 				if (rv != SCARD_S_SUCCESS)
 					goto end;
 
@@ -2868,6 +2890,9 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 		return SCARD_E_INVALID_HANDLE;
 	}
 
+	/* lock access to readerStates[] */
+	(void)pthread_mutex_lock(&readerStatesMutex);
+
 	/* synchronize reader states with daemon */
 	rv = getReaderStates(currentContextMap);
 	if (rv != SCARD_S_SUCCESS)
@@ -2935,6 +2960,7 @@ end:
 	*pcchReaders = dwReadersLen;
 
 	(void)pthread_mutex_unlock(&currentContextMap->mMutex);
+	(void)pthread_mutex_unlock(&readerStatesMutex);
 
 	PROFILE_END(rv)
 	API_TRACE_OUT("%d", *pcchReaders)
