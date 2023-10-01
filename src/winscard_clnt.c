@@ -342,7 +342,8 @@ static int SCONTEXTMAP_seeker(const void *el, const void *key)
 /**
  * Make sure the initialization code is executed only once.
  */
-static short isExecuted = 0;
+static bool isExecuted = false;
+static pthread_once_t init_lib_control = PTHREAD_ONCE_INIT;
 
 
 /**
@@ -499,6 +500,44 @@ DESTRUCTOR static void destructor(void)
 }
 #endif
 
+/*
+ * Do this only once:
+ * - Initialize context list.
+ */
+static void init_lib(void)
+{
+	int lrv;
+
+	/* NOTE: The list will be freed only if DESTRUCTOR is defined.
+	 * Applications which load and unload the library may leak
+	 * the list's internal structures. */
+	lrv = list_init(&contextMapList);
+	if (lrv < 0)
+	{
+		Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d",
+			lrv);
+		return;
+	}
+
+	lrv = list_attributes_seeker(&contextMapList,
+			SCONTEXTMAP_seeker);
+	if (lrv <0)
+	{
+		Log2(PCSC_LOG_CRITICAL,
+			"list_attributes_seeker failed with return value: %d", lrv);
+		list_destroy(&contextMapList);
+		return;
+	}
+
+	if (getenv("PCSCLITE_NO_BLOCKING"))
+	{
+		Log1(PCSC_LOG_INFO, "Disable shared blocking");
+		sharing_shall_block = false;
+	}
+
+	isExecuted = true;
+}
+
 /**
  * @brief Creates a communication context to the PC/SC Resource
  * Manager.
@@ -541,44 +580,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	else
 		*phContext = 0;
 
-	/*
-	 * Do this only once:
-	 * - Initialize context list.
-	 */
-	if (isExecuted == 0)
-	{
-		int lrv;
-
-		/* NOTE: The list will be freed only if DESTRUCTOR is defined.
-		 * Applications which load and unload the library may leak
-		 * the list's internal structures. */
-		lrv = list_init(&contextMapList);
-		if (lrv < 0)
-		{
-			Log2(PCSC_LOG_CRITICAL, "list_init failed with return value: %d",
-				lrv);
-			return SCARD_E_NO_MEMORY;
-		}
-
-		lrv = list_attributes_seeker(&contextMapList,
-				SCONTEXTMAP_seeker);
-		if (lrv <0)
-		{
-			Log2(PCSC_LOG_CRITICAL,
-				"list_attributes_seeker failed with return value: %d", lrv);
-			list_destroy(&contextMapList);
-			return SCARD_E_NO_MEMORY;
-		}
-
-		if (getenv("PCSCLITE_NO_BLOCKING"))
-		{
-			Log1(PCSC_LOG_INFO, "Disable shared blocking");
-			sharing_shall_block = false;
-		}
-
-		isExecuted = 1;
-	}
-
+	pthread_once(&init_lib_control, init_lib);
+	if (!isExecuted)
+		return SCARD_E_NO_MEMORY;
 
 	/* Establishes a connection to the server */
 	if (ClientSetupSession(&dwClientID) != 0)
