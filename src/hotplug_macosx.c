@@ -283,29 +283,22 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			int j;
 			for (j=0; j<reader_nb; j++)
 			{
+				char stringBuffer[1000];
 				CFStringRef strValue = CFArrayGetValueAtIndex(vendorArray, j);
 
-				driverBundle->m_vendorId = strtoul(CFStringGetCStringPtr(strValue,
-					CFStringGetSystemEncoding()), NULL, 16);
+				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
+					kCFStringEncodingUTF8);
+				driverBundle->m_vendorId = strtoul(stringBuffer, NULL, 16);
 
 				strValue = CFArrayGetValueAtIndex(productArray, j);
-				driverBundle->m_productId = strtoul(CFStringGetCStringPtr(strValue,
-					CFStringGetSystemEncoding()), NULL, 16);
+				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
+					kCFStringEncodingUTF8);
+				driverBundle->m_productId = strtoul(stringBuffer, NULL, 16);
 
 				strValue = CFArrayGetValueAtIndex(friendlyNameArray, j);
-				const char *cstr = CFStringGetCStringPtr(strValue,
-					CFStringGetSystemEncoding());
-				if (NULL == cstr)
-				{
-					char utf8_str[200];
-					if (CFStringGetCString(strValue, utf8_str, sizeof utf8_str,
-						kCFStringEncodingUTF8))
-						driverBundle->m_friendlyName = strdup(utf8_str);
-					else
-						continue;
-				}
-				else
-					driverBundle->m_friendlyName = strdup(cstr);
+				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
+					kCFStringEncodingUTF8);
+				driverBundle->m_friendlyName = strdup(stringBuffer);
 
 				if (!driverBundle->m_libPath)
 					driverBundle->m_libPath = strdup(libPath);
