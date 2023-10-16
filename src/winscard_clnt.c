@@ -1114,8 +1114,8 @@ error:
  * You might want to use this when you are selecting a few files and then
  * writing a large file so you can make sure that another application will
  * not change the current file. If another application has a lock on this
- * reader or this application is in \ref SCARD_SHARE_EXCLUSIVE there will be no
- * action taken.
+ * reader or this application is in \ref SCARD_SHARE_EXCLUSIVE the
+ * function will block until it can continue.
  *
  * @ingroup API
  * @param[in] hCard Connection made from SCardConnect().
