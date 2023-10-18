@@ -45,12 +45,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "debuglog.h"
 #include "dyn_generic.h"
 
-LONG DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+void * DYN_LoadLibrary(char *pcLibrary)
 {
-
 	shl_t myHandle;
+	void *pvFHandle;
 
-	*pvLHandle = 0;
 	myHandle =
 		shl_load(pcLibrary, BIND_IMMEDIATE | BIND_VERBOSE | BIND_NOSTART,
 		0L);
@@ -58,20 +57,18 @@ LONG DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
 	if (myHandle == 0)
 	{
 		Log3(PCSC_LOG_ERROR, "%s: %s", pcLibrary, strerror(errno));
-		return SCARD_F_UNKNOWN_ERROR;
 	}
 
-	*pvLHandle = (void *) myHandle;
-	return SCARD_S_SUCCESS;
+	pvLHandle = (void *) myHandle;
+	return pvLHandle;
 }
 
-LONG DYN_CloseLibrary(void **pvLHandle)
+LONG DYN_CloseLibrary(void *pvLHandle)
 {
 
 	int rv;
 
-	rv = shl_unload((shl_t) * pvLHandle);
-	*pvLHandle = 0;
+	rv = shl_unload((shl_t) pvLHandle);
 
 	if (rv == -1)
 	{

@@ -48,29 +48,27 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "debuglog.h"
 #include "dyn_generic.h"
 
-INTERNAL LONG DYN_LoadLibrary(void **pvLHandle, char *pcLibrary)
+INTERNAL void * DYN_LoadLibrary(char *pcLibrary)
 {
-	*pvLHandle = NULL;
+	void *pvLHandle = NULL;
 #ifndef PCSCLITE_STATIC_DRIVER
-	*pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
+	pvLHandle = dlopen(pcLibrary, RTLD_LAZY);
 
-	if (*pvLHandle == NULL)
+	if (pvLHandle == NULL)
 	{
 		Log3(PCSC_LOG_CRITICAL, "%s: %s", pcLibrary, dlerror());
-		return SCARD_F_UNKNOWN_ERROR;
 	}
 #endif
 
-	return SCARD_S_SUCCESS;
+	return pvLHandle;
 }
 
-INTERNAL LONG DYN_CloseLibrary(void **pvLHandle)
+INTERNAL LONG DYN_CloseLibrary(void *pvLHandle)
 {
 #ifndef PCSCLITE_STATIC_DRIVER
 	int ret;
 
-	ret = dlclose(*pvLHandle);
-	*pvLHandle = NULL;
+	ret = dlclose(pvLHandle);
 
 	if (ret)
 	{
