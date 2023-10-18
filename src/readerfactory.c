@@ -872,6 +872,7 @@ LONG RFReaderInfoById(SCARDHANDLE hCard, READER_CONTEXT * * sReader)
 
 LONG RFLoadReader(READER_CONTEXT * rContext)
 {
+	LONG ret = SCARD_S_SUCCESS;
 	if (rContext->vHandle != 0)
 	{
 		Log2(PCSC_LOG_INFO, "Reusing already loaded driver for %s",
@@ -880,7 +881,10 @@ LONG RFLoadReader(READER_CONTEXT * rContext)
 		return SCARD_S_SUCCESS;
 	}
 
-	return DYN_LoadLibrary(&rContext->vHandle, rContext->library);
+	rContext->vHandle = DYN_LoadLibrary(rContext->library);
+	if (NULL == rContext->vHandle)
+		ret = SCARD_F_UNKNOWN_ERROR;
+	return ret;
 }
 
 LONG RFBindFunctions(READER_CONTEXT * rContext)
@@ -999,7 +1003,8 @@ LONG RFUnloadReader(READER_CONTEXT * rContext)
 	if (*rContext->pFeeds == 1)
 	{
 		Log1(PCSC_LOG_INFO, "Unloading reader driver.");
-		(void)DYN_CloseLibrary(&rContext->vHandle);
+		(void)DYN_CloseLibrary(rContext->vHandle);
+		rContext->vHandle = NULL;
 	}
 
 	rContext->vHandle = NULL;
