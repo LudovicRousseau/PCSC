@@ -149,6 +149,7 @@ LONG ContextsInitialize(int customMaxThreadCounter,
 void ContextsDeinitialize(void)
 {
 	int listSize;
+	(void)pthread_mutex_lock(&contextsList_lock);
 	listSize = list_size(&contextsList);
 #ifdef NO_LOG
 	(void)listSize;
@@ -157,6 +158,7 @@ void ContextsDeinitialize(void)
 	/* This is currently a no-op. It should terminate the threads properly. */
 
 	list_destroy(&contextsList);
+	(void)pthread_mutex_unlock(&contextsList_lock);
 }
 
 /**
