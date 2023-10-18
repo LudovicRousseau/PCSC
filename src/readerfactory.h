@@ -119,7 +119,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			FCT_MAP_V3 psFunctions_v3;	/**< API V3.0 */
 		} psFunctions;	/**< driver functions */
 
-		LPVOID vHandle;			/**< Dlopen handle */
+		_Atomic LPVOID vHandle;			/**< Dlopen handle */
 		int version;			/**< IFD Handler version number */
 		int port;				/**< Port ID */
 		int slot;				/**< Current Reader Slot */
