@@ -110,6 +110,8 @@ static char LogLevel = PCSC_LOG_ERROR;
 
 static signed char LogDoColor = 0;	/**< no color by default */
 
+static pthread_mutex_t LastTimeMutex = PTHREAD_MUTEX_INITIALIZER;
+
 static void log_line(const int priority, const char *DebugBuffer,
 	unsigned int rv);
 
@@ -213,6 +215,7 @@ static void log_line(const int priority, const char *DebugBuffer,
 		pthread_t thread_id;
 		const char *rv_text = NULL;
 
+		(void)pthread_mutex_lock(&LastTimeMutex);
 		gettimeofday(&new_time, NULL);
 		if (0 == last_time.tv_sec)
 			last_time = new_time;
@@ -230,6 +233,7 @@ static void log_line(const int priority, const char *DebugBuffer,
 			delta = 99999999;
 
 		last_time = new_time;
+		(void)pthread_mutex_unlock(&LastTimeMutex);
 
 		thread_id = pthread_self();
 
