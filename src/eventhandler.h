@@ -54,7 +54,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		char readerName[MAX_READERNAME]; /**< reader name */
 		uint32_t eventCounter; /**< number of card events */
 		uint32_t readerState; /**< SCARD_* bit field */
-		int32_t readerSharing; /**< PCSCLITE_SHARING_* sharing status */
+		_Atomic int32_t readerSharing; /**< PCSCLITE_SHARING_* sharing status */
 
 		UCHAR cardAtr[MAX_ATR_SIZE]; /**< ATR */
 		_Atomic uint32_t cardAtrLength; /**< ATR length */
