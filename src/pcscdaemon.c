@@ -116,10 +116,12 @@ static void SVCServiceRunLoop(void)
 #endif
 			(void)SYS_Sleep(1);
 
+			/* stop all the clients */
+			ContextsDeinitialize();
+
 			/* now stop all the drivers */
 			RFCleanupReaders();
 			EHDeinitializeEventStructures();
-			ContextsDeinitialize();
 			at_exit();
 		}
 

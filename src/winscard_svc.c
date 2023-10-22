@@ -155,8 +155,25 @@ void ContextsDeinitialize(void)
 	(void)listSize;
 #endif
 	Log2(PCSC_LOG_DEBUG, "remaining threads: %d", listSize);
-	/* This is currently a no-op. It should terminate the threads properly. */
 
+	/* terminate all the client threads */
+	int rv = list_iterator_start(&contextsList);
+	if (0 == rv)
+		Log1(PCSC_LOG_ERROR, "list_iterator_start failed");
+	else
+	{
+		while (list_iterator_hasnext(&contextsList))
+		{
+			SCONTEXT * elt = list_iterator_next(&contextsList);
+			Log3(PCSC_LOG_DEBUG, "Cancel dwClientID=%d hContext: %p",
+				elt->dwClientID, elt);
+			EHTryToUnregisterClientForEvent(elt->dwClientID);
+			close(elt->dwClientID);
+			Log2(PCSC_LOG_DEBUG, "Waiting client: %d", elt->dwClientID);
+			pthread_join(elt->pthThread, NULL);
+			Log2(PCSC_LOG_INFO, "Client %d terminated", elt->dwClientID);
+		}
+	}
 	list_destroy(&contextsList);
 	(void)pthread_mutex_unlock(&contextsList_lock);
 }
