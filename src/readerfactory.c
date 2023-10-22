@@ -1428,7 +1428,7 @@ void RFWaitForReaderInit(void)
 		for (int i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
 		{
 			/* reader is present */
-			if (sReadersContexts[i]->vHandle != NULL)
+			if (sReadersContexts[i] && sReadersContexts[i]->vHandle != NULL)
 			{
 				/* but card state is not yet available */
 				if (READER_NOT_INITIALIZED
