@@ -8,7 +8,7 @@ pcscd \- PC/SC Smart Card Daemon
 .
 .SH OPTIONS
 .TP
-.BR -a ", " \-\-apdu
+.BR \-a ", " \-\-apdu
 log APDUs and SW using the debug method (see
 .BR \-\-debug ).
 .TP
