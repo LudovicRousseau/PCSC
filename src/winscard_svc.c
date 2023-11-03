@@ -621,6 +621,8 @@ static void * ContextThread(LPVOID newContext)
 					/* signal the client only if it was still waiting */
 					if (SCARD_S_SUCCESS == rv)
 						caStr.rv = MSGSignalClient(fd, SCARD_E_CANCELLED);
+					else
+						caStr.rv = SCARD_S_SUCCESS;
 				}
 
 				WRITE_BODY(caStr);
