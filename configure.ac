@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 
-AC_INIT([pcsc-lite],[2.0.0])
+AC_INIT([pcsc-lite], [2.0.0])
 AC_CONFIG_SRCDIR(src/pcscdaemon.c)
 AM_INIT_AUTOMAKE(1.8 dist-bzip2 no-dist-gzip)
 AC_CONFIG_HEADERS([config.h])
@@ -58,7 +58,7 @@ AM_PROG_AR
 AX_PTHREAD([
  AC_DEFINE(HAVE_PTHREAD, 1,
   [Define if you have POSIX threads libraries and header files.])
-],[
+], [
  AC_MSG_ERROR([POSIX thread support required])
 ])
 
@@ -127,7 +127,7 @@ PCSCLITE_FEATURES="${PCSCLITE_FEATURES} $PCSC_ARCH $host"
 
 # --disable-documentation
 AC_ARG_ENABLE(documentation,
-	AS_HELP_STRING([--disable-documentation],[do not build documentation]),
+	AS_HELP_STRING([--disable-documentation], [do not build documentation]),
 	[ enable_doc="${enableval}" ], [ enable_doc="yes" ] )
 AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
 
@@ -139,7 +139,7 @@ AC_CHECK_LIB(rt, mq_getattr, [LIBS="$LIBS -lrt"])
 
 # check for libsystemd
 AC_ARG_ENABLE(libsystemd,
-	AS_HELP_STRING([--disable-libsystemd],[do not use libsystemd]),
+	AS_HELP_STRING([--disable-libsystemd], [do not use libsystemd]),
 	[ use_libsystemd="${enableval}" ], [ use_libsystemd="yes" ] )
 AS_IF([test "$use_libsystemd" != "no"],
 	[PKG_CHECK_MODULES(LIBSYSTEMD, libsystemd,,
@@ -149,7 +149,7 @@ AS_IF([test "$use_libsystemd" != "no"],
 
 # --disable-serial
 AC_ARG_ENABLE(serial,
-	AS_HELP_STRING([--disable-serial],[do not use serial reader.conf files]),
+	AS_HELP_STRING([--disable-serial], [do not use serial reader.conf files]),
 	[ use_serial="${enableval}" ], [ use_serial="yes" ] )
 AM_CONDITIONAL(ENABLE_SERIAL, test "$use_serial" != "no")
 AS_IF([test "$use_serial" != "no"],
@@ -158,7 +158,7 @@ AS_IF([test "$use_serial" != "no"],
 
 # --disable-usb
 AC_ARG_ENABLE(usb,
-	AS_HELP_STRING([--disable-usb],[do not use usb hotplug]),
+	AS_HELP_STRING([--disable-usb], [do not use usb hotplug]),
 	[ use_usb="${enableval}" ], [ use_usb="yes" ] )
 AM_CONDITIONAL(ENABLE_USB, test "$use_usb" != "no")
 AS_IF([test "$use_usb" != "no"],
@@ -167,7 +167,7 @@ AS_IF([test "$use_usb" != "no"],
 
 # --enable-libudev
 AC_ARG_ENABLE(libudev,
-	AS_HELP_STRING([--disable-libudev],[do not use libudev]),
+	AS_HELP_STRING([--disable-libudev], [do not use libudev]),
 	[ use_libudev="${enableval}" ],
 	[ AS_IF([test "$PCSC_ARCH" != "Linux"],
 		[use_libudev="no"],
@@ -175,7 +175,7 @@ AC_ARG_ENABLE(libudev,
 	])
 
 # disable libudev check is USB is not used
-AS_IF([test "$use_usb" = "no"],[use_libudev="no"])
+AS_IF([test "$use_usb" = "no"], [use_libudev="no"])
 
 # check if libudev is used
 AS_IF([test "x$use_libudev" != xno],
@@ -212,7 +212,7 @@ AS_IF([test x$use_libudev = xyes],
 
 # --enable-libusb
 AC_ARG_ENABLE(libusb,
-	AS_HELP_STRING([--enable-libusb],[use libusb]),
+	AS_HELP_STRING([--enable-libusb], [use libusb]),
 	[ use_libusb="${enableval}" ],
 	[ AS_IF([test "x$use_libudev" = xyes],
 		   	[use_libusb="${use_libusb-no}"],
@@ -299,7 +299,7 @@ AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_sy
 
 # --enable-embedded
 AC_ARG_ENABLE(embedded,
-  AS_HELP_STRING([--enable-embedded],[limit RAM and CPU resources by disabling features (log)]),
+  AS_HELP_STRING([--enable-embedded], [limit RAM and CPU resources by disabling features (log)]),
   [ use_embedded="${enableval}" ])
 
 AS_IF([test x$use_embedded = xyes],
@@ -308,7 +308,7 @@ AS_IF([test x$use_embedded = xyes],
 
 # --enable-usbdropdir=DIR
 AC_ARG_ENABLE(usbdropdir,
-  AS_HELP_STRING([--enable-usbdropdir=DIR],[directory containing USB
+  AS_HELP_STRING([--enable-usbdropdir=DIR], [directory containing USB
 				  drivers (default /usr/local/lib/pcsc/drivers)]),
 [usbdropdir="${enableval}"], [usbdropdir=false])
 AS_IF([test x${usbdropdir} = xfalse],
@@ -323,7 +323,7 @@ PCSCLITE_FEATURES="${PCSCLITE_FEATURES} usbdropdir=${usbdropdir}"
 
 # --enable-debugatr
 AC_ARG_ENABLE(debugatr,
-  AS_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
+  AS_HELP_STRING([--enable-debugatr], [enable ATR debug messages from pcscd]),
 [ AS_CASE(["${enableval}"],
 	[yes], [debugatr=true],
 	[no], [debugatr=false],
@@ -336,7 +336,7 @@ AS_IF([test x${debugatr} = xtrue],
 
 # --enable-ipcdir=DIR
 AC_ARG_ENABLE(ipcdir,
-  AS_HELP_STRING([--enable-ipcdir=DIR],[directory containing IPC files
+  AS_HELP_STRING([--enable-ipcdir=DIR], [directory containing IPC files
 				  (default /run/pcscd)]),
 [ipcdir="${enableval}"], [ipcdir=false])
 
@@ -348,13 +348,13 @@ CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"
 
 # --enable-confdir=DIR
 AC_ARG_ENABLE(confdir,
-AS_HELP_STRING([--enable-confdir=DIR],[directory containing reader configurations (default ${sysconfdir}/reader.conf.d)]),
+AS_HELP_STRING([--enable-confdir=DIR], [directory containing reader configurations (default ${sysconfdir}/reader.conf.d)]),
 	[confdir="${enableval}"],
 	[confdir="${sysconfdir}/reader.conf.d"])
 
 # --disable-filter
 AC_ARG_ENABLE(filter,
-  AS_HELP_STRING([--disable-filter],[disable reader filtering using
+  AS_HELP_STRING([--disable-filter], [disable reader filtering using
 				  PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES]),
   [ use_filter="${enableval}" ], [ use_filter="yes" ])
 
@@ -365,7 +365,7 @@ AS_IF([test x$use_filter = xyes],
 # --enable-strict
 AC_ARG_ENABLE(
 	[strict],
-	[AS_HELP_STRING([--enable-strict],[enable strict compile mode @<:@enabled@:>@])],
+	[AS_HELP_STRING([--enable-strict], [enable strict compile mode @<:@enabled@:>@])],
 	,
 	[enable_strict="no"]
 )
