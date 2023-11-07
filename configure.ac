@@ -17,37 +17,28 @@ AC_PROG_CC
 AC_C_BIGENDIAN
 
 # Check for some target-specific stuff
-case "$host" in
-*-*-hpux*)
-	CPPFLAGS="$CPPFLAGS -D_HPUX_SOURCE -D_XOPEN_SOURCE_EXTENDED"
-	;;
-*-*-solaris*)
-	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-	LDFLAGS="$LDFLAGS -L/usr/local/lib -R/usr/local/lib"
-	need_dash_r=1
-	;;
-*-*-sunos4*)
-	CPPFLAGS="$CPPFLAGS -DSUNOS4"
-	;;
-*-*-aix*)
-	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-	LDFLAGS="$LDFLAGS -L/usr/local/lib"
-	AS_IF([test "$LD" != "gcc" && test -z "$blibpath"],
-		[blibpath="/usr/lib:/lib:/usr/local/lib"])
-	;;
-*-*-osf*)
-	CPPFLAGS="$CPPFLAGS -D_POSIX_PII_SOCKET"
-	;;
-*-*-darwin*)
-	AC_SUBST(COREFOUNDATION)
-	COREFOUNDATION="-Wl,-framework,CoreFoundation"
-	AC_SUBST(IOKIT)
-	IOKIT="-Wl,-framework,IOKit"
-	AS_IF([test "$GCC" = "yes"], [CFLAGS="$CFLAGS -no-cpp-precomp"])
-	use_libusb=no
-	AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])
-	;;
-esac
+AS_CASE(["$host"],
+	[*-*-hpux*], [CPPFLAGS="$CPPFLAGS -D_HPUX_SOURCE -D_XOPEN_SOURCE_EXTENDED"],
+	[*-*-solaris*], [
+		CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib -R/usr/local/lib"
+		need_dash_r=1 ],
+	[*-*-sunos4*], [CPPFLAGS="$CPPFLAGS -DSUNOS4"],
+	[*-*-aix*], [
+		CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib"
+		AS_IF([test "$LD" != "gcc" && test -z "$blibpath"],
+			[blibpath="/usr/lib:/lib:/usr/local/lib"])],
+	[*-*-osf*], [CPPFLAGS="$CPPFLAGS -D_POSIX_PII_SOCKET"],
+	[*-*-darwin*], [
+		AC_SUBST(COREFOUNDATION)
+		COREFOUNDATION="-Wl,-framework,CoreFoundation"
+		AC_SUBST(IOKIT)
+		IOKIT="-Wl,-framework,IOKit"
+		AS_IF([test "$GCC" = "yes"], [CFLAGS="$CFLAGS -no-cpp-precomp"])
+		use_libusb=no
+		AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])]
+)
 
 # Options
 AM_MAINTAINER_MODE
@@ -128,14 +119,9 @@ AC_SEARCH_LIBS([dlopen], [dl dld], [], [
 
 # Use 'uname' output as an architecture define
 PCSC_ARCH=`uname | sed -e s,/,_,`
-case "$PCSC_ARCH" in
-Darwin)
-	PCSC_ARCH=MacOS
-	;;
-SunOS)
-	PCSC_ARCH=Solaris
-	;;
-esac
+AS_CASE(["$PCSC_ARCH"],
+	[Darwin], [PCSC_ARCH=MacOS],
+	[SunOS], [PCSC_ARCH=Solaris])
 AC_DEFINE_UNQUOTED(PCSC_ARCH, "$PCSC_ARCH", [PC/SC target architecture])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} $PCSC_ARCH $host"
 
@@ -338,11 +324,11 @@ PCSCLITE_FEATURES="${PCSCLITE_FEATURES} usbdropdir=${usbdropdir}"
 # --enable-debugatr
 AC_ARG_ENABLE(debugatr,
   AS_HELP_STRING([--enable-debugatr],[enable ATR debug messages from pcscd]),
-[ case "${enableval}" in
-  yes)	debugatr=true ;;
-  no)	debugatr=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-debugatr]) ;;
-esac], [debugatr=false])
+[ AS_CASE(["${enableval}"],
+	[yes], [debugatr=true],
+	[no], [debugatr=false],
+	[*], [AC_MSG_ERROR([bad value ${enableval} for --enable-debugatr])])
+], [debugatr=false])
 
 AS_IF([test x${debugatr} = xtrue],
 	[AC_DEFINE(ATR_DEBUG, 1, [display ATR parsing debug messages.])
