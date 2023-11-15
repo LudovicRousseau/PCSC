@@ -497,16 +497,19 @@ static void * ContextThread(LPVOID newContext)
 				if (IsClientAuthorized(filedes, "access_card", coStr.szReader) == 0)
 				{
 					Log2(PCSC_LOG_CRITICAL, "Rejected unauthorized client for '%s'", coStr.szReader);
-					goto exit;
+
+					coStr.rv = SCARD_W_SECURITY_VIOLATION;
+					hCard = -1;
+					dwActiveProtocol = -1;
 				}
 				else
 				{
 					Log2(PCSC_LOG_DEBUG, "Authorized client for '%s'", coStr.szReader);
-				}
 
-				coStr.rv = SCardConnect(coStr.hContext, coStr.szReader,
-					coStr.dwShareMode, coStr.dwPreferredProtocols,
-					&hCard, &dwActiveProtocol);
+					coStr.rv = SCardConnect(coStr.hContext, coStr.szReader,
+						coStr.dwShareMode, coStr.dwPreferredProtocols,
+						&hCard, &dwActiveProtocol);
+				}
 
 				coStr.hCard = hCard;
 				coStr.dwActiveProtocol = dwActiveProtocol;
