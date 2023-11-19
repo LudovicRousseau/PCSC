@@ -266,12 +266,12 @@ AS_IF([test x$use_libusb = xyes],
 	[AC_DEFINE(HAVE_LIBUSB, 1, [Libusb is available])
 	 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} libusb"])
 
-# --enable-polkit
+# --disable-polkit
 POLKIT_MINIMUM=0.111
 AC_ARG_ENABLE(polkit,
-	AS_HELP_STRING([--enable-polkit],
-		[Build with polkit support]),
-		use_polkit=$enableval, use_polkit=no)
+	AS_HELP_STRING([--disable-polkit],
+		[do not build with polkit support]),
+		use_polkit=$enableval, use_polkit=yes)
 AS_IF([test "$use_polkit" != "no"],
 	[PKG_CHECK_MODULES(POLKIT, [polkit-gobject-1 >= $POLKIT_MINIMUM], [use_polkit=yes], [use_polkit=no])
 	AS_IF([test "$use_polkit" != "no"],
