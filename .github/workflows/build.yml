@@ -47,10 +47,10 @@ jobs:
         run: |
           ./bootstrap
           export CFLAGS="-Wall -Wextra -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wold-style-definition -Wpointer-arith -Wredundant-decls -Wshadow -Wstrict-prototypes -Wswitch-enum -Wundef -Wuninitialized -Wunused -Wwrite-strings -Wmissing-noreturn -flto=auto -O2 -Wp,-D_FORTIFY_SOURCE=2"
-          ./configure ${{ matrix.configure_args }}
+          ./configure --disable-polkit ${{ matrix.configure_args }}
           make V=1
 
       - name: distcheck
         shell: bash
         run: |
-          make distcheck
+          AM_DISTCHECK_CONFIGURE_FLAGS=--disable-polkit make distcheck
