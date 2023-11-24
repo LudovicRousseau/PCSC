@@ -1,3 +1,15 @@
+2.0.1: Ludovic Rousseau
+24 November 2023
+- SCardConnect(): return SCARD_W_SECURITY_VIOLATION when needed (polkit)
+- SCardCancel(): return SCARD_S_SUCCESS even if the client already finished
+- polkit is enabled by default
+- libpcscspy: fix a crash with NULL pointers
+- Doxygen: fix SCardBeginTransaction() documentation
+- fix pcscd internal thread safety issues (clang -fsanitize=thread)
+- Some other minor improvements
+
+
+9 June 2023
 2.0.0: Ludovic Rousseau
 9 June 2023
 - Adjust USB drivers path at run-time via environment variable PCSCLITE_HP_DROPDIR
