@@ -117,7 +117,34 @@ directory as a bundle. You shall NOT add a USB driver in a
 .I @PCSCLITE_CONFIG_DIR@/my_reader.conf
 file.
 .
+.SH "CONFIGURATION FILE"
+It is possible to set arguments that will be used by pcscd with the
+configuration file
+.I /etc/default/pcscd
+For example you can increase the debug level using:
+.RS
+.EX
+PCSCD_ARGS=--debug
+.EE
+.RE
+.PP
+Or set environment variables like:
+.RS
+.EX
+PCSCLITE_FILTER_IGNORE_READER_NAMES="Twin"
+PCSCLITE_FILTER_EXTEND_READER_NAMES=" $HOSTNAME"
+.EE
+.RE
+.PP
+See
+.UR
+https://blog.apdu.fr/posts/2021/08/pcsc-lite-configuration-using/
+.UE
+for more details.
 .SH FILES
+.I /etc/default/pcscd
+: daemon configuration file
+.PP
 .I @PCSCLITE_CONFIG_DIR@/*
 : Serial reader configuration files
 .PP
