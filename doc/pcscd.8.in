@@ -84,6 +84,9 @@ Do not include the USB serial number in the reader name.
 .TP
 .BR \-I ", " \-\-reader\-name\-no\-interface
 Do not include the USB interface name in the reader name.
+.TP
+.BR \-\-disable-polkit
+Ignore polkit rules. All accesses are allowed.
 .SH DESCRIPTION
 pcscd is the daemon program for pcsc-lite. It is a resource manager that
 coordinates communications with smart card readers and smart cards and
