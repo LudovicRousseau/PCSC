@@ -3,8 +3,35 @@
 pcscd \- PC/SC Smart Card Daemon
 .
 .SH SYNOPSIS
-.B pcscd
-.RI [ options ]
+.SY pcscd
+.OP \-acfTdeCvHSI
+.OP \-\-apdu
+.OP \-\-config dir
+.OP \-\-foreground
+.OP \-\-color
+.OP \-\-debug
+.OP \-\-info
+.OP \-\-error
+.OP \-\-critical
+.OP \-\-force\-reader\-polling
+.OP \-t number
+.OP \-\-max\-thread number
+.OP \-s number
+.OP \-\-max\-card\-handle\-per\-thread number
+.OP \-r number
+.OP \-\-max\-card\-handle\-per\-reader number
+.OP \-\-version
+.OP \-\-hotplug
+.OP \-\-reader\-name\-no\-serial
+.OP \-\-reader\-name\-no\-interface
+.OP \-\-disable-polkit
+.YS
+.
+.SY pcscd
+.B \-h
+.SY pcscd
+.B \-\-help
+.YS
 .
 .SH OPTIONS
 .TP
@@ -40,24 +67,24 @@ use error log level.
 use critical log level.
 .PP
 The log levels are ordered as: debug < info < error < critical. Use a
-log level l will log this level and all the levels above it.
+log level \fIl\fP will log this level and all the levels above it.
 .TP
 .B \-\-force\-reader\-polling
 ignore the IFD_GENERATE_HOTPLUG reader capability
 .TP
-.BR \-t ", " \-\-max\-thread
+.BR \-t ", " \-\-max\-thread " " \fInumber
 maximum number of threads (default 200).
 
 This is the maximum number of clients (SCardEstablishContext) that pcscd
 can handle.
 .TP
-.BR \-s ", " \-\-max\-card\-handle\-per\-thread
+.BR \-s ", " \-\-max\-card\-handle\-per\-thread " " \fInumber
 maximum number of card handle per thread (default: 200).
 
 This is the maximum number of card handle (SCardConnect) per client
 (SCardEstablishContext).
 .TP
-.BR \-r ", " \-\-max\-card\-handle\-per\-reader
+.BR \-r ", " \-\-max\-card\-handle\-per\-reader " " \fInumber
 maximum number of card handle per reader (default: 200)
 
 This is the maximum number of card handle (SCardConnect) per reader.
