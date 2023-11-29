@@ -378,6 +378,9 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
 
+				/* restrict to the protocols requested by the user */
+				availableProtocols &= dwPreferredProtocols;
+
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					availableProtocols, defaultProtocol);
 
@@ -674,6 +677,9 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				/* If it is set to ANY let it do any of the protocols */
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
 					dwPreferredProtocols = SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1;
+
+				/* restrict to the protocols requested by the user */
+				availableProtocols &= dwPreferredProtocols;
 
 				ret = PHSetProtocol(rContext, dwPreferredProtocols,
 					availableProtocols, defaultProtocol);
