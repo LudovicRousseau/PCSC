@@ -119,9 +119,17 @@ DWORD PHSetProtocol(struct ReaderContext * rContext,
 			/* protocol not supported */
 			if (protocol != dwPreferred)
 			{
-				Log3(PCSC_LOG_INFO,
-					"Set PTS failed (%ld). Using T=%d", rv,
-					(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+				if (protocol & dwPreferred)
+				{
+					Log3(PCSC_LOG_INFO,
+						"Set PTS failed (%ld). Using T=%d", rv,
+						(SCARD_PROTOCOL_T0 == protocol) ? 0 : 1);
+				}
+				else
+				{
+					Log2(PCSC_LOG_INFO, "Set PTS failed (%ld)", rv);
+					protocol = SET_PROTOCOL_WRONG_ARGUMENT;
+				}
 			}
 			else
 			{
