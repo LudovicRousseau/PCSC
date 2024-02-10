@@ -507,7 +507,7 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 				 * other errors are fatal */
 				if (errno != EINTR && errno != EAGAIN)
 				{
-					/* connection reseted by pcscd? */
+					/* connection reset by pcscd? */
 					if (ECONNRESET == errno)
 						retval = SCARD_W_SECURITY_VIOLATION;
 					else

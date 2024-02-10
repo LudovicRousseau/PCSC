@@ -342,7 +342,7 @@ static void HPRescanUsbBus(void)
 	ssize_t cnt;
 
 	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		/* clear rollcall */
+		/* clear roll call */
 		readerTracker[i].status = READER_ABSENT;
 
 	cnt = libusb_get_device_list(ctx, &devs);

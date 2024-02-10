@@ -29,7 +29,7 @@ Then you shall generate a complete log (do not truncate it).
 ```
 sudo LIBCCID_ifdLogLevel=0x000F pcscd --foreground --debug --apdu --color | tee log.txt
 ```
-* Stop pcscd (using Control-C) after the problem occured and send me the
+* Stop pcscd (using Control-C) after the problem occurred and send me the
   generated log.txt file
 
 See also https://pcsclite.apdu.fr/#support

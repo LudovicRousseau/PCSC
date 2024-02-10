@@ -6,7 +6,7 @@
  * Copyright (C) 2006-2009
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
- * This file is dual licenced:
+ * This file is dual licensed:
  * - BSD-like, see the COPYING file
  * - GNU Lesser General Licence 2.1 or (at your option) any later version.
  *

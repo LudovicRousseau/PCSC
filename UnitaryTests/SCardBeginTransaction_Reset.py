@@ -54,7 +54,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult = SCardEndTransaction(hcard2, SCARD_UNPOWER_CARD)
 if hresult != SCARD_S_SUCCESS:
     # we should get an error here
-    # but the card shall not be reseted
+    # but the card shall not be reset
     if hresult == SCARD_E_SHARING_VIOLATION:
         print("We got the expected error")
     else:
@@ -63,7 +63,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, reader, state, protocol, atr = SCardStatus(hcard1)
 if hresult == SCARD_W_RESET_CARD:
     print("The test failed")
-    print("The card should not been reseted")
+    print("The card should not been reset")
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

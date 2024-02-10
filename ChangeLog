@@ -625,7 +625,7 @@ pcsc-lite-1.6.1: Ludovic Rousseau
   list of readers even if a reader was connected.
   Thanks to Patrice Angelini for the bug report
 - SCardConnect() & SCardReconnect(): do not reset the cardProtocol in
-  SCARD_SHARE_DIRECT case since the card have _not_ been reseted. A new
+  SCARD_SHARE_DIRECT case since the card have _not_ been reset. A new
   PPS negotiation would fail.
 - Do not install files in /etc any more. Serial drivers are rare now.
 - Avoids a crash if a client sends a unknown command.
@@ -1129,7 +1129,7 @@ pcsc-lite-1.2.9-beta7: Ludovic Rousseau
   get the needed length in pcbAttrLen
 - SCardReconnect() now works after a card movement.  Previously
   SCardReconnect() returned "Card was removed" even if the new card is
-  reseted.
+  reset.
 - SCardGetStatusChange(): greatly improve performances. Thanks to Oivind
   H. Danielsen
 - SCardControl(): check if the pbSendBuffer is NULL or no bytes are sent
@@ -1164,7 +1164,7 @@ pcsc-lite-1.2.9-beta6: Ludovic Rousseau
     You should use 'DEVICENAME /dev/null' if your driver does not use this field
 - src/winscard.c:
   . Avoid generating a PPS request that would not be just after a power
-    up. The previous code worked only when the card was _reseted_ at
+    up. The previous code worked only when the card was _reset_ at
     SCardDisconnect() but not when SCARD_LEAVE_CARD was used.
 - correctly manage multi-slots readers
 - etc/pcscd.init:
@@ -1396,7 +1396,7 @@ pcsc-lite-1.2.0-rc2: Ludovic Rousseau
   link with libmusclecard.
 - src/winscard_clnt.c: add a new function SCardUnload() to free allocated
   resources. It is mandatory only if you use dlopen/dlclose to often
-  load/unload the library.  Otherwi se you will exhaust the resources
+  load/unload the library.  Otherwise you will exhaust the resources
   available and get a crash.  Thanks to Guy Moreillon for the patch.
 - src/muscletest.c: code cleaning
 

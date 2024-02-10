@@ -59,7 +59,7 @@ Options:
 
 By running pcscd under a privileged account you can link to
 libpcsclite.so and it will act as a client to the pcscd allowing multiple
-applications to be run under non-priveledged accounts.
+applications to be run under non-privileged accounts.
 
 Then type "make install" to copy the libraries to /usr/local/lib. If you
 choose not to have your reader configuration file in /etc/reader.conf.d/

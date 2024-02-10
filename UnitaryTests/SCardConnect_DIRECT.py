@@ -35,7 +35,7 @@ print('PC/SC Readers:', readers)
 reader = readers[0]
 print("Using reader:", reader)
 
-# the card should be reseted or inserted just before execution
+# the card should be reset or inserted just before execution
 
 # Connect in SCARD_SHARE_DIRECT mode
 hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,

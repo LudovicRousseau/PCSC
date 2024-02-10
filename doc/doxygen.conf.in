@@ -358,7 +358,7 @@ TOC_INCLUDE_HEADINGS   = 5
 # unique.
 # Possible values are: DOXYGEN Use a fixed 'autotoc_md' string followed by a
 # sequence number starting at 0. and GITHUB Use the lower case version of title
-# with any whitespace replaced by '-' and punctations characters removed..
+# with any whitespace replaced by '-' and punctuation characters removed..
 # The default value is: DOXYGEN.
 # This tag requires that the tag MARKDOWN_SUPPORT is set to YES.
 

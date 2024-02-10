@@ -44,7 +44,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdbool.h>
 
-/* We shall not export the log_msg() sumbol */
+/* We shall not export the log_msg() symbol */
 #undef PCSC_API
 #include "debuglog.h"
 
