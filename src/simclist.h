@@ -75,7 +75,7 @@ typedef struct {
  *      -# receives two references to elements a and b
  *      -# returns {<0, 0, >0} if (a > b), (a == b), (a < b) respectively
  *
- * It is responsability of the function to handle possible NULL values.
+ * It is responsibility of the function to handle possible NULL values.
  */
 typedef int (*element_comparator)(const void *a, const void *b);
 
@@ -87,7 +87,7 @@ typedef int (*element_comparator)(const void *a, const void *b);
  *      -# receives a reference to some indicator data
  *      -# returns non-0 if the element matches the indicator, 0 otherwise
  *
- * It is responsability of the function to handle possible NULL values in any
+ * It is responsibility of the function to handle possible NULL values in any
  * argument.
  */
 typedef int (*element_seeker)(const void *el, const void *indicator);
@@ -99,7 +99,7 @@ typedef int (*element_seeker)(const void *el, const void *indicator);
  *      -# receives the reference to an element el
  *      -# returns its size in bytes
  *
- * It is responsability of the function to handle possible NULL values.
+ * It is responsibility of the function to handle possible NULL values.
  */
 typedef size_t (*element_meter)(const void *el);
 
@@ -110,7 +110,7 @@ typedef size_t (*element_meter)(const void *el);
  *      -# receives the reference to an element el
  *      -# returns a hash value for el
  *
- * It is responsability of the function to handle possible NULL values.
+ * It is responsibility of the function to handle possible NULL values.
  */
 typedef list_hash_t (*element_hash_computer)(const void *el);
 
@@ -120,7 +120,7 @@ typedef list_hash_t (*element_hash_computer)(const void *el);
  * A serializer function is one that gets a reference to an element,
  * and returns a reference to a buffer that contains its serialization
  * along with the length of this buffer.
- * It is responsability of the function to handle possible NULL values,
+ * It is responsibility of the function to handle possible NULL values,
  * returning a NULL buffer and a 0 buffer length.
  *
  * These functions have 3 goals:
@@ -259,7 +259,7 @@ int list_attributes_seeker(list_t *restrict l, element_seeker seeker_fun);
  * the list by its actual data is not free()d. With this option, every
  * deletion causes element data to be freed.
  *
- * It is responsability of this function to correctly handle NULL values, if
+ * It is responsibility of this function to correctly handle NULL values, if
  * NULL elements are inserted into the list.
  *
  * @param l             list to operate
@@ -439,7 +439,7 @@ int list_insert_at(list_t *restrict l, const void *data, unsigned int pos);
  * expunge the first found given element from the list.
  *
  * Inspects the given list looking for the given element; if the element
- * is found, it is removed. Only the first occurence is removed.
+ * is found, it is removed. Only the first occurrence is removed.
  * If a comparator function was not set, elements are compared by reference.
  * Otherwise, the comparator is used to match the element.
  *
@@ -641,7 +641,7 @@ int list_hash(const list_t *restrict l, list_hash_t *restrict hash);
 
 #ifndef SIMCLIST_NO_DUMPRESTORE
 /**
- * get meta informations on a list dump on filedescriptor.
+ * get meta information on a list dump on filedescriptor.
  *
  * [ advanced function ]
  *
@@ -658,7 +658,7 @@ int list_hash(const list_t *restrict l, list_hash_t *restrict hash);
 int list_dump_getinfo_filedescriptor(int fd, list_dump_info_t *restrict info);
 
 /**
- * get meta informations on a list dump on file.
+ * get meta information on a list dump on file.
  *
  * [ advanced function ]
  *
