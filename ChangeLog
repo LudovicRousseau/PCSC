@@ -625,7 +625,7 @@ pcsc-lite-1.6.1: Ludovic Rousseau
   list of readers even if a reader was connected.
   Thanks to Patrice Angelini for the bug report
 - SCardConnect() & SCardReconnect(): do not reset the cardProtocol in
-  SCARD_SHARE_DIRECT case since the card have _not_ been reset. A new
+  SCARD_SHARE_DIRECT case since the card has _not_ been reset. A new
   PPS negotiation would fail.
 - Do not install files in /etc any more. Serial drivers are rare now.
 - Avoids a crash if a client sends a unknown command.

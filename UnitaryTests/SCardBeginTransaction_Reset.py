@@ -63,7 +63,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, reader, state, protocol, atr = SCardStatus(hcard1)
 if hresult == SCARD_W_RESET_CARD:
     print("The test failed")
-    print("The card should not been reset")
+    print("The card should not have been reset")
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
