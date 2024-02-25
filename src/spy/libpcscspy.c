@@ -327,24 +327,14 @@ static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
 static LONG load_lib(void)
 {
 
-#define LIBPCSC_NOSPY "libpcsclite_nospy.so.1"
-#define LIBPCSC "libpcsclite.so.1"
+#define LIBPCSC "libpcsclite_real.so.1"
 
-	/* first try to load the NOSPY library
-	 * this is used for programs doing an explicit dlopen like
-	 * Perl and Python wrappers */
-	Lib_handle = dlopen(LIBPCSC_NOSPY, RTLD_LAZY);
+	/* load the normal library */
+	Lib_handle = dlopen(LIBPCSC, RTLD_LAZY);
 	if (NULL == Lib_handle)
 	{
-		log_line("%s", dlerror());
-
-		/* load the normal library */
-		Lib_handle = dlopen(LIBPCSC, RTLD_LAZY);
-		if (NULL == Lib_handle)
-		{
-			log_line("%s", dlerror());
-			return SCARD_F_INTERNAL_ERROR;
-		}
+		log_line("loading \"" LIBPCSC "\" failed: %s", dlerror());
+		return SCARD_F_INTERNAL_ERROR;
 	}
 
 #define get_symbol(s) do { spy.s = dlsym(Lib_handle, #s); if (NULL == spy.s) { log_line("%s", dlerror()); return SCARD_F_INTERNAL_ERROR; } } while (0)
