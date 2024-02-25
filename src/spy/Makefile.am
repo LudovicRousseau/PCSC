@@ -14,6 +14,7 @@ pcsc-spy.1: pcsc-spy.pod
 	pod2man \
 		--center="PC/SC lite" \
 		--release="$(PACKAGE_NAME) $(PACKAGE_VERSION)" \
+		--date=2024-01-01 \
 		$(srcdir)/pcsc-spy.pod > $@
 endif
 
