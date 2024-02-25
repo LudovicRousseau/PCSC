@@ -2,7 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC
 
 lib_LTLIBRARIES = libpcscspy.la
 dist_bin_SCRIPTS = pcsc-spy
-dist_doc_DATA = install_spy.sh uninstall_spy.sh
+dist_doc_DATA = setup_spy.sh
 
 libpcscspy_la_SOURCES = \
 	libpcscspy.c
