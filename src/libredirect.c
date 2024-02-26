@@ -87,17 +87,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define p_SCardSetAttrib(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr, DWORD cbAttrLen)
 
-#define p_pcsc_stringify_error(fct) const char *(fct)(const LONG pcscError)
-
 /* fake function to just return en error code */
 static LONG internal_error(void)
 {
 	return SCARD_F_INTERNAL_ERROR;
-}
-
-static const char * internal_stringify_error(void)
-{
-	return "No pcsc_stringify_error() function";
 }
 
 #pragma GCC diagnostic push
@@ -123,7 +116,6 @@ static struct
 	p_SCardCancel(*SCardCancel);
 	p_SCardGetAttrib(*SCardGetAttrib);
 	p_SCardSetAttrib(*SCardSetAttrib);
-	p_pcsc_stringify_error(*pcsc_stringify_error);
 } redirect = {
 	/* initialized with the fake internal_error() function */
 	.SCardEstablishContext = (p_SCardEstablishContext(*))internal_error,
@@ -144,7 +136,6 @@ static struct
 	.SCardCancel = (p_SCardCancel(*))internal_error,
 	.SCardGetAttrib = (p_SCardGetAttrib(*))internal_error,
 	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error,
-	.pcsc_stringify_error = (p_pcsc_stringify_error(*))internal_stringify_error
 };
 #pragma GCC diagnostic pop
 
@@ -210,7 +201,6 @@ static LONG load_lib(void)
 	get_symbol(SCardCancel);
 	get_symbol(SCardGetAttrib);
 	get_symbol(SCardSetAttrib);
-	get_symbol(pcsc_stringify_error);
 
 	return SCARD_S_SUCCESS;
 }
@@ -326,11 +316,6 @@ PCSC_API p_SCardGetAttrib(SCardGetAttrib)
 PCSC_API p_SCardSetAttrib(SCardSetAttrib)
 {
 	return redirect.SCardSetAttrib(hCard, dwAttrId, pbAttr, cbAttrLen);
-}
-
-PCSC_API p_pcsc_stringify_error(pcsc_stringify_error)
-{
-	return redirect.pcsc_stringify_error(pcscError);
 }
 
 /** Protocol Control Information for T=0 */

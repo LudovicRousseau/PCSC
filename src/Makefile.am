@@ -20,12 +20,12 @@ USB_CONFIG = tokenparser.l \
 endif
 
 libpcsclite_la_SOURCES = \
+	error.c \
 	libredirect.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 
 libpcsclite_real_la_SOURCES = \
 	debug.c \
-	error.c \
 	winscard_clnt.c \
 	simclist.c \
 	sys_unix.c \
