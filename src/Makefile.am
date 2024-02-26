@@ -4,6 +4,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/PCSC -I$(top_builddir)/src/PCSC \
 	$(SYMBOL_VISIBILITY)
 
 lib_LTLIBRARIES = libpcsclite.la libpcsclite_real.la
+check_LTLIBRARIES = libpcsclite_fake.la
 
 sbin_PROGRAMS = pcscd
 noinst_PROGRAMS = testpcsc pcsc-wirecheck pcsc-wirecheck-gen
@@ -34,6 +35,9 @@ libpcsclite_real_la_SOURCES = \
 libpcsclite_real_la_LDFLAGS = -version-info 1:0:0
 libpcsclite_real_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
 libpcsclite_real_la_LIBADD = $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
+
+libpcsclite_fake_la_SOURCES = \
+	libfake.c
 
 pcscd_SOURCES = \
 	auth.c \
