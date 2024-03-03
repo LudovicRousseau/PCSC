@@ -193,6 +193,7 @@ extern const SCARD_IO_REQUEST g_rgSCardT0Pci, g_rgSCardT1Pci, g_rgSCardRawPci;
 #define SCARD_E_INVALID_CHV		((LONG)0x8010002A) /**< The supplied PIN is incorrect. */
 /** @ingroup ErrorCodes */
 #define SCARD_E_UNKNOWN_RES_MSG		((LONG)0x8010002B) /**< An unrecognized error code was returned from a layered component. */
+#define SCARD_E_UNKNOWN_RES_MNG		SCARD_E_UNKNOWN_RES_MSG
 /** @ingroup ErrorCodes */
 #define SCARD_E_NO_SUCH_CERTIFICATE	((LONG)0x8010002C) /**< The requested certificate does not exist. */
 /** @ingroup ErrorCodes */
