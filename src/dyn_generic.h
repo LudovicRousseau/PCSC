@@ -41,7 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include "wintypes.h"
 
-	void * DYN_LoadLibrary(char *);
+	void * DYN_LoadLibrary(const char *);
 	LONG DYN_CloseLibrary(void *);
 	LONG DYN_GetAddress(void *, /*@out@*/ void **, const char *, bool);
 

@@ -48,7 +48,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "debuglog.h"
 #include "dyn_generic.h"
 
-INTERNAL void * DYN_LoadLibrary(char *pcLibrary)
+INTERNAL void * DYN_LoadLibrary(const char *pcLibrary)
 {
 	void *pvLHandle = NULL;
 #ifndef PCSCLITE_STATIC_DRIVER

@@ -50,7 +50,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * / Load a module (if needed)
  */
-void * DYN_LoadLibrary(char *pcLibrary)
+void * DYN_LoadLibrary(const char *pcLibrary)
 {
 
 	CFStringRef bundlePath;
