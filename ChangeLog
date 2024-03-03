@@ -1,3 +1,12 @@
+2.0.2: Ludovic Rousseau
+3 March 2024
+- SCardConnect() & SCardReconnect(): restrict the protocol used
+- negotiate PTS also for the backup protocol
+- pcscd.8:
+  . document --disable-polkit
+  . add "CONFIGURATION FILE" section
+- Some other minor improvements
+
 2.0.1: Ludovic Rousseau
 24 November 2023
 - SCardConnect(): return SCARD_W_SECURITY_VIOLATION when needed (polkit)
