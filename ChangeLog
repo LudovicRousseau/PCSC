@@ -1,3 +1,7 @@
+2.0.3: Ludovic Rousseau
+3 March 2024
+- add SCARD_E_UNKNOWN_RES_MNG back
+
 2.0.2: Ludovic Rousseau
 3 March 2024
 - SCardConnect() & SCardReconnect(): restrict the protocol used
