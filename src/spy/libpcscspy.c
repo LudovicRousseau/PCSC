@@ -320,11 +320,17 @@ static LONG load_lib(void)
 
 #define LIBPCSC "libpcsclite_real.so.1"
 
+	const char *lib;
+
+	lib = getenv("LIBPCSCLITE_SPY_DELEGATE");
+	if (NULL == lib)
+		lib = LIBPCSC;
+
 	/* load the normal library */
-	Lib_handle = dlopen(LIBPCSC, RTLD_LAZY);
+	Lib_handle = dlopen(lib, RTLD_LAZY);
 	if (NULL == Lib_handle)
 	{
-		log_line("loading \"" LIBPCSC "\" failed: %s", dlerror());
+		log_line("loading \"%s\" failed: %s", lib, dlerror());
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
