@@ -322,8 +322,15 @@ static LONG load_lib(void)
 
 	const char *lib;
 
-	lib = getenv("LIBPCSCLITE_SPY_DELEGATE");
-	if (NULL == lib)
+	/* if process is not root */
+	if (geteuid() != 0)
+	{
+		lib = getenv("LIBPCSCLITE_SPY_DELEGATE");
+		if (NULL == lib)
+			lib = LIBPCSC;
+	}
+	else
+		/* otherwise do not allow getenv(3) */
 		lib = LIBPCSC;
 
 	/* load the normal library */
