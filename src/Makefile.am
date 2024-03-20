@@ -35,7 +35,7 @@ libpcsclite_real_la_SOURCES = \
 	utils.c \
 	winscard_msg.c
 libpcsclite_real_la_LDFLAGS = -version-info 1:0:0
-libpcsclite_real_la_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
+libpcsclite_real_la_CFLAGS = $(PTHREAD_CFLAGS) -DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE
 libpcsclite_real_la_LIBADD = $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 
 libpcsclite_fake_la_SOURCES = \
@@ -85,7 +85,7 @@ pcscd_SOURCES = \
 	winscard_msg_srv.c \
 	winscard_svc.c \
 	winscard_svc.h
-pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
+pcscd_CFLAGS = $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
 	$(POLKIT_CFLAGS) $(LIBSYSTEMD_CFLAGS) \
 	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
 pcscd_LDFLAGS = $(LDFLAGS) $(LIBSYSTEMD_LIBS) -export-dynamic
