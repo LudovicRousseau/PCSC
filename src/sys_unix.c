@@ -116,7 +116,9 @@ INTERNAL int SYS_RandomInt(void)
 	ret = getrandom(c, sizeof c, 0);
 	if (-1 == ret)
 	{
+#ifndef LIBREDIRECT
 		Log2(PCSC_LOG_ERROR, "getrandom() failed: %s", strerror(errno));
+#endif
 		return lrand48();
 	}
 	// this loop avoids trap representations that may occur in the naive solution
