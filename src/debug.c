@@ -47,6 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* We shall not export the log_msg() symbol */
 #undef PCSC_API
 #include "debuglog.h"
+#include "sys_generic.h"
 
 #define DEBUG_BUF_SIZE 2048
 
@@ -67,18 +68,18 @@ static signed char LogDoColor = 0;	/**< no color by default */
 
 static void log_init(void)
 {
-	char *e;
+	const char *e;
 
-	e = getenv("PCSCLITE_DEBUG");
+	e = SYS_GetEnv("PCSCLITE_DEBUG");
 	if (e)
 		LogLevel = atoi(e);
 
 	/* log to stderr and stderr is a tty? */
 	if (isatty(fileno(stderr)))
 	{
-		char *term;
+		const char *term;
 
-		term = getenv("TERM");
+		term = SYS_GetEnv("TERM");
 		if (term)
 		{
 			const char *terms[] = { "linux", "xterm", "xterm-color", "Eterm", "rxvt", "rxvt-unicode" };

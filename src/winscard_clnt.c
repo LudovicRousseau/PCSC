@@ -529,7 +529,7 @@ static void init_lib(void)
 		return;
 	}
 
-	if (getenv("PCSCLITE_NO_BLOCKING"))
+	if (SYS_GetEnv("PCSCLITE_NO_BLOCKING"))
 	{
 		Log1(PCSC_LOG_INFO, "Disable shared blocking");
 		sharing_shall_block = false;

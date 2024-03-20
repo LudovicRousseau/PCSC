@@ -168,7 +168,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		return SCARD_E_INVALID_VALUE;
 
 #ifdef FILTER_NAMES
-	const char *ro_filter = getenv("PCSCLITE_FILTER_IGNORE_READER_NAMES");
+	const char *ro_filter = SYS_GetEnv("PCSCLITE_FILTER_IGNORE_READER_NAMES");
 	if (ro_filter)
 	{
 		char *filter, *next;
@@ -584,7 +584,7 @@ LONG RFRemoveReader(const char *readerName, int port, int flags)
 		return SCARD_E_INVALID_VALUE;
 
 #ifdef FILTER_NAMES
-	extend = getenv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
+	extend = SYS_GetEnv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
 	if (extend)
 		extend_size = strlen(extend);
 #endif
@@ -802,7 +802,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	}
 
 #ifdef FILTER_NAMES
-	extend = getenv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
+	extend = SYS_GetEnv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
 	if (NULL == extend)
 		extend = "";
 #endif
