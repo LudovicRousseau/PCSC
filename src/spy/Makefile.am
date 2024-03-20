@@ -5,7 +5,8 @@ dist_bin_SCRIPTS = pcsc-spy
 dist_doc_DATA = setup_spy.sh
 
 libpcscspy_la_SOURCES = \
-	libpcscspy.c
+	libpcscspy.c \
+	../sys_unix.c
 
 if ENABLE_DOC
 man_MANS = pcsc-spy.1

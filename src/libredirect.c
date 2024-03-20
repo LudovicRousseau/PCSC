@@ -46,6 +46,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "misc.h"
 #include <winscard.h>
+#include "sys_generic.h"
 
 #define DEBUG
 
@@ -163,15 +164,8 @@ static LONG load_lib(void)
 
 	const char *lib;
 
-	/* if process is not root */
-	if (geteuid() != 0)
-	{
-		lib = getenv("LIBPCSCLITE_DELEGATE");
-		if (NULL == lib)
-			lib = LIBPCSC;
-	}
-	else
-		/* otherwise do not allow getenv(3) */
+	lib = SYS_GetEnv("LIBPCSCLITE_DELEGATE");
+	if (NULL == lib)
 		lib = LIBPCSC;
 
 	/* load the real library */

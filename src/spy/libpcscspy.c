@@ -29,6 +29,7 @@
 
 #include "misc.h"
 #include <winscard.h>
+#include "sys_generic.h"
 
 #define DEBUG
 
@@ -322,15 +323,8 @@ static LONG load_lib(void)
 
 	const char *lib;
 
-	/* if process is not root */
-	if (geteuid() != 0)
-	{
-		lib = getenv("LIBPCSCLITE_SPY_DELEGATE");
-		if (NULL == lib)
-			lib = LIBPCSC;
-	}
-	else
-		/* otherwise do not allow getenv(3) */
+	lib = SYS_GetEnv("LIBPCSCLITE_SPY_DELEGATE");
+	if (NULL == lib)
 		lib = LIBPCSC;
 
 	/* load the normal library */
@@ -393,7 +387,7 @@ PCSC_API p_SCardEstablishContext(SCardEstablishContext)
 			return rv;
 
 		/* check if we can log */
-		home = getenv("HOME");
+		home = SYS_GetEnv("HOME");
 		if (NULL == home)
 			home = "/tmp";
 

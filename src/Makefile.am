@@ -22,7 +22,8 @@ endif
 
 libpcsclite_la_SOURCES = \
 	error.c \
-	libredirect.c
+	libredirect.c \
+	sys_unix.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
 
 libpcsclite_real_la_SOURCES = \
