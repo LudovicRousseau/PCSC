@@ -5,7 +5,7 @@ AC_PREREQ([2.69])
 
 AC_INIT([pcsc-lite], [2.0.3])
 AC_CONFIG_SRCDIR(src/pcscdaemon.c)
-AM_INIT_AUTOMAKE(1.8 dist-bzip2 no-dist-gzip foreign)
+AM_INIT_AUTOMAKE(1.8 dist-bzip2 no-dist-gzip foreign subdir-objects)
 AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_MACRO_DIR(m4)
