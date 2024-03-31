@@ -137,16 +137,6 @@ AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 # check for mq_getattr()
 AC_CHECK_LIB(rt, mq_getattr, [LIBS="$LIBS -lrt"])
 
-# check for libsystemd
-AC_ARG_ENABLE(libsystemd,
-	AS_HELP_STRING([--disable-libsystemd], [do not use libsystemd]),
-	[ use_libsystemd="${enableval}" ], [ use_libsystemd="yes" ] )
-AS_IF([test "$use_libsystemd" != "no"],
-	[PKG_CHECK_MODULES(LIBSYSTEMD, libsystemd,,
-		[ AC_MSG_ERROR([install libsystemd-dev or use --disable-libsystemd]) ])
-	AC_DEFINE(USE_LIBSYSTEMD, 1, [Use libsystemd])
-	PCSCLITE_FEATURES="${PCSCLITE_FEATURES} libsystemd"])
-
 # --disable-serial
 AC_ARG_ENABLE(serial,
 	AS_HELP_STRING([--disable-serial], [do not use serial reader.conf files]),
@@ -415,7 +405,6 @@ ATR parsing messages:   ${debugatr}
 ipcdir:                 ${ipcdir}
 use serial:             ${use_serial}
 use usb:                ${use_usb}
-use libsystemd:         ${use_libsystemd}
 systemd unit directory: ${with_systemdsystemunitdir}
 serial config dir.:     ${confdir_exp}
 filter:                 ${use_filter}

@@ -76,9 +76,9 @@ pcscd_SOURCES = \
 	winscard_svc.c \
 	winscard_svc.h
 pcscd_CFLAGS = $(CFLAGS) $(PTHREAD_CFLAGS) $(LIBUSB_CFLAGS) $(LIBUDEV_CFLAGS) \
-	$(POLKIT_CFLAGS) $(LIBSYSTEMD_CFLAGS) \
+	$(POLKIT_CFLAGS) \
 	-DPCSCD -DSIMCLIST_NO_DUMPRESTORE
-pcscd_LDFLAGS = $(LDFLAGS) $(LIBSYSTEMD_LIBS) -export-dynamic
+pcscd_LDFLAGS = $(LDFLAGS) -export-dynamic
 pcscd_LDADD = \
 	$(PTHREAD_LIBS) $(COREFOUNDATION) \
 	$(LIBUSB_LIBS) $(IOKIT) $(LIBUDEV_LIBS) \

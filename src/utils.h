@@ -57,6 +57,9 @@ int CheckForOpenCT(void);
 int ThreadCreate(pthread_t *, int, PCSCLITE_THREAD_FUNCTION( ),
 	/*@null@*/ LPVOID);
 
+#define LISTEN_FDS_START 3
+int GetListenFdCount(void);
+
 #endif
 
 #endif

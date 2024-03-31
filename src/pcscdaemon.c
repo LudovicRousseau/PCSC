@@ -54,9 +54,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif
-#ifdef USE_LIBSYSTEMD
-#include <systemd/sd-daemon.h>
-#endif
 
 #include "misc.h"
 #include "pcsclite.h"
@@ -441,11 +438,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-#ifdef USE_LIBSYSTEMD
-	/*
-	 * Check if systemd passed us any file descriptors
-	 */
-	rv = sd_listen_fds(0);
+	rv = GetListenFdCount();
 	if (rv > 1)
 	{
 		Log1(PCSC_LOG_CRITICAL, "Too many file descriptors received");
@@ -456,12 +449,11 @@ int main(int argc, char **argv)
 		if (rv == 1)
 		{
 			SocketActivated = true;
-			Log1(PCSC_LOG_INFO, "Started by systemd");
+			Log1(PCSC_LOG_INFO, "Started with socket activation");
 		}
 		else
 			SocketActivated = false;
 	}
-#endif
 
 	/*
 	 * test the presence of /var/run/pcscd/pcscd.comm
@@ -720,11 +712,9 @@ int main(int argc, char **argv)
 	/*
 	 * Initialize the comm structure
 	 */
-#ifdef USE_LIBSYSTEMD
 	if (SocketActivated)
-		rv = ListenExistingSocket(SD_LISTEN_FDS_START + 0);
+		rv = ListenExistingSocket(LISTEN_FDS_START + 0);
 	else
-#endif
 		rv = InitializeSocket();
 
 	if (rv)
