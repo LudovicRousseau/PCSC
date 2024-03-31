@@ -57,9 +57,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
-#ifdef USE_LIBSYSTEMD
-#include <systemd/sd-daemon.h>
-#endif
 
 #include "misc.h"
 #include "pcscd.h"
@@ -165,7 +162,6 @@ INTERNAL int32_t InitializeSocket(void)
 	return 0;
 }
 
-#ifdef USE_LIBSYSTEMD
 /**
  * @brief Acquires a socket passed in from systemd.
  *
@@ -180,16 +176,27 @@ INTERNAL int32_t InitializeSocket(void)
  */
 INTERNAL int32_t ListenExistingSocket(int fd)
 {
-	if (!sd_is_socket(fd, AF_UNIX, SOCK_STREAM, -1))
-	{
+	socklen_t sockopt_size, sockaddr_size;
+	struct sockaddr_storage ss;
+	int rv, sockopt;
+
+	sockaddr_size = sizeof ss;
+	rv = getsockname(fd, (struct sockaddr *)&ss, &sockaddr_size);
+	if (rv == -1 || sockaddr_size < sizeof ss.ss_family || ss.ss_family != AF_UNIX) {
 		Log1(PCSC_LOG_CRITICAL, "Passed FD is not an UNIX socket");
+		return -1;
+	}
+
+	sockopt_size = sizeof sockopt;
+	rv = getsockopt(fd, SOL_SOCKET, SO_TYPE, &sockopt, &sockopt_size);
+	if (rv == -1 || sockopt_size != sizeof sockopt || sockopt != SOCK_STREAM) {
+		Log1(PCSC_LOG_CRITICAL, "Passed FD is not a stream type socket");
 		return -1;
 	}
 
 	commonSocket = fd;
 	return 0;
 }
-#endif
 
 /**
  * @brief Looks for messages sent by clients.

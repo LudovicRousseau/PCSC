@@ -43,6 +43,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dirent.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <limits.h>
 
 #include "config.h"
 #include "debuglog.h"
@@ -186,5 +187,41 @@ int ThreadCreate(pthread_t * pthThread, int attributes,
 error:
 	pthread_attr_destroy(&attr);
 	return ret;
+}
+
+int GetListenFdCount(void)
+{
+	long long num;
+	char *endptr;
+	const char *envv;
+	int flags;
+
+	envv = getenv("LISTEN_PID");
+        if (envv == NULL)
+		return 0;
+
+	errno = 0;
+	num = strtoll(envv, &endptr, 0);
+	if (errno != 0 || *endptr != '\0' || num != getpid())
+		return 0;
+
+	envv = getenv("LISTEN_FDS");
+	if (envv == NULL)
+		return 0;
+
+	errno = 0;
+	num = strtoll(envv, &endptr, 0);
+	if (errno != 0 || *endptr != '\0' || num < 0 || num > INT_MAX - LISTEN_FDS_START)
+		return 0;
+
+	for (int fd = LISTEN_FDS_START; fd < LISTEN_FDS_START + num; fd++) {
+		flags = fcntl(fd, F_GETFD);
+		if (flags == -1)
+			return -1;
+		if (fcntl(fd, F_SETFD, flags | O_CLOEXEC) == -1)
+			return -1;
+	}
+
+	return num;
 }
 #endif
