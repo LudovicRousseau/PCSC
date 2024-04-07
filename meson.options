@@ -1,0 +1,51 @@
+option('libsystemd',
+  type : 'boolean',
+  description : 'Use systemd for daemon auto start')
+
+option('libudev',
+  type : 'boolean',
+  description : 'Use libudev (preferred) for USB hotplug')
+
+option('libusb',
+  type : 'boolean',
+  value : false,
+  description : 'Use libusb for USB hotplug')
+
+option('polkit',
+  type : 'boolean',
+  description : 'Use polkit to enforce access control')
+
+option('usb',
+  type : 'boolean',
+  description : 'Support USB readers')
+
+option('serial',
+  type : 'boolean',
+  value : false,
+  description : 'Support serial readers')
+
+option('serialconfdir',
+  type : 'string',
+  value : '/etc/reader.conf.d',
+  description : 'Path for serial configuration files')
+
+option('usbdropdir',
+  type : 'string',
+  value : '/usr/lib/pcsc/drivers',
+  description : 'Path for USB drivers')
+
+option('ipcdir',
+  type : 'string',
+  value : '/run/pcscd',
+  description : 'Direcrory for pcsc-lite internal communication socket')
+
+option('systemdunit',
+  type : 'combo',
+  choices : ['user', 'system'],
+  value : 'user',
+  description : 'Systemd unit directory to use')
+
+option('embedded',
+  type : 'boolean',
+  value : 'false',
+  description : 'for embedded systems [limit RAM and CPU resources by disabling features (log)]')
