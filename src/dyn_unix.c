@@ -38,7 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#if defined(HAVE_DLFCN_H) && !defined(HAVE_DL_H) && !defined(__APPLE__)
+#ifndef __APPLE__
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -111,4 +111,4 @@ INTERNAL LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle,
 	return rv;
 }
 
-#endif	/* HAVE_DLFCN_H && !HAVE_DL_H && !__APPLE__ */
+#endif	/* !__APPLE__ */
