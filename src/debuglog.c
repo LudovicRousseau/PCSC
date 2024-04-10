@@ -36,9 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
