@@ -1,3 +1,10 @@
+2.1.0: Ludovic Rousseau
+12 April 2024
+- LIBPCSCLITE_DELEGATE is used to redirect to another libpcsclite library
+- setup_spy.sh displays the LIBPCSCLITE_DELEGATE value to use for spying
+- provides libfake.c as a sample source code
+- Some other minor improvements
+
 2.0.3: Ludovic Rousseau
 3 March 2024
 - add SCARD_E_UNKNOWN_RES_MNG back
