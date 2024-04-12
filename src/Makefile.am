@@ -25,7 +25,6 @@ libpcsclite_la_SOURCES = \
 	libredirect.c \
 	sys_unix.c
 libpcsclite_la_LDFLAGS = -version-info 1:0:0
-libpcsclite_la_CFLAGS = -DLIBREDIRECT
 
 libpcsclite_real_la_SOURCES = \
 	debug.c \
