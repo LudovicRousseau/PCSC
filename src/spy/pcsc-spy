@@ -54,14 +54,14 @@ def _parse_rv(line):
     if line == "":
         raise Exception("Empty line (application exited?)")
 
-    (direction, sec, usec, function, code, rv) = line.split('|')
+    (direction, sec, usec, function, rv) = line.split('|')
     if direction != '<':
         raise Exception("Wrong line:", line)
 
     sec = int(sec)
     usec = int(usec)
 
-    return (code, rv, sec, usec)
+    return (rv, sec, usec)
 
 
 class SpyExit(Exception):
@@ -98,7 +98,7 @@ class PCSCspy(object):
     def _log_rv(self):
         """ log the return value """
         line = self.get_line()
-        (code, rv, sec, usec) = _parse_rv(line)
+        (rv, sec, usec) = _parse_rv(line)
         delta_sec = sec - self.sec
         delta_usec = usec - self.usec
         if delta_usec < 0:
@@ -173,7 +173,7 @@ class PCSCspy(object):
             0x8010006F: "SCARD_W_CARD_NOT_AUTHENTICATED",
             }
         rv_text = rvs[int(rv, 16)]
-        data = " => " + code + " (" + rv_text + " [" + rv + "]) "
+        data = " => " + rv_text + " [" + rv + "] "
         if "0x00000000" != rv:
             if self.color:
                 print(self.indent + PCSCspy.color_red + data +
@@ -933,7 +933,7 @@ class PCSCdemultiplexer(object):
         for thread in threads:
             threads[thread].join()
 
-        (code, rv, sec, usec) = _parse_rv(lastest_result)
+        (rv, sec, usec) = _parse_rv(lastest_result)
         end_time = sec + usec / 1000000.
         total_time = end_time - start_time
 
