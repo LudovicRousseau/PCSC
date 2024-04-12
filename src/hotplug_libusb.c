@@ -576,7 +576,7 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 			return -1;
 		}
 
-		ThreadCreate(&usbNotifyThread, THREAD_ATTR_DETACHED,
+		ThreadCreate(&usbNotifyThread, 0,
 			(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, pipefd);
 
 		/* Wait for initial readers to setup */
@@ -596,12 +596,16 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 
 LONG HPStopHotPluggables(void)
 {
+	/* tell the rescan thread to shut down; it checks the ara kiri flag, but it
+	 * might also need to be awaken from reading the rescan pipe */
 	AraKiriHotPlug = true;
 	if (rescan_pipe[1] >= 0)
 	{
 		close(rescan_pipe[1]);
 		rescan_pipe[1] = -1;
 	}
+	/* wait for the rescan thread to complete its cleanup */
+	pthread_join(usbNotifyThread, NULL);
 
 	return 0;
 }
