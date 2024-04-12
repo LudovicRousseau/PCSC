@@ -506,12 +506,6 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 	else
 	{
 		char dummy;
-
-		if (pipe(rescan_pipe) == -1)
-		{
-			Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
-			return NULL;
-		}
 		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
 		{
 			if (AraKiriHotPlug)
@@ -523,8 +517,6 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 #endif
 			Log1(PCSC_LOG_INFO, "End reload serial configuration");
 		}
-		close(rescan_pipe[0]);
-		rescan_pipe[0] = -1;
 	}
 
 	libusb_exit(ctx);
@@ -567,10 +559,17 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 
 	if (HPReadBundleValues(hpDirPath) > 0)
 	{
+		/* used for waiting for the initialization completion */
 		int pipefd[2];
 		char c;
-
 		if (pipe(pipefd) == -1)
+		{
+			Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
+			return -1;
+		}
+
+		/* used for rescan events */
+		if (pipe(rescan_pipe) == -1)
 		{
 			Log2(PCSC_LOG_ERROR, "pipe: %s", strerror(errno));
 			return -1;
@@ -584,7 +583,7 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 		{
 			Log2(PCSC_LOG_ERROR, "read: %s", strerror(errno));
 			return -1;
-		};
+		}
 
 		/* cleanup pipe fd */
 		close(pipefd[0]);
