@@ -13,6 +13,6 @@ DIR=$(echo "$DIR" | cut -d'=' -f2 | cut -d' ' -f2)
 # get the directory part only: /usr/lib/x86_64-linux-gnu
 DIR=$(dirname "$DIR")
 
-cmd="export LIBPCSCLITE_DELEGATE=$DIR/libpcscspy.so"
+cmd="export LIBPCSCLITE_DELEGATE=$DIR/libpcscspy.so.0"
 echo "$cmd"
 $cmd
