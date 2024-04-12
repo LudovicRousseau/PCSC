@@ -10,19 +10,11 @@ pcsc-spy [B<-n>|B<--nocolor>] [B<-d>|B<--diffable>] [B<-h>|B<--help>]
 =head1 DESCRIPTION
 
 pcsc-spy displays PC/SC calls of an application. It must be used with
-the F<libpcscspy.so> library.
+the F<libpcscspy.so.0> library.
 
 To be able to spy the PC/SC layer, the application flow must be
-modified so that all PC/SC calls are redirected. Two options are
-available:
-
-=over
-
-=item - the application is linked with F<libpcsclite.so.1>
-
-=item - the application loads the F<libpcsclite.so.1> library using dlopen(3)
-
-=back
+modified using C<LIBPCSCLITE_DELEGATE> so that all PC/SC calls are
+redirected. 
 
 =head1 OPTIONS
 
@@ -56,31 +48,15 @@ the same threads.
 
 =head1 EXAMPLES
 
-=head2 Applications linked with libpcsclite.so.1
-
-We will use the standard C<LD_PRELOAD> loader option to load our spying
-library.
+We will use the C<LIBPCSCLITE_DELEGATE> environment variable to load our
+spying library.
 
 Example:
 
- LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libpcscspy.so pcsc_scan
+ sh /usr/share/doc/libpcsclite-dev/setup_spy.sh
+ export LIBPCSCLITE_DELEGATE=/lib/x86_64-linux-gnu/libpcscspy.so.0
 
-=head2 Application loading libpcsclite.so.1
-
-This is the case for the PC/SC wrappers like pyscard (for Python) and
-pcsc-perl (for Perl). The LD_PRELOAD mechanism can't be used. Instead
-we replace the F<libpcsclite.so.1> library by the spying one.
-
-You may use F<install_spy.sh> and F<uninstall_spy.sh> to install and
-uninstall the spying library.
-
-Using the spying library without F<pcsc-spy> is not a problem but has
-side effects:
-
-- a line "libpcsclite_nospy.so.1: cannot open shared object file:
-No such file or directory" will be displayed
-
-- some CPU time will be lost because of the PC/SC calls redirection
+ LIBPCSCLITE_DELEGATE=/lib/x86_64-linux-gnu/libpcscspy.so.0 my_application
 
 =head2 Starting the spy tool
 
@@ -99,7 +75,7 @@ and run your PC/SC application.
 
 =head1 FILES
 
-F<~/pcsc-spy> FIFO file is used by F<libpcsclite.so.1> to send the raw
+F<~/pcsc-spy> FIFO file is used by F<libpcscspy.so.0> to send the raw
 log lines
 
 =head1 SEE ALSO
