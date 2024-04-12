@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Update PATH to get access to ldconfig(8)
+PATH="$PATH:/usr/sbin"
+
 # ldconfig --print-cache will return something like
 # libpcsclite.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libpcsclite.so.1
 DIR=$(ldconfig --print-cache | grep libpcsclite.so.1)
