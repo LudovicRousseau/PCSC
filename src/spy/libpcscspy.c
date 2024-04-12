@@ -205,8 +205,8 @@ static void spy_quit(const char *fname, LONG rv)
 	struct timeval profile_time;
 
 	gettimeofday(&profile_time, NULL);
-	spy_line("<|%ld|%ld|%s|%s|0x%08lX", profile_time.tv_sec,
-		profile_time.tv_usec, fname, pcsc_stringify_error(rv), rv);
+	spy_line("<|%ld|%ld|%s|0x%08lX", profile_time.tv_sec,
+		profile_time.tv_usec, fname, rv);
 }
 
 #define Enter() spy_enter(__FUNCTION__)
