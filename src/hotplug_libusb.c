@@ -447,30 +447,6 @@ static void HPRescanUsbBus(void)
 
 	/* free the libusb allocated list & devices */
 	libusb_free_device_list(devs, 1);
-
-	if (AraKiriHotPlug)
-	{
-		int retval;
-
-		for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
-		{
-			if (readerTracker[i].fullName != NULL)
-				HPCleanupHotPluggable(i);
-		}
-
-		for (i=0; i<driverSize; i++)
-		{
-			/* free strings allocated by strdup() */
-			free(driverTracker[i].bundleName);
-			free(driverTracker[i].libraryPath);
-			free(driverTracker[i].readerName);
-			free(driverTracker[i].CFBundleName);
-		}
-		free(driverTracker);
-
-		Log1(PCSC_LOG_INFO, "Hotplug stopped");
-		pthread_exit(&retval);
-	}
 }
 
 static void * HPEstablishUSBNotifications(int pipefd[2])
@@ -526,7 +502,6 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 			SYS_Sleep(HPForceReaderPolling);
 			HPRescanUsbBus();
 		}
-		libusb_exit(ctx);
 	}
 	else
 	{
@@ -551,6 +526,29 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 		close(rescan_pipe[0]);
 		rescan_pipe[0] = -1;
 	}
+
+	libusb_exit(ctx);
+
+	for (int i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	{
+		if (readerTracker[i].fullName != NULL)
+			HPCleanupHotPluggable(i);
+	}
+
+	for (int i=0; i<driverSize; i++)
+	{
+		/* free strings allocated by strdup() */
+		free(driverTracker[i].bundleName);
+		free(driverTracker[i].libraryPath);
+		free(driverTracker[i].readerName);
+		free(driverTracker[i].CFBundleName);
+	}
+	free(driverTracker);
+
+	close(rescan_pipe[0]);
+	rescan_pipe[0] = -1;
+
+	Log1(PCSC_LOG_INFO, "Hotplug stopped");
 
 	return NULL;
 }
