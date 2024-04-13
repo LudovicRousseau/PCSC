@@ -539,6 +539,8 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 		}
 		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
 		{
+			if (AraKiriHotPlug)
+				break;
 			Log1(PCSC_LOG_INFO, "Reload serial configuration");
 			HPRescanUsbBus();
 #ifdef USE_SERIAL
@@ -597,6 +599,8 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 LONG HPStopHotPluggables(void)
 {
 	AraKiriHotPlug = true;
+	HPReCheckSerialReaders();
+
 	if (rescan_pipe[1] >= 0)
 	{
 		close(rescan_pipe[1]);
