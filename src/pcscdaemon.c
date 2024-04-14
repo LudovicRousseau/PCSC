@@ -51,9 +51,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#ifdef HAVE_GETOPT_H
 #include <getopt.h>
-#endif
 #ifdef USE_LIBSYSTEMD
 #include <systemd/sd-daemon.h>
 #endif
