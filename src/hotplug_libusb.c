@@ -584,7 +584,7 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 		{
 			Log2(PCSC_LOG_ERROR, "read: %s", strerror(errno));
 			return -1;
-		};
+		}
 
 		/* cleanup pipe fd */
 		close(pipefd[0]);
