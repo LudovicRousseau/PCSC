@@ -341,7 +341,6 @@ AC_ARG_ENABLE(ipcdir,
 [ipcdir="${enableval}"], [ipcdir=false])
 
 AS_IF([test x${ipcdir} = xfalse], [ipcdir="/run/pcscd"])
-AC_DEFINE_UNQUOTED(USE_IPCDIR, "$ipcdir", [directory containing IPC files])
 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} ipcdir=${ipcdir}"
 
 CPPFLAGS="-I\${top_srcdir}/src $CPPFLAGS"

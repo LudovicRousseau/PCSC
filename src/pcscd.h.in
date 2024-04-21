@@ -44,7 +44,7 @@
 
 #define PCSCLITE_CONFIG_DIR		"@PCSCLITE_CONFIG_DIR@"
 
-#define PCSCLITE_IPC_DIR		USE_IPCDIR
+#define PCSCLITE_IPC_DIR		"@ipcdir@"
 #define PCSCLITE_RUN_PID		PCSCLITE_IPC_DIR "/pcscd.pid"
 
 #define PCSCLITE_CSOCK_NAME		PCSCLITE_IPC_DIR "/pcscd.comm"
