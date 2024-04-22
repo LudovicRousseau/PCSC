@@ -41,9 +41,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "pcsclite.h"
+#include "PCSC/pcsclite.h"
 #include "readerfactory.h"
-#include "wintypes.h"
+#include "PCSC/wintypes.h"
 
 	/**
 	 * Define an exported public reader state structure so each
