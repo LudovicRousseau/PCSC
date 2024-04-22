@@ -41,7 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <inttypes.h>
 #include <pthread.h>
 
-#include "ifdhandler.h"
+#include "PCSC/ifdhandler.h"
 #include "pcscd.h"
 #include "simclist.h"
 
