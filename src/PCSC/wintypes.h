@@ -74,6 +74,10 @@ extern "C"
 
 #else
 
+#ifdef __CYGWIN__
+#include <_mingw.h>
+#endif
+
 #ifndef BYTE
 	typedef unsigned char BYTE;
 #endif
@@ -82,14 +86,26 @@ extern "C"
 	typedef unsigned short USHORT;
 
 #ifndef __COREFOUNDATION_CFPLUGINCOM__
-	typedef unsigned long ULONG;
+#ifndef __CYGWIN__
+        typedef unsigned long ULONG;
+#else
+        typedef unsigned __LONG32 ULONG;
+#endif
 	typedef void *LPVOID;
 #endif
 
 	typedef const void *LPCVOID;
-	typedef unsigned long DWORD;
+#ifndef __CYGWIN__
+        typedef unsigned long DWORD;
+#else
+        typedef unsigned __LONG32 DWORD;
+#endif
 	typedef DWORD *PDWORD;
-	typedef long LONG;
+#ifndef __CYGWIN__
+        typedef long LONG;
+#else
+        typedef __LONG32 LONG;
+#endif
 	typedef const char *LPCSTR;
 	typedef const BYTE *LPCBYTE;
 	typedef BYTE *LPBYTE;
@@ -102,7 +118,11 @@ extern "C"
 	typedef LPCSTR LPCTSTR;
 
 	/* types unused by pcsc-lite */
-	typedef short BOOL;
+#ifndef __CYGWIN__
+        typedef short BOOL;
+#else
+        typedef int BOOL;
+#endif
 	typedef unsigned short WORD;
 	typedef ULONG *PULONG;
 
