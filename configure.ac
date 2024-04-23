@@ -37,7 +37,10 @@ AS_CASE(["$host"],
 		IOKIT="-Wl,-framework,IOKit"
 		AS_IF([test "$GCC" = "yes"], [CFLAGS="$CFLAGS -no-cpp-precomp"])
 		use_libusb=no
-		AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])]
+		AC_MSG_WARN([libusb disabled on Darwin for pcsc-lite])],
+        [*-*-cygwin*], [
+                CPPFLAGS="$CPPFLAGS -I/usr/include"
+                LDFLAGS="$LDFLAGS -L/usr/lib"]
 )
 
 # Options
