@@ -8,7 +8,7 @@ doc_DATA = \
 man_MANS = pcscd.8 reader.conf.5 
 man_in = pcscd.8.in reader.conf.5.in
 
-EXTRA_DIST = $(doc_DATA) $(man_in) doxygen.conf.in formaticc.1 \
+EXTRA_DIST = $(doc_DATA) $(man_in) doxygen.conf.in \
 	org.debian.pcsc-lite.policy
 
 doxygen:
