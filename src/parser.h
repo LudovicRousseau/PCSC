@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2003
  *  Toni Andjelkovic <toni@soth.at>
- * Copyright (C) 2003-2009
+ * Copyright (C) 2003-2018
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without

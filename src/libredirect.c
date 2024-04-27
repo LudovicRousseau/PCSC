@@ -1,7 +1,7 @@
 /*
  * MUSCLE SmartCard Development ( https://pcsclite.apdu.fr/ )
  *
- * Copyright (C) 2025
+ * Copyright (C) 2024
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without

@@ -5,7 +5,7 @@
  *  David Corcoran <corcoran@musclecard.com>
  * Copyright (C) 2003-2004
  *  Damien Sauveron <damien.sauveron@labri.fr>
- * Copyright (C) 2002-2010
+ * Copyright (C) 2002-2023
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2007
  *  Jacob Berkman
- * Copyright (C) 2008
+ * Copyright (C) 2008-2014
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without

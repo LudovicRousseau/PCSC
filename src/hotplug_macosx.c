@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2002-2004
  *  Stephen M. Webb <stephenw@cryptocard.com>
- * Copyright (C) 2002-2011
+ * Copyright (C) 2002-2023
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  * Copyright (C) 2002
  *  David Corcoran <corcoran@musclecard.com>
