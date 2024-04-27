@@ -14,7 +14,7 @@ the F<libpcscspy.so.0> library.
 
 To be able to spy the PC/SC layer, the application flow must be
 modified using C<LIBPCSCLITE_DELEGATE> so that all PC/SC calls are
-redirected. 
+redirected.
 
 =head1 OPTIONS
 
