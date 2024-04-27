@@ -50,43 +50,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define DEBUG
 
-/* function prototypes */
-
-#define p_SCardEstablishContext(fct) LONG(fct)(DWORD dwScope, LPCVOID pvReserved1, LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
-
-#define p_SCardReleaseContext(fct) LONG(fct)(SCARDCONTEXT hContext)
-
-#define p_SCardIsValidContext(fct) LONG(fct) (SCARDCONTEXT hContext)
-
-#define p_SCardConnect(fct) LONG(fct) (SCARDCONTEXT hContext, LPCSTR szReader, DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard, LPDWORD pdwActiveProtocol)
-
-#define p_SCardReconnect(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwShareMode, DWORD dwPreferredProtocols, DWORD dwInitialization, LPDWORD pdwActiveProtocol)
-
-#define p_SCardDisconnect(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwDisposition)
-
-#define p_SCardBeginTransaction(fct) LONG(fct) (SCARDHANDLE hCard)
-
-#define p_SCardEndTransaction(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwDisposition)
-
-#define p_SCardStatus(fct) LONG(fct) (SCARDHANDLE hCard, LPSTR mszReaderName, LPDWORD pcchReaderLen, LPDWORD pdwState, LPDWORD pdwProtocol, LPBYTE pbAtr, LPDWORD pcbAtrLen)
-
-#define p_SCardGetStatusChange(fct) LONG(fct) (SCARDCONTEXT hContext, DWORD dwTimeout, LPSCARD_READERSTATE rgReaderStates, DWORD cReaders)
-
-#define p_SCardControl(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwControlCode, LPCVOID pbSendBuffer, DWORD cbSendLength, LPVOID pbRecvBuffer, DWORD cbRecvLength, LPDWORD lpBytesReturned)
-
-#define p_SCardTransmit(fct) LONG(fct) (SCARDHANDLE hCard, const SCARD_IO_REQUEST * pioSendPci, LPCBYTE pbSendBuffer, DWORD cbSendLength, SCARD_IO_REQUEST * pioRecvPci, LPBYTE pbRecvBuffer, LPDWORD pcbRecvLength)
-
-#define p_SCardListReaderGroups(fct) LONG(fct) (SCARDCONTEXT hContext, LPSTR mszGroups, LPDWORD pcchGroups)
-
-#define p_SCardListReaders(fct) LONG(fct) (SCARDCONTEXT hContext, LPCSTR mszGroups, LPSTR mszReaders, LPDWORD pcchReaders)
-
-#define p_SCardFreeMemory(fct) LONG(fct) (SCARDCONTEXT hContext, LPCVOID pvMem)
-
-#define p_SCardCancel(fct) LONG(fct) (SCARDCONTEXT hContext)
-
-#define p_SCardGetAttrib(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwAttrId, LPBYTE pbAttr, LPDWORD pcbAttrLen)
-
-#define p_SCardSetAttrib(fct) LONG(fct) (SCARDHANDLE hCard, DWORD dwAttrId, LPCBYTE pbAttr, DWORD cbAttrLen)
+#define DLSYM_DECLARE(symbol)          \
+		typeof(symbol)* symbol
+#define DLSYM_SET_VALUE(symbol)        \
+		.symbol = (typeof(symbol)(*))internal_error
 
 /* fake function to just return en error code */
 static LONG internal_error(void)
@@ -99,44 +66,44 @@ static LONG internal_error(void)
 /* contains pointers to real functions */
 static struct
 {
-	p_SCardEstablishContext(*SCardEstablishContext);
-	p_SCardReleaseContext(*SCardReleaseContext);
-	p_SCardIsValidContext(*SCardIsValidContext);
-	p_SCardConnect(*SCardConnect);
-	p_SCardReconnect(*SCardReconnect);
-	p_SCardDisconnect(*SCardDisconnect);
-	p_SCardBeginTransaction(*SCardBeginTransaction);
-	p_SCardEndTransaction(*SCardEndTransaction);
-	p_SCardStatus(*SCardStatus);
-	p_SCardGetStatusChange(*SCardGetStatusChange);
-	p_SCardControl(*SCardControl);
-	p_SCardTransmit(*SCardTransmit);
-	p_SCardListReaderGroups(*SCardListReaderGroups);
-	p_SCardListReaders(*SCardListReaders);
-	p_SCardFreeMemory(*SCardFreeMemory);
-	p_SCardCancel(*SCardCancel);
-	p_SCardGetAttrib(*SCardGetAttrib);
-	p_SCardSetAttrib(*SCardSetAttrib);
+	DLSYM_DECLARE(SCardEstablishContext);
+	DLSYM_DECLARE(SCardReleaseContext);
+	DLSYM_DECLARE(SCardIsValidContext);
+	DLSYM_DECLARE(SCardConnect);
+	DLSYM_DECLARE(SCardReconnect);
+	DLSYM_DECLARE(SCardDisconnect);
+	DLSYM_DECLARE(SCardBeginTransaction);
+	DLSYM_DECLARE(SCardEndTransaction);
+	DLSYM_DECLARE(SCardStatus);
+	DLSYM_DECLARE(SCardGetStatusChange);
+	DLSYM_DECLARE(SCardControl);
+	DLSYM_DECLARE(SCardTransmit);
+	DLSYM_DECLARE(SCardListReaderGroups);
+	DLSYM_DECLARE(SCardListReaders);
+	DLSYM_DECLARE(SCardFreeMemory);
+	DLSYM_DECLARE(SCardCancel);
+	DLSYM_DECLARE(SCardGetAttrib);
+	DLSYM_DECLARE(SCardSetAttrib);
 } redirect = {
 	/* initialized with the fake internal_error() function */
-	.SCardEstablishContext = (p_SCardEstablishContext(*))internal_error,
-	.SCardReleaseContext = (p_SCardReleaseContext(*))internal_error,
-	.SCardIsValidContext = (p_SCardIsValidContext(*))internal_error,
-	.SCardConnect = (p_SCardConnect(*))internal_error,
-	.SCardReconnect = (p_SCardReconnect(*))internal_error,
-	.SCardDisconnect = (p_SCardDisconnect(*))internal_error,
-	.SCardBeginTransaction = (p_SCardBeginTransaction(*))internal_error,
-	.SCardEndTransaction = (p_SCardEndTransaction(*))internal_error,
-	.SCardStatus = (p_SCardStatus(*))internal_error,
-	.SCardGetStatusChange = (p_SCardGetStatusChange(*))internal_error,
-	.SCardControl = (p_SCardControl(*))internal_error,
-	.SCardTransmit = (p_SCardTransmit(*))internal_error,
-	.SCardListReaderGroups = (p_SCardListReaderGroups(*))internal_error,
-	.SCardListReaders = (p_SCardListReaders(*))internal_error,
-	.SCardFreeMemory = (p_SCardFreeMemory(*))internal_error,
-	.SCardCancel = (p_SCardCancel(*))internal_error,
-	.SCardGetAttrib = (p_SCardGetAttrib(*))internal_error,
-	.SCardSetAttrib = (p_SCardSetAttrib(*))internal_error,
+	DLSYM_SET_VALUE(SCardEstablishContext),
+	DLSYM_SET_VALUE(SCardReleaseContext),
+	DLSYM_SET_VALUE(SCardIsValidContext),
+	DLSYM_SET_VALUE(SCardConnect),
+	DLSYM_SET_VALUE(SCardReconnect),
+	DLSYM_SET_VALUE(SCardDisconnect),
+	DLSYM_SET_VALUE(SCardBeginTransaction),
+	DLSYM_SET_VALUE(SCardEndTransaction),
+	DLSYM_SET_VALUE(SCardStatus),
+	DLSYM_SET_VALUE(SCardGetStatusChange),
+	DLSYM_SET_VALUE(SCardControl),
+	DLSYM_SET_VALUE(SCardTransmit),
+	DLSYM_SET_VALUE(SCardListReaderGroups),
+	DLSYM_SET_VALUE(SCardListReaders),
+	DLSYM_SET_VALUE(SCardFreeMemory),
+	DLSYM_SET_VALUE(SCardCancel),
+	DLSYM_SET_VALUE(SCardGetAttrib),
+	DLSYM_SET_VALUE(SCardSetAttrib)
 };
 #pragma GCC diagnostic pop
 
@@ -208,7 +175,10 @@ static LONG load_lib(void)
 
 
 /* exported functions */
-PCSC_API p_SCardEstablishContext(SCardEstablishContext)
+PCSC_API LONG SCardEstablishContext(DWORD dwScope,
+	LPCVOID pvReserved1,
+	LPCVOID pvReserved2,
+	LPSCARDCONTEXT phContext)
 {
 	LONG rv;
 	static int init = 0;
@@ -228,93 +198,137 @@ PCSC_API p_SCardEstablishContext(SCardEstablishContext)
 	return rv;
 }
 
-PCSC_API p_SCardReleaseContext(SCardReleaseContext)
+PCSC_API LONG SCardReleaseContext(SCARDCONTEXT hContext)
 {
 	return redirect.SCardReleaseContext(hContext);
 }
 
-PCSC_API p_SCardIsValidContext(SCardIsValidContext)
+PCSC_API LONG SCardIsValidContext(SCARDCONTEXT hContext)
 {
 	return redirect.SCardIsValidContext(hContext);
 }
 
-PCSC_API p_SCardConnect(SCardConnect)
+PCSC_API LONG SCardConnect(SCARDCONTEXT hContext,
+	LPCSTR szReader,
+	DWORD dwShareMode,
+	DWORD dwPreferredProtocols,
+	LPSCARDHANDLE phCard,
+	LPDWORD pdwActiveProtocol)
 {
 	return redirect.SCardConnect(hContext, szReader, dwShareMode,
 		dwPreferredProtocols, phCard, pdwActiveProtocol);
 }
 
-PCSC_API p_SCardReconnect(SCardReconnect)
+PCSC_API LONG SCardReconnect(SCARDHANDLE hCard,
+	DWORD dwShareMode,
+	DWORD dwPreferredProtocols,
+	DWORD dwInitialization,
+	LPDWORD pdwActiveProtocol)
 {
 	return redirect.SCardReconnect(hCard, dwShareMode, dwPreferredProtocols,
 		dwInitialization, pdwActiveProtocol);
 }
 
-PCSC_API p_SCardDisconnect(SCardDisconnect)
+PCSC_API LONG SCardDisconnect(SCARDHANDLE hCard,
+	DWORD dwDisposition)
 {
 	return redirect.SCardDisconnect(hCard, dwDisposition);
 }
 
-PCSC_API p_SCardBeginTransaction(SCardBeginTransaction)
+PCSC_API LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
 	return redirect.SCardBeginTransaction(hCard);
 }
 
-PCSC_API p_SCardEndTransaction(SCardEndTransaction)
+PCSC_API LONG SCardEndTransaction(SCARDHANDLE hCard,
+	DWORD dwDisposition)
 {
 	return redirect.SCardEndTransaction(hCard, dwDisposition);
 }
 
-PCSC_API p_SCardStatus(SCardStatus)
+PCSC_API LONG SCardStatus(SCARDHANDLE hCard,
+	LPSTR mszReaderName,
+	LPDWORD pcchReaderLen,
+	LPDWORD pdwState,
+	LPDWORD pdwProtocol,
+	LPBYTE pbAtr,
+	LPDWORD pcbAtrLen)
 {
 	return redirect.SCardStatus(hCard, mszReaderName, pcchReaderLen, pdwState,
 		pdwProtocol, pbAtr, pcbAtrLen);
 }
 
-PCSC_API p_SCardGetStatusChange(SCardGetStatusChange)
+PCSC_API LONG SCardGetStatusChange(SCARDCONTEXT hContext,
+	DWORD dwTimeout,
+	SCARD_READERSTATE *rgReaderStates,
+	DWORD cReaders)
 {
 	return redirect.SCardGetStatusChange(hContext, dwTimeout, rgReaderStates,
 		cReaders);
 }
 
-PCSC_API p_SCardControl(SCardControl)
+PCSC_API LONG SCardControl(SCARDHANDLE hCard,
+	DWORD dwControlCode,
+	LPCVOID pbSendBuffer,
+	DWORD cbSendLength,
+	LPVOID pbRecvBuffer,
+	DWORD cbRecvLength,
+	LPDWORD lpBytesReturned)
 {
 	return redirect.SCardControl(hCard, dwControlCode, pbSendBuffer, cbSendLength,
 		pbRecvBuffer, cbRecvLength, lpBytesReturned);
 }
 
-PCSC_API p_SCardTransmit(SCardTransmit)
+PCSC_API LONG SCardTransmit(SCARDHANDLE hCard,
+	const SCARD_IO_REQUEST *pioSendPci,
+	LPCBYTE pbSendBuffer,
+	DWORD cbSendLength,
+	SCARD_IO_REQUEST *pioRecvPci,
+	LPBYTE pbRecvBuffer,
+	LPDWORD pcbRecvLength)
 {
 	return redirect.SCardTransmit(hCard, pioSendPci, pbSendBuffer, cbSendLength,
 		pioRecvPci, pbRecvBuffer, pcbRecvLength);
 }
 
-PCSC_API p_SCardListReaderGroups(SCardListReaderGroups)
+PCSC_API LONG SCardListReaderGroups(SCARDCONTEXT hContext,
+	LPSTR mszGroups,
+	LPDWORD pcchGroups)
 {
 	return redirect.SCardListReaderGroups(hContext, mszGroups, pcchGroups);
 }
 
-PCSC_API p_SCardListReaders(SCardListReaders)
+PCSC_API LONG SCardListReaders(SCARDCONTEXT hContext,
+	LPCSTR mszGroups,
+	LPSTR mszReaders,
+	LPDWORD pcchReaders)
 {
 	return redirect.SCardListReaders(hContext, mszGroups, mszReaders, pcchReaders);
 }
 
-PCSC_API p_SCardFreeMemory(SCardFreeMemory)
+PCSC_API LONG SCardFreeMemory(SCARDCONTEXT hContext,
+	LPCVOID pvMem)
 {
 	return redirect.SCardFreeMemory(hContext, pvMem);
 }
 
-PCSC_API p_SCardCancel(SCardCancel)
+PCSC_API LONG SCardCancel(SCARDCONTEXT hContext)
 {
 	return redirect.SCardCancel(hContext);
 }
 
-PCSC_API p_SCardGetAttrib(SCardGetAttrib)
+PCSC_API LONG SCardGetAttrib(SCARDHANDLE hCard,
+	DWORD dwAttrId,
+	LPBYTE pbAttr,
+	LPDWORD pcbAttrLen)
 {
 	return redirect.SCardGetAttrib(hCard, dwAttrId, pbAttr, pcbAttrLen);
 }
 
-PCSC_API p_SCardSetAttrib(SCardSetAttrib)
+PCSC_API LONG SCardSetAttrib(SCARDHANDLE hCard,
+	DWORD dwAttrId,
+	LPCBYTE pbAttr,
+	DWORD cbAttrLen)
 {
 	return redirect.SCardSetAttrib(hCard, dwAttrId, pbAttr, cbAttrLen);
 }
