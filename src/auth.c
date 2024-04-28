@@ -80,9 +80,11 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 	ret = getsockopt(socket, SOL_SOCKET, SO_PEERCRED, &cr, &cr_len);
 	if (ret == -1)
 	{
+#ifndef NO_LOG
 		int e = errno;
 		Log2(PCSC_LOG_CRITICAL,
 		     "Error obtaining client process credentials: %s", strerror(e));
+#endif
 		return 0;
 	}
 
