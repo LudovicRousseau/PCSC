@@ -1,3 +1,12 @@
+2.2.0: Ludovic Rousseau
+3 May 2024
+- provide files for meson build tool (replaces autoconf/auoomake)
+- fix a missing symbol in libpcscspy (bug introduced by the previous version)
+- fix shutdown issues with hotplug_libusb
+- update pcsc-spy manpage
+- update copyright date
+- Some other minor improvements
+
 2.1.0: Ludovic Rousseau
 12 April 2024
 - LIBPCSCLITE_DELEGATE is used to redirect to another libpcsclite library
