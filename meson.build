@@ -20,11 +20,12 @@ conf_data = configuration_data({
   'NO_LOG' : get_option('embedded'),
   })
 # for generated files from .in templates
+sbindir = join_paths(get_option('prefix') , get_option('sbindir'))
 confgen_data = configuration_data({
   'VERSION' : meson.project_version(),
   'ipcdir' : get_option('ipcdir'),
   'sysconfdir' : get_option('sysconfdir'),
-  'sbindir_exp' : '/' / get_option('sbindir'),
+  'sbindir_exp' : sbindir,
   'PCSCLITE_CONFIG_DIR' : get_option('serialconfdir'),
   'usbdropdir' : get_option('usbdropdir'),
   })
@@ -143,7 +144,7 @@ executable('pcscd',
   dependencies : pcscd_dep,
   c_args: '-DPCSCD',
   export_dynamic : true,
-  install_dir : '/' / get_option('sbindir'),
+  install_dir : sbindir,
   install : true)
 
 # libpcsclite_real library
