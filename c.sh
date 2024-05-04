@@ -10,7 +10,6 @@ rm -rf "$BUILDDIR"
 
 meson setup "$BUILDDIR" \
 	--prefix /usr \
-	--sbindir usr/sbin \
 	-Dsystemdunit=system \
 	"$@"
 
