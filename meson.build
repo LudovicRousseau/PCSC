@@ -118,19 +118,19 @@ if systemd_dep.found()
   features += 'systemd'
 endif
 
-target_system = target_machine.system()
-if target_system == 'darwin'
+# architecture
+r = run_command('uname', check: true)
+pcsc_arch = r.stdout().strip()
+if pcsc_arch == 'Darwin'
+  pcsc_arch = 'MacOS'
   pcscd_dep += dependency('appleframeworks', modules : ['foundation', 'IOKit'])
   pcscd_src += files(['src/hotplug_macosx.c', 'src/dyn_macosx.c'])
-  conf_data.set_quoted('PCSC_ARCH', 'MacOS')
-elif target_system == 'linux'
-  conf_data.set_quoted('PCSC_ARCH', 'Linux')
-elif target_system == 'netbsd'
-  conf_data.set_quoted('PCSC_ARCH', 'NetBSD')
 endif
+conf_data.set_quoted('PCSC_ARCH', pcsc_arch)
+
 pcscd_dep += [polkit_dep, systemd_dep]
 
-features +=  conf_data.get_unquoted('PCSC_ARCH')
+features +=  pcsc_arch
 features += target_machine.cpu()
 features += 'ipcdir=' + get_option('ipcdir')
 features += 'usbdropdir=' + get_option('usbdropdir')
