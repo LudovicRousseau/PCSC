@@ -56,9 +56,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#ifdef HAVE_SYS_FILIO_H
-#include <sys/filio.h>
-#endif
 
 #include "misc.h"
 #include "pcscd.h"

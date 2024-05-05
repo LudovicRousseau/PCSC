@@ -54,9 +54,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#ifdef HAVE_SYS_FILIO_H
-#include <sys/filio.h>
-#endif
 #ifdef USE_LIBSYSTEMD
 #include <systemd/sd-daemon.h>
 #endif
