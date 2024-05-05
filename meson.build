@@ -65,8 +65,8 @@ add_global_arguments('-fvisibility=hidden', language : 'c')
 
 # pcscd daemon
 pcscd_src = [
-  'src/auth.c',
   'src/atrhandler.c',
+  'src/auth.c',
   'src/debuglog.c',
   'src/dyn_unix.c',
   'src/eventhandler.c',
@@ -74,7 +74,6 @@ pcscd_src = [
   'src/hotplug_libudev.c',
   'src/hotplug_libusb.c',
   'src/ifdwrapper.c',
-  'src/ifdwrapper.h',
   'src/pcscdaemon.c',
   'src/prothandler.c',
   'src/readerfactory.c',
