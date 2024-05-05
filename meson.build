@@ -114,6 +114,7 @@ endif
 
 systemd_dep = dependency('libsystemd', required : get_option('libsystemd'))
 if systemd_dep.found()
+  conf_data.set('USE_LIBSYSTEMD', true)
   features += 'systemd'
 endif
 
