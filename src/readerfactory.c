@@ -49,9 +49,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef HAVE_ALLOCA_H
 #include <alloca.h>
-#endif
 #include <stdatomic.h>
 #include <stdbool.h>
 
