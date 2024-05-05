@@ -49,7 +49,6 @@ pcscd_SOURCES = \
 	$(SERIAL_CONFIG) \
 	debuglog.c \
 	dyn_generic.h \
-	dyn_hpux.c \
 	dyn_macosx.c \
 	dyn_unix.c \
 	eventhandler.c \
