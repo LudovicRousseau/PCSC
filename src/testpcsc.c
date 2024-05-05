@@ -283,14 +283,6 @@ wait_for_card_again:
 	printf("\n" NORMAL);
 
 	printf("Testing SCardControl\t\t: ");
-#ifdef PCSC_PRE_120
-	{
-		char buffer[1024] = "Foobar";
-		DWORD cbRecvLength = sizeof(buffer);
-
-		rv = SCardControl(hCard, buffer, 7, buffer, &cbRecvLength);
-	}
-#else
 	{
 		char buffer[1024] = { 0x02 };
 		DWORD cbRecvLength = sizeof(buffer);
@@ -304,7 +296,6 @@ wait_for_card_again:
 			printf(" ");
 		}
 	}
-#endif
 	test_rv(rv, hContext, DONT_PANIC);
 
 	printf("Testing SCardGetAttrib\t\t: ");
