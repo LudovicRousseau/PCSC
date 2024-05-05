@@ -18,6 +18,7 @@ conf_data = configuration_data({
   'PCSCLITE_HP_DROPDIR' : '"' + get_option('usbdropdir') + '"',
   'HAVE_NANOSLEEP' : true,
   'NO_LOG' : get_option('embedded'),
+  'FILTER_NAMES' : get_option('filter_names'),
   })
 # for generated files from .in templates
 sbindir = join_paths(get_option('prefix') , get_option('sbindir'))
