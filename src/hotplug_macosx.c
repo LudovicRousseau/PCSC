@@ -288,12 +288,12 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
 					kCFStringEncodingUTF8);
-				driverBundle->m_vendorId = strtoul(stringBuffer, NULL, 16);
+				driverBundle->m_vendorId = (unsigned int)strtoul(stringBuffer, NULL, 16);
 
 				strValue = CFArrayGetValueAtIndex(productArray, j);
 				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
 					kCFStringEncodingUTF8);
-				driverBundle->m_productId = strtoul(stringBuffer, NULL, 16);
+				driverBundle->m_productId = (unsigned int)strtoul(stringBuffer, NULL, 16);
 
 				strValue = CFArrayGetValueAtIndex(friendlyNameArray, j);
 				CFStringGetCString(strValue, stringBuffer, sizeof stringBuffer,
