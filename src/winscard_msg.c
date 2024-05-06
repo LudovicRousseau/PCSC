@@ -478,7 +478,7 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 		/* try to read only when socket is readable */
 		if (pollret > 0)
 		{
-			int bytes_read;
+			ssize_t bytes_read;
 
 			if (!(read_fd.revents & POLLIN))
 			{
