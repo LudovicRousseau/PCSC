@@ -238,7 +238,7 @@ INTERNAL LONG MessageReceiveTimeout(uint32_t command, void *buffer_void,
 		/* try to read only when socket is readable */
 		if (pollret > 0)
 		{
-			int bytes_read;
+			ssize_t bytes_read;
 
 			if (!(read_fd.revents & POLLIN))
 			{
