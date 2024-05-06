@@ -129,7 +129,7 @@ INTERNAL int SYS_RandomInt(void)
 	// the casts are for the sake of clarity
 	return (int)(ui & (unsigned int)INT_MAX);
 #else
-	int r = lrand48(); // this is not thread-safe
+	int r = (int)lrand48(); // this is not thread-safe
 	return r;
 #endif /* HAVE_GETRANDOM */
 }
