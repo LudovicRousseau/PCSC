@@ -627,6 +627,7 @@ static void HPEstablishUSBNotification(void)
 	if (!matchingDictionary)
 	{
 		Log1(PCSC_LOG_ERROR, "IOServiceMatching() failed");
+		return;
 	}
 	matchingDictionary =
 		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
@@ -670,6 +671,7 @@ static void HPEstablishPCCardNotification(void)
 	if (!matchingDictionary)
 	{
 		Log1(PCSC_LOG_ERROR, "IOServiceMatching() failed");
+		return;
 	}
 	matchingDictionary =
 		(CFMutableDictionaryRef) CFRetain(matchingDictionary);
