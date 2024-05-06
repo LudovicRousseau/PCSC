@@ -183,6 +183,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 		if (!blobValue)
 		{
 			Log1(PCSC_LOG_ERROR, "error getting vendor ID from bundle");
+			CFRelease(bundleArray);
 			return NULL;
 		}
 
@@ -209,6 +210,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	if (!bundleVector)
 	{
 		Log1(PCSC_LOG_ERROR, "memory allocation failure");
+		CFRelease(bundleArray);
 		return NULL;
 	}
 
@@ -231,6 +233,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 		if (!blobValue)
 		{
 			Log1(PCSC_LOG_ERROR, "error getting vendor ID from bundle");
+			CFRelease(bundleArray);
 			return bundleVector;
 		}
 
@@ -250,6 +253,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			if (!productArray)
 			{
 				Log1(PCSC_LOG_ERROR, "error getting product ID from bundle");
+				CFRelease(bundleArray);
 				return bundleVector;
 			}
 
@@ -259,6 +263,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			if (!friendlyNameArray)
 			{
 				Log1(PCSC_LOG_ERROR, "error getting product ID from bundle");
+				CFRelease(bundleArray);
 				return bundleVector;
 			}
 
@@ -269,6 +274,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				Log3(PCSC_LOG_ERROR,
 					"Malformed Info.plist: %ld vendors and %ld products",
 					reader_nb, CFArrayGetCount(productArray));
+				CFRelease(bundleArray);
 				return bundleVector;
 			}
 
@@ -277,6 +283,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				Log3(PCSC_LOG_ERROR,
 					"Malformed Info.plist: %ld vendors and %ld friendlynames",
 					reader_nb, CFArrayGetCount(friendlyNameArray));
+				CFRelease(bundleArray);
 				return bundleVector;
 			}
 
