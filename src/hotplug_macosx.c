@@ -787,6 +787,8 @@ pthread_t sHotplugWatcherThread;
  */
 ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 {
+	(void)hpDirPath;
+
 	ThreadCreate(&sHotplugWatcherThread,
 		THREAD_ATTR_DEFAULT,
 		(PCSCLITE_THREAD_FUNCTION( )) HPDeviceNotificationThread, NULL);
