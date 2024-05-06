@@ -262,12 +262,12 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 				return bundleVector;
 			}
 
-			int reader_nb = CFArrayGetCount(vendorArray);
+			long reader_nb = CFArrayGetCount(vendorArray);
 
 			if (reader_nb != CFArrayGetCount(productArray))
 			{
 				Log3(PCSC_LOG_ERROR,
-					"Malformed Info.plist: %d vendors and %ld products",
+					"Malformed Info.plist: %ld vendors and %ld products",
 					reader_nb, CFArrayGetCount(productArray));
 				return bundleVector;
 			}
@@ -275,7 +275,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 			if (reader_nb != CFArrayGetCount(friendlyNameArray))
 			{
 				Log3(PCSC_LOG_ERROR,
-					"Malformed Info.plist: %d vendors and %ld friendlynames",
+					"Malformed Info.plist: %ld vendors and %ld friendlynames",
 					reader_nb, CFArrayGetCount(friendlyNameArray));
 				return bundleVector;
 			}
