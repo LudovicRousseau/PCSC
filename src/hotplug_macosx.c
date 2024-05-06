@@ -227,6 +227,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 		driverBundle->m_libPath = strdup(CFStringGetCStringPtr(bundlePath,
 				CFStringGetSystemEncoding()));
+		CFRelease(bundlePath);
 
 		const void * blobValue = CFDictionaryGetValue(dict,
 			CFSTR(PCSCLITE_HP_MANUKEY_NAME));
