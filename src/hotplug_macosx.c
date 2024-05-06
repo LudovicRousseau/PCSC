@@ -728,10 +728,20 @@ static int HPScan(void)
 	HPDeviceList devices = NULL;
 
 	if (HPDriversMatchUSBDevices(Drivers, &devices))
+	{
+		if (devices)
+			free(devices);
+
 		return -1;
+	}
 
 	if (HPDriversMatchPCCardDevices(Drivers, &devices))
+	{
+		if (devices)
+			free(devices);
+
 		return -1;
+	}
 
 	HPDevice *a;
 
