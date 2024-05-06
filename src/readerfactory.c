@@ -49,7 +49,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include <alloca.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 
