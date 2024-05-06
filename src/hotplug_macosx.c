@@ -223,6 +223,7 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 
 		CFURLRef bundleUrl = CFBundleCopyBundleURL(currBundle);
 		CFStringRef bundlePath = CFURLCopyPath(bundleUrl);
+		CFRelease(bundleUrl);
 
 		driverBundle->m_libPath = strdup(CFStringGetCStringPtr(bundlePath,
 				CFStringGetSystemEncoding()));
