@@ -177,7 +177,7 @@ static void *signal_thread(void *arg)
 
 	while (true)
 	{
-		int r;
+		ssize_t r;
 		int sig;
 
 		r = read(signal_handler_fd[0], &sig, sizeof sig);
@@ -569,7 +569,7 @@ int main(int argc, char **argv)
 		/* in the father */
 		{
 			char buf;
-			int ret;
+			ssize_t ret;
 
 			/* close write side */
 			close(pipefd[1]);
@@ -846,7 +846,7 @@ static void clean_temp_files(void)
 
 static void signal_trap(int sig)
 {
-	int r;
+	ssize_t r;
 
 	r = write(signal_handler_fd[1], &sig, sizeof sig);
 	if (r < 0)
