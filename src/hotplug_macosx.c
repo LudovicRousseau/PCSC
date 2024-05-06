@@ -568,6 +568,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		{
 			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
 				&vendorId);
+			CFRelease(valueRef);
 		}
 		valueRef =
 			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("DeviceID"),
@@ -580,6 +581,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		{
 			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
 				&productId);
+			CFRelease(valueRef);
 		}
 		valueRef =
 			IORegistryEntryCreateCFProperty(pccDevice, CFSTR("SocketNumber"),
@@ -592,6 +594,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 		{
 			CFNumberGetValue((CFNumberRef) valueRef, kCFNumberSInt32Type,
 				&pccAddress);
+			CFRelease(valueRef);
 		}
 		HPDriver *driver = driverBundle;
 
