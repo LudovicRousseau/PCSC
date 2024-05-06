@@ -378,7 +378,7 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 		/* try to write only when the file descriptor is writable */
 		if (pollret > 0)
 		{
-			int written;
+			ssize_t written;
 
 			if (!(write_fd.revents & POLLOUT))
 			{
