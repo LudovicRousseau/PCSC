@@ -419,7 +419,7 @@ HPDriversMatchUSBDevices(HPDriverVector driverBundle,
 	}
 
 	io_iterator_t usbIter;
-	kern_return_t kret = IOServiceGetMatchingServices(kIOMasterPortDefault,
+	kern_return_t kret = IOServiceGetMatchingServices(kIOMainPortDefault,
 		usbMatch, &usbIter);
 
 	if (kret != 0)
@@ -522,7 +522,7 @@ HPDriversMatchPCCardDevices(HPDriver * driverBundle,
 
 	io_iterator_t pccIter;
 	kern_return_t kret =
-		IOServiceGetMatchingServices(kIOMasterPortDefault, pccMatch,
+		IOServiceGetMatchingServices(kIOMainPortDefault, pccMatch,
 		&pccIter);
 	if (kret != 0)
 	{
@@ -609,7 +609,7 @@ static void HPEstablishUSBNotification(void)
 	IONotificationPortRef notificationPort;
 	IOReturn kret;
 
-	notificationPort = IONotificationPortCreate(kIOMasterPortDefault);
+	notificationPort = IONotificationPortCreate(kIOMainPortDefault);
 	CFRunLoopAddSource(CFRunLoopGetCurrent(),
 		IONotificationPortGetRunLoopSource(notificationPort),
 		kCFRunLoopDefaultMode);
@@ -652,7 +652,7 @@ static void HPEstablishPCCardNotification(void)
 	IONotificationPortRef notificationPort;
 	IOReturn kret;
 
-	notificationPort = IONotificationPortCreate(kIOMasterPortDefault);
+	notificationPort = IONotificationPortCreate(kIOMainPortDefault);
 	CFRunLoopAddSource(CFRunLoopGetCurrent(),
 		IONotificationPortGetRunLoopSource(notificationPort),
 		kCFRunLoopDefaultMode);
