@@ -160,12 +160,12 @@ static HPDriverVector HPDriversGetFromDirectory(const char *driverBundlePath)
 	}
 	bundleArray = CFBundleCreateBundlesFromDirectory(kCFAllocatorDefault,
 		pluginUrl, NULL);
+	CFRelease(pluginUrl);
 	if (!bundleArray)
 	{
 		Log1(PCSC_LOG_ERROR, "error getting plugin directory bundles");
 		return NULL;
 	}
-	CFRelease(pluginUrl);
 
 	size_t bundleArraySize = CFArrayGetCount(bundleArray);
 	size_t i;
