@@ -271,3 +271,15 @@ pkg.generate(
     'usbdropdir=' + conf_data.get_unquoted('PCSCLITE_HP_DROPDIR'),
     'serialconfdir=' + get_option('serialconfdir')],
   description : 'PC/SC smart card interface')
+
+# generate documentation
+configure_file(output : 'doxygen.conf',
+  input : 'doc/doxygen.conf.in',
+  configuration : confgen_data)
+doxygen = find_program('doxygen', required : false)
+if doxygen.found()
+  message('Doxygen found')
+  run_target('doc', command : [doxygen, 'doxygen.conf'])
+else
+  warning('Documentation disabled without doxygen')
+endif
