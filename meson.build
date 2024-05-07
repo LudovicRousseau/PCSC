@@ -207,6 +207,11 @@ executable('testpcsc',
   include_directories : incdir,
   link_with : libpcsclite)
 
+executable('pcsc_demo',
+  sources : 'doc/example/pcsc_demo.c',
+  include_directories : incdir,
+  link_with : libpcsclite)
+
 # PC/SC headers
 install_headers(
   ['src/PCSC/debuglog.h',
