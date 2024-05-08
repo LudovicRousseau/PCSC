@@ -1,3 +1,8 @@
+2.2.1: Ludovic Rousseau
+8 May 2024
+- fix meson related issues
+- Some code cleanup
+
 2.2.0: Ludovic Rousseau
 3 May 2024
 - provide files for meson build tool (replaces autoconf/auoomake)
