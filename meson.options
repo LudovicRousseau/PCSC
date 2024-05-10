@@ -21,7 +21,7 @@ option('usb',
 
 option('serial',
   type : 'boolean',
-  value : false,
+  value : true,
   description : 'Support serial readers')
 
 option('serialconfdir',
