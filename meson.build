@@ -100,6 +100,9 @@ if get_option('libudev')
 endif
 
 if get_option('libusb')
+  if get_option('libudev')
+    error('You can\'t use both libudev and libusb')
+  endif
   libusb_dep = dependency('libusb-1.0')
   pcscd_dep += libusb_dep
   conf_data.set('HAVE_LIBUSB', true)
