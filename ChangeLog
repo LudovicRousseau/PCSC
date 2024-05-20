@@ -1,3 +1,7 @@
+2.2.2: Ludovic Rousseau
+20 May 2024
+- Serial support is ENABLED by default
+
 2.2.1: Ludovic Rousseau
 8 May 2024
 - fix meson related issues
