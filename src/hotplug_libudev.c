@@ -149,7 +149,7 @@ static LONG HPReadBundleValues(const char * hpDirPath)
 			unsigned int alias;
 			list_t plist, *values;
 			list_t *manuIDs, *productIDs, *readerNames;
-			char *CFBundleName;
+			char *CFBundleName = NULL;
 			char *libraryPath;
 
 			/*
@@ -210,7 +210,7 @@ static LONG HPReadBundleValues(const char * hpDirPath)
 				/* constant entries for a same driver */
 				driverTracker[listCount].bundleName = strdup(currFP->d_name);
 				driverTracker[listCount].libraryPath = strdup(fullLibPath);
-				driverTracker[listCount].CFBundleName = CFBundleName;
+				driverTracker[listCount].CFBundleName = CFBundleName ?  strdup(CFBundleName) : NULL;
 
 #ifdef DEBUG_HOTPLUG
 				Log2(PCSC_LOG_INFO, "Found driver for: %s",
@@ -254,6 +254,7 @@ static LONG HPReadBundleValues(const char * hpDirPath)
 				}
 			}
 			bundleRelease(&plist);
+			free(CFBundleName);
 		}
 	}
 
@@ -696,6 +697,7 @@ LONG HPStopHotPluggables(void)
 		free(driverTracker[i].bundleName);
 		free(driverTracker[i].libraryPath);
 		free(driverTracker[i].readerName);
+		free(driverTracker[i].CFBundleName);
 	}
 	free(driverTracker);
 
