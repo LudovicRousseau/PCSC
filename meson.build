@@ -109,6 +109,9 @@ if get_option('libusb')
   features += 'libusb'
 endif
 
+cc = meson.get_compiler('c')
+dl_deps = cc.find_library('dl', required: false)
+
 polkit_dep = dependency('polkit-gobject-1', required : get_option('polkit'))
 if polkit_dep.found()
   conf_data.set('HAVE_POLKIT', true)
@@ -176,6 +179,7 @@ libpcsclite_src = [
   ]
 libpcsclite = library('pcsclite',
   libpcsclite_src,
+  dependencies : dl_deps,
   include_directories : incdir,
   soversion : 1,
   install : true)
@@ -188,6 +192,7 @@ library('pcsclite_fake',
 # libpcscspy library
 library('pcscspy',
   sources : ['src/spy/libpcscspy.c', 'src/sys_unix.c'],
+  dependencies : dl_deps,
   include_directories : incdir,
   soversion : 0,
   install : true)
