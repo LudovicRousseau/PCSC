@@ -560,7 +560,12 @@ PCSC_API LONG SCardControl(SCARDHANDLE hCard,
 	rv = spy.SCardControl(hCard, dwControlCode, pbSendBuffer, cbSendLength,
 		pbRecvBuffer, cbRecvLength, lpBytesReturned);
 	if (lpBytesReturned)
-		spy_buffer(pbRecvBuffer, *lpBytesReturned);
+	{
+		if (SCARD_S_SUCCESS == rv)
+			spy_buffer(pbRecvBuffer, *lpBytesReturned);
+		else
+			spy_buffer(NULL, *lpBytesReturned);
+	}
 	else
 		spy_buffer(NULL, 0);
 	Quit();
@@ -603,7 +608,12 @@ PCSC_API LONG SCardTransmit(SCARDHANDLE hCard,
 		spy_long(-1);
 	}
 	if (pcbRecvLength)
-		spy_buffer(pbRecvBuffer, *pcbRecvLength);
+	{
+		if (SCARD_S_SUCCESS == rv)
+			spy_buffer(pbRecvBuffer, *pcbRecvLength);
+		else
+			spy_buffer(NULL, *pcbRecvLength);
+	}
 	else
 		spy_buffer(NULL, 0);
 	Quit();
@@ -697,16 +707,19 @@ PCSC_API LONG SCardGetAttrib(SCARDHANDLE hCard,
 	if (NULL == pcbAttrLen)
 		spy_buffer(NULL, 0);
 	else
-	{
-		LPBYTE buffer;
-
-		if (autoallocate)
-			buffer = *(LPBYTE *)pbAttr;
+		if (rv != SCARD_S_SUCCESS)
+			spy_buffer(NULL, *pcbAttrLen);
 		else
-			buffer = pbAttr;
+		{
+			LPBYTE buffer;
 
-		spy_buffer(buffer, *pcbAttrLen);
-	}
+			if (autoallocate)
+				buffer = *(LPBYTE *)pbAttr;
+			else
+				buffer = pbAttr;
+
+			spy_buffer(buffer, *pcbAttrLen);
+		}
 	Quit();
 	return rv;
 }
