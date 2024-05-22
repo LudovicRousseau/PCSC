@@ -164,6 +164,7 @@ RESPONSECODE IFDCloseIFD(READER_CONTEXT * rContext)
 {
 	RESPONSECODE rv;
 	int repeat;
+	bool do_unlock = true;
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	RESPONSECODE(*IFDH_close_channel) (DWORD) = NULL;
@@ -184,6 +185,9 @@ again:
 			(void)SYS_USleep(100*1000);	/* 100 ms */
 			goto again;
 		}
+		else
+			/* locking failed but we need to close the IFD */
+			do_unlock = false;
 	}
 
 #ifndef PCSCLITE_STATIC_DRIVER
@@ -193,7 +197,8 @@ again:
 #endif
 
 	/* END OF LOCKED REGION */
-	(void)pthread_mutex_unlock(rContext->mMutex);
+	if (do_unlock)
+		(void)pthread_mutex_unlock(rContext->mMutex);
 
 	return rv;
 }
