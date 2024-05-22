@@ -195,7 +195,6 @@ PCSC_API LONG SCardEstablishContext(DWORD dwScope,
 
 	return redirect.SCardEstablishContext(dwScope, pvReserved1, pvReserved2,
 		phContext);
-	return rv;
 }
 
 PCSC_API LONG SCardReleaseContext(SCARDCONTEXT hContext)
