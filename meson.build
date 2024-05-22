@@ -134,7 +134,7 @@ if pcsc_arch == 'Darwin'
 endif
 conf_data.set_quoted('PCSC_ARCH', pcsc_arch)
 
-pcscd_dep += [polkit_dep, systemd_dep]
+pcscd_dep += [polkit_dep, systemd_dep, dl_deps]
 
 features +=  pcsc_arch
 features += target_machine.cpu()
