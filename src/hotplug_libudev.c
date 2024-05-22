@@ -73,6 +73,7 @@ extern bool Add_Serial_In_Name;
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
 static struct udev *Udev;
+static struct udev_monitor *Udev_monitor;
 
 
 /**
@@ -701,6 +702,7 @@ LONG HPStopHotPluggables(void)
 	free(driverTracker);
 
 	udev_unref(Udev);
+	udev_monitor_unref(Udev_monitor);
 
 	Udev = NULL;
 	driverSize = -1;
@@ -715,7 +717,6 @@ LONG HPStopHotPluggables(void)
  */
 ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 {
-	struct udev_monitor *udev_monitor;
 	int r;
 
 	if (driverSize <= 0)
@@ -735,15 +736,15 @@ ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 		return SCARD_F_INTERNAL_ERROR;
 	}
 
-	udev_monitor = udev_monitor_new_from_netlink(Udev, "udev");
-	if (NULL == udev_monitor)
+	Udev_monitor = udev_monitor_new_from_netlink(Udev, "udev");
+	if (NULL == Udev_monitor)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_monitor_new_from_netlink() error");
 		pthread_exit(NULL);
 	}
 
 	/* filter only the interfaces */
-	r = udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "usb",
+	r = udev_monitor_filter_add_match_subsystem_devtype(Udev_monitor, "usb",
 		"usb_interface");
 	if (r)
 	{
@@ -751,7 +752,7 @@ ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 		pthread_exit(NULL);
 	}
 
-	r = udev_monitor_enable_receiving(udev_monitor);
+	r = udev_monitor_enable_receiving(Udev_monitor);
 	if (r)
 	{
 		Log2(PCSC_LOG_ERROR, "udev_monitor_enable_receiving() error: %d\n", r);
@@ -762,7 +763,7 @@ ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 	HPScanUSB(Udev);
 
 	if (ThreadCreate(&usbNotifyThread, 0,
-		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, udev_monitor))
+		(PCSCLITE_THREAD_FUNCTION( )) HPEstablishUSBNotifications, Udev_monitor))
 	{
 		Log1(PCSC_LOG_ERROR, "ThreadCreate() failed");
 		return SCARD_F_INTERNAL_ERROR;
