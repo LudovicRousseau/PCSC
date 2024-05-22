@@ -37,6 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 
 #include <winscard.h>
+#include <reader.h>
 
 /* PCSC error message pretty print */
 #define PCSC_ERROR(rv, text) \
@@ -265,6 +266,24 @@ int main(int argc, char *argv[])
 	/* end transaction */
 	rv = SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
 	PCSC_ERROR(rv, "SCardEndTransaction")
+
+	/* get Attribute */
+	dwAtrLen = sizeof(pbAtr);
+	rv = SCardGetAttrib(hCard, SCARD_ATTR_ATR_STRING, pbAtr, &dwAtrLen);
+	printf("Received: ");
+	for (i=0; i<dwAtrLen; i++)
+		printf("%02X ", pbAtr[i]);
+	printf("\n");
+	PCSC_ERROR(rv, "SCardGetAttrib")
+
+	/* control */
+	rv = SCardControl(hCard, CM_IOCTL_GET_FEATURE_REQUEST, NULL, 0,
+		pbRecvBuffer, sizeof pbRecvBuffer, &dwRecvLength);
+	printf("Received: ");
+	for (i=0; i<dwRecvLength; i++)
+		printf("%02X ", pbRecvBuffer[i]);
+	printf("\n");
+	PCSC_ERROR(rv, "SCardControl")
 
 	/* card disconnect */
 	rv = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
