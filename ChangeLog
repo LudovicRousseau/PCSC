@@ -1,3 +1,12 @@
+2.2.3: Ludovic Rousseau
+26 May 2024
+- meson:
+  . Fix build on Slackware 15
+  . fail if both libusb and libudev are used
+- Fix memory leak on exit
+- libpcscspy: dump an output buffer only if the call succeeded
+- Some code cleanup
+
 2.2.2: Ludovic Rousseau
 20 May 2024
 - Serial support is ENABLED by default
