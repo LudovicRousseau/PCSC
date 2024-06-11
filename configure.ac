@@ -49,7 +49,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX([noyywrap])
-AS_IF([test $LEX = ":"], [AC_MSG_ERROR([no lex or flex found])])
+AS_IF([test $LEX = ":"], [
+       AM_MISSING_PROG(MISSINGLEX, [flex])
+       LEX=$MISSINGLEX]
+)
 PKG_PROG_PKG_CONFIG
 AM_PROG_CC_C_O
 AM_PROG_AR
@@ -281,7 +284,7 @@ AS_IF([test "$use_polkit" != "no"],
 		 PCSCLITE_FEATURES="${PCSCLITE_FEATURES} polkit"],
 		[use_polkit=no
 		 AC_MSG_ERROR([[
-*** 
+***
 *** polkit >= $POLKIT_MINIMUM was not found. Access control will be disabled.
 *** You may get it from http://www.freedesktop.org/software/polkit/
 *** ]])
@@ -440,4 +443,3 @@ src/PCSC/pcsclite.h
 src/spy/Makefile
 ])
 AC_OUTPUT
-
