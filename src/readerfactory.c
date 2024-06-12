@@ -74,7 +74,6 @@ static int ConfigFileCRC = 0;
 #endif
 static pthread_mutex_t LockMutex = PTHREAD_MUTEX_INITIALIZER;
 
-#define IDENTITY_SHIFT 16
 static LONG removeReader(READER_CONTEXT * sReader);
 
 static int RDR_CLIHANDLES_seeker(const void *el, const void *key)
