@@ -188,7 +188,7 @@ wait_for_card_again:
 	mszReaders = calloc(dwReaders, sizeof(char));
 	rv = SCardListReaders(hContext, mszGroups, mszReaders, &dwReaders);
 #endif
-	test_rv(rv, hContext, DONT_PANIC);
+	test_rv(rv, hContext, PANIC);
 
 	/*
 	 * Have to understand the multi-string here
