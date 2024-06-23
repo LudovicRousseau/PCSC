@@ -10,7 +10,7 @@
 # meson setup --reconfigure --wipe
 
 project('pcsc-lite', 'c',
-  meson_version : '>=0.49.0',
+  meson_version : '>=0.58.0',
   version : '2.2.3')
 
 # for config.h
