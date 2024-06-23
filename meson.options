@@ -46,10 +46,10 @@ option('systemdunit',
 
 option('embedded',
   type : 'boolean',
-  value : 'false',
+  value : false,
   description : 'for embedded systems [limit RAM and CPU resources by disabling features (log)]')
 
 option('filter_names',
   type : 'boolean',
-  value : 'true',
+  value : true,
   description : 'reader filtering using PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES')
