@@ -24,6 +24,7 @@ jobs:
           sudo apt install \
             autoconf-archive \
             debhelper-compat \
+            doxygen \
             dpkg-dev \
             flex \
             libpolkit-gobject-1-dev \
@@ -44,6 +45,9 @@ jobs:
           find /tmp/pcsc
 
           meson dist
+
+          # doxygen
+          meson compile doc
 
           meson setup --reconfigure -Dlibsystemd=false -Dlibudev=false -Dpolkit=false
           meson compile
