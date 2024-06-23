@@ -450,7 +450,7 @@ static void * ContextThread(LPVOID newContext)
 				struct wait_reader_state_change waStr =
 				{
 					.timeOut = 0,
-					.rv = 0
+					.rv = SCARD_S_SUCCESS
 				};
 				LONG rv;
 
@@ -849,7 +849,7 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 	struct wait_reader_state_change waStr =
 	{
 		.timeOut = 0,
-		.rv = 0
+		.rv = SCARD_S_SUCCESS
 	};
 
 	Log2(PCSC_LOG_DEBUG, "Signal client: %d", filedes);
