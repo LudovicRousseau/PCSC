@@ -1695,8 +1695,9 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 #ifdef DO_TRACE
 	for (j=0; j<cReaders; j++)
 	{
-		API_TRACE_IN("[%d] %s %lX %lX", j, rgReaderStates[j].szReader,
-			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState)
+		API_TRACE_IN("[%d] %s %lX %lX (%d)", j, rgReaderStates[j].szReader,
+			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState,
+			rgReaderStates[j].cbAtr)
 	}
 #endif
 
@@ -2168,8 +2169,9 @@ error:
 #ifdef DO_TRACE
 	for (j=0; j<cReaders; j++)
 	{
-		API_TRACE_OUT("[%d] %s %X %X", j, rgReaderStates[j].szReader,
-			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState)
+		API_TRACE_OUT("[%d] %s %lX %lX (%d)", j, rgReaderStates[j].szReader,
+			rgReaderStates[j].dwCurrentState, rgReaderStates[j].dwEventState,
+			rgReaderStates[j].cbAtr)
 	}
 #endif
 
