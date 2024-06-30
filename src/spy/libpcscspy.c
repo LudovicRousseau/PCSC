@@ -121,7 +121,7 @@ static void spy_line_direct(char *line)
 	if (Log_fd < 0)
 		return;
 
-	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
+	snprintf(threadid, sizeof threadid, "%lX@", (unsigned long)pthread_self());
 	pthread_mutex_lock(&Log_fd_mutex);
 	r = write(Log_fd, threadid, strlen(threadid));
 	r = write(Log_fd, line, strlen(line));
@@ -150,7 +150,7 @@ static void spy_line(const char *fmt, ...)
 		printf("libpcsc-spy: Buffer is too small!\n");
 		return;
 	}
-	snprintf(threadid, sizeof threadid, "%lX@", pthread_self());
+	snprintf(threadid, sizeof threadid, "%lX@", (unsigned long)pthread_self());
 	pthread_mutex_lock(&Log_fd_mutex);
 	r = write(Log_fd, threadid, strlen(threadid));
 	r = write(Log_fd, line, size);
