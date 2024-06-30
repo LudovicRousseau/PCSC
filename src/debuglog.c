@@ -262,7 +262,7 @@ static void log_line(const int priority, const char *DebugBuffer,
 					break;
 			}
 
-#ifdef __APPLE__
+#ifndef __GLIBC__
 #define THREAD_FORMAT "%p"
 #else
 #define THREAD_FORMAT "%lu"
