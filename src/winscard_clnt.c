@@ -251,14 +251,10 @@ static void profile_end(const char *f, LONG rv)
 
 	if (profile_tty)
 	{
-		if (rv != SCARD_S_SUCCESS)
-			fprintf(stderr,
-				COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld "
-				COLOR_BLUE "0x%08lX" COLOR_NORMAL "\n",
-				f, d, rv);
-		else
-			fprintf(stderr, COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld"
-				COLOR_NORMAL "\n", f, d);
+		fprintf(stderr,
+			COLOR_RED "RESULT %s " COLOR_MAGENTA "%ld "
+			COLOR_BLUE "0x%08lX" COLOR_NORMAL "\n",
+			f, d, rv);
 	}
 	fprintf(profile_fd, "%s %ld\n", f, d);
 	fflush(profile_fd);
