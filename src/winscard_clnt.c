@@ -371,6 +371,7 @@ static void SCardRemoveHandle(SCARDHANDLE);
 static LONG SCardGetSetAttrib(SCARDHANDLE hCard, int command, DWORD dwAttrId,
 	LPBYTE pbAttr, LPDWORD pcbAttrLen);
 
+static LONG getReaderEvents(SCONTEXTMAP * currentContextMap, int *readerEvents);
 static LONG getReaderStates(SCONTEXTMAP * currentContextMap);
 static LONG getReaderStatesAndRegisterForEvents(SCONTEXTMAP * currentContextMap);
 static LONG unregisterFromEvents(SCONTEXTMAP * currentContextMap);
@@ -3556,6 +3557,26 @@ LONG SCardCheckDaemonAvailability(void)
 			socketName, strerror(errno));
 		return SCARD_E_NO_SERVICE;
 	}
+
+	return SCARD_S_SUCCESS;
+}
+
+static LONG getReaderEvents(SCONTEXTMAP * currentContextMap, int *readerEvents)
+{
+	int32_t dwClientID = currentContextMap->dwClientID;
+	LONG rv;
+	struct get_reader_events get_reader_events = {0};
+
+	rv = MessageSendWithHeader(CMD_GET_READER_EVENTS, dwClientID, 0, NULL);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/* Read a message from the server */
+	rv = MessageReceive(&get_reader_events, sizeof(get_reader_events), dwClientID);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	*readerEvents = get_reader_events.readerEvents;
 
 	return SCARD_S_SUCCESS;
 }
