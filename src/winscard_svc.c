@@ -99,6 +99,7 @@ static void MSGCleanupClient(SCONTEXT *);
 static void * ContextThread(LPVOID pdwIndex);
 
 extern READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+extern int16_t ReaderEvents;
 
 static int contextsListhContext_seeker(const void *el, const void *key)
 {
@@ -322,6 +323,7 @@ static const char *CommandsText[] = {
 	"CMD_GET_READERS_STATE",
 	"CMD_WAIT_READER_STATE_CHANGE",
 	"CMD_STOP_WAITING_READER_STATE_CHANGE",	/* 0x14 */
+	"CMD_GET_READER_EVENTS",
 	"NULL"
 };
 #endif
@@ -464,6 +466,20 @@ static void * ContextThread(LPVOID newContext)
 					waStr.rv = rv;
 					WRITE_BODY(waStr);
 				}
+			}
+			break;
+
+			case CMD_GET_READER_EVENTS:
+			{
+				/* nothing to read */
+
+				struct get_reader_events readerEvents =
+				{
+					.readerEvents = ReaderEvents,
+					.rv = SCARD_S_SUCCESS
+				};
+
+				WRITE_BODY(readerEvents);
 			}
 			break;
 
