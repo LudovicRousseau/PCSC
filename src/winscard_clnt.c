@@ -1686,6 +1686,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	SCONTEXTMAP * currentContextMap;
 	int currentReaderCount = 0;
 	LONG rv = SCARD_S_SUCCESS;
+	int pnp_reader = -1;
 
 	PROFILE_START
 	API_TRACE_IN("%ld %ld %d", hContext, dwTimeout, cReaders)
@@ -1779,6 +1780,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 				(void)pthread_mutex_unlock(&readerStatesMutex);
 				goto end;
 			}
+			else
+				pnp_reader = j;
 		}
 	}
 	(void)pthread_mutex_unlock(&readerStatesMutex);
@@ -1789,6 +1792,33 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 	/* Now is where we start our event checking loop */
 	Log2(PCSC_LOG_DEBUG, "Event Loop Start, dwTimeout: %ld", dwTimeout);
+
+	/* index of the PnP readerin rgReaderStates[] */
+	if (pnp_reader >= 0)
+	{
+		int readerEvents;
+		currReader = &rgReaderStates[pnp_reader];
+
+		/* PnP special reader */
+		if (SCARD_S_SUCCESS == getReaderEvents(currentContextMap, &readerEvents))
+		{
+			int previousReaderEvents = currReader->dwCurrentState >> 16;
+
+			// store readerEvents in .dwEventState high word
+			currReader->dwEventState = (currReader->dwEventState & 0xFFFF) + (readerEvents << 16);
+			if (
+				/* the value has changed since the last call */
+				(previousReaderEvents != readerEvents)
+				/* backward compatibility: only if we had a non-null
+				 * reader events value */
+				&& previousReaderEvents)
+			{
+				currReader->dwEventState |= SCARD_STATE_CHANGED;
+				rv = SCARD_S_SUCCESS;
+				dwBreakFlag = 1;
+			}
+		}
+	}
 
 	/* Get the initial reader count on the system */
 	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
@@ -1839,8 +1869,16 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 					if (newReaderCount != currentReaderCount)
 					{
+						int readerEvents;
+
 						Log1(PCSC_LOG_INFO, "Reader list changed");
 						currentReaderCount = newReaderCount;
+
+						if (SCARD_S_SUCCESS == getReaderEvents(currentContextMap, &readerEvents))
+						{
+							// store readerEvents in .dwEventState high word
+							currReader->dwEventState = (currReader->dwEventState & 0xFFFF) + (readerEvents << 16);
+						}
 
 						currReader->dwEventState |= SCARD_STATE_CHANGED;
 						dwBreakFlag = 1;
