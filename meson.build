@@ -228,7 +228,7 @@ install_headers(
    'src/PCSC/reader.h',
    'src/PCSC/winscard.h',
    'src/PCSC/wintypes.h'],
-  install_dir : 'include/PCSC')
+  install_dir : get_option('includedir') / 'PCSC')
 
 # data
 if get_option('polkit')
@@ -243,7 +243,7 @@ configure_file(output : 'config.h',
 # generate from .in files
 configure_file(output : 'pcsclite.h',
   input : 'src/PCSC/pcsclite.h.in',
-  install_dir : join_paths(get_option('prefix'), 'include/PCSC'),
+  install_dir : get_option('prefix') / get_option('includedir') / 'PCSC',
   configuration : confgen_data)
 configure_file(output : 'pcscd.h',
   input : 'src/pcscd.h.in',
