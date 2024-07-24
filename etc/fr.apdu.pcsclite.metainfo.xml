@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <id>fr.apdu.pcsclite</id>
+  <metadata_license>MIT</metadata_license>
+  <name>pcscd</name>
+  <summary>Middleware to access a smart card using PC/SC</summary>
+  <description>
+    <p>The purpose of PC/SC Lite is to provide a Windows(R) SCard
+    interface in a very small form factor for communicating to smart
+    cards and smart cards readers.</p>
+
+    <p>The PC/SC daemon is used to dynamically allocate/deallocate
+    reader drivers at runtime and manage connections to the
+    readers.</p>
+  </description>
+  <developer id="fr.apdu.pcsclite">
+    <name>PCSC-lite project</name>
+  </developer>
+  <url type="homepage">https://pcsclite.apdu.fr/</url>
+  <provides>
+    <modalias>usb:*ic0Bisc00ip*</modalias>
+  </provides>
+</component>

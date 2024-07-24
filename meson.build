@@ -236,6 +236,9 @@ install_data('doc/org.debian.pcsc-lite.policy',
   install_dir : polkit_dep.get_variable('policydir'))
 endif
 
+install_data('etc/fr.apdu.pcsclite.metainfo.xml',
+  install_dir : 'share/metainfo'
+  )
 # generate config.h
 configure_file(output : 'config.h',
   configuration : conf_data)
