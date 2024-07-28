@@ -102,8 +102,8 @@ static void log_line(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vprintf(fmt, args);
-	printf("\n");
+	vfprintf(stderr, fmt, args);
+	fprintf(stderr, "\n");
 	va_end(args);
 }
 #else
