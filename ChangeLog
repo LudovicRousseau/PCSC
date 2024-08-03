@@ -1,3 +1,12 @@
+2.3.0: Ludovic Rousseau
+3 August 2024
+- SCardGetStatusChange(): add the number of reader events
+- Add Appstream metainfo announcing HW support
+- meson: specify minimum meson version to use
+- fix formats under musl libc
+- Send libpcsclite.so logs to stderr instead of stdout
+- Some other minor improvements
+
 2.2.3: Ludovic Rousseau
 26 May 2024
 - meson:
