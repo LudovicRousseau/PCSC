@@ -1586,9 +1586,13 @@ end:
  * be used to detect a card removal/insertion between two calls to
  * SCardGetStatusChange()
  *
- * To wait for a reader event (reader added or removed) you may use the special
- * reader name \c "\\?PnP?\Notification". If a reader event occurs the state of
- * this reader will change and the bit \ref SCARD_STATE_CHANGED will be set.
+ * To wait for a reader event (reader added or removed) you may use the
+ * special reader name \c "\\?PnP?\Notification". If a reader event
+ * occurs the state of this reader will change and the bit \ref
+ * SCARD_STATE_CHANGED will be set.
+ * To detect a reader event betweeen 2 calls to SCardGetStatusChange()
+ * you can use the upper 16 bits of \p dwCurrentState. See https://blog.apdu.fr/posts/2024/08/improved-scardgetstatuschange-for-pnpnotification-special-reader/
+
  *
  * To cancel the ongoing call, use SCardCancel() with the same
  * \ref SCARDCONTEXT.
