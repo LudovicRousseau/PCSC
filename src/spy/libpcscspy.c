@@ -286,7 +286,11 @@ static void spy_readerstate(SCARD_READERSTATE * rgReaderStates, int cReaders)
 static LONG load_lib(void)
 {
 
+#ifdef __OpenBSD__
+#define LIBPCSC "libpcsclite_real.so"
+#else
 #define LIBPCSC "libpcsclite_real.so.1"
+#endif
 
 	const char *lib;
 
