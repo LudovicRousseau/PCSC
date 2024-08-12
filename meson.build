@@ -19,7 +19,6 @@ conf_data = configuration_data({
   'PCSCLITE_HP_DROPDIR' : '"' + get_option('usbdropdir') + '"',
   'HAVE_NANOSLEEP' : true,
   'NO_LOG' : get_option('embedded'),
-  'FILTER_NAMES' : get_option('filter_names'),
   })
 # for generated files from .in templates
 sbindir = join_paths(get_option('prefix') , get_option('sbindir'))
@@ -54,6 +53,11 @@ endif
 if get_option('serial')
   conf_data.set('USE_SERIAL', true)
   features += 'serial'
+endif
+
+if get_option('filter_names')
+  conf_data.set('FILTER_NAMES', true)
+  features += 'filter_names'
 endif
 
 # flex generator
