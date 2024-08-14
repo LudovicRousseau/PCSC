@@ -117,14 +117,18 @@ endif
 cc = meson.get_compiler('c')
 dl_deps = cc.find_library('dl', required: false)
 
-polkit_dep = dependency('polkit-gobject-1', required : get_option('polkit'))
-if polkit_dep.found()
+pcscd_dep += dl_deps
+
+if get_option('polkit')
+  polkit_dep = dependency('polkit-gobject-1')
+  pcscd_dep += polkit_dep
   conf_data.set('HAVE_POLKIT', true)
   features += 'polkit'
 endif
 
-systemd_dep = dependency('libsystemd', required : get_option('libsystemd'))
-if systemd_dep.found()
+if get_option('libsystemd')
+  systemd_dep = dependency('libsystemd')
+  pcscd_dep += systemd_dep
   conf_data.set('USE_LIBSYSTEMD', true)
   features += 'systemd'
 endif
@@ -138,8 +142,6 @@ if pcsc_arch == 'Darwin'
   pcscd_src += files(['src/hotplug_macosx.c', 'src/dyn_macosx.c'])
 endif
 conf_data.set_quoted('PCSC_ARCH', pcsc_arch)
-
-pcscd_dep += [polkit_dep, systemd_dep, dl_deps]
 
 features +=  pcsc_arch
 features += target_machine.cpu()
