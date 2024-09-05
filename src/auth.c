@@ -159,6 +159,10 @@ cleanup1:
 	return ret;
 }
 
+#elif defined(HAVE_POLKIT)
+
+#error polkit is enabled, but no socket cred implementation for this platform
+
 #else
 
 unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
