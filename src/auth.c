@@ -51,7 +51,9 @@
 
 #include <errno.h>
 
-#if defined(HAVE_POLKIT) && defined(SO_PEERCRED)
+#ifdef HAVE_POLKIT
+
+#if defined(SO_PEERCRED)
 
 #include <polkit/polkit.h>
 #include <stdbool.h>
@@ -158,6 +160,12 @@ cleanup1:
 
 	return ret;
 }
+
+#else
+
+#error polkit is enabled, but no socket cred implementation for this platform
+
+#endif
 
 #else
 
