@@ -53,17 +53,32 @@
 
 #ifdef HAVE_POLKIT
 
-#if defined(SO_PEERCRED)
+#if defined(SO_PEERCRED) || defined(LOCAL_PEERCRED)
 
 #include <polkit/polkit.h>
 #include <stdbool.h>
+
+#ifdef __FreeBSD__
+
+#include <sys/ucred.h>
+typedef struct xucred platform_cred;
+#define	CRED_PID(uc)	(uc).cr_pid
+#define	CRED_UID(uc)	(uc).cr_uid
+
+#else
+
+typedef struct ucred platform_cred;
+#define	CRED_PID(uc)	(uc).pid
+#define	CRED_UID(uc)	(uc).uid
+
+#endif
 
 extern bool disable_polkit;
 
 /* Returns non zero when the client is authorized */
 unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 {
-	struct ucred cr;
+	platform_cred cr;
 	socklen_t cr_len;
 	int ret;
 	PolkitSubject *subject;
@@ -79,7 +94,11 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 	snprintf(action_name, sizeof(action_name), "org.debian.pcsc-lite.%s", action);
 
 	cr_len = sizeof(cr);
+#ifdef LOCAL_PEERCRED
+	ret = getsockopt(socket, SOL_LOCAL, LOCAL_PEERCRED, &cr, &cr_len);
+#else
 	ret = getsockopt(socket, SOL_SOCKET, SO_PEERCRED, &cr, &cr_len);
+#endif
 	if (ret == -1)
 	{
 #ifndef NO_LOG
@@ -99,7 +118,7 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 		return 0;
 	}
 
-	subject = polkit_unix_process_new_for_owner(cr.pid, 0, cr.uid);
+	subject = polkit_unix_process_new_for_owner(CRED_PID(cr), 0, CRED_UID(cr));
 	if (subject == NULL)
 	{
 		Log1(PCSC_LOG_CRITICAL, "polkit_unix_process_new_for_owner failed");
@@ -146,7 +165,7 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 	{
 		Log4(PCSC_LOG_CRITICAL,
 		     "Process %u (user: %u) is NOT authorized for action: %s",
-			(unsigned)cr.pid, (unsigned)cr.uid, action);
+			(unsigned)CRED_PID(cr), (unsigned)CRED_UID(cr), action);
 	}
 
 	if (result)
