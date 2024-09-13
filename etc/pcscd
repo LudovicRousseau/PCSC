@@ -1,0 +1,24 @@
+# Defaults for pcscd (/etc/default/pcscd)
+# https://blog.apdu.fr/posts/2021/08/pcsc-lite-configuration-using/
+
+# PCSCD_ARGS is used in the systemd service unit to pass cli arguments
+# to pcscd executable.
+PCSCD_ARGS = ''
+
+# Set the socket name to talk to remote instance of libpcsclite.so
+# https://blog.apdu.fr/posts/2010/11/pcsc-client-and-server-on-two-different/
+# https://blog.apdu.fr/posts/2022/11/share-smart-card-reader-between-host/
+# https://blog.apdu.fr/posts/2022/02/one-smart-card-reader-accessible-from/
+;PCSCLITE_CSOCK_NAME =
+
+# Adjust USB drivers path at run-time
+;PCSCLITE_HP_DROPDIR = "/usr/lib/pcsc/drivers/"
+
+# Remove and/or customize PC/SC reader names
+# https://blog.apdu.fr/posts/2015/12/remove-andor-customize-pcsc-reader-names/
+;PCSCLITE_FILTER_IGNORE_READER_NAMES = ''
+;PCSCLITE_FILTER_EXTEND_READER_NAMES =
+
+# Do not block on some PC/SC calls
+# https://blog.apdu.fr/posts/2010/05/pcsc-lite-160-new-major-version/
+;PCSCLITE_NO_BLOCKING =

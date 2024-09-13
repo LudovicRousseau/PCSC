@@ -245,6 +245,11 @@ endif
 install_data('etc/fr.apdu.pcsclite.metainfo.xml',
   install_dir : 'share/metainfo'
   )
+
+install_data('etc/pcscd',
+  install_dir : 'etc/default'
+  )
+
 # generate config.h
 configure_file(output : 'config.h',
   configuration : conf_data)
