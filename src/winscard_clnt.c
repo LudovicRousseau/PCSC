@@ -121,7 +121,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "winscard.h"
 #include "debuglog.h"
 
-#include "readerfactory.h"
 #include "eventhandler.h"
 #include "sys_generic.h"
 #include "winscard_msg.h"
