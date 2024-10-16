@@ -36,16 +36,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#include <string.h>
 
 #include "misc.h"
-#include "pcscd.h"
 #include "debuglog.h"
-#include "readerfactory.h"
 #include "prothandler.h"
-#include "atrhandler.h"
 #include "ifdwrapper.h"
-#include "eventhandler.h"
 
 /**
  * Determine which protocol to use.
