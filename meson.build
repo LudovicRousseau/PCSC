@@ -265,7 +265,7 @@ install_data('etc/fr.apdu.pcsclite.metainfo.xml',
   )
 
 install_data('etc/pcscd',
-  install_dir : 'etc/default'
+  install_dir : get_option('sysconfdir') / 'default'
   )
 
 # generate config.h
