@@ -79,7 +79,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	SCARDCONTEXT hContext = -1;
 	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
-	DWORD dwPref, dwReaders = 0;
+	DWORD dwPref = -1, dwReaders = 0;
 	char *pcReader = NULL, *mszReaders;
 #ifdef USE_AUTOALLOCATE
 	unsigned char *pbAtr = NULL;
