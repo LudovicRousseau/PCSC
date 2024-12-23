@@ -76,7 +76,7 @@ static void test_rv(LONG rv, SCARDCONTEXT hContext, int dont_panic)
 int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
 	SCARDHANDLE hCard;
-	SCARDCONTEXT hContext;
+	SCARDCONTEXT hContext = -1;
 	SCARD_READERSTATE rgReaderStates[1];
 	DWORD dwReaderLen, dwState, dwProt, dwAtrLen;
 	DWORD dwPref, dwReaders = 0;
