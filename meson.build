@@ -181,6 +181,7 @@ library('pcsclite_real',
 # libpcsclite library
 libpcsclite_src = [
   'src/error.c',
+  'src/g_defines.c',
   'src/libredirect.c',
   'src/sys_unix.c'
   ]
