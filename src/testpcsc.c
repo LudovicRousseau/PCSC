@@ -94,7 +94,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	DWORD dwBufLen;
 	unsigned char *pbAttr = NULL;
 	DWORD pcbAttrLen;
-	char *mszGroups;
+	char *mszGroups = NULL;
 	DWORD dwGroups = 0;
 	long rv;
 	DWORD i;
