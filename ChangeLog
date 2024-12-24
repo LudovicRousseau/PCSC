@@ -1,3 +1,14 @@
+2.3.1: Ludovic Rousseau
+24 December 2024
+- Install a default /etc/default/pcscd file
+- auth.c: implement polkit support for FreeBSD
+- meson:
+  . also build static version of libpcsclite
+  . add options to disable polkit and libsystemd
+  . add "filter_names" in features when needed
+- Doxygen: document dwCurrentState use for "\\?PnP?\Notification"
+- Some other minor improvements
+
 2.3.0: Ludovic Rousseau
 3 August 2024
 - SCardGetStatusChange(): add the number of reader events
