@@ -170,7 +170,7 @@ libpcsclite_real_src = [
   'src/utils.c',
   'src/winscard_msg.c'
   ]
-library('pcsclite_real',
+shared_library('pcsclite_real',
   libpcsclite_real_src,
   include_directories : incdir,
   dependencies : threads_dep,
@@ -185,11 +185,23 @@ libpcsclite_src = [
   'src/libredirect.c',
   'src/sys_unix.c'
   ]
-libpcsclite = library('pcsclite',
+libpcsclite = shared_library('pcsclite',
   libpcsclite_src,
   dependencies : dl_deps,
   include_directories : incdir,
   soversion : 1,
+  install : true)
+
+# static library
+libpcsclite_static_src = libpcsclite_real_src + [
+  'src/error.c',
+  'src/g_defines.c',
+  ]
+libpcsclite_static = static_library('pcsclite',
+  libpcsclite_static_src,
+  include_directories : incdir,
+  dependencies : threads_dep,
+  c_args: '-DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE',
   install : true)
 
 # libpcsclite_fake library
@@ -227,6 +239,11 @@ executable('pcsc_demo',
   sources : 'doc/example/pcsc_demo.c',
   include_directories : incdir,
   link_with : libpcsclite)
+
+executable('pcsc_demo_static',
+  sources : 'doc/example/pcsc_demo.c',
+  include_directories : incdir,
+  link_with : libpcsclite_static)
 
 # PC/SC headers
 install_headers(
