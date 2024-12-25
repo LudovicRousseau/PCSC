@@ -604,7 +604,11 @@ class PCSCspy(object):
                 6: "PCSCv2_PART10_PROPERTY_bMinPINSize",
                 7: "PCSCv2_PART10_PROPERTY_bMaxPINSize",
                 8: "PCSCv2_PART10_PROPERTY_sFirmwareID",
-                9: "PCSCv2_PART10_PROPERTY_bPPDUSupport"}
+                9: "PCSCv2_PART10_PROPERTY_bPPDUSupport",
+                10: "PCSCv2_PART10_PROPERTY_dwMaxAPDUDataSize",
+                11: "PCSCv2_PART10_PROPERTY_wIdVendor",
+                12: "PCSCv2_PART10_PROPERTY_wIdProduct",
+                }
 
             # parse GET_TLV_PROPERTIES results
             while bRecvBuffer:
