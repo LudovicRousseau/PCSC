@@ -946,7 +946,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	else if (dwDisposition == SCARD_EJECT_CARD)
 	{
 		UCHAR controlBuffer[5];
-		UCHAR receiveBuffer[MAX_BUFFER_SIZE];
+		UCHAR receiveBuffer[MAX_BUFFER_SIZE] = { 0 };
 		DWORD receiveLength;
 
 		/*
