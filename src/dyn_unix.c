@@ -58,6 +58,8 @@ INTERNAL void * DYN_LoadLibrary(const char *pcLibrary)
 	{
 		Log3(PCSC_LOG_CRITICAL, "%s: %s", pcLibrary, dlerror());
 	}
+#else
+	(void)pcLibrary;
 #endif
 
 	return pvLHandle;
@@ -75,6 +77,8 @@ INTERNAL LONG DYN_CloseLibrary(void *pvLHandle)
 		Log2(PCSC_LOG_CRITICAL, "%s", dlerror());
 		return SCARD_F_UNKNOWN_ERROR;
 	}
+#else
+	(void)pvLHandle;
 #endif
 
 	return SCARD_S_SUCCESS;
@@ -106,6 +110,10 @@ INTERNAL LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle,
 			pcFunction, dlerror());
 		rv = SCARD_F_UNKNOWN_ERROR;
 	}
+#else
+	(void)pvLHandle;
+	(void)pvFHandle;
+	(void)mayfail;
 #endif
 
 	return rv;
