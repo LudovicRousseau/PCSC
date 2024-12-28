@@ -217,7 +217,7 @@ static inline void list_sort_selectionsort(list_t *restrict l, int versus,
 
 static void *list_get_minmax(const list_t *restrict l, int versus);
 
-static inline struct list_entry_s *list_findpos(const list_t *restrict l, int posstart);
+static struct list_entry_s *list_findpos(const list_t *restrict l, int posstart);
 
 /*
  * Random Number Generator
@@ -440,7 +440,7 @@ static void *list_get_minmax(const list_t *restrict l, int versus) {
 }
 
 /* set tmp to point to element at index posstart in l */
-static inline struct list_entry_s *list_findpos(const list_t *restrict l, int posstart) {
+static struct list_entry_s *list_findpos(const list_t *restrict l, int posstart) {
     struct list_entry_s *ptr;
     float x;
     int i;
