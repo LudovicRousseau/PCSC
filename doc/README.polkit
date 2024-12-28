@@ -1,5 +1,10 @@
-When pcsc-lite is compiled using the --enable-polkit option then
-polkit will be used to control access to the pcsc-lite daemon.
+By default pcsc-lite will use polkit to control access to the pcsc-lite
+daemon.
+
+For now, only GNU/Linux and FreeBSD are supported. Patches are welcome
+for other platforms.
+Configure pcsc-lite with -Dpolkit=false if polkit is not available for
+your platform.
 
 That allows more fine grained access control to smart cards that
 is tied to the system processes rather than solely depending on

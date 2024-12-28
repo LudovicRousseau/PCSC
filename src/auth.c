@@ -182,6 +182,8 @@ cleanup1:
 
 #else
 
+/* Do not enable polkit if it not yet supported on your system.
+ * Patches are welcome. */
 #error polkit is enabled, but no socket cred implementation for this platform
 
 #endif
