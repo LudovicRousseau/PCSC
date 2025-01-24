@@ -168,6 +168,19 @@ See
 https://blog.apdu.fr/posts/2021/08/pcsc-lite-configuration-using/
 .UE
 for more details.
+.SH "UDEV USB READER FILTERING (LINUX ONLY)"
+If udev support is enabled, setting the udev property
+.I PCSCLITE_IGNORE=1
+on a USB device will cause that reader to be ignored. For example
+to ignore any reader attached to USB port 3 of bus 1, add
+the following to a file in the
+.I /etc/udev/rules.d
+directory:
+.RS
+.EX
+ACTION!="remove|unbind", SUBSYSTEM=="usb", KERNEL=="1-3", ENV{PCSCLITE_IGNORE}="1"
+.EE
+.RE
 .SH FILES
 .I /etc/default/pcscd
 : daemon configuration file
@@ -183,7 +196,8 @@ for more details.
 .
 .SH "SEE ALSO"
 .BR reader.conf (5),
-.BR syslog (3)
+.BR syslog (3),
+.BR udev (7)
 .
 .SH AUTHORS
 David Corcoran <corcoran@musclecard.com> and Ludovic Rousseau

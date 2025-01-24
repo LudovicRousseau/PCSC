@@ -373,6 +373,7 @@ static void HPAddDevice(struct udev_device *dev)
 	const char *devpath;
 	struct udev_device *parent;
 	const char *sysname;
+	const char *ignoreprop;
 
 	/* The device pointed to by dev contains information about
 	   the interface. In order to get information about the USB
@@ -407,6 +408,15 @@ static void HPAddDevice(struct udev_device *dev)
 	if (!sysname)
 	{
 		Log1(PCSC_LOG_ERROR, "udev_device_get_sysname() failed");
+		return;
+	}
+
+	ignoreprop = udev_device_get_property_value(parent, "PCSCLITE_IGNORE");
+	if (ignoreprop && !strcmp(ignoreprop, "1"))
+	{
+		Log4(PCSC_LOG_ERROR,
+			"Device %s at %s (%s) has PCSCLITE_IGNORE set: ignored",
+			driver->readerName, devpath, sysname);
 		return;
 	}
 
