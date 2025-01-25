@@ -173,8 +173,10 @@ If udev support is enabled, setting the udev property
 .I PCSCLITE_IGNORE=1
 on a USB device will cause that reader to be ignored. For example
 to ignore any reader attached to USB port 3 of bus 1, add
-the following to a file in the
-.I /etc/udev/rules.d
+the following to a
+.I foobar.rules
+file in the
+.I /etc/udev/rules.d/
 directory:
 .RS
 .EX
