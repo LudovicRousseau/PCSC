@@ -54,7 +54,7 @@ else \
 int main(int argc, char *argv[])
 {
 	LONG rv;
-	SCARDCONTEXT hContext;
+	SCARDCONTEXT hContext = 0;
 	DWORD dwReaders;
 	LPSTR mszReaders = NULL;
 	char *ptr, **readers = NULL;
