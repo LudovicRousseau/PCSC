@@ -334,6 +334,27 @@ static LONG load_lib(void)
 	return SCARD_S_SUCCESS;
 }
 
+static void init(void)
+{
+	const char *home;
+	char log_pipe[128];
+
+	/* load the real library */
+	if (load_lib() != SCARD_S_SUCCESS)
+		return;
+
+	/* check if we can log */
+	home = SYS_GetEnv("HOME");
+	if (NULL == home)
+		home = "/tmp";
+
+	snprintf(log_pipe, sizeof log_pipe, "%s/pcsc-spy", home);
+	Log_fd = open(log_pipe, O_WRONLY);
+	if (Log_fd < 0)
+	{
+		log_line("open %s failed: %s", log_pipe, strerror(errno));
+	}
+}
 
 /* exported functions */
 PCSC_API LONG SCardEstablishContext(DWORD dwScope,
@@ -342,32 +363,9 @@ PCSC_API LONG SCardEstablishContext(DWORD dwScope,
 	LPSCARDCONTEXT phContext)
 {
 	LONG rv;
-	static int init = 0;
+	static pthread_once_t once_control = PTHREAD_ONCE_INIT;
 
-	if (!init)
-	{
-		const char *home;
-		char log_pipe[128];
-
-		init = 1;
-
-		/* load the real library */
-		rv = load_lib();
-		if (rv != SCARD_S_SUCCESS)
-			return rv;
-
-		/* check if we can log */
-		home = SYS_GetEnv("HOME");
-		if (NULL == home)
-			home = "/tmp";
-
-		snprintf(log_pipe, sizeof log_pipe, "%s/pcsc-spy", home);
-		Log_fd = open(log_pipe, O_WRONLY);
-		if (Log_fd < 0)
-		{
-			log_line("open %s failed: %s", log_pipe, strerror(errno));
-		}
-	}
+	pthread_once(&once_control, init);
 
 	Enter();
 	spy_long(dwScope);
