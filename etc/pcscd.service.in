@@ -8,6 +8,9 @@ Documentation=man:pcscd(8)
 ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit $PCSCD_ARGS
 ExecReload=@sbindir_exp@/pcscd --hotplug
 EnvironmentFile=-@sysconfdir@/default/pcscd
+User=pcscd
+RuntimeDirectory=pcscd
+RuntimeDirectoryPreserve=true
 
 # Paths
 ProtectProc=invisible

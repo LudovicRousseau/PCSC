@@ -10,6 +10,7 @@
   <action id="org.debian.pcsc-lite.access_pcsc">
     <description>Access to the PC/SC daemon</description>
     <message>Authentication is required to access the PC/SC daemon</message>
+    <annotate key="org.freedesktop.policykit.owner">unix-user:pcscd</annotate>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
@@ -20,6 +21,7 @@
   <action id="org.debian.pcsc-lite.access_card">
     <description>Access to the smart card</description>
     <message>Authentication is required to access the smart card</message>
+    <annotate key="org.freedesktop.policykit.owner">unix-user:pcscd</annotate>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>

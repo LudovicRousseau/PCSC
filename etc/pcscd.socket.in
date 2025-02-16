@@ -4,6 +4,8 @@ Description=PC/SC Smart Card Daemon Activation Socket
 [Socket]
 ListenStream=@ipcdir@/pcscd.comm
 SocketMode=0666
+SocketUser=pcscd
+SocketGroup=pcscd
 
 [Install]
 WantedBy=sockets.target

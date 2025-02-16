@@ -295,6 +295,7 @@ if get_option('libsystemd')
   systemd = dependency('systemd')
   unit = get_option('systemdunit')
   systemdsystemunitdir = systemd.get_variable(pkgconfig : 'systemd' + unit + 'unitdir')
+  sysusersdir = systemd.get_variable(pkgconfig : 'sysusersdir')
 configure_file(output : 'pcscd.socket',
   input : 'etc/pcscd.socket.in',
   install_dir : systemdsystemunitdir,
@@ -303,6 +304,8 @@ configure_file(output : 'pcscd.service',
   input : 'etc/pcscd.service.in',
   install_dir : systemdsystemunitdir,
   configuration : confgen_data)
+install_data('etc/pcscd-sysusers.conf',
+  install_dir : sysusersdir)
 endif
 configure_file(output : 'pcscd.8',
   input : 'doc/pcscd.8.in',
