@@ -47,6 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/time.h>
 #include <time.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "pcsclite.h"
 #include "misc.h"
@@ -106,7 +107,7 @@ static char LogCategory = DEBUG_CATEGORY_NOTHING;
 /** default level */
 static char LogLevel = PCSC_LOG_ERROR;
 
-static signed char LogDoColor = 0;	/**< no color by default */
+static bool LogDoColor = false;	/**< no color by default */
 
 static pthread_mutex_t LastTimeMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -366,7 +367,7 @@ void DebugLogSetLogType(const int dbgtype)
 				/* we found a supported term? */
 				if (0 == strcmp(terms[i], term))
 				{
-					LogDoColor = 1;
+					LogDoColor = true;
 					break;
 				}
 			}
