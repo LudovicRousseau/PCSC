@@ -340,8 +340,11 @@ void DebugLogSetLogType(const int dbgtype)
 		case DEBUGLOG_NO_DEBUG:
 		case DEBUGLOG_SYSLOG_DEBUG:
 		case DEBUGLOG_STDOUT_DEBUG:
+			LogMsgType = dbgtype;
+			break;
 		case DEBUGLOG_STDOUT_COLOR_DEBUG:
 			LogMsgType = dbgtype;
+			LogDoColor = true;
 			break;
 		default:
 			Log2(PCSC_LOG_CRITICAL, "unknown log type (%d), using stdout",
@@ -350,8 +353,7 @@ void DebugLogSetLogType(const int dbgtype)
 	}
 
 	/* log to stdout and stdout is a tty? */
-	if ((DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
-		|| (DEBUGLOG_STDOUT_COLOR_DEBUG == LogMsgType))
+	if (DEBUGLOG_STDOUT_DEBUG == LogMsgType && isatty(fileno(stdout)))
 	{
 		const char *term;
 
