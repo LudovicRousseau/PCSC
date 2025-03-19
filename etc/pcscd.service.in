@@ -1,6 +1,7 @@
 [Unit]
 Description=PC/SC Smart Card Daemon
 Requires=pcscd.socket
+@requires_polkit@
 Documentation=man:pcscd(8)
 
 [Service]
