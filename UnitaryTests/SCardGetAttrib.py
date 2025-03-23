@@ -21,10 +21,10 @@
 # SCARD_ATTR_VENDOR_IFD_SERIAL_NO support has been added in ccid 1.3.13
 # SCARD_ATTR_ATR_STRING support has been added in ccid 0.9.0
 
+from struct import unpack
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.util import toHexString, toASCIIString
-from struct import unpack
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -33,19 +33,23 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 for reader in readers:
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-        SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY)
+    hresult, hcard, dwActiveProtocol = SCardConnect(
+        hcontext, reader, SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY
+    )
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
     print("reader:", reader)
-    for attribute in (SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
-            SCARD_ATTR_ATR_STRING, SCARD_ATTR_CHANNEL_ID):
+    for attribute in (
+        SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
+        SCARD_ATTR_ATR_STRING,
+        SCARD_ATTR_CHANNEL_ID,
+    ):
         hresult, attrib = SCardGetAttrib(hcard, attribute)
-        print(hex(attribute), end=' ')
+        print(hex(attribute), end=" ")
         if hresult != SCARD_S_SUCCESS:
             print(SCardGetErrorMessage(hresult))
         else:
@@ -57,8 +61,7 @@ for reader in readers:
                 if DDDD == 0x0020:
                     bus = (DDDDCCCC & 0xFF00) >> 8
                     addr = DDDDCCCC & 0xFF
-                    print(" USB: bus: {}, addr: {}".format(bus, addr))
-
+                    print(f" USB: bus: {bus}, addr: {addr}")
 
     hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
