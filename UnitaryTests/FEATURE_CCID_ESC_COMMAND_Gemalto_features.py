@@ -19,11 +19,17 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from smartcard.System import readers
-from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD, FEATURE_CCID_ESC_COMMAND,
-    FEATURE_GET_TLV_PROPERTIES, getTlvProperties,
-    getFeatureRequest, hasFeature)
+from smartcard.pcsc.PCSCPart10 import (
+    SCARD_SHARE_DIRECT,
+    SCARD_LEAVE_CARD,
+    FEATURE_CCID_ESC_COMMAND,
+    FEATURE_GET_TLV_PROPERTIES,
+    getTlvProperties,
+    getFeatureRequest,
+    hasFeature,
+)
 from smartcard.Exceptions import SmartcardException
+
 try:
     from itertools import izip
 except ImportError:
@@ -31,16 +37,17 @@ except ImportError:
 
 
 # http://www.usb.org/developers/docs/USB_LANGIDs.pdf
-USBLangID = {0x0409: "English (United States)",
-        0x040C: "French (Standard)",
-        0x0425: "Estonian",
-        0x0419: "Russian",
-        0x0415: "Polish",
-        0x0416: "Portuguese (Brazil)",
-        0x0405: "Czech",
-        0x040A: "Spanish (Traditional Sort)",
-        0x041B: "Slovak"
-        }
+USBLangID = {
+    0x0409: "English (United States)",
+    0x040C: "French (Standard)",
+    0x0425: "Estonian",
+    0x0419: "Russian",
+    0x0415: "Polish",
+    0x0416: "Portuguese (Brazil)",
+    0x0405: "Czech",
+    0x040A: "Spanish (Traditional Sort)",
+    0x041B: "Slovak",
+}
 
 
 def test_bit(value, bit):
@@ -49,10 +56,9 @@ def test_bit(value, bit):
 
 
 def main():
-    """ main """
+    """main"""
     card_connection = readers()[0].createConnection()
-    card_connection.connect(mode=SCARD_SHARE_DIRECT,
-        disposition=SCARD_LEAVE_CARD)
+    card_connection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
     feature_list = getFeatureRequest(card_connection)
 
@@ -60,8 +66,8 @@ def main():
     if get_tlv_properties:
         tlv = getTlvProperties(card_connection)
         print("Reader:   ", readers()[0])
-        print("IdVendor:  0x%04X" % tlv['PCSCv2_PART10_PROPERTY_wIdVendor'])
-        print("IdProduct: 0x%04X" % tlv['PCSCv2_PART10_PROPERTY_wIdProduct'])
+        print("IdVendor:  0x%04X" % tlv["PCSCv2_PART10_PROPERTY_wIdVendor"])
+        print("IdProduct: 0x%04X" % tlv["PCSCv2_PART10_PROPERTY_wIdProduct"])
 
     ccid_esc_command = hasFeature(feature_list, FEATURE_CCID_ESC_COMMAND)
     if ccid_esc_command is None:
@@ -136,6 +142,7 @@ def main():
         print("FirewalledCommand_SW1: 0x%02X" % res[16])
         print("FirewalledCommand_SW2: 0x%02X" % res[17])
     # bytes 18-20 are RFU
+
 
 if __name__ == "__main__":
     main()

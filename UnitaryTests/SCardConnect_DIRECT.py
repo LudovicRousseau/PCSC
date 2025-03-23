@@ -31,38 +31,41 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 reader = readers[0]
 print("Using reader:", reader)
 
 # the card should be reset or inserted just before execution
 
 # Connect in SCARD_SHARE_DIRECT mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-        SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 print("dwActiveProtocol:", dwActiveProtocol)
 
 # Reconnect in SCARD_SHARE_DIRECT mode
-hresult, dwActiveProtocol = SCardReconnect(hcard,
-        SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
+hresult, dwActiveProtocol = SCardReconnect(
+    hcard, SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print("dwActiveProtocol:", dwActiveProtocol)
 if SCARD_PROTOCOL_UNDEFINED != dwActiveProtocol:
-    raise Exception('dwActiveProtocol should be SCARD_PROTOCOL_UNDEFINED')
+    raise Exception("dwActiveProtocol should be SCARD_PROTOCOL_UNDEFINED")
 
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-        SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
@@ -70,15 +73,16 @@ print("dwActiveProtocol:", dwActiveProtocol)
 oldActiveProtocol = dwActiveProtocol
 
 # Reconnect in SCARD_SHARE_DIRECT mode
-hresult, dwActiveProtocol = SCardReconnect(hcard,
-        SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
+hresult, dwActiveProtocol = SCardReconnect(
+    hcard, SCARD_SHARE_DIRECT, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
 # ActiveProtocol should be SCARD_PROTOCOL_UNDEFINED (0)
 print("dwActiveProtocol:", dwActiveProtocol)
 if oldActiveProtocol != dwActiveProtocol:
-    raise Exception('dwActiveProtocol should be like before')
+    raise Exception("dwActiveProtocol should be like before")
 
 hresult = SCardDisconnect(hcard, SCARD_RESET_CARD)
 if hresult != SCARD_S_SUCCESS:

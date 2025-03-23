@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 """
-    stress_apdu.py: send an apdu in loop
-    Copyright (C) 2010  Ludovic Rousseau
+stress_apdu.py: send an apdu in loop
+Copyright (C) 2010  Ludovic Rousseau
 """
 
 #   This program is free software; you can redistribute it and/or modify
@@ -18,14 +18,29 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import readers
 from time import time, ctime
+from smartcard.System import readers
 
 
 def stress(reader):
     # define the APDUs used in this script
-    SELECT = [0x00, 0xA4, 0x04, 0x00, 0x0A, 0xA0, 0x00, 0x00, 0x00, 0x62,
-        0x03, 0x01, 0x0C, 0x06, 0x01]
+    SELECT = [
+        0x00,
+        0xA4,
+        0x04,
+        0x00,
+        0x0A,
+        0xA0,
+        0x00,
+        0x00,
+        0x00,
+        0x62,
+        0x03,
+        0x01,
+        0x0C,
+        0x06,
+        0x01,
+    ]
     COMMAND = [0x00, 0x00, 0x00, 0x00]
 
     connection = reader.createConnection()
@@ -46,6 +61,7 @@ def stress(reader):
         if delta > 1:
             sys.stderr.write(ctime() + " %f\n" % delta)
         i += 1
+
 
 if __name__ == "__main__":
     import sys

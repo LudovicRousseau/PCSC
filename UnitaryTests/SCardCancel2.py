@@ -25,23 +25,26 @@ from smartcard.scard import *
 try:
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
-        raise Exception('Failed to establish context : ' +
-                        SCardGetErrorMessage(hresult))
-    print('Context established!')
+        raise Exception(
+            "Failed to establish context : " + SCardGetErrorMessage(hresult)
+        )
+    print("Context established!")
 
     try:
         hresult = SCardCancel(hcontext)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to cancel context : ' +
-                            SCardGetErrorMessage(hresult))
-        print('context canceled')
+            raise Exception(
+                "Failed to cancel context : " + SCardGetErrorMessage(hresult)
+            )
+        print("context canceled")
 
     finally:
         hresult = SCardReleaseContext(hcontext)
         if hresult != SCARD_S_SUCCESS:
-            raise Exception('Failed to release context: ' +
-                            SCardGetErrorMessage(hresult))
-        print('Released context.')
+            raise Exception(
+                "Failed to release context: " + SCardGetErrorMessage(hresult)
+            )
+        print("Released context.")
 
 except Exception as message:
     print("Exception:", message)

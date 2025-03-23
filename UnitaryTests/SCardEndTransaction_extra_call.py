@@ -30,11 +30,13 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 reader = readers[0]
 print("Using reader:", reader)
 
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

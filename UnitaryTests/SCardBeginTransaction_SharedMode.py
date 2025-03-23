@@ -20,10 +20,10 @@
 # SCardReleaseContext() should not release a PC/SC transaction not
 # started by the released context
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 import threading
 import time
+from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
@@ -44,7 +44,9 @@ def init_client():
     print("Using reader:", reader)
 
     print("SCardConnect")
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+    hresult, hcard, dwActiveProtocol = SCardConnect(
+        hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+    )
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 

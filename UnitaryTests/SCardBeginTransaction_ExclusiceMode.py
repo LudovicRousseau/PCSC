@@ -29,7 +29,7 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext1, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 reader = readers[0]
 print("Using reader:", reader)
 
@@ -37,11 +37,15 @@ hresult, hcontext2 = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
     raise EstablishContextException(hresult)
 
-hresult, hcard1, dwActiveProtocol = SCardConnect(hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard1, dwActiveProtocol = SCardConnect(
+    hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
-hresult, hcard2, dwActiveProtocol = SCardConnect(hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard2, dwActiveProtocol = SCardConnect(
+    hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
@@ -64,7 +68,9 @@ if hresult != SCARD_S_SUCCESS:
 
 # Connect should not return an error since hcard1 and hcard2 are now
 # disconnected
-hresult, hcard1, dwActiveProtocol = SCardConnect(hcontext1, reader, SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY)
+hresult, hcard1, dwActiveProtocol = SCardConnect(
+    hcontext1, reader, SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

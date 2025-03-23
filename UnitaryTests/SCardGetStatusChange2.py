@@ -30,15 +30,14 @@ if hresult != SCARD_S_SUCCESS:
 
 hresult, readers = SCardListReaders(hcontext, [])
 print("SCardListReaders()", SCardGetErrorMessage(hresult))
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 readers = ["a", "b"]
 print(readers)
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 10,
-        list(readerstates.values()))
+hresult, newstates = SCardGetStatusChange(hcontext, 10, list(readerstates.values()))
 print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)

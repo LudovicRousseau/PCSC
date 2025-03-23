@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 """
-    transmit_card_removed.py
-    Copyright (C) 2020  Ludovic Rousseau
+transmit_card_removed.py
+Copyright (C) 2020  Ludovic Rousseau
 """
 
 #   This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,8 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from time import time
+
 """
 SCardTransmit() should return SCARD_E_NO_SMARTCARD when a card is
 removed during an APDU exchange.
@@ -28,7 +30,6 @@ SCardStatus() should report that the card is no more present.
 from smartcard.scard import *
 from smartcard.util import toBytes, toHexString
 from smartcard.pcsc.PCSCExceptions import *
-from time import time
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"

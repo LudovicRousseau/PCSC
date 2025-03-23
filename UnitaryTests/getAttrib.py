@@ -19,29 +19,32 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from smartcard.System import readers
-from smartcard.scard import (SCARD_ATTR_VENDOR_NAME, SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD, SCARD_ATTR_DEVICE_FRIENDLY_NAME,
-    SCARD_ATTR_VENDOR_IFD_VERSION, SCARD_ATTR_VENDOR_IFD_SERIAL_NO)
+from smartcard.scard import (
+    SCARD_ATTR_VENDOR_NAME,
+    SCARD_SHARE_DIRECT,
+    SCARD_LEAVE_CARD,
+    SCARD_ATTR_DEVICE_FRIENDLY_NAME,
+    SCARD_ATTR_VENDOR_IFD_VERSION,
+    SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
+)
 import smartcard.Exceptions
 
 
 def main():
-    """ Ask the first reader/driver to return its Vendor Name if any """
+    """Ask the first reader/driver to return its Vendor Name if any"""
     card_connection = readers()[0].createConnection()
-    card_connection.connect(mode=SCARD_SHARE_DIRECT,
-        disposition=SCARD_LEAVE_CARD)
+    card_connection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
     try:
         # Vendor name
         name = card_connection.getAttrib(SCARD_ATTR_VENDOR_NAME)
-        print(''.join([chr(char) for char in name]))
+        print("".join([chr(char) for char in name]))
 
         # Vendor-supplied interface device version (DWORD in the form
         # 0xMMmmbbbb where MM = major version, mm = minor version, and
         # bbbb = build number).
         version = card_connection.getAttrib(SCARD_ATTR_VENDOR_IFD_VERSION)
-        print("Version: %d.%d.%d" % (version[3], version[2],
-                version[0]))
+        print("Version: %d.%d.%d" % (version[3], version[2], version[0]))
 
         # Vendor-supplied interface device serial number.
         # only for readers with a USB serial number
@@ -51,10 +54,11 @@ def main():
         # Reader's display name
         # only with pcsc-lite version >= 1.6.0
         name = card_connection.getAttrib(SCARD_ATTR_DEVICE_FRIENDLY_NAME)
-        print(''.join([chr(char) for char in name]))
+        print("".join([chr(char) for char in name]))
 
     except smartcard.Exceptions.SmartcardException as ex:
         print("Exception:", ex)
+
 
 if __name__ == "__main__":
     main()

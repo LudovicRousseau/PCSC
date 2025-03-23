@@ -21,14 +21,17 @@
 # http://archives.neohapsis.com/archives/dev/muscle/2012-q2/0109.html
 # fixed in revisions 6358, 6359, 6360 and 6361
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 import threading
 import time
+from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
+
 
 def myThread(reader):
     print("thread 2: SCardConnect")
-    hresult, hcard2, dwActiveProtocol = SCardConnect(hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+    hresult, hcard2, dwActiveProtocol = SCardConnect(
+        hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+    )
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
@@ -68,8 +71,9 @@ def myThread(reader):
 
     # check for SCardReconnect()
     print("thread 2: SCardReconnect")
-    hresult, dwActiveProtocol = SCardReconnect(hcard2,
-        SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
+    hresult, dwActiveProtocol = SCardReconnect(
+        hcard2, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD
+    )
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
 
@@ -77,6 +81,7 @@ def myThread(reader):
     hresult = SCardDisconnect(hcard2, SCARD_LEAVE_CARD)
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
+
 
 print("thread 1: SCardEstablishContext")
 hresult, hcontext1 = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -87,19 +92,21 @@ print("thread 1: SCardListReaders")
 hresult, readers = SCardListReaders(hcontext1, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 reader = readers[0]
 print("Using reader:", reader)
 
 # second thread
-t = threading.Thread(target=myThread, args=(reader, ))
+t = threading.Thread(target=myThread, args=(reader,))
 t.start()
 
 # wait for the 1st thread to begin a transaction
 time.sleep(0.5)
 
 print("thread 1: SCardConnect")
-hresult, hcard1, dwActiveProtocol = SCardConnect(hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard1, dwActiveProtocol = SCardConnect(
+    hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

@@ -32,14 +32,14 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import sys
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
 from smartcard.Exceptions import NoReadersException
-import sys
 
 
 def Connect(mode):
-    """ Connect """
+    """Connect"""
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
         raise EstablishContextException(hresult)
@@ -47,25 +47,27 @@ def Connect(mode):
     hresult, readers = SCardListReaders(hcontext, [])
     if hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
-    print('PC/SC Readers:', readers)
-    if (len(readers) <= 0):
+    print("PC/SC Readers:", readers)
+    if len(readers) <= 0:
         raise NoReadersException()
     reader = readers[0]
     print("Using reader:", reader)
 
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-        mode, SCARD_PROTOCOL_ANY)
+    hresult, hcard, dwActiveProtocol = SCardConnect(
+        hcontext, reader, mode, SCARD_PROTOCOL_ANY
+    )
     return hresult, hcontext, hcard, reader
 
 
 def ConnectWithReader(readerName, mode):
-    """ ConnectWithReader """
+    """ConnectWithReader"""
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
         raise EstablishContextException(hresult)
 
-    hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readerName,
-        mode, SCARD_PROTOCOL_ANY)
+    hresult, hcard, dwActiveProtocol = SCardConnect(
+        hcontext, readerName, mode, SCARD_PROTOCOL_ANY
+    )
     return hresult, hcontext, hcard
 
 
@@ -74,32 +76,41 @@ def main():
 
     hresult, hcontext1, hcard1, readerName = Connect(SCARD_SHARE_EXCLUSIVE)
     if hresult != SCARD_S_SUCCESS:
-        print("Test1: Error creating first exclusive connection % x" %
-                hresult)
+        print("Test1: Error creating first exclusive connection % x" % hresult)
         return
 
     hresult, hcontext2, hcardTest2 = ConnectWithReader(readerName, SCARD_SHARE_SHARED)
     if hresult != SCARD_E_SHARING_VIOLATION:
-        print("Test1: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
-                % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
-                        SCardGetErrorMessage(hresult)))
+        print(
+            "Test1: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
+            % (
+                SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
+                SCardGetErrorMessage(hresult),
+            )
+        )
         return
 
     SCardDisconnect(hcard1, 0)
 
     hresult, hcontext1, hcard1 = ConnectWithReader(readerName, SCARD_SHARE_SHARED)
     if hresult != SCARD_S_SUCCESS:
-        print("Testt2: Error creating first shared connection % x" %
-                hresult)
+        print("Testt2: Error creating first shared connection % x" % hresult)
         return
 
-    hresult, hcontext2, hcardTest2 = ConnectWithReader(readerName, SCARD_SHARE_EXCLUSIVE)
+    hresult, hcontext2, hcardTest2 = ConnectWithReader(
+        readerName, SCARD_SHARE_EXCLUSIVE
+    )
     if hresult != SCARD_E_SHARING_VIOLATION:
-        print("Test2: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
-                % (SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
-                SCardGetErrorMessage(hresult)))
+        print(
+            "Test2: Expected %s (SCARD_E_SHARING_VIOLATION) but got %s"
+            % (
+                SCardGetErrorMessage(SCARD_E_SHARING_VIOLATION),
+                SCardGetErrorMessage(hresult),
+            )
+        )
         sys.exit(1)
     print("Test successful")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

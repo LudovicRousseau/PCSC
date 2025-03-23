@@ -39,8 +39,10 @@ for reader in readers():
     tlv = getTlvProperties(card_connection)
 
     for key in sorted(tlv):
-        if key in ["PCSCv2_PART10_PROPERTY_wIdProduct",
-                "PCSCv2_PART10_PROPERTY_wIdVendor"]:
+        if key in [
+            "PCSCv2_PART10_PROPERTY_wIdProduct",
+            "PCSCv2_PART10_PROPERTY_wIdVendor",
+        ]:
             print("%s: 0x%04X" % (key, tlv[key]))
         else:
             print("%s: %s" % (key, tlv[key]))

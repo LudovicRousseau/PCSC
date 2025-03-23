@@ -20,12 +20,20 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
-    SCardListReaders, SCardConnect, SCardDisconnect,
-    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD,
-    SCARD_SCOPE_USER, SCARD_S_SUCCESS)
-from smartcard.pcsc.PCSCExceptions import *
 import threading
+from smartcard.scard import (
+    SCardEstablishContext,
+    SCardReleaseContext,
+    SCardListReaders,
+    SCardConnect,
+    SCardDisconnect,
+    SCARD_SHARE_SHARED,
+    SCARD_PROTOCOL_ANY,
+    SCARD_LEAVE_CARD,
+    SCARD_SCOPE_USER,
+    SCARD_S_SUCCESS,
+)
+from smartcard.pcsc.PCSCExceptions import *
 
 MAX_THREADS = 10
 MAX_ITER = 10
@@ -48,13 +56,14 @@ def stress(*args):
 
     for j in range(0, MAX_ITER):
         # Connect in SCARD_SHARE_SHARED mode
-        hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, readers[0],
-               SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+        hresult, hcard, dwActiveProtocol = SCardConnect(
+            hcontext, readers[0], SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+        )
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
         log = "%d:%d" % (thread, j)
-        print(log, end=' ')
+        print(log, end=" ")
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
         if hresult != SCARD_S_SUCCESS:
@@ -82,11 +91,12 @@ def main():
         thread.start()
 
     for thread in threads:
-        print("joining:", thread.name, end=' ')
+        print("joining:", thread.name, end=" ")
         thread.join()
         print("joined:", thread.name)
 
     print("Exiting main")
+
 
 if __name__ == "__main__":
     main()

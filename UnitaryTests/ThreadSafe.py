@@ -19,10 +19,15 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from smartcard.scard import (SCardEstablishContext, SCardReleaseContext,
-    SCardGetErrorMessage, SCARD_SCOPE_USER, SCARD_S_SUCCESS)
-from smartcard.pcsc.PCSCExceptions import *
 import threading
+from smartcard.scard import (
+    SCardEstablishContext,
+    SCardReleaseContext,
+    SCardGetErrorMessage,
+    SCARD_SCOPE_USER,
+    SCARD_S_SUCCESS,
+)
+from smartcard.pcsc.PCSCExceptions import *
 
 MAX_THREADS = 100
 MAX_ITER = 10
@@ -34,7 +39,7 @@ def stress(*args):
     """
     thread = args[0]
     for j in range(0, MAX_ITER):
-        print(thread, end=' ')
+        print(thread, end=" ")
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
         if hresult != SCARD_S_SUCCESS:
             raise EstablishContextException(hresult)
@@ -60,6 +65,7 @@ def main():
 
     for thread in threads:
         thread.join()
+
 
 if __name__ == "__main__":
     main()

@@ -19,10 +19,10 @@
 
 # check the card is not auto powered off after a SCardReconnect()
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 import sys
 import time
+from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 
 RED = "\033[0;31m"
@@ -36,14 +36,15 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 reader = readers[0]
 print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
@@ -54,8 +55,9 @@ while True:
     if hresult == SCARD_W_REMOVED_CARD:
         print("\nInsert the card")
         while hresult != SCARD_S_SUCCESS:
-            hresult, dwActiveProtocol = SCardReconnect(hcard,
-                SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD)
+            hresult, dwActiveProtocol = SCardReconnect(
+                hcard, SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD
+            )
             print(".", end="")
             sys.stdout.flush()
             time.sleep(1)
@@ -65,7 +67,7 @@ while True:
 
     if hresult != SCARD_S_SUCCESS:
         raise BaseSCardException(hresult)
-    #print(SCardGetErrorMessage(hresult))
+    # print(SCardGetErrorMessage(hresult))
 
     print(".", end="")
     sys.stdout.flush()
@@ -76,7 +78,7 @@ while True:
 
     if count >= 0:
         count += 1
-        if (count > 10):
+        if count > 10:
             print(BLUE + "\nTest passed" + NORMAL)
             break
     time.sleep(1)

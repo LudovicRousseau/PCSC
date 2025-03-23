@@ -24,17 +24,18 @@
 
 # The bug has been fixed in 57b0ba5a200bcbf1c489d39261340324392a8e8a
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 import threading
 import time
 import sys
+from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 
 def getstatuschange():
     # this call will be cancelled
-    hresult, newstates = SCardGetStatusChange(hcontext, 10000,
-            list(readerstates.values()))
+    hresult, newstates = SCardGetStatusChange(
+        hcontext, 10000, list(readerstates.values())
+    )
     print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
     if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
         if SCARD_E_CANCELLED == hresult:
@@ -55,6 +56,7 @@ def getstatuschange():
         else:
             print("Card removed")
 
+
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
     raise EstablishContextException(hresult)
@@ -62,13 +64,12 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 0,
-        list(readerstates.values()))
+hresult, newstates = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print(newstates)
@@ -77,8 +78,9 @@ for state in newstates:
     readerstates[readername] = (readername, eventstate)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
@@ -89,7 +91,7 @@ time.sleep(1)
 print("cancel")
 hresult = SCardCancel(hcontext)
 if hresult != SCARD_S_SUCCESS:
-    print('Failed to SCardCancel: ' + SCardGetErrorMessage(hresult))
+    print("Failed to SCardCancel: " + SCardGetErrorMessage(hresult))
 
 time.sleep(5)
 hresult = SCardReleaseContext(hcontext)

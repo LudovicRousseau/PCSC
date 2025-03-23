@@ -18,9 +18,9 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+import sys
 from smartcard.scard import *
 from smartcard.pcsc.PCSCExceptions import *
-import sys
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -30,14 +30,15 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 reader = readers[0]
 print("Using reader:", reader)
 
 # Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 

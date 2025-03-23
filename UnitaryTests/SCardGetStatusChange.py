@@ -40,7 +40,8 @@ from smartcard.pcsc.PCSCExceptions import *
 
 def parseEventState(eventstate):
     stateList = list()
-    states = {SCARD_STATE_IGNORE: "Ignore",
+    states = {
+        SCARD_STATE_IGNORE: "Ignore",
         SCARD_STATE_CHANGED: "Changed",
         SCARD_STATE_UNKNOWN: "Unknown",
         SCARD_STATE_UNAVAILABLE: "Unavailable",
@@ -50,11 +51,13 @@ def parseEventState(eventstate):
         SCARD_STATE_EXCLUSIVE: "Exclusive",
         SCARD_STATE_INUSE: "In use",
         SCARD_STATE_MUTE: "Mute",
-        SCARD_STATE_UNPOWERED: "Unpowered"}
+        SCARD_STATE_UNPOWERED: "Unpowered",
+    }
     for state in states:
         if eventstate & state:
             stateList.append(states[state])
     return stateList
+
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -63,13 +66,12 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 0,
-        list(readerstates.values()))
+hresult, newstates = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print(newstates)
@@ -79,8 +81,7 @@ for readerState in newstates:
 
 print("Remove the reader")
 
-hresult, newstates = SCardGetStatusChange(hcontext, 10000,
-        list(readerstates.values()))
+hresult, newstates = SCardGetStatusChange(hcontext, 10000, list(readerstates.values()))
 print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
 if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
     raise BaseSCardException(hresult)

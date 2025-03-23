@@ -20,10 +20,10 @@
 # #define DO_CHECK_SAME_PROCESS
 # or this unitary test will fail
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 import time
 import os
+from smartcard.scard import *
+from smartcard.pcsc.PCSCExceptions import *
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -33,13 +33,14 @@ if hresult != SCARD_S_SUCCESS:
 hresult, readers = SCardListReaders(hcontext, [])
 if hresult != SCARD_S_SUCCESS:
     raise ListReadersException(hresult)
-print('PC/SC Readers:', readers)
+print("PC/SC Readers:", readers)
 
 reader = readers[0]
 print("Using reader:", reader)
 
-hresult, hcard, dwActiveProtocol = SCardConnect(hcontext, reader,
-    SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY)
+hresult, hcard, dwActiveProtocol = SCardConnect(
+    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 
@@ -56,8 +57,10 @@ if pid == 0:
     elif hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
     else:
-        print("test FAILED got %s. SCARD_E_INVALID_HANDLE was expected"
-                % SCardGetErrorMessage(hresult))
+        print(
+            "test FAILED got %s. SCARD_E_INVALID_HANDLE was expected"
+            % SCardGetErrorMessage(hresult)
+        )
         print()
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
@@ -84,7 +87,6 @@ else:
 
     print("father: SCardReleaseContext...")
     hresult = SCardReleaseContext(hcontext)
-    print("father: SCardReleaseContext()",
-            SCardGetErrorMessage(hresult))
+    print("father: SCardReleaseContext()", SCardGetErrorMessage(hresult))
     if hresult != SCARD_S_SUCCESS:
         raise ReleaseContextException(hresult)

@@ -19,8 +19,11 @@
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from smartcard.System import readers
-from smartcard.pcsc.PCSCPart10 import (SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD, SCARD_CTL_CODE)
+from smartcard.pcsc.PCSCPart10 import (
+    SCARD_SHARE_DIRECT,
+    SCARD_LEAVE_CARD,
+    SCARD_CTL_CODE,
+)
 from smartcard.Exceptions import SmartcardException
 
 IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
@@ -35,15 +38,16 @@ def switch_interface(interface):
         cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
         switch_interface_cmd = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
-        print("Reader:", reader, "=>", end=' ')
+        print("Reader:", reader, "=>", end=" ")
         try:
-            res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE,
-                switch_interface_cmd)
+            res = cardConnection.control(
+                IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE, switch_interface_cmd
+            )
         except SmartcardException as e:
             print("FAILED")
         else:
             if res != [0, 0, 0, 0]:
-                print("Failed: ", end='')
+                print("Failed: ", end="")
                 err = res[0] * 256 + res[1]
                 if err == 0xFF83:
                     print("Wrong data parameters")
@@ -53,6 +57,7 @@ def switch_interface(interface):
                     print("Unknown error:", [hex(x) for x in res])
             else:
                 print("Success")
+
 
 if __name__ == "__main__":
     import sys
