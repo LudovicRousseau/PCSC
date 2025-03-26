@@ -11,7 +11,7 @@
 
 project('pcsc-lite', 'c',
   meson_version : '>=0.58.0',
-  version : '2.3.1')
+  version : '2.3.2')
 
 # for config.h
 conf_data = configuration_data({

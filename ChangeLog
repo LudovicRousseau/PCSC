@@ -1,3 +1,12 @@
+2.3.2: Ludovic Rousseau
+26 March 2025
+- Hardening systemd pcscd.service file
+- pcscd.service: add missing Requires=polkit.service
+- pcsc-spy: add missing PCSCv2_PART10_PROPERTY_* definitions
+- Support udev PCSCLITE_IGNORE property to filter readers
+- debuglog: force use of colors when --color is used
+- Some other minor improvements
+
 2.3.1: Ludovic Rousseau
 24 December 2024
 - Install a default /etc/default/pcscd file
