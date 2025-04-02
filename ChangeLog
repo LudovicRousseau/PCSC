@@ -1,3 +1,7 @@
+2.3.3: Ludovic Rousseau
+2 April 2025
+- Make polkit rules work again (bug introduced in 2.3.2)
+
 2.3.2: Ludovic Rousseau
 26 March 2025
 - Hardening systemd pcscd.service file
