@@ -53,3 +53,8 @@ option('filter_names',
   type : 'boolean',
   value : true,
   description : 'reader filtering using PCSCLITE_FILTER_IGNORE_READER_NAMES and PCSCLITE_FILTER_EXTEND_READER_NAMES')
+
+option('program_suffix',
+  type : 'string',
+  value : '',
+  description : 'suffix for programs')

@@ -1,12 +1,12 @@
 [Unit]
 Description=PC/SC Smart Card Daemon
-Requires=pcscd.socket
+Requires=pcscd@program_suffix@.socket
 @requires_polkit@
 Documentation=man:pcscd(8)
 
 [Service]
-ExecStart=@sbindir_exp@/pcscd --foreground --auto-exit $PCSCD_ARGS
-ExecReload=@sbindir_exp@/pcscd --hotplug
+ExecStart=@sbindir_exp@/pcscd@program_suffix@ --foreground --auto-exit $PCSCD_ARGS
+ExecReload=@sbindir_exp@/pcscd@program_suffix@ --hotplug
 EnvironmentFile=-@sysconfdir@/default/pcscd
 User=pcscd
 RuntimeDirectory=pcscd
@@ -48,4 +48,4 @@ SystemCallFilter=~@resources @privileged
 SystemCallArchitectures=native
 
 [Install]
-Also=pcscd.socket
+Also=pcscd@program_suffix@.socket

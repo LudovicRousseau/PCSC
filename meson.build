@@ -29,6 +29,7 @@ confgen_data = configuration_data({
   'sbindir_exp' : sbindir,
   'PCSCLITE_CONFIG_DIR' : get_option('serialconfdir'),
   'usbdropdir' : get_option('usbdropdir'),
+  'program_suffix' : get_option('program_suffix'),
   })
 
 # tests for functions
@@ -161,7 +162,7 @@ features += 'serialconfdir=' + get_option('serialconfdir')
 # generate PCSCLITE_FEATURES
 conf_data.set('PCSCLITE_FEATURES', '"' + ' '.join(features) + '"')
 
-executable('pcscd',
+executable('pcscd@0@'.format(get_option('program_suffix')),
   sources : pcscd_src,
   include_directories : incdir,
   dependencies : pcscd_dep,
@@ -299,11 +300,11 @@ configure_file(output : 'pcsclite.h',
 configure_file(output : 'pcscd.h',
   input : 'src/pcscd.h.in',
   configuration : confgen_data)
-configure_file(output : 'pcscd.socket',
+configure_file(output : 'pcscd@0@.socket'.format(get_option('program_suffix')),
   input : 'etc/pcscd.socket.in',
   install_dir : systemdsystemunitdir,
   configuration : confgen_data)
-configure_file(output : 'pcscd.service',
+configure_file(output : 'pcscd@0@.service'.format(get_option('program_suffix')),
   input : 'etc/pcscd.service.in',
   install_dir : systemdsystemunitdir,
   configuration : confgen_data)
