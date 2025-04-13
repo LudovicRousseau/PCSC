@@ -308,6 +308,7 @@ endif
 # pkg-config libpcsclite.pc
 pkg = import('pkgconfig')
 pkg.generate(
+  extra_cflags : '-pthread',
   libraries : '-L${libdir} -lpcsclite',
   libraries_private : '-pthread',
   subdirs : 'PCSC',
