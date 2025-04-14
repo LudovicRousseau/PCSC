@@ -2851,8 +2851,8 @@ end:
  * The reader names and group names are encoded using UTF-8.
  *
  * The reader names is a multi-string and separated by a null character
- * ('\0') and ended by a double null character like
- * "Reader foo 00 00\0Reader bar 01 00\0\0".
+ * (\c '\0') and ended by a double null character like
+ * \c "Reader foo 00 00\0Reader bar 01 00\0\0".
  *
  * @ingroup API
  * @param[in] hContext Connection context to the PC/SC Resource Manager.
