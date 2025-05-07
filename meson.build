@@ -186,24 +186,31 @@ libpcsclite_src = [
   'src/libredirect.c',
   'src/sys_unix.c'
   ]
-libpcsclite = shared_library('pcsclite',
-  libpcsclite_src,
-  dependencies : dl_deps,
-  include_directories : incdir,
-  soversion : 1,
-  install : true)
+if get_option('default_library') != 'static'
+  libpcsclite = shared_library('pcsclite',
+    libpcsclite_src,
+    dependencies : dl_deps,
+    include_directories : incdir,
+    soversion : 1,
+    install : true)
+endif
 
 # static library
 libpcsclite_static_src = libpcsclite_real_src + [
   'src/error.c',
   'src/g_defines.c',
   ]
-libpcsclite_static = static_library('pcsclite',
-  libpcsclite_static_src,
-  include_directories : incdir,
-  dependencies : threads_dep,
-  c_args: '-DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE',
-  install : true)
+if get_option('default_library') != 'shared'
+  libpcsclite_static = static_library('pcsclite',
+    libpcsclite_static_src,
+    include_directories : incdir,
+    dependencies : threads_dep,
+    c_args: '-DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE',
+    install : true)
+  if get_option('default_library') == 'static'
+    libpcsclite = libpcsclite_static
+  endif
+endif
 
 # libpcsclite_fake library
 library('pcsclite_fake',
@@ -241,10 +248,12 @@ executable('pcsc_demo',
   include_directories : incdir,
   link_with : libpcsclite)
 
-executable('pcsc_demo_static',
-  sources : 'doc/example/pcsc_demo.c',
-  include_directories : incdir,
-  link_with : libpcsclite_static)
+if get_option('default_library') == 'both'
+  executable('pcsc_demo_static',
+    sources : 'doc/example/pcsc_demo.c',
+    include_directories : incdir,
+    link_with : libpcsclite_static)
+endif
 
 # PC/SC headers
 install_headers(
