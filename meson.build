@@ -171,13 +171,6 @@ libpcsclite_real_src = [
   'src/utils.c',
   'src/winscard_msg.c'
   ]
-shared_library('pcsclite_real',
-  libpcsclite_real_src,
-  include_directories : incdir,
-  dependencies : threads_dep,
-  c_args: '-DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE',
-  soversion : 1,
-  install : true)
 
 # libpcsclite library
 libpcsclite_src = [
@@ -193,6 +186,34 @@ if get_option('default_library') != 'static'
     include_directories : incdir,
     soversion : 1,
     install : true)
+
+  shared_library('pcsclite_real',
+    libpcsclite_real_src,
+    include_directories : incdir,
+    dependencies : threads_dep,
+    c_args: '-DLIBPCSCLITE -DSIMCLIST_NO_DUMPRESTORE',
+    soversion : 1,
+    install : true)
+
+  # libpcscspy library
+  library('pcscspy',
+    sources : ['src/spy/libpcscspy.c', 'src/sys_unix.c'],
+    dependencies : dl_deps,
+    include_directories : incdir,
+    soversion : 0,
+    install : true)
+
+  install_data('src/spy/pcsc-spy',
+    install_dir : get_option('bindir'))
+
+  install_data('src/spy/setup_spy.sh',
+    install_dir : 'share/doc/pcsc-lite')
+
+  run_command('pod2man',
+    ['--date=2024-01-01', 'src/spy/pcsc-spy.pod', 'pcsc-spy.1'],
+    check : true)
+  install_data('pcsc-spy.1',
+    install_dir : join_paths(get_option('mandir'), 'man1'))
 endif
 
 # static library
@@ -216,26 +237,6 @@ endif
 library('pcsclite_fake',
   sources : 'src/libfake.c',
   include_directories : incdir)
-
-# libpcscspy library
-library('pcscspy',
-  sources : ['src/spy/libpcscspy.c', 'src/sys_unix.c'],
-  dependencies : dl_deps,
-  include_directories : incdir,
-  soversion : 0,
-  install : true)
-
-install_data('src/spy/pcsc-spy',
-  install_dir : get_option('bindir'))
-
-install_data('src/spy/setup_spy.sh',
-  install_dir : 'share/doc/pcsc-lite')
-
-run_command('pod2man',
-  ['--date=2024-01-01', 'src/spy/pcsc-spy.pod', 'pcsc-spy.1'],
-  check : true)
-install_data('pcsc-spy.1',
-  install_dir : join_paths(get_option('mandir'), 'man1'))
 
 # testpcsc program
 executable('testpcsc',
