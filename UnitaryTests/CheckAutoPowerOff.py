@@ -17,13 +17,32 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-# check the card is not auto powered off after a SCardReconnect()
+"""check the card is not auto powered off after a SCardReconnect()"""
 
 import sys
 import time
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+)
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_EXCLUSIVE,
+    SCARD_SHARE_SHARED,
+    SCARD_W_REMOVED_CARD,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReconnect,
+    SCardReleaseContext,
+    SCardStatus,
+)
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
