@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+"""
 #   reset_card.py: reset a card
 #   Copyright (C) 2010  Ludovic Rousseau
 #
@@ -15,10 +16,31 @@
 #
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
+"""
 
 import sys
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_PROTOCOL_ANY,
+    SCARD_RESET_CARD,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_EXCLUSIVE,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReconnect,
+    SCardReleaseContext,
+    SCardStatus,
+)
 from smartcard.util import toHexString
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
