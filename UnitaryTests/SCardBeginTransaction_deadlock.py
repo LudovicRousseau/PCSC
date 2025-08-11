@@ -160,5 +160,6 @@ def main():
     if hresult != SCARD_S_SUCCESS:
         raise ReleaseContextException(hresult)
 
+
 if __name__ == "__main__":
     main()

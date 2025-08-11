@@ -16,13 +16,32 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # A bug has been corrected in revision 3467
 # The problem occurs if SCardBeginTransaction() are made without
 # corresponding SCardEndTransaction(). OpenSC "pkcs11-tool -I" exhibits
 # such a behavior.
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_PROTOCOL_ANY,
+    SCARD_RESET_CARD,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
