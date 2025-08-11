@@ -29,7 +29,7 @@ from smartcard.Exceptions import SmartcardException
 IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
 
 
-def switch_interface(interface):
+def switch_interface(my_interface):
     """
     switch from contact to contactless (or reverse) on a GemProx DU reader
     """
@@ -37,7 +37,7 @@ def switch_interface(interface):
         cardConnection = reader.createConnection()
         cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
-        switch_interface_cmd = [0x52, 0xF8, 0x04, 0x01, 0x00, interface]
+        switch_interface_cmd = [0x52, 0xF8, 0x04, 0x01, 0x00, my_interface]
         print("Reader:", reader, "=>", end=" ")
         try:
             res = cardConnection.control(
