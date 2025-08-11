@@ -17,13 +17,35 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # SCardReleaseContext() should not release a PC/SC transaction not
 # started by the released context
+"""
 
 import threading
 import time
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import SCARD_E_SHARING_VIOLATION  # SCardDisconnect,
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardEndTransaction,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReleaseContext,
+    SCardTransmit,
+)
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
@@ -31,6 +53,7 @@ NORMAL = "\033[00m"
 
 
 def init_client():
+    """init a client"""
     print("SCardEstablishContext")
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
@@ -54,8 +77,9 @@ def init_client():
 
 
 def thread_transaction():
+    """Transcation on 2nd client"""
     # 2nd client
-    hcontext2, hcard2, reader, dwActiveProtocol = init_client()
+    hcontext2, hcard2, _reader, dwActiveProtocol = init_client()
 
     time.sleep(0.5)
 
@@ -86,48 +110,55 @@ def thread_transaction():
         raise ReleaseContextException(hresult)
 
 
-# 1st client
-hcontext1, hcard1, reader, dwActiveProtocol = init_client()
+def main():
+    """main"""
 
-# 3rd client
-hcontext3, hcard3, reader, dwActiveProtocol = init_client()
+    # 1st client
+    hcontext1, _hcard1, _reader, dwActiveProtocol = init_client()
 
-t = threading.Thread(target=thread_transaction)
-t.start()
+    # 3rd client
+    hcontext3, hcard3, _reader, dwActiveProtocol = init_client()
 
-time.sleep(1)
+    t = threading.Thread(target=thread_transaction)
+    t.start()
 
-print("SCardReleaseContext hcontext1")
-hresult = SCardReleaseContext(hcontext1)
-if hresult not in (SCARD_S_SUCCESS, SCARD_E_SHARING_VIOLATION):
-    raise ReleaseContextException(hresult)
+    time.sleep(1)
 
-time.sleep(2)
+    print("SCardReleaseContext hcontext1")
+    hresult = SCardReleaseContext(hcontext1)
+    if hresult not in (SCARD_S_SUCCESS, SCARD_E_SHARING_VIOLATION):
+        raise ReleaseContextException(hresult)
 
-before = time.time()
-print("SCardBeginTransaction hcard3 (should block)")
-hresult = SCardBeginTransaction(hcard3)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
-after = time.time()
-delta = (after - before) * 1000
-print("Delta time: %f ms" % delta)
-if delta < 1000:
-    print(RED + " ERROR! No blocking" + NORMAL)
-else:
-    print(BLUE + "Blocking: OK" + NORMAL)
+    time.sleep(2)
 
-SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
-print("SCardTransmit hcard3")
-hresult, response = SCardTransmit(hcard3, dwActiveProtocol, SELECT)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
-print(response)
+    before = time.time()
+    print("SCardBeginTransaction hcard3 (should block)")
+    hresult = SCardBeginTransaction(hcard3)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
+    after = time.time()
+    delta = (after - before) * 1000
+    print(f"Delta time: {delta} ms")
+    if delta < 1000:
+        print(RED + " ERROR! No blocking" + NORMAL)
+    else:
+        print(BLUE + "Blocking: OK" + NORMAL)
 
-# wait for the thread
-t.join()
+    SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
+    print("SCardTransmit hcard3")
+    hresult, response = SCardTransmit(hcard3, dwActiveProtocol, SELECT)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
+    print(response)
 
-print("SCardReleaseContext hcontext3")
-hresult = SCardReleaseContext(hcontext3)
-if hresult != SCARD_S_SUCCESS:
-    raise ReleaseContextException(hresult)
+    # wait for the thread
+    t.join()
+
+    print("SCardReleaseContext hcontext3")
+    hresult = SCardReleaseContext(hcontext3)
+    if hresult != SCARD_S_SUCCESS:
+        raise ReleaseContextException(hresult)
+
+
+if __name__ == "__main__":
+    main()
