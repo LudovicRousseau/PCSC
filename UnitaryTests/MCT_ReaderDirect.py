@@ -29,38 +29,39 @@ from smartcard.pcsc.PCSCPart10 import (
 from smartcard.util import toHexString
 
 
-def parse_info(bytes):
+def parse_info(data_bytes):
     """parse the SECODER INFO answer"""
-    print("parse the SECODER INFO answer:", toHexString(bytes))
+    print("parse the SECODER INFO answer:", toHexString(data_bytes))
 
-    sw = bytes[-2:]
-    del bytes[-2:]
+    sw = data_bytes[-2:]
+    del data_bytes[-2:]
 
-    while len(bytes):
-        tag = bytes[0]
-        length = bytes[1]
-        data = bytes[2 : 2 + length]
+    while len(data_bytes):
+        tag = data_bytes[0]
+        length = data_bytes[1]
+        data = data_bytes[2 : 2 + length]
 
-        print("tag: %02X, length: %2d:" % (tag, length), end=" ")
+        print(f"tag: {tag:02X}, length: {length:2}:", end=" ")
         if tag in [0x40, 0x80, 0x81, 0x83, 0x84]:
             print("'%s'" % "".join([chr(x) for x in data]))
         else:
             print(toHexString(data))
 
-        del bytes[: 2 + length]
+        del data_bytes[: 2 + length]
     print("SW:", toHexString(sw))
 
 
-def parse_select(bytes):
+def parse_select(data_bytes):
     """parse the SECODER SELECT APPLICATION answer"""
-    print("parse the SECODER SELECT APPLICATION answer:", toHexString(bytes))
+    print("parse the SECODER SELECT APPLICATION answer:",
+          toHexString(data_bytes))
 
-    print("Activation ID:", toHexString(bytes[0:4]))
-    print("Interface Version: '%s'" % "".join([chr(x) for x in bytes[5:11]]))
-    print("Language Code:", toHexString(bytes[11:15]))
-    print("CSI:", toHexString(bytes[15:18]))
-    print("Application Identifier:", toHexString(bytes[18:23]))
-    print("SW:", toHexString(bytes[23:25]))
+    print("Activation ID:", toHexString(data_bytes[0:4]))
+    print("Interface Version: '%s'" % "".join([chr(x) for x in data_bytes[5:11]]))
+    print("Language Code:", toHexString(data_bytes[11:15]))
+    print("CSI:", toHexString(data_bytes[15:18]))
+    print("Application Identifier:", toHexString(data_bytes[18:23]))
+    print("SW:", toHexString(data_bytes[23:25]))
 
 
 def main():
