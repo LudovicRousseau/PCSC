@@ -18,16 +18,16 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import readers
-from smartcard.scard import (
-    SCARD_ATTR_VENDOR_NAME,
-    SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD,
-    SCARD_ATTR_DEVICE_FRIENDLY_NAME,
-    SCARD_ATTR_VENDOR_IFD_VERSION,
-    SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
-)
 import smartcard.Exceptions
+from smartcard.scard import (
+    SCARD_ATTR_DEVICE_FRIENDLY_NAME,
+    SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
+    SCARD_ATTR_VENDOR_IFD_VERSION,
+    SCARD_ATTR_VENDOR_NAME,
+    SCARD_LEAVE_CARD,
+    SCARD_SHARE_DIRECT,
+)
+from smartcard.System import readers
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
         # 0xMMmmbbbb where MM = major version, mm = minor version, and
         # bbbb = build number).
         version = card_connection.getAttrib(SCARD_ATTR_VENDOR_IFD_VERSION)
-        print("Version: %d.%d.%d" % (version[3], version[2], version[0]))
+        print(f"Version: {version[3]}.{version[2]}.{version[0]}")
 
         # Vendor-supplied interface device serial number.
         # only for readers with a USB serial number
