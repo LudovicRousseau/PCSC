@@ -51,11 +51,13 @@ USBLangID = {
 
 
 def test_bit(value, bit):
+    """test if bit bit is set"""
     mask = 1 << bit
     return value & mask == mask
 
 
 def main():
+    # pylint: disable=too-many-statements,too-many-locals
     """main"""
     card_connection = readers()[0].createConnection()
     card_connection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
@@ -66,8 +68,10 @@ def main():
     if get_tlv_properties:
         tlv = getTlvProperties(card_connection)
         print("Reader:   ", readers()[0])
-        print("IdVendor:  0x%04X" % tlv["PCSCv2_PART10_PROPERTY_wIdVendor"])
-        print("IdProduct: 0x%04X" % tlv["PCSCv2_PART10_PROPERTY_wIdProduct"])
+        wIdVendor = tlv["PCSCv2_PART10_PROPERTY_wIdVendor"]
+        print(f"IdVendor:  0x{wIdVendor:04X}")
+        wIdProduct = tlv["PCSCv2_PART10_PROPERTY_wIdProduct"]
+        print(f"IdProduct: 0x{wIdProduct:04X}")
 
     ccid_esc_command = hasFeature(feature_list, FEATURE_CCID_ESC_COMMAND)
     if ccid_esc_command is None:
@@ -123,7 +127,7 @@ def main():
                 lang_t = USBLangID[lang_x]
             except KeyError:
                 lang_t = "unknown"
-            print("  0x%04X: %s" % (lang_x, lang_t))
+            print(f"  0x{lang_x:04X}: {lang_t}")
 
     print(" bNumberMessageFix:", test_bit(res[8], 2))
     print(" bPPDUSupportOverXferBlock:", test_bit(res[8], 3))
@@ -139,8 +143,8 @@ def main():
     # bits 1-7 are RFU
 
     if Firewall:
-        print("FirewalledCommand_SW1: 0x%02X" % res[16])
-        print("FirewalledCommand_SW2: 0x%02X" % res[17])
+        print(f"FirewalledCommand_SW1: 0x{res[16]:02X}")
+        print(f"FirewalledCommand_SW2: 0x{res[17]:02X}")
     # bytes 18-20 are RFU
 
 
