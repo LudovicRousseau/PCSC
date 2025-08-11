@@ -17,19 +17,42 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # [Muscle] [PATCH] fix deadlock in PCSC-Lite
 # http://archives.neohapsis.com/archives/dev/muscle/2012-q2/0109.html
 # fixed in revisions 6358, 6359, 6360 and 6361
+"""
 
 import threading
 import time
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEndTransaction,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReconnect,
+    SCardReleaseContext,
+)
 
 
-def myThread(reader):
+def myThread(hcontext1, reader):
+    """access from another thread"""
     print("thread 2: SCardConnect")
-    hresult, hcard2, dwActiveProtocol = SCardConnect(
+    hresult, hcard2, _dwActiveProtocol = SCardConnect(
         hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
     )
     if hresult != SCARD_S_SUCCESS:
@@ -71,7 +94,7 @@ def myThread(reader):
 
     # check for SCardReconnect()
     print("thread 2: SCardReconnect")
-    hresult, dwActiveProtocol = SCardReconnect(
+    hresult, _dwActiveProtocol = SCardReconnect(
         hcard2, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY, SCARD_LEAVE_CARD
     )
     if hresult != SCARD_S_SUCCESS:
@@ -83,54 +106,59 @@ def myThread(reader):
         raise BaseSCardException(hresult)
 
 
-print("thread 1: SCardEstablishContext")
-hresult, hcontext1 = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult != SCARD_S_SUCCESS:
-    raise EstablishContextException(hresult)
+def main():
+    """main"""
+    print("thread 1: SCardEstablishContext")
+    hresult, hcontext1 = SCardEstablishContext(SCARD_SCOPE_USER)
+    if hresult != SCARD_S_SUCCESS:
+        raise EstablishContextException(hresult)
 
-print("thread 1: SCardListReaders")
-hresult, readers = SCardListReaders(hcontext1, [])
-if hresult != SCARD_S_SUCCESS:
-    raise ListReadersException(hresult)
-print("PC/SC Readers:", readers)
-reader = readers[0]
-print("Using reader:", reader)
+    print("thread 1: SCardListReaders")
+    hresult, readers = SCardListReaders(hcontext1, [])
+    if hresult != SCARD_S_SUCCESS:
+        raise ListReadersException(hresult)
+    print("PC/SC Readers:", readers)
+    reader = readers[0]
+    print("Using reader:", reader)
 
-# second thread
-t = threading.Thread(target=myThread, args=(reader,))
-t.start()
+    # second thread
+    t = threading.Thread(target=myThread, args=(hcontext1, reader))
+    t.start()
 
-# wait for the 1st thread to begin a transaction
-time.sleep(0.5)
+    # wait for the 1st thread to begin a transaction
+    time.sleep(0.5)
 
-print("thread 1: SCardConnect")
-hresult, hcard1, dwActiveProtocol = SCardConnect(
-    hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
-)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
+    print("thread 1: SCardConnect")
+    hresult, hcard1, _dwActiveProtocol = SCardConnect(
+        hcontext1, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+    )
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
-print("thread 1: SCardBeginTransaction")
-hresult = SCardBeginTransaction(hcard1)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
+    print("thread 1: SCardBeginTransaction")
+    hresult = SCardBeginTransaction(hcard1)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
-time.sleep(2)
+    time.sleep(2)
 
-print("thread 1: SCardEndTransaction")
-hresult = SCardEndTransaction(hcard1, SCARD_LEAVE_CARD)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
+    print("thread 1: SCardEndTransaction")
+    hresult = SCardEndTransaction(hcard1, SCARD_LEAVE_CARD)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
-# give time to thread2 to finish
-time.sleep(1)
+    # give time to thread2 to finish
+    time.sleep(1)
 
-print("thread 1: SCardDisconnect")
-hresult = SCardDisconnect(hcard1, SCARD_LEAVE_CARD)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
+    print("thread 1: SCardDisconnect")
+    hresult = SCardDisconnect(hcard1, SCARD_LEAVE_CARD)
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
-print("thread 1: SCardReleaseContext")
-hresult = SCardReleaseContext(hcontext1)
-if hresult != SCARD_S_SUCCESS:
-    raise ReleaseContextException(hresult)
+    print("thread 1: SCardReleaseContext")
+    hresult = SCardReleaseContext(hcontext1)
+    if hresult != SCARD_S_SUCCESS:
+        raise ReleaseContextException(hresult)
+
+if __name__ == "__main__":
+    main()
