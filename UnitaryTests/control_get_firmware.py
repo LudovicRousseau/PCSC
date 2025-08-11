@@ -57,6 +57,6 @@ for reader in readers():
                 firmware = properties[key]
                 print(" Firmware:", firmware)
             else:
-                print(" %s not supported" % key)
+                print(f" {key} not supported")
     else:
-        print(" %s not supported" % key)
+        print(f" {key} not supported")
