@@ -44,7 +44,7 @@ def switch_interface(interface):
                 IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE, switch_interface_cmd
             )
         except SmartcardException as e:
-            print("FAILED")
+            print("FAILED", e)
         else:
             if res != [0, 0, 0, 0]:
                 print("Failed: ", end="")
