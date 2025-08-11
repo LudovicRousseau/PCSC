@@ -16,12 +16,36 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # Check that a transaction will not reset a card while another
 # transaction is ongoing.
 # Test for the patch in 74656f24db3da1532040a1775ceffa225fbc3d00
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_SHARING_VIOLATION,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCARD_UNPOWER_CARD,
+    SCARD_W_RESET_CARD,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEndTransaction,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReleaseContext,
+    SCardStatus,
+)
 
 hresult, hcontext1 = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
