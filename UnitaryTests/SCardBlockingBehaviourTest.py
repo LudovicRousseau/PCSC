@@ -32,10 +32,33 @@
 import sys
 import threading
 import time
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
-from smartcard.Exceptions import NoReadersException
 
+from smartcard.Exceptions import NoReadersException
+from smartcard.pcsc.PCSCExceptions import (  # ReleaseContextException,
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+)
+from smartcard.scard import (  # SCardReleaseContext,
+    SCARD_ATTR_DEVICE_FRIENDLY_NAME_A,
+    SCARD_LEAVE_CARD,
+    SCARD_PCI_T0,
+    SCARD_PROTOCOL_ANY,
+    SCARD_PROTOCOL_T0,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardEndTransaction,
+    SCardEstablishContext,
+    SCardGetAttrib,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReconnect,
+    SCardStatus,
+    SCardTransmit,
+)
 
 # Global variable used by test functions to acknowledge
 # that they do not get blocked
@@ -45,18 +68,18 @@ unblocked = False
 def check(testFunctionName, hresult, duration):
     """check"""
     if hresult != SCARD_S_SUCCESS:
-        print("%s failed: %s" % (testFunctionName, SCardGetErrorMessage(hresult)))
+        print(f"{testFunctionName} failed: {SCardGetErrorMessage(hresult)}")
         print('Failure for "Sharing violation" are OK for non blocking calls')
-    print("%s finished after %ss" % (testFunctionName, duration))
+    print(f"{testFunctionName} finished after {duration}s")
 
 
-def SCardReconnectTest(hcontextTest, hcardTest, readerName):
+def SCardReconnectTest(_hcontextTest, hcardTest, _readerName):
     """SCardReconnectTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     before = time.time()
-    hresult, dwDisposition = SCardReconnect(
+    hresult, _dwDisposition = SCardReconnect(
         hcardTest,
         SCARD_SHARE_SHARED,
         SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T0,
@@ -66,68 +89,68 @@ def SCardReconnectTest(hcontextTest, hcardTest, readerName):
     unblocked = True
 
 
-def SCardGetAttribTest(hcontextTest, hcardTest, readerName):
+def SCardGetAttribTest(_hcontextTest, hcardTest, _readerName):
     """SCardGetAttribTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     before = time.time()
-    hresult, attrib = SCardGetAttrib(hcardTest, SCARD_ATTR_DEVICE_FRIENDLY_NAME_A)
+    hresult, _attrib = SCardGetAttrib(hcardTest, SCARD_ATTR_DEVICE_FRIENDLY_NAME_A)
     check(testFunctionName, hresult, time.time() - before)
     unblocked = True
 
 
-def SCardTransmitTest(hcontextTest, hcardTest, readerName):
+def SCardTransmitTest(_hcontextTest, hcardTest, _readerName):
     """SCardTransmitTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     SELECT = [0xA0, 0xA4, 0x00, 0x00, 0x02]
     DF_TELECOM = [0x7F, 0x10]
     before = time.time()
-    hresult, response = SCardTransmit(hcardTest, SCARD_PCI_T0, SELECT + DF_TELECOM)
+    hresult, _response = SCardTransmit(hcardTest, SCARD_PCI_T0, SELECT + DF_TELECOM)
     check(testFunctionName, hresult, time.time() - before)
     unblocked = True
 
 
-def SCardStatusTest(hcontextTest, hcardTest, readerName):
+def SCardStatusTest(_hcontextTest, hcardTest, _readerName):
     """SCardStatusTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     before = time.time()
-    hresult, reader, state, protocol, atr = SCardStatus(hcardTest)
+    hresult, _reader, _state, _protocol, _atr = SCardStatus(hcardTest)
     check(testFunctionName, hresult, time.time() - before)
     unblocked = True
 
 
-def SCardConnectTest(hcontextTest, hcardTest, readerName):
+def SCardConnectTest(_hcontextTest, _hcardTest, readerName):
     """SCardConnectTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
     if hresult != SCARD_S_SUCCESS:
         raise EstablishContextException(hresult)
 
     before = time.time()
     # Connect in SCARD_SHARE_SHARED mode
-    hresult, hcard, dwActiveProtocol = SCardConnect(
+    hresult, _hcard, _dwActiveProtocol = SCardConnect(
         hcontext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
     )
     check(testFunctionName, hresult, time.time() - before)
     unblocked = True
 
 
-def SCardBeginTransactionTest(hcontextTest, hcardTest, readerName):
+def SCardBeginTransactionTest(_hcontextTest, hcardTest, _readerName):
     """SCardBeginTransactionTest"""
     global unblocked
     testFunctionName = sys._getframe().f_code.co_name
-    print("Test thread for %s" % testFunctionName)
+    print(f"Test thread for {testFunctionName}")
     before = time.time()
     hresult = SCardBeginTransaction(hcardTest)
     if hresult != SCARD_S_SUCCESS:
-        print("%s failed: %s" % (testFunctionName, SCardGetErrorMessage(hresult)))
+        print(f"{testFunctionName} failed: {SCardGetErrorMessage(hresult)}")
         print('Failure for "Sharing violation" are OK for non blocking calls')
     hresult = SCardEndTransaction(hcardTest, SCARD_LEAVE_CARD)
     check(testFunctionName, hresult, time.time() - before)
@@ -187,7 +210,7 @@ def Connect(index=0):
     print("Using reader:", reader)
 
     # Connect in SCARD_SHARE_SHARED mode
-    hresult, hcard, dwActiveProtocol = SCardConnect(
+    hresult, hcard, _dwActiveProtocol = SCardConnect(
         hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
     )
     if hresult != SCARD_S_SUCCESS:
@@ -203,7 +226,7 @@ def ConnectWithReader(readerName):
         raise EstablishContextException(hresult)
 
     # Connect in SCARD_SHARE_SHARED mode
-    hresult, hcard, dwActiveProtocol = SCardConnect(
+    hresult, hcard, _dwActiveProtocol = SCardConnect(
         hcontext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
     )
     if hresult != SCARD_S_SUCCESS:
@@ -230,19 +253,19 @@ def main():
     index = 0
     if len(sys.argv) > 1:
         index = int(sys.argv[1])
-    hcontext, hcard, readerName = Connect(index)
+    _hcontext, hcard, readerName = Connect(index)
     # Creating the test handles here:
     # the test thread can't create them as
     # doing it may block on another call
     hcontextTest, hcardTest = ConnectWithReader(readerName)
 
-    for testTarget in tests.keys():
+    for testTarget, testResults in tests.items():
         # Start test function in a new thread
         SCardBeginTransaction(hcard)
         unblocked = False
         print()
-        print("Testing %s, expecting" % testTarget, end=" ")
-        methodName, shouldBlock = tests[testTarget]
+        print(f"Testing {testTarget}, expecting", end=" ")
+        methodName, shouldBlock = testResults
         if shouldBlock:
             print("blocking")
         else:
@@ -253,10 +276,7 @@ def main():
         thread.start()
         # print("Thread started")
         time.sleep(1)
-        if (unblocked and shouldBlock) or ((not unblocked) and (not shouldBlock)):
-            failed = True
-        else:
-            failed = False
+        failed = (unblocked and shouldBlock) or ((not unblocked) and (not shouldBlock))
         SCardEndTransaction(hcard, SCARD_LEAVE_CARD)
 
         # wait for the thread to finish
