@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # Check event after SCardCancel is correctly handled
 
 # When a SCardGetStatusChange() was cancelled then a next PC/SC call
@@ -23,21 +24,46 @@
 # the event waited in SCardGetStatusChange() occurs.
 
 # The bug has been fixed in 57b0ba5a200bcbf1c489d39261340324392a8e8a
+"""
 
+import sys
 import threading
 import time
-import sys
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_CANCELLED,
+    SCARD_E_TIMEOUT,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCARD_STATE_UNAWARE,
+    SCARD_W_REMOVED_CARD,
+    SCardCancel,
+    SCardConnect,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+    SCardStatus,
+)
 
 
-def getstatuschange():
+def getstatuschange(hcontext, readerstates, hcard):
+    """SCardGetStatusChange from a thread"""
     # this call will be cancelled
-    hresult, newstates = SCardGetStatusChange(
+    hresult, _newstates = SCardGetStatusChange(
         hcontext, 10000, list(readerstates.values())
     )
     print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
-    if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
+    if hresult not in (SCARD_S_SUCCESS, SCARD_E_TIMEOUT):
         if SCARD_E_CANCELLED == hresult:
             print("Cancelled")
         else:
@@ -49,52 +75,58 @@ def getstatuschange():
 
     # try another PC/SC call. It should return SCARD_W_REMOVED_CARD and
     # not something else
-    hresult, reader, state, protocol, atr = SCardStatus(hcard)
+    hresult, _reader, _state, _protocol, _atr = SCardStatus(hcard)
     if hresult != SCARD_S_SUCCESS:
         if hresult != SCARD_W_REMOVED_CARD:
             raise BaseSCardException(hresult)
-        else:
-            print("Card removed")
+        print("Card removed")
 
 
-hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-if hresult != SCARD_S_SUCCESS:
-    raise EstablishContextException(hresult)
+def main():
+    """main"""
+    hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
+    if hresult != SCARD_S_SUCCESS:
+        raise EstablishContextException(hresult)
 
-hresult, readers = SCardListReaders(hcontext, [])
-if hresult != SCARD_S_SUCCESS:
-    raise ListReadersException(hresult)
-print("PC/SC Readers:", readers)
+    hresult, readers = SCardListReaders(hcontext, [])
+    if hresult != SCARD_S_SUCCESS:
+        raise ListReadersException(hresult)
+    print("PC/SC Readers:", readers)
 
-readerstates = {}
-for reader in readers:
-    readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
-hresult, newstates = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
-print(newstates)
-for state in newstates:
-    readername, eventstate, atr = state
-    readerstates[readername] = (readername, eventstate)
+    readerstates = {}
+    for reader in readers:
+        readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
+    hresult, newstates = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
+    print(newstates)
+    for state in newstates:
+        readername, eventstate, _atr = state
+        readerstates[readername] = (readername, eventstate)
 
-# Connect in SCARD_SHARE_SHARED mode
-hresult, hcard, dwActiveProtocol = SCardConnect(
-    hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
-)
-if hresult != SCARD_S_SUCCESS:
-    raise BaseSCardException(hresult)
+    # Connect in SCARD_SHARE_SHARED mode
+    reader = readers[0]
+    hresult, hcard, _dwActiveProtocol = SCardConnect(
+        hcontext, reader, SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
+    )
+    if hresult != SCARD_S_SUCCESS:
+        raise BaseSCardException(hresult)
 
-t = threading.Thread(target=getstatuschange)
-t.start()
+    t = threading.Thread(target=getstatuschange, args=(hcontext, readerstates, hcard))
+    t.start()
 
-time.sleep(1)
-print("cancel")
-hresult = SCardCancel(hcontext)
-if hresult != SCARD_S_SUCCESS:
-    print("Failed to SCardCancel: " + SCardGetErrorMessage(hresult))
+    time.sleep(1)
+    print("cancel")
+    hresult = SCardCancel(hcontext)
+    if hresult != SCARD_S_SUCCESS:
+        print("Failed to SCardCancel: " + SCardGetErrorMessage(hresult))
 
-time.sleep(5)
-hresult = SCardReleaseContext(hcontext)
-print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
-if hresult != SCARD_S_SUCCESS:
-    raise ReleaseContextException(hresult)
+    time.sleep(5)
+    hresult = SCardReleaseContext(hcontext)
+    print("SCardReleaseContext()", SCardGetErrorMessage(hresult))
+    if hresult != SCARD_S_SUCCESS:
+        raise ReleaseContextException(hresult)
+
+
+if __name__ == "__main__":
+    main()
