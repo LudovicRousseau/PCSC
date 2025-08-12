@@ -18,14 +18,36 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+"""
+test SCardGetStatusChange for PnP reader
+"""
 
-from smartcard.System import readers
-from smartcard.scard import *
+from smartcard.scard import (
+    SCARD_SCOPE_USER,
+    SCARD_STATE_ATRMATCH,
+    SCARD_STATE_CHANGED,
+    SCARD_STATE_EMPTY,
+    SCARD_STATE_EXCLUSIVE,
+    SCARD_STATE_IGNORE,
+    SCARD_STATE_INUSE,
+    SCARD_STATE_MUTE,
+    SCARD_STATE_PRESENT,
+    SCARD_STATE_UNAVAILABLE,
+    SCARD_STATE_UNAWARE,
+    SCARD_STATE_UNKNOWN,
+    SCARD_STATE_UNPOWERED,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 from smartcard.util import toHexString
 
 
 def scardstate2text(cardstate):
-    state = list()
+    """state 2 text"""
+    state = []
     states_dict = {
         SCARD_STATE_UNAWARE: "SCARD_STATE_UNAWARE",
         SCARD_STATE_IGNORE: "SCARD_STATE_IGNORE",
@@ -38,11 +60,13 @@ def scardstate2text(cardstate):
         SCARD_STATE_EXCLUSIVE: "SCARD_STATE_EXCLUSIVE",
         SCARD_STATE_INUSE: "SCARD_STATE_INUSE",
         SCARD_STATE_MUTE: "SCARD_STATE_MUTE",
-        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED"}
-    for s in states_dict.keys():
-        if (cardstate & s):
-            state.append(states_dict[s])
+        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED",
+    }
+    for s, t in states_dict.items():
+        if cardstate & s:
+            state.append(t)
     return state
+
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 hresult, readers = SCardListReaders(hcontext, [])
@@ -61,8 +85,7 @@ print("values:", readerstates.values())
 print(SCardGetErrorMessage(hresult))
 print(states)
 
-for state in states:
-    readername, eventstate, atr = state
+for readername, eventstate, atr in states:
     print("readername:", readername)
     print("eventstate:", scardstate2text(eventstate))
     print("atr:", toHexString(atr))
@@ -76,8 +99,7 @@ print(SCardGetErrorMessage(hresult))
 print(states)
 print()
 
-for state in states:
-    readername, eventstate, atr = state
+for readername, eventstate, atr in states:
     print("readername:", readername)
     print("eventstate:", scardstate2text(eventstate))
     print("atr:", toHexString(atr))
