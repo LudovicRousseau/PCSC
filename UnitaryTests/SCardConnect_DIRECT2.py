@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # Scenario
 # use a T=1 card, a TPDU reader
 # Connect in SCARD_SHARE_SHARED
@@ -30,9 +31,29 @@
 
 # same issue with Reconnect instead of connect
 # bug fixed in revision 4940
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_DIRECT,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReconnect,
+    SCardReleaseContext,
+    SCardTransmit,
+)
 
 SELECT = [0x00, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]
 
