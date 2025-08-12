@@ -16,12 +16,26 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # Check the return value of SCardGetStatusChange() for unknown readers
 # Before revision 5881 SCardGetStatusChange() returned SCARD_S_SUCCESS
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
-
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_STATE_UNAWARE,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 print("SCardEstablishContext()", SCardGetErrorMessage(hresult))
