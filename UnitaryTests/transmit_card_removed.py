@@ -1,9 +1,7 @@
 #! /usr/bin/env python3
 
-"""
-transmit_card_removed.py
-Copyright (C) 2020  Ludovic Rousseau
-"""
+# transmit_card_removed.py
+# Copyright (C) 2020  Ludovic Rousseau
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,8 +16,6 @@ Copyright (C) 2020  Ludovic Rousseau
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from time import time
-
 """
 SCardTransmit() should return SCARD_E_NO_SMARTCARD when a card is
 removed during an APDU exchange.
@@ -27,9 +23,31 @@ removed during an APDU exchange.
 SCardStatus() should report that the card is no more present.
 """
 
-from smartcard.scard import *
+from time import time
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_NO_SMARTCARD,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReleaseContext,
+    SCardStatus,
+    SCardTransmit,
+)
 from smartcard.util import toBytes, toHexString
-from smartcard.pcsc.PCSCExceptions import *
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
@@ -40,9 +58,9 @@ SELECT = toBytes("00 A4 04 00 06 A0 00 00 00 18 FF")
 TIME = toBytes("80 38 00 10")
 
 
-def pcsc_error(command, hresult):
-    h = hresult & 0xFFFFFFFF
-    return "{}: {} ({})".format(command, SCardGetErrorMessage(hresult), hex(h))
+def pcsc_error(command, h):
+    """PCSC error"""
+    return f"{command}: {SCardGetErrorMessage(hresult)} ({h:X})"
 
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
@@ -98,7 +116,7 @@ print(pcsc_error("status", hresult))
 
 after = time()
 delta = after - before
-print("Detected after: {} ms".format(delta * 1000))
+print(f"Detected after: {delta * 1000} ms")
 
 # Disconnect
 hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
