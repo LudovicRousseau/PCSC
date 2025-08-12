@@ -16,8 +16,11 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import *
-from smartcard.CardConnection import *
+"""
+PCSC transmit infinite loop
+"""
+
+from smartcard.System import readers
 
 r = readers()
 connection = r[0].createConnection()
@@ -31,6 +34,6 @@ try:
         i += 1
         data, sw1, sw2 = connection.transmit(SELECT)
         print(data)
-        print("%02x %02x" % (sw1, sw2))
+        print("{sw1:02x} {s2:02x}")
 except KeyboardInterrupt:
     connection.disconnect()
