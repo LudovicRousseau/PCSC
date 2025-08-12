@@ -18,51 +18,48 @@ Copyright (C) 2010  Ludovic Rousseau
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from time import time, ctime
-from smartcard.System import readers
+import sys
+from time import ctime, time
+
 from smartcard.pcsc.PCSCPart10 import (
-    SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD,
     SCARD_CTL_CODE,
+    SCARD_LEAVE_CARD,
+    SCARD_SHARE_DIRECT,
 )
+from smartcard.System import readers
 
 
 def stress(reader):
+    """stress"""
+    print("Using:", reader)
     cardConnection = reader.createConnection()
     cardConnection.connect(mode=SCARD_SHARE_DIRECT, disposition=SCARD_LEAVE_CARD)
 
     get_firmware = [0x02]
     IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
-    i = 0
+    cpt = 0
     while True:
         before = time()
         res = cardConnection.control(IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE, get_firmware)
         after = time()
         delta = after - before
-        print("%d Reader: %s, delta: %d" % (i, reader, delta))
+        print(f"{cpt} Reader: {reader}, delta: {delta}")
         print("Firmware:", "".join([chr(x) for x in res]))
         if delta > 1:
-            sys.stderr.write(ctime() + " %f\n" % delta)
-        i += 1
+            sys.stderr.write(ctime() + f" {delta}\n")
+        cpt += 1
 
 
 if __name__ == "__main__":
-    import sys
-
     # get all the available readers
     readers = readers()
     print("Available readers:")
-    i = 0
-    for r in readers:
-        print("%d: %s" % (i, r))
-        i += 1
+    for i, r in enumerate(readers):
+        print(f"{i}: {r}")
 
     try:
         i = int(sys.argv[1])
     except IndexError:
         i = 0
 
-    reader = readers[i]
-    print("Using:", reader)
-
-    stress(reader)
+    stress(readers[i])
