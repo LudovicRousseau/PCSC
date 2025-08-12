@@ -21,19 +21,25 @@
 
 
 import threading
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
 from smartcard.scard import (
-    SCardEstablishContext,
-    SCardReleaseContext,
-    SCardListReaders,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
     SCardConnect,
     SCardDisconnect,
-    SCARD_SHARE_SHARED,
-    SCARD_PROTOCOL_ANY,
-    SCARD_LEAVE_CARD,
-    SCARD_SCOPE_USER,
-    SCARD_S_SUCCESS,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReleaseContext,
 )
-from smartcard.pcsc.PCSCExceptions import *
 
 MAX_THREADS = 10
 MAX_ITER = 10
@@ -54,15 +60,15 @@ def stress(*args):
     if hresult != SCARD_S_SUCCESS:
         raise ListReadersException(hresult)
 
-    for j in range(0, MAX_ITER):
+    for j in range(MAX_ITER):
         # Connect in SCARD_SHARE_SHARED mode
-        hresult, hcard, dwActiveProtocol = SCardConnect(
+        hresult, hcard, _dwActiveProtocol = SCardConnect(
             hcontext, readers[0], SCARD_SHARE_SHARED, SCARD_PROTOCOL_ANY
         )
         if hresult != SCARD_S_SUCCESS:
             raise BaseSCardException(hresult)
 
-        log = "%d:%d" % (thread, j)
+        log = f"{thread}:{j}"
         print(log, end=" ")
 
         hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
@@ -83,9 +89,9 @@ def main():
     main
     """
 
-    threads = list()
+    threads = []
 
-    for i in range(0, MAX_THREADS):
+    for i in range(MAX_THREADS):
         thread = threading.Thread(target=stress, args=[i])
         threads.append(thread)
         thread.start()
