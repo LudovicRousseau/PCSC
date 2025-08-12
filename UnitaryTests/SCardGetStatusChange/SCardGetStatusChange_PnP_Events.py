@@ -17,21 +17,33 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+"""
+test SCardGetStatusChange for PnP reader
+"""
 
-from smartcard.scard import (SCARD_STATE_UNAWARE, SCARD_STATE_IGNORE,
-                             SCARD_STATE_CHANGED, SCARD_STATE_UNKNOWN,
-                             SCARD_STATE_UNAVAILABLE, SCARD_STATE_EMPTY,
-                             SCARD_STATE_PRESENT, SCARD_STATE_ATRMATCH,
-                             SCARD_STATE_EXCLUSIVE, SCARD_STATE_INUSE,
-                             SCARD_STATE_MUTE, SCARD_STATE_UNPOWERED,
-                             SCardEstablishContext,
-                             SCardGetStatusChange,
-                             SCardListReaders,
-                             SCardGetErrorMessage,
-                             SCardReleaseContext,
-                             SCARD_SCOPE_USER)
-from smartcard.util import toHexString
 import time
+
+from smartcard.scard import (
+    SCARD_SCOPE_USER,
+    SCARD_STATE_ATRMATCH,
+    SCARD_STATE_CHANGED,
+    SCARD_STATE_EMPTY,
+    SCARD_STATE_EXCLUSIVE,
+    SCARD_STATE_IGNORE,
+    SCARD_STATE_INUSE,
+    SCARD_STATE_MUTE,
+    SCARD_STATE_PRESENT,
+    SCARD_STATE_UNAVAILABLE,
+    SCARD_STATE_UNAWARE,
+    SCARD_STATE_UNKNOWN,
+    SCARD_STATE_UNPOWERED,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+)
+from smartcard.util import toHexString
 
 RED = "\033[0;31m"
 BLUE = "\033[0;34m"
@@ -39,7 +51,8 @@ NORMAL = "\033[00m"
 
 
 def scardstate2text(cardstate):
-    state = list()
+    """state to text"""
+    state = []
     states_dict = {
         SCARD_STATE_UNAWARE: "SCARD_STATE_UNAWARE",
         SCARD_STATE_IGNORE: "SCARD_STATE_IGNORE",
@@ -52,19 +65,21 @@ def scardstate2text(cardstate):
         SCARD_STATE_EXCLUSIVE: "SCARD_STATE_EXCLUSIVE",
         SCARD_STATE_INUSE: "SCARD_STATE_INUSE",
         SCARD_STATE_MUTE: "SCARD_STATE_MUTE",
-        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED"}
-    for s in states_dict.keys():
-        if (cardstate & s):
-            state.append(states_dict[s])
+        SCARD_STATE_UNPOWERED: "SCARD_STATE_UNPOWERED",
+    }
+    for s, t in states_dict.items():
+        if cardstate & s:
+            state.append(t)
     return state
 
 
-def dumpStates(states):
-    for state in states:
+def dumpStates(my_states):
+    """Dump states"""
+    for state in my_states:
         readername, eventstate, atr = state
         print("readername:", readername)
         print("eventstate:", scardstate2text(eventstate))
-        print("eventstate hw:", eventstate // (2 ** 16))
+        print("eventstate hw:", eventstate // (2**16))
         print("atr:", toHexString(atr))
         readerstates[readername] = (readername, eventstate)
 
@@ -86,8 +101,7 @@ readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 print("values:", readerstates.values())
 
 # Get the initial states
-hresult, states = SCardGetStatusChange(hcontext, 0,
-                                       list(readerstates.values()))
+hresult, states = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
 dumpStates(states)
 
 print("Connect a reader within the next 5 seconds")
@@ -95,8 +109,7 @@ time.sleep(5)
 
 before = time.time()
 # wait 1 second. SCardGetStatusChange() should return immediately
-hresult, states = SCardGetStatusChange(hcontext, 1_000,
-                                       list(readerstates.values()))
+hresult, states = SCardGetStatusChange(hcontext, 1_000, list(readerstates.values()))
 print(SCardGetErrorMessage(hresult))
 duration = time.time() - before
 dumpStates(states)
