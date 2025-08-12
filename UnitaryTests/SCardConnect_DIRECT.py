@@ -16,13 +16,35 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # MSDN indicates that pdwActiveProtocol must be set to
 # SCARD_PROTOCOL_UNDEFINED if SCARD_SHARE_DIRECT is used. This behavior
 # has been implemented in revision 4332 but reverted in revision 4940 so
 # that the protocol is not negotiated again
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_PROTOCOL_UNDEFINED,
+    SCARD_RESET_CARD,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_DIRECT,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardListReaders,
+    SCardReconnect,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
