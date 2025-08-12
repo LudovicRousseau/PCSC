@@ -16,12 +16,34 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # A bug has been corrected in revision 6748
 # SCardEndTransaction() should return SCARD_E_NOT_TRANSACTED if called
 # more times than SCardBeginTransaction()
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_NOT_TRANSACTED,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardBeginTransaction,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEndTransaction,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -56,6 +78,10 @@ if hresult == SCARD_E_NOT_TRANSACTED:
     print("OK")
 else:
     print("ERROR! SCardEndTransaction() should have failed")
+
+hresult = SCardDisconnect(hcard, SCARD_LEAVE_CARD)
+if hresult != SCARD_S_SUCCESS:
+    raise BaseSCardException(hresult)
 
 hresult = SCardReleaseContext(hcontext)
 if hresult != SCARD_S_SUCCESS:
