@@ -18,11 +18,16 @@ Copyright (C) 2010  Ludovic Rousseau
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from time import time, ctime
+import sys
+from time import ctime, time
+
 from smartcard.System import readers
 
 
 def stress(reader):
+    """stress"""
+    print("Using:", reader)
+
     # define the APDUs used in this script
     SELECT = [
         0x00,
@@ -48,38 +53,32 @@ def stress(reader):
 
     data, sw1, sw2 = connection.transmit(SELECT)
     print(data)
-    print("Select Applet: %02X %02X" % (sw1, sw2))
+    print(f"Select Applet: {sw1:02X} {sw2:02X}")
 
-    i = 0
+    cpt = 0
     while True:
         before = time()
         data, sw1, sw2 = connection.transmit(COMMAND)
         after = time()
         print(data)
         delta = after - before
-        print("%d Command: %02X %02X, delta: %f" % (i, sw1, sw2, delta))
+        print(f"{cpt} Command: {sw1:02X} {sw2:02X}, delta:{delta}")
         if delta > 1:
-            sys.stderr.write(ctime() + " %f\n" % delta)
-        i += 1
+            sys.stderr.write(ctime() + f" {delta}\n")
+        cpt += 1
 
 
 if __name__ == "__main__":
-    import sys
 
     # get all the available readers
     readers = readers()
     print("Available readers:")
-    i = 0
-    for r in readers:
-        print("%d: %s" % (i, r))
-        i += 1
+    for i, r in enumerate(readers):
+        print("{i}: {r}")
 
     try:
         i = int(sys.argv[1])
     except IndexError:
         i = 0
 
-    reader = readers[i]
-    print("Using:", reader)
-
-    stress(reader)
+    stress(readers[i])
