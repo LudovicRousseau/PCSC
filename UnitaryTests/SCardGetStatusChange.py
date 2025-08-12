@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # Check the return value of SCardGetStatusChange() after a reader has
 # been removed.
 #
@@ -33,13 +34,41 @@
 #  *
 #  * - FIXME: Mac?
 #  */
+"""
 
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_TIMEOUT,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_STATE_ATRMATCH,
+    SCARD_STATE_CHANGED,
+    SCARD_STATE_EMPTY,
+    SCARD_STATE_EXCLUSIVE,
+    SCARD_STATE_IGNORE,
+    SCARD_STATE_INUSE,
+    SCARD_STATE_MUTE,
+    SCARD_STATE_PRESENT,
+    SCARD_STATE_UNAVAILABLE,
+    SCARD_STATE_UNAWARE,
+    SCARD_STATE_UNKNOWN,
+    SCARD_STATE_UNPOWERED,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 
-def parseEventState(eventstate):
-    stateList = list()
+def parseEventState(my_eventstate):
+    """state to text"""
+    stateList = []
     states = {
         SCARD_STATE_IGNORE: "Ignore",
         SCARD_STATE_CHANGED: "Changed",
@@ -53,9 +82,9 @@ def parseEventState(eventstate):
         SCARD_STATE_MUTE: "Mute",
         SCARD_STATE_UNPOWERED: "Unpowered",
     }
-    for state in states:
-        if eventstate & state:
-            stateList.append(states[state])
+    for state, text in states.items():
+        if my_eventstate & state:
+            stateList.append(text)
     return stateList
 
 
@@ -83,7 +112,7 @@ print("Remove the reader")
 
 hresult, newstates = SCardGetStatusChange(hcontext, 10000, list(readerstates.values()))
 print("SCardGetStatusChange()", SCardGetErrorMessage(hresult))
-if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
+if hresult not in (SCARD_S_SUCCESS, SCARD_E_TIMEOUT):
     raise BaseSCardException(hresult)
 for readerState in newstates:
     readername, eventstate, atr = readerState
