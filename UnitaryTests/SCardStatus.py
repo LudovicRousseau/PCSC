@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-# -*- coding: UTF-8 -*-
 
 #   SCardStatus.py : Unit test for SCardStatus()
 #   Copyright (C) 2010  Ludovic Rousseau
@@ -17,11 +16,32 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
+test SCardStatus
+"""
+
 
 import sys
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
 
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+)
+from smartcard.scard import (
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReleaseContext,
+    SCardStatus,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
