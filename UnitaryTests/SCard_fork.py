@@ -16,15 +16,35 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # you must compile pcsc-lite (src/winscard_clnt.c) with
 # #define DO_CHECK_SAME_PROCESS
 # or this unitary test will fail
+"""
 
-import time
 import os
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
+import time
 
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_E_INVALID_HANDLE,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_SHARED,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
@@ -58,8 +78,8 @@ if pid == 0:
         raise ListReadersException(hresult)
     else:
         print(
-            "test FAILED got %s. SCARD_E_INVALID_HANDLE was expected"
-            % SCardGetErrorMessage(hresult)
+            f"test FAILED got {SCardGetErrorMessage(hresult)}. \
+SCARD_E_INVALID_HANDLE was expected"
         )
         print()
 
