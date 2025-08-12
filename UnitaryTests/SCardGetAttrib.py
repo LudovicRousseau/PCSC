@@ -22,9 +22,31 @@
 # SCARD_ATTR_ATR_STRING support has been added in ccid 0.9.0
 
 from struct import unpack
-from smartcard.scard import *
-from smartcard.pcsc.PCSCExceptions import *
-from smartcard.util import toHexString, toASCIIString
+
+from smartcard.pcsc.PCSCExceptions import (
+    BaseSCardException,
+    EstablishContextException,
+    ListReadersException,
+    ReleaseContextException,
+)
+from smartcard.scard import (
+    SCARD_ATTR_ATR_STRING,
+    SCARD_ATTR_CHANNEL_ID,
+    SCARD_ATTR_VENDOR_IFD_SERIAL_NO,
+    SCARD_LEAVE_CARD,
+    SCARD_PROTOCOL_ANY,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_SHARE_DIRECT,
+    SCardConnect,
+    SCardDisconnect,
+    SCardEstablishContext,
+    SCardGetAttrib,
+    SCardGetErrorMessage,
+    SCardListReaders,
+    SCardReleaseContext,
+)
+from smartcard.util import toASCIIString, toHexString
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 if hresult != SCARD_S_SUCCESS:
