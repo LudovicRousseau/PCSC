@@ -17,10 +17,19 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
+"""
 # SCardCancel() should do nothing if no cancellable call is ongoing
 # bug fixed in revision 5344
+"""
 
-from smartcard.scard import *
+from smartcard.scard import (
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCardCancel,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardReleaseContext,
+)
 
 try:
     hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
