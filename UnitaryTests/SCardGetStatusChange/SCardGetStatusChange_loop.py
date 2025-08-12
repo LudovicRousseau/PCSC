@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-# -*- coding: UTF-8 -*-
 
 #   SCardGetStatusChange.py : Unit tests for unlock a SCardGetStatusChange()
 #   Copyright (C) 2010  Ludovic Rousseau
@@ -18,10 +17,21 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+"""
+test SCardGetStatusChange in a loop
+"""
 
-from smartcard.System import readers
-from smartcard.scard import *
-
+from smartcard.scard import (
+    SCARD_E_TIMEOUT,
+    SCARD_S_SUCCESS,
+    SCARD_SCOPE_USER,
+    SCARD_STATE_UNAWARE,
+    SCardEstablishContext,
+    SCardGetErrorMessage,
+    SCardGetStatusChange,
+    SCardListReaders,
+    SCardReleaseContext,
+)
 
 hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 hresult, readers = SCardListReaders(hcontext, [])
@@ -31,7 +41,7 @@ readerstates = {}
 for reader in readers:
     readerstates[reader] = (reader, SCARD_STATE_UNAWARE)
 print("values", readerstates.values())
-(hresult, states) = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
+hresult, states = SCardGetStatusChange(hcontext, 0, list(readerstates.values()))
 print(SCardGetErrorMessage(hresult))
 print(states)
 
@@ -46,9 +56,13 @@ print("values", readerstates.values())
 try:
     while True:
         # timeout is 1000 ms
-        (hresult, states) = SCardGetStatusChange(hcontext, 1000, list(readerstates.values()))
-        if hresult != SCARD_S_SUCCESS and hresult != SCARD_E_TIMEOUT:
-            raise Exception("SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult))
+        hresult, states = SCardGetStatusChange(
+            hcontext, 1000, list(readerstates.values())
+        )
+        if hresult not in (SCARD_S_SUCCESS, SCARD_E_TIMEOUT):
+            raise Exception(
+                "SCardGetStatusChange failed: " + SCardGetErrorMessage(hresult)
+            )
         print(SCardGetErrorMessage(hresult))
         print(states)
 
