@@ -315,6 +315,7 @@ struct _psContextMap
 typedef struct _psContextMap SCONTEXTMAP;
 
 static list_t contextMapList;
+pthread_mutex_t contextMapList_lock;	/**< lock for the above list */
 
 static int SCONTEXTMAP_seeker(const void *el, const void *key)
 {
@@ -485,7 +486,11 @@ end:
 #ifdef DESTRUCTOR
 DESTRUCTOR static void destructor(void)
 {
+	(void)pthread_mutex_lock(&contextMapList_lock);
 	list_destroy(&contextMapList);
+	(void)pthread_mutex_unlock(&contextMapList_lock);
+
+	(void)pthread_mutex_destroy(&contextMapList_lock);
 }
 #endif
 
@@ -523,6 +528,8 @@ static void init_lib(void)
 		Log1(PCSC_LOG_INFO, "Disable shared blocking");
 		sharing_shall_block = false;
 	}
+
+	(void)pthread_mutex_init(&contextMapList_lock, NULL);
 
 	isExecuted = true;
 }
@@ -3342,7 +3349,9 @@ static LONG SCardAddContext(SCARDCONTEXT hContext, DWORD dwClientID)
 		goto error;
 	}
 
+	(void)pthread_mutex_lock(&contextMapList_lock);
 	lrv = list_append(&contextMapList, newContextMap);
+	(void)pthread_mutex_unlock(&contextMapList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL, "list_append failed with return value: %d",
@@ -3407,7 +3416,13 @@ static SCONTEXTMAP * SCardGetAndLockContext(SCARDCONTEXT hContext)
  */
 static SCONTEXTMAP * SCardGetContextTH(SCARDCONTEXT hContext)
 {
-	return list_seek(&contextMapList, &hContext);
+	SCONTEXTMAP * currentContextMap;
+
+	(void)pthread_mutex_lock(&contextMapList_lock);
+	currentContextMap = list_seek(&contextMapList, &hContext);
+	(void)pthread_mutex_unlock(&contextMapList_lock);
+
+	return currentContextMap;
 }
 
 /**
@@ -3456,7 +3471,9 @@ static void SCardCleanContext(SCONTEXTMAP * targetContextMap)
 	}
 	list_destroy(&targetContextMap->channelMapList);
 
+	(void)pthread_mutex_lock(&contextMapList_lock);
 	lrv = list_delete(&contextMapList, targetContextMap);
+	(void)pthread_mutex_unlock(&contextMapList_lock);
 	if (lrv < 0)
 	{
 		Log2(PCSC_LOG_CRITICAL,
@@ -3556,6 +3573,7 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 	*targetContextMap = NULL;
 	*targetChannelMap = NULL;
 
+	(void)pthread_mutex_lock(&contextMapList_lock);
 	listSize = list_size(&contextMapList);
 
 	for (list_index = 0; list_index < listSize; list_index++)
@@ -3571,11 +3589,14 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 			&hCard);
 		if (currentChannelMap != NULL)
 		{
+			(void)pthread_mutex_unlock(&contextMapList_lock);
 			*targetContextMap = currentContextMap;
 			*targetChannelMap = currentChannelMap;
 			return SCARD_S_SUCCESS;
 		}
 	}
+
+	(void)pthread_mutex_unlock(&contextMapList_lock);
 
 	return -1;
 }
