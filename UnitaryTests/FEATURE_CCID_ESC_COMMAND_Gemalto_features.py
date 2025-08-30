@@ -18,17 +18,16 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import readers
+from smartcard.Exceptions import SmartcardException
 from smartcard.pcsc.PCSCPart10 import (
-    SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD,
     FEATURE_CCID_ESC_COMMAND,
     FEATURE_GET_TLV_PROPERTIES,
-    getTlvProperties,
     getFeatureRequest,
+    getTlvProperties,
     hasFeature,
 )
-from smartcard.Exceptions import SmartcardException
+from smartcard.scard import SCARD_LEAVE_CARD, SCARD_SHARE_DIRECT
+from smartcard.System import readers
 
 try:
     from itertools import izip
