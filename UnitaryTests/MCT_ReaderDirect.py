@@ -18,14 +18,14 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import readers
 from smartcard.pcsc.PCSCPart10 import (
-    SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD,
     FEATURE_MCT_READER_DIRECT,
+    SCARD_LEAVE_CARD,
+    SCARD_SHARE_DIRECT,
     getFeatureRequest,
     hasFeature,
 )
+from smartcard.System import readers
 from smartcard.util import toHexString
 
 
@@ -53,8 +53,7 @@ def parse_info(data_bytes):
 
 def parse_select(data_bytes):
     """parse the SECODER SELECT APPLICATION answer"""
-    print("parse the SECODER SELECT APPLICATION answer:",
-          toHexString(data_bytes))
+    print("parse the SECODER SELECT APPLICATION answer:", toHexString(data_bytes))
 
     print("Activation ID:", toHexString(data_bytes[0:4]))
     print("Interface Version: '%s'" % "".join([chr(x) for x in data_bytes[5:11]]))
