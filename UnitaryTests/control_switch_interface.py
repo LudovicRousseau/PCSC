@@ -18,13 +18,10 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from smartcard.System import readers
-from smartcard.pcsc.PCSCPart10 import (
-    SCARD_SHARE_DIRECT,
-    SCARD_LEAVE_CARD,
-    SCARD_CTL_CODE,
-)
 from smartcard.Exceptions import SmartcardException
+from smartcard.pcsc.PCSCPart10 import SCARD_CTL_CODE
+from smartcard.scard import SCARD_LEAVE_CARD, SCARD_SHARE_DIRECT
+from smartcard.System import readers
 
 IOCTL_SMARTCARD_VENDOR_IFD_EXCHANGE = SCARD_CTL_CODE(1)
 
@@ -64,7 +61,6 @@ if __name__ == "__main__":
 
     # 01h = Switch to contactless interface
     # 02h = Switch to contact interface
-
     # switch to contactless by default
     interface = 0x01
     if len(sys.argv) > 1:
