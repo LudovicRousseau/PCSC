@@ -87,6 +87,8 @@ hresult, response = SCardTransmit(hcard, dwActiveProtocol, SELECT)
 if hresult != SCARD_S_SUCCESS:
     raise BaseSCardException(hresult)
 print(toHexString(response))
+if response != [0x90, 0x00]:
+    raise Exception("Can't find test applet")
 
 print("Remove the card")
 # Transmit
