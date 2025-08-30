@@ -24,8 +24,8 @@
 # DRIVER_OPTION_CCID_EXCHANGE_AUTHORIZED bit in the ifdDriverOptions
 # option of the CCID driver Info.plist file
 
+from smartcard.pcsc.PCSCPart10 import SCARD_SHARE_DIRECT, getTlvProperties
 from smartcard.System import readers
-from smartcard.pcsc.PCSCPart10 import getTlvProperties, SCARD_SHARE_DIRECT
 
 # for each reader
 for reader in readers():
