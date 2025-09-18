@@ -182,7 +182,7 @@ libpcsclite_src = [
 if get_option('default_library') != 'static'
   libpcsclite = shared_library('pcsclite',
     libpcsclite_src,
-    dependencies : dl_deps,
+    dependencies : [dl_deps, threads_dep],
     include_directories : incdir,
     soversion : 1,
     install : true)
@@ -198,7 +198,7 @@ if get_option('default_library') != 'static'
   # libpcscspy library
   library('pcscspy',
     sources : ['src/spy/libpcscspy.c', 'src/sys_unix.c'],
-    dependencies : dl_deps,
+    dependencies : [dl_deps, threads_dep],
     include_directories : incdir,
     soversion : 0,
     install : true)
