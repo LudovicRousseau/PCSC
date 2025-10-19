@@ -1,3 +1,15 @@
+2.4.0: Ludovic Rousseau
+19 October 2025
+- Run pcscd under a pcscd user instead of root when using systemd
+- Set PIDFile in systemd service file
+- Protect contextMapList modifications using a mutex
+- meson:
+  . Fix libpcsclite.pc file
+  . respect builtin meson default_library option
+  . build and install spy lib & tool only when needed
+- UnitaryTests/*.py: fix pylint warnings
+- Improve Doxygen documentation
+
 2.3.3: Ludovic Rousseau
 2 April 2025
 - Make polkit rules work again (bug introduced in 2.3.2)
