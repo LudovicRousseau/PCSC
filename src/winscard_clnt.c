@@ -3564,6 +3564,7 @@ static LONG SCardGetContextChannelAndLockFromHandle(SCARDHANDLE hCard,
 static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 	SCONTEXTMAP **targetContextMap, CHANNEL_MAP ** targetChannelMap)
 {
+	LONG rv = -1;
 	int listSize;
 	int list_index;
 	SCONTEXTMAP * currentContextMap;
@@ -3589,16 +3590,16 @@ static LONG SCardGetContextAndChannelFromHandleTH(SCARDHANDLE hCard,
 			&hCard);
 		if (currentChannelMap != NULL)
 		{
-			(void)pthread_mutex_unlock(&contextMapList_lock);
 			*targetContextMap = currentContextMap;
 			*targetChannelMap = currentChannelMap;
-			return SCARD_S_SUCCESS;
+			rv = SCARD_S_SUCCESS;
+			break;
 		}
 	}
 
 	(void)pthread_mutex_unlock(&contextMapList_lock);
 
-	return -1;
+	return rv;
 }
 
 /**
