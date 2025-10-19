@@ -43,6 +43,6 @@ for reader in readers():
             "PCSCv2_PART10_PROPERTY_wIdProduct",
             "PCSCv2_PART10_PROPERTY_wIdVendor",
         ]:
-            print("%s: 0x%04X" % (key, tlv[key]))
+            print(f"{key}: 0x{tlv[key]:04X}")
         else:
-            print("%s: %s" % (key, tlv[key]))
+            print(f"{key}: {tlv[key]}")
