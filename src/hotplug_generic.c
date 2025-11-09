@@ -42,6 +42,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "config.h"
 #include "hotplug.h"
+#include "debuglog.h"
 
 #if !defined(__APPLE__) && !defined(HAVE_LIBUSB) && !defined(HAVE_LIBUDEV)
 
@@ -55,6 +56,8 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 ULONG HPRegisterForHotplugEvents(const char * hpDirPath)
 {
 	(void)hpDirPath;
+
+	Log1(PCSC_LOG_INFO, "Using fake hotplug");
 
 	return 0;
 }
