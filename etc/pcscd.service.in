@@ -10,7 +10,7 @@ ExecReload=@sbindir_exp@/pcscd --hotplug
 EnvironmentFile=-@sysconfdir@/default/pcscd
 User=pcscd
 RuntimeDirectory=pcscd
-RuntimeDirectoryPreserve=true
+RuntimeDirectoryPreserve=yes
 PIDFile=@ipcdir@/pcscd.pid
 
 # Paths
