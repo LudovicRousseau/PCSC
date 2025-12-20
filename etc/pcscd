@@ -5,12 +5,6 @@
 # to pcscd executable.
 PCSCD_ARGS=""
 
-# Set the socket name to talk to remote instance of libpcsclite.so
-# https://blog.apdu.fr/posts/2010/11/pcsc-client-and-server-on-two-different/
-# https://blog.apdu.fr/posts/2022/11/share-smart-card-reader-between-host/
-# https://blog.apdu.fr/posts/2022/02/one-smart-card-reader-accessible-from/
-#PCSCLITE_CSOCK_NAME="/var/run/pcscd/pcscd.comm"
-
 # Adjust USB drivers path at run-time
 #PCSCLITE_HP_DROPDIR="/usr/lib/pcsc/drivers/"
 
