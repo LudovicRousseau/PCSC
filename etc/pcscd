@@ -12,7 +12,3 @@ PCSCD_ARGS=""
 # https://blog.apdu.fr/posts/2015/12/remove-andor-customize-pcsc-reader-names/
 #PCSCLITE_FILTER_IGNORE_READER_NAMES="Contactless"
 #PCSCLITE_FILTER_EXTEND_READER_NAMES=" $HOSTNAME"
-
-# Do not block on some PC/SC calls
-# https://blog.apdu.fr/posts/2010/05/pcsc-lite-160-new-major-version/
-#PCSCLITE_NO_BLOCKING=1
