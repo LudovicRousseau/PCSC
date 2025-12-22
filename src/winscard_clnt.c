@@ -135,6 +135,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static bool sharing_shall_block = true;
+static int Protocol_version;
 
 #define COLOR_RED "\33[01;31m"
 #define COLOR_GREEN "\33[32m"
@@ -568,6 +569,7 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	LONG rv;
 	struct establish_struct scEstablishStruct;
 	uint32_t dwClientID = 0;
+	struct version_struct veStr;
 
 	(void)pvReserved1;
 	(void)pvReserved2;
@@ -586,11 +588,12 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 		return SCARD_E_NO_SERVICE;
 	}
 
-	{	/* exchange client/server protocol versions */
-		struct version_struct veStr;
+	veStr.major = PROTOCOL_VERSION_MAJOR;
+	veStr.minor = PROTOCOL_VERSION_MINOR;
 
-		veStr.major = PROTOCOL_VERSION_MAJOR;
-		veStr.minor = PROTOCOL_VERSION_MINOR;
+connect_again:
+	{	/* exchange client/server protocol versions */
+
 		veStr.rv = SCARD_S_SUCCESS;
 
 		rv = MessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
@@ -609,6 +612,23 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 
 		Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
 			veStr.major, veStr.minor);
+		Log3(PCSC_LOG_INFO, "Client is protocol version %d:%d",
+			PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
+
+		if (SCARD_E_SERVICE_STOPPED == veStr.rv)
+		{
+			/* server complained about our protocol version? */
+			if (PROTOCOL_VERSION_MAJOR == veStr.major)
+			{
+				if (PROTOCOL_VERSION_MINOR_CLIENT_BACKWARD <= veStr.minor)
+				{
+					/* try again with the protocol version proposed by
+					 * the server */
+					Log1(PCSC_LOG_INFO, "Using backward compatibility");
+					goto connect_again;
+				}
+			}
+		}
 
 		if (veStr.rv != SCARD_S_SUCCESS)
 		{
@@ -616,6 +636,9 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 			goto cleanup;
 		}
 	}
+
+	/* store protocol version of the server */
+	Protocol_version = veStr.major * 1000 + veStr.minor;
 
 again:
 	/*
@@ -3633,6 +3656,10 @@ static LONG getReaderEvents(SCONTEXTMAP * currentContextMap, int *readerEvents)
 	int32_t dwClientID = currentContextMap->dwClientID;
 	LONG rv;
 	struct get_reader_events get_reader_events = {0};
+
+	/* CMD_GET_READER_EVENTS was added in protocol 4:5 */
+	if (Protocol_version < 4005)
+		return SCARD_E_UNSUPPORTED_FEATURE;
 
 	rv = MessageSendWithHeader(CMD_GET_READER_EVENTS, dwClientID, 0, NULL);
 	if (rv != SCARD_S_SUCCESS)

@@ -50,6 +50,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PROTOCOL_VERSION_MAJOR 4
 /** Minor version of the current message protocol */
 #define PROTOCOL_VERSION_MINOR 5
+/** Minor version the client also supports */
+#define PROTOCOL_VERSION_MINOR_CLIENT_BACKWARD 4
 
 	/**
 	 * @brief Information transmitted in \ref CMD_VERSION Messages.
