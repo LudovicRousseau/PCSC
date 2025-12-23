@@ -407,7 +407,11 @@ static void * ContextThread(LPVOID newContext)
 						veStr.major, veStr.minor);
 					Log3(PCSC_LOG_ERROR, "Server protocol is %d:%d",
 						PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
-					veStr.rv = SCARD_E_SERVICE_STOPPED;
+
+					if (veStr.minor < PROTOCOL_VERSION_MINOR_SERVER_BACKWARD)
+						veStr.rv = SCARD_E_SERVICE_STOPPED;
+					else
+						Log1(PCSC_LOG_INFO, "Enable backward compatibility");
 				}
 
 				/* set the server protocol version */
