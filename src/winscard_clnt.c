@@ -592,49 +592,48 @@ static LONG SCardEstablishContextTH(DWORD dwScope,
 	veStr.minor = PROTOCOL_VERSION_MINOR;
 
 connect_again:
-	{	/* exchange client/server protocol versions */
+	/* exchange client/server protocol versions */
 
-		veStr.rv = SCARD_S_SUCCESS;
+	veStr.rv = SCARD_S_SUCCESS;
 
-		rv = MessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
+	rv = MessageSendWithHeader(CMD_VERSION, dwClientID, sizeof(veStr),
 			&veStr);
-		if (rv != SCARD_S_SUCCESS)
-			goto cleanup;
+	if (rv != SCARD_S_SUCCESS)
+		goto cleanup;
 
-		/* Read a message from the server */
-		rv = MessageReceive(&veStr, sizeof(veStr), dwClientID);
-		if (rv != SCARD_S_SUCCESS)
-		{
-			Log1(PCSC_LOG_CRITICAL,
+	/* Read a message from the server */
+	rv = MessageReceive(&veStr, sizeof(veStr), dwClientID);
+	if (rv != SCARD_S_SUCCESS)
+	{
+		Log1(PCSC_LOG_CRITICAL,
 				"Your pcscd is too old and does not support CMD_VERSION");
-			goto cleanup;
-		}
+		goto cleanup;
+	}
 
-		Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
+	Log3(PCSC_LOG_INFO, "Server is protocol version %d:%d",
 			veStr.major, veStr.minor);
-		Log3(PCSC_LOG_INFO, "Client is protocol version %d:%d",
+	Log3(PCSC_LOG_INFO, "Client is protocol version %d:%d",
 			PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
 
-		if (SCARD_E_SERVICE_STOPPED == veStr.rv)
+	if (SCARD_E_SERVICE_STOPPED == veStr.rv)
+	{
+		/* server complained about our protocol version? */
+		if (PROTOCOL_VERSION_MAJOR == veStr.major)
 		{
-			/* server complained about our protocol version? */
-			if (PROTOCOL_VERSION_MAJOR == veStr.major)
+			if (PROTOCOL_VERSION_MINOR_CLIENT_BACKWARD <= veStr.minor)
 			{
-				if (PROTOCOL_VERSION_MINOR_CLIENT_BACKWARD <= veStr.minor)
-				{
-					/* try again with the protocol version proposed by
-					 * the server */
-					Log1(PCSC_LOG_INFO, "Using backward compatibility");
-					goto connect_again;
-				}
+				/* try again with the protocol version proposed by
+				 * the server */
+				Log1(PCSC_LOG_INFO, "Using backward compatibility");
+				goto connect_again;
 			}
 		}
+	}
 
-		if (veStr.rv != SCARD_S_SUCCESS)
-		{
-			rv = veStr.rv;
-			goto cleanup;
-		}
+	if (veStr.rv != SCARD_S_SUCCESS)
+	{
+		rv = veStr.rv;
+		goto cleanup;
 	}
 
 	/* store protocol version of the server */
