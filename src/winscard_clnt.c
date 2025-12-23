@@ -449,6 +449,7 @@ static LONG SCardEstablishContextTH(DWORD, LPCVOID, LPCVOID,
  * @retval SCARD_E_INVALID_VALUE Invalid scope type passed (\ref SCARD_E_INVALID_VALUE )
  * @retval SCARD_E_NO_MEMORY There is no free slot to store \p hContext (\ref SCARD_E_NO_MEMORY)
  * @retval SCARD_E_NO_SERVICE The server is not running (\ref SCARD_E_NO_SERVICE)
+ * @retval SCARD_E_SERVICE_STOPPED Wrong communication protocol version (\ref SCARD_E_SERVICE_STOPPED)
  * @retval SCARD_F_COMM_ERROR An internal communications error has been detected (\ref SCARD_F_COMM_ERROR)
  * @retval SCARD_F_INTERNAL_ERROR An internal consistency check failed (\ref SCARD_F_INTERNAL_ERROR)
  *
