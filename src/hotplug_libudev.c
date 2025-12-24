@@ -789,6 +789,10 @@ void HPReCheckSerialReaders(void)
 #ifdef DEBUG_HOTPLUG
 	Log0(PCSC_LOG_ERROR);
 #endif
+
+	/* re-scan the USB bus */
+	HPScanUSB(Udev);
+
 } /* HPReCheckSerialReaders */
 
 #endif
