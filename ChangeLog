@@ -1,3 +1,12 @@
+2.4.1: Ludovic Rousseau
+1 January 2026
+- Add backward version support on the client side
+- Add backward version support on the server side
+- hotplug libudev: rescan the USB bus with "pcscd --hotplug"
+- fix a value in pcscd.service syustemd file
+- meson: install systemd files even if libsystemd is not used
+- Some other minor improvements
+
 2.4.0: Ludovic Rousseau
 19 October 2025
 - Run pcscd under a pcscd user instead of root when using systemd
