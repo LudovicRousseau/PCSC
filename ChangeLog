@@ -3,7 +3,7 @@
 - Add backward version support on the client side
 - Add backward version support on the server side
 - hotplug libudev: rescan the USB bus with "pcscd --hotplug"
-- fix a value in pcscd.service syustemd file
+- fix a value in pcscd.service systemd file
 - meson: install systemd files even if libsystemd is not used
 - Some other minor improvements
 
