@@ -21,11 +21,8 @@ Copyright (C) 2010  Ludovic Rousseau
 import sys
 from time import ctime, time
 
-from smartcard.pcsc.PCSCPart10 import (
-    SCARD_CTL_CODE,
-    SCARD_LEAVE_CARD,
-    SCARD_SHARE_DIRECT,
-)
+from smartcard.pcsc.PCSCPart10 import SCARD_CTL_CODE
+from smartcard.scard import SCARD_LEAVE_CARD, SCARD_SHARE_DIRECT
 from smartcard.System import readers
 
 
