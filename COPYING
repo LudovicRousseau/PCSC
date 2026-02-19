@@ -27,7 +27,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Some files are under GNU GPL v3 or any later version
-- doc/example/pcsc_demo.c
 - the files in src/spy/
 - the files in UnitaryTests/
 
