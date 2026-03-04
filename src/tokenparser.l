@@ -121,6 +121,15 @@ static void eval_value(char *pcToken, list_t *list_values)
 	/* <string>foobar</string>
 	 * 012345678 : 8 is the first string character index */
 
+	/* list_values may be NULL if the Info.plist file is corrupted and
+	 * eval_key() has not yet been called */
+	if (! list_values)
+	{
+		Log3(PCSC_LOG_CRITICAL, "Corrupted bundle file %s before: %s",
+			Filename, pcToken);
+		return;
+	}
+
 	/* calculate the argument length */
 	for (len=0; pcToken[len+8] != '<'; len++)
 		;
