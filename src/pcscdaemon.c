@@ -756,12 +756,8 @@ int main(int argc, char **argv)
 	 * Set up the search for USB/PCMCIA devices
 	 */
 	rv = HPSearchHotPluggables(hpDirPath);
-#ifndef USE_SERIAL
 	if (rv)
 		at_exit();
-#else
-	(void)rv;
-#endif
 
 	rv = HPRegisterForHotplugEvents(hpDirPath);
 	if (rv)
