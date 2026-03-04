@@ -121,7 +121,7 @@ static LONG HPReadBundleValues(const char * hpDirPath)
 	{
 		Log2(PCSC_LOG_ERROR, "Cannot open PC/SC drivers directory: %s", hpDirPath);
 		Log1(PCSC_LOG_ERROR, "Disabling USB support for pcscd.");
-		return -1;
+		return 0;
 	}
 
 	/* allocate a first array */
