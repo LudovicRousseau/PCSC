@@ -59,6 +59,7 @@ void tperrorCheck (char *pcToken_error);
 
 static list_t *ListKeys;
 static list_t *ListValues;
+static const char * Filename;
 
 %}
 
@@ -215,6 +216,7 @@ int bundleParse(const char *fileName, list_t *l)
 			fileName, strerror(errno));
 		return 1;
 	}
+	Filename = fileName;
 
 	r = list_init(l);
 	assert(r >= 0);
