@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2001-2003
  *  David Corcoran <corcoran@musclecard.com>
- * Copyright (C) 2003-2020
+ * Copyright (C) 2003-2026
  *  Ludovic Rousseau <ludovic.rousseau@free.fr>
  *
 Redistribution and use in source and binary forms, with or without
