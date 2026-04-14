@@ -177,6 +177,9 @@ cleanup0:
 cleanup1:
 	g_object_unref(authority);
 
+	while (g_main_context_pending(NULL))
+		g_main_context_iteration(NULL, TRUE);
+
 	return ret;
 }
 
