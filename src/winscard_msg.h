@@ -101,6 +101,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		CMD_WAIT_READER_STATE_CHANGE = 0x13,	/**< wait for a reader state change */
 		CMD_STOP_WAITING_READER_STATE_CHANGE = 0x14,	/**< stop waiting for a reader state change */
 		CMD_GET_READER_EVENTS = 0x15,	/**< get the number of reader events */
+		CMD_GET_READERS_STATE_SIZE = 0x16,	/* get the size of the readers state array */
+		CMD_GET_READERS_STATE_ARRAY = 0x17,	/**< get the readers state array */
 		CMD_ENUM_LAST
 	};
 
