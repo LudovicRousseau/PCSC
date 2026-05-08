@@ -149,5 +149,26 @@ void log_msg(const int priority, const char *fmt, ...)
 	}
 } /* log_msg */
 
+void log_xxd(const int priority, const char *msg, const unsigned char *buffer,
+	const int len)
+{
+	char DebugBuffer[len*3 + strlen(msg) +1];
+	int i;
+	char *c;
+
+	/* DebugBuffer is always big enough for msg */
+	strcpy(DebugBuffer, msg);
+	c = DebugBuffer + strlen(DebugBuffer);
+
+	for (i = 0; (i < len); ++i)
+	{
+		/* 2 hex characters, 1 space, 1 NUL : total 4 characters */
+		snprintf(c, 4, "%02X ", buffer[i]);
+		c += 3;
+	}
+
+	log_msg(priority, "%s", DebugBuffer);
+} /* log_xxd */
+
 #endif
 
