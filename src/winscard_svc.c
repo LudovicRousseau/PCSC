@@ -98,7 +98,8 @@ static void MSGCleanupClient(SCONTEXT *);
 
 static void * ContextThread(LPVOID pdwIndex);
 
-extern READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+extern int pcsclite_max_reader_context;
+extern READER_STATE * readerStates;
 extern int16_t ReaderEvents;
 
 static int contextsListhContext_seeker(const void *el, const void *key)
@@ -435,7 +436,7 @@ static void * ContextThread(LPVOID newContext)
 #endif
 
 				/* dump the readers state */
-				ret = MessageSend(readerStates, sizeof(readerStates), filedes);
+				ret = MessageSend(readerStates, sizeof(readerStates[0]) * pcsclite_max_reader_context, filedes);
 			}
 			break;
 
@@ -486,6 +487,29 @@ static void * ContextThread(LPVOID newContext)
 				};
 
 				WRITE_BODY(readerEvents);
+			}
+			break;
+
+			case CMD_GET_READERS_STATE_SIZE:
+			{
+				/* nothing to read */
+				int32_t array_size = pcsclite_max_reader_context;
+
+				ret = MessageSend(&array_size, sizeof(array_size), filedes);
+			}
+			break;
+
+			case CMD_GET_READERS_STATE_ARRAY:
+			{
+				/* nothing to read */
+
+#ifdef USE_USB
+				/* wait until all readers are ready */
+				RFWaitForReaderInit();
+#endif
+
+				/* dump the readers state */
+				ret = MessageSend(readerStates, sizeof(readerStates[0]) * pcsclite_max_reader_context, filedes);
 			}
 			break;
 
@@ -889,7 +913,7 @@ LONG MSGSendReaderStates(uint32_t filedes)
 	Log2(PCSC_LOG_DEBUG, "Send reader states: %d", filedes);
 
 	/* dump the readers state */
-	ret = MessageSend(readerStates, sizeof(readerStates), filedes);
+	ret = MessageSend(readerStates, sizeof(readerStates[0]) * pcsclite_max_reader_context, filedes);
 
 	return ret;
 }

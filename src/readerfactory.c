@@ -64,8 +64,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "configfile.h"
 #include "utils.h"
 
-static READER_CONTEXT * sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
-READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+#define INITIAL_MAX_READERS_CONTEXTS 2
+
+int pcsclite_max_reader_context = -1;
+static READER_CONTEXT ** sReadersContexts;
+READER_STATE * readerStates;
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 #ifdef USE_SERIAL
@@ -126,8 +129,20 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	if (customMaxReaderHandles != 0)
 		maxReaderHandles = customMaxReaderHandles;
 
+	pcsclite_max_reader_context = INITIAL_MAX_READERS_CONTEXTS;
+	sReadersContexts = calloc(pcsclite_max_reader_context, sizeof(sReadersContexts[0]));
+	if (NULL == sReadersContexts)
+		return SCARD_E_INSUFFICIENT_BUFFER;
+
+	readerStates = calloc(pcsclite_max_reader_context, sizeof(readerStates[0]));
+	if (NULL == readerStates)
+	{
+		free(sReadersContexts);
+		return SCARD_E_INSUFFICIENT_BUFFER;
+	}
+
 	/* Allocate each reader structure */
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
 		sReadersContexts[i]->vHandle = NULL;
@@ -219,7 +234,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	/* Same name, same port, same device - duplicate reader cannot be used */
 	if (dwNumReadersContexts != 0)
 	{
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			if (sReadersContexts[i]->vHandle != 0)
 			{
@@ -245,7 +260,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	}
 
 	/* We must find an empty slot to put the reader structure */
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (sReadersContexts[i]->vHandle == 0)
 		{
@@ -254,7 +269,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		}
 	}
 
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+	if (i == pcsclite_max_reader_context)
 	{
 		/* No more spots left return */
 		return SCARD_E_NO_MEMORY;
@@ -307,7 +322,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	sReadersContexts[dwContext]->reference = 1;
 
 	/* If a clone to this reader exists take some values from that clone */
-	if (parentNode >= 0 && parentNode < PCSCLITE_MAX_READERS_CONTEXTS)
+	if (parentNode >= 0 && parentNode < pcsclite_max_reader_context)
 	{
 		sReadersContexts[dwContext]->pFeeds =
 		  sReadersContexts[parentNode]->pFeeds;
@@ -434,7 +449,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		RESPONSECODE (*fct)(DWORD, int) = NULL;
 
 		/* We must find an empty spot to put the reader structure */
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			if (sReadersContexts[i]->vHandle == 0)
 			{
@@ -443,7 +458,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 			}
 		}
 
-		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		if (i == pcsclite_max_reader_context)
 		{
 			/* No more slot left return */
 			RFRemoveReader(readerName, port, REMOVE_READER_NO_FLAG);
@@ -592,7 +607,7 @@ LONG RFRemoveReader(const char *readerName, int port, int flags)
 		extend_size = strlen(extend);
 #endif
 
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (sReadersContexts[i] && (sReadersContexts[i]->vHandle != 0))
 		{
@@ -717,17 +732,17 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	DWORD valueLength;
 	int currentDigit = -1;
 	int supportedChannels = 0;
-	bool usedDigits[PCSCLITE_MAX_READERS_CONTEXTS];
+	bool usedDigits[pcsclite_max_reader_context];
 	int i;
 	const char *extend = "";
 
 	/* Clear the list */
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 		usedDigits[i] = false;
 
 	if (dwNumReadersContexts != 0)
 	{
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			if (sReadersContexts[i]->vHandle != 0)
 			{
@@ -788,16 +803,16 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	/* Other identical readers exist on the same bus */
 	if (currentDigit != -1)
 	{
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			/* get the first free digit */
 			if (usedDigits[i] == false)
 				break;
 		}
 
-		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		if (i == pcsclite_max_reader_context)
 		{
-			Log2(PCSC_LOG_ERROR, "Max number of readers reached: %d", PCSCLITE_MAX_READERS_CONTEXTS);
+			Log2(PCSC_LOG_ERROR, "Max number of readers reached: %d", pcsclite_max_reader_context);
 			return -2;
 		}
 
@@ -833,7 +848,7 @@ LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 	if (readerName == NULL)
 		return SCARD_E_UNKNOWN_READER;
 
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (sReadersContexts[i]->vHandle != 0)
 		{
@@ -856,7 +871,7 @@ LONG RFReaderInfoById(SCARDHANDLE hCard, READER_CONTEXT * * sReader)
 {
 	int i;
 
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (sReadersContexts[i]->vHandle != 0)
 		{
@@ -1386,7 +1401,7 @@ void RFCleanupReaders(void)
 	int i;
 
 	Log1(PCSC_LOG_INFO, "entering cleaning function");
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (sReadersContexts[i]->vHandle != 0)
 		{
@@ -1434,7 +1449,7 @@ void RFWaitForReaderInit(void)
 	do
 	{
 		need_to_wait = false;
-		for (int i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (int i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			/* reader is present */
 			if (sReadersContexts[i] && sReadersContexts[i]->vHandle != NULL)
@@ -1540,7 +1555,7 @@ void RFReCheckReaderConf(void)
 			reader_list[i].pcFriendlyname);
 
 		/* is the reader already present? */
-		for (r = 0; r < PCSCLITE_MAX_READERS_CONTEXTS; r++)
+		for (r = 0; r < pcsclite_max_reader_context; r++)
 		{
 			if (sReadersContexts[r]->vHandle != 0)
 			{

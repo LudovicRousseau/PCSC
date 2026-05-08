@@ -352,7 +352,8 @@ static pthread_mutex_t clientMutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * Area used to read status information about the readers.
  */
-static READER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
+int pcsclite_max_reader_context = 0;
+static READER_STATE * readerStates = NULL;
 static pthread_mutex_t readerStatesMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
@@ -1470,14 +1471,14 @@ retry:
 		goto end;
 
 	r = pChannelMap->readerName;
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		/* by default r == NULL */
 		if (r && strcmp(r, readerStates[i].readerName) == 0)
 			break;
 	}
 
-	if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+	if (i == pcsclite_max_reader_context)
 	{
 		rv = SCARD_E_READER_UNAVAILABLE;
 		goto end;
@@ -1733,7 +1734,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 #endif
 
 	if ((rgReaderStates == NULL && cReaders > 0)
-		|| (cReaders > PCSCLITE_MAX_READERS_CONTEXTS))
+		|| (cReaders > pcsclite_max_reader_context))
 	{
 		rv = SCARD_E_INVALID_PARAMETER;
 		goto error;
@@ -1797,14 +1798,14 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 		int i;
 
 		readerName = rgReaderStates[j].szReader;
-		for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+		for (i = 0; i < pcsclite_max_reader_context; i++)
 		{
 			if (strcmp(readerName, readerStates[i].readerName) == 0)
 				break;
 		}
 
 		/* The requested reader name is not recognized */
-		if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+		if (i == pcsclite_max_reader_context)
 		{
 			/* PnP special reader? */
 			if (strcasecmp(readerName, "\\\\?PnP?\\Notification") != 0)
@@ -1854,7 +1855,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 
 	/* Get the initial reader count on the system */
-	for (j=0; j < PCSCLITE_MAX_READERS_CONTEXTS; j++)
+	for (j=0; j < pcsclite_max_reader_context; j++)
 		if (readerStates[j].readerName[0] != '\0')
 			currentReaderCount++;
 
@@ -1882,21 +1883,21 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 
 			/* Looks for correct readernames */
 			readerName = currReader->szReader;
-			for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+			for (i = 0; i < pcsclite_max_reader_context; i++)
 			{
 				if (strcmp(readerName, readerStates[i].readerName) == 0)
 					break;
 			}
 
 			/* The requested reader name is not recognized */
-			if (i == PCSCLITE_MAX_READERS_CONTEXTS)
+			if (i == pcsclite_max_reader_context)
 			{
 				/* PnP special reader? */
 				if (strcasecmp(readerName, "\\\\?PnP?\\Notification") == 0)
 				{
 					int k, newReaderCount = 0;
 
-					for (k=0; k < PCSCLITE_MAX_READERS_CONTEXTS; k++)
+					for (k=0; k < pcsclite_max_reader_context; k++)
 						if (readerStates[k].readerName[0] != '\0')
 							newReaderCount++;
 
@@ -2970,7 +2971,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 		goto end;
 
 	dwReadersLen = 0;
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 		if (readerStates[i].readerName[0] != '\0')
 			dwReadersLen += strlen(readerStates[i].readerName) + 1;
 
@@ -3013,7 +3014,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext, /*@unused@*/ LPCSTR mszGroups,
 	if (mszReaders == NULL)	/* text array not allocated */
 		goto end;
 
-	for (i = 0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
 		if (readerStates[i].readerName[0] != '\0')
 		{
@@ -3679,13 +3680,38 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 {
 	int32_t dwClientID = currentContextMap->dwClientID;
 	LONG rv;
+	int32_t array_size;
 
-	rv = MessageSendWithHeader(CMD_GET_READERS_STATE, dwClientID, 0, NULL);
+	rv = MessageSendWithHeader(CMD_GET_READERS_STATE_SIZE, dwClientID, 0, NULL);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
 	/* Read a message from the server */
-	rv = MessageReceive(&readerStates, sizeof(readerStates), dwClientID);
+	rv = MessageReceive(&array_size, sizeof(array_size), dwClientID);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	if (array_size > pcsclite_max_reader_context)
+	{
+		/* need to resize */
+		readerStates = realloc(readerStates, array_size * sizeof(readerStates[0]));
+		if (NULL == readerStates)
+			return SCARD_E_INSUFFICIENT_BUFFER;
+		pcsclite_max_reader_context = array_size;
+	}
+
+	if (array_size != pcsclite_max_reader_context)
+	{
+		/* Should never happen */
+		return SCARD_E_UNSUPPORTED_FEATURE;
+	}
+
+	rv = MessageSendWithHeader(CMD_GET_READERS_STATE_ARRAY, dwClientID, 0, NULL);
+	if (rv != SCARD_S_SUCCESS)
+		return rv;
+
+	/* Read a message from the server */
+	rv = MessageReceive(readerStates, array_size * sizeof(readerStates[0]), dwClientID);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3703,9 +3729,7 @@ static LONG getReaderStatesAndRegisterForEvents(SCONTEXTMAP * currentContextMap)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	/* Read a message from the server */
-	rv = MessageReceive(&readerStates, sizeof(readerStates), dwClientID);
-	return rv;
+	return getReaderStates(currentContextMap);
 }
 
 static LONG unregisterFromEvents(SCONTEXTMAP * currentContextMap)
