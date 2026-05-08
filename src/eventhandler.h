@@ -49,7 +49,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	 * Define an exported public reader state structure so each
 	 * application gets instant notification of changes in state.
 	 */
-	typedef struct pubReaderStatesList
+	typedef struct pubReaderState
 	{
 		char readerName[MAX_READERNAME]; /**< reader name */
 		uint32_t eventCounter; /**< number of card events */

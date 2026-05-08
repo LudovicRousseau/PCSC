@@ -132,7 +132,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		pthread_mutex_t powerState_lock;	/**< powerState mutex */
 		_Atomic int reference;			/**< number of users of the structure */
 
-		struct pubReaderStatesList *readerState; /**< link to the reader state */
+		struct pubReaderState *readerState; /**< link to the reader state */
 		/* we can't use READER_STATE * here since eventhandler.h can't be
 		 * included because of circular dependencies */
 	};
