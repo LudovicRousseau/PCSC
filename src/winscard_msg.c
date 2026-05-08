@@ -65,6 +65,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sys_generic.h"
 #include "utils.h"
 
+//#define DEBUG_PROTOCOL
+
 #ifdef PCSCD
 
 /* functions used by pcscd only */
@@ -363,6 +365,10 @@ INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	/* how many bytes remains to be written */
 	size_t remaining = buffer_size;
 
+#ifdef DEBUG_PROTOCOL
+	Log2(PCSC_LOG_DEBUG, "write %ld bytes", buffer_size);
+	LogXxd(PCSC_LOG_DEBUG, "write: ", buffer, buffer_size);
+#endif
 	/* repeat until all data is written */
 	while (remaining > 0)
 	{
@@ -463,6 +469,9 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 	/* how many bytes we must read */
 	size_t remaining = buffer_size;
 
+#ifdef DEBUG_PROTOCOL
+	Log2(PCSC_LOG_DEBUG, "read %ld bytes", buffer_size);
+#endif
 	/* repeat until we get the whole message */
 	while (remaining > 0)
 	{
@@ -525,6 +534,10 @@ INTERNAL LONG MessageReceive(void *buffer_void, uint64_t buffer_size,
 			}
 		}
 	}
+
+#ifdef DEBUG_PROTOCOL
+	LogXxd(PCSC_LOG_DEBUG, "read: ", buffer_void, buffer_size);
+#endif
 
 	return retval;
 }
