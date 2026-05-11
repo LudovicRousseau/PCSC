@@ -1733,8 +1733,7 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 #endif
 
-	if ((rgReaderStates == NULL && cReaders > 0)
-		|| (cReaders > pcsclite_max_reader_context))
+	if (rgReaderStates == NULL && cReaders > 0)
 	{
 		rv = SCARD_E_INVALID_PARAMETER;
 		goto error;
