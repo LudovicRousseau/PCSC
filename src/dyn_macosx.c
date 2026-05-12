@@ -94,7 +94,7 @@ void * DYN_LoadLibrary(const char *pcLibrary)
 	return pvLHandle;
 }
 
-int DYN_CloseLibrary(void *pvLHandle)
+LONG DYN_CloseLibrary(void *pvLHandle)
 {
 
 	CFBundleRef bundle = (CFBundleRef) pvLHandle;
@@ -110,7 +110,7 @@ int DYN_CloseLibrary(void *pvLHandle)
 	return SCARD_S_SUCCESS;
 }
 
-int DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
+LONG DYN_GetAddress(void *pvLHandle, void **pvFHandle, const char *pcFunction,
 	bool mayfail)
 {
 	(void)mayfail;
