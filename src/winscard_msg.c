@@ -357,7 +357,7 @@ INTERNAL LONG MessageSendWithHeader(uint32_t command, uint32_t dwClientID,
 INTERNAL LONG MessageSend(void *buffer_void, uint64_t buffer_size,
 	int32_t filedes)
 {
-	char *buffer = buffer_void;
+	unsigned char *buffer = buffer_void;
 
 	/* default is success */
 	LONG retval = SCARD_S_SUCCESS;
