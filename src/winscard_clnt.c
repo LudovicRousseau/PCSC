@@ -1854,8 +1854,8 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext, DWORD dwTimeout,
 	}
 
 	/* Get the initial reader count on the system */
-	for (j=0; j < pcsclite_max_reader_context; j++)
-		if (readerStates[j].readerName[0] != '\0')
+	for (int k=0; k < pcsclite_max_reader_context; k++)
+		if (readerStates[k].readerName[0] != '\0')
 			currentReaderCount++;
 
 	/* catch possible sign extension problems from 32 to 64-bits integers */
