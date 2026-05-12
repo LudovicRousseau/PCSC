@@ -157,6 +157,38 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	return EHInitializeEventStructures();
 }
 
+static LONG RFReAllocateReaderSpace(void)
+{
+	int new_size = pcsclite_max_reader_context + INITIAL_MAX_READERS_CONTEXTS;
+
+	Log3(PCSC_LOG_INFO, "from %d to %d", pcsclite_max_reader_context, new_size);
+
+	sReadersContexts = realloc(sReadersContexts, new_size * sizeof(sReadersContexts[0]));
+
+	/* Allocate each new reader structure */
+	for (int i = pcsclite_max_reader_context; i < new_size; i++)
+	{
+		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
+		sReadersContexts[i]->vHandle = NULL;
+		atomic_init(&sReadersContexts[i]->hLockId, 0);
+		atomic_init(&sReadersContexts[i]->contexts, 0);
+		atomic_init(&sReadersContexts[i]->reference, 0);
+
+		/* Zero out each value in the struct */
+		memset(sReadersContexts[i]->readerState.readerName, 0, MAX_READERNAME);
+		memset(sReadersContexts[i]->readerState.cardAtr, 0, MAX_ATR_SIZE);
+		sReadersContexts[i]->readerState.eventCounter = 0;
+		sReadersContexts[i]->readerState.readerState = 0;
+		sReadersContexts[i]->readerState.readerSharing = 0;
+		sReadersContexts[i]->readerState.cardAtrLength = READER_NOT_INITIALIZED;
+		sReadersContexts[i]->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+	}
+
+	pcsclite_max_reader_context = new_size;
+
+	return SCARD_S_SUCCESS;
+}
+
 LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	const char *device)
 {
@@ -263,7 +295,8 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	if (i == pcsclite_max_reader_context)
 	{
 		/* No more spots left return */
-		return SCARD_E_NO_MEMORY;
+		RFReAllocateReaderSpace();
+		dwContext = i;
 	}
 
 	/* Check and set the readername to see if it must be enumerated */
