@@ -137,6 +137,9 @@ AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
 # See if socket() is found from libsocket
 AC_CHECK_LIB(socket, socket, [LIBS="$LIBS -lsocket"])
 
+# Check for the network library.
+AC_CHECK_LIB(network, socket, [LIBS="$LIBS -lnetwork"])
+
 # check for mq_getattr()
 AC_CHECK_LIB(rt, mq_getattr, [LIBS="$LIBS -lrt"])
 
