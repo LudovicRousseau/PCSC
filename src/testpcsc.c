@@ -39,6 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "pcsclite.h"
 #include "winscard.h"
@@ -204,7 +205,7 @@ wait_for_card_again:
 
 	if (p > 1)
 	{
-		int again = 0;
+		bool again = false;
 
 		do
 		{
@@ -221,7 +222,7 @@ wait_for_card_again:
 			if (iReader > p || iReader <= 0)
 			{
 				printf("Invalid Value - try again\n");
-				again = 1;
+				again = true;
 			}
 		}
 		while (again);
