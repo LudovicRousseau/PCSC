@@ -1549,13 +1549,13 @@ void RFReCheckReaderConf(void)
 
 				/* get the reader name without the reader and slot numbers */
 				strncpy(lpcStripReader,
-					sReadersContexts[i]->readerState->readerName,
+					sReadersContexts[r]->readerState->readerName,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
 
 				if ((strcmp(reader_list[i].pcFriendlyname, lpcStripReader) == 0)
-					&& (reader_list[r].channelId == sReadersContexts[i]->port))
+					&& (reader_list[i].channelId == sReadersContexts[r]->port))
 				{
 					DWORD dwStatus = 0;
 
@@ -1569,7 +1569,7 @@ void RFReCheckReaderConf(void)
 						Log2(PCSC_LOG_INFO, "Reader %s disappeared",
 							reader_list[i].pcFriendlyname);
 						(void)RFRemoveReader(reader_list[i].pcFriendlyname,
-							reader_list[r].channelId, REMOVE_READER_NO_FLAG);
+							reader_list[i].channelId, REMOVE_READER_NO_FLAG);
 					}
 				}
 			}
