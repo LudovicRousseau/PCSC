@@ -212,6 +212,7 @@ wait_for_card_again:
 			char input[80];
 			char *r;
 
+			again = false;
 			printf("Enter the reader number\t\t: ");
 			r = fgets(input, sizeof(input), stdin);
 			if (NULL == r)
