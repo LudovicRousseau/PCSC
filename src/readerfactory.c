@@ -1139,8 +1139,8 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 	RESPONSECODE rvd;
 
 	/* Spawn the event handler thread */
-	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
-		rContext->readerState.readerName, rContext->library);
+	Log4(PCSC_LOG_INFO, "Attempting startup of %s using %s on port %d",
+		rContext->readerState.readerName, rContext->library, rContext->port);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/* loads the library */
