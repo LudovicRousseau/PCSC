@@ -178,7 +178,7 @@ again:
 	rv = pthread_mutex_trylock(rContext->mMutex);
 	if (EBUSY == rv)
 	{
-		Log1(PCSC_LOG_ERROR, "Locking failed");
+		Log2(PCSC_LOG_ERROR, "Locking failed. %d tries remaining.", repeat);
 		repeat--;
 		if (repeat)
 		{
