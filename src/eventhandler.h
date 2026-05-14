@@ -45,23 +45,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readerfactory.h"
 #include "wintypes.h"
 
-	/**
-	 * Define an exported public reader state structure so each
-	 * application gets instant notification of changes in state.
-	 */
-	typedef struct pubReaderState
-	{
-		char readerName[MAX_READERNAME]; /**< reader name */
-		uint32_t eventCounter; /**< number of card events */
-		uint32_t readerState; /**< SCARD_* bit field */
-		_Atomic int32_t readerSharing; /**< PCSCLITE_SHARING_* sharing status */
-
-		UCHAR cardAtr[MAX_ATR_SIZE]; /**< ATR */
-		_Atomic uint32_t cardAtrLength; /**< ATR length */
-		uint32_t cardProtocol; /**< SCARD_PROTOCOL_* value */
-	}
-	READER_STATE;
-
 	LONG EHTryToUnregisterClientForEvent(int32_t filedes);
 	LONG EHRegisterClientForEvent(int32_t filedes);
 	LONG EHUnregisterClientForEvent(int32_t filedes);

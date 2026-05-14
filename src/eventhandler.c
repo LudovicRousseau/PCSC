@@ -159,7 +159,7 @@ void EHDestroyEventHandler(READER_CONTEXT * rContext)
 	DWORD dwGetSize;
 	UCHAR ucGetData[1];
 
-	if ('\0' == rContext->readerState->readerName[0])
+	if ('\0' == rContext->readerState.readerName[0])
 	{
 		Log1(PCSC_LOG_INFO, "Thread already stomped.");
 		return;
@@ -222,7 +222,7 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext)
 	if (rv != SCARD_S_SUCCESS)
 	{
 		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s",
-			rContext->readerState->readerName);
+			rContext->readerState.readerName);
 		return SCARD_F_UNKNOWN_ERROR;
 	}
 
@@ -257,7 +257,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	dwStatus = 0;
 
 #ifndef NO_LOG
-	readerName = rContext->readerState->readerName;
+	readerName = rContext->readerState.readerName;
 #endif
 
 	rv = IFDStatusICC(rContext, &dwStatus);
@@ -265,18 +265,18 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	if ((SCARD_S_SUCCESS == rv) && (dwStatus & SCARD_PRESENT))
 	{
 #ifdef DISABLE_AUTO_POWER_ON
-		rContext->readerState->cardAtrLength = 0;
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardAtrLength = 0;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 		readerState = SCARD_PRESENT;
 		Log1(PCSC_LOG_INFO, "Skip card power on");
 #else
-		dwAtrLen = sizeof(rContext->readerState->cardAtr);
+		dwAtrLen = sizeof(rContext->readerState.cardAtr);
 		rv = IFDPowerICC(rContext, IFD_POWER_UP,
-			rContext->readerState->cardAtr, &dwAtrLen);
-		rContext->readerState->cardAtrLength = dwAtrLen;
+			rContext->readerState.cardAtr, &dwAtrLen);
+		rContext->readerState.cardAtrLength = dwAtrLen;
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		if (rv == IFD_SUCCESS)
 		{
@@ -284,11 +284,11 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 			RFSetPowerState(rContext, POWER_STATE_POWERED);
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 
-			if (rContext->readerState->cardAtrLength > 0)
+			if (rContext->readerState.cardAtrLength > 0)
 			{
 				LogXxd(PCSC_LOG_INFO, "Card ATR: ",
-					rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+					rContext->readerState.cardAtr,
+					rContext->readerState.cardAtrLength);
 			}
 			else
 				Log1(PCSC_LOG_INFO, "Card ATR: (NULL)");
@@ -307,8 +307,8 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	else
 	{
 		readerState = SCARD_ABSENT;
-		rContext->readerState->cardAtrLength = 0;
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardAtrLength = 0;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		dwCurrentState = SCARD_ABSENT;
 	}
@@ -316,8 +316,8 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	/*
 	 * Set all the public attributes to this reader
 	 */
-	rContext->readerState->readerState = readerState;
-	rContext->readerState->readerSharing = readerSharing = rContext->contexts;
+	rContext->readerState.readerState = readerState;
+	rContext->readerState.readerSharing = readerSharing = rContext->contexts;
 
 	EHSignalEventToClients();
 
@@ -334,9 +334,9 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 			/*
 			 * Set error status on this reader while errors occur
 			 */
-			rContext->readerState->readerState = SCARD_UNKNOWN;
-			rContext->readerState->cardAtrLength = 0;
-			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+			rContext->readerState.readerState = SCARD_UNKNOWN;
+			rContext->readerState.cardAtrLength = 0;
+			rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 			dwCurrentState = SCARD_UNKNOWN;
 
@@ -357,14 +357,14 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 				 */
 				(void)RFSetReaderEventState(rContext, SCARD_REMOVED);
 
-				rContext->readerState->cardAtrLength = 0;
-				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-				rContext->readerState->readerState = SCARD_ABSENT;
+				rContext->readerState.cardAtrLength = 0;
+				rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+				rContext->readerState.readerState = SCARD_ABSENT;
 				dwCurrentState = SCARD_ABSENT;
 
-				rContext->readerState->eventCounter++;
-				if (rContext->readerState->eventCounter > 0xFFFF)
-					rContext->readerState->eventCounter = 0;
+				rContext->readerState.eventCounter++;
+				if (rContext->readerState.eventCounter > 0xFFFF)
+					rContext->readerState.eventCounter = 0;
 
 				EHSignalEventToClients();
 			}
@@ -376,9 +376,9 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 				dwCurrentState == SCARD_UNKNOWN)
 			{
 #ifdef DISABLE_AUTO_POWER_ON
-				rContext->readerState->cardAtrLength = 0;
-				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-				rContext->readerState->readerState = SCARD_PRESENT;
+				rContext->readerState.cardAtrLength = 0;
+				rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+				rContext->readerState.readerState = SCARD_PRESENT;
 				RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 				Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 				rv = IFD_SUCCESS;
@@ -387,34 +387,34 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 				/*
 				 * Power and reset the card
 				 */
-				dwAtrLen = sizeof(rContext->readerState->cardAtr);
+				dwAtrLen = sizeof(rContext->readerState.cardAtr);
 				rv = IFDPowerICC(rContext, IFD_POWER_UP,
-					rContext->readerState->cardAtr, &dwAtrLen);
-				rContext->readerState->cardAtrLength = dwAtrLen;
+					rContext->readerState.cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtrLength = dwAtrLen;
 
 				/* the protocol is unset after a power on */
-				rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+				rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 				if (rv == IFD_SUCCESS)
 				{
-					rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+					rContext->readerState.readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 					RFSetPowerState(rContext, POWER_STATE_POWERED);
 					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_POWERED");
 				}
 				else
 				{
-					rContext->readerState->readerState = SCARD_PRESENT | SCARD_SWALLOWED;
+					rContext->readerState.readerState = SCARD_PRESENT | SCARD_SWALLOWED;
 					RFSetPowerState(rContext, POWER_STATE_UNPOWERED);
 					Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
-					rContext->readerState->cardAtrLength = 0;
+					rContext->readerState.cardAtrLength = 0;
 				}
 #endif
 
 				dwCurrentState = SCARD_PRESENT;
 
-				rContext->readerState->eventCounter++;
-				if (rContext->readerState->eventCounter > 0xFFFF)
-					rContext->readerState->eventCounter = 0;
+				rContext->readerState.eventCounter++;
+				if (rContext->readerState.eventCounter > 0xFFFF)
+					rContext->readerState.eventCounter = 0;
 
 				Log2(PCSC_LOG_INFO, "Card inserted into %s", readerName);
 
@@ -422,11 +422,11 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 
 				if (rv == IFD_SUCCESS)
 				{
-					if (rContext->readerState->cardAtrLength > 0)
+					if (rContext->readerState.cardAtrLength > 0)
 					{
 						LogXxd(PCSC_LOG_INFO, "Card ATR: ",
-							rContext->readerState->cardAtr,
-							rContext->readerState->cardAtrLength);
+							rContext->readerState.cardAtr,
+							rContext->readerState.cardAtrLength);
 					}
 					else
 						Log1(PCSC_LOG_INFO, "Card ATR: (NULL)");
@@ -442,7 +442,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 		if (readerSharing != rContext->contexts)
 		{
 			readerSharing = rContext->contexts;
-			rContext->readerState->readerSharing = readerSharing;
+			rContext->readerState.readerSharing = readerSharing;
 			EHSignalEventToClients();
 		}
 
@@ -478,7 +478,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_UNPOWERED");
 
 			/* the protocol is unset after a power down */
-			rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+			rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 		}
 
 		/* the card was in use */

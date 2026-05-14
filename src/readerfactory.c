@@ -59,6 +59,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dyn_generic.h"
 #include "sys_generic.h"
 #include "eventhandler.h"
+#include "readers.h"
 #include "ifdwrapper.h"
 #include "hotplug.h"
 #include "configfile.h"
@@ -67,8 +68,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INITIAL_MAX_READERS_CONTEXTS 2
 
 int pcsclite_max_reader_context = -1;
-static READER_CONTEXT ** sReadersContexts;
-READER_STATE * readerStates;
+READER_CONTEXT ** sReadersContexts;
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
 static DWORD dwNumReadersContexts = 0;
 #ifdef USE_SERIAL
@@ -134,13 +134,6 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	if (NULL == sReadersContexts)
 		return SCARD_E_INSUFFICIENT_BUFFER;
 
-	readerStates = calloc(pcsclite_max_reader_context, sizeof(readerStates[0]));
-	if (NULL == readerStates)
-	{
-		free(sReadersContexts);
-		return SCARD_E_INSUFFICIENT_BUFFER;
-	}
-
 	/* Allocate each reader structure */
 	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
@@ -151,15 +144,13 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 		atomic_init(&sReadersContexts[i]->reference, 0);
 
 		/* Zero out each value in the struct */
-		memset(readerStates[i].readerName, 0, MAX_READERNAME);
-		memset(readerStates[i].cardAtr, 0, MAX_ATR_SIZE);
-		readerStates[i].eventCounter = 0;
-		readerStates[i].readerState = 0;
-		readerStates[i].readerSharing = 0;
-		readerStates[i].cardAtrLength = READER_NOT_INITIALIZED;
-		readerStates[i].cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-
-		sReadersContexts[i]->readerState = &readerStates[i];
+		memset(sReadersContexts[i]->readerState.readerName, 0, MAX_READERNAME);
+		memset(sReadersContexts[i]->readerState.cardAtr, 0, MAX_ATR_SIZE);
+		sReadersContexts[i]->readerState.eventCounter = 0;
+		sReadersContexts[i]->readerState.readerState = 0;
+		sReadersContexts[i]->readerState.readerSharing = 0;
+		sReadersContexts[i]->readerState.cardAtrLength = READER_NOT_INITIALIZED;
+		sReadersContexts[i]->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
 
 	/* Create public event structures */
@@ -243,7 +234,7 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 
 				/* get the reader name without the reader and slot numbers */
 				strncpy(lpcStripReader,
-					sReadersContexts[i]->readerState->readerName,
+					sReadersContexts[i]->readerState.readerName,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;
@@ -466,10 +457,10 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		}
 
 		/* Copy the previous reader name and increment the slot number */
-		tmpReader = sReadersContexts[dwContextB]->readerState->readerName;
+		tmpReader = sReadersContexts[dwContextB]->readerState.readerName;
 		memcpy(tmpReader,
-			sReadersContexts[dwContext]->readerState->readerName,
-			sizeof(sReadersContexts[dwContextB]->readerState->readerName));
+			sReadersContexts[dwContext]->readerState.readerName,
+			sizeof(sReadersContexts[dwContextB]->readerState.readerName));
 		snprintf(tmpReader + strlen(tmpReader) - 2, 3, "%02X", j);
 
 		sReadersContexts[dwContextB]->library =
@@ -612,7 +603,7 @@ LONG RFRemoveReader(const char *readerName, int port, int flags)
 		if (sReadersContexts[i] && (sReadersContexts[i]->vHandle != 0))
 		{
 			strncpy(lpcStripReader,
-				sReadersContexts[i]->readerState->readerName,
+				sReadersContexts[i]->readerState.readerName,
 				sizeof(lpcStripReader));
 			lpcStripReader[strlen(lpcStripReader) - 6 - extend_size] = 0;
 
@@ -773,7 +764,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 						&& (sReadersContexts[i]->port != port))
 						|| (supportedChannels > 1))
 					{
-						const char *reader = sReadersContexts[i]->readerState->readerName;
+						const char *reader = sReadersContexts[i]->readerState.readerName;
 
 						/*
 						 * tells the caller who the parent of this
@@ -831,8 +822,8 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 		extend = "";
 #endif
 
-	snprintf(rContext->readerState->readerName,
-		sizeof(rContext->readerState->readerName), "%s%s %02X 00",
+	snprintf(rContext->readerState.readerName,
+		sizeof(rContext->readerState.readerName), "%s%s %02X 00",
 		readerName, extend, i);
 
 	/* Set the slot in 0xDDDDCCCC */
@@ -853,7 +844,7 @@ LONG RFReaderInfo(const char *readerName, READER_CONTEXT ** sReader)
 		if (sReadersContexts[i]->vHandle != 0)
 		{
 			if (strcmp(readerName,
-				sReadersContexts[i]->readerState->readerName) == 0)
+				sReadersContexts[i]->readerState.readerName) == 0)
 			{
 				/* Increase reference count */
 				REF_READER(sReadersContexts[i])
@@ -1116,7 +1107,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 
 	/* Spawn the event handler thread */
 	Log3(PCSC_LOG_INFO, "Attempting startup of %s using %s",
-		rContext->readerState->readerName, rContext->library);
+		rContext->readerState.readerName, rContext->library);
 
 #ifndef PCSCLITE_STATIC_DRIVER
 	/* loads the library */
@@ -1170,7 +1161,7 @@ LONG RFInitializeReader(READER_CONTEXT * rContext)
 void RFUnInitializeReader(READER_CONTEXT * rContext)
 {
 	Log2(PCSC_LOG_INFO, "Attempting shutdown of %s.",
-		rContext->readerState->readerName);
+		rContext->readerState.readerName);
 
 	/* Do not close a reader if IFDOpenIFD() failed in RFInitializeReader() */
 	if (rContext->slot != -1)
@@ -1183,15 +1174,15 @@ void RFUnInitializeReader(READER_CONTEXT * rContext)
 	 * Zero out the public status struct to allow it to be recycled and
 	 * used again
 	 */
-	memset(rContext->readerState->readerName, 0,
-		sizeof(rContext->readerState->readerName));
-	memset(rContext->readerState->cardAtr, 0,
-		sizeof(rContext->readerState->cardAtr));
-	rContext->readerState->readerState = 0;
-	rContext->readerState->eventCounter = 0;
-	rContext->readerState->readerSharing = 0;
-	rContext->readerState->cardAtrLength = READER_NOT_INITIALIZED;
-	rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+	memset(rContext->readerState.readerName, 0,
+		sizeof(rContext->readerState.readerName));
+	memset(rContext->readerState.cardAtr, 0,
+		sizeof(rContext->readerState.cardAtr));
+	rContext->readerState.readerState = 0;
+	rContext->readerState.eventCounter = 0;
+	rContext->readerState.readerSharing = 0;
+	rContext->readerState.cardAtrLength = READER_NOT_INITIALIZED;
+	rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 	return;
 }
@@ -1390,7 +1381,7 @@ LONG RFClearReaderEventState(READER_CONTEXT * rContext, SCARDHANDLE hCard)
 
 LONG RFCheckReaderStatus(READER_CONTEXT * rContext)
 {
-	if (rContext->readerState->readerState & SCARD_UNKNOWN)
+	if (rContext->readerState.readerState & SCARD_UNKNOWN)
 		return SCARD_E_READER_UNAVAILABLE;
 	else
 		return SCARD_S_SUCCESS;
@@ -1409,10 +1400,10 @@ void RFCleanupReaders(void)
 			char lpcStripReader[MAX_READERNAME];
 
 			Log2(PCSC_LOG_INFO, "Stopping reader: %s",
-				sReadersContexts[i]->readerState->readerName);
+				sReadersContexts[i]->readerState.readerName);
 
 			strncpy(lpcStripReader,
-				sReadersContexts[i]->readerState->readerName,
+				sReadersContexts[i]->readerState.readerName,
 				sizeof(lpcStripReader));
 			/* strip the 6 last char ' 00 00' */
 			lpcStripReader[strlen(lpcStripReader) - 6] = '\0';
@@ -1456,10 +1447,10 @@ void RFWaitForReaderInit(void)
 			{
 				/* but card state is not yet available */
 				if (READER_NOT_INITIALIZED
-					== sReadersContexts[i]->readerState->cardAtrLength)
+					== sReadersContexts[i]->readerState.cardAtrLength)
 				{
 					Log2(PCSC_LOG_DEBUG, "Waiting init for reader: %s",
-						sReadersContexts[i]->readerState->readerName);
+						sReadersContexts[i]->readerState.readerName);
 					need_to_wait = true;
 				}
 			}
@@ -1564,7 +1555,7 @@ void RFReCheckReaderConf(void)
 
 				/* get the reader name without the reader and slot numbers */
 				strncpy(lpcStripReader,
-					sReadersContexts[r]->readerState->readerName,
+					sReadersContexts[r]->readerState.readerName,
 					sizeof(lpcStripReader));
 				tmplen = strlen(lpcStripReader);
 				lpcStripReader[tmplen - 6] = 0;

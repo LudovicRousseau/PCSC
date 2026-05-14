@@ -302,7 +302,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 *******************************************/
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
-		if (!(rContext->readerState->readerState & SCARD_PRESENT))
+		if (!(rContext->readerState.readerState & SCARD_PRESENT))
 		{
 			Log1(PCSC_LOG_DEBUG, "Card Not Inserted");
 			rv = SCARD_E_NO_SMARTCARD;
@@ -315,26 +315,26 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		{
 			DWORD dwAtrLen;
 
-			dwAtrLen = sizeof(rContext->readerState->cardAtr);
+			dwAtrLen = sizeof(rContext->readerState.cardAtr);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr, &dwAtrLen);
-			rContext->readerState->cardAtrLength = dwAtrLen;
+				rContext->readerState.cardAtr, &dwAtrLen);
+			rContext->readerState.cardAtrLength = dwAtrLen;
 
 			if (rv == IFD_SUCCESS)
 			{
-				rContext->readerState->readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
+				rContext->readerState.readerState = SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 				Log1(PCSC_LOG_DEBUG, "power up complete.");
 				LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-					rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+					rContext->readerState.cardAtr,
+					rContext->readerState.cardAtrLength);
 			}
 			else
 				Log2(PCSC_LOG_ERROR, "Error powering up card: %s",
 					rv2text(rv));
 		}
 
-		if (! (rContext->readerState->readerState & SCARD_POWERED))
+		if (! (rContext->readerState.readerState & SCARD_POWERED))
 		{
 			Log1(PCSC_LOG_ERROR, "Card Not Powered");
 			(void)pthread_mutex_unlock(&rContext->powerState_lock);
@@ -355,24 +355,24 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	 *
 	 *******************************************/
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_RAW;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_RAW;
 	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
-			 * setting rContext->readerState->cardProtocol */
+			 * setting rContext->readerState.cardProtocol */
 			(void)pthread_mutex_lock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
-			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
+			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState.cardProtocol)
 			{
 				int availableProtocols, defaultProtocol;
 				int ret;
 
 				ATRDecodeAtr(&availableProtocols, &defaultProtocol,
-					rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+					rContext->readerState.cardAtr,
+					rContext->readerState.cardAtrLength);
 
 				/* If it is set to ANY let it do any of the protocols */
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
@@ -400,7 +400,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 				}
 
 				/* use negotiated protocol */
-				rContext->readerState->cardProtocol = ret;
+				rContext->readerState.cardProtocol = ret;
 
 				(void)pthread_mutex_unlock(rContext->mMutex);
 			}
@@ -408,7 +408,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 			{
 				(void)pthread_mutex_unlock(rContext->mMutex);
 
-				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
+				if (! (dwPreferredProtocols & rContext->readerState.cardProtocol))
 				{
 					rv = SCARD_E_PROTO_MISMATCH;
 					goto exit;
@@ -417,7 +417,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 		}
 	}
 
-	*pdwActiveProtocol = rContext->readerState->cardProtocol;
+	*pdwActiveProtocol = rContext->readerState.cardProtocol;
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
@@ -510,7 +510,7 @@ LONG SCardConnect(/*@unused@*/ SCARDCONTEXT hContext, LPCSTR szReader,
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->contexts;
+	rContext->readerState.readerSharing = rContext->contexts;
 
 exit:
 	UNREF_READER(rContext)
@@ -581,48 +581,48 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		 */
 		RFSetReaderEventState(rContext, SCARD_RESET);
 
-		dwAtrLen = sizeof(rContext->readerState->cardAtr);
+		dwAtrLen = sizeof(rContext->readerState.cardAtr);
 		if (SCARD_RESET_CARD == dwInitialization)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtr, &dwAtrLen);
 		else
 		{
 			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtr, &dwAtrLen);
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
 		 * Set up the status bit masks on readerState
 		 */
 		if (rv == IFD_SUCCESS)
 		{
-			rContext->readerState->cardAtrLength = dwAtrLen;
-			rContext->readerState->readerState =
+			rContext->readerState.cardAtrLength = dwAtrLen;
+			rContext->readerState.readerState =
 				SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-				rContext->readerState->cardAtr,
-				rContext->readerState->cardAtrLength);
+				rContext->readerState.cardAtr,
+				rContext->readerState.cardAtrLength);
 		}
 		else
 		{
-			rContext->readerState->cardAtrLength = 0;
+			rContext->readerState.cardAtrLength = 0;
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
 			if (rv == SCARD_W_REMOVED_CARD)
 			{
-				rContext->readerState->readerState = SCARD_ABSENT;
+				rContext->readerState.readerState = SCARD_ABSENT;
 				rv = SCARD_E_NO_SMARTCARD;
 				goto exit;
 			}
 			else
 			{
-				rContext->readerState->readerState =
+				rContext->readerState.readerState =
 					SCARD_PRESENT | SCARD_SWALLOWED;
 				rv = SCARD_W_UNRESPONSIVE_CARD;
 				goto exit;
@@ -632,7 +632,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	else
 		if (dwInitialization == SCARD_LEAVE_CARD)
 		{
-			uint32_t readerState = rContext->readerState->readerState;
+			uint32_t readerState = rContext->readerState.readerState;
 
 			if (readerState & SCARD_ABSENT)
 			{
@@ -655,24 +655,24 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	 *
 	 *******************************************/
 	if (dwPreferredProtocols & SCARD_PROTOCOL_RAW)
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_RAW;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_RAW;
 	else
 	{
 		if (dwShareMode != SCARD_SHARE_DIRECT)
 		{
 			/* lock here instead in IFDSetPTS() to lock up to
-			 * setting rContext->readerState->cardProtocol */
+			 * setting rContext->readerState.cardProtocol */
 			(void)pthread_mutex_lock(rContext->mMutex);
 
 			/* the protocol is not yet set (no PPS yet) */
-			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState->cardProtocol)
+			if (SCARD_PROTOCOL_UNDEFINED == rContext->readerState.cardProtocol)
 			{
 				int availableProtocols, defaultProtocol;
 				int ret;
 
 				ATRDecodeAtr(&availableProtocols, &defaultProtocol,
-					rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+					rContext->readerState.cardAtr,
+					rContext->readerState.cardAtrLength);
 
 				/* If it is set to ANY let it do any of the protocols */
 				if (dwPreferredProtocols & SCARD_PROTOCOL_ANY_OLD)
@@ -700,7 +700,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 				}
 
 				/* use negotiated protocol */
-				rContext->readerState->cardProtocol = ret;
+				rContext->readerState.cardProtocol = ret;
 
 				(void)pthread_mutex_unlock(rContext->mMutex);
 			}
@@ -708,7 +708,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 			{
 				(void)pthread_mutex_unlock(rContext->mMutex);
 
-				if (! (dwPreferredProtocols & rContext->readerState->cardProtocol))
+				if (! (dwPreferredProtocols & rContext->readerState.cardProtocol))
 				{
 					rv = SCARD_E_PROTO_MISMATCH;
 					goto exit;
@@ -721,7 +721,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 		}
 	}
 
-	*pdwActiveProtocol = rContext->readerState->cardProtocol;
+	*pdwActiveProtocol = rContext->readerState.cardProtocol;
 
 	if (dwShareMode != SCARD_SHARE_DIRECT)
 	{
@@ -815,7 +815,7 @@ LONG SCardReconnect(SCARDHANDLE hCard, DWORD dwShareMode,
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->contexts;
+	rContext->readerState.readerSharing = rContext->contexts;
 
 	rv = SCARD_S_SUCCESS;
 
@@ -893,10 +893,10 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		 */
 		RFSetReaderEventState(rContext, SCARD_RESET);
 
-		dwAtrLen = sizeof(rContext->readerState->cardAtr);
+		dwAtrLen = sizeof(rContext->readerState.cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtr, &dwAtrLen);
 		else
 		{
 			/* SCARD_UNPOWER_CARD */
@@ -907,22 +907,22 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		if (rv == IFD_SUCCESS)
 		{
 			if (SCARD_UNPOWER_CARD == dwDisposition)
-				rContext->readerState->readerState = SCARD_PRESENT;
+				rContext->readerState.readerState = SCARD_PRESENT;
 			else
 			{
-				rContext->readerState->cardAtrLength = dwAtrLen;
-				rContext->readerState->readerState =
+				rContext->readerState.cardAtrLength = dwAtrLen;
+				rContext->readerState.readerState =
 					SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 				Log1(PCSC_LOG_DEBUG, "Reset complete.");
 				LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-					rContext->readerState->cardAtr,
-					rContext->readerState->cardAtrLength);
+					rContext->readerState.cardAtr,
+					rContext->readerState.cardAtrLength);
 			}
 		}
 		else
@@ -932,14 +932,14 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 					rv2text(rv));
 			else
 			{
-				rContext->readerState->cardAtrLength = 0;
+				rContext->readerState.cardAtrLength = 0;
 				Log1(PCSC_LOG_ERROR, "Error resetting card.");
 			}
 
 			if (rv == SCARD_W_REMOVED_CARD)
-				rContext->readerState->readerState = SCARD_ABSENT;
+				rContext->readerState.readerState = SCARD_ABSENT;
 			else
-				rContext->readerState->readerState =
+				rContext->readerState.readerState =
 					SCARD_PRESENT | SCARD_SWALLOWED;
 		}
 	}
@@ -1037,7 +1037,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 	/*
 	 * Propagate new state to reader state
 	 */
-	rContext->readerState->readerSharing = rContext->contexts;
+	rContext->readerState.readerSharing = rContext->contexts;
 
 	rv = SCARD_S_SUCCESS;
 
@@ -1136,19 +1136,19 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 	{
 		DWORD dwAtrLen;
 
-		dwAtrLen = sizeof(rContext->readerState->cardAtr);
+		dwAtrLen = sizeof(rContext->readerState.cardAtr);
 		if (SCARD_RESET_CARD == dwDisposition)
 			rv = IFDPowerICC(rContext, IFD_RESET,
-				rContext->readerState->cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtr, &dwAtrLen);
 		else
 		{
 			IFDPowerICC(rContext, IFD_POWER_DOWN, NULL, NULL);
 			rv = IFDPowerICC(rContext, IFD_POWER_UP,
-				rContext->readerState->cardAtr, &dwAtrLen);
+				rContext->readerState.cardAtr, &dwAtrLen);
 		}
 
 		/* the protocol is unset after a power on */
-		rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+		rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 
 		/*
 		 * Notify the card has been reset
@@ -1160,24 +1160,24 @@ LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 		 */
 		if (rv == IFD_SUCCESS)
 		{
-			rContext->readerState->cardAtrLength = dwAtrLen;
-			rContext->readerState->readerState =
+			rContext->readerState.cardAtrLength = dwAtrLen;
+			rContext->readerState.readerState =
 				SCARD_PRESENT | SCARD_POWERED | SCARD_NEGOTIABLE;
 
 			Log1(PCSC_LOG_DEBUG, "Reset complete.");
 			LogXxd(PCSC_LOG_DEBUG, "Card ATR: ",
-				rContext->readerState->cardAtr,
-				rContext->readerState->cardAtrLength);
+				rContext->readerState.cardAtr,
+				rContext->readerState.cardAtrLength);
 		}
 		else
 		{
-			rContext->readerState->cardAtrLength = 0;
+			rContext->readerState.cardAtrLength = 0;
 			Log1(PCSC_LOG_ERROR, "Error resetting card.");
 
 			if (rv == SCARD_W_REMOVED_CARD)
-				rContext->readerState->readerState = SCARD_ABSENT;
+				rContext->readerState.readerState = SCARD_ABSENT;
 			else
-				rContext->readerState->readerState =
+				rContext->readerState.readerState =
 					SCARD_PRESENT | SCARD_SWALLOWED;
 		}
 	}
@@ -1272,7 +1272,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR szReaderNames,
 	if (rv != SCARD_S_SUCCESS)
 		goto exit;
 
-	if (rContext->readerState->cardAtrLength > MAX_ATR_SIZE)
+	if (rContext->readerState.cardAtrLength > MAX_ATR_SIZE)
 	{
 		rv = SCARD_F_INTERNAL_ERROR;
 		goto exit;
@@ -1411,13 +1411,13 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 			if ((SCARD_ATTR_DEVICE_FRIENDLY_NAME == dwAttrId)
 				|| (SCARD_ATTR_DEVICE_SYSTEM_NAME == dwAttrId))
 			{
-				unsigned int len = strlen(rContext->readerState->readerName)+1;
+				unsigned int len = strlen(rContext->readerState.readerName)+1;
 
 				if (len > *pcbAttrLen)
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
-					strcpy((char *)pbAttr, rContext->readerState->readerName);
+					strcpy((char *)pbAttr, rContext->readerState.readerName);
 					rv = SCARD_S_SUCCESS;
 				}
 				*pcbAttrLen = len;
@@ -1541,7 +1541,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	 */
 	if (pioSendPci->dwProtocol != SCARD_PROTOCOL_RAW)
 	{
-		if (rContext->readerState->readerState & SCARD_ABSENT)
+		if (rContext->readerState.readerState & SCARD_ABSENT)
 		{
 			rv = SCARD_E_NO_SMARTCARD;
 			goto exit;
@@ -1552,7 +1552,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	{
 		if (pioSendPci->dwProtocol != SCARD_PROTOCOL_ANY_OLD)
 		{
-			if (pioSendPci->dwProtocol != rContext->readerState->cardProtocol)
+			if (pioSendPci->dwProtocol != rContext->readerState.cardProtocol)
 			{
 				rv = SCARD_E_PROTO_MISMATCH;
 				goto exit;
@@ -1580,7 +1580,7 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 	{
 	  /* Fix by Amira (Athena) */
 		unsigned long i;
-		unsigned long prot = rContext->readerState->cardProtocol;
+		unsigned long prot = rContext->readerState.cardProtocol;
 
 		for (i = 0 ; prot != 1 && i < 16; i++)
 			prot >>= 1;
@@ -1623,9 +1623,9 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 
         if (SCARD_E_NO_SMARTCARD == rv)
         {
-            rContext->readerState->cardAtrLength = 0;
-            rContext->readerState->cardProtocol = SCARD_PROTOCOL_UNDEFINED;
-            rContext->readerState->readerState = SCARD_ABSENT;
+            rContext->readerState.cardAtrLength = 0;
+            rContext->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
+            rContext->readerState.readerState = SCARD_ABSENT;
         }
 
 		goto exit;
