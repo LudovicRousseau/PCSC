@@ -87,7 +87,7 @@ pthread_mutex_t usbNotifierMutex;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
-static bool AraKiriHotPlug = false;
+static bool ExitHotPlug = false;
 static int rescan_pipe[] = { -1, -1 };
 extern int HPForceReaderPolling;
 
@@ -497,7 +497,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 
 	if (do_polling)
 	{
-		while (!AraKiriHotPlug)
+		while (!ExitHotPlug)
 		{
 			SYS_Sleep(HPForceReaderPolling);
 			HPRescanUsbBus();
@@ -508,7 +508,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 		char dummy;
 		while (read(rescan_pipe[0], &dummy, sizeof(dummy)) > 0)
 		{
-			if (AraKiriHotPlug)
+			if (ExitHotPlug)
 				break;
 			Log1(PCSC_LOG_INFO, "Reload serial configuration");
 			HPRescanUsbBus();
@@ -549,7 +549,7 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 {
 	int i;
 
-	AraKiriHotPlug = false;
+	ExitHotPlug = false;
 	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
 	{
 		readerTracker[i].status = READER_ABSENT;
@@ -557,7 +557,7 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 		readerTracker[i].fullName = NULL;
 	}
 
-	if (HPReadBundleValues(hpDirPath) > 0)
+	if (HPReadBundleValues(hpDirPath) >= 0)
 	{
 		/* used for waiting for the initialization completion */
 		int pipefd[2];
@@ -596,9 +596,9 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 
 LONG HPStopHotPluggables(void)
 {
-	/* tell the rescan thread to shut down; it checks the ara kiri flag, but it
+	/* tell the rescan thread to shut down; it checks the ExitHotPlug flag, but it
 	 * might also need to be awaken from reading the rescan pipe */
-	AraKiriHotPlug = true;
+	ExitHotPlug = true;
 	HPReCheckSerialReaders();
 
 	if (rescan_pipe[1] >= 0)
