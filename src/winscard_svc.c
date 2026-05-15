@@ -269,7 +269,7 @@ LONG CreateContextThread(uint32_t *pdwClientID)
 		goto out;
 	}
 
-	/* disable any suicide alarm */
+	/* disable any exit alarm */
 	if (AutoExit)
 		alarm(0);
 
@@ -1185,10 +1185,10 @@ static void MSGCleanupClient(SCONTEXT * threadContext)
 
 	free(threadContext);
 
-	/* start a suicide alarm */
+	/* start an exit alarm */
 	if (AutoExit && (listSize < 1))
 	{
-		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
+		Log2(PCSC_LOG_DEBUG, "Starting exit alarm in %d seconds",
 			TIME_BEFORE_SUICIDE);
 		alarm(TIME_BEFORE_SUICIDE);
 	}

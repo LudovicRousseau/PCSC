@@ -69,7 +69,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils.h"
 #include "eventhandler.h"
 
-_Atomic bool AraKiri = false;
+_Atomic bool MustExit = false;
 static bool Init = true;
 bool AutoExit = false;
 bool SocketActivated = false;
@@ -106,7 +106,7 @@ static void SVCServiceRunLoop(void)
 
 	while (true)
 	{
-		if (AraKiri)
+		if (MustExit)
 		{
 			/* stop the hotpug thread and waits its exit */
 #ifdef USE_USB
@@ -152,7 +152,7 @@ static void SVCServiceRunLoop(void)
 			 * We just try again */
 
 			/* we wait a bit so that the signal handler thread can do
-			 * its job and set AraKiri if needed */
+			 * its job and set MustExit if needed */
 			SYS_USleep(1000);
 			break;
 
@@ -193,7 +193,7 @@ static void *signal_thread(void *arg)
 		if (SIGUSR1 == sig)
 		{
 #ifdef USE_USB
-			if (! AraKiri)
+			if (! MustExit)
 				HPReCheckSerialReaders();
 #endif
 			/* Re-enable the signal handler.
@@ -207,7 +207,7 @@ static void *signal_thread(void *arg)
 		 * avoids waiting after the reader(s) in shutdown for example */
 		if (SIGTERM == sig)
 		{
-			Log1(PCSC_LOG_INFO, "Direct suicide");
+			Log1(PCSC_LOG_INFO, "Direct exit");
 			ExitValue = EXIT_SUCCESS;
 			at_exit();
 		}
@@ -219,12 +219,12 @@ static void *signal_thread(void *arg)
 		}
 
 		/* the signal handler is called several times for the same Ctrl-C */
-		if (AraKiri == false)
+		if (MustExit == false)
 		{
-			Log1(PCSC_LOG_INFO, "Preparing for suicide");
-			AraKiri = true;
+			Log1(PCSC_LOG_INFO, "Preparing for exit");
+			MustExit = true;
 
-			/* if still in the init/loading phase the AraKiri will not be
+			/* if still in the init/loading phase the MustExit will not be
 			 * seen by the main event loop
 			 */
 			if (Init)
@@ -242,7 +242,7 @@ static void *signal_thread(void *arg)
 			/* no live left. Something is blocking the normal death. */
 			if (0 == lives)
 			{
-				Log1(PCSC_LOG_INFO, "Forced suicide");
+				Log1(PCSC_LOG_INFO, "Forced exit");
 				at_exit();
 			}
 		}
@@ -600,7 +600,7 @@ int main(int argc, char **argv)
 	(void)signal(SIGTERM, signal_trap); /* default kill signal & init round 1 */
 	(void)signal(SIGINT, signal_trap);	/* sent by Ctrl-C */
 
-	/* exits on SIGALARM to allow pcscd to suicide if not used */
+	/* exits on SIGALARM to allow pcscd to exit if not used */
 	(void)signal(SIGALRM, signal_trap);
 
 	if (pipe(signal_handler_fd) == -1)
@@ -787,7 +787,7 @@ int main(int argc, char **argv)
 
 	if (AutoExit)
 	{
-		Log2(PCSC_LOG_DEBUG, "Starting suicide alarm in %d seconds",
+		Log2(PCSC_LOG_DEBUG, "Starting exit alarm in %d seconds",
 			TIME_BEFORE_SUICIDE);
 		alarm(TIME_BEFORE_SUICIDE);
 	}
