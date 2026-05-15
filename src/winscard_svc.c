@@ -354,6 +354,7 @@ static void * ContextThread(LPVOID newContext)
 {
 	SCONTEXT * threadContext = (SCONTEXT *) newContext;
 	int32_t filedes = threadContext->dwClientID;
+	bool old_reader_state_api = false;
 
 	if (IsClientAuthorized(filedes, "access_pcsc", NULL) == 0)
 	{
@@ -414,7 +415,10 @@ static void * ContextThread(LPVOID newContext)
 					if (veStr.minor < PROTOCOL_VERSION_MINOR_SERVER_BACKWARD)
 						veStr.rv = SCARD_E_SERVICE_STOPPED;
 					else
+					{
 						Log1(PCSC_LOG_INFO, "Enable backward compatibility");
+						old_reader_state_api = true;
+					}
 				}
 
 				/* set the server protocol version */
@@ -435,12 +439,7 @@ static void * ContextThread(LPVOID newContext)
 				RFWaitForReaderInit();
 #endif
 
-				/* dump the readers state */
-				for (int i=0; i<pcsclite_max_reader_context; i++)
-				{
-					ret = MessageSend(&sReadersContexts[i]->readerState,
-						sizeof(READER_STATE), filedes);
-				}
+				MSGSendReaderStates(filedes, true);
 			}
 			break;
 
@@ -455,6 +454,8 @@ static void * ContextThread(LPVOID newContext)
 
 				/* add the client fd to the list and dump the readers state */
 				EHRegisterClientForEvent(filedes);
+				if (old_reader_state_api)
+					MSGSendReaderStates(filedes, true);
 			}
 			break;
 
@@ -499,7 +500,7 @@ static void * ContextThread(LPVOID newContext)
 				/* nothing to read */
 				int32_t array_size = pcsclite_max_reader_context;
 
-				ret = MessageSend(&array_size, sizeof(array_size), filedes);
+				MessageSend(&array_size, sizeof(array_size), filedes);
 			}
 			break;
 
@@ -512,7 +513,7 @@ static void * ContextThread(LPVOID newContext)
 				RFWaitForReaderInit();
 #endif
 
-				ret = MSGSendReaderStates(filedes);
+				MSGSendReaderStates(filedes, false);
 			}
 			break;
 
@@ -909,17 +910,36 @@ LONG MSGSignalClient(uint32_t filedes, LONG rv)
 	return ret;
 } /* MSGSignalClient */
 
-LONG MSGSendReaderStates(uint32_t filedes)
+LONG MSGSendReaderStates(uint32_t filedes, bool old_api)
 {
-	uint32_t ret;
+	uint32_t ret = SCARD_S_SUCCESS;
 
 	Log2(PCSC_LOG_DEBUG, "Send reader states: %d", filedes);
 
+	int length = pcsclite_max_reader_context;
+	if (old_api)
+	{
+		if (length > PCSCLITE_MAX_READERS_CONTEXTS)
+			length = PCSCLITE_MAX_READERS_CONTEXTS;
+	}
+
 	/* dump the readers state */
-	for (int i=0; i<pcsclite_max_reader_context; i++)
+	for (int i=0; i<length; i++)
 	{
 		ret = MessageSend(&sReadersContexts[i]->readerState,
 			sizeof(READER_STATE), filedes);
+	}
+
+	if (old_api)
+	{
+		/* complete the list */
+		if (length < PCSCLITE_MAX_READERS_CONTEXTS)
+		{
+			READER_STATE readerState = { 0 };
+			for (int i=length; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+				ret = MessageSend(&readerState,
+					sizeof(READER_STATE), filedes);
+		}
 	}
 
 	return ret;

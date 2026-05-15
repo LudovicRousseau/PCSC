@@ -49,6 +49,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	void ContextsDeinitialize(void);
 	LONG CreateContextThread(uint32_t *);
 	LONG MSGSignalClient(uint32_t filedes, LONG rv);
-	LONG MSGSendReaderStates(uint32_t filedes);
+	LONG MSGSendReaderStates(uint32_t filedes, bool old_api);
 
 #endif
