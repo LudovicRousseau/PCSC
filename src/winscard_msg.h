@@ -49,7 +49,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** Major version of the current message protocol */
 #define PROTOCOL_VERSION_MAJOR 4
 /** Minor version of the current message protocol */
-#define PROTOCOL_VERSION_MINOR 5
+#define PROTOCOL_VERSION_MINOR 6
 /** Minor version the client also supports */
 #define PROTOCOL_VERSION_MINOR_CLIENT_BACKWARD 4
 /** Minor version the server also supports */
