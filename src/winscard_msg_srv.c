@@ -68,7 +68,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Socket to a file, used for clients-server communication.
  */
 static int commonSocket = 0;
-extern char AraKiri;
 
 /**
  * @brief Accepts a Client connection.
