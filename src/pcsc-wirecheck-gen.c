@@ -240,13 +240,13 @@ check_types (void)
     CHECK_MEMBER (getset_struct, rv);
 
     BLANK_LINE ();
-    CHECK_STRUCT (pubReaderStatesList);
-    CHECK_MEMBER (pubReaderStatesList, readerName);
-    CHECK_MEMBER (pubReaderStatesList, readerState);
-    CHECK_MEMBER (pubReaderStatesList, readerSharing);
-    CHECK_MEMBER (pubReaderStatesList, cardAtr);
-    CHECK_MEMBER (pubReaderStatesList, cardAtrLength);
-    CHECK_MEMBER (pubReaderStatesList, cardProtocol);
+    CHECK_STRUCT (pubReaderState);
+    CHECK_MEMBER (pubReaderState, readerName);
+    CHECK_MEMBER (pubReaderState, readerState);
+    CHECK_MEMBER (pubReaderState, readerSharing);
+    CHECK_MEMBER (pubReaderState, cardAtr);
+    CHECK_MEMBER (pubReaderState, cardAtrLength);
+    CHECK_MEMBER (pubReaderState, cardProtocol);
 }
 
 int
