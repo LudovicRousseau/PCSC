@@ -87,7 +87,7 @@ pthread_mutex_t usbNotifierMutex;
 
 static pthread_t usbNotifyThread;
 static int driverSize = -1;
-static bool ExitHotPlug = false;
+static _Atomic bool ExitHotPlug = false;
 static int rescan_pipe[] = { -1, -1 };
 extern int HPForceReaderPolling;
 
