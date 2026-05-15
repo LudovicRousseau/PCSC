@@ -71,6 +71,7 @@ pcscd_SOURCES = \
 	prothandler.h \
 	readerfactory.c \
 	readerfactory.h \
+	readers.h \
 	simclist.c \
 	simclist.h \
 	sys_generic.h \
