@@ -111,14 +111,16 @@ static struct _driverTracker
 #define DRIVER_TRACKER_SIZE_STEP 8
 
 /**
- * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
+ * keep track of readerTrackerNbEntries simultaneous readers
  */
-static struct _readerTracker
+struct _readerTracker
 {
 	char status;
 	char bus_device[BUS_DEVICE_STRSIZE];	/**< device name */
 	char *fullName;	/**< full reader name (including serial number) */
-} readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
+};
+struct _readerTracker *readerTracker;
+int readerTrackerNbEntries = -1;
 
 static LONG HPAddHotPluggable(struct libusb_device *dev,
 	struct libusb_device_descriptor desc,
@@ -341,7 +343,7 @@ static void HPRescanUsbBus(void)
 	libusb_device **devs, *dev;
 	ssize_t cnt;
 
-	for (i=0; i < PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i=0; i < readerTrackerNbEntries; i++)
 		/* clear roll call */
 		readerTracker[i].status = READER_ABSENT;
 
@@ -410,7 +412,7 @@ static void HPRescanUsbBus(void)
 			newreader = true;
 
 			/* Check if the reader is a new one */
-			for (j=0; j<PCSCLITE_MAX_READERS_CONTEXTS; j++)
+			for (j=0; j<readerTrackerNbEntries; j++)
 			{
 				if (strncmp(readerTracker[j].bus_device,
 							bus_device, BUS_DEVICE_STRSIZE) == 0)
@@ -438,7 +440,7 @@ static void HPRescanUsbBus(void)
 	/*
 	 * check if all the previously found readers are still present
 	 */
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i=0; i<readerTrackerNbEntries; i++)
 	{
 		if ((readerTracker[i].status == READER_ABSENT) &&
 			(readerTracker[i].fullName != NULL))
@@ -521,7 +523,7 @@ static void * HPEstablishUSBNotifications(int pipefd[2])
 
 	libusb_exit(ctx);
 
-	for (int i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (int i=0; i<readerTrackerNbEntries; i++)
 	{
 		if (readerTracker[i].fullName != NULL)
 			HPCleanupHotPluggable(i);
@@ -550,7 +552,9 @@ LONG HPSearchHotPluggables(const char * hpDirPath)
 	int i;
 
 	ExitHotPlug = false;
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	readerTrackerNbEntries = 2;
+	readerTracker = calloc(readerTrackerNbEntries, sizeof(*readerTracker));
+	for (i=0; i<readerTrackerNbEntries; i++)
 	{
 		readerTracker[i].status = READER_ABSENT;
 		readerTracker[i].bus_device[0] = '\0';
@@ -637,18 +641,27 @@ static LONG HPAddHotPluggable(struct libusb_device *dev,
 	pthread_mutex_lock(&usbNotifierMutex);
 
 	/* find a free entry */
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i=0; i<readerTrackerNbEntries; i++)
 	{
 		if (readerTracker[i].fullName == NULL)
 			break;
 	}
 
-	if (i==PCSCLITE_MAX_READERS_CONTEXTS)
+	if (i == readerTrackerNbEntries)
 	{
-		Log2(PCSC_LOG_ERROR,
-			"Not enough reader entries. Already found %d readers", i);
-		pthread_mutex_unlock(&usbNotifierMutex);
-		return 0;
+		int new_size = readerTrackerNbEntries + 2;
+		Log3(PCSC_LOG_DEBUG, "increase from %d to %d readers", readerTrackerNbEntries, new_size);
+		readerTracker = realloc(readerTracker, new_size * sizeof(*readerTracker));
+
+		for (int tmp=readerTrackerNbEntries; tmp<new_size; tmp++)
+		{
+			readerTracker[tmp].status = READER_ABSENT;
+			readerTracker[tmp].bus_device[0] = '\0';
+			readerTracker[tmp].fullName = NULL;
+		}
+
+		i = readerTrackerNbEntries;		/* new free index */
+		readerTrackerNbEntries = new_size;
 	}
 
 	strncpy(readerTracker[i].bus_device, bus_device,
