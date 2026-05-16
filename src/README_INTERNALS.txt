@@ -71,7 +71,7 @@ Maximum channels on an application context
 	PCSCLITE_MAX_APPLICATION_CONTEXT_CHANNELS
 
 Maximum readers context (a slot is counted as a reader)
-	PCSCLITE_MAX_READERS_CONTEXTS
+	No real limit. The sReadersContexts[] array is dynamic.
 
 First imagine:
 - 3 PC/SC daemons started on 3 different hosts (it is possible to
@@ -128,16 +128,11 @@ are the channels.
 Daemon global variables:
 ------------------------
 readerfactory.c
- static PREADER_CONTEXT sReadersContexts[PCSCLITE_MAX_READERS_CONTEXTS];
- static DWORD *dwNumReadersContexts = 0;
+ static PREADER_CONTEXT sReadersContexts[];
+ int pcsclite_max_reader_context = -1;
 
-dwNumReadersContexts is the number of Readers Contexts
+pcsclite_max_reader_context is the number of Readers Contexts
 sReadersContexts[] contains the Readers Contexts
-
-
-eventhandler.c
- static PREADER_STATE readerStates[PCSCLITE_MAX_READERS_CONTEXTS];
-
 
 
 IPC communication between pcscd and libpcsclite?:
