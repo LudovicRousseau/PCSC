@@ -70,7 +70,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int pcsclite_max_reader_context = -1;
 READER_CONTEXT ** sReadersContexts;
 static int maxReaderHandles = PCSC_MAX_READER_HANDLES;
-static DWORD dwNumReadersContexts = 0;
 #ifdef USE_SERIAL
 static char *ConfigFile = NULL;
 static int ConfigFileCRC = 0;
@@ -255,29 +254,26 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 	}
 
 	/* Same name, same port, same device - duplicate reader cannot be used */
-	if (dwNumReadersContexts != 0)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
-		for (i = 0; i < pcsclite_max_reader_context; i++)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
-			if (sReadersContexts[i]->vHandle != 0)
+			char lpcStripReader[MAX_READERNAME];
+			int tmplen;
+
+			/* get the reader name without the reader and slot numbers */
+			strncpy(lpcStripReader,
+				sReadersContexts[i]->readerState.readerName,
+				sizeof(lpcStripReader));
+			tmplen = strlen(lpcStripReader);
+			lpcStripReader[tmplen - 6] = 0;
+
+			if ((strcmp(readerName, lpcStripReader) == 0)
+				&& (port == sReadersContexts[i]->port)
+				&& (strcmp(device, sReadersContexts[i]->device) == 0))
 			{
-				char lpcStripReader[MAX_READERNAME];
-				int tmplen;
-
-				/* get the reader name without the reader and slot numbers */
-				strncpy(lpcStripReader,
-					sReadersContexts[i]->readerState.readerName,
-					sizeof(lpcStripReader));
-				tmplen = strlen(lpcStripReader);
-				lpcStripReader[tmplen - 6] = 0;
-
-				if ((strcmp(readerName, lpcStripReader) == 0)
-					&& (port == sReadersContexts[i]->port)
-					&& (strcmp(device, sReadersContexts[i]->device) == 0))
-				{
-					Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
-					return SCARD_E_DUPLICATE_READER;
-				}
+				Log1(PCSC_LOG_ERROR, "Duplicate reader found.");
+				return SCARD_E_DUPLICATE_READER;
 			}
 		}
 	}
@@ -396,8 +392,6 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		sReadersContexts[dwContext]->pMutex = malloc(sizeof(int));
 		*(sReadersContexts[dwContext])->pMutex = 1;
 	}
-
-	dwNumReadersContexts += 1;
 
 	rv = RFInitializeReader(sReadersContexts[dwContext]);
 	if (rv != SCARD_S_SUCCESS)
@@ -576,8 +570,6 @@ LONG RFAddReader(const char *readerNameLong, int port, const char *library,
 		else
 			*(sReadersContexts[dwContextB])->pMutex += 1;
 
-		dwNumReadersContexts += 1;
-
 		rv = RFInitializeReader(sReadersContexts[dwContextB]);
 		if (rv != SCARD_S_SUCCESS)
 		{
@@ -741,7 +733,6 @@ LONG removeReader(READER_CONTEXT * sContext)
 	(void)pthread_mutex_unlock(&sContext->handlesList_lock);
 	(void)pthread_mutex_destroy(&sContext->handlesList_lock);
 	list_destroy(&sContext->handlesList);
-	dwNumReadersContexts -= 1;
 
 	/* signal an event to clients */
 	EHSignalEventToClients();
@@ -764,58 +755,55 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	for (i = 0; i < pcsclite_max_reader_context; i++)
 		usedDigits[i] = false;
 
-	if (dwNumReadersContexts != 0)
+	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
-		for (i = 0; i < pcsclite_max_reader_context; i++)
+		if (sReadersContexts[i]->vHandle != 0)
 		{
-			if (sReadersContexts[i]->vHandle != 0)
+			if (strcmp(sReadersContexts[i]->library, libraryName) == 0)
 			{
-				if (strcmp(sReadersContexts[i]->library, libraryName) == 0)
-				{
-					UCHAR tagValue[1];
-					LONG ret;
+				UCHAR tagValue[1];
+				LONG ret;
 
-					/* Ask the driver if it supports multiple channels */
-					valueLength = sizeof(tagValue);
-					ret = IFDGetCapabilities(sReadersContexts[i],
+				/* Ask the driver if it supports multiple channels */
+				valueLength = sizeof(tagValue);
+				ret = IFDGetCapabilities(sReadersContexts[i],
 						TAG_IFD_SIMULTANEOUS_ACCESS,
 						&valueLength, tagValue);
 
-					if ((ret == IFD_SUCCESS) && (valueLength == 1) &&
+				if ((ret == IFD_SUCCESS) && (valueLength == 1) &&
 						(tagValue[0] > 1))
-					{
-						supportedChannels = tagValue[0];
-						Log2(PCSC_LOG_INFO,
+				{
+					supportedChannels = tagValue[0];
+					Log2(PCSC_LOG_INFO,
 							"Support %d simultaneous readers", tagValue[0]);
-					}
-					else
-						supportedChannels = 1;
+				}
+				else
+					supportedChannels = 1;
 
-					/* Check to see if it is a hotplug reader and different */
-					if ((((sReadersContexts[i]->port & 0xFFFF0000) ==
-							PCSCLITE_HP_BASE_PORT)
-						&& (sReadersContexts[i]->port != port))
+				/* Check to see if it is a hotplug reader and different */
+				if ((((sReadersContexts[i]->port & 0xFFFF0000) ==
+								PCSCLITE_HP_BASE_PORT)
+							&& (sReadersContexts[i]->port != port))
 						|| (supportedChannels > 1))
-					{
-						const char *reader = sReadersContexts[i]->readerState.readerName;
+				{
+					const char *reader = sReadersContexts[i]->readerState.readerName;
 
-						/*
-						 * tells the caller who the parent of this
-						 * clone is so it can use its shared
-						 * resources like mutex/etc.
-						 */
-						parent = i;
+					/*
+					 * tells the caller who the parent of this
+					 * clone is so it can use its shared
+					 * resources like mutex/etc.
+					 */
+					parent = i;
 
-						/*
-						 * If the same reader already exists and it is
-						 * hotplug then we must look for others and
-						 * enumerate the readername
-						 */
-						currentDigit = strtol(reader + strlen(reader) - 5, NULL, 16);
+					/*
+					 * If the same reader already exists and it is
+					 * hotplug then we must look for others and
+					 * enumerate the readername
+					 */
+					currentDigit = strtol(reader + strlen(reader) - 5, NULL, 16);
 
-						/* This spot is taken */
-						usedDigits[currentDigit] = true;
-					}
+					/* This spot is taken */
+					usedDigits[currentDigit] = true;
 				}
 			}
 		}
