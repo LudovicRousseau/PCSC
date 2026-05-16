@@ -416,8 +416,13 @@ static void * ContextThread(LPVOID newContext)
 						veStr.rv = SCARD_E_SERVICE_STOPPED;
 					else
 					{
-						Log1(PCSC_LOG_INFO, "Enable backward compatibility");
-						old_reader_state_api = true;
+						if (veStr.minor < PROTOCOL_VERSION_MINOR)
+						{
+							Log1(PCSC_LOG_INFO, "Enable backward compatibility");
+							old_reader_state_api = true;
+						}
+						else
+							Log1(PCSC_LOG_INFO, "forward compatibility detected");
 					}
 				}
 
