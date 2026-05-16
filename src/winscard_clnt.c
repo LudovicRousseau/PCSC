@@ -3681,14 +3681,20 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 	LONG rv;
 	int32_t array_size;
 
-	rv = MessageSendWithHeader(CMD_GET_READERS_STATE_SIZE, dwClientID, 0, NULL);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
+	if (Protocol_version <= 4005)
+		/* protocol up to 4:5 used a fixed size */
+		array_size = PCSCLITE_MAX_READERS_CONTEXTS;
+	else
+	{
+		rv = MessageSendWithHeader(CMD_GET_READERS_STATE_SIZE, dwClientID, 0, NULL);
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
 
-	/* Read a message from the server */
-	rv = MessageReceive(&array_size, sizeof(array_size), dwClientID);
-	if (rv != SCARD_S_SUCCESS)
-		return rv;
+		/* Read a message from the server */
+		rv = MessageReceive(&array_size, sizeof(array_size), dwClientID);
+		if (rv != SCARD_S_SUCCESS)
+			return rv;
+	}
 
 	if (array_size > pcsclite_max_reader_context)
 	{
@@ -3705,7 +3711,10 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 		return SCARD_E_UNSUPPORTED_FEATURE;
 	}
 
-	rv = MessageSendWithHeader(CMD_GET_READERS_STATE_ARRAY, dwClientID, 0, NULL);
+	if (Protocol_version <= 4005)
+		rv = MessageSendWithHeader(CMD_GET_READERS_STATE, dwClientID, 0, NULL);
+	else
+		rv = MessageSendWithHeader(CMD_GET_READERS_STATE_ARRAY, dwClientID, 0, NULL);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -3728,7 +3737,20 @@ static LONG getReaderStatesAndRegisterForEvents(SCONTEXTMAP * currentContextMap)
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
-	return getReaderStates(currentContextMap);
+	if (Protocol_version <= 4005)
+	{
+		/* This should not happen
+		 * pcsclite_max_reader_context should be set to the backward
+		 * compatible value from a previous call to getReaderStates()
+		 * called from SCardStatus() or SCardListReaders() */
+		if (pcsclite_max_reader_context != PCSCLITE_MAX_READERS_CONTEXTS)
+			return SCARD_E_NO_SERVICE;
+
+		rv = MessageReceive(readerStates, pcsclite_max_reader_context * sizeof(readerStates[0]), dwClientID);
+		return rv;
+	}
+	else
+		return getReaderStates(currentContextMap);
 }
 
 static LONG unregisterFromEvents(SCONTEXTMAP * currentContextMap)
