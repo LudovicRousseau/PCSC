@@ -412,18 +412,18 @@ static void * ContextThread(LPVOID newContext)
 					Log3(PCSC_LOG_ERROR, "Server protocol is %d:%d",
 						PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR);
 
-					if (veStr.minor < PROTOCOL_VERSION_MINOR_SERVER_BACKWARD)
-						veStr.rv = SCARD_E_SERVICE_STOPPED;
-					else
+					/* the protocol major corresponds and the minior
+					 * indicates the protocol is just old enough */
+					if (PROTOCOL_VERSION_MAJOR == veStr.major
+						&& veStr.minor >= PROTOCOL_VERSION_MINOR_SERVER_BACKWARD
+						&& veStr.minor < PROTOCOL_VERSION_MINOR)
 					{
-						if (veStr.minor < PROTOCOL_VERSION_MINOR)
-						{
-							Log1(PCSC_LOG_INFO, "Enable backward compatibility");
-							old_reader_state_api = true;
-						}
-						else
-							Log1(PCSC_LOG_INFO, "forward compatibility detected");
+						Log1(PCSC_LOG_INFO, "Enable backward compatibility");
+						old_reader_state_api = true;
 					}
+					else
+						/* any other case is unsupported */
+						veStr.rv = SCARD_E_SERVICE_STOPPED;
 				}
 
 				/* set the server protocol version */
