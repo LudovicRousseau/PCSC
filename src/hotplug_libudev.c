@@ -96,14 +96,16 @@ static struct _driverTracker
 #define DRIVER_TRACKER_INITIAL_SIZE 200
 
 /**
- * keep track of PCSCLITE_MAX_READERS_CONTEXTS simultaneous readers
+ * keep track of readerTrackerNbEntries simultaneous readers
  */
-static struct _readerTracker
+struct _readerTracker
 {
 	char *devpath;	/**< device name seen by udev */
 	char *fullName;	/**< full reader name (including serial number) */
 	char *sysname;	/**< sysfs path */
-} readerTracker[PCSCLITE_MAX_READERS_CONTEXTS];
+};
+struct _readerTracker *readerTracker = NULL;
+int readerTrackerNbEntries = -1;
 
 
 static LONG HPReadBundleValues(const char * hpDirPath)
@@ -339,7 +341,7 @@ static void HPRemoveDevice(struct udev_device *dev)
 		return;
 	}
 
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
+	for (i=0; i<readerTrackerNbEntries; i++)
 	{
 		if (readerTracker[i].fullName && !strcmp(sysname, readerTracker[i].sysname))
 		{
@@ -421,7 +423,7 @@ static void HPAddDevice(struct udev_device *dev)
 	}
 
 	/* check for duplicated add */
-	for (index=0; index<PCSCLITE_MAX_READERS_CONTEXTS; index++)
+	for (index=0; index<readerTrackerNbEntries; index++)
 	{
 		if (readerTracker[index].fullName && !strcmp(sysname, readerTracker[index].sysname))
 			return;
@@ -444,17 +446,27 @@ static void HPAddDevice(struct udev_device *dev)
 	}
 
 	/* find a free entry */
-	for (index=0; index<PCSCLITE_MAX_READERS_CONTEXTS; index++)
+	for (index=0; index<readerTrackerNbEntries; index++)
 	{
 		if (NULL == readerTracker[index].fullName)
 			break;
 	}
 
-	if (PCSCLITE_MAX_READERS_CONTEXTS == index)
+	/* the array is full? */
+	if (readerTrackerNbEntries == index)
 	{
-		Log2(PCSC_LOG_ERROR,
-			"Not enough reader entries. Already found %d readers", index);
-		goto exit;
+		int new_size = readerTrackerNbEntries + 2;
+		Log3(PCSC_LOG_DEBUG, "increase from %d to %d readers", readerTrackerNbEntries, new_size);
+		readerTracker = realloc(readerTracker, new_size * sizeof(*readerTracker));
+		for (int i=readerTrackerNbEntries; i<new_size; i++)
+		{
+			readerTracker[i].devpath = NULL;
+			readerTracker[i].fullName = NULL;
+			readerTracker[i].sysname = NULL;
+		}
+
+		index = readerTrackerNbEntries;		/* new free index */
+		readerTrackerNbEntries = new_size;
 	}
 
 	if (Add_Interface_In_Name)
@@ -672,14 +684,8 @@ static void * HPEstablishUSBNotifications(void *arg)
  */
 LONG HPSearchHotPluggables(const char * hpDirPath)
 {
-	int i;
-
-	for (i=0; i<PCSCLITE_MAX_READERS_CONTEXTS; i++)
-	{
-		readerTracker[i].devpath = NULL;
-		readerTracker[i].fullName = NULL;
-		readerTracker[i].sysname = NULL;
-	}
+	readerTrackerNbEntries = 2;
+	readerTracker = calloc(readerTrackerNbEntries, sizeof(*readerTracker));
 
 	return HPReadBundleValues(hpDirPath);
 } /* HPSearchHotPluggables */
