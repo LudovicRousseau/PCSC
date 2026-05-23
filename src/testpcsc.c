@@ -100,7 +100,7 @@ int main(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	long rv;
 	DWORD i;
 	int p, iReader;
-	int iList[16] = {0};
+	int iList[512] = {0};
 	SCARD_IO_REQUEST ioRecvPci = *SCARD_PCI_T0;	/* use a default value */
 	const SCARD_IO_REQUEST *pioSendPci;
 	unsigned char bSendBuffer[MAX_BUFFER_SIZE];
