@@ -126,17 +126,15 @@ RESPONSECODE IFDOpenIFD(READER_CONTEXT * rContext)
 	(void)pthread_mutex_lock(rContext->mMutex);
 
 #ifndef PCSCLITE_STATIC_DRIVER
-	if (rContext->version == IFD_HVERSION_2_0)
+	if (IFDH_create_channel_by_name)
 	{
-		rv = (*IFDH_create_channel) (rContext->slot, rContext->port);
-	} else
-	{
-		/* use device name only if defined */
 		if (rContext->device[0] != '\0')
 			rv = (*IFDH_create_channel_by_name) (rContext->slot, rContext->device);
 		else
 			rv = (*IFDH_create_channel) (rContext->slot, rContext->port);
 	}
+	else
+		rv = (*IFDH_create_channel) (rContext->slot, rContext->port);
 #else
 #if defined(IFDHANDLERv2)
 	rv = IFDHCreateChannel(rContext->slot, rContext->port);
