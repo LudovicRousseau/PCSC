@@ -749,7 +749,7 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	int supportedChannels = 0;
 	bool usedDigits[pcsclite_max_reader_context];
 	int i;
-	const char *extend = "";
+	const char *extend = NULL;
 
 	/* Clear the list */
 	for (i = 0; i < pcsclite_max_reader_context; i++)
@@ -841,6 +841,8 @@ LONG RFSetReaderName(READER_CONTEXT * rContext, const char *readerName,
 	extend = SYS_GetEnv("PCSCLITE_FILTER_EXTEND_READER_NAMES");
 	if (NULL == extend)
 		extend = "";
+#else
+	extend = "";
 #endif
 
 	snprintf(rContext->readerState.readerName,
