@@ -1417,7 +1417,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 					rv = SCARD_E_INSUFFICIENT_BUFFER;
 				else
 				{
-					strcpy((char *)pbAttr, rContext->readerState.readerName);
+					memcpy(pbAttr, rContext->readerState.readerName, len);
 					rv = SCARD_S_SUCCESS;
 				}
 				*pcbAttrLen = len;
