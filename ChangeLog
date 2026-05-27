@@ -1,3 +1,12 @@
+2.5.0: Ludovic Rousseau
+27 May 2026
+- Do not limit to 16 readers only
+- Remove support of autotools
+- Fix a crash when rescanning serial configs
+- Fix a memory leak in Polkit
+- tokenparser: avoid a crash with corrupted Info.plist files
+- Some other minor improvements
+
 2.4.1: Ludovic Rousseau
 1 January 2026
 - Add backward version support on the client side
