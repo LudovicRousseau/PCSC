@@ -164,8 +164,7 @@ PCSCLITE_FILTER_EXTEND_READER_NAMES=" $HOSTNAME"
 .RE
 .PP
 See
-.UR
-https://blog.apdu.fr/posts/2021/08/pcsc-lite-configuration-using/
+.UR https://blog.apdu.fr/posts/2021/08/pcsc-lite-configuration-using/
 .UE
 for more details.
 .SH "UDEV USB READER FILTERING (LINUX ONLY)"
