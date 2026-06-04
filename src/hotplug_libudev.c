@@ -426,7 +426,29 @@ static void HPAddDevice(struct udev_device *dev)
 	for (index=0; index<readerTrackerNbEntries; index++)
 	{
 		if (readerTracker[index].fullName && !strcmp(sysname, readerTracker[index].sysname))
+		{
+			/* check that the card is working properly, if it isn't, drop the old one */
+			READER_CONTEXT *rContext = NULL;
+			LONG rv = RFReaderInfo(readerTracker[index].fullName, &rContext);
+			if (
+				(SCARD_S_SUCCESS == rv) && rContext &&
+				(rContext->readerState.readerState & SCARD_UNKNOWN)
+			) {
+				Log2(PCSC_LOG_INFO,
+					"Stale reader slot for %s, forcing re-add",
+					readerTracker[index].fullName);
+				RFRemoveReader(readerTracker[index].fullName,
+					PCSCLITE_HP_BASE_PORT + index, REMOVE_READER_FLAG_REMOVED);
+				free(readerTracker[index].devpath);
+				readerTracker[index].devpath = NULL;
+				free(readerTracker[index].fullName);
+				readerTracker[index].fullName = NULL;
+				free(readerTracker[index].sysname);
+				readerTracker[index].sysname = NULL;
+				break;
+			}
 			return;
+		}
 	}
 
 	Log2(PCSC_LOG_INFO, "Adding USB device: %s", driver->readerName);
