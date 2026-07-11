@@ -136,18 +136,13 @@ LONG RFAllocateReaderSpace(unsigned int customMaxReaderHandles)
 	/* Allocate each reader structure */
 	for (i = 0; i < pcsclite_max_reader_context; i++)
 	{
-		sReadersContexts[i] = malloc(sizeof(READER_CONTEXT));
+		sReadersContexts[i] = calloc(1, sizeof(READER_CONTEXT));
 		sReadersContexts[i]->vHandle = NULL;
 		atomic_init(&sReadersContexts[i]->hLockId, 0);
 		atomic_init(&sReadersContexts[i]->contexts, 0);
 		atomic_init(&sReadersContexts[i]->reference, 0);
 
-		/* Zero out each value in the struct */
-		memset(sReadersContexts[i]->readerState.readerName, 0, MAX_READERNAME);
-		memset(sReadersContexts[i]->readerState.cardAtr, 0, MAX_ATR_SIZE);
-		sReadersContexts[i]->readerState.eventCounter = 0;
-		sReadersContexts[i]->readerState.readerState = 0;
-		sReadersContexts[i]->readerState.readerSharing = 0;
+		/* Initialize the readerState struct */
 		sReadersContexts[i]->readerState.cardAtrLength = READER_NOT_INITIALIZED;
 		sReadersContexts[i]->readerState.cardProtocol = SCARD_PROTOCOL_UNDEFINED;
 	}
