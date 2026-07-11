@@ -860,7 +860,7 @@ LONG SCardConnect(SCARDCONTEXT hContext, LPCSTR szReader,
 		return SCARD_E_INVALID_HANDLE;
 
 	memset(scConnectStruct.szReader, 0, sizeof scConnectStruct.szReader);
-	strncpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader);
+	strncpy(scConnectStruct.szReader, szReader, sizeof scConnectStruct.szReader -1);
 	scConnectStruct.szReader[sizeof scConnectStruct.szReader -1] = '\0';
 
 	scConnectStruct.hContext = hContext;
