@@ -3693,6 +3693,10 @@ static LONG getReaderStates(SCONTEXTMAP * currentContextMap)
 		rv = MessageReceive(&array_size, sizeof(array_size), dwClientID);
 		if (rv != SCARD_S_SUCCESS)
 			return rv;
+
+		/* this should not happen but coverity complained */
+		if (array_size < 0)
+			return SCARD_E_INVALID_PARAMETER;
 	}
 
 	if (array_size > pcsclite_max_reader_context)
