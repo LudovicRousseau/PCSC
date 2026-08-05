@@ -505,7 +505,7 @@ static void * ContextThread(LPVOID newContext)
 				/* nothing to read */
 				int32_t array_size = pcsclite_max_reader_context;
 
-				MessageSend(&array_size, sizeof(array_size), filedes);
+				ret = MessageSend(&array_size, sizeof(array_size), filedes);
 			}
 			break;
 
