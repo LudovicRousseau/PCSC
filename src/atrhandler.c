@@ -108,10 +108,17 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 	{
 		short TAi, TBi, TCi, TDi;	/* Interface characters */
 
-		TAi = (Y1i & 0x01) ? pucAtr[p++] : -1;
-		TBi = (Y1i & 0x02) ? pucAtr[p++] : -1;
-		TCi = (Y1i & 0x04) ? pucAtr[p++] : -1;
-		TDi = (Y1i & 0x08) ? pucAtr[p++] : -1;
+#define READ_IF_PRESENT(mask, out)                  \
+	do {                                            \
+		if (p >= dwLength || p >= MAX_ATR_SIZE)     \
+			return -5;	/** @retval -5 Maximum attribute size */ \
+		(out) = (Y1i & (mask)) ? pucAtr[p++] : -1;  \
+	} while (0)
+
+		READ_IF_PRESENT(0x01, TAi);
+		READ_IF_PRESENT(0x02, TBi);
+		READ_IF_PRESENT(0x04, TCi);
+		READ_IF_PRESENT(0x08, TDi);
 
 		/* We don't use TBi and TCi but we must calculate them because
 		 * of the p++ in the formulae */
@@ -199,9 +206,6 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 					return -4; /** @retval -4 Unable do decode T protocol */
 			}
 		}
-
-		if (p > MAX_ATR_SIZE)
-			return -5;	/** @retval -5 Maximum attribute size */
 
 		/* next interface characters index */
 		i++;
