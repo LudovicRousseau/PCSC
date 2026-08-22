@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           sudo apt update
-          sudo apt install \
+          sudo apt install -y \
             autoconf-archive \
             debhelper-compat \
             doxygen \
