@@ -65,13 +65,26 @@ static void * EHStatusHandlerThread(READER_CONTEXT *);
 
 LONG EHRegisterClientForEvent(int32_t filedes)
 {
+	LONG rv = SCARD_S_SUCCESS;
+	int lrv;
+
 	(void)pthread_mutex_lock(&ClientsWaitingForEvent_lock);
 
-	(void)list_append(&ClientsWaitingForEvent, &filedes);
+	if (list_locate(&ClientsWaitingForEvent, &filedes) < 0)
+	{
+	    lrv = list_append(&ClientsWaitingForEvent, &filedes);
+	    if (lrv < 0)
+			rv = SCARD_E_NO_MEMORY;
+	}
+	else
+	{
+		Log2(PCSC_LOG_ERROR, "Client %d already in list", filedes);
+		rv = SCARD_E_INVALID_VALUE;
+	}
 
 	(void)pthread_mutex_unlock(&ClientsWaitingForEvent_lock);
 
-	return SCARD_S_SUCCESS;
+	return rv;
 } /* EHRegisterClientForEvent */
 
 /**
