@@ -327,6 +327,15 @@ RESPONSECODE IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 		return SCARD_E_NOT_TRANSACTED;
 	}
 
+	if (*pdwAtrLen > MAX_ATR_SIZE)
+	{
+		Log3(PCSC_LOG_CRITICAL,
+			"Driver reported ATR length %lu exceeds maximum of %u",
+			*pdwAtrLen, MAX_ATR_SIZE);
+		*pdwAtrLen = 0;
+		return SCARD_E_INSUFFICIENT_BUFFER;
+	}
+
 	return rv;
 }
 
