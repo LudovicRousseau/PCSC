@@ -799,6 +799,9 @@ void HPReCheckSerialReaders(void)
 	/* re-scan the USB bus */
 	HPScanUSB(Udev);
 
+#ifdef USE_SERIAL
+	RFReCheckReaderConf();
+#endif
 } /* HPReCheckSerialReaders */
 
 #endif
