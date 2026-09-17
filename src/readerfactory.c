@@ -1587,7 +1587,7 @@ void RFReCheckReaderConf(void)
 					present = true;
 
 					/* verify the reader is still connected */
-					if (IFDStatusICC(sReadersContexts[r], &dwStatus)
+					if (IFDStatusICC(sReadersContexts[r], &dwStatus, false)
 						!= SCARD_S_SUCCESS)
 					{
 						Log2(PCSC_LOG_INFO, "Reader %s disappeared",

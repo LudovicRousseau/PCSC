@@ -290,7 +290,7 @@ RESPONSECODE IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
 	/*
 	 * Check that the card is inserted first
 	 */
-	rv = IFDStatusICC(rContext, &dwStatus);
+	rv = IFDStatusICC(rContext, &dwStatus, true);
 	if (rv != SCARD_S_SUCCESS)
 		return rv;
 
@@ -334,7 +334,7 @@ RESPONSECODE IFDPowerICC(READER_CONTEXT * rContext, DWORD dwAction,
  * Provide statistical information about the IFD and ICC including insertions,
  * atr, powering status/etc.
  */
-LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus)
+LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus, bool hotplug)
 {
 	RESPONSECODE rv;
 	DWORD dwCardStatus = 0;
@@ -369,7 +369,8 @@ LONG IFDStatusICC(READER_CONTEXT * rContext, PDWORD pdwStatus)
 
 			if (rv == IFD_NO_SUCH_DEVICE)
 			{
-				(void)SendHotplugSignal();
+				if (hotplug)
+					(void)SendHotplugSignal();
 				return SCARD_E_READER_UNAVAILABLE;
 			}
 

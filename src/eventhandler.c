@@ -218,7 +218,7 @@ LONG EHSpawnEventHandler(READER_CONTEXT * rContext)
 	LONG rv;
 	DWORD dwStatus = 0;
 
-	rv = IFDStatusICC(rContext, &dwStatus);
+	rv = IFDStatusICC(rContext, &dwStatus, false);
 	if (rv != SCARD_S_SUCCESS)
 	{
 		Log2(PCSC_LOG_ERROR, "Initial Check Failed on %s",
@@ -260,7 +260,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	readerName = rContext->readerState.readerName;
 #endif
 
-	rv = IFDStatusICC(rContext, &dwStatus);
+	rv = IFDStatusICC(rContext, &dwStatus, true);
 
 	if ((SCARD_S_SUCCESS == rv) && (dwStatus & SCARD_PRESENT))
 	{
@@ -325,7 +325,7 @@ static void * EHStatusHandlerThread(READER_CONTEXT * rContext)
 	{
 		dwStatus = 0;
 
-		rv = IFDStatusICC(rContext, &dwStatus);
+		rv = IFDStatusICC(rContext, &dwStatus, true);
 
 		if (rv != SCARD_S_SUCCESS)
 		{

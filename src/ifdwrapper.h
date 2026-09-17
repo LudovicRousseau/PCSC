@@ -39,6 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __ifdwrapper_h__
 #define __ifdwrapper_h__
 
+#include <stdbool.h>
 #include "ifdhandler.h"
 #include "readerfactory.h"
 #include "wintypes.h"
@@ -46,7 +47,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	RESPONSECODE IFDOpenIFD(READER_CONTEXT *);
 	RESPONSECODE IFDCloseIFD(READER_CONTEXT *);
 	RESPONSECODE IFDPowerICC(READER_CONTEXT *, DWORD, PUCHAR, /*@out@*/ PDWORD);
-	LONG IFDStatusICC(READER_CONTEXT *, /*@out@*/ PDWORD);
+	LONG IFDStatusICC(READER_CONTEXT *, /*@out@*/ PDWORD, bool);
 	LONG IFDControl_v2(READER_CONTEXT *, PUCHAR, DWORD, /*@out@*/ PUCHAR,
 		PDWORD);
 	LONG IFDControl(READER_CONTEXT *, DWORD, LPCVOID, DWORD, LPVOID,
