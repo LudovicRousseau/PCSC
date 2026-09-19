@@ -1,3 +1,8 @@
+2.5.2: Ludovic Rousseau
+19 September 2026
+- hotplug_libudev: rescan "serial" readers in HPReCheckSerialReaders
+- fix minor issues found by AI tool
+
 2.5.1: Ludovic Rousseau
 10 June 2026
 - Fix a bug (introduced in 2.5.0) with multi-slots readers
