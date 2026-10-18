@@ -139,8 +139,10 @@ if get_option('polkit')
   polkit_dep = dependency('polkit-gobject-1')
   pcscd_dep += polkit_dep
   conf_data.set('HAVE_POLKIT', true)
-  confgen_data.set('requires_polkit', 'Requires=polkit.service')
+  confgen_data.set('polkit_dependencies', 'Wants=polkit.service\nAfter=polkit.service')
   features += 'polkit'
+else
+  confgen_data.set('polkit_dependencies', '')
 endif
 
 systemdunit = get_option('systemdunit')
