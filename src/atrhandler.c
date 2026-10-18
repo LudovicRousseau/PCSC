@@ -110,9 +110,14 @@ short ATRDecodeAtr(int *availableProtocols, int *currentProtocol,
 
 #define READ_IF_PRESENT(mask, out)                  \
 	do {                                            \
-		if (p >= dwLength || p >= MAX_ATR_SIZE)     \
-			return -5;	/** @retval -5 Maximum attribute size */ \
-		(out) = (Y1i & (mask)) ? pucAtr[p++] : -1;  \
+		if (Y1i & (mask))                           \
+		{                                           \
+			if (p >= dwLength || p >= MAX_ATR_SIZE) \
+				return -5;	/** @retval -5 Maximum attribute size */ \
+			(out) = pucAtr[p++];                    \
+		}                                           \
+		else                                        \
+			(out) = -1;                             \
 	} while (0)
 
 		READ_IF_PRESENT(0x01, TAi);
