@@ -1,3 +1,9 @@
+2.5.3: Ludovic Rousseau
+18 October 2026
+- pcscd.service: preserve card sessions across polkit restarts
+- correctly decode all ATRs (fix the fix suggested by AI)
+- Fix authorization for uid > 65536
+
 2.5.2: Ludovic Rousseau
 19 September 2026
 - hotplug_libudev: rescan "serial" readers in HPReCheckSerialReaders
