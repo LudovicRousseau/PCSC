@@ -7,7 +7,7 @@ on: [push, pull_request]
 # A workflow run is made up of one or more jobs that can run
 # sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # This workflow contains a job called "build" for CI builds
   build:
     runs-on: ubuntu-latest
 
@@ -45,6 +45,54 @@ jobs:
           find /tmp/pcsc
 
           meson dist
+
+          # doxygen
+          meson compile doc
+
+          meson setup --reconfigure -Dlibsystemd=false -Dlibudev=false -Dpolkit=false
+          meson compile
+
+          meson setup --reconfigure -Dserial=true
+          meson compile
+
+          meson setup --reconfigure -Dembedded=true
+          meson compile
+
+  local-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: setup prerequisites
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            autoconf-archive \
+            debhelper-compat \
+            doxygen \
+            dpkg-dev \
+            flex \
+            libpolkit-gobject-1-dev \
+            libsystemd-dev \
+            libudev-dev \
+            libusb-1.0-0-dev \
+            meson \
+            pkg-config
+
+      - name: compile
+        shell: bash
+        run: |
+          export CFLAGS="-Wall -Wextra -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wold-style-definition -Wpointer-arith -Wredundant-decls -Wshadow -Wstrict-prototypes -Wswitch-enum -Wundef -Wuninitialized -Wunused -Wwrite-strings -Wmissing-noreturn -flto=auto -O2"
+          meson setup builddir --werror
+          cd builddir
+
+          # Use ../dist to write to repo root outside builddir
+          DESTDIR=../dist meson install
+          find ../dist
+
+          meson dist --allow-dirty
 
           # doxygen
           meson compile doc
