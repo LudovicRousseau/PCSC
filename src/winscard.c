@@ -105,6 +105,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/time.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "pcscd.h"
 #include "winscard.h"
@@ -1007,30 +1008,34 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 
 	if (PCSCLITE_SHARING_NO_CONTEXT == rContext->contexts)
 	{
-		RESPONSECODE (*fct)(DWORD) = NULL;
-		DWORD dwGetSize;
+		bool wakeup = false;
 
 		(void)pthread_mutex_lock(&rContext->powerState_lock);
 		/* Switch to POWER_STATE_GRACE_PERIOD unless the card was not
 		 * powered */
 		if (POWER_STATE_POWERED <= rContext->powerState)
 		{
+			wakeup = true;
 			rContext->powerState = POWER_STATE_GRACE_PERIOD;
 			Log1(PCSC_LOG_DEBUG, "powerState: POWER_STATE_GRACE_PERIOD");
 		}
 
 		(void)pthread_mutex_unlock(&rContext->powerState_lock);
 
-		/* ask to stop the "polling" thread so it can be restarted using
-		 * the correct timeout */
-		dwGetSize = sizeof(fct);
-		rv = IFDGetCapabilities(rContext, TAG_IFD_STOP_POLLING_THREAD,
-			&dwGetSize, (PUCHAR)&fct);
-
-		if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
+		if (wakeup)
 		{
-			Log1(PCSC_LOG_INFO, "Stopping polling thread");
-			fct(rContext->slot);
+			/* ask to stop the "polling" thread so it can be restarted using
+			 * the correct timeout */
+			RESPONSECODE (*fct)(DWORD) = NULL;
+			DWORD dwGetSize = sizeof(fct);
+			rv = IFDGetCapabilities(rContext, TAG_IFD_STOP_POLLING_THREAD,
+				&dwGetSize, (PUCHAR)&fct);
+
+			if ((IFD_SUCCESS == rv) && (dwGetSize == sizeof(fct)))
+			{
+				Log1(PCSC_LOG_INFO, "Stopping polling thread");
+				fct(rContext->slot);
+			}
 		}
 	}
 
