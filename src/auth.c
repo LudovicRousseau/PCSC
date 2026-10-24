@@ -113,8 +113,8 @@ unsigned IsClientAuthorized(int socket, const char* action, const char* reader)
 	if (authority == NULL)
 	{
 		Log2(PCSC_LOG_CRITICAL, "polkit_authority_get_sync failed: %s",
-			error->message);
-		g_error_free(error);
+			error ? error->message : "(no GError)");
+		g_clear_error(&error);
 		return 0;
 	}
 
