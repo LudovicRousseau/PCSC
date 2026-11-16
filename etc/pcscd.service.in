@@ -29,7 +29,6 @@ UMask=0077
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
-PrivateUsers=full
 ProtectHostname=yes
 ProtectClock=yes
 ProtectKernelTunables=yes
