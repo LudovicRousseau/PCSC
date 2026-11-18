@@ -32,7 +32,8 @@ jobs:
             libudev-dev \
             libusb-1.0-0-dev \
             meson \
-            pkg-config
+            pkg-config \
+            systemd-dev
 
       - name: compile
         shell: bash
