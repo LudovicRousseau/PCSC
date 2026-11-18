@@ -1,3 +1,8 @@
+2.5.4: Ludovic Rousseau
+18 November 2026
+- systemd: do not use PrivateUsers= and fix a regression introduced in 2.5.3
+- avoid a bug in polkit
+
 2.5.3: Ludovic Rousseau
 18 October 2026
 - pcscd.service: preserve card sessions across polkit restarts
